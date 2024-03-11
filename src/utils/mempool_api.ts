@@ -18,14 +18,6 @@ function utxosInfoUrl(address: String): URL {
   return new URL(mempoolAPI + "address/" + address + "/utxo");
 }
 
-function transactionStatusURL(txID: String): URL {
-  return new URL(`${mempoolAPI}tx/${txID}/status`);
-}
-
-function blockTipURL(): URL {
-  return new URL(`${mempoolAPI}blocks/tip/height`);
-}
-
 export async function broadcastTransaction(txhex: string): Promise<string> {
   const response = await fetch(pushTxUrl(), {
     method: "POST",
@@ -60,29 +52,6 @@ export async function getAddressBalance(address: String): Promise<number> {
       addressInfo.chain_stats.funded_txo_sum -
       addressInfo.chain_stats.spent_txo_sum
     );
-  }
-}
-
-export async function getTip(): Promise<number> {
-  const response = await fetch(blockTipURL());
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
-  } else {
-    return await response.json();
-  }
-}
-
-export async function getTransactionStatus(
-  txID: string,
-): Promise<{ txID: string; blockHeight: number }> {
-  const response = await fetch(transactionStatusURL(txID));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
-  } else {
-    const data = await response.json();
-    return { txID, blockHeight: data?.block_height || 0 };
   }
 }
 
