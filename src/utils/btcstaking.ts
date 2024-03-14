@@ -158,18 +158,55 @@ export class StakingScriptData {
     ]);
   }
 
+  buildTimelockDataScript(): Buffer {
+    // 4 bytes for magic bytes
+    const magicBytes = Buffer.alloc(4);
+    magicBytes.writeUInt32LE(1, 0);
+    // 1 byte for version
+    const version = Buffer.alloc(1);
+    version.writeUInt8(2);
+    // SerializedStakingData = MagicBytes || Version || StakerPublicKey || FinalityProviderPublicKey || StakingTime
+    const serializedStakingData = Buffer.concat([
+      magicBytes,
+      version,
+      this.stakerKey,
+      this.finalityProviderKeys[0],
+      script.number.encode(this.stakingTime),
+    ]);
+    // OP_DATA_71 is not defined in bitcoinjs-lib
+    // https://gist.github.com/qikcoin/10006199
+    const OP_DATA_71 = 71;
+    const result = script.compile([
+      opcodes.OP_RETURN,
+      OP_DATA_71,
+      serializedStakingData,
+    ]);
+    console.log("timelockDataScript", {
+      magicBytes: magicBytes.toString("hex"),
+      version: version.toString("hex"),
+      stakerKey: this.stakerKey.toString("hex"),
+      finalityProviderKeys: this.finalityProviderKeys[0].toString("hex"),
+      stakingTime: script.number.encode(this.stakingTime).toString("hex"),
+      serializedStakingData: serializedStakingData.toString("hex"),
+      StakingDataPkScript: result.toString("hex"),
+    });
+    return result;
+  }
+
   // buildScripts creates the timelock, unbonding and slashing scripts
   buildScripts(): {
     timelockScript: Buffer;
     unbondingScript: Buffer;
     slashingScript: Buffer;
     unbondingTimelockScript: Buffer;
+    timelockDataScript: Buffer;
   } {
     return {
       timelockScript: this.buildTimelockScript(),
       unbondingScript: this.buildUnbondingScript(),
       slashingScript: this.buildSlashingScript(),
       unbondingTimelockScript: this.buildUnbondingTimelockScript(),
+      timelockDataScript: this.buildTimelockDataScript(),
     };
   }
 
@@ -241,6 +278,7 @@ export class StakingScriptData {
 //   - The second one corresponds to the change from spending the amount and the transaction fee
 export function stakingTransaction(
   timelockScript: Buffer,
+  timelockDataScript: Buffer,
   unbondingScript: Buffer,
   slashingScript: Buffer,
   amount: number,
@@ -250,10 +288,18 @@ export function stakingTransaction(
   network: networks.Network,
   publicKeyNoCoord?: Buffer,
 ): Psbt {
-  // - Sum of inputs is more than the staking amount + the fee
-  // - The change address is a valid address
-  // - The amount and fee are more than 0
-
+  console.log("stakingTransaction input", {
+    timelockScript: timelockScript.toString("hex"),
+    timelockDataScript: timelockDataScript.toString("hex"),
+    unbondingScript: unbondingScript.toString("hex"),
+    slashingScript: slashingScript.toString("hex"),
+    amount,
+    fee,
+    changeAddress,
+    inputUTXOs,
+    network: "signet",
+    publicKeyNoCoord: publicKeyNoCoord?.toString("hex"),
+  });
   // Create a partially signed transaction
   const psbt = new Psbt({ network });
   // Add the UTXOs provided as inputs to the transaction
@@ -273,10 +319,16 @@ export function stakingTransaction(
     inputsSum += input.value;
   }
 
+  // TODO check if the order correct
   const scriptTree: Taptree = [
-    {
-      output: slashingScript,
-    },
+    [
+      {
+        output: timelockDataScript,
+      },
+      {
+        output: slashingScript,
+      },
+    ],
     [{ output: unbondingScript }, { output: timelockScript }],
   ];
 

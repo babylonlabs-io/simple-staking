@@ -104,13 +104,14 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
     const timelockScript = scripts.timelockScript;
+    const timelockDataScript = scripts.timelockDataScript;
     const unbondingScript = scripts.unbondingScript;
     const slashingScript = scripts.slashingScript;
-    // const unbondingTimelockScript = scripts.unbondingTimelockScript;
     let unsignedStakingTx = null;
     try {
       unsignedStakingTx = btcstaking.stakingTransaction(
         timelockScript,
+        timelockDataScript,
         unbondingScript,
         slashingScript,
         stakingAmount,
@@ -126,6 +127,7 @@ const Home: React.FC<HomeProps> = () => {
       );
       return;
     }
+    console.log("unsignedStakingTx", unsignedStakingTx.toHex());
     let stakingTx = null;
     try {
       stakingTx = await btcWallet.signTransaction(unsignedStakingTx);
@@ -133,6 +135,7 @@ const Home: React.FC<HomeProps> = () => {
       console.log(error?.message || "Staking transaction signing error");
       return;
     }
+    console.log("stakingTx", stakingTx.toHex());
     setStakingTx(stakingTx.toHex());
 
     let txID = "";
@@ -141,6 +144,7 @@ const Home: React.FC<HomeProps> = () => {
     } catch (error: Error | any) {
       console.log(error?.message || "Broadcasting staking transaction error");
     }
+    console.log("txID", txID);
     setMempoolTxID(txID);
   };
 
