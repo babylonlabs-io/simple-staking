@@ -36,16 +36,6 @@ export class OKXWalletInfo {
     return response.map((tx: any) => Psbt.fromHex(tx).extractTransaction());
   }
 
-  async signDataBip322(msg: string): Promise<Buffer> {
-    const method = "bip322-simple";
-
-    const response = await window?.okxwallet?.bitcoinSignet?.signMessage(
-      msg,
-      method,
-    );
-    return Buffer.from(response, "base64");
-  }
-
   btclibNetwork(): networks.Network {
     return this.network;
   }

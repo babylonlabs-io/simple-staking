@@ -11,10 +11,7 @@ import {
   FinalityProvider,
   data as finalityProvidersMock,
 } from "@/mock/finality_providers";
-import {
-  BtcStakingParams,
-  data as btcStakingParamsMock,
-} from "@/mock/btc_staking_params";
+import { data as btcStakingParamsMock } from "@/mock/btc_staking_params";
 import * as btcstaking from "@/utils/btcstaking";
 import * as mempoolApi from "@/utils/mempool_api";
 
