@@ -138,14 +138,14 @@ const Home: React.FC<HomeProps> = () => {
     console.log("stakingTx", stakingTx.toHex());
     setStakingTx(stakingTx.toHex());
 
-    let txID = "";
-    try {
-      txID = await mempoolApi.broadcastTransaction(stakingTx.toHex());
-    } catch (error: Error | any) {
-      console.log(error?.message || "Broadcasting staking transaction error");
-    }
-    console.log("txID", txID);
-    setMempoolTxID(txID);
+    // let txID = "";
+    // try {
+    //   txID = await mempoolApi.broadcastTransaction(stakingTx.toHex());
+    // } catch (error: Error | any) {
+    //   console.log(error?.message || "Broadcasting staking transaction error");
+    // }
+    // console.log("txID", txID);
+    // setMempoolTxID(txID);
   };
 
   useEffect(() => {

@@ -6,7 +6,7 @@ import {
   opcodes,
   networks,
 } from "bitcoinjs-lib";
-import { Taptree } from "bitcoinjs-lib/src/types";
+import { Tapleaf, Taptree } from "bitcoinjs-lib/src/types";
 import ecc from "@bitcoinerlab/secp256k1";
 
 // internalPubKey denotes an unspendable internal public key to be used for the taproot output
@@ -160,11 +160,11 @@ export class StakingScriptData {
 
   buildTimelockDataScript(): Buffer {
     // 4 bytes for magic bytes
-    const magicBytes = Buffer.alloc(4);
-    magicBytes.writeUInt32LE(1, 0);
+    const magicBytes = Buffer.from("01020304", "hex");
     // 1 byte for version
     const version = Buffer.alloc(1);
-    version.writeUInt8(2);
+    version.writeUInt8(0);
+    console.log("version", version.toString("hex"));
     // SerializedStakingData = MagicBytes || Version || StakerPublicKey || FinalityProviderPublicKey || StakingTime
     const serializedStakingData = Buffer.concat([
       magicBytes,
@@ -175,12 +175,7 @@ export class StakingScriptData {
     ]);
     // OP_DATA_71 is not defined in bitcoinjs-lib
     // https://gist.github.com/qikcoin/10006199
-    const OP_DATA_71 = 71;
-    const result = script.compile([
-      opcodes.OP_RETURN,
-      OP_DATA_71,
-      serializedStakingData,
-    ]);
+    const result = script.compile([opcodes.OP_RETURN, serializedStakingData]);
     console.log("timelockDataScript", {
       magicBytes: magicBytes.toString("hex"),
       version: version.toString("hex"),
@@ -319,16 +314,10 @@ export function stakingTransaction(
     inputsSum += input.value;
   }
 
-  // TODO check if the order correct
   const scriptTree: Taptree = [
-    [
-      {
-        output: timelockDataScript,
-      },
-      {
-        output: slashingScript,
-      },
-    ],
+    {
+      output: slashingScript,
+    },
     [{ output: unbondingScript }, { output: timelockScript }],
   ];
 
@@ -341,6 +330,10 @@ export function stakingTransaction(
   psbt.addOutput({
     address: stakingOutput.address!,
     value: amount,
+  });
+  psbt.addOutput({
+    script: timelockDataScript,
+    value: 0,
   });
   // Add a change output only if there's any amount leftover from the inputs
   if (inputsSum > amount + fee) {
