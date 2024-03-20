@@ -158,7 +158,7 @@ export class StakingScriptData {
     ]);
   }
 
-  buildTimelockDataScript(): Buffer {
+  buildDataEmbedScript(): Buffer {
     // 4 bytes for magic bytes
     const magicBytes = Buffer.from("01020304", "hex");
     // 1 byte for version
@@ -186,14 +186,14 @@ export class StakingScriptData {
     unbondingScript: Buffer;
     slashingScript: Buffer;
     unbondingTimelockScript: Buffer;
-    timelockDataScript: Buffer;
+    dataEmbedScript: Buffer;
   } {
     return {
       timelockScript: this.buildTimelockScript(),
       unbondingScript: this.buildUnbondingScript(),
       slashingScript: this.buildSlashingScript(),
       unbondingTimelockScript: this.buildUnbondingTimelockScript(),
-      timelockDataScript: this.buildTimelockDataScript(),
+      dataEmbedScript: this.buildDataEmbedScript(),
     };
   }
 
@@ -265,7 +265,7 @@ export class StakingScriptData {
 //   - The second one corresponds to the change from spending the amount and the transaction fee
 export function stakingTransaction(
   timelockScript: Buffer,
-  timelockDataScript: Buffer,
+  dataEmbedScript: Buffer,
   unbondingScript: Buffer,
   slashingScript: Buffer,
   amount: number,
@@ -312,7 +312,7 @@ export function stakingTransaction(
     value: amount,
   });
   psbt.addOutput({
-    script: timelockDataScript,
+    script: dataEmbedScript,
     value: 0,
   });
   // Add a change output only if there's any amount leftover from the inputs

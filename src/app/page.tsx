@@ -104,14 +104,14 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
     const timelockScript = scripts.timelockScript;
-    const timelockDataScript = scripts.timelockDataScript;
+    const dataEmbedScript = scripts.dataEmbedScript;
     const unbondingScript = scripts.unbondingScript;
     const slashingScript = scripts.slashingScript;
     let unsignedStakingTx = null;
     try {
       unsignedStakingTx = btcstaking.stakingTransaction(
         timelockScript,
-        timelockDataScript,
+        dataEmbedScript,
         unbondingScript,
         slashingScript,
         stakingAmount,
