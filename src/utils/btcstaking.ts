@@ -6,7 +6,7 @@ import {
   opcodes,
   networks,
 } from "bitcoinjs-lib";
-import { Tapleaf, Taptree } from "bitcoinjs-lib/src/types";
+import { Taptree } from "bitcoinjs-lib/src/types";
 import ecc from "@bitcoinerlab/secp256k1";
 
 // internalPubKey denotes an unspendable internal public key to be used for the taproot output
@@ -165,23 +165,18 @@ export class StakingScriptData {
     const version = Buffer.alloc(1);
     version.writeUInt8(0);
     // SerializedStakingData = MagicBytes || Version || StakerPublicKey || FinalityProviderPublicKey || StakingTime
+    // 2 bytes for staking time
+    const stakingTime = Buffer.alloc(2);
+    // big endian
+    stakingTime.writeUInt16BE(this.stakingTime);
     const serializedStakingData = Buffer.concat([
       magicBytes,
       version,
       this.stakerKey,
       this.finalityProviderKeys[0],
-      script.number.encode(this.stakingTime),
+      stakingTime,
     ]);
     const result = script.compile([opcodes.OP_RETURN, serializedStakingData]);
-    console.log("timelockDataScript", {
-      magicBytes: magicBytes.toString("hex"),
-      version: version.toString("hex"),
-      stakerKey: this.stakerKey.toString("hex"),
-      finalityProviderKeys: this.finalityProviderKeys[0].toString("hex"),
-      stakingTime: script.number.encode(this.stakingTime).toString("hex"),
-      serializedStakingData: serializedStakingData.toString("hex"),
-      StakingDataPkScript: result.toString("hex"),
-    });
     return result;
   }
 
@@ -280,18 +275,6 @@ export function stakingTransaction(
   network: networks.Network,
   publicKeyNoCoord?: Buffer,
 ): Psbt {
-  console.log("stakingTransaction input", {
-    timelockScript: timelockScript.toString("hex"),
-    timelockDataScript: timelockDataScript.toString("hex"),
-    unbondingScript: unbondingScript.toString("hex"),
-    slashingScript: slashingScript.toString("hex"),
-    amount,
-    fee,
-    changeAddress,
-    inputUTXOs,
-    network: "signet",
-    publicKeyNoCoord: publicKeyNoCoord?.toString("hex"),
-  });
   // Create a partially signed transaction
   const psbt = new Psbt({ network });
   // Add the UTXOs provided as inputs to the transaction
