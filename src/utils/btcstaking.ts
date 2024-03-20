@@ -176,8 +176,7 @@ export class StakingScriptData {
       this.finalityProviderKeys[0],
       stakingTime,
     ]);
-    const result = script.compile([opcodes.OP_RETURN, serializedStakingData]);
-    return result;
+    return script.compile([opcodes.OP_RETURN, serializedStakingData]);
   }
 
   // buildScripts creates the timelock, unbonding and slashing scripts
