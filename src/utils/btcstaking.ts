@@ -158,18 +158,41 @@ export class StakingScriptData {
     ]);
   }
 
+  buildDataEmbedScript(): Buffer {
+    // 4 bytes for magic bytes
+    const magicBytes = Buffer.from("01020304", "hex");
+    // 1 byte for version
+    const version = Buffer.alloc(1);
+    version.writeUInt8(0);
+    // SerializedStakingData = MagicBytes || Version || StakerPublicKey || FinalityProviderPublicKey || StakingTime
+    // 2 bytes for staking time
+    const stakingTime = Buffer.alloc(2);
+    // big endian
+    stakingTime.writeUInt16BE(this.stakingTime);
+    const serializedStakingData = Buffer.concat([
+      magicBytes,
+      version,
+      this.stakerKey,
+      this.finalityProviderKeys[0],
+      stakingTime,
+    ]);
+    return script.compile([opcodes.OP_RETURN, serializedStakingData]);
+  }
+
   // buildScripts creates the timelock, unbonding and slashing scripts
   buildScripts(): {
     timelockScript: Buffer;
     unbondingScript: Buffer;
     slashingScript: Buffer;
     unbondingTimelockScript: Buffer;
+    dataEmbedScript: Buffer;
   } {
     return {
       timelockScript: this.buildTimelockScript(),
       unbondingScript: this.buildUnbondingScript(),
       slashingScript: this.buildSlashingScript(),
       unbondingTimelockScript: this.buildUnbondingTimelockScript(),
+      dataEmbedScript: this.buildDataEmbedScript(),
     };
   }
 
@@ -241,6 +264,7 @@ export class StakingScriptData {
 //   - The second one corresponds to the change from spending the amount and the transaction fee
 export function stakingTransaction(
   timelockScript: Buffer,
+  dataEmbedScript: Buffer,
   unbondingScript: Buffer,
   slashingScript: Buffer,
   amount: number,
@@ -250,10 +274,6 @@ export function stakingTransaction(
   network: networks.Network,
   publicKeyNoCoord?: Buffer,
 ): Psbt {
-  // - Sum of inputs is more than the staking amount + the fee
-  // - The change address is a valid address
-  // - The amount and fee are more than 0
-
   // Create a partially signed transaction
   const psbt = new Psbt({ network });
   // Add the UTXOs provided as inputs to the transaction
@@ -289,6 +309,10 @@ export function stakingTransaction(
   psbt.addOutput({
     address: stakingOutput.address!,
     value: amount,
+  });
+  psbt.addOutput({
+    script: dataEmbedScript,
+    value: 0,
   });
   // Add a change output only if there's any amount leftover from the inputs
   if (inputsSum > amount + fee) {
