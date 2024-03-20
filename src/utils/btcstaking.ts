@@ -164,7 +164,6 @@ export class StakingScriptData {
     // 1 byte for version
     const version = Buffer.alloc(1);
     version.writeUInt8(0);
-    console.log("version", version.toString("hex"));
     // SerializedStakingData = MagicBytes || Version || StakerPublicKey || FinalityProviderPublicKey || StakingTime
     const serializedStakingData = Buffer.concat([
       magicBytes,
@@ -173,8 +172,6 @@ export class StakingScriptData {
       this.finalityProviderKeys[0],
       script.number.encode(this.stakingTime),
     ]);
-    // OP_DATA_71 is not defined in bitcoinjs-lib
-    // https://gist.github.com/qikcoin/10006199
     const result = script.compile([opcodes.OP_RETURN, serializedStakingData]);
     console.log("timelockDataScript", {
       magicBytes: magicBytes.toString("hex"),
