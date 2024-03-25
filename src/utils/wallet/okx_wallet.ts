@@ -1,4 +1,4 @@
-import { networks, Psbt, Transaction } from "bitcoinjs-lib";
+import { Psbt } from "bitcoinjs-lib";
 
 import { WalletProvider, Network } from "./wallet_provider";
 
@@ -67,6 +67,7 @@ export class OKXWallet extends WalletProvider {
         }
         return this.okxWalletInfo.address;
     }
+
     async getPublicKeyHex(): Promise<string> {
         if (!this.okxWalletInfo) {
             throw new Error("OKX Wallet not connected");
@@ -74,7 +75,7 @@ export class OKXWallet extends WalletProvider {
         return this.okxWalletInfo.publicKeyHex;
     }
 
-    async signPsdt(psdtHex: string): Promise<string> {
+    async signPsbt(psdtHex: string): Promise<string> {
         if (!this.okxWalletInfo) {
             throw new Error("OKX Wallet not connected");
         }

@@ -1,8 +1,7 @@
 import { getAddressBalance } from "../mempool_api";
 
 
-const nativeSegwitAddressLength = 42;
-const taprootAddressLength = 62;
+
 
 export type Network = "mainnet" | "testnet" | "regtest" | "signet";
 
@@ -27,21 +26,10 @@ export abstract class WalletProvider {
      * Sign a transaction.
      * @param psbtHex the hex string of psbt to sign
      */
-    abstract signPsdt(unsignedTx: string): Promise<string>;
+    abstract signPsbt(unsignedTx: string): Promise<string>;
 
     // Get network of current account
     abstract getNetwork(): Promise<Network>;
-
-    // Babylon only supports native segwit and taproot address types for now.
-    async isSupportedAddressType(): Promise<boolean> {
-        const address = await this.getAddress();
-        return address.length === nativeSegwitAddressLength || address.length === taprootAddressLength;
-    }
-
-    async isTaproot(): Promise<boolean> {
-        const address = await this.getAddress();
-        return address.length === taprootAddressLength;
-    }
 
     /**
      * Get the balance for the connectted wallet address.

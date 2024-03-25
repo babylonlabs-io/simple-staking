@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { getWallet, toNetwork } from "@/utils/wallet/index";
+import { getWallet, toNetwork, isSupportedAddressType, isTaproot } from "@/utils/wallet/index";
 import { Connect } from "./components/Connect/Connect";
 import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
@@ -38,9 +38,10 @@ const Home: React.FC<HomeProps> = () => {
     try {
       const walletProvider = getWallet();
       await walletProvider.connectWallet();
+      const address = await walletProvider.getAddress();
       // check if the wallet address type is supported in babylon
-      const isSupportedAddressType = await walletProvider.isSupportedAddressType();
-      if (!isSupportedAddressType) {
+      const supported = isSupportedAddressType(address)
+      if (!supported) {
         throw new Error(
           "Invalid address type. Please use a Native SegWit or Taptoor",
         );
@@ -50,8 +51,8 @@ const Home: React.FC<HomeProps> = () => {
       setBTCWallet(walletProvider);
       setBTCWalletBalance(balance);
       setBTCWalletInfo({
-        address: await walletProvider.getAddress(),
-        isTaproot: await walletProvider.isTaproot(),
+        address,
+        isTaproot: isTaproot(address)
       });
 
     } catch (error: Error | any) {
@@ -151,7 +152,7 @@ const Home: React.FC<HomeProps> = () => {
     }
     let stakingTx: string;
     try {
-      stakingTx = await btcWallet.signPsdt(unsignedStakingTx.toHex());
+      stakingTx = await btcWallet.signPsbt(unsignedStakingTx.toHex());
     } catch (error: Error | any) {
       console.log(error?.message || "Staking transaction signing error");
       return;

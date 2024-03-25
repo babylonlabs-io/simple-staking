@@ -1,6 +1,9 @@
 import { OKXWallet } from "./okx_wallet";
 import { Network, WalletProvider } from "./wallet_provider";
-import { networks, Psbt, Transaction } from "bitcoinjs-lib";
+import { networks } from "bitcoinjs-lib";
+
+const nativeSegwitAddressLength = 42;
+const taprootAddressLength = 62;
 
 // Get the wallet provider from the window object, default to OKXWallet if not found.
 export const getWallet = (): WalletProvider => {
@@ -18,4 +21,13 @@ export const toNetwork = (network: Network): networks.Network => {
         default:
             throw new Error("Unsupported network");
     }
+}
+
+export const isSupportedAddressType = (address: string): boolean => {
+    return address.length === nativeSegwitAddressLength || address.length === taprootAddressLength;
+}
+
+
+export const isTaproot = (address: string): boolean => {
+    return address.length === taprootAddressLength;
 }
