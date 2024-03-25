@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { OKXWalletInfo, connectOKXWallet } from "@/utils/okx_wallet";
+import { getWallet, toNetwork } from "@/utils/wallet/index";
 import { Connect } from "./components/Connect/Connect";
 import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
@@ -14,12 +14,20 @@ import {
 import { data as btcStakingParamsMock } from "@/mock/btc_staking_params";
 import * as btcstaking from "@/utils/btcstaking";
 import * as mempoolApi from "@/utils/mempool_api";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
-interface HomeProps {}
+interface HomeProps { }
+
+export type WalletInfo = {
+  address: string;
+  isTaproot: boolean;
+}
 
 const Home: React.FC<HomeProps> = () => {
-  const [btcWallet, setBTCWallet] = useState<OKXWalletInfo>();
+  const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletBalance, setBTCWalletBalance] = useState(0);
+  const [btcWalletInfo, setBTCWalletInfo] = useState<WalletInfo>({ address: "", isTaproot: false });
+
   const [amount, setAmount] = useState(0);
   const [duration, setDuration] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
@@ -28,10 +36,24 @@ const Home: React.FC<HomeProps> = () => {
 
   const handleConnectBTC = async () => {
     try {
-      const wallet = await connectOKXWallet();
-      const balance = await wallet.getBalance();
-      setBTCWallet(wallet);
+      const walletProvider = getWallet();
+      await walletProvider.connectWallet();
+      // check if the wallet address type is supported in babylon
+      const isSupportedAddressType = await walletProvider.isSupportedAddressType();
+      if (!isSupportedAddressType) {
+        throw new Error(
+          "Invalid address type. Please use a Native SegWit or Taptoor",
+        );
+      }
+
+      const balance = await walletProvider.getBalance();
+      setBTCWallet(walletProvider);
       setBTCWalletBalance(balance);
+      setBTCWalletInfo({
+        address: await walletProvider.getAddress(),
+        isTaproot: await walletProvider.isTaproot(),
+      });
+
     } catch (error: Error | any) {
       console.error(error?.message || error);
     }
@@ -68,7 +90,7 @@ const Home: React.FC<HomeProps> = () => {
     let inputUTXOs = [];
     try {
       inputUTXOs = await mempoolApi.getFundingUTXOs(
-        btcWallet.address,
+        btcWalletInfo.address,
         stakingAmount + stakingFee,
       );
     } catch (error: Error | any) {
@@ -82,7 +104,7 @@ const Home: React.FC<HomeProps> = () => {
     let stakingScriptData = null;
     try {
       stakingScriptData = new btcstaking.StakingScriptData(
-        btcWallet.publicKeyNoCoord(),
+        await btcWallet.publicKeyNoCoord(),
         [Buffer.from(finalityProvider.btc_pk_hex, "hex")],
         covenantPKsBuffer,
         btcStakingParamsMock.covenant_quorum,
@@ -116,10 +138,10 @@ const Home: React.FC<HomeProps> = () => {
         slashingScript,
         stakingAmount,
         stakingFee,
-        btcWallet.address,
+        btcWalletInfo.address,
         inputUTXOs,
-        btcWallet.btclibNetwork(),
-        btcWallet.isTaproot ? btcWallet.publicKeyNoCoord() : undefined,
+        toNetwork(await btcWallet.getNetwork()),
+        btcWalletInfo.isTaproot ? (await btcWallet.publicKeyNoCoord()) : undefined,
       );
     } catch (error: Error | any) {
       console.log(
@@ -127,18 +149,18 @@ const Home: React.FC<HomeProps> = () => {
       );
       return;
     }
-    let stakingTx = null;
+    let stakingTx: string;
     try {
-      stakingTx = await btcWallet.signTransaction(unsignedStakingTx);
+      stakingTx = await btcWallet.signPsdt(unsignedStakingTx.toHex());
     } catch (error: Error | any) {
       console.log(error?.message || "Staking transaction signing error");
       return;
     }
-    setStakingTx(stakingTx.toHex());
+    setStakingTx(stakingTx);
 
     let txID = "";
     try {
-      txID = await mempoolApi.broadcastTransaction(stakingTx.toHex());
+      txID = await mempoolApi.broadcastTransaction(stakingTx);
     } catch (error: Error | any) {
       console.log(error?.message || "Broadcasting staking transaction error");
     }
@@ -154,7 +176,7 @@ const Home: React.FC<HomeProps> = () => {
       <div className="container flex flex-col gap-4">
         <Connect
           onConnect={handleConnectBTC}
-          wallet={btcWallet}
+          walletInfo={btcWalletInfo}
           btcWalletBalance={btcWalletBalance}
         />
         <Form
