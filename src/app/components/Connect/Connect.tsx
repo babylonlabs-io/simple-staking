@@ -2,11 +2,10 @@ import Image from "next/image";
 
 import okx from "./okx.svg";
 import { trim } from "@/utils/trim";
-import { WalletInfo } from "@/app/page";
 
 interface ConnectProps {
   onConnect: () => void;
-  walletInfo: WalletInfo;
+  walletInfo: { address: string; isTaproot: boolean };
   btcWalletBalance: number;
 }
 

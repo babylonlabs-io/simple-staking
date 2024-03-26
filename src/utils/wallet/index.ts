@@ -27,7 +27,11 @@ export const isSupportedAddressType = (address: string): boolean => {
     return address.length === nativeSegwitAddressLength || address.length === taprootAddressLength;
 }
 
-
 export const isTaproot = (address: string): boolean => {
     return address.length === taprootAddressLength;
+}
+
+export const getPublicKeyNoCoord = (pkHex: string): Buffer => {
+    const publicKey = Buffer.from(pkHex, "hex");
+    return publicKey.subarray(1, 33);
 }

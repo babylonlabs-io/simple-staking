@@ -84,7 +84,7 @@ export class OKXWallet extends WalletProvider {
             await window?.okxwallet?.bitcoinSignet?.signPsbts([psdtHex]);
 
         // convert the signed PSBTs to transactions
-        return response.map((tx: any) => Psbt.fromHex(tx).extractTransaction());
+        return response.map((tx: any) => Psbt.fromHex(tx).extractTransaction())[0].toHex();
     }
 
     async getNetwork(): Promise<Network> {

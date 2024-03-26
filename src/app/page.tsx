@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-import { getWallet, toNetwork, isSupportedAddressType, isTaproot } from "@/utils/wallet/index";
+import {
+  getWallet, toNetwork,
+  isSupportedAddressType,
+  isTaproot, getPublicKeyNoCoord
+} from "@/utils/wallet/index";
 import { Connect } from "./components/Connect/Connect";
 import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
@@ -18,16 +22,12 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 interface HomeProps { }
 
-export type WalletInfo = {
-  address: string;
-  isTaproot: boolean;
-}
-
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletBalance, setBTCWalletBalance] = useState(0);
-  const [btcWalletInfo, setBTCWalletInfo] = useState<WalletInfo>({ address: "", isTaproot: false });
 
+  const [address, setAddress] = useState("");
+  const [isTaprootAddress, setIsTaprootAddress] = useState(false);
   const [amount, setAmount] = useState(0);
   const [duration, setDuration] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
@@ -50,11 +50,8 @@ const Home: React.FC<HomeProps> = () => {
       const balance = await walletProvider.getBalance();
       setBTCWallet(walletProvider);
       setBTCWalletBalance(balance);
-      setBTCWalletInfo({
-        address,
-        isTaproot: isTaproot(address)
-      });
-
+      setAddress(address);
+      setIsTaprootAddress(isTaproot(address));
     } catch (error: Error | any) {
       console.error(error?.message || error);
     }
@@ -80,6 +77,8 @@ const Home: React.FC<HomeProps> = () => {
 
     const stakingFee = 500;
 
+    const publicKeyNoCoord = getPublicKeyNoCoord(await btcWallet.getPublicKeyHex());
+
     const covenantPKsBuffer = btcStakingParamsMock.covenant_pks.map((pk) =>
       Buffer.from(pk, "hex"),
     );
@@ -91,7 +90,7 @@ const Home: React.FC<HomeProps> = () => {
     let inputUTXOs = [];
     try {
       inputUTXOs = await mempoolApi.getFundingUTXOs(
-        btcWalletInfo.address,
+        address,
         stakingAmount + stakingFee,
       );
     } catch (error: Error | any) {
@@ -105,7 +104,7 @@ const Home: React.FC<HomeProps> = () => {
     let stakingScriptData = null;
     try {
       stakingScriptData = new btcstaking.StakingScriptData(
-        await btcWallet.publicKeyNoCoord(),
+        publicKeyNoCoord,
         [Buffer.from(finalityProvider.btc_pk_hex, "hex")],
         covenantPKsBuffer,
         btcStakingParamsMock.covenant_quorum,
@@ -139,10 +138,10 @@ const Home: React.FC<HomeProps> = () => {
         slashingScript,
         stakingAmount,
         stakingFee,
-        btcWalletInfo.address,
+        address,
         inputUTXOs,
         toNetwork(await btcWallet.getNetwork()),
-        btcWalletInfo.isTaproot ? (await btcWallet.publicKeyNoCoord()) : undefined,
+        isTaprootAddress ? publicKeyNoCoord : undefined,
       );
     } catch (error: Error | any) {
       console.log(
@@ -177,7 +176,7 @@ const Home: React.FC<HomeProps> = () => {
       <div className="container flex flex-col gap-4">
         <Connect
           onConnect={handleConnectBTC}
-          walletInfo={btcWalletInfo}
+          walletInfo={{ address, isTaproot: isTaprootAddress }}
           btcWalletBalance={btcWalletBalance}
         />
         <Form

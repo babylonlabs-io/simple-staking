@@ -40,10 +40,4 @@ export abstract class WalletProvider {
         // mempool call
         return await getAddressBalance(await this.getAddress());
     }
-
-    // Get the public key without the coordinate.
-    async publicKeyNoCoord(): Promise<Buffer> {
-        const publicKey = Buffer.from(await this.getPublicKeyHex(), "hex");
-        return publicKey.subarray(1, 33);
-    }
 }
