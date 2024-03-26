@@ -1,3 +1,5 @@
+import { WalletProvider } from "./wallet/wallet_provider";
+
 export {};
 
 declare global {
@@ -5,5 +7,6 @@ declare global {
     btc: any;
     keplr: any;
     okxwallet: any;
+    btcwallet: WalletProvider;
   }
 }
