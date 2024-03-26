@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 
 import {
-  getWallet, toNetwork,
+  getWallet,
+  toNetwork,
   isSupportedAddressType,
-  isTaproot, getPublicKeyNoCoord
+  isTaproot,
+  getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
 import { Connect } from "./components/Connect/Connect";
 import { Steps } from "./components/Steps/Steps";
@@ -20,14 +22,13 @@ import * as btcstaking from "@/utils/btcstaking";
 import * as mempoolApi from "@/utils/mempool_api";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletBalance, setBTCWalletBalance] = useState(0);
 
   const [address, setAddress] = useState("");
-  const [isTaprootAddress, setIsTaprootAddress] = useState(false);
   const [amount, setAmount] = useState(0);
   const [duration, setDuration] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
@@ -40,7 +41,7 @@ const Home: React.FC<HomeProps> = () => {
       await walletProvider.connectWallet();
       const address = await walletProvider.getAddress();
       // check if the wallet address type is supported in babylon
-      const supported = isSupportedAddressType(address)
+      const supported = isSupportedAddressType(address);
       if (!supported) {
         throw new Error(
           "Invalid address type. Please use a Native SegWit or Taptoor",
@@ -51,7 +52,6 @@ const Home: React.FC<HomeProps> = () => {
       setBTCWallet(walletProvider);
       setBTCWalletBalance(balance);
       setAddress(address);
-      setIsTaprootAddress(isTaproot(address));
     } catch (error: Error | any) {
       console.error(error?.message || error);
     }
@@ -77,7 +77,9 @@ const Home: React.FC<HomeProps> = () => {
 
     const stakingFee = 500;
 
-    const publicKeyNoCoord = getPublicKeyNoCoord(await btcWallet.getPublicKeyHex());
+    const publicKeyNoCoord = getPublicKeyNoCoord(
+      await btcWallet.getPublicKeyHex(),
+    );
 
     const covenantPKsBuffer = btcStakingParamsMock.covenant_pks.map((pk) =>
       Buffer.from(pk, "hex"),
@@ -141,7 +143,7 @@ const Home: React.FC<HomeProps> = () => {
         address,
         inputUTXOs,
         toNetwork(await btcWallet.getNetwork()),
-        isTaprootAddress ? publicKeyNoCoord : undefined,
+        isTaproot(address) ? publicKeyNoCoord : undefined,
       );
     } catch (error: Error | any) {
       console.log(
@@ -176,7 +178,7 @@ const Home: React.FC<HomeProps> = () => {
       <div className="container flex flex-col gap-4">
         <Connect
           onConnect={handleConnectBTC}
-          walletInfo={{ address, isTaproot: isTaprootAddress }}
+          address={address}
           btcWalletBalance={btcWalletBalance}
         />
         <Form

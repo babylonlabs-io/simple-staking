@@ -2,16 +2,17 @@ import Image from "next/image";
 
 import okx from "./okx.svg";
 import { trim } from "@/utils/trim";
+import { isTaproot } from "@/utils/wallet";
 
 interface ConnectProps {
   onConnect: () => void;
-  walletInfo: { address: string; isTaproot: boolean };
+  address: string;
   btcWalletBalance: number;
 }
 
 export const Connect: React.FC<ConnectProps> = ({
   onConnect,
-  walletInfo,
+  address,
   btcWalletBalance,
 }) => {
   return (
@@ -21,10 +22,10 @@ export const Connect: React.FC<ConnectProps> = ({
           <div className="stat">
             <div className="stat-title">Address 🏠</div>
             <div className="stat-value text-base text-primary">
-              {walletInfo.address ? trim(walletInfo.address) : "Not connected"}
+              {address ? trim(address) : "Not connected"}
             </div>
             <div className="stat-desc">
-              {walletInfo.isTaproot ? "Taproot" : "Native SegWit"}
+              {isTaproot(address) ? "Taproot" : "Native SegWit"}
             </div>
           </div>
 
@@ -40,7 +41,7 @@ export const Connect: React.FC<ConnectProps> = ({
         <button
           className="btn btn-primary w-full max-w-sm uppercase"
           onClick={onConnect}
-          disabled={!!walletInfo.address}
+          disabled={!!address}
         >
           <span>Connect</span>
           <Image src={okx} alt="OKX" width={40} />
