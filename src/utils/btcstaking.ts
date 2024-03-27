@@ -20,7 +20,7 @@ export interface UTXO {
   txid: string;
   vout: number;
   value: number;
-  scriptPubKey: String;
+  scriptPubKey: string;
 }
 
 export function initBTCCurve() {

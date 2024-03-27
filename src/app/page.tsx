@@ -19,7 +19,6 @@ import {
 } from "@/mock/finality_providers";
 import { data as btcStakingParamsMock } from "@/mock/btc_staking_params";
 import * as btcstaking from "@/utils/btcstaking";
-import * as mempoolApi from "@/utils/mempool_api";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 interface HomeProps {}
@@ -57,6 +56,21 @@ const Home: React.FC<HomeProps> = () => {
     }
   };
 
+  // Subscribe to account changes
+  useEffect(() => {
+    if (btcWallet) {
+      let once = false;
+      btcWallet.on("accountChanged", () => {
+        if (!once) {
+          handleConnectBTC();
+        }
+      });
+      return () => {
+        once = true;
+      };
+    }
+  }, [btcWallet]);
+
   const handleChooseFinalityProvider = (btcPkHex: string) => {
     const finalityProviderFromMock = finalityProvidersMock.find(
       (fp) => fp.btc_pk_hex === btcPkHex,
@@ -91,7 +105,7 @@ const Home: React.FC<HomeProps> = () => {
     const stakingDuration = Number(duration) * 24 * 6;
     let inputUTXOs = [];
     try {
-      inputUTXOs = await mempoolApi.getFundingUTXOs(
+      inputUTXOs = await btcWallet.getUtxos(
         address,
         stakingAmount + stakingFee,
       );
@@ -162,7 +176,7 @@ const Home: React.FC<HomeProps> = () => {
 
     let txID = "";
     try {
-      txID = await mempoolApi.broadcastTransaction(stakingTx);
+      txID = await btcWallet.pushTx(stakingTx);
     } catch (error: Error | any) {
       console.log(error?.message || "Broadcasting staking transaction error");
     }
@@ -176,6 +190,7 @@ const Home: React.FC<HomeProps> = () => {
   return (
     <main className="container mx-auto flex h-full min-h-svh w-full justify-center p-4">
       <div className="container flex flex-col gap-4">
+        <button onClick={() => btcWallet?.getNetworkFees()}>get fees</button>
         <Connect
           onConnect={handleConnectBTC}
           address={address}

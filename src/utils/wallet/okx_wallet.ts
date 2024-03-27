@@ -79,18 +79,47 @@ export class OKXWallet extends WalletProvider {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
+    return (await this.signPsbts([psbtHex]))[0];
+  }
+
+  async signPsbts(psbtsHexes: string[]): Promise<string[]> {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
     // sign the PSBTs
-    const response = await window?.okxwallet?.bitcoinSignet?.signPsbts([
-      psbtHex,
-    ]);
+    const response =
+      await window?.okxwallet?.bitcoinSignet?.signPsbts(psbtsHexes);
 
     // convert the signed PSBTs to transactions
-    return response
-      .map((tx: any) => Psbt.fromHex(tx).extractTransaction())[0]
-      .toHex();
+    return response.map((tx: any) =>
+      Psbt.fromHex(tx).extractTransaction().toHex(),
+    );
+  }
+
+  async signMessage(
+    message: string,
+    method?: string | undefined,
+  ): Promise<string> {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
+    return await window?.okxwallet?.bitcoinSignet?.signMessage(
+      message,
+      method || "bip322-simple",
+    );
   }
 
   async getNetwork(): Promise<Network> {
     return "testnet";
+  }
+
+  on(eventName: string, callBack: () => void) {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
+    // subscribe to account change event
+    if (eventName === "accountChanged") {
+      return window.okxwallet.bitcoinSignet.on(eventName, callBack);
+    }
   }
 }

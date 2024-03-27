@@ -2,11 +2,11 @@ import { UTXO } from "./btcstaking";
 
 const mempoolAPI = `${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/api/`;
 
-function addressInfoUrl(address: String): URL {
+function addressInfoUrl(address: string): URL {
   return new URL(mempoolAPI + "address/" + address);
 }
 
-function txInfoUrl(txid: String): URL {
+function txInfoUrl(txid: string): URL {
   return new URL(mempoolAPI + "tx/" + txid);
 }
 
@@ -14,14 +14,18 @@ function pushTxUrl(): URL {
   return new URL(mempoolAPI + "tx");
 }
 
-function utxosInfoUrl(address: String): URL {
+function utxosInfoUrl(address: string): URL {
   return new URL(mempoolAPI + "address/" + address + "/utxo");
 }
 
-export async function broadcastTransaction(txhex: string): Promise<string> {
+function networkFeesUrl(): URL {
+  return new URL(mempoolAPI + "v1/fees/recommended");
+}
+
+export async function pushTx(txHex: string): Promise<string> {
   const response = await fetch(pushTxUrl(), {
     method: "POST",
-    body: txhex,
+    body: txHex,
   });
   if (!response.ok) {
     try {
@@ -41,7 +45,7 @@ export async function broadcastTransaction(txhex: string): Promise<string> {
   }
 }
 
-export async function getAddressBalance(address: String): Promise<number> {
+export async function getAddressBalance(address: string): Promise<number> {
   const response = await fetch(addressInfoUrl(address));
   if (!response.ok) {
     const err = await response.text();
@@ -55,10 +59,28 @@ export async function getAddressBalance(address: String): Promise<number> {
   }
 }
 
+export type Fees = {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+};
+
+export async function getNetworkFees(): Promise<Fees> {
+  const response = await fetch(networkFeesUrl());
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err);
+  } else {
+    return await response.json();
+  }
+}
+
 // Get available UTXOs in order to find a set of those that satisfy
 // the `amount` requirement.
 export async function getFundingUTXOs(
-  address: String,
+  address: string,
   amount: number,
 ): Promise<UTXO[]> {
   // Get all UTXOs for the given address
