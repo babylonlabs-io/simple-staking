@@ -1,6 +1,6 @@
+import { Fees } from "@/types/Fees";
 import { UTXO } from "../btcstaking";
 import {
-  Fees,
   getAddressBalance,
   getFundingUTXOs,
   getNetworkFees,

@@ -1,3 +1,4 @@
+import { Fees } from "@/types/Fees";
 import { UTXO } from "./btcstaking";
 
 const mempoolAPI = `${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/api/`;
@@ -58,14 +59,6 @@ export async function getAddressBalance(address: string): Promise<number> {
     );
   }
 }
-
-export type Fees = {
-  fastestFee: number;
-  halfHourFee: number;
-  hourFee: number;
-  economyFee: number;
-  minimumFee: number;
-};
 
 export async function getNetworkFees(): Promise<Fees> {
   const response = await fetch(networkFeesUrl());
