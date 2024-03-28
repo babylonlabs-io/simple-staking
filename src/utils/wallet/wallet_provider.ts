@@ -72,6 +72,14 @@ export abstract class WalletProvider {
   abstract signMessage(message: string, method?: string): Promise<string>;
 
   /**
+   * Registers an event listener for the specified event.
+   * At the moment, only the "accountChanged" event is supported.
+   * @param eventName - The name of the event to listen for.
+   * @param callBack - The callback function to be executed when the event occurs.
+   */
+  abstract on(eventName: string, callBack: () => void): void;
+
+  /**
    * Gets the balance for the connected wallet address.
    * By default, this method will return the mempool balance if not implemented by the child class.
    * @returns A promise that resolves to the balance of the wallet.
@@ -110,12 +118,4 @@ export abstract class WalletProvider {
     // mempool call
     return await getFundingUTXOs(address, amount);
   }
-
-  /**
-   * Registers an event listener for the specified event.
-   * At the moment, only the "accountChanged" event is supported.
-   * @param eventName - The name of the event to listen for.
-   * @param callBack - The callback function to be executed when the event occurs.
-   */
-  abstract on(eventName: string, callBack: () => void): void;
 }
