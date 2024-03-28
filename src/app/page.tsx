@@ -110,11 +110,11 @@ const Home: React.FC<HomeProps> = () => {
         stakingAmount + stakingFee,
       );
     } catch (error: Error | any) {
-      console.log(error?.message || "UTXOs error");
+      console.error(error?.message || "UTXOs error");
       return;
     }
     if (inputUTXOs.length == 0) {
-      console.log("Confirmed UTXOs not enough");
+      console.error("Confirmed UTXOs not enough");
       return;
     }
     let stakingScriptData = null;
@@ -131,14 +131,14 @@ const Home: React.FC<HomeProps> = () => {
         throw new Error("Invalid staking data");
       }
     } catch (error: Error | any) {
-      console.log(error?.message || "Cannot build staking script data");
+      console.error(error?.message || "Cannot build staking script data");
       return;
     }
     let scripts = null;
     try {
       scripts = stakingScriptData.buildScripts();
     } catch (error: Error | any) {
-      console.log(error?.message || "Cannot build staking scripts");
+      console.error(error?.message || "Cannot build staking scripts");
       return;
     }
     const timelockScript = scripts.timelockScript;
@@ -160,7 +160,7 @@ const Home: React.FC<HomeProps> = () => {
         isTaproot(address) ? publicKeyNoCoord : undefined,
       );
     } catch (error: Error | any) {
-      console.log(
+      console.error(
         error?.message || "Cannot build unsigned staking transaction",
       );
       return;
@@ -169,7 +169,7 @@ const Home: React.FC<HomeProps> = () => {
     try {
       stakingTx = await btcWallet.signPsbt(unsignedStakingTx.toHex());
     } catch (error: Error | any) {
-      console.log(error?.message || "Staking transaction signing error");
+      console.error(error?.message || "Staking transaction signing error");
       return;
     }
     setStakingTx(stakingTx);
@@ -178,7 +178,7 @@ const Home: React.FC<HomeProps> = () => {
     try {
       txID = await btcWallet.pushTx(stakingTx);
     } catch (error: Error | any) {
-      console.log(error?.message || "Broadcasting staking transaction error");
+      console.error(error?.message || "Broadcasting staking transaction error");
     }
     setMempoolTxID(txID);
   };

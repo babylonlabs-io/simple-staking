@@ -1,11 +1,17 @@
-import { Fees } from "@/types/Fees";
-import { UTXO } from "../btcstaking";
-import {
-  getAddressBalance,
-  getFundingUTXOs,
-  getNetworkFees,
-  pushTx,
-} from "../mempool_api";
+export type Fees = {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+};
+
+export interface UTXO {
+  txid: string;
+  vout: number;
+  value: number;
+  scriptPubKey: string;
+}
 
 export type Network = "mainnet" | "testnet" | "regtest" | "signet";
 
@@ -40,8 +46,6 @@ export abstract class WalletProvider {
    * @returns A promise that resolves to the public key of the connected wallet.
    */
   abstract getPublicKeyHex(): Promise<string>;
-
-  // TODO move mempool actual implementation and calls inside okx_wallet using functions
 
   /**
    * Signs a transaction. Should finalize after signing.
@@ -84,29 +88,20 @@ export abstract class WalletProvider {
    * By default, this method will return the mempool balance if not implemented by the child class.
    * @returns A promise that resolves to the balance of the wallet.
    */
-  async getBalance(): Promise<number> {
-    // mempool call
-    return await getAddressBalance(await this.getAddress());
-  }
+  abstract getBalance(): Promise<number>;
 
   /**
    * Retrieves the network fees.
    * @returns A promise that resolves to the network fees.
    */
-  async getNetworkFees(): Promise<Fees> {
-    // mempool call
-    return await getNetworkFees();
-  }
+  abstract getNetworkFees(): Promise<Fees>;
 
   /**
    * Pushes a transaction to the network.
    * @param txHex - The hexadecimal representation of the transaction.
    * @returns A promise that resolves to a string representing the transaction ID.
    */
-  async pushTx(txHex: string): Promise<string> {
-    // mempool call
-    return await pushTx(txHex);
-  }
+  abstract pushTx(txHex: string): Promise<string>;
 
   /**
    * Retrieves the unspent transaction outputs (UTXOs) for a given address and amount.
@@ -114,8 +109,5 @@ export abstract class WalletProvider {
    * @param amount - The amount of funds required.
    * @returns A promise that resolves to an array of UTXOs.
    */
-  async getUtxos(address: string, amount: number): Promise<UTXO[]> {
-    // mempool call
-    return await getFundingUTXOs(address, amount);
-  }
+  abstract getUtxos(address: string, amount: number): Promise<UTXO[]>;
 }
