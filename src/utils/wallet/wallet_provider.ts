@@ -41,7 +41,6 @@ export abstract class WalletProvider {
    */
   abstract getPublicKeyHex(): Promise<string>;
 
-  // TODO we need public key no coord
   // TODO move mempool actual implementation and calls inside okx_wallet using functions
 
   /**
