@@ -1,6 +1,7 @@
+import { networks } from "bitcoinjs-lib";
+
 import { OKXWallet } from "./okx_wallet";
 import { Network, WalletProvider } from "./wallet_provider";
-import { networks } from "bitcoinjs-lib";
 
 const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;
