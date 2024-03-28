@@ -113,6 +113,7 @@ export abstract class WalletProvider {
 
   /**
    * Registers an event listener for the specified event.
+   * At the moment, only the "accountChanged" event is supported.
    * @param eventName - The name of the event to listen for.
    * @param callBack - The callback function to be executed when the event occurs.
    */
