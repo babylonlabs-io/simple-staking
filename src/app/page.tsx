@@ -190,7 +190,6 @@ const Home: React.FC<HomeProps> = () => {
   return (
     <main className="container mx-auto flex h-full min-h-svh w-full justify-center p-4">
       <div className="container flex flex-col gap-4">
-        <button onClick={() => btcWallet?.getNetworkFees()}>get fees</button>
         <Connect
           onConnect={handleConnectBTC}
           address={address}
