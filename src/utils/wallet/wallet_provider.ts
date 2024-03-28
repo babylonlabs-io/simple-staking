@@ -1,39 +1,113 @@
-import { getAddressBalance } from "../mempool_api";
+export type Fees = {
+  fastestFee: number;
+  halfHourFee: number;
+  hourFee: number;
+  economyFee: number;
+  minimumFee: number;
+};
+
+export interface UTXO {
+  txid: string;
+  vout: number;
+  value: number;
+  scriptPubKey: string;
+}
+
 export type Network = "mainnet" | "testnet" | "regtest" | "signet";
+
+/**
+ * Abstract class representing a wallet provider.
+ * Provides methods for connecting to a wallet, retrieving wallet information, signing transactions, and more.
+ */
 
 export abstract class WalletProvider {
   /**
    * Connects to the wallet and returns the instance of the wallet provider.
-   * Currently only support "native segwit" and "taproot" address types.
+   * Currently only supports "native segwit" and "taproot" address types.
    * @returns A promise that resolves to an instance of the wrapper wallet provider in babylon friendly format.
    * @throws An error if the wallet is not installed or if connection fails.
    */
   abstract connectWallet(): Promise<this>;
 
+  /**
+   * Gets the name of the wallet provider.
+   * @returns A promise that resolves to the name of the wallet provider.
+   */
   abstract getWalletProviderName(): Promise<string>;
 
-  // Get the address of the connected wallet.
+  /**
+   * Gets the address of the connected wallet.
+   * @returns A promise that resolves to the address of the connected wallet.
+   */
   abstract getAddress(): Promise<string>;
 
-  // Get the public key of the connected wallet.
+  /**
+   * Gets the public key of the connected wallet.
+   * @returns A promise that resolves to the public key of the connected wallet.
+   */
   abstract getPublicKeyHex(): Promise<string>;
 
   /**
-   * Sign a transaction.
-   * @param psbtHex the hex string of psbt to sign
+   * Signs a transaction. Should finalize after signing.
+   * @param psbtHex - The hex string of the unsigned PSBT to sign.
+   * @returns A promise that resolves to the signed transaction.
    */
-  abstract signPsbt(unsignedTx: string): Promise<string>;
+  abstract signPsbt(psbtHex: string): Promise<string>;
 
-  // Get network of current account
+  /**
+   * Signs multiple transactions. Should finalize after signing.
+   * @param psbtsHexes - The hex strings of the unsigned PSBTs to sign.
+   * @returns A promise that resolves to an array of signed transactions.
+   */
+  abstract signPsbts(psbtsHexes: string[]): Promise<string[]>;
+
+  /**
+   * Gets the network of the current account.
+   * @returns A promise that resolves to the network of the current account.
+   */
   abstract getNetwork(): Promise<Network>;
 
   /**
-   * Get the balance for the connectted wallet address.
-   * By default this method will return the mempool balance if not being implemented by the child class.
+   * Signs a message.
+   * @param message - The message to sign.
+   * @param method - The signing method to use (optional).
+   * @returns A promise that resolves to the signed message.
+   */
+  abstract signMessage(message: string, method?: string): Promise<string>;
+
+  /**
+   * Registers an event listener for the specified event.
+   * At the moment, only the "accountChanged" event is supported.
+   * @param eventName - The name of the event to listen for.
+   * @param callBack - The callback function to be executed when the event occurs.
+   */
+  abstract on(eventName: string, callBack: () => void): void;
+
+  /**
+   * Gets the balance for the connected wallet address.
+   * By default, this method will return the mempool balance if not implemented by the child class.
    * @returns A promise that resolves to the balance of the wallet.
    */
-  async getBalance(): Promise<number> {
-    // mempool call
-    return await getAddressBalance(await this.getAddress());
-  }
+  abstract getBalance(): Promise<number>;
+
+  /**
+   * Retrieves the network fees.
+   * @returns A promise that resolves to the network fees.
+   */
+  abstract getNetworkFees(): Promise<Fees>;
+
+  /**
+   * Pushes a transaction to the network.
+   * @param txHex - The hexadecimal representation of the transaction.
+   * @returns A promise that resolves to a string representing the transaction ID.
+   */
+  abstract pushTx(txHex: string): Promise<string>;
+
+  /**
+   * Retrieves the unspent transaction outputs (UTXOs) for a given address and amount.
+   * @param address - The address to retrieve UTXOs for.
+   * @param amount - The amount of funds required.
+   * @returns A promise that resolves to an array of UTXOs.
+   */
+  abstract getUtxos(address: string, amount: number): Promise<UTXO[]>;
 }

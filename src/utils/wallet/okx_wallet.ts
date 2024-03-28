@@ -1,6 +1,12 @@
 import { Psbt } from "bitcoinjs-lib";
 
-import { WalletProvider, Network } from "./wallet_provider";
+import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
+import {
+  getAddressBalance,
+  getFundingUTXOs,
+  getNetworkFees,
+  pushTx,
+} from "../mempool_api";
 
 type OKXWalletInfo = {
   publicKeyHex: string;
@@ -79,18 +85,66 @@ export class OKXWallet extends WalletProvider {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
+    return (await this.signPsbts([psbtHex]))[0];
+  }
+
+  async signPsbts(psbtsHexes: string[]): Promise<string[]> {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
     // sign the PSBTs
-    const response = await window?.okxwallet?.bitcoinSignet?.signPsbts([
-      psbtHex,
-    ]);
+    const response =
+      await window?.okxwallet?.bitcoinSignet?.signPsbts(psbtsHexes);
 
     // convert the signed PSBTs to transactions
-    return response
-      .map((tx: any) => Psbt.fromHex(tx).extractTransaction())[0]
-      .toHex();
+    return response.map((tx: any) =>
+      Psbt.fromHex(tx).extractTransaction().toHex(),
+    );
+  }
+
+  async signMessage(
+    message: string,
+    method?: string | undefined,
+  ): Promise<string> {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
+    return await window?.okxwallet?.bitcoinSignet?.signMessage(
+      message,
+      method || "bip322-simple",
+    );
   }
 
   async getNetwork(): Promise<Network> {
     return "testnet";
+  }
+
+  on(eventName: string, callBack: () => void) {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
+    // subscribe to account change event
+    if (eventName === "accountChanged") {
+      return window.okxwallet.bitcoinSignet.on(eventName, callBack);
+    }
+  }
+
+  // Mempool calls
+
+  async getBalance(): Promise<number> {
+    return await getAddressBalance(await this.getAddress());
+  }
+
+  async getNetworkFees(): Promise<Fees> {
+    return await getNetworkFees();
+  }
+
+  async pushTx(txHex: string): Promise<string> {
+    return await pushTx(txHex);
+  }
+
+  async getUtxos(address: string, amount: number): Promise<UTXO[]> {
+    // mempool call
+    return await getFundingUTXOs(address, amount);
   }
 }
