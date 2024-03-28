@@ -63,18 +63,18 @@ export class OKXWallet extends WalletProvider {
     }
   }
 
-  async getWalletProviderName(): Promise<string> {
+  getWalletProviderName() {
     return "OKX";
   }
 
-  async getAddress(): Promise<string> {
+  getAddress(): string {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return this.okxWalletInfo.address;
   }
 
-  async getPublicKeyHex(): Promise<string> {
+  getPublicKeyHex(): string {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -115,7 +115,7 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  async getNetwork(): Promise<Network> {
+  getNetwork(): Network {
     return "testnet";
   }
 
