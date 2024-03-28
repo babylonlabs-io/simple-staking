@@ -1,5 +1,4 @@
-import { Fees } from "@/types/Fees";
-import { UTXO } from "./btcstaking";
+import { Fees, UTXO } from "./wallet/wallet_provider";
 
 const mempoolAPI = `${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/api/`;
 
