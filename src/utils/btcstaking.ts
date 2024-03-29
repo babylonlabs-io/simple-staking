@@ -15,14 +15,6 @@ const internalPubKey = Buffer.from(
   "hex",
 ).subarray(1, 33); // Do a subarray(1, 33) to get the public coordinate
 
-// UTXO is a structure defining attributes for a UTXO
-export interface UTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  scriptPubKey: string;
-}
-
 export function initBTCCurve() {
   // Initialize elliptic curve library
   initEccLib(ecc);
