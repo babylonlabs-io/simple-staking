@@ -79,12 +79,11 @@ export abstract class WalletProvider {
   abstract getNetwork(): Promise<Network>;
 
   /**
-   * Signs a message.
+   * Signs a message using BIP-322 simple.
    * @param message - The message to sign.
-   * @param method - The signing method to use (optional).
    * @returns A promise that resolves to the signed message.
    */
-  abstract signMessage(message: string, method?: string): Promise<string>;
+  abstract signMessageBIP322(message: string): Promise<string>;
 
   /**
    * Registers an event listener for the specified event.

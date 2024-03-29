@@ -93,21 +93,20 @@ export abstract class WalletProvider {
 
   /**
    * Gets the network of the current account.
-   * @returns A promise that resolves to the network of the current account.
+   * @returns The network of the current account.
    */
   abstract getNetwork(): Network;
 
   /**
-   * Signs a message.
+   * Signs a message using BIP-322 simple.
    * @param message - The message to sign.
-   * @param method - The signing method to use (optional).
    * @returns A promise that resolves to the signed message.
    */
-  abstract signMessage(message: string, method?: string): Promise<string>;
+  abstract signMessageBIP322(message: string): Promise<string>;
 
   /**
    * Registers an event listener for the specified event.
-   * At the moment, only the "accountChanged" event is supported.
+   * At the moment, only the "accountChanged" event is required.
    * @param eventName - The name of the event to listen for.
    * @param callBack - The callback function to be executed when the event occurs.
    */
@@ -277,16 +276,15 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  async signMessage(
+  async signMessageBIP322(
     message: string,
-    method?: string | undefined,
   ): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return await window?.okxwallet?.bitcoinSignet?.signMessage(
       message,
-      method || "bip322-simple",
+      "bip322-simple",
     );
   }
 
