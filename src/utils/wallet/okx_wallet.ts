@@ -102,16 +102,13 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  async signMessage(
-    message: string,
-    method?: string | undefined,
-  ): Promise<string> {
+  async signMessageBIP322(message: string): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return await window?.okxwallet?.bitcoinSignet?.signMessage(
       message,
-      method || "bip322-simple",
+      "bip322-simple",
     );
   }
 

@@ -1,18 +1,29 @@
 export type Fees = {
+  // fee for inclusion in the next block
   fastestFee: number;
+  // fee for inclusion in a block in 30 mins
   halfHourFee: number;
+  // fee for inclusion in a block in 1 hour
   hourFee: number;
+  // economy fee: inclusion not guaranteed
   economyFee: number;
+  // minimum fee: the minimum fee of the network
   minimumFee: number;
 };
 
+// UTXO is a structure defining attributes for a UTXO
 export interface UTXO {
+  // hash of transaction that holds the UTXO
   txid: string;
+  // index of the output in the transaction
   vout: number;
+  // amount of satoshis the UTXO holds
   value: number;
+  // the script that the UTXO contains
   scriptPubKey: string;
 }
 
+// supported networks
 export type Network = "mainnet" | "testnet" | "regtest" | "signet";
 
 /**
@@ -68,12 +79,11 @@ export abstract class WalletProvider {
   abstract getNetwork(): Promise<Network>;
 
   /**
-   * Signs a message.
+   * Signs a message using BIP-322 simple.
    * @param message - The message to sign.
-   * @param method - The signing method to use (optional).
    * @returns A promise that resolves to the signed message.
    */
-  abstract signMessage(message: string, method?: string): Promise<string>;
+  abstract signMessageBIP322(message: string): Promise<string>;
 
   /**
    * Registers an event listener for the specified event.
