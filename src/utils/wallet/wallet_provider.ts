@@ -42,21 +42,21 @@ export abstract class WalletProvider {
 
   /**
    * Gets the name of the wallet provider.
-   * @returns A promise that resolves to the name of the wallet provider.
+   * @returns The name of the wallet provider.
    */
-  abstract getWalletProviderName(): Promise<string>;
+  abstract getWalletProviderName(): string;
 
   /**
    * Gets the address of the connected wallet.
-   * @returns A promise that resolves to the address of the connected wallet.
+   * @returns The address of the connected wallet.
    */
-  abstract getAddress(): Promise<string>;
+  abstract getAddress(): string;
 
   /**
    * Gets the public key of the connected wallet.
-   * @returns A promise that resolves to the public key of the connected wallet.
+   * @returns The public key of the connected wallet.
    */
-  abstract getPublicKeyHex(): Promise<string>;
+  abstract getPublicKeyHex(): string;
 
   /**
    * Signs a transaction. Should finalize after signing.
@@ -74,9 +74,9 @@ export abstract class WalletProvider {
 
   /**
    * Gets the network of the current account.
-   * @returns A promise that resolves to the network of the current account.
+   * @returns The network of the current account.
    */
-  abstract getNetwork(): Promise<Network>;
+  abstract getNetwork(): Network;
 
   /**
    * Signs a message using BIP-322 simple.
