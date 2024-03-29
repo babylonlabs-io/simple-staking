@@ -63,18 +63,18 @@ export class OKXWallet extends WalletProvider {
     }
   }
 
-  getWalletProviderName(): string {
+  async getWalletProviderName(): Promise<string> {
     return "OKX";
   }
 
-  getAddress(): string {
+  async getAddress(): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return this.okxWalletInfo.address;
   }
 
-  getPublicKeyHex(): string {
+  async getPublicKeyHex(): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -102,9 +102,7 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  async signMessageBIP322(
-    message: string,
-  ): Promise<string> {
+  async signMessageBIP322(message: string): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -114,7 +112,7 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  getNetwork(): Network {
+  async getNetwork(): Promise<Network> {
     return "testnet";
   }
 
@@ -131,7 +129,7 @@ export class OKXWallet extends WalletProvider {
   // Mempool calls
 
   async getBalance(): Promise<number> {
-    return await getAddressBalance(this.getAddress());
+    return await getAddressBalance(await this.getAddress());
   }
 
   async getNetworkFees(): Promise<Fees> {

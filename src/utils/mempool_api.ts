@@ -1,4 +1,4 @@
-import { Fees, UTXO} from "../wallet/wallet_provider";
+import { Fees, UTXO } from "./wallet/wallet_provider";
 
 /*
     URL Construction methods
@@ -23,21 +23,21 @@ function pushTxUrl(): URL {
   return new URL(mempoolAPI + "tx");
 }
 
-// URL for retrieving information about an address' UTXOs 
+// URL for retrieving information about an address' UTXOs
 function utxosInfoUrl(address: string): URL {
   return new URL(mempoolAPI + "address/" + address + "/utxo");
 }
 
-// URL for retrieving information about the recommended network fees 
+// URL for retrieving information about the recommended network fees
 function networkFeesUrl(): URL {
   return new URL(mempoolAPI + "v1/fees/recommended");
 }
 
 /**
-* Pushes a transaction to the Bitcoin network.
-* @param txHex - The hex string corresponding to the full transaction.
-* @returns A promise that resolves to the response message.
-*/
+ * Pushes a transaction to the Bitcoin network.
+ * @param txHex - The hex string corresponding to the full transaction.
+ * @returns A promise that resolves to the response message.
+ */
 export async function pushTx(txHex: string): Promise<string> {
   const response = await fetch(pushTxUrl(), {
     method: "POST",
@@ -62,11 +62,11 @@ export async function pushTx(txHex: string): Promise<string> {
 }
 
 /**
-* Returns the balance of an address.
-* @param address - The Bitcoin address in string format.
-* @returns A promise that resolves to the amount of satoshis that the address
-*          holds.
-*/
+ * Returns the balance of an address.
+ * @param address - The Bitcoin address in string format.
+ * @returns A promise that resolves to the amount of satoshis that the address
+ *          holds.
+ */
 export async function getAddressBalance(address: string): Promise<number> {
   const response = await fetch(addressInfoUrl(address));
   if (!response.ok) {
@@ -82,9 +82,9 @@ export async function getAddressBalance(address: string): Promise<number> {
 }
 
 /**
-* Retrieve the recommended Bitcoin network fees.
-* @returns A promise that resolves into a `Fees` object.
-*/
+ * Retrieve the recommended Bitcoin network fees.
+ * @returns A promise that resolves into a `Fees` object.
+ */
 export async function getNetworkFees(): Promise<Fees> {
   const response = await fetch(networkFeesUrl());
   if (!response.ok) {
@@ -96,13 +96,13 @@ export async function getNetworkFees(): Promise<Fees> {
 }
 
 /**
-* Retrieve a set of UTXOs that are available to an address and are enough to
-* fund a transaction with a total `amount` of Satoshis in its output. The UTXOs
-* are chosen based on descending amount order. 
-* @param address - The Bitcoin address in string format.
-* @param amount - The amount we expect the resulting UTXOs to satisfy.
-* @returns A promise that resolves into a list of UTXOs.
-*/
+ * Retrieve a set of UTXOs that are available to an address and are enough to
+ * fund a transaction with a total `amount` of Satoshis in its output. The UTXOs
+ * are chosen based on descending amount order.
+ * @param address - The Bitcoin address in string format.
+ * @param amount - The amount we expect the resulting UTXOs to satisfy.
+ * @returns A promise that resolves into a list of UTXOs.
+ */
 export async function getFundingUTXOs(
   address: string,
   amount: number,

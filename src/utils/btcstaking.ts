@@ -9,6 +9,8 @@ import {
 import { Taptree } from "bitcoinjs-lib/src/types";
 import ecc from "@bitcoinerlab/secp256k1";
 
+import { UTXO } from "./wallet/wallet_provider";
+
 // internalPubKey denotes an unspendable internal public key to be used for the taproot output
 const internalPubKey = Buffer.from(
   "0250929b74c1a04954b78b4b6035e97a5e078a5a0f28ec96d547bfee9ace803ac0",
