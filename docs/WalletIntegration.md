@@ -32,6 +32,7 @@ export type Fees = {
   minimumFee: number;
 };
 
+// UTXO is a structure defining attributes for a UTXO
 export interface UTXO {
   // hash of transaction that holds the UTXO
   txid: string;
@@ -50,6 +51,7 @@ export type Network = "mainnet" | "testnet" | "regtest" | "signet";
  * Abstract class representing a wallet provider.
  * Provides methods for connecting to a wallet, retrieving wallet information, signing transactions, and more.
  */
+
 export abstract class WalletProvider {
   /**
    * Connects to the wallet and returns the instance of the wallet provider.
@@ -61,21 +63,21 @@ export abstract class WalletProvider {
 
   /**
    * Gets the name of the wallet provider.
-   * @returns The name of the wallet provider.
+   * @returns A promise that resolves to the name of the wallet provider.
    */
-  abstract getWalletProviderName(): string;
+  abstract getWalletProviderName(): Promise<string>;
 
   /**
    * Gets the address of the connected wallet.
-   * @returns The address of the connected wallet.
+   * @returns A promise that resolves to the address of the connected wallet.
    */
-  abstract getAddress(): string;
+  abstract getAddress(): Promise<string>;
 
   /**
    * Gets the public key of the connected wallet.
    * @returns A promise that resolves to the public key of the connected wallet.
    */
-  abstract getPublicKeyHex(): string;
+  abstract getPublicKeyHex(): Promise<string>;
 
   /**
    * Signs a transaction. Should finalize after signing.
@@ -93,9 +95,9 @@ export abstract class WalletProvider {
 
   /**
    * Gets the network of the current account.
-   * @returns The network of the current account.
+   * @returns A promise that resolves to the network of the current account.
    */
-  abstract getNetwork(): Network;
+  abstract getNetwork(): Promise<Network>;
 
   /**
    * Signs a message using BIP-322 simple.
@@ -106,7 +108,7 @@ export abstract class WalletProvider {
 
   /**
    * Registers an event listener for the specified event.
-   * At the moment, only the "accountChanged" event is required.
+   * At the moment, only the "accountChanged" event is supported.
    * @param eventName - The name of the event to listen for.
    * @param callBack - The callback function to be executed when the event occurs.
    */
@@ -156,7 +158,7 @@ class MobileAppWallet extends WalletProvider {
     ...
 }
 // Create an instance of the class
-wallet = new MobileAppWallet();
+const wallet = new MobileAppWallet();
 
 // Inject it under the `window.btcwallet` object before the Babylon dApp loads
 window.btcwallet = wallet;
@@ -237,18 +239,18 @@ export class OKXWallet extends WalletProvider {
     }
   }
 
-  getWalletProviderName() {
+  async getWalletProviderName(): Promise<string> {
     return "OKX";
   }
 
-  getAddress(): string {
+  async getAddress(): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return this.okxWalletInfo.address;
   }
 
-  getPublicKeyHex(): string {
+  async getPublicKeyHex(): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -276,9 +278,7 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  async signMessageBIP322(
-    message: string,
-  ): Promise<string> {
+  async signMessageBIP322(message: string): Promise<string> {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -288,7 +288,7 @@ export class OKXWallet extends WalletProvider {
     );
   }
 
-  getNetwork(): Network {
+  async getNetwork(): Promise<Network> {
     return "testnet";
   }
 
@@ -351,21 +351,21 @@ function pushTxUrl(): URL {
   return new URL(mempoolAPI + "tx");
 }
 
-// URL for retrieving information about an address' UTXOs 
+// URL for retrieving information about an address' UTXOs
 function utxosInfoUrl(address: string): URL {
   return new URL(mempoolAPI + "address/" + address + "/utxo");
 }
 
-// URL for retrieving information about the recommended network fees 
+// URL for retrieving information about the recommended network fees
 function networkFeesUrl(): URL {
   return new URL(mempoolAPI + "v1/fees/recommended");
 }
 
 /**
-* Pushes a transaction to the Bitcoin network.
-* @param txHex - The hex string corresponding to the full transaction.
-* @returns A promise that resolves to the response message.
-*/
+ * Pushes a transaction to the Bitcoin network.
+ * @param txHex - The hex string corresponding to the full transaction.
+ * @returns A promise that resolves to the response message.
+ */
 export async function pushTx(txHex: string): Promise<string> {
   const response = await fetch(pushTxUrl(), {
     method: "POST",
@@ -384,16 +384,17 @@ export async function pushTx(txHex: string): Promise<string> {
     } catch (error: Error | any) {
       throw new Error(error?.message || error);
     }
+  } else {
+    return await response.text();
   }
-  return await response.text();
 }
 
 /**
-* Returns the balance of an address.
-* @param address - The Bitcoin address in string format.
-* @returns A promise that resolves to the amount of satoshis that the address
-*          holds.
-*/
+ * Returns the balance of an address.
+ * @param address - The Bitcoin address in string format.
+ * @returns A promise that resolves to the amount of satoshis that the address
+ *          holds.
+ */
 export async function getAddressBalance(address: string): Promise<number> {
   const response = await fetch(addressInfoUrl(address));
   if (!response.ok) {
@@ -409,9 +410,9 @@ export async function getAddressBalance(address: string): Promise<number> {
 }
 
 /**
-* Retrieve the recommended Bitcoin network fees.
-* @returns A promise that resolves into a `Fees` object.
-*/
+ * Retrieve the recommended Bitcoin network fees.
+ * @returns A promise that resolves into a `Fees` object.
+ */
 export async function getNetworkFees(): Promise<Fees> {
   const response = await fetch(networkFeesUrl());
   if (!response.ok) {
@@ -423,18 +424,19 @@ export async function getNetworkFees(): Promise<Fees> {
 }
 
 /**
-* Retrieve a set of UTXOs that are available to an address and are enough to
-* fund a transaction with a total `amount` of Satoshis in its output. The UTXOs
-* are chosen based on descending amount order. 
-* @param address - The Bitcoin address in string format.
-* @param amount - The amount we expect the resulting UTXOs to satisfy.
-* @returns A promise that resolves into a list of UTXOs.
-*/
+ * Retrieve a set of UTXOs that are available to an address and are enough to
+ * fund a transaction with a total `amount` of Satoshis in its output. The UTXOs
+ * are chosen based on descending amount order.
+ * @param address - The Bitcoin address in string format.
+ * @param amount - The amount we expect the resulting UTXOs to satisfy.
+ * @returns A promise that resolves into a list of UTXOs.
+ */
 export async function getFundingUTXOs(
   address: string,
   amount: number,
 ): Promise<UTXO[]> {
   // Get all UTXOs for the given address
+
   let utxos = null;
   try {
     const response = await fetch(utxosInfoUrl(address));
