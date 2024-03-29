@@ -99,7 +99,7 @@ workflows:
                 #    - main
       - deploy_mainnet:
           requires:
-            - push_docker
+            - push
               #filters:
               #  branches:
               #    only:
