@@ -1,0 +1,66 @@
+namespace: simple-staking
+name: simple-staking
+deployment:
+  image: 490721144737.dkr.ecr.us-east-1.amazonaws.com/simple-staking
+  version: REPLACEME
+  replicas: 2
+  ports:
+    - protocol: TCP
+      containerPort: 3000
+      name: simple-staking
+  env:
+    - name: MEMPOOL_API
+      value: https://babylon.mempool.space
+  resources:
+    requests:
+      memory: 100Mi
+      cpu: 100m
+    limits:
+      memory: 1Gi
+      cpu: 1000m
+  nodeSelector:
+    workload: "webservices"
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: staking-api-service
+            topologyKey: topology.kubernetes.io/zone
+          weight: 1
+service:
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: simple-staking
+      name: simple-staking
+ingress:
+  enabled: true
+  tlsCertArn: arn:aws:acm:us-east-2:490721144737:certificate/2c6cb5ad-8899-4871-9206-ea8e978aebae
+  groupName: "testnet3-internal"
+  scheme: "internal"
+  hosts:
+    - host: dashboard.mainnet.babylonchain.io
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ssl-redirect
+                port:
+                  name: use-annotation
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: simple-staking
+                port:
+                  name: simple-staking
+externalDns:
+  fqdn: dashboard.mainnet.babylonchain.io
+  ttl: 60
+purgeCloudflareCache:
+  enabled: false

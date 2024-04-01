@@ -1,0 +1,106 @@
+version: 2.1
+
+orbs:
+  aws-ecr: circleci/aws-ecr@8.2.1
+  kubernetes: circleci/kubernetes@1.3.1
+  helm: circleci/helm@2.0.1
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-2204:2022.10.1
+      resource_class: large
+    steps:
+      - checkout
+      - aws-ecr/build-image:
+          push-image: false
+          dockerfile: Dockerfile
+          path: ./
+          build-path: ./
+          tag: "$CIRCLE_SHA1,$CIRCLE_TAG"
+          repo: "$CIRCLE_PROJECT_REPONAME"
+      - run:
+          name: Save Docker image to export it to workspace
+          command: |
+            docker save $(docker image ls --format '{{.Repository}}:{{.Tag}}') > /tmp/simple-staking.tar
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - simple-staking.tar
+
+  push:
+    machine:
+      image: ubuntu-2204:2022.10.1
+      resource_class: large
+    steps:
+      - attach_workspace:
+          at: /tmp
+      - run:
+          name: Load Docker image from workspace
+          command: |
+            docker load -i /tmp/simple-staking.tar
+      - aws-ecr/ecr-login:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          region: "$AWS_REGION"
+      - aws-ecr/push-image:
+          registry-id: AWS_ECR_REGISTRY_ID
+          region: "$AWS_REGION"
+          repo: "$CIRCLE_PROJECT_REPONAME"
+          tag: "$CIRCLE_SHA1,$CIRCLE_TAG"
+
+  deploy_mainnet:
+    machine:
+      image: ubuntu-2204:2024.01.1
+      resource_class: large
+    steps:
+      - checkout
+      - aws-ecr/ecr-login:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          region: "$AWS_REGION"
+      - kubernetes/install-kubeconfig:
+          kubeconfig: MAINNET_KUBECONFIG
+      - helm/install-helm-client
+      - run:
+          name: Perform a dry run of the new release
+          command: |
+            helm upgrade --install --debug --dry-run \
+              -n $DEPLOY_MAINNET_NAMESPACE \
+              --values /home/circleci/project/.circleci/values-mainnet.yaml \
+              --version $HELM_CHART_VERSION \
+              --set deployment.version=$CIRCLE_SHA1 \
+              simple-staking $HELM_CHART_REPO
+      - run:
+          name: Release new service version in an atomic way
+          command: |
+            helm upgrade --install --debug --atomic --wait \
+              -n $DEPLOY_MAINNET_NAMESPACE --create-namespace \
+              --values /home/circleci/project/.circleci/values-mainnet.yaml \
+              --version $HELM_CHART_VERSION \
+              --set deployment.version=$CIRCLE_SHA1 \
+              simple-staking $HELM_CHART_REPO
+
+workflows:
+  CICD:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+      - push:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /.*/
+                #branches:
+                #  only:
+                #    - main
+      - deploy_mainnet:
+          requires:
+            - push
+              #filters:
+              #  branches:
+              #    only:
+              #      - main

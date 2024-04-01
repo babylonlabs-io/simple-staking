@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  simple-staking:
+    container_name: simple-staking
+    image: babylonchain/simple-staking
+    environment:
+      - MEMPOOL_API=https://babylon.mempool.space
+    restart: always
+    ports:
+      - 3000:3000
+    networks:
+      - simple-staking
+
+networks:
+  simple-staking:
+    ipam:
+      driver: default
+      config:
+        - subnet: 192.168.13.0/25
