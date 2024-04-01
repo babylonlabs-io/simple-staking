@@ -13,13 +13,9 @@ import { Connect } from "./components/Connect/Connect";
 import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
 import { Transaction } from "./components/Transaction/Transaction";
-import {
-  FinalityProvider,
-  data as finalityProvidersMock,
-} from "@/mock/finality_providers";
-import { data as btcStakingParamsMock } from "@/mock/btc_staking_params";
 import * as btcstaking from "@/utils/btcstaking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { FinalityProvider, mockApiData } from "@/mock/data";
 
 interface HomeProps {}
 
@@ -72,8 +68,8 @@ const Home: React.FC<HomeProps> = () => {
   }, [btcWallet]);
 
   const handleChooseFinalityProvider = (btcPkHex: string) => {
-    const finalityProviderFromMock = finalityProvidersMock.find(
-      (fp) => fp.btc_pk_hex === btcPkHex,
+    const finalityProviderFromMock = mockApiData.finality_providers.find(
+      (fp) => fp.btc_pk === btcPkHex,
     );
     if (finalityProviderFromMock) {
       setFinalityProvider(finalityProviderFromMock);
@@ -95,7 +91,7 @@ const Home: React.FC<HomeProps> = () => {
       await btcWallet.getPublicKeyHex(),
     );
 
-    const covenantPKsBuffer = btcStakingParamsMock.covenant_pks.map((pk) =>
+    const covenantPKsBuffer = mockApiData.covenant_pks.map((pk) =>
       Buffer.from(pk, "hex"),
     );
 
@@ -121,11 +117,11 @@ const Home: React.FC<HomeProps> = () => {
     try {
       stakingScriptData = new btcstaking.StakingScriptData(
         publicKeyNoCoord,
-        [Buffer.from(finalityProvider.btc_pk_hex, "hex")],
+        [Buffer.from(finalityProvider.btc_pk, "hex")],
         covenantPKsBuffer,
-        btcStakingParamsMock.covenant_quorum,
+        mockApiData.covenant_quorum,
         stakingDuration,
-        btcStakingParamsMock.min_unbonding_time + 1,
+        mockApiData.unbonding_time + 1,
       );
       if (!stakingScriptData.validate()) {
         throw new Error("Invalid staking data");
@@ -201,7 +197,7 @@ const Home: React.FC<HomeProps> = () => {
           duration={duration}
           onDurationChange={setDuration}
           enabled={!!btcWallet}
-          finalityProviders={finalityProvidersMock}
+          finalityProviders={mockApiData.finality_providers}
           finalityProvider={finalityProvider}
           onFinalityProviderChange={handleChooseFinalityProvider}
           onSign={handleSign}

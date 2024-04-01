@@ -1,4 +1,4 @@
-import { FinalityProvider } from "@/mock/finality_providers";
+import { FinalityProvider } from "@/mock/data";
 
 interface FormProps {
   amount: number;
@@ -66,14 +66,14 @@ export const Form: React.FC<FormProps> = ({
           <select
             className="select select-bordered"
             onChange={(e) => onFinalityProviderChange(e.target.value)}
-            value={finalityProvider ? finalityProvider.btc_pk_hex : "-"}
+            value={finalityProvider ? finalityProvider.btc_pk : "-"}
             disabled={!enabled}
           >
             <option key="-" value="-">
               Choose a finality provider
             </option>
             {finalityProviders.map((provider) => (
-              <option key={provider.btc_pk_hex} value={provider.btc_pk_hex}>
+              <option key={provider.btc_pk} value={provider.btc_pk}>
                 {provider.description.moniker}
               </option>
             ))}
