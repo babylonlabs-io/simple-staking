@@ -1,6 +1,3 @@
-import Image from "next/image";
-
-import okx from "./okx.svg";
 import { trim } from "@/utils/trim";
 import { isTaproot } from "@/utils/wallet";
 
@@ -44,7 +41,6 @@ export const Connect: React.FC<ConnectProps> = ({
           disabled={!!address}
         >
           <span>Connect</span>
-          <Image src={okx} alt="OKX" width={40} />
         </button>
       </div>
     </div>
