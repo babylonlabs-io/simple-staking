@@ -1,6 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  StakingScriptData,
+  initBTCCurve,
+  stakingTransaction,
+} from "btc-staking-ts";
+import { useLocalStorage } from "usehooks-ts";
 
 import {
   getWallet,
@@ -12,10 +18,12 @@ import {
 import { Connect } from "./components/Connect/Connect";
 import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
-import { Transaction } from "./components/Transaction/Transaction";
-import * as btcstaking from "@/utils/btcstaking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { FinalityProvider, mockApiData } from "@/mock/data";
+import { Delegations } from "./components/Delegations/Delegations";
+import { LocalStorageDelegation } from "@/types/LocalStorageDelegation";
+import { State } from "@/types/State";
+import { toLocalStorageDelegation } from "@/utils/toLocalStorageDelegation";
 
 interface HomeProps {}
 
@@ -27,8 +35,20 @@ const Home: React.FC<HomeProps> = () => {
   const [amount, setAmount] = useState(0);
   const [duration, setDuration] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
-  const [stakingTx, setStakingTx] = useState("");
-  const [mempoolTxID, setMempoolTxID] = useState("");
+
+  // Initializing btc curve is a required one-time operation
+  useEffect(() => {
+    initBTCCurve();
+  }, []);
+
+  // Local state for delegations
+  const delegationsLocalStorageKey = address
+    ? `bbn-staking-delegations-${address}`
+    : "";
+
+  const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
+    LocalStorageDelegation[]
+  >(delegationsLocalStorageKey, []);
 
   const handleConnectBTC = async () => {
     try {
@@ -81,10 +101,6 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
 
-    // Reset the Transaction component
-    setStakingTx("");
-    setMempoolTxID("");
-
     const stakingFee = 500;
 
     const publicKeyNoCoord = getPublicKeyNoCoord(
@@ -115,13 +131,14 @@ const Home: React.FC<HomeProps> = () => {
     }
     let stakingScriptData = null;
     try {
-      stakingScriptData = new btcstaking.StakingScriptData(
+      stakingScriptData = new StakingScriptData(
         publicKeyNoCoord,
         [Buffer.from(finalityProvider.btc_pk, "hex")],
         covenantPKsBuffer,
         mockApiData.covenant_quorum,
         stakingDuration,
         mockApiData.unbonding_time + 1,
+        Buffer.from(mockApiData.tag),
       );
       if (!stakingScriptData.validate()) {
         throw new Error("Invalid staking data");
@@ -143,9 +160,8 @@ const Home: React.FC<HomeProps> = () => {
     const slashingScript = scripts.slashingScript;
     let unsignedStakingTx = null;
     try {
-      unsignedStakingTx = btcstaking.stakingTransaction(
+      unsignedStakingTx = stakingTransaction(
         timelockScript,
-        dataEmbedScript,
         unbondingScript,
         slashingScript,
         stakingAmount,
@@ -154,6 +170,7 @@ const Home: React.FC<HomeProps> = () => {
         inputUTXOs,
         toNetwork(await btcWallet.getNetwork()),
         isTaproot(address) ? publicKeyNoCoord : undefined,
+        dataEmbedScript,
       );
     } catch (error: Error | any) {
       console.error(
@@ -168,7 +185,6 @@ const Home: React.FC<HomeProps> = () => {
       console.error(error?.message || "Staking transaction signing error");
       return;
     }
-    setStakingTx(stakingTx);
 
     let txID = "";
     try {
@@ -176,12 +192,28 @@ const Home: React.FC<HomeProps> = () => {
     } catch (error: Error | any) {
       console.error(error?.message || "Broadcasting staking transaction error");
     }
-    setMempoolTxID(txID);
-  };
 
-  useEffect(() => {
-    btcstaking.initBTCCurve();
-  }, []);
+    // Update the local state with the new delegation
+    setDelegationsLocalStorage((delegations) =>
+      [
+        ...delegations,
+        toLocalStorageDelegation(
+          amount,
+          duration,
+          finalityProvider.description.moniker,
+          stakingTx,
+          txID,
+          State.active,
+          Math.floor(Date.now() / 1000),
+        ),
+      ].sort((a, b) => b.inception - a.inception),
+    );
+
+    // Clear the form
+    setAmount(0);
+    setDuration(0);
+    setFinalityProvider(undefined);
+  };
 
   return (
     <main className="container mx-auto flex h-full min-h-svh w-full justify-center p-4">
@@ -208,8 +240,8 @@ const Home: React.FC<HomeProps> = () => {
           isDurationSet={duration > 0}
           isFinalityProviderSet={!!finalityProvider}
         />
-        {stakingTx && (
-          <Transaction stakingTx={stakingTx} mempoolTxID={mempoolTxID} />
+        {delegationsLocalStorage?.length > 0 && (
+          <Delegations data={delegationsLocalStorage} />
         )}
       </div>
     </main>
