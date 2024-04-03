@@ -18,6 +18,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
       </div>
       <div className="grid w-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
         {data?.map((delegation) => {
+          if (!delegation) return null;
+
           const { staking_value, staking_tx, staking_tx_hash_hex } = delegation;
           const finalityProviderMoniker =
             finalityProvidersKV[delegation?.finality_provider_pk_hex];
