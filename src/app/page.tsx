@@ -21,9 +21,9 @@ import { Form } from "./components/Form/Form";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { FinalityProvider, mockApiData } from "@/mock/data";
 import { Delegations } from "./components/Delegations/Delegations";
-import { LocalDelegation } from "@/types/LocalDelegation";
+import { LocalStorageDelegation } from "@/types/LocalStorageDelegation";
 import { State } from "@/types/State";
-import { toLocalDelegation } from "@/utils/toLocalDelegation";
+import { toLocalStorageDelegation } from "@/utils/toLocalStorageDelegation";
 
 interface HomeProps {}
 
@@ -47,7 +47,7 @@ const Home: React.FC<HomeProps> = () => {
     : "";
 
   const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
-    LocalDelegation[]
+    LocalStorageDelegation[]
   >(delegationsLocalStorageKey, []);
 
   const handleConnectBTC = async () => {
@@ -197,7 +197,7 @@ const Home: React.FC<HomeProps> = () => {
     setDelegationsLocalStorage((delegations) =>
       [
         ...delegations,
-        toLocalDelegation(
+        toLocalStorageDelegation(
           amount,
           duration,
           finalityProvider.description.moniker,

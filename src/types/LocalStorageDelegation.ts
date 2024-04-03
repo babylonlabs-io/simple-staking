@@ -1,6 +1,6 @@
 import { State } from "./State";
 
-export interface LocalDelegation {
+export interface LocalStorageDelegation {
   amount: number;
   duration: number;
   finalityProviderMoniker: string;

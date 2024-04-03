@@ -1,7 +1,7 @@
-import { LocalDelegation } from "@/types/LocalDelegation";
+import { LocalStorageDelegation } from "@/types/LocalStorageDelegation";
 import { State } from "@/types/State";
 
-export const toLocalDelegation = (
+export const toLocalStorageDelegation = (
   amount: number,
   duration: number,
   finalityProviderMoniker: string,
@@ -9,7 +9,7 @@ export const toLocalDelegation = (
   stakingTxID: string,
   state: State,
   inception: number,
-): LocalDelegation => ({
+): LocalStorageDelegation => ({
   amount,
   duration,
   finalityProviderMoniker,

@@ -1,9 +1,8 @@
-import { LocalDelegation } from "@/types/LocalDelegation";
-import { State } from "@/types/State";
+import { LocalStorageDelegation } from "@/types/LocalStorageDelegation";
 import { trim } from "@/utils/trim";
 
 interface DelegationProps {
-  item: LocalDelegation;
+  item: LocalStorageDelegation;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({ item }) => {
