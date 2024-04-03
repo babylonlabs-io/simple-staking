@@ -6,8 +6,8 @@ npm run dev
 
 ```
 NEXT_PUBLIC_MEMPOOL_API=https://babylon.mempool.space
+NEXT_PUBLIC_API_URL=https://staking-api.mainnet.babylonchain.io
 ```
-
 
 # Instructions for Integrating Staking in Your Mobile Wallet Browser
 
@@ -20,4 +20,3 @@ To integrate staking functionality into your mobile wallet browser, follow the s
 3. **Inject Instance**: Once your wallet provider is properly configured, inject its instance into the global window object of your wallet browser as `window.btcwallet`. This makes the provider accessible for staking operations within the browser environment.
 
 For a practical example of how these steps can be implemented, refer to the `okx_wallet.ts` file.
-
