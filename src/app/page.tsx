@@ -316,8 +316,7 @@ const Home: React.FC<HomeProps> = () => {
           isDurationSet={duration > 0}
           isFinalityProviderSet={!!finalityProvider}
         />
-        {delegationsData &&
-          delegationsData.length > 0 &&
+        {combinedDelegationsData.length > 0 &&
           finalityProvidersData &&
           finalityProvidersData.length > 0 &&
           finalityProvidersKV && (
