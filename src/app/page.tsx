@@ -23,6 +23,7 @@ import { FinalityProvider, mockApiData } from "@/mock/data";
 import { Delegations } from "./components/Delegations/Delegations";
 import { LocalDelegation } from "@/types/LocalDelegation";
 import { State } from "@/types/State";
+import { toLocalDelegation } from "@/utils/toLocalDelegation";
 
 interface HomeProps {}
 
@@ -196,15 +197,15 @@ const Home: React.FC<HomeProps> = () => {
     setDelegationsLocalStorage((delegations) =>
       [
         ...delegations,
-        {
+        toLocalDelegation(
           amount,
           duration,
-          finalityProviderMoniker: finalityProvider.description.moniker,
+          finalityProvider.description.moniker,
           stakingTx,
-          stakingTxID: txID,
-          state: State.active,
-          inception: Math.floor(Date.now() / 1000),
-        },
+          txID,
+          State.active,
+          Math.floor(Date.now() / 1000),
+        ),
       ].sort((a, b) => b.inception - a.inception),
     );
 
