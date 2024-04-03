@@ -138,7 +138,7 @@ const Home: React.FC<HomeProps> = () => {
         mockApiData.covenant_quorum,
         stakingDuration,
         mockApiData.unbonding_time + 1,
-        Buffer.from(mockApiData.tag, "hex"),
+        Buffer.from(mockApiData.tag),
       );
       if (!stakingScriptData.validate()) {
         throw new Error("Invalid staking data");
