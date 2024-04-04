@@ -32,32 +32,22 @@ export const Delegations: React.FC<DelegationsProps> = ({
             finalityProvidersKV[finality_provider_pk_hex];
           // Convert state to human readable format
           const readableState = getState(state);
-          // Convert the start timestamp to a human readable format
-          const startTimestamp = new Date(
-            staking_tx?.start_timestamp,
-          )?.toLocaleDateString();
-          // startHeight differentiates the local storage items
-          const startHeight = staking_tx?.start_height;
           if (
             finalityProviderMoniker &&
             staking_tx &&
             staking_value &&
             staking_tx_hash_hex &&
             staking_tx?.timelock &&
-            readableState &&
-            startTimestamp
+            readableState
           ) {
             return (
               <Delegation
-                key={staking_tx_hash_hex + startHeight}
+                key={staking_tx_hash_hex}
                 finalityProviderMoniker={finalityProviderMoniker}
                 stakingTx={staking_tx}
                 stakingValue={staking_value}
-                timelock={staking_tx?.timelock}
                 stakingTxID={staking_tx_hash_hex}
                 state={readableState}
-                startTimestamp={startTimestamp}
-                startHeight={startHeight}
               />
             );
           }

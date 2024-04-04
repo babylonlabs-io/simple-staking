@@ -5,27 +5,24 @@ interface DelegationProps {
   finalityProviderMoniker: string;
   stakingTx: StakingTx;
   stakingValue: number;
-  timelock: number;
   stakingTxID: string;
   state: string;
-  startTimestamp: string;
-  startHeight: number;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
+  stakingTx,
   finalityProviderMoniker,
-  stakingValue,
-  timelock,
   stakingTxID,
   state,
-  startTimestamp,
-  startHeight,
+  stakingValue,
 }) => {
+  const { start_height, timelock, start_timestamp } = stakingTx;
+
   return (
     <div className="card relative bg-base-200 p-4 text-sm">
       {/* TODO to be removed after initial dev phase */}
       {/* local storage items has startHeight 0 */}
-      {startHeight === 0 && (
+      {start_height === 0 && (
         <div className="absolute right-0 top-0 rounded-sm bg-red-500 px-1 text-xs text-white">
           <p>local</p>
         </div>
@@ -47,7 +44,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       </div>
       <div className="flex justify-between gap-4">
         <p>{state}</p>
-        <p>{startTimestamp}</p>
+        <p>{new Date(start_timestamp)?.toLocaleDateString()}</p>
       </div>
     </div>
   );
