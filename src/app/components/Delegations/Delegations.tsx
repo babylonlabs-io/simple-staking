@@ -20,14 +20,23 @@ export const Delegations: React.FC<DelegationsProps> = ({
         {delegations?.map((delegation) => {
           if (!delegation) return null;
 
-          const { staking_value, staking_tx, staking_tx_hash_hex } = delegation;
+          const {
+            staking_value,
+            staking_tx,
+            staking_tx_hash_hex,
+            finality_provider_pk_hex,
+            state,
+          } = delegation;
+          // Get the moniker of the finality provider
           const finalityProviderMoniker =
-            finalityProvidersKV[delegation?.finality_provider_pk_hex];
-          const stakingTxID = delegation?.staking_tx_hash_hex;
-          const state = getState(delegation?.state);
+            finalityProvidersKV[finality_provider_pk_hex];
+          // Convert state to human readable format
+          const readableState = getState(state);
+          // Convert the start timestamp to a human readable format
           const startTimestamp = new Date(
             staking_tx?.start_timestamp,
-          ).toLocaleDateString();
+          )?.toLocaleDateString();
+          // startHeight differentiates the local storage items
           const startHeight = staking_tx?.start_height;
           if (
             finalityProviderMoniker &&
@@ -35,8 +44,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             staking_value &&
             staking_tx_hash_hex &&
             staking_tx?.timelock &&
-            stakingTxID &&
-            state &&
+            readableState &&
             startTimestamp
           ) {
             return (
@@ -46,8 +54,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
                 stakingTx={staking_tx}
                 stakingValue={staking_value}
                 timelock={staking_tx?.timelock}
-                stakingTxID={stakingTxID}
-                state={state}
+                stakingTxID={staking_tx_hash_hex}
+                state={readableState}
                 startTimestamp={startTimestamp}
                 startHeight={startHeight}
               />
