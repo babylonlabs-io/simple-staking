@@ -321,7 +321,7 @@ const Home: React.FC<HomeProps> = () => {
           finalityProvidersData.length > 0 &&
           finalityProvidersKV && (
             <Delegations
-              data={combinedDelegationsData}
+              delegations={combinedDelegationsData}
               finalityProvidersKV={finalityProvidersKV}
             />
           )}

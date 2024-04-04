@@ -3,12 +3,12 @@ import { Delegation } from "./Delegation";
 import { getState } from "@/utils/getState";
 
 interface DelegationsProps {
-  data: DelegationInterface[];
+  delegations: DelegationInterface[];
   finalityProvidersKV: Record<string, string>;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
-  data,
+  delegations,
   finalityProvidersKV,
 }) => {
   return (
@@ -17,7 +17,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         <h2 className="font-bold">Staking history</h2>
       </div>
       <div className="grid w-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
-        {data?.map((delegation) => {
+        {delegations?.map((delegation) => {
           if (!delegation) return null;
 
           const { staking_value, staking_tx, staking_tx_hash_hex } = delegation;
