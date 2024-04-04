@@ -43,18 +43,16 @@ const Home: React.FC<HomeProps> = () => {
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
   const { data: globalParamsData } = useQuery({
-    queryKey: ["getGlobalParams", address],
+    queryKey: ["getGlobalParams"],
     queryFn: getGlobalParams,
     refetchInterval: 60000, // 1 minute
-    enabled: !!(btcWallet && address),
     select: (data) => data.data,
   });
 
   const { data: finalityProvidersData } = useQuery({
-    queryKey: ["getFinalityProviders", address],
+    queryKey: ["getFinalityProviders"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
-    enabled: !!(btcWallet && address),
     select: (data) => data.data,
   });
 
@@ -304,7 +302,7 @@ const Home: React.FC<HomeProps> = () => {
           onAmountChange={setAmount}
           duration={duration}
           onDurationChange={setDuration}
-          enabled={!!btcWallet}
+          disabled={!btcWallet}
           finalityProviders={finalityProvidersData}
           finalityProvider={finalityProvider}
           onFinalityProviderChange={handleChooseFinalityProvider}

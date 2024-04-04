@@ -5,7 +5,7 @@ interface FormProps {
   onAmountChange: (amount: number) => void;
   duration: number;
   onDurationChange: (term: number) => void;
-  enabled: boolean;
+  disabled: boolean;
   finalityProviders: FinalityProvider[] | undefined;
   finalityProvider: FinalityProvider | undefined;
   onFinalityProviderChange: (btcPkHex: string) => void;
@@ -17,7 +17,7 @@ export const Form: React.FC<FormProps> = ({
   onAmountChange,
   duration: term,
   onDurationChange: onTermChange,
-  enabled,
+  disabled,
   finalityProviders,
   finalityProvider,
   onFinalityProviderChange,
@@ -40,7 +40,7 @@ export const Form: React.FC<FormProps> = ({
             step={0.00001}
             value={amount}
             onChange={(e) => onAmountChange(Number(e.target.value))}
-            disabled={!enabled}
+            disabled={disabled}
           />
         </label>
         <label className="form-control w-full max-w-sm">
@@ -56,7 +56,7 @@ export const Form: React.FC<FormProps> = ({
             max={454}
             value={term}
             onChange={(e) => onTermChange(Number(e.target.value))}
-            disabled={!enabled}
+            disabled={disabled}
           />
         </label>
         <label className="form-control w-full max-w-sm">
@@ -67,10 +67,10 @@ export const Form: React.FC<FormProps> = ({
             className="select select-bordered"
             onChange={(e) => onFinalityProviderChange(e.target.value)}
             value={finalityProvider ? finalityProvider.btc_pk : "-"}
-            disabled={!enabled || !finalityProviders?.length}
+            disabled={disabled || !finalityProviders?.length}
           >
             <option key="-" value="-">
-              {enabled && !finalityProviders?.length
+              {!finalityProviders?.length
                 ? "Loading..."
                 : "Choose a finality provider"}
             </option>
@@ -83,7 +83,7 @@ export const Form: React.FC<FormProps> = ({
         </label>
         <button
           className="btn btn-primary mt-2 w-full max-w-sm uppercase"
-          disabled={!enabled || !signReady}
+          disabled={disabled || !signReady}
           onClick={onSign}
         >
           Sign
