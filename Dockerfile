@@ -20,6 +20,7 @@ COPY docker-entrypoint.sh .
 # Later the docker-entrypoint.sh script finds such variables and replaces them
 # with the docker environment variables we have set
 RUN NEXT_PUBLIC_MEMPOOL_API=APP_NEXT_PUBLIC_MEMPOOL_API \
+    NEXT_PUBLIC_API_URL=APP_NEXT_PUBLIC_API_URL \
     yarn build
 
 # Step 2. Production image, copy all the files and run next

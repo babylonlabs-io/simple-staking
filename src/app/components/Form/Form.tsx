@@ -1,12 +1,12 @@
-import { FinalityProvider } from "@/mock/data";
+import { FinalityProvider } from "@/app/api/getFinalityProviders";
 
 interface FormProps {
   amount: number;
   onAmountChange: (amount: number) => void;
   duration: number;
   onDurationChange: (term: number) => void;
-  enabled: boolean;
-  finalityProviders: FinalityProvider[];
+  disabled: boolean;
+  finalityProviders: FinalityProvider[] | undefined;
   finalityProvider: FinalityProvider | undefined;
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
@@ -17,7 +17,7 @@ export const Form: React.FC<FormProps> = ({
   onAmountChange,
   duration: term,
   onDurationChange: onTermChange,
-  enabled,
+  disabled,
   finalityProviders,
   finalityProvider,
   onFinalityProviderChange,
@@ -40,23 +40,23 @@ export const Form: React.FC<FormProps> = ({
             step={0.00001}
             value={amount}
             onChange={(e) => onAmountChange(Number(e.target.value))}
-            disabled={!enabled}
+            disabled={disabled}
           />
         </label>
         <label className="form-control w-full max-w-sm">
           <div className="label">
             <span className="label-text">Duration</span>
-            <span className="label-text-alt">Days</span>
+            <span className="label-text-alt">Blocks</span>
           </div>
           <input
             type="number"
-            placeholder="Days"
+            placeholder="Blocks"
             className="input input-bordered w-full"
             min={1}
             max={454}
             value={term}
             onChange={(e) => onTermChange(Number(e.target.value))}
-            disabled={!enabled}
+            disabled={disabled}
           />
         </label>
         <label className="form-control w-full max-w-sm">
@@ -67,12 +67,14 @@ export const Form: React.FC<FormProps> = ({
             className="select select-bordered"
             onChange={(e) => onFinalityProviderChange(e.target.value)}
             value={finalityProvider ? finalityProvider.btc_pk : "-"}
-            disabled={!enabled}
+            disabled={disabled || !finalityProviders?.length}
           >
             <option key="-" value="-">
-              Choose a finality provider
+              {!finalityProviders?.length
+                ? "Loading..."
+                : "Choose a finality provider"}
             </option>
-            {finalityProviders.map((provider) => (
+            {finalityProviders?.map((provider) => (
               <option key={provider.btc_pk} value={provider.btc_pk}>
                 {provider.description.moniker}
               </option>
@@ -81,7 +83,7 @@ export const Form: React.FC<FormProps> = ({
         </label>
         <button
           className="btn btn-primary mt-2 w-full max-w-sm uppercase"
-          disabled={!enabled || !signReady}
+          disabled={disabled || !signReady}
           onClick={onSign}
         >
           Sign
