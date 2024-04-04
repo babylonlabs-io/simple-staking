@@ -5,13 +5,11 @@ export const getApiData = async (
   generalErrorMessage: string,
   params?: any,
 ) => {
+  let response;
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}${url}`,
-      { params },
-    );
-
-    return response.data;
+    response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
+      params,
+    });
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error?.response?.data?.message;
@@ -20,4 +18,5 @@ export const getApiData = async (
       throw new Error(generalErrorMessage);
     }
   }
+  return response.data;
 };

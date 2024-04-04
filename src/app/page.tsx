@@ -65,7 +65,7 @@ const Home: React.FC<HomeProps> = () => {
       getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
       initialPageParam: "",
       refetchInterval: 60000, // 1 minute
-      enabled: !!(btcWallet && publicKeyNoCoord),
+      enabled: !!(btcWallet && publicKeyNoCoord && address),
       select: (data) => data?.pages?.flatMap((page) => page?.data),
     });
 
