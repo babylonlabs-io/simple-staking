@@ -11,6 +11,8 @@ deployment:
   env:
     - name: MEMPOOL_API
       value: https://babylon.mempool.space
+    - name: API_URL
+      value: https://staking-api.mainnet.babylonchain.io
   resources:
     requests:
       memory: 100Mi
