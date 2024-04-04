@@ -94,13 +94,13 @@ workflows:
           filters:
             tags:
               only: /.*/
-                #branches:
-                #  only:
-                #    - main
+            branches:
+              only:
+                - main
       - deploy_mainnet:
           requires:
             - push
-              #filters:
-              #  branches:
-              #    only:
-              #      - main
+          filters:
+            branches:
+              only:
+                - main
