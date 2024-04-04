@@ -1,4 +1,4 @@
-import axios from "axios";
+import { getApiData } from "@/utils/getApiData";
 import { encode } from "url-safe-base64";
 
 interface Delegations {
@@ -45,21 +45,9 @@ export const getDelegations = async (
     staker_btc_pk: encode(publicKeyNoCoord),
   };
 
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/v1/staker/delegations`,
-      { params },
-    );
-
-    return response.data;
-  } catch (error) {
-    const generalErrorMessage = "Error getting delegations";
-
-    if (axios.isAxiosError(error)) {
-      const message = error?.response?.data?.message;
-      throw new Error(generalErrorMessage, message);
-    } else {
-      throw new Error(generalErrorMessage);
-    }
-  }
+  return getApiData(
+    "/v1/staker/delegations",
+    "Error getting delegations",
+    params,
+  );
 };

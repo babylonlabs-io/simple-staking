@@ -1,4 +1,4 @@
-import axios from "axios";
+import { getApiData } from "@/utils/getApiData";
 
 interface FinalityProviders {
   data: FinalityProvider[];
@@ -22,21 +22,5 @@ interface Description {
   details: string;
 }
 
-export const getFinalityProviders = async (): Promise<FinalityProviders> => {
-  try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/v1/finality-providers`,
-    );
-
-    return response.data;
-  } catch (error) {
-    const generalErrorMessage = "Error getting finality providers";
-
-    if (axios.isAxiosError(error)) {
-      const message = error?.response?.data?.message;
-      throw new Error(generalErrorMessage, message);
-    } else {
-      throw new Error(generalErrorMessage);
-    }
-  }
-};
+export const getFinalityProviders = async (): Promise<FinalityProviders> =>
+  getApiData("/v1/finality-providers", "Error getting finality providers");
