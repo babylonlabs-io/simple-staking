@@ -1,16 +1,304 @@
+import { useEffect } from "react";
+import { useLocalStorage } from "usehooks-ts";
+import { Transaction, networks } from "bitcoinjs-lib";
+import {
+  createWitness,
+  unbondingTransaction,
+  withdrawTimelockUnbondedTransaction,
+} from "btc-staking-ts";
+
 import { Delegation as DelegationInterface } from "@/app/api/getDelegations";
 import { Delegation } from "./Delegation";
-import { getState } from "@/utils/getState";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { GlobalParamsData } from "@/app/api/getGlobalParams";
+import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
+import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
+import { postUnbonding } from "@/app/api/postUnbonding";
+import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 interface DelegationsProps {
   delegations: DelegationInterface[];
   finalityProvidersKV: Record<string, string>;
+  delegationsData: DelegationInterface[];
+  btcWallet: WalletProvider;
+  globalParamsData: GlobalParamsData;
+  publicKeyNoCoord: string;
+  unbondingFee: number;
+  withdrawalFee: number;
+  btcWalletNetwork: networks.Network;
+  address: string;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
   delegations,
   finalityProvidersKV,
+  delegationsData,
+  btcWallet,
+  globalParamsData,
+  publicKeyNoCoord,
+  unbondingFee,
+  withdrawalFee,
+  btcWalletNetwork,
+  address,
 }) => {
+  // Local storage state for intermediate delegations (withdrawing, unbonding)
+  const intermediateDelegationsLocalStorageKey = address
+    ? `bbn-staking-intermediate-delegations-${address}`
+    : "";
+
+  const [
+    intermediateDelegationsLocalStorage,
+    setIntermediateDelegationsLocalStorage,
+  ] = useLocalStorage<DelegationInterface[]>(
+    intermediateDelegationsLocalStorageKey,
+    [],
+  );
+
+  const handleUnbond = async (id: string) => {
+    if (!delegationsData || !btcWallet || !globalParamsData) return;
+
+    // Find the delegation in the data
+    const item = delegationsData?.find(
+      (delegation) => delegation?.staking_tx_hash_hex === id,
+    );
+
+    if (!item) return;
+
+    // Check if the unbonding is possible
+    let unbondingEligibility;
+    try {
+      unbondingEligibility = await getUnbondingEligibility(
+        item.staking_tx_hash_hex,
+      );
+      if (!unbondingEligibility) {
+        throw new Error("Not eligible for unbonding");
+      }
+    } catch (error: Error | any) {
+      console.error(error?.message || "Error checking unbonding eligibility");
+      return;
+    }
+
+    if (!unbondingEligibility) return;
+
+    // Recreate the staking scripts
+    let timelockScript;
+    let slashingScript;
+    let unbondingScript;
+    let unbondingTimelockScript;
+    try {
+      const data = apiDataToStakingScripts(
+        item,
+        globalParamsData,
+        publicKeyNoCoord,
+      );
+      if (!data) {
+        throw new Error("Error recreating scripts");
+      }
+      timelockScript = data.timelockScript;
+      slashingScript = data.slashingScript;
+      unbondingScript = data.unbondingScript;
+      unbondingTimelockScript = data.unbondingTimelockScript;
+    } catch (error: Error | any) {
+      console.error(error?.message || "Cannot build staking scripts");
+      return;
+    }
+
+    // Create the withdrawal transaction
+    let unsignedUnbondingTx;
+    try {
+      unsignedUnbondingTx = unbondingTransaction(
+        unbondingScript,
+        unbondingTimelockScript,
+        timelockScript,
+        slashingScript,
+        Transaction.fromHex(item.staking_tx.tx_hex),
+        unbondingFee,
+        btcWalletNetwork,
+        item.staking_tx.output_index,
+      );
+    } catch (error: Error | any) {
+      console.error(error?.message || "Error creating unbonding transaction");
+      return;
+    }
+
+    // Delegator signature from the wallet
+    let unbondingTx: Transaction;
+    try {
+      unbondingTx = Transaction.fromHex(
+        await btcWallet.signPsbt(unsignedUnbondingTx.toHex()),
+      );
+    } catch (error: Error | any) {
+      console.error(error?.message || "Error signing unbonding transaction");
+      return;
+    }
+
+    // Covenant signatures
+    const witness = createWitness(
+      unbondingTx.ins[0].witness,
+      globalParamsData.covenant_pks.map((pk) => Buffer.from(pk, "hex")),
+      [], // TODO ?
+    );
+
+    unbondingTx.setWitness(0, witness);
+
+    // Broadcast unbonding transaction
+    let txID;
+    try {
+      txID = await btcWallet.pushTx(unbondingTx.toHex());
+    } catch (error: Error | any) {
+      console.error(
+        error?.message || "Error broadcasting the unbonding transaction",
+      );
+      return;
+    }
+
+    console.log("payload", {
+      staker_signed_signature_hex: item.staking_tx.tx_hex,
+      staking_tx_hash_hex: item.staking_tx_hash_hex,
+      unbonding_tx_hash_hex: txID,
+      unbonding_tx_hex: unbondingTx.toHex(),
+    });
+
+    // POST unbonding to the API
+    let response;
+    try {
+      response = await postUnbonding({
+        staker_signed_signature_hex: item.staking_tx.tx_hex,
+        staking_tx_hash_hex: item.staking_tx_hash_hex,
+        unbonding_tx_hash_hex: txID,
+        unbonding_tx_hex: unbondingTx.toHex(),
+      });
+    } catch (error: Error | any) {
+      console.error(error?.message || "Error posting unbonding transaction");
+      return;
+    }
+
+    console.log("Unbonding response", response);
+
+    // Update the local state with the new delegation
+    setIntermediateDelegationsLocalStorage((delegations) => [
+      toLocalStorageIntermediateDelegation(
+        item.staking_tx_hash_hex,
+        publicKeyNoCoord,
+        item.finality_provider_pk_hex,
+        item.staking_value,
+        item.staking_tx.tx_hex,
+        item.staking_tx.timelock,
+        "intermediate_unbonding",
+      ),
+      ...delegations,
+    ]);
+  };
+
+  const handleWithdraw = async (id: string) => {
+    if (!delegationsData || !btcWallet) return;
+
+    // Find the delegation in the data
+    const item = delegationsData?.find(
+      (delegation) => delegation?.staking_tx_hash_hex === id,
+    );
+
+    if (!item) return;
+
+    // Recreate the staking scripts
+    let timelockScript;
+    let slashingScript;
+    let unbondingScript;
+    try {
+      const data = apiDataToStakingScripts(
+        item,
+        globalParamsData,
+        publicKeyNoCoord,
+      );
+      if (!data) {
+        throw new Error("Error recreating scripts");
+      }
+      timelockScript = data.timelockScript;
+      slashingScript = data.slashingScript;
+      unbondingScript = data.unbondingScript;
+    } catch (error: Error | any) {
+      console.error(error?.message || "Cannot build staking scripts");
+      return;
+    }
+
+    // Create the withdrawal transaction
+    let unsignedWithdrawalTx;
+    // TODO add manually unbonded tx support
+    try {
+      unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
+        timelockScript,
+        slashingScript,
+        unbondingScript,
+        Transaction.fromHex(item.staking_tx.tx_hex),
+        address,
+        withdrawalFee,
+        btcWalletNetwork,
+        item.staking_tx.output_index,
+      );
+    } catch (error: Error | any) {
+      console.error(error?.message || "Error creating withdrawal transaction");
+      return;
+    }
+
+    // Sign withdrawal transaction
+    let withdrawalTransaction: Transaction;
+    try {
+      withdrawalTransaction = Transaction.fromHex(
+        await btcWallet.signPsbt(unsignedWithdrawalTx.toHex()),
+      );
+    } catch (error: Error | any) {
+      console.error(error?.message || "Error signing withdrawal transaction");
+      return;
+    }
+
+    // Broadcast withdrawal transaction
+    let txID;
+    try {
+      txID = await btcWallet.pushTx(withdrawalTransaction.toHex());
+    } catch (error: Error | any) {
+      console.error(
+        error?.message || "Error broadcasting the withdrawal transaction",
+      );
+      return;
+    }
+
+    // Update the local state with the new delegation
+    setIntermediateDelegationsLocalStorage((delegations) => [
+      toLocalStorageIntermediateDelegation(
+        item.staking_tx_hash_hex,
+        publicKeyNoCoord,
+        item.finality_provider_pk_hex,
+        item.staking_value,
+        item.staking_tx.tx_hex,
+        item.staking_tx.timelock,
+        "intermediate_withdrawal",
+      ),
+      ...delegations,
+    ]);
+  };
+
+  // Remove the intermediate delegations that are already present in the API
+  useEffect(() => {
+    if (!delegationsData) {
+      return;
+    }
+
+    // check if delegationsData has status of unbonded or withdrawn
+    // if it does, remove the intermediate delegation from local storage
+    setIntermediateDelegationsLocalStorage((intermediateDelegations) =>
+      intermediateDelegations?.filter(
+        (intermediateDelegation) =>
+          !delegationsData?.find(
+            (delegation) =>
+              delegation?.staking_tx_hash_hex ===
+                intermediateDelegation?.staking_tx_hash_hex &&
+              (delegation?.state === "unbonded" ||
+                delegation?.state === "withdrawn"),
+          ),
+      ),
+    );
+  }, [delegationsData, setIntermediateDelegationsLocalStorage]);
+
   return (
     <div className="card gap-4 bg-base-300 p-4">
       <div className="flex w-full">
@@ -30,17 +318,22 @@ export const Delegations: React.FC<DelegationsProps> = ({
           // Get the moniker of the finality provider
           const finalityProviderMoniker =
             finalityProvidersKV[finality_provider_pk_hex];
-          // Convert state to human readable format
-          const readableState = getState(state);
+          const intermediateDelegation =
+            intermediateDelegationsLocalStorage.find(
+              (item) => item.staking_tx_hash_hex === staking_tx_hash_hex,
+            );
 
           return (
             <Delegation
-              key={staking_tx_hash_hex}
+              key={staking_tx_hash_hex + staking_tx.start_height}
               finalityProviderMoniker={finalityProviderMoniker}
               stakingTx={staking_tx}
               stakingValue={staking_value}
               stakingTxID={staking_tx_hash_hex}
-              state={readableState}
+              state={state}
+              onUnbond={handleUnbond}
+              onWithdraw={handleWithdraw}
+              intermediateDelegation={intermediateDelegation}
             />
           );
         })}

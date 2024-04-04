@@ -1,4 +1,4 @@
-import { getApiData } from "@/utils/getApiData";
+import { apiWrapper } from "./apiWrapper";
 
 interface FinalityProviders {
   data: FinalityProvider[];
@@ -22,5 +22,11 @@ interface Description {
   details: string;
 }
 
-export const getFinalityProviders = async (): Promise<FinalityProviders> =>
-  getApiData("/v1/finality-providers", "Error getting finality providers");
+export const getFinalityProviders = async (): Promise<FinalityProviders> => {
+  const reponse = await apiWrapper(
+    "GET",
+    "/v1/finality-providers",
+    "Error getting finality providers",
+  );
+  return reponse.data;
+};

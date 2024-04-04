@@ -11,7 +11,7 @@ export const toLocalStorageDelegation = (
   staking_tx_hash_hex: stakingTxHashHex,
   staker_pk_hex: stakerPkHex,
   finality_provider_pk_hex: finalityProviderPkHex,
-  state: "active",
+  state: "pending",
   staking_value: stakingValue,
   staking_tx: {
     tx_hex: stakingTxHex,
