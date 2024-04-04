@@ -32,25 +32,17 @@ export const Delegations: React.FC<DelegationsProps> = ({
             finalityProvidersKV[finality_provider_pk_hex];
           // Convert state to human readable format
           const readableState = getState(state);
-          if (
-            finalityProviderMoniker &&
-            staking_tx &&
-            staking_value &&
-            staking_tx_hash_hex &&
-            staking_tx?.timelock &&
-            readableState
-          ) {
-            return (
-              <Delegation
-                key={staking_tx_hash_hex}
-                finalityProviderMoniker={finalityProviderMoniker}
-                stakingTx={staking_tx}
-                stakingValue={staking_value}
-                stakingTxID={staking_tx_hash_hex}
-                state={readableState}
-              />
-            );
-          }
+
+          return (
+            <Delegation
+              key={staking_tx_hash_hex}
+              finalityProviderMoniker={finalityProviderMoniker}
+              stakingTx={staking_tx}
+              stakingValue={staking_value}
+              stakingTxID={staking_tx_hash_hex}
+              state={readableState}
+            />
+          );
         })}
       </div>
     </div>
