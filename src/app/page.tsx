@@ -187,7 +187,7 @@ const Home: React.FC<HomeProps> = () => {
         covenantPKsBuffer,
         globalParamsData.covenant_quorum,
         stakingDuration,
-        globalParamsData.unbonding_time + 1,
+        globalParamsData.unbonding_time,
         Buffer.from(globalParamsData.tag),
       );
       if (!stakingScriptData.validate()) {
