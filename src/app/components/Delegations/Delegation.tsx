@@ -64,8 +64,16 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       )}
       <div className="flex justify-between gap-4">
-        <p>{stakingValue / 1e8} Signet BTC</p>
-        <p>{timelock} blocks</p>
+        <p>
+          {stakingValue / 1e8}
+          <br />
+          Signet BTC
+        </p>
+        <div className="flex flex-col items-end">
+          <p>{timelock} blocks</p>
+          {/* convert date to a readable format */}
+          <p>{new Date(start_timestamp)?.toLocaleDateString()}</p>
+        </div>
       </div>
       <div className="flex justify-between gap-4">
         <p className="text-left">{finalityProviderMoniker}</p>
@@ -82,9 +90,7 @@ export const Delegation: React.FC<DelegationProps> = ({
           className="text-primary hover:underline"
         >
           {trim(stakingTxID)}
-        </a>{" "}
-        {/* convert date to a readable format */}
-        <p>{new Date(start_timestamp)?.toLocaleDateString()}</p>
+        </a>
         {/* unbond or withdraw button */}
         {generateCTA()}
       </div>

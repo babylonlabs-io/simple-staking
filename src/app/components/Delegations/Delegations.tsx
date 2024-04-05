@@ -274,7 +274,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
                 intermediateDelegation?.staking_tx_hash_hex &&
-              (delegation?.state === "unbonded" ||
+              (delegation?.state === "unbonding_requested" ||
                 delegation?.state === "withdrawn"),
           ),
       ),
