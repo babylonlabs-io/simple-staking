@@ -26,7 +26,7 @@ export const apiWrapper = async (
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error?.response?.data?.message;
-      throw new Error(generalErrorMessage, message);
+      throw new Error(message || generalErrorMessage);
     } else {
       throw new Error(generalErrorMessage);
     }

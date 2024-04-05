@@ -121,7 +121,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       return;
     }
 
-    // Delegator signature from the wallet
+    // Sign the unbonding transaction
     let unbondingTx: Transaction;
     try {
       unbondingTx = Transaction.fromHex(
@@ -132,48 +132,30 @@ export const Delegations: React.FC<DelegationsProps> = ({
       return;
     }
 
-    // Covenant signatures
-    const witness = createWitness(
-      unbondingTx.ins[0].witness,
-      globalParamsData.covenant_pks.map((pk) => Buffer.from(pk, "hex")),
-      [], // TODO ?
-    );
-
-    unbondingTx.setWitness(0, witness);
-
-    // Broadcast unbonding transaction
-    let txID;
+    let stakerSignature;
     try {
-      txID = await btcWallet.pushTx(unbondingTx.toHex());
+      stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
     } catch (error: Error | any) {
       console.error(
-        error?.message || "Error broadcasting the unbonding transaction",
+        error?.message ||
+          "Error extracting staked signature from the unbonding transaction",
       );
       return;
     }
-
-    console.log("payload", {
-      staker_signed_signature_hex: item.staking_tx.tx_hex,
-      staking_tx_hash_hex: item.staking_tx_hash_hex,
-      unbonding_tx_hash_hex: txID,
-      unbonding_tx_hex: unbondingTx.toHex(),
-    });
 
     // POST unbonding to the API
     let response;
     try {
       response = await postUnbonding({
-        staker_signed_signature_hex: item.staking_tx.tx_hex,
+        staker_signed_signature_hex: stakerSignature,
         staking_tx_hash_hex: item.staking_tx_hash_hex,
-        unbonding_tx_hash_hex: txID,
+        unbonding_tx_hash_hex: Transaction.fromHex(unbondingTx.toHex()).getId(),
         unbonding_tx_hex: unbondingTx.toHex(),
       });
     } catch (error: Error | any) {
       console.error(error?.message || "Error posting unbonding transaction");
       return;
     }
-
-    console.log("Unbonding response", response);
 
     // Update the local state with the new delegation
     setIntermediateDelegationsLocalStorage((delegations) => [
