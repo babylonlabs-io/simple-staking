@@ -34,6 +34,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         <button
           className="btn btn-link btn-xs text-primary no-underline"
           onClick={() => onUnbond(stakingTxID)}
+          disabled={intermediateDelegation?.state === "intermediate_unbonding"}
         >
           unbond
         </button>

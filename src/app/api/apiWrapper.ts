@@ -20,9 +20,15 @@ export const apiWrapper = async (
         throw new Error("Invalid method");
     }
 
-    response = await handler(`${process.env.NEXT_PUBLIC_API_URL}${url}`, {
-      params,
-    });
+    // destructure params in case of post request
+    response = await handler(
+      `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      method === "POST"
+        ? { ...params }
+        : {
+            params,
+          },
+    );
   } catch (error) {
     if (axios.isAxiosError(error)) {
       const message = error?.response?.data?.message;
