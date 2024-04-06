@@ -15,6 +15,7 @@ import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -42,9 +43,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
 }) => {
   // Local storage state for intermediate delegations (withdrawing, unbonding)
-  const intermediateDelegationsLocalStorageKey = address
-    ? `bbn-staking-intermediate-delegations-${address}`
-    : "";
+  const intermediateDelegationsLocalStorageKey =
+    getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
 
   const [
     intermediateDelegationsLocalStorage,

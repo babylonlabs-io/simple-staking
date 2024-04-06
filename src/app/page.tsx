@@ -29,6 +29,7 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { Transaction, networks } from "bitcoinjs-lib";
+import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 
 interface HomeProps {}
 
@@ -76,9 +77,8 @@ const Home: React.FC<HomeProps> = () => {
   }, []);
 
   // Local storage state for delegations
-  const delegationsLocalStorageKey = address
-    ? `bbn-staking-delegations-${address}`
-    : "";
+  const delegationsLocalStorageKey =
+    getDelegationsLocalStorageKey(publicKeyNoCoord);
 
   const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
     Delegation[]
