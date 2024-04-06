@@ -62,16 +62,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
       }
 
       // Find the delegation in the data
-      const item = delegationsAPI.find(
+      const delegation = delegationsAPI.find(
         (delegation) => delegation.staking_tx_hash_hex === id,
       );
-      if (!item) {
+      if (!delegation) {
         throw new Error("Not eligible for unbonding");
       }
 
       // Check if the unbonding is possible
       const unbondingEligibility = await getUnbondingEligibility(
-        item.staking_tx_hash_hex,
+        delegation.staking_tx_hash_hex,
       );
       if (!unbondingEligibility) {
         throw new Error("Not eligible for unbonding");
@@ -79,7 +79,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
       // Recreate the staking scripts
       const data = apiDataToStakingScripts(
-        item,
+        delegation,
         globalParamsData,
         publicKeyNoCoord,
       );
@@ -101,10 +101,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
         unbondingTimelockScript,
         timelockScript,
         slashingScript,
-        Transaction.fromHex(item.staking_tx.tx_hex),
+        Transaction.fromHex(delegation.staking_tx.tx_hex),
         unbondingFee,
         btcWalletNetwork,
-        item.staking_tx.output_index,
+        delegation.staking_tx.output_index,
       );
 
       // Sign the unbonding transaction
@@ -118,7 +118,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       // POST unbonding to the API
       const response = await postUnbonding({
         staker_signed_signature_hex: stakerSignature,
-        staking_tx_hash_hex: item.staking_tx_hash_hex,
+        staking_tx_hash_hex: delegation.staking_tx_hash_hex,
         unbonding_tx_hash_hex: Transaction.fromHex(unbondingTx.toHex()).getId(),
         unbonding_tx_hex: unbondingTx.toHex(),
       });
@@ -126,12 +126,12 @@ export const Delegations: React.FC<DelegationsProps> = ({
       // Update the local state with the new delegation
       setIntermediateDelegationsLocalStorage((delegations) => [
         toLocalStorageIntermediateDelegation(
-          item.staking_tx_hash_hex,
+          delegation.staking_tx_hash_hex,
           publicKeyNoCoord,
-          item.finality_provider_pk_hex,
-          item.staking_value,
-          item.staking_tx.tx_hex,
-          item.staking_tx.timelock,
+          delegation.finality_provider_pk_hex,
+          delegation.staking_value,
+          delegation.staking_tx.tx_hex,
+          delegation.staking_tx.timelock,
           "intermediate_unbonding",
         ),
         ...delegations,
