@@ -20,9 +20,5 @@ export const postUnbonding = async (payload: UnbondingPayload) => {
   );
 
   // If the response status is 202, the request was accepted
-  if (response.status === 202) {
-    return true;
-  } else {
-    return false;
-  }
+  return response.status === 202;
 };
