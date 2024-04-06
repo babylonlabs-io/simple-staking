@@ -14,6 +14,7 @@ export interface Delegation {
   state: string;
   staking_value: number;
   staking_tx: StakingTx;
+  unbonding_tx?: UnbondingTx;
 }
 
 export interface StakingTx {
@@ -22,6 +23,11 @@ export interface StakingTx {
   start_timestamp: string;
   start_height: number;
   timelock: number;
+}
+
+export interface UnbondingTx {
+  tx_hex: string;
+  output_index: number;
 }
 
 interface Pagination {

@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { Transaction, networks } from "bitcoinjs-lib";
 import {
-  createWitness,
   unbondingTransaction,
+  withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
 
@@ -186,6 +186,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     let timelockScript;
     let slashingScript;
     let unbondingScript;
+    let unbondingTimelockScript;
     try {
       const data = apiDataToStakingScripts(
         item,
@@ -198,6 +199,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       timelockScript = data.timelockScript;
       slashingScript = data.slashingScript;
       unbondingScript = data.unbondingScript;
+      unbondingTimelockScript = data.unbondingTimelockScript;
     } catch (error: Error | any) {
       console.error(error?.message || "Cannot build staking scripts");
       return;
@@ -205,18 +207,31 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Create the withdrawal transaction
     let unsignedWithdrawalTx;
-    // TODO add manually unbonded tx support
     try {
-      unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
-        timelockScript,
-        slashingScript,
-        unbondingScript,
-        Transaction.fromHex(item.staking_tx.tx_hex),
-        address,
-        withdrawalFee,
-        btcWalletNetwork,
-        item.staking_tx.output_index,
-      );
+      if (item?.unbonding_tx) {
+        // delegation unbonded manually
+        unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
+          unbondingTimelockScript,
+          slashingScript,
+          Transaction.fromHex(item.unbonding_tx.tx_hex),
+          address,
+          withdrawalFee,
+          btcWalletNetwork,
+          item.staking_tx.output_index,
+        );
+      } else {
+        // delegation unbonded naturally
+        unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
+          timelockScript,
+          slashingScript,
+          unbondingScript,
+          Transaction.fromHex(item.staking_tx.tx_hex),
+          address,
+          withdrawalFee,
+          btcWalletNetwork,
+          item.staking_tx.output_index,
+        );
+      }
     } catch (error: Error | any) {
       console.error(error?.message || "Error creating withdrawal transaction");
       return;
