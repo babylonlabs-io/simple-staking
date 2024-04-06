@@ -19,9 +19,5 @@ export const getUnbondingEligibility = async (txID: string) => {
   );
 
   // If the response status is 200, the unbonding is eligible
-  if (response.status === 200) {
-    return true;
-  } else {
-    return false;
-  }
+  return response.status === 200;
 };
