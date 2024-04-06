@@ -78,11 +78,11 @@ export const Delegation: React.FC<DelegationProps> = ({
       <div className="flex justify-between gap-4">
         <p className="text-left">{finalityProviderMoniker}</p>
         <p className="text-right">
+          {/* convert state to a readable format */}
           {getState(intermediateDelegation?.state || state)}
         </p>
       </div>
       <div className="flex justify-between gap-4">
-        {/* convert state to a readable format */}
         <a
           href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxID}`}
           target="_blank"
