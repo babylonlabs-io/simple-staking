@@ -9,7 +9,7 @@ interface DelegationProps {
   finalityProviderMoniker: string;
   stakingTx: StakingTx;
   stakingValue: number;
-  stakingTxID: string;
+  stakingTxHash: string;
   state: string;
   onUnbond: (id: string) => void;
   onWithdraw: (id: string) => void;
@@ -19,7 +19,7 @@ interface DelegationProps {
 export const Delegation: React.FC<DelegationProps> = ({
   stakingTx,
   finalityProviderMoniker,
-  stakingTxID,
+  stakingTxHash,
   state,
   stakingValue,
   onUnbond,
@@ -33,7 +33,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <button
           className="btn btn-link btn-xs text-primary no-underline"
-          onClick={() => onUnbond(stakingTxID)}
+          onClick={() => onUnbond(stakingTxHash)}
           disabled={intermediateDelegation?.state === "intermediate_unbonding"}
         >
           unbond
@@ -43,7 +43,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <button
           className="btn btn-link btn-xs text-secondary no-underline"
-          onClick={() => onWithdraw(stakingTxID)}
+          onClick={() => onWithdraw(stakingTxHash)}
           disabled={intermediateDelegation?.state === "intermediate_withdrawal"}
         >
           withdraw
@@ -84,12 +84,12 @@ export const Delegation: React.FC<DelegationProps> = ({
       </div>
       <div className="flex justify-between gap-4">
         <a
-          href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxID}`}
+          href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-primary hover:underline"
         >
-          {trim(stakingTxID)}
+          {trim(stakingTxHash)}
         </a>
         {/* unbond or withdraw button */}
         {generateCTA()}
