@@ -13,7 +13,10 @@ interface DelegationProps {
   state: string;
   onUnbond: (id: string) => void;
   onWithdraw: (id: string) => void;
-  intermediateDelegation?: DelegationInterface;
+  // This attribute is set when an action has been taken by the user
+  // that should change the status but the back-end
+  // has not had time to reflect this change yet
+  intermediateState?: string;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
@@ -24,7 +27,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   stakingValue,
   onUnbond,
   onWithdraw,
-  intermediateDelegation,
+  intermediateState,
 }) => {
   const { start_height, timelock, start_timestamp } = stakingTx;
 
@@ -38,7 +41,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         <button
           className="btn btn-link btn-xs text-primary no-underline"
           onClick={() => onUnbond(stakingTxHash)}
-          disabled={intermediateDelegation?.state === "intermediate_unbonding"}
+          disabled={intermediateState === "intermediate_unbonding"}
         >
           unbond
         </button>
@@ -48,7 +51,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         <button
           className="btn btn-link btn-xs text-secondary no-underline"
           onClick={() => onWithdraw(stakingTxHash)}
-          disabled={intermediateDelegation?.state === "intermediate_withdrawal"}
+          disabled={intermediateState === "intermediate_withdrawal"}
         >
           withdraw
         </button>
@@ -83,7 +86,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         <p className="text-left">{finalityProviderMoniker}</p>
         <p className="text-right">
           {/* convert state to a readable format */}
-          {getState(intermediateDelegation?.state || state)}
+          {getState(intermediateState || state)}
         </p>
       </div>
       <div className="flex justify-between gap-4">

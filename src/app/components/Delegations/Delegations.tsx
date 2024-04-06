@@ -330,7 +330,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
               state={state}
               onUnbond={handleUnbond}
               onWithdraw={handleWithdraw}
-              intermediateDelegation={intermediateDelegation}
+              intermediateState={intermediateDelegation?.state}
             />
           );
         })}
