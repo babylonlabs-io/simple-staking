@@ -290,10 +290,6 @@ const Home: React.FC<HomeProps> = () => {
     {},
   );
 
-  const combinedDelegationsData = delegationsData
-    ? [...delegationsLocalStorage, ...delegationsData]
-    : delegationsLocalStorage;
-
   return (
     <main className="container mx-auto flex h-full min-h-svh w-full justify-center p-4">
       <div className="container flex flex-col gap-4">
@@ -324,14 +320,13 @@ const Home: React.FC<HomeProps> = () => {
           globalParamsData &&
           btcWalletNetwork &&
           publicKeyNoCoord &&
-          combinedDelegationsData.length > 0 &&
           finalityProvidersData &&
           finalityProvidersData.length > 0 &&
           finalityProvidersKV && (
             <Delegations
-              delegations={combinedDelegationsData}
               finalityProvidersKV={finalityProvidersKV}
-              delegationsData={delegationsData}
+              delegationsAPI={delegationsData}
+              delegationsLocalStorage={delegationsLocalStorage}
               btcWallet={btcWallet}
               globalParamsData={globalParamsData}
               publicKeyNoCoord={publicKeyNoCoord}

@@ -17,9 +17,9 @@ import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 interface DelegationsProps {
-  delegations: DelegationInterface[];
   finalityProvidersKV: Record<string, string>;
-  delegationsData: DelegationInterface[];
+  delegationsAPI: DelegationInterface[];
+  delegationsLocalStorage: DelegationInterface[];
   btcWallet: WalletProvider;
   globalParamsData: GlobalParamsData;
   publicKeyNoCoord: string;
@@ -30,9 +30,9 @@ interface DelegationsProps {
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
-  delegations,
   finalityProvidersKV,
-  delegationsData,
+  delegationsAPI,
+  delegationsLocalStorage,
   btcWallet,
   globalParamsData,
   publicKeyNoCoord,
@@ -55,10 +55,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
   );
 
   const handleUnbond = async (id: string) => {
-    if (!delegationsData || !btcWallet || !globalParamsData) return;
+    if (!delegationsAPI || !btcWallet || !globalParamsData) return;
 
     // Find the delegation in the data
-    const item = delegationsData?.find(
+    const item = delegationsAPI?.find(
       (delegation) => delegation?.staking_tx_hash_hex === id,
     );
 
@@ -173,10 +173,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
   };
 
   const handleWithdraw = async (id: string) => {
-    if (!delegationsData || !btcWallet) return;
+    if (!delegationsAPI || !btcWallet) return;
 
     // Find the delegation in the data
-    const item = delegationsData?.find(
+    const item = delegationsAPI?.find(
       (delegation) => delegation?.staking_tx_hash_hex === id,
     );
 
@@ -276,16 +276,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
   // Remove the intermediate delegations that are already present in the API
   useEffect(() => {
-    if (!delegationsData) {
+    if (!delegationsAPI) {
       return;
     }
 
-    // check if delegationsData has status of unbonded or withdrawn
+    // check if delegationsAPI has status of unbonded or withdrawn
     // if it does, remove the intermediate delegation from local storage
     setIntermediateDelegationsLocalStorage((intermediateDelegations) =>
       intermediateDelegations?.filter(
         (intermediateDelegation) =>
-          !delegationsData?.find(
+          !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
                 intermediateDelegation?.staking_tx_hash_hex &&
@@ -294,7 +294,12 @@ export const Delegations: React.FC<DelegationsProps> = ({
           ),
       ),
     );
-  }, [delegationsData, setIntermediateDelegationsLocalStorage]);
+  }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
+
+  // Combine the delegations from the API and local storage
+  const combinedDelegationsData = delegationsAPI
+    ? [...delegationsLocalStorage, ...delegationsAPI]
+    : delegationsLocalStorage;
 
   return (
     <div className="card gap-4 bg-base-300 p-4">
@@ -302,7 +307,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         <h2 className="font-bold">Staking history</h2>
       </div>
       <div className="grid w-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
-        {delegations?.map((delegation) => {
+        {combinedDelegationsData?.map((delegation) => {
           if (!delegation) return null;
 
           const {
