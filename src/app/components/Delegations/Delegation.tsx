@@ -1,7 +1,4 @@
-import {
-  Delegation as DelegationInterface,
-  StakingTx,
-} from "@/app/api/getDelegations";
+import { StakingTx } from "@/app/api/getDelegations";
 import { getState } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 
@@ -31,7 +28,7 @@ export const Delegation: React.FC<DelegationProps> = ({
 }) => {
   const { start_height, timelock, start_timestamp } = stakingTx;
 
-  const generateCTA = () => {
+  const generateActionButton = () => {
     // This function generates the unbond or withdraw button
     // based on the state of the delegation
     // It also disables the button if the delegation
@@ -99,7 +96,7 @@ export const Delegation: React.FC<DelegationProps> = ({
           {trim(stakingTxHash)}
         </a>
         {/* unbond or withdraw button */}
-        {generateCTA()}
+        {generateActionButton()}
       </div>
     </div>
   );
