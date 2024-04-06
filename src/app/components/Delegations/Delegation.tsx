@@ -29,6 +29,10 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { start_height, timelock, start_timestamp } = stakingTx;
 
   const generateCTA = () => {
+    // This function generates the unbond or withdraw button
+    // based on the state of the delegation
+    // It also disables the button if the delegation
+    // is in an intermediate state (local storage)
     if (state === "active") {
       return (
         <button
