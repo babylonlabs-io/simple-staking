@@ -15,7 +15,7 @@ export const postUnbonding = async (payload: UnbondingPayload) => {
   const response = await apiWrapper(
     "POST",
     "/v1/unbonding",
-    "Error POST unbonding request",
+    "Error submitting unbonding request",
     payload,
   );
 
