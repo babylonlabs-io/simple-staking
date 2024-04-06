@@ -95,7 +95,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         unbondingTimelockScript,
       } = data;
 
-      // Create the withdrawal transaction
+      // Create the unbonding transaction
       const unsignedUnbondingTx = unbondingTransaction(
         unbondingScript,
         unbondingTimelockScript,
