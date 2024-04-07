@@ -6,7 +6,7 @@ import { Delegation } from "@/app/api/getDelegations";
 // Used to recreate scripts from the data received from the API
 export const apiDataToStakingScripts = (
   item: Delegation,
-  globalParams: GlobalParamsData | undefined,
+  globalParams: GlobalParamsData,
   publicKeyNoCoord: string,
 ): StakingScripts | undefined => {
   if (!item || !globalParams || !publicKeyNoCoord) {
