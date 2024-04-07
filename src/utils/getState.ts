@@ -3,6 +3,7 @@ import {
   INTERMEDIATE_WITHDRAWAL,
 } from "@/app/types/local_storage/intermediate";
 
+// Define the state of a delegation as per API
 export const State = {
   active: "active",
   unbonding_requested: "unbonding_requested",
@@ -14,6 +15,7 @@ export const State = {
   INTERMEDIATE_WITHDRAWAL,
 };
 
+// Convert state to human readable format
 export const getState = (state: string) => {
   switch (state) {
     case State.active:
