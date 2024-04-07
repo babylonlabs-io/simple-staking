@@ -327,13 +327,14 @@ const Home: React.FC<HomeProps> = () => {
               finalityProvidersKV={finalityProvidersKV}
               delegationsAPI={delegationsData}
               delegationsLocalStorage={delegationsLocalStorage}
-              btcWallet={btcWallet}
               globalParamsData={globalParamsData}
               publicKeyNoCoord={publicKeyNoCoord}
               unbondingFee={unbondingFee}
               withdrawalFee={withdrawalFee}
               btcWalletNetwork={btcWalletNetwork}
               address={address}
+              signPsbt={btcWallet.signPsbt}
+              pushTx={btcWallet.pushTx}
             />
           )}
       </div>

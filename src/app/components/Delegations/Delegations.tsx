@@ -16,32 +16,37 @@ import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { INTERMEDIATE_UNBONDING, INTERMEDIATE_WITHDRAWAL } from "@/app/types/local_storage/intermediate";
+import {
+  INTERMEDIATE_UNBONDING,
+  INTERMEDIATE_WITHDRAWAL,
+} from "@/app/types/local_storage/intermediate";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
   delegationsAPI: DelegationInterface[];
   delegationsLocalStorage: DelegationInterface[];
-  btcWallet: WalletProvider;
   globalParamsData: GlobalParamsData;
   publicKeyNoCoord: string;
   unbondingFee: number;
   withdrawalFee: number;
   btcWalletNetwork: networks.Network;
   address: string;
+  signPsbt: WalletProvider["signPsbt"];
+  pushTx: WalletProvider["pushTx"];
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
   finalityProvidersKV,
   delegationsAPI,
   delegationsLocalStorage,
-  btcWallet,
   globalParamsData,
   publicKeyNoCoord,
   unbondingFee,
   withdrawalFee,
   btcWalletNetwork,
   address,
+  signPsbt,
+  pushTx,
 }) => {
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -59,7 +64,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const handleUnbond = async (id: string) => {
     try {
       // Check if the data is available
-      if (!delegationsAPI || !btcWallet || !globalParamsData) {
+      if (!delegationsAPI || !globalParamsData) {
         throw new Error("No data available");
       }
 
@@ -111,7 +116,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
       // Sign the unbonding transaction
       const unbondingTx = Transaction.fromHex(
-        await btcWallet.signPsbt(unsignedUnbondingTx.toHex()),
+        await signPsbt(unsignedUnbondingTx.toHex()),
       );
 
       // Get the staker signature
@@ -147,7 +152,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const handleWithdraw = async (id: string) => {
     try {
       // Check if the data is available
-      if (!delegationsAPI || !btcWallet || !globalParamsData) {
+      if (!delegationsAPI || !globalParamsData) {
         throw new Error("No data available");
       }
 
@@ -206,11 +211,11 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
       // Sign the withdrawal transaction
       const withdrawalTransaction = Transaction.fromHex(
-        await btcWallet.signPsbt(unsignedWithdrawalTx.toHex()),
+        await signPsbt(unsignedWithdrawalTx.toHex()),
       );
 
       // Broadcast withdrawal transaction
-      const txID = await btcWallet.pushTx(withdrawalTransaction.toHex());
+      const txID = await pushTx(withdrawalTransaction.toHex());
 
       // Update the local state with the new delegation
       setIntermediateDelegationsLocalStorage((delegations) => [
