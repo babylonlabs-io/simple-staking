@@ -1,3 +1,8 @@
+import {
+  INTERMEDIATE_UNBONDING,
+  INTERMEDIATE_WITHDRAWAL,
+} from "@/app/types/local_storage/intermediate";
+
 export const getState = (state: string) => {
   switch (state) {
     case "active":
@@ -13,9 +18,9 @@ export const getState = (state: string) => {
     case "pending":
       return "Pending";
     // Intermediate local storage states
-    case "intermediate_unbonding":
+    case INTERMEDIATE_UNBONDING:
       return "Unbonding";
-    case "intermediate_withdrawal":
+    case INTERMEDIATE_WITHDRAWAL:
       return "Withdrawing";
     default:
       return "Unknown";

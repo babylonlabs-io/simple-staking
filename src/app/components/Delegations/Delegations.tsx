@@ -16,6 +16,7 @@ import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { INTERMEDIATE_UNBONDING, INTERMEDIATE_WITHDRAWAL } from "@/app/types/local_storage/intermediate";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -133,7 +134,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           delegation.staking_value,
           delegation.staking_tx.tx_hex,
           delegation.staking_tx.timelock,
-          "intermediate_unbonding",
+          INTERMEDIATE_UNBONDING,
         ),
         ...delegations,
       ]);
@@ -220,7 +221,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           delegation.staking_value,
           delegation.staking_tx.tx_hex,
           delegation.staking_tx.timelock,
-          "intermediate_withdrawal",
+          INTERMEDIATE_WITHDRAWAL,
         ),
         ...delegations,
       ]);
