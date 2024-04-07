@@ -65,7 +65,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         throw new Error("No data available");
       }
 
-      // Find the delegation in the data
+      // Find the delegation in the delegations retrieved from the API
       const delegation = delegationsAPI.find(
         (delegation) => delegation.staking_tx_hash_hex === id,
       );
@@ -153,7 +153,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         throw new Error("No data available");
       }
 
-      // Find the delegation in the data
+      // Find the delegation in the delegations retrieved from the API
       const delegation = delegationsAPI.find(
         (delegation) => delegation.staking_tx_hash_hex === id,
       );
