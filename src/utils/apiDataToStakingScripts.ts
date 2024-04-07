@@ -8,7 +8,7 @@ export const apiDataToStakingScripts = (
   item: Delegation,
   globalParams: GlobalParamsData,
   publicKeyNoCoord: string,
-): StakingScripts | undefined => {
+): StakingScripts => {
   if (!item || !globalParams || !publicKeyNoCoord) {
     throw new Error("Invalid data");
   }

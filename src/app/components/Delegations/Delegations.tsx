@@ -59,48 +59,66 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
   // Handles unbonding requests for Active delegations that want to be withdrawn early. It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
   const handleUnbond = async (id: string) => {
-    try {
-      // Check if the data is available
-      if (!delegationsAPI || !globalParamsData) {
-        throw new Error("No back-end API data available");
-      }
+    // TODO all console.errors should be UI popups
 
-      // Find the delegation in the delegations retrieved from the API
-      const delegation = delegationsAPI.find(
+    // Check if the data is available
+    if (!delegationsAPI || !globalParamsData) {
+      console.error("No back-end API data available");
+      return;
+    }
+
+    // Find the delegation in the delegations retrieved from the API
+    let delegation;
+    try {
+      delegation = delegationsAPI.find(
         (delegation) => delegation.staking_tx_hash_hex === id,
       );
       if (!delegation) {
-        throw new Error("Not eligible for unbonding");
+        throw new Error("Delegation not found");
       }
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+      return;
+    }
 
-      // Check if the unbonding is possible
+    // Check if the unbonding is possible
+    try {
       const unbondingEligibility = await getUnbondingEligibility(
         delegation.staking_tx_hash_hex,
       );
       if (!unbondingEligibility) {
         throw new Error("Not eligible for unbonding");
       }
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+      return;
+    }
 
-      // Recreate the staking scripts
-      const data = apiDataToStakingScripts(
+    // Recreate the staking scripts
+    let data;
+    try {
+      data = apiDataToStakingScripts(
         delegation,
         globalParamsData,
         publicKeyNoCoord,
       );
-      if (!data) {
-        throw new Error("Error recreating scripts");
-      }
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+      return;
+    }
 
-      // Destructure the staking scripts
-      const {
-        timelockScript,
-        slashingScript,
-        unbondingScript,
-        unbondingTimelockScript,
-      } = data;
+    // Destructure the staking scripts
+    const {
+      timelockScript,
+      slashingScript,
+      unbondingScript,
+      unbondingTimelockScript,
+    } = data;
 
-      // Create the unbonding transaction
-      const unsignedUnbondingTx = unbondingTransaction(
+    // Create the unbonding transaction
+    let unsignedUnbondingTx;
+    try {
+      unsignedUnbondingTx = unbondingTransaction(
         unbondingScript,
         unbondingTimelockScript,
         timelockScript,
@@ -110,43 +128,64 @@ export const Delegations: React.FC<DelegationsProps> = ({
         btcWalletNetwork,
         delegation.staking_tx.output_index,
       );
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+      return;
+    }
 
-      // Sign the unbonding transaction
-      const unbondingTx = Transaction.fromHex(
+    // Sign the unbonding transaction
+    let unbondingTx;
+    try {
+      unbondingTx = Transaction.fromHex(
         await signPsbt(unsignedUnbondingTx.toHex()),
       );
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+      return;
+    }
 
-      // Get the staker signature
-      const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
+    // Get the staker signature
+    let stakerSignature;
+    try {
+      stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+      return;
+    }
 
-      // POST unbonding to the API
-      const response = await postUnbonding({
+    // POST unbonding to the API
+    let _response;
+    try {
+      _response = await postUnbonding({
         staker_signed_signature_hex: stakerSignature,
         staking_tx_hash_hex: delegation.staking_tx_hash_hex,
         unbonding_tx_hash_hex: Transaction.fromHex(unbondingTx.toHex()).getId(),
         unbonding_tx_hex: unbondingTx.toHex(),
       });
-
-      // Update the local state with the new delegation
-      setIntermediateDelegationsLocalStorage((delegations) => [
-        toLocalStorageIntermediateDelegation(
-          delegation.staking_tx_hash_hex,
-          publicKeyNoCoord,
-          delegation.finality_provider_pk_hex,
-          delegation.staking_value,
-          delegation.staking_tx.tx_hex,
-          delegation.staking_tx.timelock,
-          State.INTERMEDIATE_UNBONDING,
-        ),
-        ...delegations,
-      ]);
     } catch (error: Error | any) {
-      console.error(error?.message || "Error unbonding");
+      console.error(error?.message || error);
     }
+
+    // Update the local state with the new delegation
+    setIntermediateDelegationsLocalStorage((delegations) => [
+      toLocalStorageIntermediateDelegation(
+        delegation.staking_tx_hash_hex,
+        publicKeyNoCoord,
+        delegation.finality_provider_pk_hex,
+        delegation.staking_value,
+        delegation.staking_tx.tx_hex,
+        delegation.staking_tx.timelock,
+        State.INTERMEDIATE_UNBONDING,
+      ),
+      ...delegations,
+    ]);
   };
 
   // Handles withdrawing requests for delegations that have expired timelocks. It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
+    // TODO all console.errors should be UI popups
+    // TODO move to a per-case error handling when unbonding solution is accepted
+
     try {
       // Check if the data is available
       if (!delegationsAPI || !globalParamsData) {
