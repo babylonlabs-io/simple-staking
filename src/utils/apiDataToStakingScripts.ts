@@ -13,8 +13,6 @@ export const apiDataToStakingScripts = (
     throw new Error("Invalid data");
   }
 
-  const generalErrorMessage = "Error while recreating scripts";
-
   // Convert covenant PKs to buffers
   const covenantPKsBuffer = globalParams?.covenant_pks?.map((pk) =>
     Buffer.from(pk, "hex"),
@@ -36,8 +34,7 @@ export const apiDataToStakingScripts = (
       throw new Error("Invalid staking data");
     }
   } catch (error: Error | any) {
-    console.error(error?.message || "Cannot build staking script data");
-    return;
+    throw new Error(error?.message || "Cannot build staking script data");
   }
 
   // Build scripts
@@ -45,7 +42,7 @@ export const apiDataToStakingScripts = (
   try {
     scripts = stakingScriptData.buildScripts();
   } catch (error: Error | any) {
-    throw new Error(error?.message || generalErrorMessage);
+    throw new Error(error?.message || "Error while recreating scripts");
   }
 
   return scripts;
