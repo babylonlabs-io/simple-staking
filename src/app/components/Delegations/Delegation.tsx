@@ -1,6 +1,9 @@
 import { StakingTx } from "@/app/api/getDelegations";
-import { INTERMEDIATE_UNBONDING, INTERMEDIATE_WITHDRAWAL } from "@/app/types/local_storage/intermediate";
-import { getState } from "@/utils/getState";
+import {
+  INTERMEDIATE_UNBONDING,
+  INTERMEDIATE_WITHDRAWAL,
+} from "@/app/types/local_storage/intermediate";
+import { State, getState } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 
 interface DelegationProps {
@@ -34,7 +37,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     // based on the state of the delegation
     // It also disables the button if the delegation
     // is in an intermediate state (local storage)
-    if (state === "active") {
+    if (state === State.active) {
       return (
         <button
           className="btn btn-link btn-xs text-primary no-underline"
