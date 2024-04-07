@@ -60,7 +60,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     [],
   );
 
-  // Active delegation can be unbonded manually
+  // The staking script allows users to on-demand unbond their locked stake before the staking transaction timelock expires, subject to an unbonding period.
   const handleUnbond = async (id: string) => {
     try {
       // Check if the data is available
