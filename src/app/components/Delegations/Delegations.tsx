@@ -148,7 +148,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
   };
 
-  // Withdraw can be performed on unbonded (manually or naturally expired) delegations
+  // Withdrawing involves extracting funds for which the staking/unbonding period has expired from the staking/unbonding transaction.
   const handleWithdraw = async (id: string) => {
     try {
       // Check if the data is available
@@ -185,7 +185,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       // Create the withdrawal transaction
       let unsignedWithdrawalTx;
       if (delegation?.unbonding_tx) {
-        // delegation unbonded manually
+        // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
         unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
           unbondingTimelockScript,
           slashingScript,
@@ -196,7 +196,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           delegation.staking_tx.output_index,
         );
       } else {
-        // delegation unbonded naturally
+        // Withdraw funds from a staking transaction in which the timelock naturally expired
         unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
           timelockScript,
           slashingScript,
