@@ -62,7 +62,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     try {
       // Check if the data is available
       if (!delegationsAPI || !globalParamsData) {
-        throw new Error("No data available");
+        throw new Error("No back-end API data available");
       }
 
       // Find the delegation in the delegations retrieved from the API
@@ -150,7 +150,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     try {
       // Check if the data is available
       if (!delegationsAPI || !globalParamsData) {
-        throw new Error("No data available");
+        throw new Error("No back-end API data available");
       }
 
       // Find the delegation in the delegations retrieved from the API
