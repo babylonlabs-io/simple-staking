@@ -296,7 +296,7 @@ const Home: React.FC<HomeProps> = () => {
         <Connect
           onConnect={handleConnectBTC}
           address={address}
-          btcWalletBalance={btcWalletBalance}
+          balance={btcWalletBalance}
         />
         <Form
           amount={amount}

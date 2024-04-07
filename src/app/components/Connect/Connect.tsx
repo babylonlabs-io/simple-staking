@@ -4,13 +4,13 @@ import { isTaproot } from "@/utils/wallet";
 interface ConnectProps {
   onConnect: () => void;
   address: string;
-  btcWalletBalance: number;
+  balance: number;
 }
 
 export const Connect: React.FC<ConnectProps> = ({
   onConnect,
   address,
-  btcWalletBalance,
+  balance,
 }) => {
   return (
     <div className="card bg-base-300">
@@ -29,7 +29,7 @@ export const Connect: React.FC<ConnectProps> = ({
           <div className="stat">
             <div className="stat-title">Balance 🏦</div>
             <div className="stat-value text-base text-secondary">
-              {+(btcWalletBalance / 1e8).toFixed(6)}
+              {+(balance / 1e8).toFixed(6)}
             </div>
             <div className="stat-desc">BTC</div>
           </div>
