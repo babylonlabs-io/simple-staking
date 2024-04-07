@@ -57,7 +57,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     [],
   );
 
-  // The staking script allows users to on-demand unbond their locked stake before the staking transaction timelock expires, subject to an unbonding period.
+  // Handles unbonding requests for Active delegations that want to be withdrawn early. It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
   const handleUnbond = async (id: string) => {
     try {
       // Check if the data is available
@@ -145,7 +145,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
   };
 
-  // Withdrawing involves extracting funds for which the staking/unbonding period has expired from the staking/unbonding transaction.
+  // Handles withdrawing requests for delegations that have expired timelocks. It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
     try {
       // Check if the data is available
