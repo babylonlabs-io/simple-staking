@@ -182,7 +182,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
     ]);
   };
 
-  // Handles withdrawing requests for delegations that have expired timelocks. It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
+  // Handles withdrawing requests for delegations that have expired timelocks
+  // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
     // TODO all console.errors should be UI popups
     // TODO move to a per-case error handling when unbonding solution is accepted
