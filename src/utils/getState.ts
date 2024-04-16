@@ -1,39 +1,24 @@
-import {
-  INTERMEDIATE_UNBONDING,
-  INTERMEDIATE_WITHDRAWAL,
-} from "@/app/types/local_storage/intermediate";
-
-// Define the state of a delegation as per API
-export const State = {
-  active: "active",
-  unbonding_requested: "unbonding_requested",
-  unbonding: "unbonding",
-  unbonded: "unbonded",
-  withdrawn: "withdrawn",
-  pending: "pending",
-  INTERMEDIATE_UNBONDING,
-  INTERMEDIATE_WITHDRAWAL,
-};
+import { DelegationState } from "@/app/types/delegationState";
 
 // Convert state to human readable format
 export const getState = (state: string) => {
   switch (state) {
-    case State.active:
+    case DelegationState.ACTIVE:
       return "Active";
-    case State.unbonding_requested:
+    case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding Requested";
-    case State.unbonding:
+    case DelegationState.UNBONDING:
       return "Unbonding";
-    case State.unbonded:
+    case DelegationState.UNBONDED:
       return "Unbonded";
-    case State.withdrawn:
+    case DelegationState.WITHDRAWN:
       return "Withdrawn";
-    case State.pending:
+    case DelegationState.PENDING:
       return "Pending";
     // Intermediate local storage states
-    case State.INTERMEDIATE_UNBONDING:
+    case DelegationState.INTERMEDIATE_UNBONDING:
       return "Unbonding";
-    case State.INTERMEDIATE_WITHDRAWAL:
+    case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawing";
     default:
       return "Unknown";

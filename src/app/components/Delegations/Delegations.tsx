@@ -16,7 +16,7 @@ import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { State } from "@/utils/getState";
+import { DelegationState } from "@/app/types/delegationState";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -176,7 +176,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         delegation.staking_value,
         delegation.staking_tx.tx_hex,
         delegation.staking_tx.timelock,
-        State.INTERMEDIATE_UNBONDING,
+        DelegationState.INTERMEDIATE_UNBONDING,
       ),
       ...delegations,
     ]);
@@ -263,7 +263,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           delegation.staking_value,
           delegation.staking_tx.tx_hex,
           delegation.staking_tx.timelock,
-          State.INTERMEDIATE_WITHDRAWAL,
+          DelegationState.INTERMEDIATE_WITHDRAWAL,
         ),
         ...delegations,
       ]);
@@ -287,8 +287,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
                 intermediateDelegation?.staking_tx_hash_hex &&
-              (delegation?.state === State.unbonding_requested ||
-                delegation?.state === State.withdrawn),
+              (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
+                delegation?.state === DelegationState.WITHDRAWN),
           ),
       ),
     );

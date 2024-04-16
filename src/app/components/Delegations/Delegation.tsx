@@ -1,5 +1,6 @@
 import { StakingTx } from "@/app/api/getDelegations";
-import { State, getState } from "@/utils/getState";
+import { DelegationState } from "@/app/types/delegationState";
+import { getState } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 
 interface DelegationProps {
@@ -33,22 +34,26 @@ export const Delegation: React.FC<DelegationProps> = ({
     // based on the state of the delegation
     // It also disables the button if the delegation
     // is in an intermediate state (local storage)
-    if (state === State.active) {
+    if (state === DelegationState.ACTIVE) {
       return (
         <button
           className="btn btn-link btn-xs text-primary no-underline"
           onClick={() => onUnbond(stakingTxHash)}
-          disabled={intermediateState === State.INTERMEDIATE_UNBONDING}
+          disabled={
+            intermediateState === DelegationState.INTERMEDIATE_UNBONDING
+          }
         >
           unbond
         </button>
       );
-    } else if (state === State.unbonded) {
+    } else if (state === DelegationState.UNBONDED) {
       return (
         <button
           className="btn btn-link btn-xs text-secondary no-underline"
           onClick={() => onWithdraw(stakingTxHash)}
-          disabled={intermediateState === State.INTERMEDIATE_WITHDRAWAL}
+          disabled={
+            intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
+          }
         >
           withdraw
         </button>
