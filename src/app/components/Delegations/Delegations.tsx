@@ -57,7 +57,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
     [],
   );
 
-  // Handles unbonding requests for Active delegations that want to be withdrawn early. It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
+  // Handles unbonding requests for Active delegations that want to be withdrawn early
+  // It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
   const handleUnbond = async (id: string) => {
     // TODO all console.errors should be UI popups
 
