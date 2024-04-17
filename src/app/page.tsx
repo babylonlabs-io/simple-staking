@@ -27,14 +27,16 @@ import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
-import { toLocalStorageDelegation } from "@/utils/toLocalStorageDelegation";
-import { Transaction } from "bitcoinjs-lib";
+import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
+import { Transaction, networks } from "bitcoinjs-lib";
+import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletBalance, setBTCWalletBalance] = useState(0);
+  const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
@@ -74,10 +76,9 @@ const Home: React.FC<HomeProps> = () => {
     initBTCCurve();
   }, []);
 
-  // Local state for delegations
-  const delegationsLocalStorageKey = address
-    ? `bbn-staking-delegations-${address}`
-    : "";
+  // Local storage state for delegations
+  const delegationsLocalStorageKey =
+    getDelegationsLocalStorageKey(publicKeyNoCoord);
 
   const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
     Delegation[]
@@ -102,6 +103,7 @@ const Home: React.FC<HomeProps> = () => {
       );
       setBTCWallet(walletProvider);
       setBTCWalletBalance(balance);
+      setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
@@ -138,11 +140,16 @@ const Home: React.FC<HomeProps> = () => {
   const walletAndDataReady =
     !!btcWallet && !!globalParamsData && !!finalityProvidersData;
 
+  const stakingFee = 500;
+  const withdrawalFee = 500;
+  const unbondingFee = 500;
+
   const handleSign = async () => {
     if (
       // Simple check, should be present in the form fields first
       !walletAndDataReady ||
-      !finalityProvider
+      !finalityProvider ||
+      !btcWalletNetwork
       // TODO uncomment
       // amount <= 0 ||
       // duration <= 0 ||
@@ -153,8 +160,6 @@ const Home: React.FC<HomeProps> = () => {
     ) {
       return;
     }
-
-    const stakingFee = 500;
 
     const covenantPKsBuffer = globalParamsData.covenant_pks.map((pk) =>
       Buffer.from(pk, "hex"),
@@ -179,7 +184,7 @@ const Home: React.FC<HomeProps> = () => {
       console.error("Confirmed UTXOs not enough");
       return;
     }
-    let stakingScriptData = null;
+    let stakingScriptData;
     try {
       stakingScriptData = new StakingScriptData(
         Buffer.from(publicKeyNoCoord, "hex"),
@@ -197,7 +202,7 @@ const Home: React.FC<HomeProps> = () => {
       console.error(error?.message || "Cannot build staking script data");
       return;
     }
-    let scripts = null;
+    let scripts;
     try {
       scripts = stakingScriptData.buildScripts();
     } catch (error: Error | any) {
@@ -208,7 +213,7 @@ const Home: React.FC<HomeProps> = () => {
     const dataEmbedScript = scripts.dataEmbedScript;
     const unbondingScript = scripts.unbondingScript;
     const slashingScript = scripts.slashingScript;
-    let unsignedStakingTx = null;
+    let unsignedStakingTx;
     try {
       unsignedStakingTx = stakingTransaction(
         timelockScript,
@@ -218,7 +223,7 @@ const Home: React.FC<HomeProps> = () => {
         stakingFee,
         address,
         inputUTXOs,
-        toNetwork(await btcWallet.getNetwork()),
+        btcWalletNetwork,
         isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
         dataEmbedScript,
       );
@@ -236,7 +241,7 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
 
-    let txID = "";
+    let txID;
     try {
       txID = await btcWallet.pushTx(stakingTx);
     } catch (error: Error | any) {
@@ -285,17 +290,13 @@ const Home: React.FC<HomeProps> = () => {
     {},
   );
 
-  const combinedDelegationsData = delegationsData
-    ? [...delegationsLocalStorage, ...delegationsData]
-    : delegationsLocalStorage;
-
   return (
     <main className="container mx-auto flex h-full min-h-svh w-full justify-center p-4">
       <div className="container flex flex-col gap-4">
         <Connect
           onConnect={handleConnectBTC}
           address={address}
-          btcWalletBalance={btcWalletBalance}
+          balance={btcWalletBalance}
         />
         <Form
           amount={amount}
@@ -314,13 +315,26 @@ const Home: React.FC<HomeProps> = () => {
           isDurationSet={duration > 0}
           isFinalityProviderSet={!!finalityProvider}
         />
-        {combinedDelegationsData.length > 0 &&
+        {btcWallet &&
+          delegationsData &&
+          globalParamsData &&
+          btcWalletNetwork &&
+          publicKeyNoCoord &&
           finalityProvidersData &&
           finalityProvidersData.length > 0 &&
           finalityProvidersKV && (
             <Delegations
-              delegations={combinedDelegationsData}
               finalityProvidersKV={finalityProvidersKV}
+              delegationsAPI={delegationsData}
+              delegationsLocalStorage={delegationsLocalStorage}
+              globalParamsData={globalParamsData}
+              publicKeyNoCoord={publicKeyNoCoord}
+              unbondingFee={unbondingFee}
+              withdrawalFee={withdrawalFee}
+              btcWalletNetwork={btcWalletNetwork}
+              address={address}
+              signPsbt={btcWallet.signPsbt}
+              pushTx={btcWallet.pushTx}
             />
           )}
       </div>

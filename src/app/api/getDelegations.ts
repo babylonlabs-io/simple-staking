@@ -1,5 +1,6 @@
-import { getApiData } from "@/utils/getApiData";
 import { encode } from "url-safe-base64";
+
+import { apiWrapper } from "./apiWrapper";
 
 interface Delegations {
   data: Delegation[];
@@ -13,6 +14,7 @@ export interface Delegation {
   state: string;
   staking_value: number;
   staking_tx: StakingTx;
+  unbonding_tx?: UnbondingTx;
 }
 
 export interface StakingTx {
@@ -21,6 +23,11 @@ export interface StakingTx {
   start_timestamp: string;
   start_height: number;
   timelock: number;
+}
+
+export interface UnbondingTx {
+  tx_hex: string;
+  output_index: number;
 }
 
 interface Pagination {
@@ -45,9 +52,12 @@ export const getDelegations = async (
     staker_btc_pk: encode(publicKeyNoCoord),
   };
 
-  return getApiData(
+  const response = await apiWrapper(
+    "GET",
     "/v1/staker/delegations",
     "Error getting delegations",
     params,
   );
+
+  return response.data;
 };

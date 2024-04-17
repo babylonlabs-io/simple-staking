@@ -1,15 +1,25 @@
+import { DelegationState } from "@/app/types/delegationState";
+
+// Convert state to human readable format
 export const getState = (state: string) => {
   switch (state) {
-    case "active":
+    case DelegationState.ACTIVE:
       return "Active";
-    case "unbonding_requested":
+    case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding Requested";
-    case "unbonding":
+    case DelegationState.UNBONDING:
       return "Unbonding";
-    case "unbonded":
+    case DelegationState.UNBONDED:
       return "Unbonded";
-    case "withdrawn":
+    case DelegationState.WITHDRAWN:
       return "Withdrawn";
+    case DelegationState.PENDING:
+      return "Pending";
+    // Intermediate local storage states
+    case DelegationState.INTERMEDIATE_UNBONDING:
+      return "Unbonding";
+    case DelegationState.INTERMEDIATE_WITHDRAWAL:
+      return "Withdrawing";
     default:
       return "Unknown";
   }

@@ -20,7 +20,7 @@ export class OKXWallet extends WalletProvider {
     super();
   }
 
-  async connectWallet(): Promise<this> {
+  connectWallet = async (): Promise<this> => {
     const workingVersion = "2.83.26";
     // check whether there is an OKX Wallet extension
     if (!window.okxwallet) {
@@ -61,34 +61,34 @@ export class OKXWallet extends WalletProvider {
     } else {
       throw new Error("Could not connect to OKX Wallet");
     }
-  }
+  };
 
-  async getWalletProviderName(): Promise<string> {
+  getWalletProviderName = async (): Promise<string> => {
     return "OKX";
-  }
+  };
 
-  async getAddress(): Promise<string> {
+  getAddress = async (): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return this.okxWalletInfo.address;
-  }
+  };
 
-  async getPublicKeyHex(): Promise<string> {
+  getPublicKeyHex = async (): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return this.okxWalletInfo.publicKeyHex;
-  }
+  };
 
-  async signPsbt(psbtHex: string): Promise<string> {
+  signPsbt = async (psbtHex: string): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
     return (await this.signPsbts([psbtHex]))[0];
-  }
+  };
 
-  async signPsbts(psbtsHexes: string[]): Promise<string[]> {
+  signPsbts = async (psbtsHexes: string[]): Promise<string[]> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -100,9 +100,9 @@ export class OKXWallet extends WalletProvider {
     return response.map((tx: any) =>
       Psbt.fromHex(tx).extractTransaction().toHex(),
     );
-  }
+  };
 
-  async signMessageBIP322(message: string): Promise<string> {
+  signMessageBIP322 = async (message: string): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -110,13 +110,13 @@ export class OKXWallet extends WalletProvider {
       message,
       "bip322-simple",
     );
-  }
+  };
 
-  async getNetwork(): Promise<Network> {
+  getNetwork = async (): Promise<Network> => {
     return "testnet";
-  }
+  };
 
-  on(eventName: string, callBack: () => void) {
+  on = (eventName: string, callBack: () => void) => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
@@ -124,24 +124,24 @@ export class OKXWallet extends WalletProvider {
     if (eventName === "accountChanged") {
       return window.okxwallet.bitcoinSignet.on(eventName, callBack);
     }
-  }
+  };
 
   // Mempool calls
 
-  async getBalance(): Promise<number> {
+  getBalance = async (): Promise<number> => {
     return await getAddressBalance(await this.getAddress());
-  }
+  };
 
-  async getNetworkFees(): Promise<Fees> {
+  getNetworkFees = async (): Promise<Fees> => {
     return await getNetworkFees();
-  }
+  };
 
-  async pushTx(txHex: string): Promise<string> {
+  pushTx = async (txHex: string): Promise<string> => {
     return await pushTx(txHex);
-  }
+  };
 
-  async getUtxos(address: string, amount: number): Promise<UTXO[]> {
+  getUtxos = async (address: string, amount: number): Promise<UTXO[]> => {
     // mempool call
     return await getFundingUTXOs(address, amount);
-  }
+  };
 }
