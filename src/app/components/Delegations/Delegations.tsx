@@ -152,91 +152,91 @@ export const Delegations: React.FC<DelegationsProps> = ({
   // Handles withdrawing requests for delegations that have expired timelocks
   // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
-    // TODO all console.errors should be UI popups
-    // TODO move to a per-case error handling when unbonding solution is accepted
+    // Check if the data is available
+    if (!delegationsAPI || !globalParamsData) {
+      throw new Error("No back-end API data available");
+    }
 
-    try {
-      // Check if the data is available
-      if (!delegationsAPI || !globalParamsData) {
-        throw new Error("No back-end API data available");
-      }
+    // Find the delegation in the delegations retrieved from the API
+    const delegation = delegationsAPI.find(
+      (delegation) => delegation.staking_tx_hash_hex === id,
+    );
+    if (!delegation) {
+      throw new Error("Delegation not found");
+    }
 
-      // Find the delegation in the delegations retrieved from the API
-      const delegation = delegationsAPI.find(
-        (delegation) => delegation.staking_tx_hash_hex === id,
+    // Recreate the staking scripts
+    const data = apiDataToStakingScripts(
+      delegation,
+      globalParamsData,
+      publicKeyNoCoord,
+    );
+
+    // Destructure the staking scripts
+    const {
+      timelockScript,
+      slashingScript,
+      unbondingScript,
+      unbondingTimelockScript,
+    } = data;
+
+    // Create the withdrawal transaction
+    let unsignedWithdrawalTx;
+    if (delegation?.unbonding_tx) {
+      // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
+      unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
+        unbondingTimelockScript,
+        slashingScript,
+        Transaction.fromHex(delegation.unbonding_tx.tx_hex),
+        address,
+        withdrawalFee,
+        btcWalletNetwork,
+        delegation.staking_tx.output_index,
       );
-      if (!delegation) {
-        throw new Error("Not eligible for withdrawing");
-      }
-
-      // Recreate the staking scripts
-      const data = apiDataToStakingScripts(
-        delegation,
-        globalParamsData,
-        publicKeyNoCoord,
-      );
-      if (!data) {
-        throw new Error("Error recreating scripts");
-      }
-
-      // Destructure the staking scripts
-      const {
+    } else {
+      // Withdraw funds from a staking transaction in which the timelock naturally expired
+      unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
         timelockScript,
         slashingScript,
         unbondingScript,
-        unbondingTimelockScript,
-      } = data;
-
-      // Create the withdrawal transaction
-      let unsignedWithdrawalTx;
-      if (delegation?.unbonding_tx) {
-        // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
-        unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
-          unbondingTimelockScript,
-          slashingScript,
-          Transaction.fromHex(delegation.unbonding_tx.tx_hex),
-          address,
-          withdrawalFee,
-          btcWalletNetwork,
-          delegation.staking_tx.output_index,
-        );
-      } else {
-        // Withdraw funds from a staking transaction in which the timelock naturally expired
-        unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
-          timelockScript,
-          slashingScript,
-          unbondingScript,
-          Transaction.fromHex(delegation.staking_tx.tx_hex),
-          address,
-          withdrawalFee,
-          btcWalletNetwork,
-          delegation.staking_tx.output_index,
-        );
-      }
-
-      // Sign the withdrawal transaction
-      const withdrawalTransaction = Transaction.fromHex(
-        await signPsbt(unsignedWithdrawalTx.toHex()),
+        Transaction.fromHex(delegation.staking_tx.tx_hex),
+        address,
+        withdrawalFee,
+        btcWalletNetwork,
+        delegation.staking_tx.output_index,
       );
+    }
 
-      // Broadcast withdrawal transaction
-      const txID = await pushTx(withdrawalTransaction.toHex());
+    // Sign the withdrawal transaction
+    const withdrawalTransaction = Transaction.fromHex(
+      await signPsbt(unsignedWithdrawalTx.toHex()),
+    );
 
-      // Update the local state with the new delegation
-      setIntermediateDelegationsLocalStorage((delegations) => [
-        toLocalStorageIntermediateDelegation(
-          delegation.staking_tx_hash_hex,
-          publicKeyNoCoord,
-          delegation.finality_provider_pk_hex,
-          delegation.staking_value,
-          delegation.staking_tx.tx_hex,
-          delegation.staking_tx.timelock,
-          DelegationState.INTERMEDIATE_WITHDRAWAL,
-        ),
-        ...delegations,
-      ]);
+    // Broadcast withdrawal transaction
+    const _txID = await pushTx(withdrawalTransaction.toHex());
+
+    // Update the local state with the new delegation
+    setIntermediateDelegationsLocalStorage((delegations) => [
+      toLocalStorageIntermediateDelegation(
+        delegation.staking_tx_hash_hex,
+        publicKeyNoCoord,
+        delegation.finality_provider_pk_hex,
+        delegation.staking_value,
+        delegation.staking_tx.tx_hex,
+        delegation.staking_tx.timelock,
+        DelegationState.INTERMEDIATE_WITHDRAWAL,
+      ),
+      ...delegations,
+    ]);
+  };
+
+  // Currently we use console.error to log errors when unbonding fails
+  // This is a temporary solution until we implement a better error handling with UI popups
+  const handleWithdrawWithErrors = async (id: string) => {
+    try {
+      handleWithdraw(id);
     } catch (error: Error | any) {
-      console.error(error?.message || "Error withdrawing");
+      console.error(error?.message || error);
     }
   };
 
@@ -300,7 +300,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
               stakingTxHash={staking_tx_hash_hex}
               state={state}
               onUnbond={handleUnbondWithErrors}
-              onWithdraw={handleWithdraw}
+              onWithdraw={handleWithdrawWithErrors}
               intermediateState={intermediateDelegation?.state}
             />
           );
