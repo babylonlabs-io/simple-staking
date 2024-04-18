@@ -8,6 +8,7 @@ import {
 } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { Transaction, networks } from "bitcoinjs-lib";
 
 import {
   getWallet,
@@ -22,18 +23,24 @@ import {
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { Delegation, getDelegations } from "./api/getDelegations";
-import { Connect } from "./components/Connect/Connect";
-import { Steps } from "./components/Steps/Steps";
 import { Form } from "./components/Form/Form";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
-import { Transaction, networks } from "bitcoinjs-lib";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { useTheme } from "./hooks/useTheme";
+import { Header } from "./components/Header/Header";
+import { ConnectLarge } from "./components/Connect/ConnectLarge";
+import { Stats } from "./components/Stats/Stats";
+import { Stakers } from "./components/Stakers/Stakers";
+import { FinalityProviders } from "./components/FinalityProviders/FinalityProviders";
+import { getStats } from "./api/getStats";
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
+  const { lightSelected } = useTheme();
+
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletBalance, setBTCWalletBalance] = useState(0);
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
@@ -45,14 +52,14 @@ const Home: React.FC<HomeProps> = () => {
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
   const { data: globalParamsData } = useQuery({
-    queryKey: ["getGlobalParams"],
+    queryKey: ["global params"],
     queryFn: getGlobalParams,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.data,
   });
 
   const { data: finalityProvidersData } = useQuery({
-    queryKey: ["getFinalityProviders"],
+    queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.data,
@@ -70,6 +77,13 @@ const Home: React.FC<HomeProps> = () => {
       enabled: !!(btcWallet && publicKeyNoCoord && address),
       select: (data) => data?.pages?.flatMap((page) => page?.data),
     });
+
+  const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
+    queryKey: ["stats"],
+    queryFn: getStats,
+    refetchInterval: 60000, // 1 minute
+    select: (data) => data.data,
+  });
 
   // Initializing btc curve is a required one-time operation
   useEffect(() => {
@@ -291,52 +305,59 @@ const Home: React.FC<HomeProps> = () => {
   );
 
   return (
-    <main className="container mx-auto flex h-full min-h-svh w-full justify-center p-4">
-      <div className="container flex flex-col gap-4">
-        <Connect
-          onConnect={handleConnectBTC}
-          address={address}
-          balance={btcWalletBalance}
-        />
-        <Form
-          amount={amount}
-          onAmountChange={setAmount}
-          duration={duration}
-          onDurationChange={setDuration}
-          disabled={!btcWallet}
-          finalityProviders={finalityProvidersData}
-          finalityProvider={finalityProvider}
-          onFinalityProviderChange={handleChooseFinalityProvider}
-          onSign={handleSign}
-        />
-        <Steps
-          isWalletConnected={!!btcWallet}
-          isAmountSet={amount > 0}
-          isDurationSet={duration > 0}
-          isFinalityProviderSet={!!finalityProvider}
-        />
-        {btcWallet &&
-          delegationsData &&
-          globalParamsData &&
-          btcWalletNetwork &&
-          publicKeyNoCoord &&
-          finalityProvidersData &&
-          finalityProvidersData.length > 0 &&
-          finalityProvidersKV && (
-            <Delegations
-              finalityProvidersKV={finalityProvidersKV}
-              delegationsAPI={delegationsData}
-              delegationsLocalStorage={delegationsLocalStorage}
-              globalParamsData={globalParamsData}
-              publicKeyNoCoord={publicKeyNoCoord}
-              unbondingFee={unbondingFee}
-              withdrawalFee={withdrawalFee}
-              btcWalletNetwork={btcWalletNetwork}
-              address={address}
-              signPsbt={btcWallet.signPsbt}
-              pushTx={btcWallet.pushTx}
+    <main className={`${lightSelected ? "light" : "dark"}`}>
+      <Header
+        onConnect={handleConnectBTC}
+        address={address}
+        balance={btcWalletBalance}
+      />
+      <div className="container mx-auto flex h-full min-h-svh w-full justify-center p-6">
+        <div className="container flex flex-col gap-6">
+          {!btcWallet && <ConnectLarge onConnect={handleConnectBTC} />}
+          <Stats data={statsData} isLoading={statsDataIsLoading} />
+          {btcWallet &&
+            delegationsData &&
+            globalParamsData &&
+            btcWalletNetwork &&
+            publicKeyNoCoord &&
+            finalityProvidersData &&
+            finalityProvidersData.length > 0 &&
+            finalityProvidersKV && (
+              <>
+                <Form
+                  amount={amount}
+                  onAmountChange={setAmount}
+                  duration={duration}
+                  onDurationChange={setDuration}
+                  disabled={!btcWallet}
+                  finalityProviders={finalityProvidersData}
+                  finalityProvider={finalityProvider}
+                  onFinalityProviderChange={handleChooseFinalityProvider}
+                  onSign={handleSign}
+                />
+                <Delegations
+                  finalityProvidersKV={finalityProvidersKV}
+                  delegationsAPI={delegationsData}
+                  delegationsLocalStorage={delegationsLocalStorage}
+                  globalParamsData={globalParamsData}
+                  publicKeyNoCoord={publicKeyNoCoord}
+                  unbondingFee={unbondingFee}
+                  withdrawalFee={withdrawalFee}
+                  btcWalletNetwork={btcWalletNetwork}
+                  address={address}
+                  signPsbt={btcWallet.signPsbt}
+                  pushTx={btcWallet.pushTx}
+                />
+              </>
+            )}
+          <div className="flex flex-col gap-6 lg:flex-row">
+            <Stakers />
+            <FinalityProviders
+              data={finalityProvidersData}
+              activeTVL={statsData?.active_tvl}
             />
-          )}
+          </div>
+        </div>
       </div>
     </main>
   );

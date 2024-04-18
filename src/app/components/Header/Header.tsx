@@ -1,0 +1,58 @@
+import Image from "next/image";
+
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
+import { ConnectSmall } from "../Connect/ConnectSmall";
+import { TestingInfo } from "../TestingInfo/TestingInfo";
+import { useTheme } from "@/app/hooks/useTheme";
+import darkLogo from "@/app/assets/logo-black.svg";
+import lightLogo from "@/app/assets/logo-white.svg";
+import darkIcon from "@/app/assets/icon-black.svg";
+import lightIcon from "@/app/assets/icon-white.svg";
+
+interface HeaderProps {
+  onConnect: () => void;
+  address: string;
+  balance: number;
+}
+
+export const Header: React.FC<HeaderProps> = ({
+  onConnect,
+  address,
+  balance,
+}) => {
+  const { lightSelected } = useTheme();
+  return (
+    <nav>
+      <div className="bg-base-300 shadow-sm">
+        <div className="container mx-auto flex w-full items-center justify-between gap-4 p-6">
+          <div className="flex">
+            <Image
+              src={lightSelected ? darkLogo : lightLogo}
+              alt="Babylon"
+              className="hidden w-[9rem] md:flex"
+            />
+            <Image
+              src={lightSelected ? darkIcon : lightIcon}
+              alt="Babylon"
+              className="flex w-[2.2rem] md:hidden"
+            />
+          </div>
+          <div className="flex flex-1">
+            <div className="hidden flex-1 xl:flex">
+              <TestingInfo />
+            </div>
+          </div>
+          <ConnectSmall
+            onConnect={onConnect}
+            address={address}
+            balance={balance}
+          />
+          <ThemeToggle />
+        </div>
+      </div>
+      <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
+        <TestingInfo />
+      </div>
+    </nav>
+  );
+};
