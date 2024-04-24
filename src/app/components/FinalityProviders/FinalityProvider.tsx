@@ -21,7 +21,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
     ? `${Math.round((stake / activeTVL) * 100)}%`
     : "-";
   return (
-    <div className="lg:grid-cols-finalityProviders card grid grid-cols-2 gap-2 bg-base-200 p-4 text-sm">
+    <div className="lg:grid-cols-finalityProviders card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
       <div className="flex gap-2">
         <FaBitcoin size={16} className="mt-1 text-primary" />
         <div className="flex flex-col">

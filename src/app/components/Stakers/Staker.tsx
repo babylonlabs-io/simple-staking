@@ -12,7 +12,7 @@ export const Staker: React.FC<StakerProps> = ({
   stake,
 }) => {
   return (
-    <div className="card bg-base-200 p-4 text-sm">
+    <div className="card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
       <div className="mb-2 block lg:hidden">
         <Hash value={pkHex} address small noFade />
       </div>
