@@ -25,14 +25,18 @@ export const Stakers: React.FC<StakersProps> = () => {
         <p>Stake</p>
       </div>
       <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
-        {stakersData?.map((staker) => (
-          <Staker
-            key={staker.staker_pk_hex}
-            pkHex={staker.staker_pk_hex}
-            delegations={staker.active_delegations}
-            activeTVL={staker.active_tvl}
-          />
-        ))}
+        {stakersData?.map(
+          (staker) =>
+            // TODO handle API data errors with a proper error boundary
+            staker && (
+              <Staker
+                key={staker.staker_pk_hex}
+                pkHex={staker.staker_pk_hex}
+                delegations={staker.active_delegations}
+                activeTVL={staker.active_tvl}
+              />
+            ),
+        )}
       </div>
     </div>
   );
