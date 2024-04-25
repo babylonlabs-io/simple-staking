@@ -43,7 +43,7 @@ export const getDelegations = async (
   }
 
   const limit = 100;
-  const reverse = true;
+  const reverse = false;
 
   const params = {
     "pagination.key": encode(key),

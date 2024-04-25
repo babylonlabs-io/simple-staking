@@ -21,7 +21,7 @@ export interface Pagination {
 
 export const getStakers = async (key: string): Promise<Stakers> => {
   const limit = 10;
-  const reverse = true;
+  const reverse = false;
 
   const params = {
     "pagination.key": encode(key),
