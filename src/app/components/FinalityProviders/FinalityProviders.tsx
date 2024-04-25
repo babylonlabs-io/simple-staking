@@ -13,7 +13,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Finality Providers</h3>
-      <div className="lg:grid-cols-finalityProviders hidden gap-2 px-4 lg:grid">
+      <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-finalityProviders">
         <p>Finality Provider</p>
         <p>Delegations</p>
         <p>Stake</p>
