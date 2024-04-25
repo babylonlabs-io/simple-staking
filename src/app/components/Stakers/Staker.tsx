@@ -3,13 +3,13 @@ import { Hash } from "../Hash/Hash";
 interface StakerProps {
   pkHex: string;
   delegations: number;
-  stake: number;
+  activeTVL: number;
 }
 
 export const Staker: React.FC<StakerProps> = ({
   pkHex,
   delegations,
-  stake,
+  activeTVL,
 }) => {
   return (
     <div className="card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
@@ -26,7 +26,7 @@ export const Staker: React.FC<StakerProps> = ({
         </div>
         <div>
           <p className="dark:text-neutral-content lg:hidden">Stake</p>
-          <p>{stake / 1e8} Signet BTC</p>
+          <p>{activeTVL / 1e8} Signet BTC</p>
         </div>
       </div>
     </div>
