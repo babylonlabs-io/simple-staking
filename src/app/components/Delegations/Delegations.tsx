@@ -268,7 +268,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     : delegationsLocalStorage;
 
   return (
-    <div className="card gap-4 bg-base-300 p-4">
+    <div className="card max-h-[25rem] gap-4 overflow-y-auto bg-base-300 p-4 shadow-sm">
       <div className="flex w-full">
         <h2 className="font-bold">Staking history</h2>
       </div>

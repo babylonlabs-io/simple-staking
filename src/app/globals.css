@@ -25,3 +25,31 @@ input[type="number"] {
     text-wrap: balance;
   }
 }
+
+.dark .gradient-primary {
+  background: linear-gradient(
+    97.5deg,
+    rgba(255, 124, 42, 0.2) 2.43%,
+    rgba(153, 74, 25, 0.2) 97.63%
+  );
+}
+
+.light .gradient-primary {
+  background: linear-gradient(98.35deg, #fff3ea 2.4%, #fff6ef 117.66%);
+}
+
+.shadow-primary {
+  box-shadow: 1px 2px 20px 0px rgba(255, 124, 42, 0.3);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

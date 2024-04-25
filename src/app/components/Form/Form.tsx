@@ -25,7 +25,7 @@ export const Form: React.FC<FormProps> = ({
 }) => {
   const signReady = amount > 0 && term > 0 && finalityProvider;
   return (
-    <div className="card bg-base-300">
+    <div className="card bg-base-300 shadow-sm">
       <div className="card-body items-center gap-4">
         <label className="form-control w-full max-w-sm">
           <div className="label">
