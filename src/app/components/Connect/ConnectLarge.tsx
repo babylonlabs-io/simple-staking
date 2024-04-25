@@ -16,7 +16,7 @@ export const ConnectLarge: React.FC<ConnectLargeProps> = ({ onConnect }) => {
         <div className="rounded-full bg-primary p-2">
           <Image src={icon} alt="Connect wallet" />
         </div>
-        <p>Connect wallet to stake Bitcoin</p>
+        <p>Connect your wallet to stake Bitcoin</p>
       </button>
     </div>
   );
