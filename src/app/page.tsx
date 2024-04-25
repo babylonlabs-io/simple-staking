@@ -354,7 +354,7 @@ const Home: React.FC<HomeProps> = () => {
             <Stakers />
             <FinalityProviders
               data={finalityProvidersData}
-              activeTVL={statsData?.active_tvl}
+              totalActiveTVL={statsData?.active_tvl}
             />
           </div>
         </div>

@@ -7,7 +7,7 @@ interface FinalityProviderProps {
   delegations: number;
   stake: number;
   moniker?: string;
-  activeTVL?: number;
+  totalActiveTVL?: number;
 }
 
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
@@ -15,10 +15,10 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   delegations,
   stake,
   moniker,
-  activeTVL,
+  totalActiveTVL,
 }) => {
-  const percentage = activeTVL
-    ? `${Math.round((stake / activeTVL) * 100)}%`
+  const percentage = totalActiveTVL
+    ? `${Math.round((stake / totalActiveTVL) * 100)}%`
     : "-";
   return (
     <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200 lg:grid-cols-finalityProviders">
