@@ -81,6 +81,37 @@ jobs:
               --set deployment.version=$CIRCLE_SHA1 \
               simple-staking $HELM_CHART_REPO
 
+  deploy_staging:
+    machine:
+      image: ubuntu-2204:2024.01.1
+      resource_class: large
+    steps:
+      - checkout
+      - aws-ecr/ecr-login:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          region: "$AWS_REGION"
+      - kubernetes/install-kubeconfig:
+          kubeconfig: MAINNET_KUBECONFIG
+      - helm/install-helm-client
+      - run:
+          name: Perform a dry run of the new release
+          command: |
+            helm upgrade --install --debug --dry-run \
+              -n $DEPLOY_STAGING_NAMESPACE \
+              --values /home/circleci/project/.circleci/values-staging.yaml \
+              --version $HELM_CHART_VERSION \
+              --set deployment.version=$CIRCLE_SHA1 \
+              simple-staking $HELM_CHART_REPO
+      - run:
+          name: Release new service version in an atomic way
+          command: |
+            helm upgrade --install --debug --atomic --wait \
+              -n $DEPLOY_STAGING_NAMESPACE --create-namespace \
+              --values /home/circleci/project/.circleci/values-staging.yaml \
+              --version $HELM_CHART_VERSION \
+              --set deployment.version=$CIRCLE_SHA1 \
+              simple-staking $HELM_CHART_REPO
 workflows:
   CICD:
     jobs:
@@ -98,6 +129,13 @@ workflows:
               only:
                 - main
       - deploy_mainnet:
+          requires:
+            - push
+          filters:
+            branches:
+              only:
+                - main
+      - deploy_staging:
           requires:
             - push
           filters:
