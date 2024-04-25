@@ -35,7 +35,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       disabled={!!address}
     >
       <PiWalletBold size={20} className="flex md:hidden" />
-      <span className="hidden md:flex">Connect to BTC test network</span>
+      <span className="hidden md:flex">Connect to BTC signet network</span>
     </button>
   );
 };
