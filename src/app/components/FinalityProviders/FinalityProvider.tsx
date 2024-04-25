@@ -6,7 +6,7 @@ interface FinalityProviderProps {
   pkHex: string;
   delegations: number;
   stake: number;
-  moniker: string;
+  moniker?: string;
   activeTVL?: number;
 }
 
