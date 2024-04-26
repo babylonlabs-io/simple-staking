@@ -21,7 +21,7 @@ deployment:
       memory: 1Gi
       cpu: 1000m
   nodeSelector:
-    workload: "tooling"
+    workload: "staging"
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
