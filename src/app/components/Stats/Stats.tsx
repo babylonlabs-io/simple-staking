@@ -35,6 +35,8 @@ export const Stats: React.FC<StatsProps> = ({ data, isLoading }) => {
     },
   ];
 
+  // TODO implement staking part
+
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm md:flex-row md:justify-between">
       {sections.map((section, index) => (
