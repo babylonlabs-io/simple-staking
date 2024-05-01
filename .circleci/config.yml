@@ -163,7 +163,6 @@ workflows:
             branches:
               only:
                 - main
-                - dev
       - deploy_mainnet:
           requires:
             - require_approval_deploy
@@ -171,7 +170,6 @@ workflows:
             branches:
               only:
                 - main
-                - dev
       - require_approval_rollback:
           type: approval
           requires:
@@ -180,7 +178,6 @@ workflows:
             branches:
               only:
                 - main
-                - dev
       - rollback_mainnet:
           requires:
             - require_approval_rollback
