@@ -83,7 +83,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
-      delegation,
+      delegation.finality_provider_pk_hex,
+      delegation.staking_tx.timelock,
       globalParamsData,
       publicKeyNoCoord,
     );
@@ -167,7 +168,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
-      delegation,
+      delegation.finality_provider_pk_hex,
+      delegation.staking_tx.timelock,
       globalParamsData,
       publicKeyNoCoord,
     );
@@ -268,11 +270,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
     : delegationsLocalStorage;
 
   return (
-    <div className="card max-h-[25rem] gap-4 overflow-y-auto bg-base-300 p-4 shadow-sm">
-      <div className="flex w-full">
-        <h2 className="font-bold">Staking history</h2>
+    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+      <h3 className="mb-4 font-bold">Staking history</h3>
+      <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
+        <p>Amount</p>
+        <p>Inception</p>
+        <p>Transaction hash</p>
+        <p>Status</p>
+        <p>Action</p>
       </div>
-      <div className="grid w-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
         {combinedDelegationsData?.map((delegation) => {
           if (!delegation) return null;
 

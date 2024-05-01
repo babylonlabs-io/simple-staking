@@ -32,13 +32,25 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div>
         <p>{delegations}</p>
         <div className="flex gap-1 lg:hidden">
-          <p>{stake / 1e8 || "-"} Signet BTC</p>
-          <p className="dark:text-neutral-content">{percentage}</p>
+          {stake ? (
+            <>
+              <p>{stake / 1e8} Signet BTC</p>
+              <p className="dark:text-neutral-content">{percentage}</p>
+            </>
+          ) : (
+            <p>-</p>
+          )}
         </div>
       </div>
       <div className="hidden gap-1 lg:flex">
-        <p>{stake / 1e8 || "-"} Signet BTC</p>
-        <p className="dark:text-neutral-content">{percentage}</p>
+        {stake ? (
+          <>
+            <p>{stake / 1e8} Signet BTC</p>
+            <p className="dark:text-neutral-content">{percentage}</p>
+          </>
+        ) : (
+          <p>-</p>
+        )}
       </div>
     </div>
   );

@@ -1,21 +1,22 @@
 import { StakingScriptData, StakingScripts } from "btc-staking-ts";
 
 import { GlobalParamsData } from "@/app/api/getGlobalParams";
-import { Delegation } from "@/app/api/getDelegations";
+import { getPublicKeyNoCoord } from "@/utils/wallet/index";
 
 // Used to recreate scripts from the data received from the API
 export const apiDataToStakingScripts = (
-  item: Delegation,
+  finalityProviderPkHex: string,
+  stakingTxTimelock: number,
   globalParams: GlobalParamsData,
   publicKeyNoCoord: string,
 ): StakingScripts => {
-  if (!item || !globalParams || !publicKeyNoCoord) {
+  if (!globalParams || !publicKeyNoCoord) {
     throw new Error("Invalid data");
   }
 
   // Convert covenant PKs to buffers
   const covenantPKsBuffer = globalParams?.covenant_pks?.map((pk) =>
-    Buffer.from(pk, "hex"),
+    getPublicKeyNoCoord(pk),
   );
 
   // Create staking script data
@@ -23,16 +24,13 @@ export const apiDataToStakingScripts = (
   try {
     stakingScriptData = new StakingScriptData(
       Buffer.from(publicKeyNoCoord, "hex"),
-      [Buffer.from(item?.finality_provider_pk_hex, "hex")],
+      [Buffer.from(finalityProviderPkHex, "hex")],
       covenantPKsBuffer,
       globalParams.covenant_quorum,
-      item.staking_tx.timelock,
+      stakingTxTimelock,
       globalParams.unbonding_time,
       Buffer.from(globalParams.tag),
     );
-    if (!stakingScriptData.validate()) {
-      throw new Error("Invalid staking data");
-    }
   } catch (error: Error | any) {
     throw new Error(error?.message || "Cannot build staking script data");
   }

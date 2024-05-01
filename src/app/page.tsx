@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  StakingScriptData,
-  initBTCCurve,
-  stakingTransaction,
-} from "btc-staking-ts";
+import { initBTCCurve, stakingTransaction } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
@@ -23,7 +19,8 @@ import {
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { Delegation, getDelegations } from "./api/getDelegations";
-import { Form } from "./components/Form/Form";
+import { Staking } from "./components/Staking/Staking";
+import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
@@ -35,6 +32,9 @@ import { Stats } from "./components/Stats/Stats";
 import { Stakers } from "./components/Stakers/Stakers";
 import { FinalityProviders } from "./components/FinalityProviders/FinalityProviders";
 import { getStats } from "./api/getStats";
+import { Summary } from "./components/Summary/Summary";
+import { DelegationState } from "./types/delegationState";
+import { Footer } from "./components/Footer/Footer";
 
 interface HomeProps {}
 
@@ -175,10 +175,6 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
 
-    const covenantPKsBuffer = globalParamsData.covenant_pks.map((pk) =>
-      Buffer.from(pk, "hex"),
-    );
-
     // Rounding the input since 0.0006 * 1e8 is is 59999.999
     // which won't be accepted by the mempool API
     const stakingAmount = Math.round(Number(amount) * 1e8);
@@ -198,31 +194,20 @@ const Home: React.FC<HomeProps> = () => {
       console.error("Confirmed UTXOs not enough");
       return;
     }
-    let stakingScriptData;
-    try {
-      stakingScriptData = new StakingScriptData(
-        Buffer.from(publicKeyNoCoord, "hex"),
-        [Buffer.from(finalityProvider.btc_pk, "hex")],
-        covenantPKsBuffer,
-        globalParamsData.covenant_quorum,
-        stakingDuration,
-        globalParamsData.unbonding_time,
-        Buffer.from(globalParamsData.tag),
-      );
-      if (!stakingScriptData.validate()) {
-        throw new Error("Invalid staking data");
-      }
-    } catch (error: Error | any) {
-      console.error(error?.message || "Cannot build staking script data");
-      return;
-    }
+
     let scripts;
     try {
-      scripts = stakingScriptData.buildScripts();
+      scripts = apiDataToStakingScripts(
+        finalityProvider.btc_pk,
+        stakingDuration,
+        globalParamsData,
+        publicKeyNoCoord,
+      );
     } catch (error: Error | any) {
       console.error(error?.message || "Cannot build staking scripts");
       return;
     }
+
     const timelockScript = scripts.timelockScript;
     const dataEmbedScript = scripts.dataEmbedScript;
     const unbondingScript = scripts.unbondingScript;
@@ -304,17 +289,38 @@ const Home: React.FC<HomeProps> = () => {
     {},
   );
 
+  let totalStaked = 0;
+
+  if (delegationsData) {
+    totalStaked = delegationsData
+      // using only active delegations
+      .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
+      .reduce(
+        (accumulator: number, item) => accumulator + item?.staking_value,
+        0,
+      );
+  }
+
   return (
-    <main className={`${lightSelected ? "light" : "dark"}`}>
+    <main
+      className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
+    >
       <Header
         onConnect={handleConnectBTC}
         address={address}
         balance={btcWalletBalance}
       />
-      <div className="container mx-auto flex h-full min-h-svh w-full justify-center p-6">
+      <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           {!btcWallet && <ConnectLarge onConnect={handleConnectBTC} />}
           <Stats data={statsData} isLoading={statsDataIsLoading} />
+          {address && btcWalletBalance && (
+            <Summary
+              address={address}
+              totalStaked={totalStaked}
+              balance={btcWalletBalance}
+            />
+          )}
           {btcWallet &&
             delegationsData &&
             globalParamsData &&
@@ -324,7 +330,7 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersData.length > 0 &&
             finalityProvidersKV && (
               <>
-                <Form
+                <Staking
                   amount={amount}
                   onAmountChange={setAmount}
                   duration={duration}
@@ -359,6 +365,7 @@ const Home: React.FC<HomeProps> = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 };

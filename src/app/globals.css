@@ -53,3 +53,12 @@ input[type="number"] {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+.fp-selected {
+  border: 1px solid var(--primary) !important;
+  filter: brightness(0.98);
+}
+
+.no-focus {
+  outline: none !important;
+}
