@@ -49,6 +49,38 @@ jobs:
           repo: "$CIRCLE_PROJECT_REPONAME"
           tag: "$CIRCLE_SHA1,$CIRCLE_TAG"
 
+  deploy_staging:
+    machine:
+      image: ubuntu-2204:2024.01.1
+      resource_class: large
+    steps:
+      - checkout
+      - aws-ecr/ecr-login:
+          aws-access-key-id: AWS_ACCESS_KEY_ID
+          aws-secret-access-key: AWS_SECRET_ACCESS_KEY
+          region: "$AWS_REGION"
+      - kubernetes/install-kubeconfig:
+          kubeconfig: MAINNET_KUBECONFIG
+      - helm/install-helm-client
+      - run:
+          name: Perform a dry run of the new release
+          command: |
+            helm upgrade --install --debug --dry-run \
+              -n $DEPLOY_STAGING_NAMESPACE \
+              --values /home/circleci/project/.circleci/values-staging.yaml \
+              --version $HELM_CHART_VERSION \
+              --set deployment.version=$CIRCLE_SHA1 \
+              simple-staking $HELM_CHART_REPO
+      - run:
+          name: Release new service version in an atomic way
+          command: |
+            helm upgrade --install --debug --atomic --wait \
+              -n $DEPLOY_STAGING_NAMESPACE --create-namespace \
+              --values /home/circleci/project/.circleci/values-staging.yaml \
+              --version $HELM_CHART_VERSION \
+              --set deployment.version=$CIRCLE_SHA1 \
+              simple-staking $HELM_CHART_REPO
+
   deploy_mainnet:
     machine:
       image: ubuntu-2204:2024.01.1
@@ -81,7 +113,7 @@ jobs:
               --set deployment.version=$CIRCLE_SHA1 \
               simple-staking $HELM_CHART_REPO
 
-  deploy_staging:
+  rollback_mainnet:
     machine:
       image: ubuntu-2204:2024.01.1
       resource_class: large
@@ -95,23 +127,11 @@ jobs:
           kubeconfig: MAINNET_KUBECONFIG
       - helm/install-helm-client
       - run:
-          name: Perform a dry run of the new release
+          name: Rollback Helm Chart to previous release
           command: |
-            helm upgrade --install --debug --dry-run \
-              -n $DEPLOY_STAGING_NAMESPACE \
-              --values /home/circleci/project/.circleci/values-staging.yaml \
-              --version $HELM_CHART_VERSION \
-              --set deployment.version=$CIRCLE_SHA1 \
-              simple-staking $HELM_CHART_REPO
-      - run:
-          name: Release new service version in an atomic way
-          command: |
-            helm upgrade --install --debug --atomic --wait \
-              -n $DEPLOY_STAGING_NAMESPACE --create-namespace \
-              --values /home/circleci/project/.circleci/values-staging.yaml \
-              --version $HELM_CHART_VERSION \
-              --set deployment.version=$CIRCLE_SHA1 \
-              simple-staking $HELM_CHART_REPO
+            helm rollback --cleanup-on-fail --force --recreate-pods --wait \
+              --debug -n $DEPLOY_MAINNET_NAMESPACE simple-staking
+
 workflows:
   CICD:
     jobs:
@@ -128,13 +148,6 @@ workflows:
             branches:
               only:
                 - main
-      - deploy_mainnet:
-          requires:
-            - push
-          filters:
-            branches:
-              only:
-                - main
       - deploy_staging:
           requires:
             - push
@@ -142,3 +155,32 @@ workflows:
             branches:
               only:
                 - main
+      - require_approval_deploy:
+          type: approval
+          requires:
+            - deploy_staging
+          filters:
+            branches:
+              only:
+                - main
+                - dev
+      - deploy_mainnet:
+          requires:
+            - require_approval_deploy
+          filters:
+            branches:
+              only:
+                - main
+                - dev
+      - require_approval_rollback:
+          type: approval
+          requires:
+            - deploy_mainnet
+          filters:
+            branches:
+              only:
+                - main
+                - dev
+      - rollback_mainnet:
+          requires:
+            - require_approval_rollback
