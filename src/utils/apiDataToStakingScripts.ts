@@ -1,7 +1,7 @@
 import { StakingScriptData, StakingScripts } from "btc-staking-ts";
 
 import { GlobalParamsData } from "@/app/api/getGlobalParams";
-import { Delegation } from "@/app/api/getDelegations";
+import { getPublicKeyNoCoord } from "@/utils/wallet/index";
 
 // Used to recreate scripts from the data received from the API
 export const apiDataToStakingScripts = (
@@ -16,7 +16,7 @@ export const apiDataToStakingScripts = (
 
   // Convert covenant PKs to buffers
   const covenantPKsBuffer = globalParams?.covenant_pks?.map((pk) =>
-    Buffer.from(pk, "hex"),
+    getPublicKeyNoCoord(pk)
   );
 
   // Create staking script data
