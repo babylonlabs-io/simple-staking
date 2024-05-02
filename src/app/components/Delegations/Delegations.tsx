@@ -83,7 +83,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
-      delegation,
+      delegation.finality_provider_pk_hex,
+      delegation.staking_tx.timelock,
       globalParamsData,
       publicKeyNoCoord,
     );
@@ -167,7 +168,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
-      delegation,
+      delegation.finality_provider_pk_hex,
+      delegation.staking_tx.timelock,
       globalParamsData,
       publicKeyNoCoord,
     );
