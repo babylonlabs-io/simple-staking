@@ -232,6 +232,7 @@ const Home: React.FC<HomeProps> = () => {
       );
       return;
     }
+    console.log("unsignedStakingTx", unsignedStakingTx.toHex());
     let stakingTx: string;
     try {
       stakingTx = await btcWallet.signPsbt(unsignedStakingTx.toHex());
