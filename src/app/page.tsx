@@ -176,7 +176,6 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
 
-
     // Rounding the input since 0.0006 * 1e8 is is 59999.999
     // which won't be accepted by the mempool API
     const stakingAmount = Math.round(Number(amount) * 1e8);
@@ -204,7 +203,7 @@ const Home: React.FC<HomeProps> = () => {
         stakingDuration,
         globalParamsData,
         publicKeyNoCoord,
-      )
+      );
     } catch (error: Error | any) {
       console.error(error?.message || "Cannot build staking scripts");
       return;
@@ -234,6 +233,7 @@ const Home: React.FC<HomeProps> = () => {
       );
       return;
     }
+    console.log("unsignedStakingTx", unsignedStakingTx.toHex());
     let stakingTx: string;
     try {
       stakingTx = await btcWallet.signPsbt(unsignedStakingTx.toHex());

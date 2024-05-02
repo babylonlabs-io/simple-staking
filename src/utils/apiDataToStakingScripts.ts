@@ -16,7 +16,7 @@ export const apiDataToStakingScripts = (
 
   // Convert covenant PKs to buffers
   const covenantPKsBuffer = globalParams?.covenant_pks?.map((pk) =>
-    getPublicKeyNoCoord(pk)
+    getPublicKeyNoCoord(pk),
   );
 
   // Create staking script data
