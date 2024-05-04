@@ -97,8 +97,8 @@ export const Staking: React.FC<StakingProps> = ({
                   disabled={disabled}
                 />
                 <div className="label flex justify-end">
-                  {/* TODO add env variable */}
-                  <span className="label-text-alt">min stake is 0.1 BTC</span>
+                  {/* TODO fetch from global params */}
+                  <span className="label-text-alt">min term is 1 block</span>
                 </div>
               </label>
             </div>
