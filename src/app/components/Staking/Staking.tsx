@@ -50,7 +50,7 @@ export const Staking: React.FC<StakingProps> = ({
                 pkHex={fp.btc_pk}
                 stake={fp.active_tvl}
                 comission={fp.commission}
-                selectedFinalityProvider={selectedFinalityProvider}
+                selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
                 onClick={() => onFinalityProviderChange(fp.btc_pk)}
               />
             ))}

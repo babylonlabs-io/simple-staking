@@ -9,7 +9,7 @@ interface FinalityProviderProps {
   stake: number;
   comission: string;
   onClick: () => void;
-  selectedFinalityProvider?: FinalityProviderInterface | undefined;
+  selected: boolean;
 }
 
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
@@ -18,14 +18,14 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   stake,
   comission,
   onClick,
-  selectedFinalityProvider,
+  selected,
 }) => {
   const generalStyles =
     "card relative cursor-pointer border bg-base-300 p-4 text-sm transition-shadow hover:shadow-md dark:border-transparent dark:bg-base-200";
 
   return (
     <div
-      className={`${generalStyles} ${pkHex === selectedFinalityProvider?.btc_pk ? "fp-selected" : ""}`}
+      className={`${generalStyles} ${selected ? "fp-selected" : ""}`}
       onClick={onClick}
     >
       <div className="grid grid-cols-stakingFinalityProviders grid-rows-1 items-center gap-2">
