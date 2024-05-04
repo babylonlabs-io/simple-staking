@@ -63,7 +63,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       );
     } else {
-      return <p>-</p>;
+      return null;
     }
   };
 
