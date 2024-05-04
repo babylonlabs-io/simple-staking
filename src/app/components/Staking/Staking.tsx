@@ -105,6 +105,7 @@ export const Staking: React.FC<StakingProps> = ({
             <div className="flex flex-col gap-4">
               <div className="form-control">
                 <label className="label cursor-pointer justify-start gap-2">
+                  {/* TODO show on wallet connect and save to local storage */}
                   <input
                     type="checkbox"
                     defaultChecked
