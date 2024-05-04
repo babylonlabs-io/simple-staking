@@ -48,7 +48,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
   const { data: globalParamsData } = useQuery({
@@ -166,11 +166,11 @@ const Home: React.FC<HomeProps> = () => {
       !btcWalletNetwork
       // TODO uncomment
       // amount <= 0 ||
-      // duration <= 0 ||
+      // term <= 0 ||
       // amount > globalParamsData.max_staking_amount ||
       // amount < globalParamsData.min_staking_amount ||
-      // duration > globalParamsData.max_staking_time ||
-      // duration < globalParamsData.min_staking_time
+      // term > globalParamsData.max_staking_time ||
+      // term < globalParamsData.min_staking_time
     ) {
       return;
     }
@@ -178,8 +178,8 @@ const Home: React.FC<HomeProps> = () => {
     // Rounding the input since 0.0006 * 1e8 is is 59999.999
     // which won't be accepted by the mempool API
     const stakingAmount = Math.round(Number(amount) * 1e8);
-    // TODO Duration in blocks for dev purposes. Revert to days * 24 * 6
-    const stakingDuration = Number(duration);
+    // TODO term in blocks for dev purposes. Revert to days * 24 * 6
+    const stakingTerm = Number(term);
     let inputUTXOs = [];
     try {
       inputUTXOs = await btcWallet.getUtxos(
@@ -199,7 +199,7 @@ const Home: React.FC<HomeProps> = () => {
     try {
       scripts = apiDataToStakingScripts(
         finalityProvider.btc_pk,
-        stakingDuration,
+        stakingTerm,
         globalParamsData,
         publicKeyNoCoord,
       );
@@ -255,14 +255,14 @@ const Home: React.FC<HomeProps> = () => {
         finalityProvider.btc_pk,
         stakingAmount,
         stakingTx,
-        stakingDuration,
+        stakingTerm,
       ),
       ...delegations,
     ]);
 
     // Clear the form
     setAmount(0);
-    setDuration(0);
+    setTerm(0);
     setFinalityProvider(undefined);
   };
 
@@ -333,8 +333,8 @@ const Home: React.FC<HomeProps> = () => {
                 <Staking
                   amount={amount}
                   onAmountChange={setAmount}
-                  duration={duration}
-                  onDurationChange={setDuration}
+                  term={term}
+                  onTermChange={setTerm}
                   disabled={!btcWallet}
                   finalityProviders={finalityProvidersData}
                   selectedFinalityProvider={finalityProvider}

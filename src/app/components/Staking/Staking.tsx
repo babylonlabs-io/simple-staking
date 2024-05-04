@@ -4,8 +4,8 @@ import { FinalityProvider } from "./FinalityProvider";
 interface StakingProps {
   amount: number;
   onAmountChange: (amount: number) => void;
-  duration: number;
-  onDurationChange: (term: number) => void;
+  term: number;
+  onTermChange: (term: number) => void;
   disabled: boolean;
   finalityProviders: FinalityProviderInterface[] | undefined;
   selectedFinalityProvider: FinalityProviderInterface | undefined;
@@ -17,8 +17,8 @@ interface StakingProps {
 export const Staking: React.FC<StakingProps> = ({
   amount,
   onAmountChange,
-  duration: term,
-  onDurationChange: onTermChange,
+  term,
+  onTermChange,
   disabled,
   finalityProviders,
   selectedFinalityProvider,
