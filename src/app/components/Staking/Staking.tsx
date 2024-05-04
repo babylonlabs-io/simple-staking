@@ -8,7 +8,7 @@ interface StakingProps {
   onDurationChange: (term: number) => void;
   disabled: boolean;
   finalityProviders: FinalityProviderInterface[] | undefined;
-  finalityProvider: FinalityProviderInterface | undefined;
+  selectedFinalityProvider: FinalityProviderInterface | undefined;
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
@@ -21,11 +21,11 @@ export const Staking: React.FC<StakingProps> = ({
   onDurationChange: onTermChange,
   disabled,
   finalityProviders,
-  finalityProvider,
+  selectedFinalityProvider,
   onFinalityProviderChange,
   onSign,
 }) => {
-  const signReady = amount > 0 && term > 0 && finalityProvider;
+  const signReady = amount > 0 && term > 0 && selectedFinalityProvider;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
@@ -50,7 +50,7 @@ export const Staking: React.FC<StakingProps> = ({
                 pkHex={fp.btc_pk}
                 stake={fp.active_tvl}
                 comission={fp.commission}
-                finalityProvider={finalityProvider}
+                selectedFinalityProvider={selectedFinalityProvider}
                 onClick={() => onFinalityProviderChange(fp.btc_pk)}
               />
             ))}

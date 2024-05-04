@@ -337,7 +337,7 @@ const Home: React.FC<HomeProps> = () => {
                   onDurationChange={setDuration}
                   disabled={!btcWallet}
                   finalityProviders={finalityProvidersData}
-                  finalityProvider={finalityProvider}
+                  selectedFinalityProvider={finalityProvider}
                   onFinalityProviderChange={handleChooseFinalityProvider}
                   onSign={handleSign}
                 />
