@@ -9,6 +9,7 @@ interface StakingProps {
   disabled: boolean;
   finalityProviders: FinalityProviderInterface[] | undefined;
   finalityProvider: FinalityProviderInterface | undefined;
+  // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
 }
