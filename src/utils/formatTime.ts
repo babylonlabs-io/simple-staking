@@ -27,5 +27,9 @@ export const durationTillNow = (time: string) => {
     format,
   });
 
-  return `${formattedTime} ago`;
+  if (formattedTime) {
+    return `${formattedTime} ago`;
+  } else {
+    return "Just now";
+  }
 };
