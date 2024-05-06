@@ -4,11 +4,11 @@ import {
 } from "@/app/api/getGlobalParams";
 
 export const getCurrentGlobalParamsVersion = async (
-  btcTipHeight?: () => Promise<number>,
+  getBTCTipHeight?: () => Promise<number>,
   // manual height is required for unbonding
   height?: number,
 ): Promise<GlobalParamsVersion> => {
-  if (!btcTipHeight) {
+  if (!getBTCTipHeight) {
     throw new Error("Wallet is not loaded");
   }
   const globalParamsData = await getGlobalParams();
@@ -16,7 +16,7 @@ export const getCurrentGlobalParamsVersion = async (
   let currentBtcHeight;
   if (!height) {
     try {
-      currentBtcHeight = await btcTipHeight();
+      currentBtcHeight = await getBTCTipHeight();
     } catch (error: Error | any) {
       throw new Error("Couldn't get current BTC height");
     }

@@ -125,5 +125,5 @@ export abstract class WalletProvider {
    * Retrieves the tip height of the BTC chain.
    * @returns A promise that resolves to the block height.
    */
-  abstract btcTipHeight(): Promise<number>;
+  abstract getBTCTipHeight(): Promise<number>;
 }

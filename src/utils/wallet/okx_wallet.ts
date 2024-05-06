@@ -3,7 +3,7 @@ import { Psbt } from "bitcoinjs-lib";
 import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
 import {
   getAddressBalance,
-  getBtcTipHeight,
+  getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
   pushTx,
@@ -150,7 +150,7 @@ export class OKXWallet extends WalletProvider {
     return await getFundingUTXOs(address, amount);
   };
 
-  btcTipHeight = async (): Promise<number> => {
-    return await getBtcTipHeight();
+  getBTCTipHeight = async (): Promise<number> => {
+    return await getTipHeight();
   };
 }
