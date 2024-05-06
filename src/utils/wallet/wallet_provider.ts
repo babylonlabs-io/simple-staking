@@ -120,4 +120,10 @@ export abstract class WalletProvider {
    * @returns A promise that resolves to an array of UTXOs.
    */
   abstract getUtxos(address: string, amount: number): Promise<UTXO[]>;
+
+  /**
+   * Retrieves the tip height of the BTC chain.
+   * @returns A promise that resolves to the block height.
+   */
+  abstract getBTCTipHeight(): Promise<number>;
 }

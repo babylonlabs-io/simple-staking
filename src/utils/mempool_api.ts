@@ -33,6 +33,11 @@ function networkFeesUrl(): URL {
   return new URL(mempoolAPI + "v1/fees/recommended");
 }
 
+// URL for retrieving the tip height of the BTC chain
+function btcTipHeightUrl(): URL {
+  return new URL(mempoolAPI + "blocks/tip/height");
+}
+
 /**
  * Pushes a transaction to the Bitcoin network.
  * @param txHex - The hex string corresponding to the full transaction.
@@ -93,6 +98,19 @@ export async function getNetworkFees(): Promise<Fees> {
   } else {
     return await response.json();
   }
+}
+// Get the tip height of the BTC chain
+export async function getTipHeight(): Promise<number> {
+  const response = await fetch(btcTipHeightUrl());
+  const result = await response.text();
+  if (!response.ok) {
+    throw new Error(result);
+  }
+  const height = Number(result);
+  if (Number.isNaN(height)) {
+    throw new Error("Invalid result returned");
+  }
+  return height;
 }
 
 /**

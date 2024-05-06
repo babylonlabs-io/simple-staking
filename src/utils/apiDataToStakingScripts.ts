@@ -1,13 +1,13 @@
 import { StakingScriptData, StakingScripts } from "btc-staking-ts";
 
-import { GlobalParamsData } from "@/app/api/getGlobalParams";
+import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
 import { getPublicKeyNoCoord } from "@/utils/wallet/index";
 
 // Used to recreate scripts from the data received from the API
 export const apiDataToStakingScripts = (
   finalityProviderPkHex: string,
   stakingTxTimelock: number,
-  globalParams: GlobalParamsData,
+  globalParams: GlobalParamsVersion,
   publicKeyNoCoord: string,
 ): StakingScripts => {
   if (!globalParams || !publicKeyNoCoord) {
