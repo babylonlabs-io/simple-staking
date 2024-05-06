@@ -17,7 +17,6 @@ import {
   FinalityProvider,
   getFinalityProviders,
 } from "./api/getFinalityProviders";
-import { GlobalParamsVersion, getGlobalParams } from "./api/getGlobalParams";
 import { Delegation, getDelegations } from "./api/getDelegations";
 import { Staking } from "./components/Staking/Staking";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
@@ -35,6 +34,7 @@ import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
+import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 
 interface HomeProps {}
 
@@ -51,44 +51,9 @@ const Home: React.FC<HomeProps> = () => {
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const getCurrentGlobalParamsVersion = async (
-    // manual height is required for unbonding
-    height?: number,
-  ): Promise<GlobalParamsVersion> => {
-    if (!btcWallet) {
-      throw new Error("Wallet is not loaded");
-    }
-    const globalParamsData = await getGlobalParams();
-
-    let currentBtcHeight;
-    if (!height) {
-      try {
-        currentBtcHeight = await btcWallet?.btcTipHeight();
-      } catch (error: Error | any) {
-        throw new Error("Couldn't get current BTC height");
-      }
-    } else {
-      currentBtcHeight = height;
-    }
-
-    const sorted = [...globalParamsData.data.versions].sort(
-      (a, b) => b.activation_height - a.activation_height,
-    );
-
-    // if activation height is greater than current btc height, return the version
-    const currentVersion = sorted.find(
-      (version) => version.activation_height <= currentBtcHeight,
-    );
-    if (!currentVersion) {
-      throw new Error("No current version found");
-    } else {
-      return currentVersion;
-    }
-  };
-
   const { data: globalParamsVersion } = useQuery({
     queryKey: ["global params"],
-    queryFn: () => getCurrentGlobalParamsVersion(),
+    queryFn: () => getCurrentGlobalParamsVersion(btcWallet),
     refetchInterval: 60000, // 1 minute
     // Should be enabled only when the wallet is connected
     enabled: !!btcWallet,
