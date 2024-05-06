@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  StakingScriptData,
-  initBTCCurve,
-  stakingTransaction,
-} from "btc-staking-ts";
+import { initBTCCurve, stakingTransaction } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
@@ -23,7 +19,7 @@ import {
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { Delegation, getDelegations } from "./api/getDelegations";
-import { Form } from "./components/Form/Form";
+import { Staking } from "./components/Staking/Staking";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
@@ -36,6 +32,9 @@ import { Stats } from "./components/Stats/Stats";
 import { Stakers } from "./components/Stakers/Stakers";
 import { FinalityProviders } from "./components/FinalityProviders/FinalityProviders";
 import { getStats } from "./api/getStats";
+import { Summary } from "./components/Summary/Summary";
+import { DelegationState } from "./types/delegationState";
+import { Footer } from "./components/Footer/Footer";
 
 interface HomeProps {}
 
@@ -49,7 +48,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
   const { data: globalParamsData } = useQuery({
@@ -167,11 +166,11 @@ const Home: React.FC<HomeProps> = () => {
       !btcWalletNetwork
       // TODO uncomment
       // amount <= 0 ||
-      // duration <= 0 ||
+      // term <= 0 ||
       // amount > globalParamsData.max_staking_amount ||
       // amount < globalParamsData.min_staking_amount ||
-      // duration > globalParamsData.max_staking_time ||
-      // duration < globalParamsData.min_staking_time
+      // term > globalParamsData.max_staking_time ||
+      // term < globalParamsData.min_staking_time
     ) {
       return;
     }
@@ -179,8 +178,8 @@ const Home: React.FC<HomeProps> = () => {
     // Rounding the input since 0.0006 * 1e8 is is 59999.999
     // which won't be accepted by the mempool API
     const stakingAmount = Math.round(Number(amount) * 1e8);
-    // TODO Duration in blocks for dev purposes. Revert to days * 24 * 6
-    const stakingDuration = Number(duration);
+    // TODO term in blocks for dev purposes. Revert to days * 24 * 6
+    const stakingTerm = Number(term);
     let inputUTXOs = [];
     try {
       inputUTXOs = await btcWallet.getUtxos(
@@ -200,7 +199,7 @@ const Home: React.FC<HomeProps> = () => {
     try {
       scripts = apiDataToStakingScripts(
         finalityProvider.btc_pk,
-        stakingDuration,
+        stakingTerm,
         globalParamsData,
         publicKeyNoCoord,
       );
@@ -233,7 +232,6 @@ const Home: React.FC<HomeProps> = () => {
       );
       return;
     }
-    console.log("unsignedStakingTx", unsignedStakingTx.toHex());
     let stakingTx: string;
     try {
       stakingTx = await btcWallet.signPsbt(unsignedStakingTx.toHex());
@@ -257,14 +255,14 @@ const Home: React.FC<HomeProps> = () => {
         finalityProvider.btc_pk,
         stakingAmount,
         stakingTx,
-        stakingDuration,
+        stakingTerm,
       ),
       ...delegations,
     ]);
 
     // Clear the form
     setAmount(0);
-    setDuration(0);
+    setTerm(0);
     setFinalityProvider(undefined);
   };
 
@@ -291,17 +289,38 @@ const Home: React.FC<HomeProps> = () => {
     {},
   );
 
+  let totalStaked = 0;
+
+  if (delegationsData) {
+    totalStaked = delegationsData
+      // using only active delegations
+      .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
+      .reduce(
+        (accumulator: number, item) => accumulator + item?.staking_value,
+        0,
+      );
+  }
+
   return (
-    <main className={`${lightSelected ? "light" : "dark"}`}>
+    <main
+      className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
+    >
       <Header
         onConnect={handleConnectBTC}
         address={address}
         balance={btcWalletBalance}
       />
-      <div className="container mx-auto flex h-full min-h-svh w-full justify-center p-6">
+      <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           {!btcWallet && <ConnectLarge onConnect={handleConnectBTC} />}
           <Stats data={statsData} isLoading={statsDataIsLoading} />
+          {address && btcWalletBalance && (
+            <Summary
+              address={address}
+              totalStaked={totalStaked}
+              balance={btcWalletBalance}
+            />
+          )}
           {btcWallet &&
             delegationsData &&
             globalParamsData &&
@@ -311,14 +330,14 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersData.length > 0 &&
             finalityProvidersKV && (
               <>
-                <Form
+                <Staking
                   amount={amount}
                   onAmountChange={setAmount}
-                  duration={duration}
-                  onDurationChange={setDuration}
+                  term={term}
+                  onTermChange={setTerm}
                   disabled={!btcWallet}
                   finalityProviders={finalityProvidersData}
-                  finalityProvider={finalityProvider}
+                  selectedFinalityProvider={finalityProvider}
                   onFinalityProviderChange={handleChooseFinalityProvider}
                   onSign={handleSign}
                 />
@@ -346,6 +365,7 @@ const Home: React.FC<HomeProps> = () => {
           </div>
         </div>
       </div>
+      <Footer />
     </main>
   );
 };

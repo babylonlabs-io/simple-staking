@@ -1,5 +1,6 @@
 import { StakingTx } from "@/app/api/getDelegations";
 import { DelegationState } from "@/app/types/delegationState";
+import { durationTillNow } from "@/utils/formatTime";
 import { getState } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 
@@ -19,7 +20,6 @@ interface DelegationProps {
 
 export const Delegation: React.FC<DelegationProps> = ({
   stakingTx,
-  finalityProviderMoniker,
   stakingTxHash,
   state,
   stakingValue,
@@ -27,7 +27,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   onWithdraw,
   intermediateState,
 }) => {
-  const { start_height, timelock, start_timestamp } = stakingTx;
+  const { start_height, start_timestamp } = stakingTx;
 
   const generateActionButton = () => {
     // This function generates the unbond or withdraw button
@@ -36,27 +36,31 @@ export const Delegation: React.FC<DelegationProps> = ({
     // is in an intermediate state (local storage)
     if (state === DelegationState.ACTIVE) {
       return (
-        <button
-          className="btn btn-link btn-xs text-primary no-underline"
-          onClick={() => onUnbond(stakingTxHash)}
-          disabled={
-            intermediateState === DelegationState.INTERMEDIATE_UNBONDING
-          }
-        >
-          unbond
-        </button>
+        <div>
+          <button
+            className="btn btn-link btn-xs inline-flex text-sm font-normal text-primary no-underline"
+            onClick={() => onUnbond(stakingTxHash)}
+            disabled={
+              intermediateState === DelegationState.INTERMEDIATE_UNBONDING
+            }
+          >
+            Unbond
+          </button>
+        </div>
       );
     } else if (state === DelegationState.UNBONDED) {
       return (
-        <button
-          className="btn btn-link btn-xs text-secondary no-underline"
-          onClick={() => onWithdraw(stakingTxHash)}
-          disabled={
-            intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
-          }
-        >
-          withdraw
-        </button>
+        <div>
+          <button
+            className="btn btn-link btn-xs inline-flex text-sm font-normal text-primary no-underline"
+            onClick={() => onWithdraw(stakingTxHash)}
+            disabled={
+              intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
+            }
+          >
+            Withdraw
+          </button>
+        </div>
       );
     } else {
       return null;
@@ -64,7 +68,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   return (
-    <div className="card relative gap-2 bg-base-200 p-4 text-sm">
+    <div className="card relative border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
       {/* TODO to be removed after initial dev phase */}
       {/* local storage items has startHeight 0 */}
       {start_height === 0 && (
@@ -72,35 +76,22 @@ export const Delegation: React.FC<DelegationProps> = ({
           <p>local</p>
         </div>
       )}
-      <div className="flex justify-between gap-4">
-        <p>
-          {stakingValue / 1e8}
-          <br />
-          Signet BTC
-        </p>
-        <div className="flex flex-col items-end">
-          <p>{timelock} blocks</p>
-          {/* convert date to a readable format */}
-          <p>{new Date(start_timestamp)?.toLocaleDateString()}</p>
-        </div>
-      </div>
-      <div className="flex justify-between gap-4">
-        <p className="text-left">{finalityProviderMoniker}</p>
-        <p className="text-right">
-          {/* convert state to a readable format */}
-          {getState(intermediateState || state)}
-        </p>
-      </div>
-      <div className="flex justify-between gap-4">
+      <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
+        <p>{stakingValue / 1e8} Signet BTC</p>
+        <p>{durationTillNow(start_timestamp)}</p>
         <a
           href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-primary hover:underline"
+          className="hidden text-primary hover:underline lg:flex"
         >
           {trim(stakingTxHash)}
         </a>
-        {/* unbond or withdraw button */}
+        <div className="flex">
+          <p className="card border bg-base-300 px-2 py-1 dark:border-0">
+            {getState(intermediateState || state)}
+          </p>
+        </div>
         {generateActionButton()}
       </div>
     </div>
