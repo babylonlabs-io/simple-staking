@@ -351,6 +351,7 @@ const Home: React.FC<HomeProps> = () => {
                   unbondingFee={unbondingFee}
                   withdrawalFee={withdrawalFee}
                   btcWalletNetwork={btcWalletNetwork}
+                  getBTCTipHeight={btcWallet.getBTCTipHeight}
                   address={address}
                   signPsbt={btcWallet.signPsbt}
                   pushTx={btcWallet.pushTx}

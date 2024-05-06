@@ -31,6 +31,7 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
+  getBTCTipHeight: () => Promise<number>;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -45,6 +46,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
   signPsbt,
   pushTx,
+  getBTCTipHeight,
 }) => {
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -82,11 +84,17 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Not eligible for unbonding");
     }
 
+    // State of global params when the staking transaction was submitted
+    const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
+      getBTCTipHeight,
+      delegation.staking_tx.start_height,
+    );
+
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
       delegation.finality_provider_pk_hex,
       delegation.staking_tx.timelock,
-      globalParamsVersion,
+      globalParamsWhenStaking,
       publicKeyNoCoord,
     );
 
@@ -167,8 +175,9 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Delegation not found");
     }
 
-    const globalParamsWhenStaking = getCurrentGlobalParamsVersion(
-      btcwallet,
+    // State of global params when the staking transaction was submitted
+    const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
+      getBTCTipHeight,
       delegation.staking_tx.start_height,
     );
 
@@ -176,7 +185,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const data = apiDataToStakingScripts(
       delegation.finality_provider_pk_hex,
       delegation.staking_tx.timelock,
-      globalParamsVersion,
+      globalParamsWhenStaking,
       publicKeyNoCoord,
     );
 
