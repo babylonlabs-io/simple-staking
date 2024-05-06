@@ -10,7 +10,7 @@ import {
 import { Delegation as DelegationInterface } from "@/app/api/getDelegations";
 import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { GlobalParamsData } from "@/app/api/getGlobalParams";
+import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
@@ -22,7 +22,7 @@ interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
   delegationsAPI: DelegationInterface[];
   delegationsLocalStorage: DelegationInterface[];
-  globalParamsData: GlobalParamsData;
+  globalParamsVersion: GlobalParamsVersion;
   publicKeyNoCoord: string;
   unbondingFee: number;
   withdrawalFee: number;
@@ -36,7 +36,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   finalityProvidersKV,
   delegationsAPI,
   delegationsLocalStorage,
-  globalParamsData,
+  globalParamsVersion,
   publicKeyNoCoord,
   unbondingFee,
   withdrawalFee,
@@ -61,7 +61,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   // It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
   const handleUnbond = async (id: string) => {
     // Check if the data is available
-    if (!delegationsAPI || !globalParamsData) {
+    if (!delegationsAPI || !globalParamsVersion) {
       throw new Error("No back-end API data available");
     }
 
@@ -85,7 +85,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const data = apiDataToStakingScripts(
       delegation.finality_provider_pk_hex,
       delegation.staking_tx.timelock,
-      globalParamsData,
+      globalParamsVersion,
       publicKeyNoCoord,
     );
 
@@ -154,7 +154,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
     // Check if the data is available
-    if (!delegationsAPI || !globalParamsData) {
+    if (!delegationsAPI || !globalParamsVersion) {
       throw new Error("No back-end API data available");
     }
 
@@ -170,7 +170,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const data = apiDataToStakingScripts(
       delegation.finality_provider_pk_hex,
       delegation.staking_tx.timelock,
-      globalParamsData,
+      globalParamsVersion,
       publicKeyNoCoord,
     );
 

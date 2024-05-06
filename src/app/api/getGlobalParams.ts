@@ -5,10 +5,10 @@ interface GlobalParams {
 }
 
 export interface GlobalParamsData {
-  versions: Version[];
+  versions: GlobalParamsVersion[];
 }
 
-export interface Version {
+export interface GlobalParamsVersion {
   version: number;
   activation_height: number;
   staking_cap: number;

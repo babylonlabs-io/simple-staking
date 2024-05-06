@@ -17,7 +17,7 @@ import {
   FinalityProvider,
   getFinalityProviders,
 } from "./api/getFinalityProviders";
-import { getGlobalParams } from "./api/getGlobalParams";
+import { GlobalParamsVersion, getGlobalParams } from "./api/getGlobalParams";
 import { Delegation, getDelegations } from "./api/getDelegations";
 import { Staking } from "./components/Staking/Staking";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
@@ -51,11 +51,41 @@ const Home: React.FC<HomeProps> = () => {
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const { data: globalParamsData } = useQuery({
+  const getCurrentGlobalParamsVersion =
+    async (): Promise<GlobalParamsVersion> => {
+      if (!btcWallet) {
+        throw new Error("Wallet is not loaded");
+      }
+      const globalParamsData = await getGlobalParams();
+
+      let currentBtcHeight;
+      try {
+        currentBtcHeight = await btcWallet?.btcTipHeight();
+      } catch (error: Error | any) {
+        throw new Error("Couldn't get current BTC height");
+      }
+
+      const sorted = [...globalParamsData.data.versions].sort(
+        (a, b) => b.activation_height - a.activation_height,
+      );
+
+      // if activation height is greater than current btc height, return the version
+      const currentVersion = sorted.find(
+        (version) => version.activation_height <= currentBtcHeight,
+      );
+      if (!currentVersion) {
+        throw new Error("No current version found");
+      } else {
+        return currentVersion;
+      }
+    };
+
+  const { data: globalParamsVersion } = useQuery({
     queryKey: ["global params"],
-    queryFn: getGlobalParams,
+    queryFn: getCurrentGlobalParamsVersion,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
+    // Should be enabled only when the wallet is connected
+    enabled: !!btcWallet,
   });
 
   const { data: finalityProvidersData } = useQuery({
@@ -152,7 +182,7 @@ const Home: React.FC<HomeProps> = () => {
   };
 
   const walletAndDataReady =
-    !!btcWallet && !!globalParamsData && !!finalityProvidersData;
+    !!btcWallet && !!globalParamsVersion && !!finalityProvidersData;
 
   const stakingFee = 500;
   const withdrawalFee = 500;
@@ -164,7 +194,7 @@ const Home: React.FC<HomeProps> = () => {
       !walletAndDataReady ||
       !finalityProvider ||
       !btcWalletNetwork
-      // TODO uncomment
+      // TODO implement checks
       // amount <= 0 ||
       // term <= 0 ||
       // amount > globalParamsData.max_staking_amount ||
@@ -200,7 +230,7 @@ const Home: React.FC<HomeProps> = () => {
       scripts = apiDataToStakingScripts(
         finalityProvider.btc_pk,
         stakingTerm,
-        globalParamsData,
+        globalParamsVersion,
         publicKeyNoCoord,
       );
     } catch (error: Error | any) {
@@ -323,7 +353,7 @@ const Home: React.FC<HomeProps> = () => {
           )}
           {btcWallet &&
             delegationsData &&
-            globalParamsData &&
+            globalParamsVersion &&
             btcWalletNetwork &&
             publicKeyNoCoord &&
             finalityProvidersData &&
@@ -345,7 +375,7 @@ const Home: React.FC<HomeProps> = () => {
                   finalityProvidersKV={finalityProvidersKV}
                   delegationsAPI={delegationsData}
                   delegationsLocalStorage={delegationsLocalStorage}
-                  globalParamsData={globalParamsData}
+                  globalParamsVersion={globalParamsVersion}
                   publicKeyNoCoord={publicKeyNoCoord}
                   unbondingFee={unbondingFee}
                   withdrawalFee={withdrawalFee}
