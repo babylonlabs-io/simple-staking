@@ -17,6 +17,7 @@ import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
+import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -165,6 +166,11 @@ export const Delegations: React.FC<DelegationsProps> = ({
     if (!delegation) {
       throw new Error("Delegation not found");
     }
+
+    const globalParamsWhenStaking = getCurrentGlobalParamsVersion(
+      btcwallet,
+      delegation.staking_tx.start_height,
+    );
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
