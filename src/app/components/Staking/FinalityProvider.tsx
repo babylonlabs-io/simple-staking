@@ -1,6 +1,3 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
-
-import { trim } from "@/utils/trim";
 import { Hash } from "../Hash/Hash";
 
 interface FinalityProviderProps {
@@ -29,7 +26,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       onClick={onClick}
     >
       <div className="grid grid-cols-stakingFinalityProviders grid-rows-1 items-center gap-2">
-        <div>{moniker}</div>
+        <div>{moniker || "-"}</div>
         <Hash value={pkHex} address small noFade />
         <p>{stake / 1e8} Signet BTC</p>
         <div>{Number(comission) * 100}%</div>
