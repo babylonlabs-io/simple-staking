@@ -86,7 +86,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // State of global params when the staking transaction was submitted
     const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
-      getBTCTipHeight,
       delegation.staking_tx.start_height,
     );
 
@@ -177,7 +176,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // State of global params when the staking transaction was submitted
     const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
-      getBTCTipHeight,
       delegation.staking_tx.start_height,
     );
 

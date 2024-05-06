@@ -53,7 +53,10 @@ const Home: React.FC<HomeProps> = () => {
 
   const { data: globalParamsVersion } = useQuery({
     queryKey: ["global params"],
-    queryFn: () => getCurrentGlobalParamsVersion(btcWallet?.getBTCTipHeight),
+    queryFn: async () => {
+      const currentBtcHeight = await btcWallet!.getBTCTipHeight();
+      return getCurrentGlobalParamsVersion(currentBtcHeight);
+    },
     refetchInterval: 60000, // 1 minute
     // Should be enabled only when the wallet is connected
     enabled: !!btcWallet,
