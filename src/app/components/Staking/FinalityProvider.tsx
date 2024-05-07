@@ -28,7 +28,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="grid grid-cols-stakingFinalityProviders grid-rows-1 items-center gap-2">
         <div>{moniker || "-"}</div>
         <Hash value={pkHex} address small noFade />
-        <p>{stake / 1e8} Signet BTC</p>
+        <p>{+(stake / 1e8).toFixed(6)} Signet BTC</p>
         <div>{Number(comission) * 100}%</div>
       </div>
     </div>

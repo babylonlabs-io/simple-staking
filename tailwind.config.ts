@@ -19,6 +19,7 @@ const config: Config = {
       colors: {
         primary: "#FF7C2A",
         secondary: "#0DB7BF",
+        "base-400": "hsl(var(--base-400) / <alpha-value>)",
       },
       gridTemplateColumns: {
         finalityProviders: "2fr 1fr 1.75fr",
@@ -38,6 +39,7 @@ const config: Config = {
           "base-200": "rgba(225, 225, 225, 0.3)",
           "base-300": "#FFF",
           "base-content": "#000",
+          "--base-400": "0 0% 98%",
         },
       },
       {
@@ -49,6 +51,7 @@ const config: Config = {
           "base-200": "#303030",
           "base-300": "#1E1E1E",
           "base-content": "#FFF",
+          "--base-400": "0 0% 9.8%",
         },
       },
     ],

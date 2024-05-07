@@ -31,7 +31,7 @@ export const Staking: React.FC<StakingProps> = ({
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Staking</h3>
       <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
           <div className="flex flex-col gap-1">
             <p className="text-sm dark:text-neutral-content">Step 1</p>
             <p>Select a BTC Finality Provider or create your own</p>
@@ -56,7 +56,7 @@ export const Staking: React.FC<StakingProps> = ({
             ))}
           </div>
         </div>
-        <div className="flex flex-1 flex-col gap-4">
+        <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
           <div className="flex flex-col gap-1">
             <p className="text-sm dark:text-neutral-content">Step 2</p>
             <p>Set up staking terms</p>

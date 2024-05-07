@@ -35,6 +35,8 @@ import { Summary } from "./components/Summary/Summary";
 import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import { FAQ } from "./components/FAQ/FAQ";
+import { StakersFinalityProviders } from "./components/StakersFinalityProviders/StakersFinalityProviders";
 
 interface HomeProps {}
 
@@ -317,7 +319,11 @@ const Home: React.FC<HomeProps> = () => {
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           {!btcWallet && <ConnectLarge onConnect={handleConnectBTC} />}
-          <Stats data={statsData} isLoading={statsDataIsLoading} />
+          <Stats
+            data={statsData}
+            isLoading={statsDataIsLoading}
+            stakingCap={globalParamsVersion?.staking_cap}
+          />
           {address && btcWalletBalance && (
             <Summary
               address={address}
@@ -361,15 +367,14 @@ const Home: React.FC<HomeProps> = () => {
                 />
               </>
             )}
-          <div className="flex flex-col gap-6 lg:flex-row">
-            <Stakers />
-            <FinalityProviders
-              data={finalityProvidersData}
-              totalActiveTVL={statsData?.active_tvl}
-            />
-          </div>
+          <StakersFinalityProviders
+            finalityProviders={finalityProvidersData}
+            totalActiveTVL={statsData?.active_tvl}
+            connected={!!btcWallet}
+          />
         </div>
       </div>
+      <FAQ />
       <Footer />
     </main>
   );
