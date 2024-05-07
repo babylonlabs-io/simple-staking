@@ -29,7 +29,7 @@ export const apiDataToStakingScripts = (
       globalParams.covenant_quorum,
       stakingTxTimelock,
       globalParams.unbonding_time,
-      Buffer.from(globalParams.tag),
+      Buffer.from(globalParams.tag, "hex"),
     );
   } catch (error: Error | any) {
     throw new Error(error?.message || "Cannot build staking script data");
