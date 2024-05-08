@@ -50,7 +50,7 @@ export const Stats: React.FC<StatsProps> = ({
     [
       {
         title: "Delegations",
-        value: data?.total_delegations
+        value: data?.active_delegations
           ? formatter.format(data.total_delegations as number)
           : 0,
         icon: delegations,
@@ -70,7 +70,7 @@ export const Stats: React.FC<StatsProps> = ({
       {sections.map((section, index) => (
         <div
           key={index}
-          className="bg-base-400 card flex justify-between p-4 text-sm md:flex-row"
+          className="card flex justify-between bg-base-400 p-4 text-sm md:flex-row"
         >
           {section.map((subSection, subIndex) => (
             <Fragment key={subSection.title}>
