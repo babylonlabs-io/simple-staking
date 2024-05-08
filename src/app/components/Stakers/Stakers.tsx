@@ -19,23 +19,31 @@ export const Stakers: React.FC<StakersProps> = () => {
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Top Stakers</h3>
-      <div className="hidden grid-cols-3 gap-2 px-4 lg:grid">
-        <p>Staker</p>
-        <p>Delegations</p>
-        <p>Stake</p>
-      </div>
+      {stakersData && (
+        <div className="hidden grid-cols-3 gap-2 px-4 lg:grid">
+          <p>Staker</p>
+          <p>Delegations</p>
+          <p>Stake</p>
+        </div>
+      )}
       <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
-        {stakersData?.map(
-          (staker) =>
-            // TODO handle API data errors with a proper error boundary
-            staker && (
-              <Staker
-                key={staker.staker_pk_hex}
-                pkHex={staker.staker_pk_hex}
-                delegations={staker.active_delegations}
-                activeTVL={staker.active_tvl}
-              />
-            ),
+        {stakersData ? (
+          stakersData.map(
+            (staker) =>
+              // TODO handle API data errors with a proper error boundary
+              staker && (
+                <Staker
+                  key={staker.staker_pk_hex}
+                  pkHex={staker.staker_pk_hex}
+                  delegations={staker.active_delegations}
+                  activeTVL={staker.active_tvl}
+                />
+              ),
+          )
+        ) : (
+          <div className="flex justify-center py-4">
+            <span className="loading loading-spinner text-primary" />
+          </div>
         )}
       </div>
     </div>

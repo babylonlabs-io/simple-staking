@@ -62,3 +62,15 @@ input[type="number"] {
 .no-focus {
   outline: none !important;
 }
+
+/* tabs selection */
+.tab.tab-active:not(.tab-disabled):not([disabled]),
+.tab:is(input:checked) {
+  border-color: #ff7c2a;
+}
+
+.divider:after,
+.divider:before {
+  height: 1px !important;
+  width: 1px !important;
+}
