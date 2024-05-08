@@ -6,6 +6,7 @@ export const WITHDRAWN = "withdrawn";
 export const PENDING = "pending";
 export const INTERMEDIATE_UNBONDING = "intermediate_unbonding";
 export const INTERMEDIATE_WITHDRAWAL = "intermediate_withdrawal";
+export const OVERFLOW = "overflow";
 
 // Define the state of a delegation as per API
 export const DelegationState = {
@@ -17,4 +18,5 @@ export const DelegationState = {
   PENDING,
   INTERMEDIATE_UNBONDING,
   INTERMEDIATE_WITHDRAWAL,
+  OVERFLOW,
 };

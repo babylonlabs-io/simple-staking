@@ -40,6 +40,9 @@ const config: Config = {
           "base-300": "#FFF",
           "base-content": "#000",
           "--base-400": "0 0% 98%",
+          ".btn-primary": {
+            color: "#FFF",
+          },
         },
       },
       {
@@ -52,6 +55,9 @@ const config: Config = {
           "base-300": "#1E1E1E",
           "base-content": "#FFF",
           "--base-400": "0 0% 9.8%",
+          ".btn-primary": {
+            color: "#FFF",
+          },
         },
       },
     ],

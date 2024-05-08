@@ -15,6 +15,8 @@ export const getState = (state: string) => {
       return "Withdrawn";
     case DelegationState.PENDING:
       return "Pending";
+    case DelegationState.OVERFLOW:
+      return "Overflow";
     // Intermediate local storage states
     case DelegationState.INTERMEDIATE_UNBONDING:
       return "Unbonding";

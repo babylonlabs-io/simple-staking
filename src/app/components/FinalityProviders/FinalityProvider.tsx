@@ -1,4 +1,6 @@
 import { FaBitcoin } from "react-icons/fa";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip } from "react-tooltip";
 
 import { Hash } from "../Hash/Hash";
 
@@ -20,12 +22,29 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   const percentage = totalActiveTVL
     ? `${Math.round((stake / totalActiveTVL) * 100)}%`
     : "-";
+
+  const generateTooltip = () => {
+    return (
+      <div className="flex items-center gap-2">
+        <p>-</p>
+        <span
+          className="cursor-pointer text-xs"
+          data-tooltip-id="tooltip-missing"
+          data-tooltip-content="Finality Provider has not provided additional information"
+          data-tooltip-place="top"
+        >
+          <AiOutlineInfoCircle />
+        </span>
+      </div>
+    );
+  };
+
   return (
     <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200 lg:grid-cols-finalityProviders">
       <div className="flex gap-2">
         <FaBitcoin size={16} className="mt-1 text-primary" />
         <div className="flex flex-col">
-          <p>{moniker || "-"}</p>
+          <div>{moniker || generateTooltip()}</div>
           <Hash value={pkHex} address small />
         </div>
       </div>
@@ -38,7 +57,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
-            <p>-</p>
+            generateTooltip()
           )}
         </div>
       </div>
@@ -49,9 +68,10 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (
-          <p>-</p>
+          generateTooltip()
         )}
       </div>
+      <Tooltip id="tooltip-missing" />
     </div>
   );
 };

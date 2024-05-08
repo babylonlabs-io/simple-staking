@@ -13,12 +13,14 @@ interface HeaderProps {
   onConnect: () => void;
   address: string;
   balance: number;
+  onDisconnect: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onConnect,
   address,
   balance,
+  onDisconnect,
 }) => {
   const { lightSelected } = useTheme();
   return (
@@ -46,8 +48,9 @@ export const Header: React.FC<HeaderProps> = ({
             onConnect={onConnect}
             address={address}
             balance={balance}
+            onDisconnect={onDisconnect}
           />
-          <ThemeToggle />
+          {!address && <ThemeToggle />}
         </div>
       </div>
       <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
