@@ -63,7 +63,7 @@ export const Staking: React.FC<StakingProps> = ({
           </p>
           <p>
             But you can unbond and withdraw your Signet BTC anytime through this
-            dashboard with an unbond time of {blocksToTime(unbondingTime)}.
+            dashboard with an unbond time of 10 days.
           </p>
           <p>
             The above times are approximates based on average Bitcoin block
