@@ -1,8 +1,10 @@
 import { FaBitcoin } from "react-icons/fa";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
+import Image from "next/image";
 
 import { Hash } from "../Hash/Hash";
+import blue from "@/app/assets/blue-check.svg";
 
 interface FinalityProviderProps {
   pkHex: string;
@@ -44,7 +46,16 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="flex gap-2">
         <FaBitcoin size={16} className="mt-1 text-primary" />
         <div className="flex flex-col">
-          <div>{moniker || generateTooltip()}</div>
+          <div>
+            {moniker ? (
+              <div className="flex items-center gap-1">
+                <p>{moniker}</p>
+                <Image src={blue} alt="verified" />
+              </div>
+            ) : (
+              generateTooltip()
+            )}
+          </div>
           <Hash value={pkHex} address small />
         </div>
       </div>
