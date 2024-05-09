@@ -76,7 +76,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         </div>
         <h4 className="text-center text-base">Attention!</h4>
         <p className="dark:text-neutral-content">
-          1. The is a delay between the actual TVL and its display in this
+          1. There is a delay between the actual TVL and its display in this
           dashboard. The current staking cap may already be filled when your
           staking transaction is included in the Bitcoin chain. In that case,
           the dashboard will mark your stake as &quot;overflow&quot; and request
@@ -97,7 +97,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             Cancel
           </button>
           <button
-            className="btn-primary btn flex-1"
+            className="btn btn-primary flex-1"
             onClick={() => {
               onClose(false);
               onSign();
