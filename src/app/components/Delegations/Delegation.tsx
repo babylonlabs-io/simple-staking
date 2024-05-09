@@ -1,3 +1,6 @@
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip } from "react-tooltip";
+
 import { StakingTx } from "@/app/api/getDelegations";
 import { DelegationState } from "@/app/types/delegationState";
 import { durationTillNow } from "@/utils/formatTime";
@@ -88,9 +91,20 @@ export const Delegation: React.FC<DelegationProps> = ({
           {trim(stakingTxHash)}
         </a>
         <div className="flex">
-          <p className="card border bg-base-300 px-2 py-1 dark:border-0">
-            {getState(intermediateState || state)}
-          </p>
+          <div className="card border bg-base-300 px-2 py-1 dark:border-0">
+            <div className="flex items-center gap-1">
+              <p>{getState(intermediateState || state)}</p>
+              <span
+                className="cursor-pointer text-xs"
+                data-tooltip-id={`tooltip-${stakingTxHash}`}
+                data-tooltip-content={"Information about the delegation state"}
+                data-tooltip-place="top"
+              >
+                <AiOutlineInfoCircle />
+              </span>
+              <Tooltip id={`tooltip-${stakingTxHash}`} />
+            </div>
+          </div>
         </div>
         {generateActionButton()}
       </div>

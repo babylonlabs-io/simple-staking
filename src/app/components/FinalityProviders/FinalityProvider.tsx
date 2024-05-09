@@ -1,6 +1,10 @@
 import { FaBitcoin } from "react-icons/fa";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip } from "react-tooltip";
+import Image from "next/image";
 
 import { Hash } from "../Hash/Hash";
+import blue from "@/app/assets/blue-check.svg";
 
 interface FinalityProviderProps {
   pkHex: string;
@@ -20,12 +24,38 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   const percentage = totalActiveTVL
     ? `${Math.round((stake / totalActiveTVL) * 100)}%`
     : "-";
+
+  const generateFpNoInfoTooltip = () => {
+    return (
+      <div className="flex items-center gap-2">
+        <p>-</p>
+        <span
+          className="cursor-pointer text-xs"
+          data-tooltip-id="tooltip-missing"
+          data-tooltip-content="Finality Provider has not provided additional information"
+          data-tooltip-place="top"
+        >
+          <AiOutlineInfoCircle />
+        </span>
+      </div>
+    );
+  };
+
   return (
     <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200 lg:grid-cols-finalityProviders">
       <div className="flex gap-2">
         <FaBitcoin size={16} className="mt-1 text-primary" />
         <div className="flex flex-col">
-          <p>{moniker || "-"}</p>
+          <div>
+            {moniker ? (
+              <div className="flex items-center gap-1">
+                <p>{moniker}</p>
+                <Image src={blue} alt="verified" />
+              </div>
+            ) : (
+              generateFpNoInfoTooltip()
+            )}
+          </div>
           <Hash value={pkHex} address small />
         </div>
       </div>
@@ -38,7 +68,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
-            <p>-</p>
+            generateFpNoInfoTooltip()
           )}
         </div>
       </div>
@@ -49,9 +79,10 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (
-          <p>-</p>
+          generateFpNoInfoTooltip()
         )}
       </div>
+      <Tooltip id="tooltip-missing" />
     </div>
   );
 };

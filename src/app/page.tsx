@@ -28,8 +28,6 @@ import { useTheme } from "./hooks/useTheme";
 import { Header } from "./components/Header/Header";
 import { ConnectLarge } from "./components/Connect/ConnectLarge";
 import { Stats } from "./components/Stats/Stats";
-import { Stakers } from "./components/Stakers/Stakers";
-import { FinalityProviders } from "./components/FinalityProviders/FinalityProviders";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { DelegationState } from "./types/delegationState";
@@ -37,6 +35,7 @@ import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 import { FAQ } from "./components/FAQ/FAQ";
 import { StakersFinalityProviders } from "./components/StakersFinalityProviders/StakersFinalityProviders";
+import { ConnectModal } from "./components/Modals/ConnectModal";
 
 interface HomeProps {}
 
@@ -71,7 +70,6 @@ const Home: React.FC<HomeProps> = () => {
     select: (data) => data.data,
   });
 
-  // TODO pagination is not implemented at the moment
   const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage } =
     useInfiniteQuery({
       queryKey: ["delegations", address],
@@ -104,7 +102,24 @@ const Home: React.FC<HomeProps> = () => {
     Delegation[]
   >(delegationsLocalStorageKey, []);
 
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
+
+  const handleConnectModal = () => {
+    setConnectModalOpen(true);
+  };
+
+  const handleDisconnectBTC = () => {
+    setBTCWallet(undefined);
+    setBTCWalletBalance(0);
+    setBTCWalletNetwork(undefined);
+    setPublicKeyNoCoord("");
+    setAddress("");
+  };
+
   const handleConnectBTC = async () => {
+    // close the modal
+    setConnectModalOpen(false);
+
     try {
       const walletProvider = getWallet();
       await walletProvider.connectWallet();
@@ -162,30 +177,40 @@ const Home: React.FC<HomeProps> = () => {
 
   const stakingFee = 500;
   const withdrawalFee = 500;
-  const unbondingFee = 500;
 
   const handleSign = async () => {
+    // check if term is fixed
+    let termWithFixed;
     if (
-      // Simple check, should be present in the form fields first
+      globalParamsVersion &&
+      globalParamsVersion.min_staking_time ===
+        globalParamsVersion.max_staking_time
+    ) {
+      // if term is fixed, use the API value
+      termWithFixed = globalParamsVersion.min_staking_time;
+    } else {
+      // if term is not fixed, use the term from the input
+      termWithFixed = term;
+    }
+
+    if (
       !walletAndDataReady ||
       !finalityProvider ||
-      !btcWalletNetwork
-      // TODO implement checks
-      // amount <= 0 ||
-      // term <= 0 ||
-      // amount > globalParamsData.max_staking_amount ||
-      // amount < globalParamsData.min_staking_amount ||
-      // term > globalParamsData.max_staking_time ||
-      // term < globalParamsData.min_staking_time
+      !btcWalletNetwork ||
+      amount * 1e8 < globalParamsVersion.min_staking_amount ||
+      amount * 1e8 > globalParamsVersion.max_staking_amount ||
+      termWithFixed < globalParamsVersion.min_staking_time ||
+      termWithFixed > globalParamsVersion.max_staking_time
     ) {
+      // TODO Show Popup
+      console.error("Invalid staking data");
       return;
     }
 
     // Rounding the input since 0.0006 * 1e8 is is 59999.999
     // which won't be accepted by the mempool API
     const stakingAmount = Math.round(Number(amount) * 1e8);
-    // TODO term in blocks for dev purposes. Revert to days * 24 * 6
-    const stakingTerm = Number(term);
+    const stakingTerm = Number(termWithFixed);
     let inputUTXOs = [];
     try {
       inputUTXOs = await btcWallet.getUtxos(
@@ -312,13 +337,14 @@ const Home: React.FC<HomeProps> = () => {
       className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
     >
       <Header
-        onConnect={handleConnectBTC}
+        onConnect={handleConnectModal}
+        onDisconnect={handleDisconnectBTC}
         address={address}
         balance={btcWalletBalance}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          {!btcWallet && <ConnectLarge onConnect={handleConnectBTC} />}
+          {!btcWallet && <ConnectLarge onConnect={handleConnectModal} />}
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
@@ -338,7 +364,8 @@ const Home: React.FC<HomeProps> = () => {
             publicKeyNoCoord &&
             finalityProvidersData &&
             finalityProvidersData.length > 0 &&
-            finalityProvidersKV && (
+            finalityProvidersKV &&
+            statsData && (
               <>
                 <Staking
                   amount={amount}
@@ -350,6 +377,13 @@ const Home: React.FC<HomeProps> = () => {
                   selectedFinalityProvider={finalityProvider}
                   onFinalityProviderChange={handleChooseFinalityProvider}
                   onSign={handleSign}
+                  minAmount={globalParamsVersion.min_staking_amount / 1e8}
+                  maxAmount={globalParamsVersion.max_staking_amount / 1e8}
+                  minTerm={globalParamsVersion.min_staking_time}
+                  maxTerm={globalParamsVersion.max_staking_time}
+                  overTheCap={
+                    globalParamsVersion.staking_cap <= statsData.active_tvl
+                  }
                 />
                 <Delegations
                   finalityProvidersKV={finalityProvidersKV}
@@ -357,10 +391,9 @@ const Home: React.FC<HomeProps> = () => {
                   delegationsLocalStorage={delegationsLocalStorage}
                   globalParamsVersion={globalParamsVersion}
                   publicKeyNoCoord={publicKeyNoCoord}
-                  unbondingFee={unbondingFee}
+                  unbondingFee={globalParamsVersion.unbonding_fee}
                   withdrawalFee={withdrawalFee}
                   btcWalletNetwork={btcWalletNetwork}
-                  getBTCTipHeight={btcWallet.getBTCTipHeight}
                   address={address}
                   signPsbt={btcWallet.signPsbt}
                   pushTx={btcWallet.pushTx}
@@ -376,6 +409,12 @@ const Home: React.FC<HomeProps> = () => {
       </div>
       <FAQ />
       <Footer />
+      <ConnectModal
+        open={connectModalOpen}
+        onClose={setConnectModalOpen}
+        onConnect={handleConnectBTC}
+        connectDisabled={!!address}
+      />
     </main>
   );
 };

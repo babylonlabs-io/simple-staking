@@ -1,4 +1,7 @@
 import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip } from "react-tooltip";
+
 import { FinalityProvider } from "./FinalityProvider";
 
 interface FinalityProvidersProps {
@@ -14,10 +17,30 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Finality Providers</h3>
       {data && (
-        <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-finalityProviders">
+        <div className="hidden gap-2 px-4 text-sm lg:grid lg:grid-cols-finalityProviders ">
           <p>Finality Provider</p>
-          <p>Delegations</p>
-          <p>Stake</p>
+          <div className="flex items-center gap-1">
+            <p>Delegations</p>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id="tooltip-delegations"
+              data-tooltip-content="Delegations information"
+              data-tooltip-place="top"
+            >
+              <AiOutlineInfoCircle />
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            <p>Stake</p>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id="tooltip-stake"
+              data-tooltip-content="Stake information"
+              data-tooltip-place="top"
+            >
+              <AiOutlineInfoCircle />
+            </span>
+          </div>
         </div>
       )}
       <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
@@ -38,6 +61,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           </div>
         )}
       </div>
+      <Tooltip id="tooltip-delegations" />
+      <Tooltip id="tooltip-stake" />
     </div>
   );
 };

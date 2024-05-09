@@ -9,15 +9,23 @@ interface ThemeToggleProps {}
 export const ThemeToggle: React.FC<ThemeToggleProps> = () => {
   const { setTheme, lightSelected } = useTheme();
 
+  const getPrimaryActive = () => {
+    if (lightSelected) {
+      return "bg-white";
+    } else {
+      return "bg-primary";
+    }
+  };
+
   const iconStyles = (active: boolean) =>
     `rounded-full p-1 transition duration-300 ease-in-out ${
-      active ? "bg-base-300" : "bg-transparent"
+      active ? getPrimaryActive() : "bg-transparent"
     }`;
 
   return (
     <button
       onClick={() => (lightSelected ? setTheme("dark") : setTheme("light"))}
-      className={`flex gap-1 rounded-full bg-base-200 p-2 ${lightSelected ? "text-black" : "text-white"}`}
+      className={`flex gap-1 rounded-full bg-base-100 p-2 dark:bg-base-300 ${lightSelected ? "text-black" : "text-white"}`}
     >
       <div className={`${iconStyles(lightSelected)}`}>
         <FiSun size={16} />

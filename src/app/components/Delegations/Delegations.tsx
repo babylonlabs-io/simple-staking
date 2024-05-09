@@ -31,7 +31,6 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
-  getBTCTipHeight: () => Promise<number>;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -46,7 +45,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
   signPsbt,
   pushTx,
-  getBTCTipHeight,
 }) => {
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =

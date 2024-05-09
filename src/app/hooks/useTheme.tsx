@@ -12,14 +12,5 @@ export const useTheme = () => {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return {
-      theme: "dark",
-      setTheme: () => {},
-      lightSelected: false,
-      darkSelected: true,
-    };
-  } else {
-    return { theme, setTheme, lightSelected, darkSelected };
-  }
+  return { theme, setTheme, lightSelected, darkSelected };
 };

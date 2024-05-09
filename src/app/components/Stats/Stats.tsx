@@ -1,5 +1,7 @@
 import { Fragment } from "react";
 import Image from "next/image";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip } from "react-tooltip";
 
 import { StatsData } from "@/app/api/getStats";
 import confirmedTvl from "./icons/confirmed-tvl.svg";
@@ -26,10 +28,11 @@ export const Stats: React.FC<StatsProps> = ({
 
   const sections = [
     [
-      // TODO check field values
       {
         title: "Staking TVL Cap",
-        value: stakingCap ? `${+(stakingCap / 1e8).toFixed(6)} Signet BTC` : 0,
+        value: stakingCap
+          ? `${+(stakingCap / 1e8).toFixed(6)} Signet BTC`
+          : "-",
         icon: stakingTvlCap,
       },
       {
@@ -41,8 +44,10 @@ export const Stats: React.FC<StatsProps> = ({
       },
       {
         title: "Pending Stake",
-        value: data?.active_delegations
-          ? formatter.format(data.active_delegations as number)
+        value: data?.unconfirmed_active_tvl
+          ? formatter.format(
+              +(data.unconfirmed_active_tvl / 1e8).toFixed(6) as number,
+            )
           : 0,
         icon: pendingStake,
       },
@@ -54,6 +59,7 @@ export const Stats: React.FC<StatsProps> = ({
           ? formatter.format(data.total_delegations as number)
           : 0,
         icon: delegations,
+        tooltip: "Delegations information",
       },
       {
         title: "Stakers",
@@ -77,17 +83,34 @@ export const Stats: React.FC<StatsProps> = ({
               <div className="flex items-center gap-2 md:flex-1 md:flex-col 2xl:flex-initial 2xl:flex-row">
                 <div className="flex items-center gap-2">
                   <Image src={subSection.icon} alt={subSection.title} />
-                  <p className="dark:text-neutral-content">
-                    {subSection.title}
+                  <div className="flex items-center gap-1">
+                    <p className="dark:text-neutral-content">
+                      {subSection.title}
+                    </p>
+                    {subSection.tooltip && (
+                      <>
+                        <span
+                          className="cursor-pointer text-xs"
+                          data-tooltip-id={`tooltip-${subSection.title}`}
+                          data-tooltip-content={subSection.tooltip}
+                          data-tooltip-place="top"
+                        >
+                          <AiOutlineInfoCircle />
+                        </span>
+                        <Tooltip id={`tooltip-${subSection.title}`} />
+                      </>
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <p className="flex-1 text-right">
+                    {isLoading ? (
+                      <span className="loading loading-spinner text-primary" />
+                    ) : (
+                      <strong>{subSection.value}</strong>
+                    )}
                   </p>
                 </div>
-                <p className="flex-1 text-right">
-                  {isLoading ? (
-                    <span className="loading loading-spinner text-primary" />
-                  ) : (
-                    <strong>{subSection.value}</strong>
-                  )}
-                </p>
               </div>
               {subIndex !== section.length - 1 && (
                 <div className="divider mx-0 my-2 md:divider-horizontal" />

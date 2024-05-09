@@ -10,6 +10,7 @@ interface HashProps {
   noFade?: boolean;
   address?: boolean;
   small?: boolean;
+  fullWidth?: boolean;
 }
 
 export const Hash: React.FC<HashProps> = ({
@@ -17,6 +18,7 @@ export const Hash: React.FC<HashProps> = ({
   noFade,
   address,
   small,
+  fullWidth,
 }) => {
   const [_value, copy] = useCopyToClipboard();
   const [copiedText, setCopiedText] = useState("");
@@ -44,6 +46,7 @@ export const Hash: React.FC<HashProps> = ({
         style={{
           minWidth: small ? "3.5rem" : "5.5rem",
         }}
+        className={`${fullWidth ? "w-full" : ""}`}
       >
         {copiedText || (
           <>
