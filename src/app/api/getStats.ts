@@ -10,6 +10,7 @@ export interface StatsData {
   active_delegations: number;
   total_delegations: number;
   total_stakers: number;
+  unconfirmed_active_tvl: number;
 }
 
 export const getStats = async (): Promise<Stats> => {

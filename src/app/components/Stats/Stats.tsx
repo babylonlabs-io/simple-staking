@@ -28,7 +28,6 @@ export const Stats: React.FC<StatsProps> = ({
 
   const sections = [
     [
-      // TODO check field values
       {
         title: "Staking TVL Cap",
         value: stakingCap
@@ -45,8 +44,10 @@ export const Stats: React.FC<StatsProps> = ({
       },
       {
         title: "Pending Stake",
-        value: data?.active_delegations
-          ? formatter.format(data.active_delegations as number)
+        value: data?.unconfirmed_active_tvl
+          ? formatter.format(
+              +(data.unconfirmed_active_tvl / 1e8).toFixed(6) as number,
+            )
           : 0,
         icon: pendingStake,
       },
