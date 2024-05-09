@@ -31,7 +31,9 @@ export const Stats: React.FC<StatsProps> = ({
       // TODO check field values
       {
         title: "Staking TVL Cap",
-        value: stakingCap ? `${+(stakingCap / 1e8).toFixed(6)} Signet BTC` : 0,
+        value: stakingCap
+          ? `${+(stakingCap / 1e8).toFixed(6)} Signet BTC`
+          : "-",
         icon: stakingTvlCap,
       },
       {
