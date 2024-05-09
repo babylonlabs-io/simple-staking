@@ -48,8 +48,8 @@ export const Staking: React.FC<StakingProps> = ({
     minTerm === maxTerm || (term >= minTerm && term <= maxTerm);
 
   const signReady =
-    amount >= minAmount / 1e8 &&
-    amount <= maxAmount / 1e8 &&
+    amount >= minAmount &&
+    amount <= maxAmount &&
     termsReady &&
     selectedFinalityProvider;
 
@@ -124,8 +124,8 @@ export const Staking: React.FC<StakingProps> = ({
                   type="number"
                   placeholder="BTC"
                   className="no-focus input input-bordered w-full"
-                  min={minAmount / 1e8}
-                  max={maxAmount / 1e8}
+                  min={minAmount}
+                  max={maxAmount}
                   step={0.00001}
                   value={amount}
                   onChange={(e) => onAmountChange(Number(e.target.value))}
@@ -133,7 +133,7 @@ export const Staking: React.FC<StakingProps> = ({
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
-                    min stake is {minAmount / 1e8} Signet BTC
+                    min stake is {minAmount} Signet BTC
                   </span>
                 </div>
               </label>

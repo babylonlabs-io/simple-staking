@@ -377,8 +377,8 @@ const Home: React.FC<HomeProps> = () => {
                   selectedFinalityProvider={finalityProvider}
                   onFinalityProviderChange={handleChooseFinalityProvider}
                   onSign={handleSign}
-                  minAmount={globalParamsVersion.min_staking_amount}
-                  maxAmount={globalParamsVersion.max_staking_amount}
+                  minAmount={globalParamsVersion.min_staking_amount / 1e8}
+                  maxAmount={globalParamsVersion.max_staking_amount / 1e8}
                   minTerm={globalParamsVersion.min_staking_time}
                   maxTerm={globalParamsVersion.max_staking_time}
                   unbondingTime={globalParamsVersion.unbonding_time}
