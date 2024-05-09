@@ -22,7 +22,6 @@ interface StakingProps {
   maxTerm: number;
   // if the staking cap is reached, the user can't stake
   overTheCap: boolean;
-  unbondingTime: number;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -40,7 +39,6 @@ export const Staking: React.FC<StakingProps> = ({
   minTerm,
   maxTerm,
   overTheCap,
-  unbondingTime,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 

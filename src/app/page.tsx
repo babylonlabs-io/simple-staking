@@ -381,7 +381,6 @@ const Home: React.FC<HomeProps> = () => {
                   maxAmount={globalParamsVersion.max_staking_amount / 1e8}
                   minTerm={globalParamsVersion.min_staking_time}
                   maxTerm={globalParamsVersion.max_staking_time}
-                  unbondingTime={globalParamsVersion.unbonding_time}
                   overTheCap={
                     globalParamsVersion.staking_cap <= statsData.active_tvl
                   }
