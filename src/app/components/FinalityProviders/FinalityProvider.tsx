@@ -25,7 +25,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
     ? `${Math.round((stake / totalActiveTVL) * 100)}%`
     : "-";
 
-  const generateTooltip = () => {
+  const generateFpNoInfoTooltip = () => {
     return (
       <div className="flex items-center gap-2">
         <p>-</p>
@@ -53,7 +53,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
                 <Image src={blue} alt="verified" />
               </div>
             ) : (
-              generateTooltip()
+              generateFpNoInfoTooltip()
             )}
           </div>
           <Hash value={pkHex} address small />
@@ -68,7 +68,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
-            generateTooltip()
+            generateFpNoInfoTooltip()
           )}
         </div>
       </div>
@@ -79,7 +79,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (
-          generateTooltip()
+          generateFpNoInfoTooltip()
         )}
       </div>
       <Tooltip id="tooltip-missing" />
