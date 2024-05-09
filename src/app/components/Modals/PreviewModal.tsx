@@ -81,7 +81,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           staking transaction is included in the Bitcoin chain. In that case,
           the dashboard will mark your stake as &quot;overflow&quot; and request
           you to unbond and withdraw, which will cause extra transaction fees.
-          So please stake wisely.
+          Therefore please stake wisely.
         </p>
         <p className="dark:text-neutral-content">
           2. No third party possesses your staked Signet BTC. You are the only
@@ -97,7 +97,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             Cancel
           </button>
           <button
-            className="btn btn-primary flex-1"
+            className="btn-primary btn flex-1"
             onClick={() => {
               onClose(false);
               onSign();
