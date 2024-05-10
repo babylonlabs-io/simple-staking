@@ -7,7 +7,6 @@ interface Delegations {
   pagination: Pagination;
 }
 
-// TODO implement overflow UI
 export interface Delegation {
   staking_tx_hash_hex: string;
   staker_pk_hex: string;
