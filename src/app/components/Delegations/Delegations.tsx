@@ -300,6 +300,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             staking_tx_hash_hex,
             finality_provider_pk_hex,
             state,
+            is_overflow,
           } = delegation;
           // Get the moniker of the finality provider
           const finalityProviderMoniker =
@@ -320,6 +321,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
               onUnbond={handleUnbondWithErrors}
               onWithdraw={handleWithdrawWithErrors}
               intermediateState={intermediateDelegation?.state}
+              isOverflow={is_overflow}
             />
           );
         })}

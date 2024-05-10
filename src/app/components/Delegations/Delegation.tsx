@@ -19,6 +19,7 @@ interface DelegationProps {
   // that should change the status but the back-end
   // has not had time to reflect this change yet
   intermediateState?: string;
+  isOverflow: boolean;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
@@ -29,6 +30,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   onUnbond,
   onWithdraw,
   intermediateState,
+  isOverflow,
 }) => {
   const { start_height, start_timestamp } = stakingTx;
 
@@ -71,7 +73,9 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   return (
-    <div className="card relative border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
+    <div
+      className={`card relative border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200 ${isOverflow && "border-warning"}`}
+    >
       {/* TODO to be removed after initial dev phase */}
       {/* local storage items has startHeight 0 */}
       {start_height === 0 && (
