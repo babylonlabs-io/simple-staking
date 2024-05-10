@@ -21,4 +21,5 @@ export const toLocalStorageDelegation = (
     start_height: 0,
     timelock,
   },
+  is_overflow: false,
 });
