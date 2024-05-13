@@ -15,6 +15,7 @@ export interface Delegation {
   staking_value: number;
   staking_tx: StakingTx;
   unbonding_tx?: UnbondingTx;
+  is_overflow: boolean;
 }
 
 export interface StakingTx {

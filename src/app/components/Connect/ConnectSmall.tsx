@@ -30,7 +30,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   useOnClickOutside(ref, handleClickOutside);
 
   return address ? (
-    <div className="relative mr-[-10px] flex text-sm">
+    <div className="relative mr-[-10px] flex text-sm" ref={ref}>
       <button
         className="flex cursor-pointer"
         onClick={() => setShowMenu(!showMenu)}
@@ -54,7 +54,6 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             // margin - border
             width: "calc(100% - 8px)",
           }}
-          ref={ref}
         >
           <div className="flex items-center justify-between">
             <h3 className="font-bold dark:text-neutral-content">Settings</h3>

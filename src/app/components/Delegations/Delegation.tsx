@@ -1,5 +1,6 @@
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
+import { IoIosWarning } from "react-icons/io";
 
 import { StakingTx } from "@/app/api/getDelegations";
 import { DelegationState } from "@/app/types/delegationState";
@@ -19,6 +20,7 @@ interface DelegationProps {
   // that should change the status but the back-end
   // has not had time to reflect this change yet
   intermediateState?: string;
+  isOverflow: boolean;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
@@ -29,6 +31,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   onUnbond,
   onWithdraw,
   intermediateState,
+  isOverflow,
 }) => {
   const { start_height, start_timestamp } = stakingTx;
 
@@ -71,12 +74,13 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   return (
-    <div className="card relative border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
-      {/* TODO to be removed after initial dev phase */}
-      {/* local storage items has startHeight 0 */}
-      {start_height === 0 && (
-        <div className="absolute right-0 top-0 rounded-sm bg-red-500 px-1 text-xs text-white">
-          <p>local</p>
+    <div
+      className={`card relative border bg-base-300 p-4 text-sm dark:bg-base-200 ${isOverflow ? "border-primary" : "dark:border-0"}`}
+    >
+      {isOverflow && (
+        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-md bg-primary px-2 py-1 text-sm text-white">
+          <IoIosWarning size={20} />
+          <p>overflow</p>
         </div>
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
