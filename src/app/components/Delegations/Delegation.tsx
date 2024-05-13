@@ -83,13 +83,6 @@ export const Delegation: React.FC<DelegationProps> = ({
           <p>overflow</p>
         </div>
       )}
-      {/* TODO to be removed after initial dev phase */}
-      {/* local storage items has startHeight 0 */}
-      {start_height === 0 && (
-        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-md bg-red-500 px-2 py-1 text-sm text-white">
-          <p>local</p>
-        </div>
-      )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
         <p>{+(stakingValue / 1e8).toFixed(6)} Signet BTC</p>
         <p>{durationTillNow(start_timestamp)}</p>
