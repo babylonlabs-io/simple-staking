@@ -45,9 +45,7 @@ export const Stats: React.FC<StatsProps> = ({
       {
         title: "Pending Stake",
         value: data?.unconfirmed_tvl
-          ? formatter.format(
-            +(data.unconfirmed_tvl - data.active_tvl / 1e8).toFixed(6) as number,
-          )
+          ? `${+((data.unconfirmed_tvl - data.active_tvl) / 1e8).toFixed(6)} Signet BTC`
           : 0,
         icon: pendingStake,
       },

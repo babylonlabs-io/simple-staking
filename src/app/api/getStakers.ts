@@ -1,4 +1,4 @@
-import { encode } from "url-safe-base64";
+// import { encode } from "url-safe-base64";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -19,14 +19,15 @@ export interface Pagination {
   next_key: string;
 }
 
-export const getStakers = async (key: string): Promise<Stakers> => {
-  const limit = 10;
-  const reverse = false;
+export const getStakers = async (): Promise<Stakers> => {
+  // Intentionally used without pagination for now
+  const limit = 50;
+  // const reverse = false;
 
   const params = {
-    "pagination.key": encode(key),
-    "pagination.reverse": reverse,
-    "pagination.limit": limit,
+    // "pagination_key": encode(key),
+    // "pagination_reverse": reverse,
+    pagination_limit: limit,
   };
 
   const response = await apiWrapper(

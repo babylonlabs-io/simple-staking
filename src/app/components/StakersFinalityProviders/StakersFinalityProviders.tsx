@@ -13,6 +13,18 @@ interface StakersFinalityProvidersProps {
 export const StakersFinalityProviders: React.FC<
   StakersFinalityProvidersProps
 > = ({ finalityProviders, totalActiveTVL, connected }) => {
+  // At this point of time we disable the Stakers tab
+  return (
+    <div>
+      <FinalityProviders
+        data={finalityProviders}
+        totalActiveTVL={totalActiveTVL}
+      />
+    </div>
+  );
+
+  // TODO uncomment this code when the Stakers tab is enabled
+
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = ["Top Stakers", "Finality Providers"];

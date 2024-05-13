@@ -26,7 +26,6 @@ import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDe
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { useTheme } from "./hooks/useTheme";
 import { Header } from "./components/Header/Header";
-import { ConnectLarge } from "./components/Connect/ConnectLarge";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
@@ -34,7 +33,6 @@ import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 import { FAQ } from "./components/FAQ/FAQ";
-import { StakersFinalityProviders } from "./components/StakersFinalityProviders/StakersFinalityProviders";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 
 interface HomeProps {}
@@ -332,6 +330,19 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  // these constants are needed for easier prop passing
+
+  const overTheCap =
+    globalParamsVersion && statsData
+      ? globalParamsVersion.staking_cap <= statsData.active_tvl
+      : false;
+
+  const minAmount =
+    globalParamsVersion && globalParamsVersion.min_staking_amount / 1e8;
+
+  const maxAmount =
+    globalParamsVersion && globalParamsVersion.max_staking_amount / 1e8;
+
   return (
     <main
       className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
@@ -344,7 +355,6 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          {!btcWallet && <ConnectLarge onConnect={handleConnectModal} />}
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
@@ -357,54 +367,48 @@ const Home: React.FC<HomeProps> = () => {
               balance={btcWalletBalance}
             />
           )}
+          <Staking
+            amount={amount}
+            onAmountChange={setAmount}
+            term={term}
+            onTermChange={setTerm}
+            disabled={!btcWallet}
+            finalityProviders={finalityProvidersData}
+            selectedFinalityProvider={finalityProvider}
+            onFinalityProviderChange={handleChooseFinalityProvider}
+            onSign={handleSign}
+            minAmount={minAmount}
+            maxAmount={maxAmount}
+            minTerm={globalParamsVersion?.min_staking_time}
+            maxTerm={globalParamsVersion?.max_staking_time}
+            overTheCap={overTheCap}
+            onConnect={handleConnectModal}
+          />
           {btcWallet &&
             delegationsData &&
             globalParamsVersion &&
             btcWalletNetwork &&
-            publicKeyNoCoord &&
-            finalityProvidersData &&
-            finalityProvidersData.length > 0 &&
-            finalityProvidersKV &&
-            statsData && (
-              <>
-                <Staking
-                  amount={amount}
-                  onAmountChange={setAmount}
-                  term={term}
-                  onTermChange={setTerm}
-                  disabled={!btcWallet}
-                  finalityProviders={finalityProvidersData}
-                  selectedFinalityProvider={finalityProvider}
-                  onFinalityProviderChange={handleChooseFinalityProvider}
-                  onSign={handleSign}
-                  minAmount={globalParamsVersion.min_staking_amount / 1e8}
-                  maxAmount={globalParamsVersion.max_staking_amount / 1e8}
-                  minTerm={globalParamsVersion.min_staking_time}
-                  maxTerm={globalParamsVersion.max_staking_time}
-                  overTheCap={
-                    globalParamsVersion.staking_cap <= statsData.active_tvl
-                  }
-                />
-                <Delegations
-                  finalityProvidersKV={finalityProvidersKV}
-                  delegationsAPI={delegationsData}
-                  delegationsLocalStorage={delegationsLocalStorage}
-                  globalParamsVersion={globalParamsVersion}
-                  publicKeyNoCoord={publicKeyNoCoord}
-                  unbondingFee={globalParamsVersion.unbonding_fee}
-                  withdrawalFee={withdrawalFee}
-                  btcWalletNetwork={btcWalletNetwork}
-                  address={address}
-                  signPsbt={btcWallet.signPsbt}
-                  pushTx={btcWallet.pushTx}
-                />
-              </>
+            finalityProvidersKV && (
+              <Delegations
+                finalityProvidersKV={finalityProvidersKV}
+                delegationsAPI={delegationsData}
+                delegationsLocalStorage={delegationsLocalStorage}
+                globalParamsVersion={globalParamsVersion}
+                publicKeyNoCoord={publicKeyNoCoord}
+                unbondingFee={globalParamsVersion.unbonding_fee}
+                withdrawalFee={withdrawalFee}
+                btcWalletNetwork={btcWalletNetwork}
+                address={address}
+                signPsbt={btcWallet.signPsbt}
+                pushTx={btcWallet.pushTx}
+              />
             )}
-          <StakersFinalityProviders
+          {/* At this point of time is not used */}
+          {/* <StakersFinalityProviders
             finalityProviders={finalityProvidersData}
             totalActiveTVL={statsData?.active_tvl}
             connected={!!btcWallet}
-          />
+          /> */}
         </div>
       </div>
       <FAQ />

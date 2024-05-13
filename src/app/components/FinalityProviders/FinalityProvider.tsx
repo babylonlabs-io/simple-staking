@@ -25,14 +25,14 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
     ? `${Math.round((stake / totalActiveTVL) * 100)}%`
     : "-";
 
-  const generateFpNoInfoTooltip = () => {
+  const generateFpNoInfoTooltip = (defaultValue: string, tooltip: string) => {
     return (
       <div className="flex items-center gap-2">
-        <p>-</p>
+        <p>{defaultValue}</p>
         <span
           className="cursor-pointer text-xs"
           data-tooltip-id="tooltip-missing"
-          data-tooltip-content="Finality Provider has not provided additional information"
+          data-tooltip-content={tooltip}
           data-tooltip-place="top"
         >
           <AiOutlineInfoCircle />
@@ -53,7 +53,10 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
                 <Image src={blue} alt="verified" />
               </div>
             ) : (
-              generateFpNoInfoTooltip()
+              generateFpNoInfoTooltip(
+                "-",
+                "Finality Provider has not provided additional information",
+              )
             )}
           </div>
           <Hash value={pkHex} address small />
@@ -68,7 +71,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
-            generateFpNoInfoTooltip()
+            0
           )}
         </div>
       </div>
@@ -79,7 +82,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (
-          generateFpNoInfoTooltip()
+          0
         )}
       </div>
       <Tooltip id="tooltip-missing" />

@@ -24,11 +24,11 @@ export const Staker: React.FC<StakerProps> = ({
           <p className="text-xs dark:text-neutral-content lg:hidden">
             Delegations
           </p>
-          <p>{delegations}</p>
+          <p>{delegations || 0}</p>
         </div>
         <div>
           <p className="text-xs dark:text-neutral-content lg:hidden">Stake</p>
-          <p>{+(activeTVL / 1e8).toFixed(6)} Signet BTC</p>
+          <p>{activeTVL ? `${+(activeTVL / 1e8).toFixed(6)} Signet BTC` : 0}</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
@@ -8,15 +8,12 @@ import { Staker } from "./Staker";
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { data: stakersData, fetchNextPage: _fetchNextStakersPage } =
-    useInfiniteQuery({
-      queryKey: ["stakers"],
-      queryFn: ({ pageParam = "" }) => getStakers(pageParam),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
-      initialPageParam: "",
-      refetchInterval: 60000, // 1 minute
-      select: (data) => data?.pages?.flatMap((page) => page?.data),
-    });
+  const { data: stakersData } = useQuery({
+    queryKey: ["stakers"],
+    queryFn: getStakers,
+    refetchInterval: 60000, // 1 minute
+    select: (data) => data.data,
+  });
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">

@@ -4,6 +4,8 @@ export const UNBONDING = "unbonding";
 export const UNBONDED = "unbonded";
 export const WITHDRAWN = "withdrawn";
 export const PENDING = "pending";
+export const OVERFLOW = "overflow";
+export const EXPIRED = "expired";
 export const INTERMEDIATE_UNBONDING = "intermediate_unbonding";
 export const INTERMEDIATE_WITHDRAWAL = "intermediate_withdrawal";
 
@@ -15,6 +17,8 @@ export const DelegationState = {
   UNBONDED,
   WITHDRAWN,
   PENDING,
+  OVERFLOW,
+  EXPIRED,
   INTERMEDIATE_UNBONDING,
   INTERMEDIATE_WITHDRAWAL,
 };
