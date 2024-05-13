@@ -12,7 +12,7 @@ deployment:
     - name: MEMPOOL_API
       value: https://babylon.mempool.space
     - name: API_URL
-      value: https://staking-api.mainnet.babylonchain.io
+      value: API_FQDN
   resources:
     requests:
       memory: 100Mi
@@ -44,7 +44,7 @@ ingress:
   groupName: "testnet3-internal"
   scheme: "internal"
   hosts:
-    - host: dashboard.mainnet.babylonchain.io
+    - host: DASHBOARD_FQDN
       http:
         paths:
           - path: /
@@ -62,7 +62,7 @@ ingress:
                 port:
                   name: simple-staking
 externalDns:
-  fqdn: dashboard.mainnet.babylonchain.io
+  fqdn: DASHBOARD_FQDN
   ttl: 60
 purgeCloudflareCache:
   enabled: false

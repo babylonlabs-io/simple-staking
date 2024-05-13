@@ -60,8 +60,14 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           region: "$AWS_REGION"
       - kubernetes/install-kubeconfig:
-          kubeconfig: MAINNET_KUBECONFIG
+          kubeconfig: TESTNET_KUBECONFIG
       - helm/install-helm-client
+      - run:
+          name: Fetch and replace config placeholders from CircleCi env vars
+          command: |
+            HELM_VALUES=/home/circleci/project/.circleci/values-staging.yaml
+            sed -i "s/API_STAGING_FQDN/$API_STAGING_FQDN/g" $HELM_VALUES
+            sed -i "s/DASHBOARD_STAGING_FQDN/$DASHBOARD_STAGING_FQDN/g" $HELM_VALUES
       - run:
           name: Perform a dry run of the new release
           command: |
@@ -81,7 +87,7 @@ jobs:
               --set deployment.version=$CIRCLE_SHA1 \
               simple-staking $HELM_CHART_REPO
 
-  deploy_mainnet:
+  deploy_testnet:
     machine:
       image: ubuntu-2204:2024.01.1
       resource_class: large
@@ -92,14 +98,20 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           region: "$AWS_REGION"
       - kubernetes/install-kubeconfig:
-          kubeconfig: MAINNET_KUBECONFIG
+          kubeconfig: TESTNET_KUBECONFIG
       - helm/install-helm-client
+      - run:
+          name: Fetch and replace config placeholders from CircleCi env vars
+          command: |
+            HELM_VALUES=/home/circleci/project/.circleci/values-staging.yaml
+            sed -i "s/API_FQDN/$API_FQDN/g" $HELM_VALUES
+            sed -i "s/DASHBOARD_FQDN/$DASHBOARD_FQDN/g" $HELM_VALUES
       - run:
           name: Perform a dry run of the new release
           command: |
             helm upgrade --install --debug --dry-run \
-              -n $DEPLOY_MAINNET_NAMESPACE \
-              --values /home/circleci/project/.circleci/values-mainnet.yaml \
+              -n $DEPLOY_TESTNET_NAMESPACE \
+              --values /home/circleci/project/.circleci/values-testnet.yaml \
               --version $HELM_CHART_VERSION \
               --set deployment.version=$CIRCLE_SHA1 \
               simple-staking $HELM_CHART_REPO
@@ -107,13 +119,13 @@ jobs:
           name: Release new service version in an atomic way
           command: |
             helm upgrade --install --debug --atomic --wait \
-              -n $DEPLOY_MAINNET_NAMESPACE --create-namespace \
-              --values /home/circleci/project/.circleci/values-mainnet.yaml \
+              -n $DEPLOY_TESTNET_NAMESPACE --create-namespace \
+              --values /home/circleci/project/.circleci/values-testnet.yaml \
               --version $HELM_CHART_VERSION \
               --set deployment.version=$CIRCLE_SHA1 \
               simple-staking $HELM_CHART_REPO
 
-  rollback_mainnet:
+  rollback_testnet:
     machine:
       image: ubuntu-2204:2024.01.1
       resource_class: large
@@ -124,13 +136,13 @@ jobs:
           aws-secret-access-key: AWS_SECRET_ACCESS_KEY
           region: "$AWS_REGION"
       - kubernetes/install-kubeconfig:
-          kubeconfig: MAINNET_KUBECONFIG
+          kubeconfig: TESTNET_KUBECONFIG
       - helm/install-helm-client
       - run:
           name: Rollback Helm Chart to previous release
           command: |
             helm rollback --cleanup-on-fail --force --recreate-pods --wait \
-              --debug -n $DEPLOY_MAINNET_NAMESPACE simple-staking
+              --debug -n $DEPLOY_TESTNET_NAMESPACE simple-staking
 
 workflows:
   CICD:
@@ -163,7 +175,7 @@ workflows:
             branches:
               only:
                 - main
-      - deploy_mainnet:
+      - deploy_testnet:
           requires:
             - require_approval_deploy
           filters:
@@ -173,11 +185,11 @@ workflows:
       - require_approval_rollback:
           type: approval
           requires:
-            - deploy_mainnet
+            - deploy_testnet
           filters:
             branches:
               only:
                 - main
-      - rollback_mainnet:
+      - rollback_testnet:
           requires:
             - require_approval_rollback
