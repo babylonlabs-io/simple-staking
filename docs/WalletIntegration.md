@@ -1,4 +1,4 @@
-# Bitcoin Wallet Interface
+# Wallet Integration
 
 The Bitcoin Wallet is an application that maintains the user's account and
 connects to the Bitcoin network to identify important information about the
@@ -12,6 +12,17 @@ there is the possibility that a provider might not have access to all the data
 that the Babylon dApp requires. In the end of the document, we provide some
 examples on how this limitation can be overcome through the utilisation of 3rd
 party APIs.
+
+Integration using this interface can happen in the following ways,
+depending on the wallet provider:
+- *Extension Wallets* should work with the Babylon technical support team
+  to create a class that wraps their internal wallet API into the expected
+  Babylon interface and integrate it to the Babylon BTC Staking dApp.
+  This way, when the user loads up the page in their browser,
+  they will have the option to connect using the Extension Wallet.
+- *Mobile Wallets* can develop a class that wraps their internal Bitcoin APIs.
+  Before the mobile in-app browser loads the Babylon staking dApp, an
+  instance of this class should be injected under window.btcwallet.
 
 ## 1. Wallet Interface
 
