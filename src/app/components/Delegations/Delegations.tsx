@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 import {
   unbondingTransaction,
   withdrawEarlyUnbondedTransaction,
@@ -116,9 +116,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
     );
 
     // Sign the unbonding transaction
-    const unbondingTx = Transaction.fromHex(
-      await signPsbt(unsignedUnbondingTx.toHex()),
-    );
+    const signedPsbt = await signPsbt(unsignedUnbondingTx.toHex())
+    const unbondingTx = Psbt.fromHex(signedPsbt).extractTransaction()
 
     // Get the staker signature
     const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
@@ -267,7 +266,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
-                intermediateDelegation?.staking_tx_hash_hex &&
+              intermediateDelegation?.staking_tx_hash_hex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),

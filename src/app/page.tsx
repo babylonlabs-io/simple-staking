@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { initBTCCurve, stakingTransaction } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { Transaction, networks, Psbt } from "bitcoinjs-lib";
 
 import {
   getWallet,
@@ -37,7 +37,7 @@ import { FAQ } from "./components/FAQ/FAQ";
 import { StakersFinalityProviders } from "./components/StakersFinalityProviders/StakersFinalityProviders";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 
-interface HomeProps {}
+interface HomeProps { }
 
 const Home: React.FC<HomeProps> = () => {
   const { lightSelected } = useTheme();
@@ -184,7 +184,7 @@ const Home: React.FC<HomeProps> = () => {
     if (
       globalParamsVersion &&
       globalParamsVersion.min_staking_time ===
-        globalParamsVersion.max_staking_time
+      globalParamsVersion.max_staking_time
     ) {
       // if term is fixed, use the API value
       termWithFixed = globalParamsVersion.min_staking_time;
@@ -265,9 +265,10 @@ const Home: React.FC<HomeProps> = () => {
     }
     let stakingTx: string;
     try {
-      stakingTx = await btcWallet.signPsbt(unsignedStakingTx.toHex());
+      const signedPsbt = await btcWallet.signPsbt(unsignedStakingTx.toHex());
+      stakingTx = Psbt.fromHex(signedPsbt).extractTransaction().toHex();
     } catch (error: Error | any) {
-      console.error(error?.message || "Staking transaction signing error");
+      console.error(error?.message || "Staking transaction signing PSBT error");
       return;
     }
 
