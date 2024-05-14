@@ -37,7 +37,7 @@ import { FAQ } from "./components/FAQ/FAQ";
 import { StakersFinalityProviders } from "./components/StakersFinalityProviders/StakersFinalityProviders";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const { lightSelected } = useTheme();
@@ -184,7 +184,7 @@ const Home: React.FC<HomeProps> = () => {
     if (
       globalParamsVersion &&
       globalParamsVersion.min_staking_time ===
-      globalParamsVersion.max_staking_time
+        globalParamsVersion.max_staking_time
     ) {
       // if term is fixed, use the API value
       termWithFixed = globalParamsVersion.min_staking_time;
