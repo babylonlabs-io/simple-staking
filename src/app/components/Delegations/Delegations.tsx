@@ -31,6 +31,9 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
+  next: () => any;
+  hasMore: boolean;
+  isLoading: boolean;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -45,6 +48,9 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
   signPsbt,
   pushTx,
+  next,
+  hasMore,
+  isLoading,
 }) => {
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -279,7 +285,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const combinedDelegationsData = delegationsAPI
     ? [...delegationsLocalStorage, ...delegationsAPI]
     : delegationsLocalStorage;
-
+  
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Staking history</h3>
@@ -325,7 +331,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             />
           );
         })}
-      </div>
+      </InfiniteScroll>
     </div>
   );
 };

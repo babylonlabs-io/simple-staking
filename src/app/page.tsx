@@ -72,9 +72,9 @@ const Home: React.FC<HomeProps> = () => {
 
   const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage } =
     useInfiniteQuery({
-      queryKey: ["delegations", address],
+      queryKey: ["delegations", address, publicKeyNoCoord],
       queryFn: ({ pageParam = "" }) =>
-        getDelegations(pageParam, publicKeyNoCoord),
+      getDelegationsMock(pageParam, publicKeyNoCoord),
       getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
       initialPageParam: "",
       refetchInterval: 60000, // 1 minute
@@ -397,6 +397,9 @@ const Home: React.FC<HomeProps> = () => {
                   address={address}
                   signPsbt={btcWallet.signPsbt}
                   pushTx={btcWallet.pushTx}
+                  next={_fetchNextDelegationsPage}
+                  hasMore={hasNextDelegationsPage}
+                  isLoading={isFetchingNextDelegationsPage}
                 />
               </>
             )}
