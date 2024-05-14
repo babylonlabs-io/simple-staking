@@ -8,11 +8,15 @@ interface StakersFinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   totalActiveTVL?: number;
   connected?: boolean;
+  next: () => any;
+  hasMore: boolean;
+  isFetchingMore: boolean;
+  isLoading: boolean;
 }
 
 export const StakersFinalityProviders: React.FC<
   StakersFinalityProvidersProps
-> = ({ finalityProviders, totalActiveTVL, connected }) => {
+> = ({ finalityProviders, totalActiveTVL, connected, next, hasMore, isFetchingMore, isLoading }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const tabs = ["Top Stakers", "Finality Providers"];
@@ -55,6 +59,10 @@ export const StakersFinalityProviders: React.FC<
           <FinalityProviders
             data={finalityProviders}
             totalActiveTVL={totalActiveTVL}
+            next={next}
+            hasMore={hasMore}
+            isFetchingMore={isFetchingMore}
+            isLoading={isLoading}
           />
         </div>
       </div>

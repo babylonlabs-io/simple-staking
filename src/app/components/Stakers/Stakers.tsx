@@ -4,11 +4,18 @@ import { Tooltip } from "react-tooltip";
 
 import { getStakers } from "@/app/api/getStakers";
 import { Staker } from "./Staker";
+import InfiniteScroll from "react-infinite-scroll-component";
 
-interface StakersProps {}
+interface StakersProps { }
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { data: stakersData, fetchNextPage: _fetchNextStakersPage } =
+  const {
+    data: stakersData,
+    fetchNextPage: _fetchNextStakersPage,
+    hasNextPage: hasNextStakersPage,
+    isFetchingNextPage: isFetchingNextStakersPage,
+    isLoading: isStakersDataLoading,
+  } =
     useInfiniteQuery({
       queryKey: ["stakers"],
       queryFn: ({ pageParam = "" }) => getStakers(pageParam),
@@ -19,9 +26,9 @@ export const Stakers: React.FC<StakersProps> = () => {
     });
 
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+    <div id="top-stakers" className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Top Stakers</h3>
-      {stakersData && (
+      {stakersData && !isStakersDataLoading && (
         <div className="hidden grid-cols-3 gap-2 px-4 text-sm lg:grid">
           <p>Staker</p>
           <div className="flex items-center gap-1">
@@ -48,7 +55,20 @@ export const Stakers: React.FC<StakersProps> = () => {
           </div>
         </div>
       )}
-      <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
+      <InfiniteScroll
+        className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto"
+        dataLength={stakersData?.length || 0}
+        next={_fetchNextStakersPage}
+        hasMore={hasNextStakersPage}
+        loader={isFetchingNextStakersPage ? (
+          <div className="w-full text-center">
+            <span className="loading loading-spinner text-primary" />
+          </div>
+        ) : null
+        }
+        endMessage={<></>}
+        scrollableTarget="top-stakers"
+      >
         {stakersData ? (
           stakersData.map(
             (staker) =>
@@ -67,7 +87,7 @@ export const Stakers: React.FC<StakersProps> = () => {
             <span className="loading loading-spinner text-primary" />
           </div>
         )}
-      </div>
+      </InfiniteScroll>
       <Tooltip id="tooltip-delegations" />
       <Tooltip id="tooltip-stake" />
     </div>

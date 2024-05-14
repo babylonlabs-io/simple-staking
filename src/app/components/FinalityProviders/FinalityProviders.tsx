@@ -1,22 +1,33 @@
 import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { Tooltip } from "react-tooltip";
 
 import { FinalityProvider } from "./FinalityProvider";
+import InfiniteScroll from "react-infinite-scroll-component";
+
+import { Tooltip } from "react-tooltip";
 
 interface FinalityProvidersProps {
   data: FinalityProviderInterface[] | undefined;
   totalActiveTVL?: number;
+  next: () => any;
+  hasMore: boolean;
+  isFetchingMore: boolean;
+  isLoading: boolean;
 }
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   data,
   totalActiveTVL,
+  next,
+  hasMore,
+  isFetchingMore,
+  isLoading,
 }) => {
+
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+    <div id="finality-providers" className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Finality Providers</h3>
-      {data && (
+      {data && !isLoading && (
         <div className="hidden gap-2 px-4 text-sm lg:grid lg:grid-cols-finalityProviders ">
           <p>Finality Provider</p>
           <div className="flex items-center gap-1">
@@ -43,7 +54,20 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           </div>
         </div>
       )}
-      <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
+      <InfiniteScroll
+              className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto"
+              dataLength={data?.length || 0}
+              next={next}
+              hasMore={hasMore}
+              loader={isFetchingMore ? (
+                <div className="w-full text-center">
+                  <span className="loading loading-spinner text-primary" />
+                </div>
+              ) : null
+              }
+              endMessage={<></>}
+              scrollableTarget="finality-providers"
+            >
         {data ? (
           data.map((finalityProvider) => (
             <FinalityProvider
@@ -60,7 +84,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
             <span className="loading loading-spinner text-primary" />
           </div>
         )}
-      </div>
+      </InfiniteScroll>
       <Tooltip id="tooltip-delegations" />
       <Tooltip id="tooltip-stake" />
     </div>

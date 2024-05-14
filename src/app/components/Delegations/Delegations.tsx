@@ -18,6 +18,7 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -33,6 +34,7 @@ interface DelegationsProps {
   pushTx: WalletProvider["pushTx"];
   next: () => any;
   hasMore: boolean;
+  isFetchingMore: boolean;
   isLoading: boolean;
 }
 
@@ -50,7 +52,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
   pushTx,
   next,
   hasMore,
-  isLoading,
+  isFetchingMore,
+  isLoading
 }) => {
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -273,7 +276,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
-                intermediateDelegation?.staking_tx_hash_hex &&
+              intermediateDelegation?.staking_tx_hash_hex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),
@@ -285,53 +288,73 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const combinedDelegationsData = delegationsAPI
     ? [...delegationsLocalStorage, ...delegationsAPI]
     : delegationsLocalStorage;
-  
+
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+    <div id="staking-history" className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Staking history</h3>
-      <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
-        <p>Amount</p>
-        <p>Inception</p>
-        <p>Transaction hash</p>
-        <p>Status</p>
-        <p>Action</p>
-      </div>
-      <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
-        {combinedDelegationsData?.map((delegation) => {
-          if (!delegation) return null;
+      {
+        isLoading ?
+          <div className="flex justify-center items-center p-4">
+            <span className="loading loading-spinner text-primary" />
+          </div> :
+          <>
+            <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
+              <p>Amount</p>
+              <p>Inception</p>
+              <p>Transaction hash</p>
+              <p>Status</p>
+              <p>Action</p>
+            </div>
+            <InfiniteScroll
+              className="grid w-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4 no-scrollbar"
+              dataLength={combinedDelegationsData.length}
+              next={next}
+              hasMore={hasMore}
+              loader={isFetchingMore ? (
+                <div className="col-span-full w-full text-center">
+                  <span className="loading loading-spinner text-primary" />
+                </div>
+              ) : null
+              }
+              endMessage={<></>}
+              scrollableTarget="staking-history"
+            >
+              {combinedDelegationsData?.map((delegation) => {
+                if (!delegation) return null;
+                const {
+                  staking_value,
+                  staking_tx,
+                  staking_tx_hash_hex,
+                  finality_provider_pk_hex,
+                  state,
+                  is_overflow
+                } = delegation;
+                // Get the moniker of the finality provider
+                const finalityProviderMoniker =
+                  finalityProvidersKV[finality_provider_pk_hex];
+                const intermediateDelegation =
+                  intermediateDelegationsLocalStorage.find(
+                    (item) => item.staking_tx_hash_hex === staking_tx_hash_hex,
+                  );
 
-          const {
-            staking_value,
-            staking_tx,
-            staking_tx_hash_hex,
-            finality_provider_pk_hex,
-            state,
-            is_overflow,
-          } = delegation;
-          // Get the moniker of the finality provider
-          const finalityProviderMoniker =
-            finalityProvidersKV[finality_provider_pk_hex];
-          const intermediateDelegation =
-            intermediateDelegationsLocalStorage.find(
-              (item) => item.staking_tx_hash_hex === staking_tx_hash_hex,
-            );
-
-          return (
-            <Delegation
-              key={staking_tx_hash_hex + staking_tx.start_height}
-              finalityProviderMoniker={finalityProviderMoniker}
-              stakingTx={staking_tx}
-              stakingValue={staking_value}
-              stakingTxHash={staking_tx_hash_hex}
-              state={state}
-              onUnbond={handleUnbondWithErrors}
-              onWithdraw={handleWithdrawWithErrors}
-              intermediateState={intermediateDelegation?.state}
-              isOverflow={is_overflow}
-            />
-          );
-        })}
-      </InfiniteScroll>
+                return (
+                  <Delegation
+                    key={staking_tx_hash_hex + staking_tx.start_height}
+                    finalityProviderMoniker={finalityProviderMoniker}
+                    stakingTx={staking_tx}
+                    stakingValue={staking_value}
+                    stakingTxHash={staking_tx_hash_hex}
+                    state={state}
+                    onUnbond={handleUnbondWithErrors}
+                    onWithdraw={handleWithdrawWithErrors}
+                    intermediateState={intermediateDelegation?.state}
+                    isOverflow={is_overflow}
+                  />
+                );
+              })}
+            </InfiniteScroll>
+          </>
+      }
     </div>
   );
 };

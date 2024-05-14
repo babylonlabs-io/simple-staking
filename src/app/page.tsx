@@ -63,18 +63,33 @@ const Home: React.FC<HomeProps> = () => {
     enabled: !!btcWallet,
   });
 
-  const { data: finalityProvidersData } = useQuery({
+  const {
+    data: finalityProvidersData,
+    isLoading: isLoadingFinalityProvidersData,
+    fetchNextPage: _fetchNextFinalityProvidersPage,
+    hasNextPage: hasNextFinalityProvidersPage,
+    isFetchingNextPage: isFetchingNextFinalityProvidersPage,
+  } = useInfiniteQuery({
     queryKey: ["finality providers"],
-    queryFn: getFinalityProviders,
+    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
+    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
+    initialPageParam: "",
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
+    select: (data) => data?.pages?.flatMap((page) => page?.data),
   });
 
-  const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage } =
+
+  const {
+    data: delegationsData,
+    fetchNextPage: _fetchNextDelegationsPage,
+    hasNextPage: hasNextDelegationsPage,
+    isFetchingNextPage: isFetchingNextDelegationsPage,
+    isLoading: isLoadingDelegationsData,
+  } =
     useInfiniteQuery({
       queryKey: ["delegations", address, publicKeyNoCoord],
       queryFn: ({ pageParam = "" }) =>
-      getDelegationsMock(pageParam, publicKeyNoCoord),
+      getDelegations(pageParam, publicKeyNoCoord),
       getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
       initialPageParam: "",
       refetchInterval: 60000, // 1 minute
@@ -399,14 +414,21 @@ const Home: React.FC<HomeProps> = () => {
                   pushTx={btcWallet.pushTx}
                   next={_fetchNextDelegationsPage}
                   hasMore={hasNextDelegationsPage}
-                  isLoading={isFetchingNextDelegationsPage}
+                  isFetchingMore={isFetchingNextDelegationsPage}
+                  isLoading={isLoadingDelegationsData}
                 />
               </>
             )}
+          <div className="flex flex-col gap-6 lg:flex-row">
+          </div>
           <StakersFinalityProviders
             finalityProviders={finalityProvidersData}
             totalActiveTVL={statsData?.active_tvl}
             connected={!!btcWallet}
+            next={_fetchNextFinalityProvidersPage}
+            hasMore={hasNextFinalityProvidersPage}
+            isFetchingMore={isFetchingNextFinalityProvidersPage}
+            isLoading={isLoadingFinalityProvidersData}
           />
         </div>
       </div>
