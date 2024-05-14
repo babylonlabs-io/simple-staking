@@ -15,6 +15,7 @@ export const toNetwork = (network: Network): networks.Network => {
     case "mainnet":
       return networks.bitcoin;
     case "testnet":
+    case "signet":
       return networks.testnet;
     case "regtest":
       return networks.regtest;
