@@ -15,9 +15,10 @@ import {
 } from "@/utils/wallet/index";
 import {
   FinalityProvider,
+  FinalityProviders as FinalityProvidersType,
   getFinalityProviders,
 } from "./api/getFinalityProviders";
-import { Delegation, getDelegations } from "./api/getDelegations";
+import { Delegation, Delegations as DelegationsType, getDelegations } from "./api/getDelegations";
 import { Staking } from "./components/Staking/Staking";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -72,10 +73,20 @@ const Home: React.FC<HomeProps> = () => {
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
     queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
-    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
+    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key ?? null,
     initialPageParam: "",
     refetchInterval: 60000, // 1 minute
-    select: (data) => data?.pages?.flatMap((page) => page?.data),
+    select: (data) => {
+      const flattenedData = data.pages.reduce<FinalityProvidersType>(
+        (acc, page) => {
+          acc.data.push(...page.data);
+          acc.pagination = page.pagination;
+          return acc;
+        },
+        { data: [], pagination: { next_key: "" } }
+      );
+      return flattenedData;
+    }
   });
 
 
@@ -90,11 +101,22 @@ const Home: React.FC<HomeProps> = () => {
       queryKey: ["delegations", address, publicKeyNoCoord],
       queryFn: ({ pageParam = "" }) =>
       getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
+      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key ?? null,
       initialPageParam: "",
       refetchInterval: 60000, // 1 minute
       enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => data?.pages?.flatMap((page) => page?.data),
+      select: (data) => {
+        const flattenedData = data.pages.reduce<DelegationsType>(
+          (acc, page) => {
+            acc.data.push(...page.data);
+            acc.pagination = page.pagination;
+            return acc;
+          },
+          { data: [], pagination: { next_key: "" } }
+        );
+
+        return flattenedData;
+      }
     });
 
   const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
@@ -181,7 +203,7 @@ const Home: React.FC<HomeProps> = () => {
     if (!finalityProvidersData) {
       return;
     }
-    const found = finalityProvidersData.find((fp) => fp?.btc_pk === btcPkHex);
+    const found = finalityProvidersData.data.find((fp) => fp?.btc_pk === btcPkHex);
     if (found) {
       setFinalityProvider(found);
     }
@@ -321,7 +343,7 @@ const Home: React.FC<HomeProps> = () => {
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegationsData?.find(
+          !delegationsData?.data.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
               localDelegation?.staking_tx_hash_hex,
@@ -331,7 +353,7 @@ const Home: React.FC<HomeProps> = () => {
   }, [delegationsData, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = finalityProvidersData?.reduce(
+  const finalityProvidersKV = finalityProvidersData?.data.reduce(
     (acc, fp) => ({ ...acc, [fp?.btc_pk]: fp?.description?.moniker }),
     {},
   );
@@ -340,6 +362,7 @@ const Home: React.FC<HomeProps> = () => {
 
   if (delegationsData) {
     totalStaked = delegationsData
+      .data
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
@@ -379,7 +402,7 @@ const Home: React.FC<HomeProps> = () => {
             btcWalletNetwork &&
             publicKeyNoCoord &&
             finalityProvidersData &&
-            finalityProvidersData.length > 0 &&
+            finalityProvidersData.data.length > 0 &&
             finalityProvidersKV &&
             statsData && (
               <>
@@ -389,7 +412,7 @@ const Home: React.FC<HomeProps> = () => {
                   term={term}
                   onTermChange={setTerm}
                   disabled={!btcWallet}
-                  finalityProviders={finalityProvidersData}
+                  finalityProviders={finalityProvidersData.data}
                   selectedFinalityProvider={finalityProvider}
                   onFinalityProviderChange={handleChooseFinalityProvider}
                   onSign={handleSign}
@@ -403,7 +426,7 @@ const Home: React.FC<HomeProps> = () => {
                 />
                 <Delegations
                   finalityProvidersKV={finalityProvidersKV}
-                  delegationsAPI={delegationsData}
+                  delegationsAPI={delegationsData.data}
                   delegationsLocalStorage={delegationsLocalStorage}
                   globalParamsVersion={globalParamsVersion}
                   publicKeyNoCoord={publicKeyNoCoord}
@@ -423,7 +446,7 @@ const Home: React.FC<HomeProps> = () => {
           <div className="flex flex-col gap-6 lg:flex-row">
           </div>
           <StakersFinalityProviders
-            finalityProviders={finalityProvidersData}
+            finalityProviders={finalityProvidersData?.data}
             totalActiveTVL={statsData?.active_tvl}
             connected={!!btcWallet}
             next={_fetchNextFinalityProvidersPage}

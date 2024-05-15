@@ -2,7 +2,7 @@ import { encode } from "url-safe-base64";
 
 import { apiWrapper } from "./apiWrapper";
 
-interface Delegations {
+export interface Delegations {
   data: Delegation[];
   pagination: Pagination;
 }

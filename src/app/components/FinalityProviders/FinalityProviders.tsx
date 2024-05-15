@@ -54,37 +54,39 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           </div>
         </div>
       )}
-      <InfiniteScroll
-              className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto"
-              dataLength={data?.length || 0}
-              next={next}
-              hasMore={hasMore}
-              loader={isFetchingMore ? (
-                <div className="w-full text-center">
-                  <span className="loading loading-spinner text-primary" />
-                </div>
-              ) : null
-              }
-              endMessage={<></>}
-              scrollableTarget="finality-providers"
-            >
-        {data ? (
-          data.map((finalityProvider) => (
-            <FinalityProvider
-              key={finalityProvider.btc_pk}
-              moniker={finalityProvider?.description?.moniker}
-              pkHex={finalityProvider.btc_pk}
-              delegations={finalityProvider.active_delegations}
-              stake={finalityProvider.active_tvl}
-              totalActiveTVL={totalActiveTVL}
-            />
-          ))
-        ) : (
-          <div className="flex justify-center py-4">
-            <span className="loading loading-spinner text-primary" />
-          </div>
-        )}
-      </InfiniteScroll>
+      <div id="finality-providers" className="no-scrollbar max-h-[21rem] overflow-y-auto">
+        <InfiniteScroll
+          className="flex flex-col gap-4"
+          dataLength={data?.length || 0}
+          next={next}
+          hasMore={hasMore}
+          loader={isFetchingMore ? (
+            <div className="w-full text-center">
+              <span className="loading loading-spinner text-primary" />
+            </div>
+          ) : null
+          }
+          endMessage={<></>}
+          scrollableTarget="finality-providers"
+        >
+          {data ? (
+            data.map((finalityProvider) => (
+              <FinalityProvider
+                key={finalityProvider.btc_pk}
+                moniker={finalityProvider?.description?.moniker}
+                pkHex={finalityProvider.btc_pk}
+                delegations={finalityProvider.active_delegations}
+                stake={finalityProvider.active_tvl}
+                totalActiveTVL={totalActiveTVL}
+              />
+            ))
+          ) : (
+            <div className="flex justify-center py-4">
+              <span className="loading loading-spinner text-primary" />
+            </div>
+          )}
+        </InfiniteScroll>
+      </div>
       <Tooltip id="tooltip-delegations" />
       <Tooltip id="tooltip-stake" />
     </div>
