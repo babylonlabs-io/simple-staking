@@ -23,7 +23,7 @@ export const StakersFinalityProviders: React.FC<
     </div>
   );
 
-  // TODO uncomment this code when the Stakers tab is enabled
+  // TODO uncomment the code below this when the Stakers tab is enabled
 
   const [activeTab, setActiveTab] = useState(0);
 
