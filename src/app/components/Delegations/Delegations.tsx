@@ -18,7 +18,12 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
-import { MODE, UNBOND, UnbondWithdrawModal, WITHDRAW } from "../Modals/UnbondWithdrawModal";
+import {
+  UnbondWithdrawModal,
+  MODE,
+  MODE_UNBOND,
+  MODE_WITHDRAW,
+} from "../Modals/UnbondWithdrawModal";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -343,8 +348,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
               stakingValue={staking_value}
               stakingTxHash={staking_tx_hash_hex}
               state={state}
-              onUnbond={() => handleModal(staking_tx_hash_hex, UNBOND)}
-              onWithdraw={() => handleModal(staking_tx_hash_hex, WITHDRAW)}
+              onUnbond={() => handleModal(staking_tx_hash_hex, MODE_UNBOND)}
+              onWithdraw={() => handleModal(staking_tx_hash_hex, MODE_WITHDRAW)}
               intermediateState={intermediateDelegation?.state}
               isOverflow={is_overflow}
             />
@@ -355,7 +360,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             open={modalOpen}
             onClose={() => setModalOpen(false)}
             onProceed={() => {
-              modalMode === UNBOND
+              modalMode === MODE_UNBOND
                 ? handleUnbondWithErrors(txID)
                 : handleWithdrawWithErrors(txID);
             }}

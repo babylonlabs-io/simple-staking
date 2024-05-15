@@ -6,7 +6,7 @@ import { useTheme } from "@/app/hooks/useTheme";
 
 export const MODE_UNBOND = "unbond";
 export const MODE_WITHDRAW = "withdraw";
-export type MODE = typeof UNBOND | typeof WITHDRAW;
+export type MODE = typeof MODE_UNBOND | typeof MODE_WITHDRAW;
 
 interface PreviewModalProps {
   open: boolean;
@@ -32,8 +32,8 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const withdrawContent =
     "You are about to withdraw your stake. OK to proceed?";
 
-  const title = mode === UNBOND ? unbondTitle : withdrawTitle;
-  const content = mode === UNBOND ? unbondContent : withdrawContent;
+  const title = mode === MODE_UNBOND ? unbondTitle : withdrawTitle;
+  const content = mode === MODE_UNBOND ? unbondContent : withdrawContent;
 
   return (
     <Modal
