@@ -37,8 +37,8 @@ export const getFinalityProviders = async (
 
   const params = {
     "pagination.key": encode(key),
-    "pagination.reverse": reverse,
-    "pagination.limit": limit,
+    // "pagination.reverse": reverse,
+    // "pagination.limit": limit,
   };
 
   const reponse = await apiWrapper(
