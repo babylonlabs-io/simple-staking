@@ -24,9 +24,9 @@ export const getStakers = async (key: string): Promise<Stakers> => {
   const reverse = false;
 
   const params = {
-    "pagination.key": encode(key),
-    // "pagination.reverse": reverse,
-    // "pagination.limit": limit,
+    "pagination_key": encode(key),
+    // "pagination_reverse": reverse,
+    // "pagination_limit": limit,
   };
 
   const response = await apiWrapper(
