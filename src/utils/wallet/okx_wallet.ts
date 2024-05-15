@@ -1,5 +1,3 @@
-import { Psbt } from "bitcoinjs-lib";
-
 import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
 import {
   getAddressBalance,
@@ -87,8 +85,7 @@ export class OKXWallet extends WalletProvider {
       throw new Error("OKX Wallet not connected");
     }
     // sign the PSBT
-    const response = await window?.okxwallet?.bitcoinSignet?.signPsbt(psbtHex);
-    return Psbt.fromHex(response).extractTransaction().toHex();
+    return await window?.okxwallet?.bitcoinSignet?.signPsbt(psbtHex);
     // TODO rollback when OKX solves the issue
     // return (await this.signPsbts([psbtHex]))[0];
   };
@@ -98,13 +95,7 @@ export class OKXWallet extends WalletProvider {
       throw new Error("OKX Wallet not connected");
     }
     // sign the PSBTs
-    const response =
-      await window?.okxwallet?.bitcoinSignet?.signPsbts(psbtsHexes);
-
-    // convert the signed PSBTs to transactions
-    return response.map((tx: any) =>
-      Psbt.fromHex(tx).extractTransaction().toHex(),
-    );
+    return await window?.okxwallet?.bitcoinSignet?.signPsbts(psbtsHexes);
   };
 
   signMessageBIP322 = async (message: string): Promise<string> => {
