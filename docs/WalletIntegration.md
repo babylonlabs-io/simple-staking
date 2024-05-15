@@ -90,17 +90,17 @@ export abstract class WalletProvider {
    */
   abstract getPublicKeyHex(): Promise<string>;
 
-  /**
-   * Signs a transaction. Should finalize after signing.
+   /**
+   * Signs the given PSBT in hex format.
    * @param psbtHex - The hex string of the unsigned PSBT to sign.
-   * @returns A promise that resolves to the signed transaction.
+   * @returns A promise that resolves to the hex string of the signed PSBT.
    */
   abstract signPsbt(psbtHex: string): Promise<string>;
 
   /**
-   * Signs multiple transactions. Should finalize after signing.
+   * Signs multiple PSBTs in hex format.
    * @param psbtsHexes - The hex strings of the unsigned PSBTs to sign.
-   * @returns A promise that resolves to an array of signed transactions.
+   * @returns A promise that resolves to an array of hex strings, each representing a signed PSBT.
    */
   abstract signPsbts(psbtsHexes: string[]): Promise<string[]>;
 
@@ -152,6 +152,12 @@ export abstract class WalletProvider {
    * @returns A promise that resolves to an array of UTXOs.
    */
   abstract getUtxos(address: string, amount: number): Promise<UTXO[]>;
+
+  /**
+   * Retrieves the tip height of the BTC chain.
+   * @returns A promise that resolves to the block height.
+   */
+  abstract getBTCTipHeight(): Promise<number>;
 }
 ```
 
