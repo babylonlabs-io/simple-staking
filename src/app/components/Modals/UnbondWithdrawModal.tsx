@@ -42,7 +42,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
         root: `${lightSelected ? "light" : "dark"}`,
         modalContainer: "flex items-end justify-center md:items-center",
         modal:
-          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:w-[24rem] md:rounded-b-2xl",
+          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[24rem] md:rounded-b-2xl",
       }}
       showCloseIcon={false}
     >

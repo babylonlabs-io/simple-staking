@@ -338,12 +338,6 @@ const Home: React.FC<HomeProps> = () => {
       ? globalParamsVersion.staking_cap <= statsData.active_tvl
       : false;
 
-  const minAmount =
-    globalParamsVersion && globalParamsVersion.min_staking_amount / 1e8;
-
-  const maxAmount =
-    globalParamsVersion && globalParamsVersion.max_staking_amount / 1e8;
-
   return (
     <main
       className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
@@ -378,8 +372,8 @@ const Home: React.FC<HomeProps> = () => {
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
             onSign={handleSign}
-            minAmount={minAmount}
-            maxAmount={maxAmount}
+            minAmount={globalParamsVersion?.min_staking_amount}
+            maxAmount={globalParamsVersion?.max_staking_amount}
             minTerm={globalParamsVersion?.min_staking_time}
             maxTerm={globalParamsVersion?.max_staking_time}
             overTheCap={overTheCap}
