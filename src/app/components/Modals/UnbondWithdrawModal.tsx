@@ -28,7 +28,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
 
   const withdrawTitle = "Withdraw";
   const withdrawContent =
-    "You are about to withdraw your stake back to your own address. OK to proceed?";
+    "You are about to withdraw your stake. OK to proceed?";
 
   const title = mode === "unbond" ? unbondTitle : withdrawTitle;
   const content = mode === "unbond" ? unbondContent : withdrawContent;
