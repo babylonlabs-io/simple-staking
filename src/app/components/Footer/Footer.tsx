@@ -61,7 +61,7 @@ const iconLinks = [
 const textLinks = [
   {
     name: "Terms",
-    url: "/Babylonchain - Terms of Use.doc",
+    url: "/babylonchain_terms_of_use.doc",
     isExternal: false,
   },
 ];
