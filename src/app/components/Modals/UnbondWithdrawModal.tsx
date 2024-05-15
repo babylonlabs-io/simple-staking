@@ -4,8 +4,8 @@ import { IoMdClose } from "react-icons/io";
 
 import { useTheme } from "@/app/hooks/useTheme";
 
-export const UNBOND = "unbond";
-export const WITHDRAW = "withdraw";
+export const MODE_UNBOND = "unbond";
+export const MODE_WITHDRAW = "withdraw";
 export type MODE = typeof UNBOND | typeof WITHDRAW;
 
 interface PreviewModalProps {
