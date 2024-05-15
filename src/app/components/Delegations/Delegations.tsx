@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 import {
@@ -18,6 +18,12 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import {
+  UnbondWithdrawModal,
+  MODE,
+  MODE_UNBOND,
+  MODE_WITHDRAW,
+} from "../Modals/UnbondWithdrawModal";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -46,6 +52,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
   signPsbt,
   pushTx,
 }) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [txID, setTxID] = useState("");
+  const [modalMode, setModalMode] = useState<MODE>();
+
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
     getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
@@ -156,6 +166,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
       handleUnbond(id);
     } catch (error: Error | any) {
       console.error(error?.message || error);
+    } finally {
+      setModalOpen(false);
+      setTxID("");
+      setModalMode(undefined);
     }
   };
 
@@ -256,7 +270,17 @@ export const Delegations: React.FC<DelegationsProps> = ({
       handleWithdraw(id);
     } catch (error: Error | any) {
       console.error(error?.message || error);
+    } finally {
+      setModalOpen(false);
+      setTxID("");
+      setModalMode(undefined);
     }
+  };
+
+  const handleModal = (txID: string, mode: MODE) => {
+    setModalOpen(true);
+    setTxID(txID);
+    setModalMode(mode);
   };
 
   // Remove the intermediate delegations that are already present in the API
@@ -273,7 +297,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
-              intermediateDelegation?.staking_tx_hash_hex &&
+                intermediateDelegation?.staking_tx_hash_hex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),
@@ -324,13 +348,25 @@ export const Delegations: React.FC<DelegationsProps> = ({
               stakingValue={staking_value}
               stakingTxHash={staking_tx_hash_hex}
               state={state}
-              onUnbond={handleUnbondWithErrors}
-              onWithdraw={handleWithdrawWithErrors}
+              onUnbond={() => handleModal(staking_tx_hash_hex, MODE_UNBOND)}
+              onWithdraw={() => handleModal(staking_tx_hash_hex, MODE_WITHDRAW)}
               intermediateState={intermediateDelegation?.state}
               isOverflow={is_overflow}
             />
           );
         })}
+        {modalMode && txID && modalOpen && (
+          <UnbondWithdrawModal
+            open={modalOpen}
+            onClose={() => setModalOpen(false)}
+            onProceed={() => {
+              modalMode === MODE_UNBOND
+                ? handleUnbondWithErrors(txID)
+                : handleWithdrawWithErrors(txID);
+            }}
+            mode={modalMode}
+          />
+        )}
       </div>
     </div>
   );

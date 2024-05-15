@@ -5,7 +5,7 @@ import { IoIosWarning } from "react-icons/io";
 import { StakingTx } from "@/app/api/getDelegations";
 import { DelegationState } from "@/app/types/delegationState";
 import { durationTillNow } from "@/utils/formatTime";
-import { getState } from "@/utils/getState";
+import { getState, getStateTooltip } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 
 interface DelegationProps {
@@ -33,7 +33,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   intermediateState,
   isOverflow,
 }) => {
-  const { start_height, start_timestamp } = stakingTx;
+  const { start_timestamp } = stakingTx;
 
   const generateActionButton = () => {
     // This function generates the unbond or withdraw button
@@ -73,6 +73,22 @@ export const Delegation: React.FC<DelegationProps> = ({
     }
   };
 
+  const renderState = () => {
+    if (isOverflow) {
+      return getState(DelegationState.OVERFLOW);
+    } else {
+      return getState(intermediateState || state);
+    }
+  };
+
+  const renderStateTooltip = () => {
+    if (isOverflow) {
+      return getStateTooltip(DelegationState.OVERFLOW);
+    } else {
+      return getStateTooltip(intermediateState || state);
+    }
+  };
+
   return (
     <div
       className={`card relative border bg-base-300 p-4 text-sm dark:bg-base-200 ${isOverflow ? "border-primary" : "dark:border-0"}`}
@@ -97,11 +113,11 @@ export const Delegation: React.FC<DelegationProps> = ({
         <div className="flex">
           <div className="card border bg-base-300 px-2 py-1 dark:border-0">
             <div className="flex items-center gap-1">
-              <p>{getState(intermediateState || state)}</p>
+              <p>{renderState()}</p>
               <span
                 className="cursor-pointer text-xs"
                 data-tooltip-id={`tooltip-${stakingTxHash}`}
-                data-tooltip-content={"Information about the delegation state"}
+                data-tooltip-content={renderStateTooltip()}
                 data-tooltip-place="top"
               >
                 <AiOutlineInfoCircle />

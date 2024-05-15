@@ -10,7 +10,7 @@ import { MdAlternateEmail } from "react-icons/md";
 import { FaXTwitter } from "react-icons/fa6";
 import { IoMdBook } from "react-icons/io";
 
-const links = [
+const iconLinks = [
   {
     name: "Website",
     url: "https://babylonchain.io",
@@ -58,6 +58,14 @@ const links = [
   },
 ];
 
+const textLinks = [
+  {
+    name: "Terms",
+    url: "/babylonchain_terms_of_use.doc",
+    isExternal: false,
+  },
+];
+
 interface FooterProps {}
 
 export const Footer: React.FC<FooterProps> = () => {
@@ -66,8 +74,25 @@ export const Footer: React.FC<FooterProps> = () => {
       <div className="w-24">
         <div className="divider my-1" />
       </div>
+      <div className="flex justify-center gap-8 p-2">
+        {textLinks.map(({ name, url, isExternal }) => (
+          <div
+            key={name}
+            className="flex w-4 items-center justify-center text-sm"
+          >
+            <a
+              href={url}
+              target={isExternal ? "_blank" : "_self"}
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-primary"
+            >
+              {name}
+            </a>
+          </div>
+        ))}
+      </div>
       <div className="flex justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
-        {links.map(({ name, url, Icon }) => (
+        {iconLinks.map(({ name, url, Icon }) => (
           <div
             key={name}
             className="flex w-4 items-center justify-center text-[22px] text-xl"
