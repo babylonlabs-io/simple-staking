@@ -4,11 +4,13 @@ import { IoMdClose } from "react-icons/io";
 
 import { useTheme } from "@/app/hooks/useTheme";
 
+export type Mode = "unbond" | "withdraw";
+
 interface PreviewModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
   onProceed: () => void;
-  mode: "unbond" | "withdraw";
+  mode: Mode;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({

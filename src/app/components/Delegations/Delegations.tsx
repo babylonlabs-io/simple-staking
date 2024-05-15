@@ -18,7 +18,7 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
-import { UnbondWithdrawModal } from "../Modals/UnbondWithdrawModal";
+import { Mode, UnbondWithdrawModal } from "../Modals/UnbondWithdrawModal";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -49,7 +49,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
-  const [modalMode, setModalMode] = useState<"unbond" | "withdraw">();
+  const [modalMode, setModalMode] = useState<Mode>();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -272,7 +272,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
   };
 
-  const handleModal = (txID: string, mode: "unbond" | "withdraw") => {
+  const handleModal = (txID: string, mode: Mode) => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
