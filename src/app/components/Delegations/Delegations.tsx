@@ -116,9 +116,13 @@ export const Delegations: React.FC<DelegationsProps> = ({
     );
 
     // Sign the unbonding transaction
-    const signedPsbt = await signPsbt(unsignedUnbondingTx.toHex());
-    const unbondingTx = Psbt.fromHex(signedPsbt).extractTransaction();
-
+    let unbondingTx: Transaction;
+    try {
+      const signedPsbt = await signPsbt(unsignedUnbondingTx.toHex());
+      unbondingTx = Psbt.fromHex(signedPsbt).extractTransaction();
+    } catch (error) {
+      throw new Error("Failed to sign PSBT for the unbonding transaction");
+    }
     // Get the staker signature
     const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
 
@@ -220,10 +224,13 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // Sign the withdrawal transaction
-    const withdrawalTransaction = Transaction.fromHex(
-      await signPsbt(unsignedWithdrawalTx.toHex()),
-    );
-
+    let withdrawalTransaction: Transaction;
+    try {
+      const signedPsbt = await signPsbt(unsignedWithdrawalTx.toHex());
+      withdrawalTransaction = Psbt.fromHex(signedPsbt).extractTransaction();
+    } catch (error) {
+      throw new Error("Failed to sign PSBT for the withdrawal transaction");
+    }
     // Broadcast withdrawal transaction
     const _txID = await pushTx(withdrawalTransaction.toHex());
 
@@ -266,7 +273,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
-                intermediateDelegation?.staking_tx_hash_hex &&
+              intermediateDelegation?.staking_tx_hash_hex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),

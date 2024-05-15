@@ -1,5 +1,3 @@
-import { Psbt } from "bitcoinjs-lib";
-
 import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
 import {
   getAddressBalance,
