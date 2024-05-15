@@ -18,7 +18,7 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
-import { Mode, UnbondWithdrawModal } from "../Modals/UnbondWithdrawModal";
+import { MODE, UNBOND, UnbondWithdrawModal, WITHDRAW } from "../Modals/UnbondWithdrawModal";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -49,7 +49,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
-  const [modalMode, setModalMode] = useState<Mode>();
+  const [modalMode, setModalMode] = useState<MODE>();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -272,7 +272,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
   };
 
-  const handleModal = (txID: string, mode: Mode) => {
+  const handleModal = (txID: string, mode: MODE) => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
@@ -343,8 +343,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
               stakingValue={staking_value}
               stakingTxHash={staking_tx_hash_hex}
               state={state}
-              onUnbond={() => handleModal(staking_tx_hash_hex, "unbond")}
-              onWithdraw={() => handleModal(staking_tx_hash_hex, "withdraw")}
+              onUnbond={() => handleModal(staking_tx_hash_hex, UNBOND)}
+              onWithdraw={() => handleModal(staking_tx_hash_hex, WITHDRAW)}
               intermediateState={intermediateDelegation?.state}
               isOverflow={is_overflow}
             />
@@ -355,7 +355,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             open={modalOpen}
             onClose={() => setModalOpen(false)}
             onProceed={() => {
-              modalMode === "unbond"
+              modalMode === UNBOND
                 ? handleUnbondWithErrors(txID)
                 : handleWithdrawWithErrors(txID);
             }}
