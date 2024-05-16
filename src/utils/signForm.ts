@@ -7,53 +7,27 @@ import { stakingTransaction } from "btc-staking-ts";
 import { isTaproot } from "./wallet";
 
 export const signForm = async (
-    params: GlobalParamsVersion | undefined,
-    btcWallet: WalletProvider | undefined,
-    finalityProvidersData: FinalityProvider[] | undefined,
-    finalityProvider: FinalityProvider | undefined,
-    term: number,
-    btcWalletNetwork: networks.Network | undefined,
-    amount: number,
+    params: GlobalParamsVersion,
+    btcWallet: WalletProvider,
+    finalityProvider: FinalityProvider,
+    stakingTerm: number,
+    btcWalletNetwork: networks.Network,
+    stakingAmount: number, // in satoshis
     address: string,
     stakingFee: number,
     publicKeyNoCoord: string,
 ): Promise<string> => {
-    const walletAndDataReady =
-        !!btcWallet && !!params && !!finalityProvidersData && !!btcWalletNetwork
-
-    if (!walletAndDataReady) {
-        throw new Error("Wallet or data or wallet network not ready");
-    }
-
-    // check if term is fixed
-    let termWithFixed;
-    if (
-        params &&
-        params.minStakingTime ===
-        params.maxStakingTime
-    ) {
-        // if term is fixed, use the API value
-        termWithFixed = params.minStakingTime;
-    } else {
-        // if term is not fixed, use the term from the input
-        termWithFixed = term;
-    }
-
     if (
         !finalityProvider ||
-        amount * 1e8 < params.minStakingAmount ||
-        amount * 1e8 > params.maxStakingAmount ||
-        termWithFixed < params.minStakingTime ||
-        termWithFixed > params.maxStakingTime
+        stakingAmount < params.minStakingAmount ||
+        stakingAmount > params.maxStakingAmount ||
+        stakingTerm < params.minStakingTime ||
+        stakingTerm > params.maxStakingTime
     ) {
         // TODO Show Popup
         throw new Error("Invalid staking data");
     }
 
-    // Rounding the input since 0.0006 * 1e8 is is 59999.999
-    // which won't be accepted by the mempool API
-    const stakingAmount = Math.round(Number(amount) * 1e8);
-    const stakingTerm = Number(termWithFixed);
     let inputUTXOs = [];
     try {
         inputUTXOs = await btcWallet.getUtxos(

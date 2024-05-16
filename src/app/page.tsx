@@ -17,6 +17,7 @@ import {
   getFinalityProviders,
 } from "./api/getFinalityProviders";
 import { Delegation, getDelegations } from "./api/getDelegations";
+import { Staking } from "./components/Staking/Staking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
@@ -31,8 +32,8 @@ import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
-import { GlobalParamsVersion } from "./api/getGlobalParams";
 import { signForm } from "@/utils/signForm";
+import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 
 interface HomeProps { }
@@ -173,16 +174,29 @@ const Home: React.FC<HomeProps> = () => {
     }
   };
 
-  const handleSign = async (params: GlobalParamsVersion | undefined) => {
+  const handleSign = async () => {
     try {
+      if (!btcWallet) {
+        throw new Error("Wallet not connected");
+      } else if (!btcWalletNetwork) {
+        throw new Error("Wallet network not connected");
+      } else if (!globalParamsVersion) {
+        throw new Error("Global params not loaded");
+      } else if (!finalityProvider) {
+        throw new Error("Finality provider not selected");
+      }
+
+      // Rounding the input since 0.0006 * 1e8 is is 59999.999
+      // which won't be accepted by the mempool API
+      const stakingAmount = Math.round(Number(amount) * 1e8);
+      const stakingTerm = getStakingTerm(globalParamsVersion, term);
       const signedTxHex = await signForm(
-        params,
+        globalParamsVersion,
         btcWallet,
-        finalityProvidersData,
         finalityProvider,
         term,
         btcWalletNetwork,
-        amount,
+        stakingAmount,
         address,
         stakingFee,
         publicKeyNoCoord,
@@ -197,11 +211,11 @@ const Home: React.FC<HomeProps> = () => {
       // Update the local state with the new delegation
       setDelegationsLocalStorage((delegations) => [
         toLocalStorageDelegation(
-          Transaction.fromHex(stakingTx).getId(),
+          Transaction.fromHex(signedTxHex).getId(),
           publicKeyNoCoord,
           finalityProvider.btc_pk,
           stakingAmount,
-          stakingTx,
+          signedTxHex,
           stakingTerm,
         ),
         ...delegations,
@@ -211,7 +225,6 @@ const Home: React.FC<HomeProps> = () => {
       // TODO Show Popup
       console.error(error?.message || "Error signing the form");
     }
-
 
     // Clear the form
     setAmount(0);
@@ -257,7 +270,7 @@ const Home: React.FC<HomeProps> = () => {
   // these constants are needed for easier prop passing
   const overTheCap =
     globalParamsVersion && statsData
-      ? globalParamsVersion.staking_cap <= statsData.active_tvl
+      ? globalParamsVersion.stakingCap <= statsData.active_tvl
       : false;
 
   return (
@@ -276,7 +289,7 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
-            stakingCap={globalParamsVersion?.staking_cap}
+            stakingCap={globalParamsVersion?.stakingCap}
           />
           {address && btcWalletBalance && (
             <Summary
@@ -313,7 +326,7 @@ const Home: React.FC<HomeProps> = () => {
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={globalParamsVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={globalParamsVersion.unbonding_fee}
+                unbondingFee={globalParamsVersion.unbondingFee}
                 withdrawalFee={withdrawalFee}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
