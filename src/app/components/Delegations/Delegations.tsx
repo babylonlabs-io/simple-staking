@@ -17,7 +17,7 @@ import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
-import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import { getGlobalParamsVersioByHeight } from "@/utils/globalParams";
 import {
   UnbondWithdrawModal,
   MODE,
@@ -93,7 +93,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // State of global params when the staking transaction was submitted
-    const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
+    const globalParamsWhenStaking = await getGlobalParamsVersioByHeight(
       delegation.staking_tx.start_height,
     );
 
@@ -190,7 +190,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // State of global params when the staking transaction was submitted
-    const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
+    const globalParamsWhenStaking = await getGlobalParamsVersioByHeight(
       delegation.staking_tx.start_height,
     );
 
@@ -297,7 +297,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
-                intermediateDelegation?.staking_tx_hash_hex &&
+              intermediateDelegation?.staking_tx_hash_hex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),

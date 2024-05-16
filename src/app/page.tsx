@@ -29,7 +29,7 @@ import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
-import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { signForm } from "@/utils/signForm";
@@ -54,11 +54,10 @@ const Home: React.FC<HomeProps> = () => {
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const { data: globalParamsVersion } = useQuery({
+  const { data: globalParamsVersion, isLoading: isLoadingCurrentParams } = useQuery({
     queryKey: ["global params"],
     queryFn: async () => {
-      const currentBtcHeight = await btcWallet!.getBTCTipHeight();
-      return getCurrentGlobalParamsVersion(currentBtcHeight);
+      return getCurrentGlobalParamsVersion(btcWallet!.getBTCTipHeight);
     },
     refetchInterval: 60000, // 1 minute
     // Should be enabled only when the wallet is connected
@@ -303,17 +302,15 @@ const Home: React.FC<HomeProps> = () => {
             onAmountChange={setAmount}
             term={term}
             onTermChange={setTerm}
-            disabled={!btcWallet}
             finalityProviders={finalityProvidersData}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
             onSign={handleSign}
-            minAmount={globalParamsVersion?.minStakingAmount}
-            maxAmount={globalParamsVersion?.maxStakingAmount}
-            minTerm={globalParamsVersion?.minStakingTime}
-            maxTerm={globalParamsVersion?.maxStakingTime}
+            stakingParams={globalParamsVersion}
+            isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
+            isLoading={isLoadingCurrentParams}
           />
           {btcWallet &&
             delegationsData &&
