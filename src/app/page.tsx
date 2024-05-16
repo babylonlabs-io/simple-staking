@@ -39,6 +39,7 @@ import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
+import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 
 interface HomeProps {}
 
@@ -381,8 +382,9 @@ const Home: React.FC<HomeProps> = () => {
 
   return (
     <main
-      className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
+      className={`main-app relative h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
     >
+      <NetworkBadge />
       <Header
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
