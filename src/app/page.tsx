@@ -27,7 +27,6 @@ import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDe
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { useTheme } from "./hooks/useTheme";
 import { Header } from "./components/Header/Header";
-import { ConnectLarge } from "./components/Connect/ConnectLarge";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
@@ -35,7 +34,6 @@ import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 import { FAQ } from "./components/FAQ/FAQ";
-import { StakersFinalityProviders } from "./components/StakersFinalityProviders/StakersFinalityProviders";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 
 interface HomeProps {}
@@ -371,6 +369,13 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  // these constants are needed for easier prop passing
+
+  const overTheCap =
+    globalParamsVersion && statsData
+      ? globalParamsVersion.staking_cap <= statsData.active_tvl
+      : false;
+
   return (
     <main
       className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
@@ -383,7 +388,6 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          {!btcWallet && <ConnectLarge onConnect={handleConnectModal} />}
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
@@ -396,64 +400,56 @@ const Home: React.FC<HomeProps> = () => {
               balance={btcWalletBalance}
             />
           )}
+          <Staking
+            amount={amount}
+            onAmountChange={setAmount}
+            term={term}
+            onTermChange={setTerm}
+            disabled={!btcWallet}
+            finalityProviders={finalityProvidersData && finalityProvidersData.data}
+            selectedFinalityProvider={finalityProvider}
+            onFinalityProviderChange={handleChooseFinalityProvider}
+            onSign={handleSign}
+            minAmount={globalParamsVersion?.min_staking_amount}
+            maxAmount={globalParamsVersion?.max_staking_amount}
+            minTerm={globalParamsVersion?.min_staking_time}
+            maxTerm={globalParamsVersion?.max_staking_time}
+            overTheCap={overTheCap}
+            onConnect={handleConnectModal}
+            finalityProvidersFetchNext={_fetchNextFinalityProvidersPage}
+            finalityProvidersHasNext={hasNextFinalityProvidersPage}
+            finalityProvidersIsLoading={isLoadingFinalityProvidersData}
+            finalityProvidersIsFetchingMore={isFetchingNextFinalityProvidersPage}
+          />
           {btcWallet &&
             delegationsData &&
             globalParamsVersion &&
             btcWalletNetwork &&
-            publicKeyNoCoord &&
-            finalityProvidersData &&
-            finalityProvidersData.data.length > 0 &&
-            finalityProvidersKV &&
-            statsData && (
-              <>
-                <Staking
-                  amount={amount}
-                  onAmountChange={setAmount}
-                  term={term}
-                  onTermChange={setTerm}
-                  disabled={!btcWallet}
-                  finalityProviders={finalityProvidersData.data}
-                  selectedFinalityProvider={finalityProvider}
-                  onFinalityProviderChange={handleChooseFinalityProvider}
-                  onSign={handleSign}
-                  minAmount={globalParamsVersion.min_staking_amount / 1e8}
-                  maxAmount={globalParamsVersion.max_staking_amount / 1e8}
-                  minTerm={globalParamsVersion.min_staking_time}
-                  maxTerm={globalParamsVersion.max_staking_time}
-                  overTheCap={
-                    globalParamsVersion.staking_cap <= statsData.active_tvl
-                  }
-                />
-                <Delegations
-                  finalityProvidersKV={finalityProvidersKV}
-                  delegationsAPI={delegationsData.data}
-                  delegationsLocalStorage={delegationsLocalStorage}
-                  globalParamsVersion={globalParamsVersion}
-                  publicKeyNoCoord={publicKeyNoCoord}
-                  unbondingFee={globalParamsVersion.unbonding_fee}
-                  withdrawalFee={withdrawalFee}
-                  btcWalletNetwork={btcWalletNetwork}
-                  address={address}
-                  signPsbt={btcWallet.signPsbt}
-                  pushTx={btcWallet.pushTx}
-                  next={_fetchNextDelegationsPage}
-                  hasMore={hasNextDelegationsPage}
-                  isFetchingMore={isFetchingNextDelegationsPage}
-                  isLoading={isLoadingDelegationsData}
-                />
-              </>
+            finalityProvidersKV && (
+              <Delegations
+                finalityProvidersKV={finalityProvidersKV}
+                delegationsAPI={delegationsData.data}
+                delegationsLocalStorage={delegationsLocalStorage}
+                globalParamsVersion={globalParamsVersion}
+                publicKeyNoCoord={publicKeyNoCoord}
+                unbondingFee={globalParamsVersion.unbonding_fee}
+                withdrawalFee={withdrawalFee}
+                btcWalletNetwork={btcWalletNetwork}
+                address={address}
+                signPsbt={btcWallet.signPsbt}
+                pushTx={btcWallet.pushTx}
+                next={_fetchNextDelegationsPage}
+                hasMore={hasNextDelegationsPage}
+                isFetchingMore={isFetchingNextDelegationsPage}
+                isLoading={isLoadingDelegationsData}
+              />
             )}
-          <div className="flex flex-col gap-6 lg:flex-row">
-          </div>
-          <StakersFinalityProviders
-            finalityProviders={finalityProvidersData?.data}
+          {/* At this point of time is not used */}
+          {/* <StakersFinalityProviders
+            finalityProviders={finalityProvidersData}
             totalActiveTVL={statsData?.active_tvl}
             connected={!!btcWallet}
-            next={_fetchNextFinalityProvidersPage}
-            hasMore={hasNextFinalityProvidersPage}
-            isFetchingMore={isFetchingNextFinalityProvidersPage}
-            isLoading={isLoadingFinalityProvidersData}
-          />
+          /> */}
         </div>
       </div>
       <FAQ />

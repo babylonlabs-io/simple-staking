@@ -1,9 +1,11 @@
-import { Fragment, useState } from "react";
+import { useState } from "react";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
 import { PreviewModal } from "../Modals/PreviewModal";
 import { blocksToTime } from "@/utils/blocksToTime";
+import { ConnectLarge } from "../Connect/ConnectLarge";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 interface StakingProps {
   amount: number;
@@ -16,12 +18,17 @@ interface StakingProps {
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
-  minAmount: number;
-  maxAmount: number;
-  minTerm: number;
-  maxTerm: number;
+  minAmount?: number;
+  maxAmount?: number;
+  minTerm?: number;
+  maxTerm?: number;
   // if the staking cap is reached, the user can't stake
-  overTheCap: boolean;
+  overTheCap?: boolean;
+  onConnect: () => void;
+  finalityProvidersFetchNext: () => any;
+  finalityProvidersHasNext: boolean;
+  finalityProvidersIsLoading: boolean;
+  finalityProvidersIsFetchingMore: boolean;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -39,20 +46,32 @@ export const Staking: React.FC<StakingProps> = ({
   minTerm,
   maxTerm,
   overTheCap,
+  onConnect,
+  finalityProvidersFetchNext,
+  finalityProvidersHasNext,
+  finalityProvidersIsLoading,
+  finalityProvidersIsFetchingMore
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const termsReady =
-    minTerm === maxTerm || (term >= minTerm && term <= maxTerm);
+    minTerm &&
+    maxTerm &&
+    (minTerm === maxTerm || (term >= minTerm && term <= maxTerm));
 
-  const signReady =
-    amount >= minAmount &&
-    amount <= maxAmount &&
-    termsReady &&
-    selectedFinalityProvider;
+  const minAmountBTC = minAmount ? minAmount / 1e8 : 0;
+  const maxAmountBTC = maxAmount ? maxAmount / 1e8 : 0;
+
+  const amountReady =
+    minAmountBTC &&
+    maxAmountBTC &&
+    amount >= minAmountBTC &&
+    amount <= maxAmountBTC;
+
+  const signReady = amountReady && termsReady && selectedFinalityProvider;
 
   const renderFixedTerm = () => {
-    if (minTerm === maxTerm) {
+    if (minTerm && maxTerm && minTerm === maxTerm) {
       return (
         <div className="card mb-2 bg-base-200 p-4">
           <p>
@@ -93,8 +112,22 @@ export const Staking: React.FC<StakingProps> = ({
     }
   };
 
-  const renderWithOverTheCap = () => {
-    if (overTheCap) {
+  const renderContentForm = () => {
+    // 1. wallet is not connected
+    if (disabled) {
+      return (
+        <div className="flex flex-1 flex-col gap-1">
+          <p className="mb-2 text-sm dark:text-neutral-content">
+            Please connect wallet to start staking
+          </p>
+          <div className="flex flex-1 flex-col md:justify-center">
+            <ConnectLarge onConnect={onConnect} />
+          </div>
+        </div>
+      );
+    }
+    // 2. wallet is connected but staking cap is reached
+    else if (overTheCap) {
       return (
         <div className="flex flex-col gap-1">
           <p className="text-sm dark:text-neutral-content">
@@ -108,7 +141,9 @@ export const Staking: React.FC<StakingProps> = ({
           <p>Overflow stake should be unbonded and withdrawn.</p>
         </div>
       );
-    } else {
+    }
+    // 3. wallet is connected and staking cap is not reached
+    else {
       return (
         <>
           <div className="flex flex-col gap-1">
@@ -126,8 +161,8 @@ export const Staking: React.FC<StakingProps> = ({
                   type="number"
                   placeholder="BTC"
                   className="no-focus input input-bordered w-full"
-                  min={minAmount}
-                  max={maxAmount}
+                  min={minAmountBTC}
+                  max={maxAmountBTC}
                   step={0.00001}
                   value={amount}
                   onChange={(e) => onAmountChange(Number(e.target.value))}
@@ -135,7 +170,7 @@ export const Staking: React.FC<StakingProps> = ({
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
-                    min stake is {minAmount} Signet BTC
+                    min stake is {minAmountBTC} Signet BTC
                   </span>
                 </div>
               </label>
@@ -161,17 +196,16 @@ export const Staking: React.FC<StakingProps> = ({
     }
   };
 
-  return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
-      <h3 className="mb-4 font-bold">Staking</h3>
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
+  const renderFinalityProviders = () => {
+    if (finalityProviders && finalityProviders.length > 0) {
+      return (
+        <>
           <div className="flex flex-col gap-1">
             <p className="text-sm dark:text-neutral-content">Step 1</p>
             <p>
               Select a BTC Finality Provider or{" "}
               <a
-                href="https://docs.babylonchain.io/docs/user-guides/btc-staking-testnet/finality-providers/overview"
+                href="https://github.com/babylonchain/networks/tree/main/bbn-test-4/finality-providers"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="sublink text-primary hover:underline"
@@ -187,7 +221,21 @@ export const Staking: React.FC<StakingProps> = ({
             <p>Delegation</p>
             <p>Comission</p>
           </div>
-          <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
+          <div id="finality-providers" className="no-scrollbar max-h-[21rem] overflow-y-auto">
+            <InfiniteScroll
+              className="flex flex-col gap-4"
+              dataLength={finalityProviders?.length || 0}
+              next={finalityProvidersFetchNext}
+              hasMore={finalityProvidersHasNext}
+              loader={finalityProvidersIsFetchingMore ? (
+                <div className="w-full text-center">
+                  <span className="loading loading-spinner text-primary" />
+                </div>
+              ) : null
+              }
+              endMessage={<></>}
+              scrollableTarget="finality-providers"
+            >
             {finalityProviders?.map((fp) => (
               <FinalityProvider
                 key={fp.btc_pk}
@@ -199,10 +247,28 @@ export const Staking: React.FC<StakingProps> = ({
                 onClick={() => onFinalityProviderChange(fp.btc_pk)}
               />
             ))}
+            </InfiniteScroll>
           </div>
+        </>
+      );
+    } else {
+      return (
+        <div className="flex flex-1 items-center justify-center py-4">
+          <span className="loading loading-spinner text-primary" />
+        </div>
+      );
+    }
+  };
+
+  return (
+    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+      <h3 className="mb-4 font-bold">Staking</h3>
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
+          {renderFinalityProviders()}
         </div>
         <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
-          {renderWithOverTheCap()}
+          {renderContentForm()}
         </div>
       </div>
     </div>

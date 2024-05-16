@@ -10,7 +10,7 @@ export const ConnectLarge: React.FC<ConnectLargeProps> = ({ onConnect }) => {
   return (
     <div className="flex justify-center">
       <button
-        className="gradient-primary border-gradient-primary flex w-full flex-col items-center gap-3 rounded-xl border-2 border-primary px-10 py-5 shadow-sm shadow-primary md:w-auto"
+        className="gradient-primary border-gradient-primary flex w-full flex-col items-center gap-3 rounded-xl border-2 border-primary px-10 py-5 shadow-sm shadow-primary"
         onClick={onConnect}
       >
         <div className="rounded-full bg-primary p-2">
