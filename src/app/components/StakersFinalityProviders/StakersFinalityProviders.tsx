@@ -1,15 +1,14 @@
 // import { useState } from "react";
 
-import { FinalityProvider as FinalityProviderInterface, FinalityProviders as FinalityProvidersType } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { FinalityProviders } from "../FinalityProviders/FinalityProviders";
-import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 // import { Stakers } from "../Stakers/Stakers";
 
 interface StakersFinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   totalActiveTVL?: number;
   connected?: boolean;
-  next: () => Promise<InfiniteQueryObserverResult<FinalityProvidersType, Error>>;
+  next: () => void;
   hasMore: boolean;
   isFetchingMore: boolean;
   isLoading: boolean;
