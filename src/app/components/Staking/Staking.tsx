@@ -24,10 +24,11 @@ interface StakingProps {
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
-  stakingParams: StakingParams | null | undefined,
+  stakingParams: StakingParams | undefined,
   isWalletConnected: boolean;
   overTheCap: boolean;
   isLoading: boolean;
+  isUpgrading: boolean | undefined;
   // if the staking cap is reached, the user can't stake
   onConnect: () => void;
 }
@@ -46,6 +47,7 @@ export const Staking: React.FC<StakingProps> = ({
   overTheCap,
   onConnect,
   isLoading,
+  isUpgrading,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
@@ -123,6 +125,21 @@ export const Staking: React.FC<StakingProps> = ({
             Staking has not started
           </p>
           <p>Staking app is not yet activated</p>
+          <p>
+            Please check back later or follow our social media channels for
+            updates.
+          </p>
+        </div>
+      );
+    }
+    // 4. Global params are transitioning into a new version
+    else if (isUpgrading) {
+      return (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm dark:text-neutral-content">
+            Staking upgrade in progress
+          </p>
+          <p>Staking app is getting upgrade for better experience!</p>
           <p>
             Please check back later or follow our social media channels for
             updates.

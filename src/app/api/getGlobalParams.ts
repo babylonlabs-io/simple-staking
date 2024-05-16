@@ -15,6 +15,7 @@ export interface globalParamsDataResponse {
     min_staking_amount: number;
     max_staking_time: number;
     min_staking_time: number;
+    confirmation_depth: number;
   }[];
 }
 
@@ -31,6 +32,7 @@ export interface GlobalParamsVersion {
   minStakingAmount: number;
   maxStakingTime: number;
   minStakingTime: number;
+  confirmationDepth: number;
 }
 
 export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
@@ -55,5 +57,6 @@ export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
     minStakingAmount: v.min_staking_amount,
     maxStakingTime: v.max_staking_time,
     minStakingTime: v.min_staking_time,
+    confirmationDepth: v.confirmation_depth,
   }))
 };

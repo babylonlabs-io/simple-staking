@@ -54,7 +54,7 @@ const Home: React.FC<HomeProps> = () => {
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const { data: globalParamsVersion, isLoading: isLoadingCurrentParams } = useQuery({
+  const { data: paramWithContext, isLoading: isLoadingCurrentParams } = useQuery({
     queryKey: ["global params"],
     queryFn: async () => {
       return getCurrentGlobalParamsVersion(btcWallet!.getBTCTipHeight);
@@ -179,12 +179,12 @@ const Home: React.FC<HomeProps> = () => {
         throw new Error("Wallet not connected");
       } else if (!btcWalletNetwork) {
         throw new Error("Wallet network not connected");
-      } else if (!globalParamsVersion) {
+      } else if (!paramWithContext || !paramWithContext.currentVersion) {
         throw new Error("Global params not loaded");
       } else if (!finalityProvider) {
         throw new Error("Finality provider not selected");
       }
-
+      const { currentVersion: globalParamsVersion } = paramWithContext;
       // Rounding the input since 0.0006 * 1e8 is is 59999.999
       // which won't be accepted by the mempool API
       const stakingAmount = Math.round(Number(amount) * 1e8);
@@ -268,8 +268,8 @@ const Home: React.FC<HomeProps> = () => {
 
   // these constants are needed for easier prop passing
   const overTheCap =
-    globalParamsVersion && statsData
-      ? globalParamsVersion.stakingCap <= statsData.active_tvl
+    paramWithContext?.currentVersion && statsData
+      ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
       : false;
 
   return (
@@ -288,7 +288,7 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
-            stakingCap={globalParamsVersion?.stakingCap}
+            stakingCap={paramWithContext?.currentVersion?.stakingCap}
           />
           {address && btcWalletBalance && (
             <Summary
@@ -306,24 +306,25 @@ const Home: React.FC<HomeProps> = () => {
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
             onSign={handleSign}
-            stakingParams={globalParamsVersion}
+            stakingParams={paramWithContext?.currentVersion}
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
             isLoading={isLoadingCurrentParams}
+            isUpgrading={paramWithContext?.isApprochingNextVersion}
           />
           {btcWallet &&
             delegationsData &&
-            globalParamsVersion &&
+            paramWithContext?.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
                 delegationsAPI={delegationsData}
                 delegationsLocalStorage={delegationsLocalStorage}
-                globalParamsVersion={globalParamsVersion}
+                globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={globalParamsVersion.unbondingFee}
+                unbondingFee={paramWithContext.currentVersion.unbondingFee}
                 withdrawalFee={withdrawalFee}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
