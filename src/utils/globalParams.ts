@@ -2,7 +2,6 @@ import {
   GlobalParamsVersion,
   getGlobalParams,
 } from "@/app/api/getGlobalParams";
-import { version } from "os";
 
 
 export const getGlobalParamsVersioByHeight = async (
