@@ -16,7 +16,15 @@ interface StakersFinalityProvidersProps {
 
 export const StakersFinalityProviders: React.FC<
   StakersFinalityProvidersProps
-> = ({ finalityProviders, totalActiveTVL, connected, next, hasMore, isFetchingMore, isLoading }) => {
+> = ({
+  finalityProviders,
+  totalActiveTVL,
+  connected,
+  next,
+  hasMore,
+  isFetchingMore,
+  isLoading,
+}) => {
   // At this point of time we disable the Stakers tab
   return (
     <div>

@@ -31,12 +31,11 @@ interface Description {
 export const getFinalityProviders = async (
   key: string,
 ): Promise<FinalityProviders> => {
-
   const limit = 100;
   const reverse = false;
 
   const params = {
-    "pagination_key": encode(key),
+    pagination_key: encode(key),
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
   };
@@ -47,6 +46,6 @@ export const getFinalityProviders = async (
     "Error getting finality providers",
     params,
   );
-  
+
   return reponse.data;
 };

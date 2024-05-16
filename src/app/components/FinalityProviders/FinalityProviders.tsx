@@ -23,9 +23,11 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   isFetchingMore,
   isLoading,
 }) => {
-
   return (
-    <div id="finality-providers" className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+    <div
+      id="finality-providers"
+      className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1"
+    >
       <h3 className="mb-4 font-bold">Finality Providers</h3>
       {data && !isLoading && (
         <div className="hidden gap-2 px-4 text-sm lg:grid lg:grid-cols-finalityProviders ">
@@ -54,17 +56,21 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           </div>
         </div>
       )}
-      <div id="finality-providers" className="no-scrollbar max-h-[21rem] overflow-y-auto">
+      <div
+        id="finality-providers"
+        className="no-scrollbar max-h-[21rem] overflow-y-auto"
+      >
         <InfiniteScroll
           className="flex flex-col gap-4"
           dataLength={data?.length || 0}
           next={next}
           hasMore={hasMore}
-          loader={isFetchingMore ? (
-            <div className="w-full text-center">
-              <span className="loading loading-spinner text-primary" />
-            </div>
-          ) : null
+          loader={
+            isFetchingMore ? (
+              <div className="w-full text-center">
+                <span className="loading loading-spinner text-primary" />
+              </div>
+            ) : null
           }
           scrollableTarget="finality-providers"
         >

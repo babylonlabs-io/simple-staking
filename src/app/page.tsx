@@ -18,7 +18,11 @@ import {
   FinalityProviders as FinalityProvidersType,
   getFinalityProviders,
 } from "./api/getFinalityProviders";
-import { Delegation, Delegations as DelegationsType, getDelegations } from "./api/getDelegations";
+import {
+  Delegation,
+  Delegations as DelegationsType,
+  getDelegations,
+} from "./api/getDelegations";
 import { Staking } from "./components/Staking/Staking";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -81,12 +85,11 @@ const Home: React.FC<HomeProps> = () => {
           acc.pagination = page.pagination;
           return acc;
         },
-        { data: [], pagination: { next_key: "" } }
+        { data: [], pagination: { next_key: "" } },
       );
       return flattenedData;
-    }
+    },
   });
-
 
   const {
     data: delegationsData,
@@ -94,28 +97,27 @@ const Home: React.FC<HomeProps> = () => {
     hasNextPage: hasNextDelegationsPage,
     isFetchingNextPage: isFetchingNextDelegationsPage,
     isLoading: isLoadingDelegationsData,
-  } =
-    useInfiniteQuery({
-      queryKey: ["delegations", address, publicKeyNoCoord],
-      queryFn: ({ pageParam = "" }) =>
+  } = useInfiniteQuery({
+    queryKey: ["delegations", address, publicKeyNoCoord],
+    queryFn: ({ pageParam = "" }) =>
       getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key ?? null,
-      initialPageParam: "",
-      refetchInterval: 60000, // 1 minute
-      enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => {
-        const flattenedData = data.pages.reduce<DelegationsType>(
-          (acc, page) => {
-            acc.data.push(...page.data);
-            acc.pagination = page.pagination;
-            return acc;
-          },
-          { data: [], pagination: { next_key: "" } }
-        );
+    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key ?? null,
+    initialPageParam: "",
+    refetchInterval: 60000, // 1 minute
+    enabled: !!(btcWallet && publicKeyNoCoord && address),
+    select: (data) => {
+      const flattenedData = data.pages.reduce<DelegationsType>(
+        (acc, page) => {
+          acc.data.push(...page.data);
+          acc.pagination = page.pagination;
+          return acc;
+        },
+        { data: [], pagination: { next_key: "" } },
+      );
 
-        return flattenedData;
-      }
-    });
+      return flattenedData;
+    },
+  });
 
   const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
     queryKey: ["stats"],
@@ -201,7 +203,9 @@ const Home: React.FC<HomeProps> = () => {
     if (!finalityProvidersData) {
       return;
     }
-    const found = finalityProvidersData.data.find((fp) => fp?.btc_pk === btcPkHex);
+    const found = finalityProvidersData.data.find(
+      (fp) => fp?.btc_pk === btcPkHex,
+    );
     if (found) {
       setFinalityProvider(found);
     }
@@ -359,8 +363,7 @@ const Home: React.FC<HomeProps> = () => {
   let totalStaked = 0;
 
   if (delegationsData) {
-    totalStaked = delegationsData
-      .data
+    totalStaked = delegationsData.data
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
@@ -406,7 +409,9 @@ const Home: React.FC<HomeProps> = () => {
             term={term}
             onTermChange={setTerm}
             disabled={!btcWallet}
-            finalityProviders={finalityProvidersData && finalityProvidersData.data}
+            finalityProviders={
+              finalityProvidersData && finalityProvidersData.data
+            }
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
             onSign={handleSign}
@@ -419,7 +424,9 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersFetchNext={_fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
             finalityProvidersIsLoading={isLoadingFinalityProvidersData}
-            finalityProvidersIsFetchingMore={isFetchingNextFinalityProvidersPage}
+            finalityProvidersIsFetchingMore={
+              isFetchingNextFinalityProvidersPage
+            }
           />
           {btcWallet &&
             delegationsData &&

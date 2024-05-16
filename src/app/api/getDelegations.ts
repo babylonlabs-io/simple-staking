@@ -47,7 +47,7 @@ export const getDelegations = async (
   const reverse = false;
 
   const params = {
-    "pagination_key": encode(key),
+    pagination_key: encode(key),
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
     staker_btc_pk: encode(publicKeyNoCoord),

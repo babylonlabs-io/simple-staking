@@ -50,7 +50,7 @@ export const Staking: React.FC<StakingProps> = ({
   finalityProvidersFetchNext,
   finalityProvidersHasNext,
   finalityProvidersIsLoading,
-  finalityProvidersIsFetchingMore
+  finalityProvidersIsFetchingMore,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
@@ -221,31 +221,35 @@ export const Staking: React.FC<StakingProps> = ({
             <p>Delegation</p>
             <p>Comission</p>
           </div>
-          <div id="finality-providers" className="no-scrollbar max-h-[21rem] overflow-y-auto">
+          <div
+            id="finality-providers"
+            className="no-scrollbar max-h-[21rem] overflow-y-auto"
+          >
             <InfiniteScroll
               className="flex flex-col gap-4"
               dataLength={finalityProviders?.length || 0}
               next={finalityProvidersFetchNext}
               hasMore={finalityProvidersHasNext}
-              loader={finalityProvidersIsFetchingMore ? (
-                <div className="w-full text-center">
-                  <span className="loading loading-spinner text-primary" />
-                </div>
-              ) : null
+              loader={
+                finalityProvidersIsFetchingMore ? (
+                  <div className="w-full text-center">
+                    <span className="loading loading-spinner text-primary" />
+                  </div>
+                ) : null
               }
               scrollableTarget="finality-providers"
             >
-            {finalityProviders?.map((fp) => (
-              <FinalityProvider
-                key={fp.btc_pk}
-                moniker={fp.description.moniker}
-                pkHex={fp.btc_pk}
-                stake={fp.active_tvl}
-                comission={fp.commission}
-                selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
-                onClick={() => onFinalityProviderChange(fp.btc_pk)}
-              />
-            ))}
+              {finalityProviders?.map((fp) => (
+                <FinalityProvider
+                  key={fp.btc_pk}
+                  moniker={fp.description.moniker}
+                  pkHex={fp.btc_pk}
+                  stake={fp.active_tvl}
+                  comission={fp.commission}
+                  selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
+                  onClick={() => onFinalityProviderChange(fp.btc_pk)}
+                />
+              ))}
             </InfiniteScroll>
           </div>
         </>
