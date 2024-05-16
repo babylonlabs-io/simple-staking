@@ -77,10 +77,10 @@ input[type="number"] {
 
 .main-app.dark {
   background: rgb(43, 43, 43) url("./assets/testnet-bg-pattern.svg") center
-    center/auto repeat content-box;
+    center/auto repeat content-box fixed;
 }
 
 .main-app.light {
   background: rgb(236, 236, 236) url("./assets/testnet-bg-pattern.svg") center
-    center/auto repeat content-box;
+    center/auto repeat content-box fixed;
 }
