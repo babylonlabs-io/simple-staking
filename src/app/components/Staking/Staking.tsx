@@ -1,11 +1,12 @@
 import { useState } from "react";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface, FinalityProviders as FinalityProvidersType } from "@/app/api/getFinalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
 import { PreviewModal } from "../Modals/PreviewModal";
 import { blocksToTime } from "@/utils/blocksToTime";
 import { ConnectLarge } from "../Connect/ConnectLarge";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 
 interface StakingProps {
   amount: number;
@@ -25,7 +26,7 @@ interface StakingProps {
   // if the staking cap is reached, the user can't stake
   overTheCap?: boolean;
   onConnect: () => void;
-  finalityProvidersFetchNext: () => any;
+  finalityProvidersFetchNext: () => Promise<InfiniteQueryObserverResult<FinalityProvidersType, Error>>;
   finalityProvidersHasNext: boolean;
   finalityProvidersIsLoading: boolean;
   finalityProvidersIsFetchingMore: boolean;
@@ -233,7 +234,6 @@ export const Staking: React.FC<StakingProps> = ({
                 </div>
               ) : null
               }
-              endMessage={<></>}
               scrollableTarget="finality-providers"
             >
             {finalityProviders?.map((fp) => (

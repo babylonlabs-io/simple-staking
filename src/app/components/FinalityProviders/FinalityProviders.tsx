@@ -1,15 +1,16 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface, FinalityProviders as FinalityProvidersType } from "@/app/api/getFinalityProviders";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 
 import { FinalityProvider } from "./FinalityProvider";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { Tooltip } from "react-tooltip";
+import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 
 interface FinalityProvidersProps {
   data: FinalityProviderInterface[] | undefined;
   totalActiveTVL?: number;
-  next: () => any;
+  next: () => Promise<InfiniteQueryObserverResult<FinalityProvidersType, Error>>;
   hasMore: boolean;
   isFetchingMore: boolean;
   isLoading: boolean;
@@ -66,7 +67,6 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
             </div>
           ) : null
           }
-          endMessage={<></>}
           scrollableTarget="finality-providers"
         >
           {data ? (

@@ -7,7 +7,7 @@ import {
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
 
-import { Delegation as DelegationInterface } from "@/app/api/getDelegations";
+import { Delegation as DelegationInterface, Delegations as DelegationsType } from "@/app/api/getDelegations";
 import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
@@ -25,6 +25,7 @@ import {
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
+import { InfiniteQueryObserverResult } from "@tanstack/react-query";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -38,7 +39,7 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
-  next: () => any;
+  next: () => Promise<InfiniteQueryObserverResult<DelegationsType, Error>>;
   hasMore: boolean;
   isFetchingMore: boolean;
   isLoading: boolean;
@@ -346,7 +347,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
                 </div>
               ) : null
               }
-              endMessage={<></>}
               scrollableTarget="staking-history"
             >
               {combinedDelegationsData?.map((delegation) => {
