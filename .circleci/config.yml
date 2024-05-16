@@ -103,7 +103,7 @@ jobs:
       - run:
           name: Fetch and replace config placeholders from CircleCi env vars
           command: |
-            HELM_VALUES=/home/circleci/project/.circleci/values-staging.yaml
+            HELM_VALUES=/home/circleci/project/.circleci/values-testnet.yaml
             sed -i "s/API_FQDN/$API_FQDN/g" $HELM_VALUES
             sed -i "s/DASHBOARD_FQDN/$DASHBOARD_FQDN/g" $HELM_VALUES
       - run:
