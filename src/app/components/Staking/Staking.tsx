@@ -188,7 +188,7 @@ export const Staking: React.FC<StakingProps> = ({
           </div>
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
-              {renderFixedTerm(isWalletConnected, stakingParams)}
+              {renderFixedTerm(!isWalletConnected, stakingParams)}
               <label className="form-control w-full flex-1">
                 <div className="label pt-0">
                   <span className="label-text-alt text-base">Amount</span>
@@ -202,7 +202,7 @@ export const Staking: React.FC<StakingProps> = ({
                   step={0.00001}
                   value={amount}
                   onChange={(e) => onAmountChange(Number(e.target.value))}
-                  disabled={isWalletConnected}
+                  disabled={!isWalletConnected}
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
@@ -213,7 +213,7 @@ export const Staking: React.FC<StakingProps> = ({
             </div>
             <button
               className="btn-primary btn mt-2 w-full"
-              disabled={isWalletConnected || !signReady}
+              disabled={!isWalletConnected || !signReady}
               onClick={() => setPreviewModalOpen(true)}
             >
               Preview
