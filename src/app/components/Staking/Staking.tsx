@@ -1,252 +1,421 @@
-import { useState } from "react";
+"use client";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
-import { FinalityProvider } from "./FinalityProvider";
-import { PreviewModal } from "../Modals/PreviewModal";
-import { blocksToTime } from "@/utils/blocksToTime";
-import { ConnectLarge } from "../Connect/ConnectLarge";
+import { useEffect, useState } from "react";
+import { initBTCCurve, stakingTransaction } from "btc-staking-ts";
+import { useLocalStorage } from "usehooks-ts";
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
+import { Transaction, networks, Psbt } from "bitcoinjs-lib";
 
-interface StakingProps {
-  amount: number;
-  onAmountChange: (amount: number) => void;
-  term: number;
-  onTermChange: (term: number) => void;
-  disabled: boolean;
-  finalityProviders: FinalityProviderInterface[] | undefined;
-  selectedFinalityProvider: FinalityProviderInterface | undefined;
-  // called when the user selects a finality provider
-  onFinalityProviderChange: (btcPkHex: string) => void;
-  onSign: () => void;
-  minAmount?: number;
-  maxAmount?: number;
-  minTerm?: number;
-  maxTerm?: number;
-  // if the staking cap is reached, the user can't stake
-  overTheCap?: boolean;
-  onConnect: () => void;
-}
+import {
+  getWallet,
+  toNetwork,
+  isSupportedAddressType,
+  isTaproot,
+  getPublicKeyNoCoord,
+} from "@/utils/wallet/index";
+import {
+  FinalityProvider,
+  getFinalityProviders,
+} from "./api/getFinalityProviders";
+import { Delegation, getDelegations } from "./api/getDelegations";
+import { Staking } from "./components/Staking/Staking";
+import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { Delegations } from "./components/Delegations/Delegations";
+import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
+import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { useTheme } from "./hooks/useTheme";
+import { Header } from "./components/Header/Header";
+import { Stats } from "./components/Stats/Stats";
+import { getStats } from "./api/getStats";
+import { Summary } from "./components/Summary/Summary";
+import { DelegationState } from "./types/delegationState";
+import { Footer } from "./components/Footer/Footer";
+import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import { FAQ } from "./components/FAQ/FAQ";
+import { ConnectModal } from "./components/Modals/ConnectModal";
 
-export const Staking: React.FC<StakingProps> = ({
-  amount,
-  onAmountChange,
-  term,
-  onTermChange,
-  disabled,
-  finalityProviders,
-  selectedFinalityProvider,
-  onFinalityProviderChange,
-  onSign,
-  minAmount,
-  maxAmount,
-  minTerm,
-  maxTerm,
-  overTheCap,
-  onConnect,
-}) => {
-  const [previewModalOpen, setPreviewModalOpen] = useState(false);
+interface HomeProps { }
 
-  const termsReady =
-    minTerm &&
-    maxTerm &&
-    (minTerm === maxTerm || (term >= minTerm && term <= maxTerm));
+const Home: React.FC<HomeProps> = () => {
+  const { lightSelected } = useTheme();
 
-  const minAmountBTC = minAmount ? minAmount / 1e8 : 0;
-  const maxAmountBTC = maxAmount ? maxAmount / 1e8 : 0;
+  const [btcWallet, setBTCWallet] = useState<WalletProvider>();
+  const [btcWalletBalance, setBTCWalletBalance] = useState(0);
+  const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
+  const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
-  const amountReady =
-    minAmountBTC &&
-    maxAmountBTC &&
-    amount >= minAmountBTC &&
-    amount <= maxAmountBTC;
+  const [address, setAddress] = useState("");
+  const [amount, setAmount] = useState(0);
+  const [term, setTerm] = useState(0);
+  const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const signReady = amountReady && termsReady && selectedFinalityProvider;
+  const { data: globalParamsVersion } = useQuery({
+    queryKey: ["global params"],
+    queryFn: async () => {
+      const currentBtcHeight = await btcWallet!.getBTCTipHeight();
+      return getCurrentGlobalParamsVersion(currentBtcHeight);
+    },
+    refetchInterval: 60000, // 1 minute
+    // Should be enabled only when the wallet is connected
+    enabled: !!btcWallet,
+  });
 
-  const renderFixedTerm = () => {
-    if (minTerm && maxTerm && minTerm === maxTerm) {
-      return (
-        <div className="card mb-2 bg-base-200 p-4">
-          <p>
-            Your Signet BTC will be staked for a fixed term of{" "}
-            {blocksToTime(minTerm)}.
-          </p>
-          <p>
-            But you can unbond and withdraw your Signet BTC anytime through this
-            dashboard with an unbond time of 10 days.
-          </p>
-          <p>
-            The above times are approximates based on average Bitcoin block
-            times.
-          </p>
-        </div>
+  const { data: finalityProvidersData } = useQuery({
+    queryKey: ["finality providers"],
+    queryFn: getFinalityProviders,
+    refetchInterval: 60000, // 1 minute
+    select: (data) => data.data,
+  });
+
+  const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage } =
+    useInfiniteQuery({
+      queryKey: ["delegations", address],
+      queryFn: ({ pageParam = "" }) =>
+        getDelegations(pageParam, publicKeyNoCoord),
+      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
+      initialPageParam: "",
+      refetchInterval: 60000, // 1 minute
+      enabled: !!(btcWallet && publicKeyNoCoord && address),
+      select: (data) => data?.pages?.flatMap((page) => page?.data),
+    });
+
+  const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
+    queryKey: ["stats"],
+    queryFn: getStats,
+    refetchInterval: 60000, // 1 minute
+    select: (data) => data.data,
+  });
+
+  // Initializing btc curve is a required one-time operation
+  useEffect(() => {
+    initBTCCurve();
+  }, []);
+
+  // Local storage state for delegations
+  const delegationsLocalStorageKey =
+    getDelegationsLocalStorageKey(publicKeyNoCoord);
+
+  const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
+    Delegation[]
+  >(delegationsLocalStorageKey, []);
+
+  const [connectModalOpen, setConnectModalOpen] = useState(false);
+
+  const handleConnectModal = () => {
+    setConnectModalOpen(true);
+  };
+
+  const handleDisconnectBTC = () => {
+    setBTCWallet(undefined);
+    setBTCWalletBalance(0);
+    setBTCWalletNetwork(undefined);
+    setPublicKeyNoCoord("");
+    setAddress("");
+  };
+
+  const handleConnectBTC = async () => {
+    // close the modal
+    setConnectModalOpen(false);
+
+    try {
+      const walletProvider = getWallet();
+      await walletProvider.connectWallet();
+      const address = await walletProvider.getAddress();
+      // check if the wallet address type is supported in babylon
+      const supported = isSupportedAddressType(address);
+      if (!supported) {
+        throw new Error(
+          "Invalid address type. Please use a Native SegWit or Taptoor",
+        );
+      }
+
+      const balance = await walletProvider.getBalance();
+      const publicKeyNoCoord = getPublicKeyNoCoord(
+        await walletProvider.getPublicKeyHex(),
       );
+      setBTCWallet(walletProvider);
+      setBTCWalletBalance(balance);
+      setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
+      setAddress(address);
+      setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+    } catch (error: Error | any) {
+      console.error(error?.message || error);
+    }
+  };
+
+  // Subscribe to account changes
+  useEffect(() => {
+    if (btcWallet) {
+      let once = false;
+      btcWallet.on("accountChanged", () => {
+        if (!once) {
+          handleConnectBTC();
+        }
+      });
+      return () => {
+        once = true;
+      };
+    }
+  }, [btcWallet]);
+
+  // Select the finality provider from the list
+  const handleChooseFinalityProvider = (btcPkHex: string) => {
+    if (!finalityProvidersData) {
+      return;
+    }
+    const found = finalityProvidersData.find((fp) => fp?.btc_pk === btcPkHex);
+    if (found) {
+      setFinalityProvider(found);
+    }
+  };
+
+  const walletAndDataReady =
+    !!btcWallet && !!globalParamsVersion && !!finalityProvidersData;
+
+  const stakingFee = 500;
+  const withdrawalFee = 500;
+
+  const handleSign = async () => {
+    // check if term is fixed
+    let termWithFixed;
+    if (
+      globalParamsVersion &&
+      globalParamsVersion.min_staking_time ===
+      globalParamsVersion.max_staking_time
+    ) {
+      // if term is fixed, use the API value
+      termWithFixed = globalParamsVersion.min_staking_time;
     } else {
-      return (
-        <label className="form-control w-full flex-1">
-          <div className="label">
-            <span className="label-text-alt text-base">Term</span>
-          </div>
-          <input
-            type="number"
-            placeholder="Blocks"
-            className="no-focus input input-bordered w-full"
-            min={minTerm}
-            max={maxTerm}
-            value={term}
-            onChange={(e) => onTermChange(Number(e.target.value))}
-            disabled={disabled}
-          />
-          <div className="label flex justify-end">
-            <span className="label-text-alt">min term is {minTerm} blocks</span>
-          </div>
-        </label>
-      );
+      // if term is not fixed, use the term from the input
+      termWithFixed = term;
     }
+
+    if (
+      !walletAndDataReady ||
+      !finalityProvider ||
+      !btcWalletNetwork ||
+      amount * 1e8 < globalParamsVersion.min_staking_amount ||
+      amount * 1e8 > globalParamsVersion.max_staking_amount ||
+      termWithFixed < globalParamsVersion.min_staking_time ||
+      termWithFixed > globalParamsVersion.max_staking_time
+    ) {
+      // TODO Show Popup
+      console.error("Invalid staking data");
+      return;
+    }
+
+    // Rounding the input since 0.0006 * 1e8 is is 59999.999
+    // which won't be accepted by the mempool API
+    const stakingAmount = Math.round(Number(amount) * 1e8);
+    const stakingTerm = Number(termWithFixed);
+    let inputUTXOs = [];
+    try {
+      inputUTXOs = await btcWallet.getUtxos(
+        address,
+        stakingAmount + stakingFee,
+      );
+    } catch (error: Error | any) {
+      console.error(error?.message || "UTXOs error");
+      return;
+    }
+    if (inputUTXOs.length == 0) {
+      console.error("Confirmed UTXOs not enough");
+      return;
+    }
+
+    let scripts;
+    try {
+      scripts = apiDataToStakingScripts(
+        finalityProvider.btc_pk,
+        stakingTerm,
+        globalParamsVersion,
+        publicKeyNoCoord,
+      );
+    } catch (error: Error | any) {
+      console.error(error?.message || "Cannot build staking scripts");
+      return;
+    }
+
+    const timelockScript = scripts.timelockScript;
+    const dataEmbedScript = scripts.dataEmbedScript;
+    const unbondingScript = scripts.unbondingScript;
+    const slashingScript = scripts.slashingScript;
+    let unsignedStakingTx;
+    try {
+      unsignedStakingTx = stakingTransaction(
+        timelockScript,
+        unbondingScript,
+        slashingScript,
+        stakingAmount,
+        stakingFee,
+        address,
+        inputUTXOs,
+        btcWalletNetwork,
+        isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
+        dataEmbedScript,
+      );
+    } catch (error: Error | any) {
+      console.error(
+        error?.message || "Cannot build unsigned staking transaction",
+      );
+      return;
+    }
+    let stakingTx: string;
+    try {
+      const signedPsbt = await btcWallet.signPsbt(unsignedStakingTx.toHex());
+      stakingTx = Psbt.fromHex(signedPsbt).extractTransaction().toHex();
+    } catch (error: Error | any) {
+      console.error(error?.message || "Staking transaction signing PSBT error");
+      return;
+    }
+
+    let txID;
+    try {
+      txID = await btcWallet.pushTx(stakingTx);
+    } catch (error: Error | any) {
+      console.error(error?.message || "Broadcasting staking transaction error");
+    }
+
+    // Update the local state with the new delegation
+    setDelegationsLocalStorage((delegations) => [
+      toLocalStorageDelegation(
+        Transaction.fromHex(stakingTx).getId(),
+        publicKeyNoCoord,
+        finalityProvider.btc_pk,
+        stakingAmount,
+        stakingTx,
+        stakingTerm,
+      ),
+      ...delegations,
+    ]);
+
+    // Clear the form
+    setAmount(0);
+    setTerm(0);
+    setFinalityProvider(undefined);
   };
 
-  const renderContentForm = () => {
-    // 1. wallet is not connected
-    if (disabled) {
-      return (
-        <div className="flex flex-1 flex-col gap-1">
-          <p className="mb-2 text-sm dark:text-neutral-content">
-            Please connect wallet to start staking
-          </p>
-          <div className="flex flex-1 flex-col md:justify-center">
-            <ConnectLarge onConnect={onConnect} />
-          </div>
-        </div>
-      );
+  // Remove the delegations that are already present in the API
+  useEffect(() => {
+    if (!delegationsData) {
+      return;
     }
-    // 2. wallet is connected but staking cap is reached
-    else if (overTheCap) {
-      return (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm dark:text-neutral-content">
-            Staking cap reached
-          </p>
-          <p>Staking is temporarily disabled due to cap reached.</p>
-          <p>
-            Please check your staking history to see if any of your stake is
-            tagged overflow.
-          </p>
-          <p>Overflow stake should be unbonded and withdrawn.</p>
-        </div>
-      );
-    }
-    // 3. wallet is connected and staking cap is not reached
-    else {
-      return (
-        <>
-          <div className="flex flex-col gap-1">
-            <p className="text-sm dark:text-neutral-content">Step 2</p>
-            <p>Set up staking terms</p>
-          </div>
-          <div className="flex flex-1 flex-col">
-            <div className="flex flex-1 flex-col">
-              {renderFixedTerm()}
-              <label className="form-control w-full flex-1">
-                <div className="label pt-0">
-                  <span className="label-text-alt text-base">Amount</span>
-                </div>
-                <input
-                  type="number"
-                  placeholder="BTC"
-                  className="no-focus input input-bordered w-full"
-                  min={minAmountBTC}
-                  max={maxAmountBTC}
-                  step={0.00001}
-                  value={amount}
-                  onChange={(e) => onAmountChange(Number(e.target.value))}
-                  disabled={disabled}
-                />
-                <div className="label flex justify-end">
-                  <span className="label-text-alt">
-                    min stake is {minAmountBTC} Signet BTC
-                  </span>
-                </div>
-              </label>
-            </div>
-            <button
-              className="btn-primary btn mt-2 w-full"
-              disabled={disabled || !signReady}
-              onClick={() => setPreviewModalOpen(true)}
-            >
-              Preview
-            </button>
-            <PreviewModal
-              open={previewModalOpen}
-              onClose={setPreviewModalOpen}
-              onSign={onSign}
-              finalityProvider={selectedFinalityProvider?.description.moniker}
-              amount={amount * 1e8}
-              term={term}
-            />
-          </div>
-        </>
-      );
-    }
-  };
+    setDelegationsLocalStorage((localDelegations) =>
+      localDelegations?.filter(
+        (localDelegation) =>
+          !delegationsData?.find(
+            (delegation) =>
+              delegation?.staking_tx_hash_hex ===
+              localDelegation?.staking_tx_hash_hex,
+          ),
+      ),
+    );
+  }, [delegationsData, setDelegationsLocalStorage]);
 
-  const renderFinalityProviders = () => {
-    if (finalityProviders && finalityProviders.length > 0) {
-      return (
-        <>
-          <div className="flex flex-col gap-1">
-            <p className="text-sm dark:text-neutral-content">Step 1</p>
-            <p>
-              Select a BTC Finality Provider or{" "}
-              <a
-                href="https://github.com/babylonchain/networks/tree/main/bbn-test-4/finality-providers"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sublink text-primary hover:underline"
-              >
-                create your own
-              </a>
-              .
-            </p>
-          </div>
-          <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProviders">
-            <p>Finality Provider</p>
-            <p>BTC PK</p>
-            <p>Delegation</p>
-            <p>Comission</p>
-          </div>
-          <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
-            {finalityProviders?.map((fp) => (
-              <FinalityProvider
-                key={fp.btc_pk}
-                moniker={fp.description.moniker}
-                pkHex={fp.btc_pk}
-                stake={fp.active_tvl}
-                comission={fp.commission}
-                selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
-                onClick={() => onFinalityProviderChange(fp.btc_pk)}
-              />
-            ))}
-          </div>
-        </>
+  // Finality providers key-value map { pk: moniker }
+  const finalityProvidersKV = finalityProvidersData?.reduce(
+    (acc, fp) => ({ ...acc, [fp?.btc_pk]: fp?.description?.moniker }),
+    {},
+  );
+
+  let totalStaked = 0;
+
+  if (delegationsData) {
+    totalStaked = delegationsData
+      // using only active delegations
+      .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
+      .reduce(
+        (accumulator: number, item) => accumulator + item?.staking_value,
+        0,
       );
-    } else {
-      return (
-        <div className="flex flex-1 items-center justify-center py-4">
-          <span className="loading loading-spinner text-primary" />
-        </div>
-      );
-    }
-  };
+  }
+
+  // these constants are needed for easier prop passing
+
+  const overTheCap =
+    globalParamsVersion && statsData
+      ? globalParamsVersion.staking_cap <= statsData.active_tvl
+      : false;
 
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
-      <h3 className="mb-4 font-bold">Staking</h3>
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
-          {renderFinalityProviders()}
-        </div>
-        <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
-          {renderContentForm()}
+    <main
+      className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
+    >
+      <Header
+        onConnect={handleConnectModal}
+        onDisconnect={handleDisconnectBTC}
+        address={address}
+        balance={btcWalletBalance}
+      />
+      <div className="container mx-auto flex justify-center p-6">
+        <div className="container flex flex-col gap-6">
+          <Stats
+            data={statsData}
+            isLoading={statsDataIsLoading}
+            stakingCap={globalParamsVersion?.staking_cap}
+          />
+          {address && btcWalletBalance && (
+            <Summary
+              address={address}
+              totalStaked={totalStaked}
+              balance={btcWalletBalance}
+            />
+          )}
+          <Staking
+            amount={amount}
+            onAmountChange={setAmount}
+            term={term}
+            onTermChange={setTerm}
+            disabled={!btcWallet}
+            finalityProviders={finalityProvidersData}
+            selectedFinalityProvider={finalityProvider}
+            onFinalityProviderChange={handleChooseFinalityProvider}
+            onSign={handleSign}
+            minAmount={globalParamsVersion?.min_staking_amount}
+            maxAmount={globalParamsVersion?.max_staking_amount}
+            minTerm={globalParamsVersion?.min_staking_time}
+            maxTerm={globalParamsVersion?.max_staking_time}
+            overTheCap={overTheCap}
+            onConnect={handleConnectModal}
+          />
+          {btcWallet &&
+            delegationsData &&
+            globalParamsVersion &&
+            btcWalletNetwork &&
+            finalityProvidersKV && (
+              <Delegations
+                finalityProvidersKV={finalityProvidersKV}
+                delegationsAPI={delegationsData}
+                delegationsLocalStorage={delegationsLocalStorage}
+                globalParamsVersion={globalParamsVersion}
+                publicKeyNoCoord={publicKeyNoCoord}
+                unbondingFee={globalParamsVersion.unbonding_fee}
+                withdrawalFee={withdrawalFee}
+                btcWalletNetwork={btcWalletNetwork}
+                address={address}
+                signPsbt={btcWallet.signPsbt}
+                pushTx={btcWallet.pushTx}
+              />
+            )}
+          {/* At this point of time is not used */}
+          {/* <StakersFinalityProviders
+            finalityProviders={finalityProvidersData}
+            totalActiveTVL={statsData?.active_tvl}
+            connected={!!btcWallet}
+          /> */}
         </div>
       </div>
-    </div>
+      <FAQ />
+      <Footer />
+      <ConnectModal
+        open={connectModalOpen}
+        onClose={setConnectModalOpen}
+        onConnect={handleConnectBTC}
+        connectDisabled={!!address}
+      />
+    </main>
   );
 };
+
+export default Home;

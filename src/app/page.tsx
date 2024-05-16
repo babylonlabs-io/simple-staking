@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { initBTCCurve, stakingTransaction } from "btc-staking-ts";
+import { initBTCCurve } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Transaction, networks, Psbt } from "bitcoinjs-lib";
+import { Transaction, networks } from "bitcoinjs-lib";
 
 import {
   getWallet,
   toNetwork,
   isSupportedAddressType,
-  isTaproot,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
 import {
@@ -18,8 +17,6 @@ import {
   getFinalityProviders,
 } from "./api/getFinalityProviders";
 import { Delegation, getDelegations } from "./api/getDelegations";
-import { Staking } from "./components/Staking/Staking";
-import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
@@ -34,9 +31,14 @@ import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
+import { GlobalParamsVersion } from "./api/getGlobalParams";
+import { signForm } from "@/utils/signForm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 
-interface HomeProps {}
+interface HomeProps { }
+
+const stakingFee = 500;
+const withdrawalFee = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const { lightSelected } = useTheme();
@@ -171,125 +173,45 @@ const Home: React.FC<HomeProps> = () => {
     }
   };
 
-  const walletAndDataReady =
-    !!btcWallet && !!globalParamsVersion && !!finalityProvidersData;
-
-  const stakingFee = 500;
-  const withdrawalFee = 500;
-
-  const handleSign = async () => {
-    // check if term is fixed
-    let termWithFixed;
-    if (
-      globalParamsVersion &&
-      globalParamsVersion.min_staking_time ===
-        globalParamsVersion.max_staking_time
-    ) {
-      // if term is fixed, use the API value
-      termWithFixed = globalParamsVersion.min_staking_time;
-    } else {
-      // if term is not fixed, use the term from the input
-      termWithFixed = term;
-    }
-
-    if (
-      !walletAndDataReady ||
-      !finalityProvider ||
-      !btcWalletNetwork ||
-      amount * 1e8 < globalParamsVersion.min_staking_amount ||
-      amount * 1e8 > globalParamsVersion.max_staking_amount ||
-      termWithFixed < globalParamsVersion.min_staking_time ||
-      termWithFixed > globalParamsVersion.max_staking_time
-    ) {
-      // TODO Show Popup
-      console.error("Invalid staking data");
-      return;
-    }
-
-    // Rounding the input since 0.0006 * 1e8 is is 59999.999
-    // which won't be accepted by the mempool API
-    const stakingAmount = Math.round(Number(amount) * 1e8);
-    const stakingTerm = Number(termWithFixed);
-    let inputUTXOs = [];
+  const handleSign = async (params: GlobalParamsVersion | undefined) => {
     try {
-      inputUTXOs = await btcWallet.getUtxos(
-        address,
-        stakingAmount + stakingFee,
-      );
-    } catch (error: Error | any) {
-      console.error(error?.message || "UTXOs error");
-      return;
-    }
-    if (inputUTXOs.length == 0) {
-      console.error("Confirmed UTXOs not enough");
-      return;
-    }
-
-    let scripts;
-    try {
-      scripts = apiDataToStakingScripts(
-        finalityProvider.btc_pk,
-        stakingTerm,
-        globalParamsVersion,
-        publicKeyNoCoord,
-      );
-    } catch (error: Error | any) {
-      console.error(error?.message || "Cannot build staking scripts");
-      return;
-    }
-
-    const timelockScript = scripts.timelockScript;
-    const dataEmbedScript = scripts.dataEmbedScript;
-    const unbondingScript = scripts.unbondingScript;
-    const slashingScript = scripts.slashingScript;
-    let unsignedStakingTx;
-    try {
-      unsignedStakingTx = stakingTransaction(
-        timelockScript,
-        unbondingScript,
-        slashingScript,
-        stakingAmount,
-        stakingFee,
-        address,
-        inputUTXOs,
+      const signedTxHex = await signForm(
+        params,
+        btcWallet,
+        finalityProvidersData,
+        finalityProvider,
+        term,
         btcWalletNetwork,
-        isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
-        dataEmbedScript,
-      );
-    } catch (error: Error | any) {
-      console.error(
-        error?.message || "Cannot build unsigned staking transaction",
-      );
-      return;
-    }
-    let stakingTx: string;
-    try {
-      const signedPsbt = await btcWallet.signPsbt(unsignedStakingTx.toHex());
-      stakingTx = Psbt.fromHex(signedPsbt).extractTransaction().toHex();
-    } catch (error: Error | any) {
-      console.error(error?.message || "Staking transaction signing PSBT error");
-      return;
-    }
-
-    let txID;
-    try {
-      txID = await btcWallet.pushTx(stakingTx);
-    } catch (error: Error | any) {
-      console.error(error?.message || "Broadcasting staking transaction error");
-    }
-
-    // Update the local state with the new delegation
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(stakingTx).getId(),
+        amount,
+        address,
+        stakingFee,
         publicKeyNoCoord,
-        finalityProvider.btc_pk,
-        stakingAmount,
-        stakingTx,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
+      );
+      let txID;
+      try {
+        txID = await btcWallet.pushTx(signedTxHex);
+      } catch (error: Error | any) {
+        console.error(error?.message || "Broadcasting staking transaction error");
+      }
+
+      // Update the local state with the new delegation
+      setDelegationsLocalStorage((delegations) => [
+        toLocalStorageDelegation(
+          Transaction.fromHex(stakingTx).getId(),
+          publicKeyNoCoord,
+          finalityProvider.btc_pk,
+          stakingAmount,
+          stakingTx,
+          stakingTerm,
+        ),
+        ...delegations,
+      ]);
+
+    } catch (error: Error | any) {
+      // TODO Show Popup
+      console.error(error?.message || "Error signing the form");
+    }
+
 
     // Clear the form
     setAmount(0);
@@ -333,7 +255,6 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   // these constants are needed for easier prop passing
-
   const overTheCap =
     globalParamsVersion && statsData
       ? globalParamsVersion.staking_cap <= statsData.active_tvl
@@ -374,10 +295,10 @@ const Home: React.FC<HomeProps> = () => {
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
             onSign={handleSign}
-            minAmount={globalParamsVersion?.min_staking_amount}
-            maxAmount={globalParamsVersion?.max_staking_amount}
-            minTerm={globalParamsVersion?.min_staking_time}
-            maxTerm={globalParamsVersion?.max_staking_time}
+            minAmount={globalParamsVersion?.minStakingAmount}
+            maxAmount={globalParamsVersion?.maxStakingAmount}
+            minTerm={globalParamsVersion?.minStakingTime}
+            maxTerm={globalParamsVersion?.maxStakingTime}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
           />
