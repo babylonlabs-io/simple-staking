@@ -154,34 +154,22 @@ workflows:
       - push:
           requires:
             - build
-          filters:
-            tags:
-              only: /.*/
-            branches:
-              only:
-                - main
+              #filters:
+              #  tags:
+              #    only: /.*/
+              #  branches:
+              #    only:
+              #      - main
       - deploy_staging:
           requires:
             - push
-          filters:
-            branches:
-              only:
-                - main
-      - require_approval_deploy:
-          type: approval
-          requires:
-            - deploy_staging
-          filters:
-            branches:
-              only:
-                - main
+              #filters:
+              #  branches:
+              #    only:
+              #      - main
       - deploy_testnet:
           requires:
-            - require_approval_deploy
-          filters:
-            branches:
-              only:
-                - main
+            - deploy_staging
       - require_approval_rollback:
           type: approval
           requires:
