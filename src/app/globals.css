@@ -74,3 +74,13 @@ input[type="number"] {
   height: 1px !important;
   width: 1px !important;
 }
+
+.main-app.dark {
+  background: rgb(43, 43, 43) url("./assets/testnet-bg-pattern.svg") center
+    center/auto repeat content-box;
+}
+
+.main-app.light {
+  background: rgb(236, 236, 236) url("./assets/testnet-bg-pattern.svg") center
+    center/auto repeat content-box;
+}

@@ -340,7 +340,7 @@ const Home: React.FC<HomeProps> = () => {
 
   return (
     <main
-      className={`h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
+      className={`main-app h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
     >
       <Header
         onConnect={handleConnectModal}
