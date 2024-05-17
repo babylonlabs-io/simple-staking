@@ -95,7 +95,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       delegation.staking_tx_hash_hex,
     );
     if (!unbondingEligibility) {
-      const error = new Error("Not eligible for unbonding");
+      throw new Error("Not eligible for unbonding");
     }
 
     const paramVersions = await getGlobalParams();
