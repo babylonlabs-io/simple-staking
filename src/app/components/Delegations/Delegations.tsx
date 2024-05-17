@@ -330,7 +330,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
   return (
     <div
-      id="staking-history"
       className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1"
     >
       <h3 className="mb-4 font-bold">Staking history</h3>
@@ -347,8 +346,12 @@ export const Delegations: React.FC<DelegationsProps> = ({
             <p>Status</p>
             <p>Action</p>
           </div>
+            <div
+              id="staking-history"
+              className="no-scrollbar max-h-[21rem] overflow-y-auto"
+            >
           <InfiniteScroll
-              className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto"
+                className="flex flex-col gap-4"
             dataLength={combinedDelegationsData.length}
             next={next}
             hasMore={hasMore}
@@ -394,7 +397,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
                 />
               );
             })}
-          </InfiniteScroll>
+            </InfiniteScroll>
+            </div>
         </>
       )}
       {modalMode && txID && modalOpen && (
