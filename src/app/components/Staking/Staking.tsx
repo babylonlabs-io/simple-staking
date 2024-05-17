@@ -7,23 +7,30 @@ import { blocksToTime } from "@/utils/blocksToTime";
 import { ConnectLarge } from "../Connect/ConnectLarge";
 import InfiniteScroll from "react-infinite-scroll-component";
 
+interface StakingParams {
+  minStakingAmount: number;
+  maxStakingAmount: number;
+  minStakingTime: number;
+  maxStakingTime: number;
+  stakingCap: number;
+}
+
 interface StakingProps {
   amount: number;
   onAmountChange: (amount: number) => void;
   term: number;
   onTermChange: (term: number) => void;
-  disabled: boolean;
   finalityProviders: FinalityProviderInterface[] | undefined;
   selectedFinalityProvider: FinalityProviderInterface | undefined;
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
-  minAmount?: number;
-  maxAmount?: number;
-  minTerm?: number;
-  maxTerm?: number;
+  stakingParams: StakingParams | undefined;
+  isWalletConnected: boolean;
+  overTheCap: boolean;
+  isLoading: boolean;
+  isUpgrading: boolean | undefined;
   // if the staking cap is reached, the user can't stake
-  overTheCap?: boolean;
   onConnect: () => void;
   finalityProvidersFetchNext: () => void;
   finalityProvidersHasNext: boolean;
@@ -36,47 +43,31 @@ export const Staking: React.FC<StakingProps> = ({
   onAmountChange,
   term,
   onTermChange,
-  disabled,
   finalityProviders,
   selectedFinalityProvider,
   onFinalityProviderChange,
   onSign,
-  minAmount,
-  maxAmount,
-  minTerm,
-  maxTerm,
+  stakingParams,
+  isWalletConnected,
   overTheCap,
   onConnect,
   finalityProvidersFetchNext,
   finalityProvidersHasNext,
   finalityProvidersIsLoading,
   finalityProvidersIsFetchingMore,
+  isLoading,
+  isUpgrading,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
-  const termsReady =
-    minTerm &&
-    maxTerm &&
-    (minTerm === maxTerm || (term >= minTerm && term <= maxTerm));
-
-  const minAmountBTC = minAmount ? minAmount / 1e8 : 0;
-  const maxAmountBTC = maxAmount ? maxAmount / 1e8 : 0;
-
-  const amountReady =
-    minAmountBTC &&
-    maxAmountBTC &&
-    amount >= minAmountBTC &&
-    amount <= maxAmountBTC;
-
-  const signReady = amountReady && termsReady && selectedFinalityProvider;
-
-  const renderFixedTerm = () => {
-    if (minTerm && maxTerm && minTerm === maxTerm) {
+  const renderFixedTerm = (params: StakingParams) => {
+    const { minStakingTime, maxStakingTime } = params;
+    if (minStakingTime && maxStakingTime && minStakingTime === maxStakingTime) {
       return (
         <div className="card mb-2 bg-base-200 p-4">
           <p>
             Your Signet BTC will be staked for a fixed term of{" "}
-            {blocksToTime(minTerm)}.
+            {blocksToTime(minStakingTime)}.
           </p>
           <p>
             But you can unbond and withdraw your Signet BTC anytime through this
@@ -98,14 +89,15 @@ export const Staking: React.FC<StakingProps> = ({
             type="number"
             placeholder="Blocks"
             className="no-focus input input-bordered w-full"
-            min={minTerm}
-            max={maxTerm}
+            min={minStakingTime}
+            max={maxStakingTime}
             value={term}
             onChange={(e) => onTermChange(Number(e.target.value))}
-            disabled={disabled}
           />
           <div className="label flex justify-end">
-            <span className="label-text-alt">min term is {minTerm} blocks</span>
+            <span className="label-text-alt">
+              min term is {minStakingTime} blocks
+            </span>
           </div>
         </label>
       );
@@ -114,7 +106,7 @@ export const Staking: React.FC<StakingProps> = ({
 
   const renderContentForm = () => {
     // 1. wallet is not connected
-    if (disabled) {
+    if (!isWalletConnected) {
       return (
         <div className="flex flex-1 flex-col gap-1">
           <p className="mb-2 text-sm dark:text-neutral-content">
@@ -126,7 +118,45 @@ export const Staking: React.FC<StakingProps> = ({
         </div>
       );
     }
-    // 2. wallet is connected but staking cap is reached
+    // 2. wallet is connected but we are still loading the staking params
+    else if (isLoading) {
+      return (
+        <div className="flex justify-center py-4">
+          <span className="loading loading-spinner text-primary" />
+        </div>
+      );
+    }
+    // 3. wallet is connected but staking has not started
+    else if (!stakingParams) {
+      return (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm dark:text-neutral-content">
+            Staking has not started
+          </p>
+          <p>Staking app is not yet activated</p>
+          <p>
+            Please check back later or follow our social media channels for
+            updates.
+          </p>
+        </div>
+      );
+    }
+    // 4. Global params are transitioning into a new version
+    else if (isUpgrading) {
+      return (
+        <div className="flex flex-col gap-1">
+          <p className="text-sm dark:text-neutral-content">
+            Staking upgrade in progress
+          </p>
+          <p>The staking parameters are getting upgraded.</p>
+          <p>
+            Please check back later or follow our social media channels for
+            updates.
+          </p>
+        </div>
+      );
+    }
+    // 4. wallet is connected but staking cap is reached
     else if (overTheCap) {
       return (
         <div className="flex flex-col gap-1">
@@ -141,9 +171,28 @@ export const Staking: React.FC<StakingProps> = ({
           <p>Overflow stake should be unbonded and withdrawn.</p>
         </div>
       );
-    }
-    // 3. wallet is connected and staking cap is not reached
-    else {
+    } else {
+      const {
+        minStakingTime,
+        maxStakingTime,
+        minStakingAmount,
+        maxStakingAmount,
+      } = stakingParams;
+      const stakingTimeReady =
+        minStakingTime === maxStakingTime ||
+        (term >= minStakingTime && term <= maxStakingTime);
+
+      const minAmountBTC = minStakingAmount ? minStakingAmount / 1e8 : 0;
+      const maxAmountBTC = maxStakingAmount ? maxStakingAmount / 1e8 : 0;
+
+      const amountReady =
+        minAmountBTC &&
+        maxAmountBTC &&
+        amount >= minAmountBTC &&
+        amount <= maxAmountBTC;
+
+      const signReady =
+        amountReady && stakingTimeReady && selectedFinalityProvider;
       return (
         <>
           <div className="flex flex-col gap-1">
@@ -152,7 +201,7 @@ export const Staking: React.FC<StakingProps> = ({
           </div>
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
-              {renderFixedTerm()}
+              {renderFixedTerm(stakingParams)}
               <label className="form-control w-full flex-1">
                 <div className="label pt-0">
                   <span className="label-text-alt text-base">Amount</span>
@@ -166,7 +215,6 @@ export const Staking: React.FC<StakingProps> = ({
                   step={0.00001}
                   value={amount}
                   onChange={(e) => onAmountChange(Number(e.target.value))}
-                  disabled={disabled}
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
@@ -177,7 +225,7 @@ export const Staking: React.FC<StakingProps> = ({
             </div>
             <button
               className="btn-primary btn mt-2 w-full"
-              disabled={disabled || !signReady}
+              disabled={!signReady}
               onClick={() => setPreviewModalOpen(true)}
             >
               Preview

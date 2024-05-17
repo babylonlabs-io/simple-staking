@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { initBTCCurve, stakingTransaction } from "btc-staking-ts";
+import { initBTCCurve } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Transaction, networks, Psbt } from "bitcoinjs-lib";
+import { Transaction, networks } from "bitcoinjs-lib";
 
 import {
   getWallet,
   toNetwork,
   isSupportedAddressType,
-  isTaproot,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
 import {
@@ -24,7 +23,6 @@ import {
   getDelegations,
 } from "./api/getDelegations";
 import { Staking } from "./components/Staking/Staking";
-import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
@@ -36,12 +34,18 @@ import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
-import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
+import { signForm } from "@/utils/signForm";
+import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
+import { getGlobalParams } from "./api/getGlobalParams";
 
-interface HomeProps {}
+interface HomeProps { }
+
+const stakingFee = 500;
+const withdrawalFee = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const { lightSelected } = useTheme();
@@ -56,16 +60,28 @@ const Home: React.FC<HomeProps> = () => {
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const { data: globalParamsVersion } = useQuery({
-    queryKey: ["global params"],
-    queryFn: async () => {
-      const currentBtcHeight = await btcWallet!.getBTCTipHeight();
-      return getCurrentGlobalParamsVersion(currentBtcHeight);
-    },
-    refetchInterval: 60000, // 1 minute
-    // Should be enabled only when the wallet is connected
-    enabled: !!btcWallet,
-  });
+  const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
+    useQuery({
+      queryKey: ["global params"],
+      queryFn: async () => {
+        const [height, versions] = await Promise.all([
+          btcWallet!.getBTCTipHeight(),
+          getGlobalParams(),
+        ]);
+        try {
+          return await getCurrentGlobalParamsVersion(height + 1, versions);
+        } catch (error) {
+          // No global params version found, it means the staking is not yet enabled
+          return {
+            currentVersion: undefined,
+            isApprochingNextVersion: false,
+          };
+        }
+      },
+      refetchInterval: 60000, // 1 minute
+      // Should be enabled only when the wallet is connected
+      enabled: !!btcWallet,
+    });
 
   const {
     data: finalityProvidersData,
@@ -212,121 +228,56 @@ const Home: React.FC<HomeProps> = () => {
     }
   };
 
-  const walletAndDataReady =
-    !!btcWallet && !!globalParamsVersion && !!finalityProvidersData;
-
-  const stakingFee = 500;
-  const withdrawalFee = 500;
-
   const handleSign = async () => {
-    // check if term is fixed
-    let termWithFixed;
-    if (
-      globalParamsVersion &&
-      globalParamsVersion.min_staking_time ===
-        globalParamsVersion.max_staking_time
-    ) {
-      // if term is fixed, use the API value
-      termWithFixed = globalParamsVersion.min_staking_time;
-    } else {
-      // if term is not fixed, use the term from the input
-      termWithFixed = term;
+    if (!btcWallet) {
+      throw new Error("Wallet not connected");
+    } else if (!btcWalletNetwork) {
+      throw new Error("Wallet network not connected");
+    } else if (!paramWithContext || !paramWithContext.currentVersion) {
+      throw new Error("Global params not loaded");
+    } else if (!finalityProvider) {
+      throw new Error("Finality provider not selected");
     }
-
-    if (
-      !walletAndDataReady ||
-      !finalityProvider ||
-      !btcWalletNetwork ||
-      amount * 1e8 < globalParamsVersion.min_staking_amount ||
-      amount * 1e8 > globalParamsVersion.max_staking_amount ||
-      termWithFixed < globalParamsVersion.min_staking_time ||
-      termWithFixed > globalParamsVersion.max_staking_time
-    ) {
-      // TODO Show Popup
-      console.error("Invalid staking data");
-      return;
-    }
-
+    const { currentVersion: globalParamsVersion } = paramWithContext;
     // Rounding the input since 0.0006 * 1e8 is is 59999.999
     // which won't be accepted by the mempool API
     const stakingAmount = Math.round(Number(amount) * 1e8);
-    const stakingTerm = Number(termWithFixed);
-    let inputUTXOs = [];
+    const stakingTerm = getStakingTerm(globalParamsVersion, term);
+    let signedTxHex: string;
     try {
-      inputUTXOs = await btcWallet.getUtxos(
-        address,
-        stakingAmount + stakingFee,
-      );
-    } catch (error: Error | any) {
-      console.error(error?.message || "UTXOs error");
-      return;
-    }
-    if (inputUTXOs.length == 0) {
-      console.error("Confirmed UTXOs not enough");
-      return;
-    }
-
-    let scripts;
-    try {
-      scripts = apiDataToStakingScripts(
-        finalityProvider.btc_pk,
-        stakingTerm,
+      signedTxHex = await signForm(
         globalParamsVersion,
+        btcWallet,
+        finalityProvider,
+        stakingTerm,
+        btcWalletNetwork,
+        stakingAmount,
+        address,
+        stakingFee,
         publicKeyNoCoord,
       );
     } catch (error: Error | any) {
-      console.error(error?.message || "Cannot build staking scripts");
-      return;
-    }
-
-    const timelockScript = scripts.timelockScript;
-    const dataEmbedScript = scripts.dataEmbedScript;
-    const unbondingScript = scripts.unbondingScript;
-    const slashingScript = scripts.slashingScript;
-    let unsignedStakingTx;
-    try {
-      unsignedStakingTx = stakingTransaction(
-        timelockScript,
-        unbondingScript,
-        slashingScript,
-        stakingAmount,
-        stakingFee,
-        address,
-        inputUTXOs,
-        btcWalletNetwork,
-        isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
-        dataEmbedScript,
-      );
-    } catch (error: Error | any) {
-      console.error(
-        error?.message || "Cannot build unsigned staking transaction",
-      );
-      return;
-    }
-    let stakingTx: string;
-    try {
-      const signedPsbt = await btcWallet.signPsbt(unsignedStakingTx.toHex());
-      stakingTx = Psbt.fromHex(signedPsbt).extractTransaction().toHex();
-    } catch (error: Error | any) {
-      console.error(error?.message || "Staking transaction signing PSBT error");
-      return;
+      // TODO Show Popup
+      console.error(error?.message || "Error signing the form");
+      throw error;
     }
 
     let txID;
     try {
-      txID = await btcWallet.pushTx(stakingTx);
+      txID = await btcWallet.pushTx(signedTxHex);
     } catch (error: Error | any) {
       console.error(error?.message || "Broadcasting staking transaction error");
+      throw error;
     }
 
     // Update the local state with the new delegation
     setDelegationsLocalStorage((delegations) => [
       toLocalStorageDelegation(
-        Transaction.fromHex(stakingTx).getId(),
+        Transaction.fromHex(signedTxHex).getId(),
         publicKeyNoCoord,
         finalityProvider.btc_pk,
         stakingAmount,
-        stakingTx,
+        signedTxHex,
         stakingTerm,
       ),
       ...delegations,
@@ -374,10 +325,9 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   // these constants are needed for easier prop passing
-
   const overTheCap =
-    globalParamsVersion && statsData
-      ? globalParamsVersion.staking_cap <= statsData.active_tvl
+    paramWithContext?.currentVersion && statsData
+      ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
       : false;
 
   return (
@@ -396,7 +346,7 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
-            stakingCap={globalParamsVersion?.staking_cap}
+            stakingCap={paramWithContext?.currentVersion?.stakingCap}
           />
           {address && btcWalletBalance && (
             <Summary
@@ -410,17 +360,12 @@ const Home: React.FC<HomeProps> = () => {
             onAmountChange={setAmount}
             term={term}
             onTermChange={setTerm}
-            disabled={!btcWallet}
-            finalityProviders={
-              finalityProvidersData && finalityProvidersData.data
-            }
+            finalityProviders={finalityProvidersData && finalityProvidersData.data}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
             onSign={handleSign}
-            minAmount={globalParamsVersion?.min_staking_amount}
-            maxAmount={globalParamsVersion?.max_staking_amount}
-            minTerm={globalParamsVersion?.min_staking_time}
-            maxTerm={globalParamsVersion?.max_staking_time}
+            stakingParams={paramWithContext?.currentVersion}
+            isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
             finalityProvidersFetchNext={_fetchNextFinalityProvidersPage}
@@ -429,19 +374,21 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersIsFetchingMore={
               isFetchingNextFinalityProvidersPage
             }
+            isLoading={isLoadingCurrentParams}
+            isUpgrading={paramWithContext?.isApprochingNextVersion}
           />
           {btcWallet &&
             delegationsData &&
-            globalParamsVersion &&
+            paramWithContext?.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
                 delegationsAPI={delegationsData.data}
                 delegationsLocalStorage={delegationsLocalStorage}
-                globalParamsVersion={globalParamsVersion}
+                globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={globalParamsVersion.unbonding_fee}
+                unbondingFee={paramWithContext.currentVersion.unbondingFee}
                 withdrawalFee={withdrawalFee}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
