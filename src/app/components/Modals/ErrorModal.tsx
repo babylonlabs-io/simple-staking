@@ -13,7 +13,7 @@ interface ErrorModalProps {
   errorMessage: string;
   errorState?: ErrorState;
   errorTime: Date;
-  metadata?: ErrorMetadata;
+  errorMetadata?: ErrorMetadata;
 }
 
 export const ErrorModal: React.FC<ErrorModalProps> = ({
@@ -24,7 +24,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   errorMessage,
   errorState,
   errorTime,
-  metadata,
+  errorMetadata,
 }) => {
   const modalRef = useRef(null);
   const { lightSelected } = useTheme();
