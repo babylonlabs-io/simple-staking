@@ -39,26 +39,31 @@ export const getDelegations = async (
   key: string,
   publicKeyNoCoord?: string,
 ): Promise<Delegations> => {
-  if (!publicKeyNoCoord) {
-    throw new Error("No public key provided");
+  try {
+    console.log("in here");
+    if (!publicKeyNoCoord) {
+      throw new Error("No public key provided");
+    }
+
+    const limit = 100;
+    const reverse = false;
+
+    const params = {
+      "pagination.key": encode(key),
+      "pagination.reverse": reverse,
+      "pagination.limit": limit,
+      staker_btc_pk: encode(publicKeyNoCoord),
+    };
+
+    const response = await apiWrapper(
+      "GET",
+      "/v1/staker/delegations",
+      "Error getting delegations",
+      params,
+    );
+
+    return response.data;
+  } catch (error) {
+    throw error;
   }
-
-  const limit = 100;
-  const reverse = false;
-
-  const params = {
-    "pagination.key": encode(key),
-    "pagination.reverse": reverse,
-    "pagination.limit": limit,
-    staker_btc_pk: encode(publicKeyNoCoord),
-  };
-
-  const response = await apiWrapper(
-    "GET",
-    "/v1/staker/delegations",
-    "Error getting delegations",
-    params,
-  );
-
-  return response.data;
 };

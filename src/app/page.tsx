@@ -36,6 +36,9 @@ import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
+import { ErrorModal } from "./components/Modals/ErrorModal";
+import { useError } from "./context/Error/ErrorContext";
+import { ErrorState } from "./types/errorState";
 
 interface HomeProps { }
 
@@ -54,8 +57,9 @@ const Home: React.FC<HomeProps> = () => {
   const [amount, setAmount] = useState(0);
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
+  const { error, isErrorOpen, showError, hideError, retryErrorAction } = useError();
 
-  const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
+  const { data: paramWithContext, isLoading: isLoadingCurrentParams, error: globalParamsVersionError, refetch: refetchGlobalParamsVersion } =
     useQuery({
       queryKey: ["global params"],
       queryFn: async () => {
@@ -76,33 +80,89 @@ const Home: React.FC<HomeProps> = () => {
       refetchInterval: 60000, // 1 minute
       // Should be enabled only when the wallet is connected
       enabled: !!btcWallet,
+      retry: false,
     });
 
-  const { data: finalityProvidersData } = useQuery({
+  useEffect(() => {
+    if (globalParamsVersionError) {
+      showError({
+        error: {
+          message: globalParamsVersionError.message,
+          errorState: ErrorState.GET_GLOBAL_PARAMS,
+          errorTime: new Date(),
+        },
+        retryAction: refetchGlobalParamsVersion
+      });
+    }
+  }, [globalParamsVersionError, showError, refetchGlobalParamsVersion]);
+
+  const { data: finalityProvidersData, error: finalityProvidersError, refetch: refetchFinalityProvidersData } = useQuery({
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.data,
+    retry: false,
   });
 
-  const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage } =
+  useEffect(() => {
+    if (finalityProvidersError) {
+      showError({
+        error: {
+          message: finalityProvidersError.message,
+          errorState: ErrorState.GET_FINALITY_PROVIDER,
+          errorTime: new Date(),
+        },
+        retryAction: refetchFinalityProvidersData
+      });
+    }
+  }, [finalityProvidersError, showError, refetchFinalityProvidersData]);
+
+  const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage, refetch: refetchDelegationData, error: delegationError, isLoading } =
     useInfiniteQuery({
       queryKey: ["delegations", address],
       queryFn: ({ pageParam = "" }) =>
-        getDelegations(pageParam, publicKeyNoCoord),
+      getDelegations(pageParam, publicKeyNoCoord),
       getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
       initialPageParam: "",
       refetchInterval: 60000, // 1 minute
       enabled: !!(btcWallet && publicKeyNoCoord && address),
       select: (data) => data?.pages?.flatMap((page) => page?.data),
+      retry: false,
     });
+  
+  useEffect(() => {
+    if (delegationError) {
+      showError({
+        error: {
+          message: delegationError.message,
+          errorState: ErrorState.GET_DELEGATION,
+          errorTime: new Date(),
+        },
+        retryAction: refetchDelegationData
+      });
+    }
+  }, [delegationError, refetchDelegationData, showError]);
 
-  const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
+  const { data: statsData, isLoading: statsDataIsLoading, refetch: refetchStats, error: statsError } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.data,
+    retry: false,
   });
+
+  useEffect(() => {
+    if (statsError) {
+      showError({
+        error: {
+          message: statsError.message,
+          errorState: ErrorState.GET_STATS,
+          errorTime: new Date(),
+        },
+        retryAction: refetchStats,
+      });
+    }
+  }, [statsError, showError, refetchStats]);
 
   // Initializing btc curve is a required one-time operation
   useEffect(() => {
@@ -158,6 +218,14 @@ const Home: React.FC<HomeProps> = () => {
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
       console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.SWITCH_NETWORK,
+          errorTime: new Date(),
+        },
+        retryAction: handleConnectBTC,
+      });
     }
   };
 
@@ -364,6 +432,16 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <ErrorModal
+        open={isErrorOpen}
+        errorCode={error.errorCode}
+        errorMessage={error.message}
+        errorState={error.errorState}
+        errorTime={error.errorTime}
+        errorMetadata={error.metadata}
+        onClose={hideError}
+        onRetry={retryErrorAction}
       />
     </main>
   );

@@ -4,16 +4,35 @@ import { Tooltip } from "react-tooltip";
 
 import { getStakers } from "@/app/api/getStakers";
 import { Staker } from "./Staker";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { useEffect } from "react";
+import { ErrorState } from "@/app/types/errorState";
 
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { data: stakersData } = useQuery({
+  const { data: stakersData, error, refetch } = useQuery({
     queryKey: ["stakers"],
     queryFn: getStakers,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.data,
+    retry: false,
   });
+
+  const { showError } = useError();
+
+  useEffect(() => {
+    if (error) {
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.GET_STAKING,
+          errorTime: new Date(),
+        },
+        retryAction: refetch
+      });
+    }
+  }, [error, showError, refetch]);
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">

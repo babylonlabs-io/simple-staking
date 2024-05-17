@@ -27,6 +27,8 @@ import {
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errorState";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -58,6 +60,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
+  const { showError } = useError();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -92,7 +95,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       delegation.staking_tx_hash_hex,
     );
     if (!unbondingEligibility) {
-      throw new Error("Not eligible for unbonding");
+      const error = new Error("Not eligible for unbonding");
     }
 
     const paramVersions = await getGlobalParams();
@@ -172,6 +175,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
       handleUnbond(id);
     } catch (error: Error | any) {
       console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.POST_UNBOUNDING,
+          errorTime: new Date(),
+        },
+        retryAction: async () => await handleUnbond(id)
+      });
     } finally {
       setModalOpen(false);
       setTxID("");
@@ -278,7 +289,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
     try {
       handleWithdraw(id);
     } catch (error: Error | any) {
-      console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.WITHDRAW,
+          errorTime: new Date(),
+        },
+        retryAction: async () => await handleWithdraw(id)
+      });
     } finally {
       setModalOpen(false);
       setTxID("");
