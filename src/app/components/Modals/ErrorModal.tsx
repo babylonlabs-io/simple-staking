@@ -65,18 +65,18 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return `Your request to unbound ${btcAmount} BTC failed due to: ${errorMessage}`;
       case ErrorState.GET_STAKING:
         return `Failed to fetch staking data due to: ${errorMessage}`;
-        case ErrorState.GET_DELEGATION:
-        return `Failed to fetch delegation data due to: ${errorMessage}`; 
+      case ErrorState.GET_DELEGATION:
+        return `Failed to fetch delegation data due to: ${errorMessage}`;
       case ErrorState.GET_FINALITY_PROVIDER:
-        return `Failed to fetch finality provider data due to: ${errorMessage}`
+        return `Failed to fetch finality provider data due to: ${errorMessage}`;
       case ErrorState.GET_STATS:
-        return `Failed to fetch stats due to: ${errorMessage}`
+        return `Failed to fetch stats due to: ${errorMessage}`;
       case ErrorState.GET_GLOBAL_PARAMS:
-        return `Failed to fetch global params due to: ${errorMessage}`
+        return `Failed to fetch global params due to: ${errorMessage}`;
       case ErrorState.GET_UNBOUNDING_ELIGIBILITY:
-        return `Failed to fetch unbounding eligiblity due to: ${errorMessage}`
+        return `Failed to fetch unbounding eligiblity due to: ${errorMessage}`;
       case ErrorState.SWITCH_NETWORK:
-        return `Failed to switch network due to: ${errorMessage}`
+        return `Failed to switch network due to: ${errorMessage}`;
       default:
         return errorMessage;
     }
@@ -106,21 +106,21 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         </button>
       </div>
       <div className="flex flex-col justify-center gap-4">
-        <h3 className="font-bold text-center text-error">{getErrorTitle()}</h3>
+        <h3 className="text-center font-bold text-error">{getErrorTitle()}</h3>
         <div className="flex flex-col gap-3">
           <p className="text-center">{getErrorMessage()}</p>
           <p className="text-center text-xs opacity-50">{formattedErrorTime}</p>
         </div>
-        <div className="flex justify-around gap-4 mt-4">
+        <div className="mt-4 flex justify-around gap-4">
           <button
-            className="btn-outline flex-1 btn h-[2.5rem] min-h-[2.5rem] rounded-lg px-2 text-white"
+            className="btn btn-outline h-[2.5rem] min-h-[2.5rem] flex-1 rounded-lg px-2 text-white"
             onClick={() => onClose()}
           >
             Cancel
           </button>
           {onRetry && (
             <button
-              className="btn-primary flex-1 btn h-[2.5rem] min-h-[2.5rem] rounded-lg px-2 text-white"
+              className="btn-primary btn h-[2.5rem] min-h-[2.5rem] flex-1 rounded-lg px-2 text-white"
               onClick={handleRetry}
             >
               Try Again

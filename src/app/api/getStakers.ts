@@ -39,7 +39,7 @@ export const getStakers = async (): Promise<Stakers> => {
     );
 
     return response.data;
-  } catch (error) { 
-    throw error
+  } catch (error) {
+    throw error;
   }
 };

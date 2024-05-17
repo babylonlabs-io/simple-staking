@@ -181,7 +181,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           errorState: ErrorState.POST_UNBOUNDING,
           errorTime: new Date(),
         },
-        retryAction: async () => await handleUnbond(id)
+        retryAction: async () => await handleUnbond(id),
       });
     } finally {
       setModalOpen(false);
@@ -295,7 +295,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           errorState: ErrorState.WITHDRAW,
           errorTime: new Date(),
         },
-        retryAction: async () => await handleWithdraw(id)
+        retryAction: async () => await handleWithdraw(id),
       });
     } finally {
       setModalOpen(false);

@@ -40,7 +40,6 @@ export const getDelegations = async (
   publicKeyNoCoord?: string,
 ): Promise<Delegations> => {
   try {
-    console.log("in here");
     if (!publicKeyNoCoord) {
       throw new Error("No public key provided");
     }

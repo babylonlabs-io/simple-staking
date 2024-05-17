@@ -1,5 +1,11 @@
 import { ErrorState, ErrorType } from "@/app/types/errorState";
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 
@@ -15,7 +21,6 @@ interface ErrorContextType {
   hideError: () => void;
 }
 
-
 interface ShowErrorParams {
   error: ErrorType;
   retryAction?: () => void;
@@ -30,9 +35,11 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     errorState: undefined,
     metadata: undefined,
   });
-  const [retryErrorAction, setRetryErrorAction] = useState<(() => void) | undefined>();
+  const [retryErrorAction, setRetryErrorAction] = useState<
+    (() => void) | undefined
+  >();
 
-  const showError = useCallback(({error, retryAction}: ShowErrorParams) => {
+  const showError = useCallback(({ error, retryAction }: ShowErrorParams) => {
     setError(error);
     setIsErrorOpen(true);
     setRetryErrorAction(() => retryAction);
@@ -45,18 +52,21 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       errorCode: "",
       errorTime: new Date(),
       errorState: undefined,
-      metadata: undefined
+      metadata: undefined,
     });
     setRetryErrorAction(undefined);
   }, []);
-  
 
-  const value: ErrorContextType = { isErrorOpen: isErrorOpen, error, showError, hideError, retryErrorAction };
+  const value: ErrorContextType = {
+    isErrorOpen: isErrorOpen,
+    error,
+    showError,
+    hideError,
+    retryErrorAction,
+  };
 
   return (
-    <ErrorContext.Provider value={value}>
-      {children}
-    </ErrorContext.Provider>
+    <ErrorContext.Provider value={value}>{children}</ErrorContext.Provider>
   );
 };
 

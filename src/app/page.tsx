@@ -40,7 +40,7 @@ import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
 import { ErrorState } from "./types/errorState";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const stakingFee = 500;
 const withdrawalFee = 500;
@@ -57,31 +57,36 @@ const Home: React.FC<HomeProps> = () => {
   const [amount, setAmount] = useState(0);
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
-  const { error, isErrorOpen, showError, hideError, retryErrorAction } = useError();
+  const { error, isErrorOpen, showError, hideError, retryErrorAction } =
+    useError();
 
-  const { data: paramWithContext, isLoading: isLoadingCurrentParams, error: globalParamsVersionError, refetch: refetchGlobalParamsVersion } =
-    useQuery({
-      queryKey: ["global params"],
-      queryFn: async () => {
-        const [height, versions] = await Promise.all([
-          btcWallet!.getBTCTipHeight(),
-          getGlobalParams(),
-        ]);
-        try {
-          return await getCurrentGlobalParamsVersion(height + 1, versions);
-        } catch (error) {
-          // No global params version found, it means the staking is not yet enabled
-          return {
-            currentVersion: undefined,
-            isApprochingNextVersion: false,
-          };
-        }
-      },
-      refetchInterval: 60000, // 1 minute
-      // Should be enabled only when the wallet is connected
-      enabled: !!btcWallet,
-      retry: false,
-    });
+  const {
+    data: paramWithContext,
+    isLoading: isLoadingCurrentParams,
+    error: globalParamsVersionError,
+    refetch: refetchGlobalParamsVersion,
+  } = useQuery({
+    queryKey: ["global params"],
+    queryFn: async () => {
+      const [height, versions] = await Promise.all([
+        btcWallet!.getBTCTipHeight(),
+        getGlobalParams(),
+      ]);
+      try {
+        return await getCurrentGlobalParamsVersion(height + 1, versions);
+      } catch (error) {
+        // No global params version found, it means the staking is not yet enabled
+        return {
+          currentVersion: undefined,
+          isApprochingNextVersion: false,
+        };
+      }
+    },
+    refetchInterval: 60000, // 1 minute
+    // Should be enabled only when the wallet is connected
+    enabled: !!btcWallet,
+    retry: false,
+  });
 
   useEffect(() => {
     if (globalParamsVersionError) {
@@ -91,12 +96,16 @@ const Home: React.FC<HomeProps> = () => {
           errorState: ErrorState.GET_GLOBAL_PARAMS,
           errorTime: new Date(),
         },
-        retryAction: refetchGlobalParamsVersion
+        retryAction: refetchGlobalParamsVersion,
       });
     }
   }, [globalParamsVersionError, showError, refetchGlobalParamsVersion]);
 
-  const { data: finalityProvidersData, error: finalityProvidersError, refetch: refetchFinalityProvidersData } = useQuery({
+  const {
+    data: finalityProvidersData,
+    error: finalityProvidersError,
+    refetch: refetchFinalityProvidersData,
+  } = useQuery({
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
@@ -112,24 +121,29 @@ const Home: React.FC<HomeProps> = () => {
           errorState: ErrorState.GET_FINALITY_PROVIDER,
           errorTime: new Date(),
         },
-        retryAction: refetchFinalityProvidersData
+        retryAction: refetchFinalityProvidersData,
       });
     }
   }, [finalityProvidersError, showError, refetchFinalityProvidersData]);
 
-  const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage, refetch: refetchDelegationData, error: delegationError, isLoading } =
-    useInfiniteQuery({
-      queryKey: ["delegations", address],
-      queryFn: ({ pageParam = "" }) =>
+  const {
+    data: delegationsData,
+    fetchNextPage: _fetchNextDelegationsPage,
+    refetch: refetchDelegationData,
+    error: delegationError,
+    isLoading,
+  } = useInfiniteQuery({
+    queryKey: ["delegations", address],
+    queryFn: ({ pageParam = "" }) =>
       getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
-      initialPageParam: "",
-      refetchInterval: 60000, // 1 minute
-      enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => data?.pages?.flatMap((page) => page?.data),
-      retry: false,
-    });
-  
+    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
+    initialPageParam: "",
+    refetchInterval: 60000, // 1 minute
+    enabled: !!(btcWallet && publicKeyNoCoord && address),
+    select: (data) => data?.pages?.flatMap((page) => page?.data),
+    retry: false,
+  });
+
   useEffect(() => {
     if (delegationError) {
       showError({
@@ -138,12 +152,17 @@ const Home: React.FC<HomeProps> = () => {
           errorState: ErrorState.GET_DELEGATION,
           errorTime: new Date(),
         },
-        retryAction: refetchDelegationData
+        retryAction: refetchDelegationData,
       });
     }
   }, [delegationError, refetchDelegationData, showError]);
 
-  const { data: statsData, isLoading: statsDataIsLoading, refetch: refetchStats, error: statsError } = useQuery({
+  const {
+    data: statsData,
+    isLoading: statsDataIsLoading,
+    refetch: refetchStats,
+    error: statsError,
+  } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute

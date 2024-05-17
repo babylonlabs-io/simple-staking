@@ -11,7 +11,11 @@ import { ErrorState } from "@/app/types/errorState";
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { data: stakersData, error, refetch } = useQuery({
+  const {
+    data: stakersData,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["stakers"],
     queryFn: getStakers,
     refetchInterval: 60000, // 1 minute
@@ -29,7 +33,7 @@ export const Stakers: React.FC<StakersProps> = () => {
           errorState: ErrorState.GET_STAKING,
           errorTime: new Date(),
         },
-        retryAction: refetch
+        retryAction: refetch,
       });
     }
   }, [error, showError, refetch]);
