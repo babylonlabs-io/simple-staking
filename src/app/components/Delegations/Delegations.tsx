@@ -348,7 +348,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             <p>Action</p>
           </div>
           <InfiniteScroll
-            className="no-scrollbar grid w-full grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4"
+              className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto"
             dataLength={combinedDelegationsData.length}
             next={next}
             hasMore={hasMore}
