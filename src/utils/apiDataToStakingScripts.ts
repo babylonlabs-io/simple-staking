@@ -15,7 +15,7 @@ export const apiDataToStakingScripts = (
   }
 
   // Convert covenant PKs to buffers
-  const covenantPKsBuffer = globalParams?.covenant_pks?.map((pk) =>
+  const covenantPKsBuffer = globalParams?.covenantPks?.map((pk) =>
     getPublicKeyNoCoord(pk),
   );
 
@@ -26,9 +26,9 @@ export const apiDataToStakingScripts = (
       Buffer.from(publicKeyNoCoord, "hex"),
       [Buffer.from(finalityProviderPkHex, "hex")],
       covenantPKsBuffer,
-      globalParams.covenant_quorum,
+      globalParams.covenantQuorum,
       stakingTxTimelock,
-      globalParams.unbonding_time,
+      globalParams.unbondingTime,
       Buffer.from(globalParams.tag, "hex"),
     );
   } catch (error: Error | any) {

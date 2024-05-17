@@ -10,14 +10,17 @@ import {
 import { Delegation as DelegationInterface } from "@/app/api/getDelegations";
 import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
+import {
+  GlobalParamsVersion,
+  getGlobalParams,
+} from "@/app/api/getGlobalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
-import { getCurrentGlobalParamsVersion } from "@/utils/getCurrentGlobalParamsVersion";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import {
   UnbondWithdrawModal,
   MODE,
@@ -92,10 +95,13 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Not eligible for unbonding");
     }
 
+    const paramVersions = await getGlobalParams();
     // State of global params when the staking transaction was submitted
-    const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
-      delegation.staking_tx.start_height,
-    );
+    const { currentVersion: globalParamsWhenStaking } =
+      await getCurrentGlobalParamsVersion(
+        delegation.staking_tx.start_height,
+        paramVersions,
+      );
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
@@ -189,10 +195,13 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Delegation not found");
     }
 
+    const paramVersions = await getGlobalParams();
     // State of global params when the staking transaction was submitted
-    const globalParamsWhenStaking = await getCurrentGlobalParamsVersion(
-      delegation.staking_tx.start_height,
-    );
+    const { currentVersion: globalParamsWhenStaking } =
+      await getCurrentGlobalParamsVersion(
+        delegation.staking_tx.start_height,
+        paramVersions,
+      );
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
