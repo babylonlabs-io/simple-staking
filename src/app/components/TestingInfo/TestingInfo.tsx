@@ -13,7 +13,7 @@ export const TestingInfo: React.FC<TestingInfoProps> = () => {
           </p>
         </div>
         <p className="text-center lg:text-left">
-          Please do your due dilligence. Tokens are for testing only & do not
+          Please do your due dilligence. Tokens are for testing only and do not
           carry any monetary value.
         </p>
       </div>
