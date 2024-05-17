@@ -62,7 +62,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const getErrorMessage = () => {
     switch (errorState) {
       case ErrorState.POST_UNBOUNDING:
-        return `Your request to unbound ${btcAmount} BTC failed due to: ${errorMessage}`;
+        return `Your request to unbound failed due to: ${errorMessage}`;
       case ErrorState.GET_STAKING:
         return `Failed to fetch staking data due to: ${errorMessage}`;
       case ErrorState.GET_DELEGATION:
@@ -113,7 +113,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         </div>
         <div className="mt-4 flex justify-around gap-4">
           <button
-            className="btn btn-outline h-[2.5rem] min-h-[2.5rem] flex-1 rounded-lg px-2 text-white"
+            className="`btn btn-outline h-[2.5rem] min-h-[2.5rem] flex-1 rounded-lg px-2"
             onClick={() => onClose()}
           >
             Cancel

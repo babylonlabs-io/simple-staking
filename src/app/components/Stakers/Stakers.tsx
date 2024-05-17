@@ -11,6 +11,8 @@ import { ErrorState } from "@/app/types/errorState";
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
+  const { showError } = useError();
+
   const {
     data: stakersData,
     error,
@@ -23,7 +25,6 @@ export const Stakers: React.FC<StakersProps> = () => {
     retry: false,
   });
 
-  const { showError } = useError();
 
   useEffect(() => {
     if (error) {
