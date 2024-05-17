@@ -1,73 +1,38 @@
-import {
-  GlobalParamsVersion,
-  getGlobalParams,
-} from "@/app/api/getGlobalParams";
-
-
-export const getGlobalParamsVersioByHeight = async (
-  height: number,
-): Promise<GlobalParamsVersion> => {
-  if (!height) {
-    throw new Error("Height is not provided");
-  }
-
-  const versions = await getGlobalParams();
-
-  // sorted in descending order
-  const sorted = versions.sort(
-    (a, b) => b.activationHeight - a.activationHeight,
-  );
-
-  // find the first version that is less than or equal to the current height + 1 (next block height)
-  const params = sorted.find(
-    (v) => v.activationHeight <= height,
-  );
-
-  if (!params) {
-    throw new Error("No global params version found");
-  }
-  return params;
-};
-
-export interface GlobalParamsWithContext {
-  currentVersion?: GlobalParamsVersion;
-  isApprochingNextVersion: boolean;
-}
+import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
 
 // This function returns the current global params version and whether the next version is approaching
-// The current version is the one that is active at the current height + 1
-// Return undefined if no version is found, which means the current height is lower than the first version
+// The current version is the one that is active at the current height
+// Return currentVersion being undefined if no version is found,
+// which means the current height is lower than the first version
 export const getCurrentGlobalParamsVersion = async (
-  getCurrentBtcHeight: () => Promise<number>,
-): Promise<GlobalParamsWithContext> => {
-  const [height, versions] = await Promise.all([getCurrentBtcHeight(), getGlobalParams()])
-
-  // sorted in descending order
-  const sorted = versions.sort(
+  height: number,
+  versionedParams: GlobalParamsVersion[],
+) => {
+  // Step 1: Sort the versions in descending order based on activationHeight
+  const sorted = versionedParams.sort(
     (a, b) => b.activationHeight - a.activationHeight,
   );
 
   for (let i = 0; i < sorted.length; i++) {
     const curr = sorted[i];
-    if (curr.activationHeight <= height + 1) {
+    let isApprochingNextVersion = false;
+    // Check if the current version is active at the given height
+    if (curr.activationHeight <= height) {
+      // Check if the next version is approaching
       if (
         sorted[i - 1] &&
-        sorted[i - 1].activationHeight <= height + 1 + curr.confirmationDepth
+        sorted[i - 1].activationHeight <= height + curr.confirmationDepth
       ) {
-        return {
-          currentVersion: curr,
-          isApprochingNextVersion: true,
-        };
+        // Return the current version and whether the next version is approaching
+        isApprochingNextVersion = true;
       }
+      // Return the current version if the next version is not approaching
       return {
         currentVersion: curr,
-        isApprochingNextVersion: false,
+        isApprochingNextVersion,
       };
     }
   }
 
-  return {
-    currentVersion: undefined,
-    isApprochingNextVersion: false,
-  };
+  throw new Error("No global params version found");
 };

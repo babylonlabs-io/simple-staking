@@ -24,7 +24,7 @@ interface StakingProps {
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
   onSign: () => void;
-  stakingParams: StakingParams | undefined,
+  stakingParams: StakingParams | undefined;
   isWalletConnected: boolean;
   overTheCap: boolean;
   isLoading: boolean;
@@ -51,8 +51,7 @@ export const Staking: React.FC<StakingProps> = ({
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
-
-  const renderFixedTerm = (isDisabled: boolean, params: StakingParams) => {
+  const renderFixedTerm = (params: StakingParams) => {
     const { minStakingTime, maxStakingTime } = params;
     if (minStakingTime && maxStakingTime && minStakingTime === maxStakingTime) {
       return (
@@ -85,10 +84,11 @@ export const Staking: React.FC<StakingProps> = ({
             max={maxStakingTime}
             value={term}
             onChange={(e) => onTermChange(Number(e.target.value))}
-            disabled={isDisabled}
           />
           <div className="label flex justify-end">
-            <span className="label-text-alt">min term is {minStakingTime} blocks</span>
+            <span className="label-text-alt">
+              min term is {minStakingTime} blocks
+            </span>
           </div>
         </label>
       );
@@ -139,7 +139,7 @@ export const Staking: React.FC<StakingProps> = ({
           <p className="text-sm dark:text-neutral-content">
             Staking upgrade in progress
           </p>
-          <p>Staking app is getting upgrade for better experience!</p>
+          <p>The staking parameters are getting upgraded.</p>
           <p>
             Please check back later or follow our social media channels for
             updates.
@@ -162,11 +162,16 @@ export const Staking: React.FC<StakingProps> = ({
           <p>Overflow stake should be unbonded and withdrawn.</p>
         </div>
       );
-    }
-    else {
-      const { minStakingTime, maxStakingTime, minStakingAmount, maxStakingAmount } = stakingParams;
-      const termsReady =
-        (minStakingTime === maxStakingTime || (term >= minStakingTime && term <= maxStakingTime));
+    } else {
+      const {
+        minStakingTime,
+        maxStakingTime,
+        minStakingAmount,
+        maxStakingAmount,
+      } = stakingParams;
+      const stakingTimeReady =
+        minStakingTime === maxStakingTime ||
+        (term >= minStakingTime && term <= maxStakingTime);
 
       const minAmountBTC = minStakingAmount ? minStakingAmount / 1e8 : 0;
       const maxAmountBTC = maxStakingAmount ? maxStakingAmount / 1e8 : 0;
@@ -177,9 +182,8 @@ export const Staking: React.FC<StakingProps> = ({
         amount >= minAmountBTC &&
         amount <= maxAmountBTC;
 
-      const signReady = amountReady && termsReady && selectedFinalityProvider;
-
-
+      const signReady =
+        amountReady && stakingTimeReady && selectedFinalityProvider;
       return (
         <>
           <div className="flex flex-col gap-1">
@@ -188,7 +192,7 @@ export const Staking: React.FC<StakingProps> = ({
           </div>
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
-              {renderFixedTerm(!isWalletConnected, stakingParams)}
+              {renderFixedTerm(stakingParams)}
               <label className="form-control w-full flex-1">
                 <div className="label pt-0">
                   <span className="label-text-alt text-base">Amount</span>
@@ -202,7 +206,6 @@ export const Staking: React.FC<StakingProps> = ({
                   step={0.00001}
                   value={amount}
                   onChange={(e) => onAmountChange(Number(e.target.value))}
-                  disabled={!isWalletConnected}
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
@@ -213,7 +216,7 @@ export const Staking: React.FC<StakingProps> = ({
             </div>
             <button
               className="btn-primary btn mt-2 w-full"
-              disabled={!isWalletConnected || !signReady}
+              disabled={!signReady}
               onClick={() => setPreviewModalOpen(true)}
             >
               Preview

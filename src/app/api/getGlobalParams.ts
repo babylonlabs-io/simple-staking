@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 import { apiWrapper } from "./apiWrapper";
 
-export interface globalParamsDataResponse {
+interface GlobalParamsDataResponse {
   versions: {
     version: number;
     activation_height: number;
@@ -36,11 +36,11 @@ export interface GlobalParamsVersion {
 }
 
 export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
-  const { data } = await apiWrapper(
+  const { data } = (await apiWrapper(
     "GET",
     "/v1/global-params",
     "Error getting global params",
-  ) as AxiosResponse<{ data: globalParamsDataResponse }>;
+  )) as AxiosResponse<{ data: GlobalParamsDataResponse }>;
   const { versions } = data.data;
 
   // covert them into GlobalParamsVersion
@@ -58,5 +58,5 @@ export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
     maxStakingTime: v.max_staking_time,
     minStakingTime: v.min_staking_time,
     confirmationDepth: v.confirmation_depth,
-  }))
+  }));
 };

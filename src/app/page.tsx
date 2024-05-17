@@ -35,6 +35,7 @@ import { ConnectModal } from "./components/Modals/ConnectModal";
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
+import { getGlobalParams } from "./api/getGlobalParams";
 
 interface HomeProps { }
 
@@ -54,15 +55,20 @@ const Home: React.FC<HomeProps> = () => {
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
-  const { data: paramWithContext, isLoading: isLoadingCurrentParams } = useQuery({
-    queryKey: ["global params"],
-    queryFn: async () => {
-      return getCurrentGlobalParamsVersion(btcWallet!.getBTCTipHeight);
-    },
-    refetchInterval: 60000, // 1 minute
-    // Should be enabled only when the wallet is connected
-    enabled: !!btcWallet,
-  });
+  const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
+    useQuery({
+      queryKey: ["global params"],
+      queryFn: async () => {
+        const [height, versions] = await Promise.all([
+          btcWallet!.getBTCTipHeight(),
+          getGlobalParams(),
+        ]);
+        return getCurrentGlobalParamsVersion(height + 1, versions);
+      },
+      refetchInterval: 60000, // 1 minute
+      // Should be enabled only when the wallet is connected
+      enabled: !!btcWallet,
+    });
 
   const { data: finalityProvidersData } = useQuery({
     queryKey: ["finality providers"],
@@ -174,56 +180,59 @@ const Home: React.FC<HomeProps> = () => {
   };
 
   const handleSign = async () => {
+    if (!btcWallet) {
+      throw new Error("Wallet not connected");
+    } else if (!btcWalletNetwork) {
+      throw new Error("Wallet network not connected");
+    } else if (!paramWithContext || !paramWithContext.currentVersion) {
+      throw new Error("Global params not loaded");
+    } else if (!finalityProvider) {
+      throw new Error("Finality provider not selected");
+    }
+    const { currentVersion: globalParamsVersion } = paramWithContext;
+    // Rounding the input since 0.0006 * 1e8 is is 59999.999
+    // which won't be accepted by the mempool API
+    const stakingAmount = Math.round(Number(amount) * 1e8);
+    const stakingTerm = getStakingTerm(globalParamsVersion, term);
+    let signedTxHex: string;
     try {
-      if (!btcWallet) {
-        throw new Error("Wallet not connected");
-      } else if (!btcWalletNetwork) {
-        throw new Error("Wallet network not connected");
-      } else if (!paramWithContext || !paramWithContext.currentVersion) {
-        throw new Error("Global params not loaded");
-      } else if (!finalityProvider) {
-        throw new Error("Finality provider not selected");
-      }
-      const { currentVersion: globalParamsVersion } = paramWithContext;
-      // Rounding the input since 0.0006 * 1e8 is is 59999.999
-      // which won't be accepted by the mempool API
-      const stakingAmount = Math.round(Number(amount) * 1e8);
-      const stakingTerm = getStakingTerm(globalParamsVersion, term);
-      const signedTxHex = await signForm(
+      signedTxHex = await signForm(
         globalParamsVersion,
         btcWallet,
         finalityProvider,
-        term,
+        stakingTerm,
         btcWalletNetwork,
         stakingAmount,
         address,
         stakingFee,
         publicKeyNoCoord,
       );
-      let txID;
-      try {
-        txID = await btcWallet.pushTx(signedTxHex);
-      } catch (error: Error | any) {
-        console.error(error?.message || "Broadcasting staking transaction error");
-      }
-
-      // Update the local state with the new delegation
-      setDelegationsLocalStorage((delegations) => [
-        toLocalStorageDelegation(
-          Transaction.fromHex(signedTxHex).getId(),
-          publicKeyNoCoord,
-          finalityProvider.btc_pk,
-          stakingAmount,
-          signedTxHex,
-          stakingTerm,
-        ),
-        ...delegations,
-      ]);
-
     } catch (error: Error | any) {
       // TODO Show Popup
       console.error(error?.message || "Error signing the form");
+      throw error;
     }
+
+    let txID;
+    try {
+      txID = await btcWallet.pushTx(signedTxHex);
+    } catch (error: Error | any) {
+      console.error(error?.message || "Broadcasting staking transaction error");
+      throw error;
+    }
+
+    // Update the local state with the new delegation
+    setDelegationsLocalStorage((delegations) => [
+      toLocalStorageDelegation(
+        Transaction.fromHex(signedTxHex).getId(),
+        publicKeyNoCoord,
+        finalityProvider.btc_pk,
+        stakingAmount,
+        signedTxHex,
+        stakingTerm,
+      ),
+      ...delegations,
+    ]);
 
     // Clear the form
     setAmount(0);
