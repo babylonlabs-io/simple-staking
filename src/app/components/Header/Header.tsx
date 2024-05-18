@@ -1,9 +1,9 @@
 import Image from "next/image";
+import { useTheme } from "next-themes";
 
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
-import { useTheme } from "@/app/hooks/useTheme";
 import darkLogo from "@/app/assets/logo-black.svg";
 import lightLogo from "@/app/assets/logo-white.svg";
 import darkIcon from "@/app/assets/icon-black.svg";
@@ -22,7 +22,9 @@ export const Header: React.FC<HeaderProps> = ({
   balance,
   onDisconnect,
 }) => {
-  const { lightSelected } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const lightSelected = resolvedTheme === "light";
+
   return (
     <nav>
       <div className="bg-base-300 shadow-sm">
