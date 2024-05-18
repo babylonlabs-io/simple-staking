@@ -22,15 +22,6 @@ deployment:
       cpu: 1000m
   nodeSelector:
     workload: "staging"
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            labelSelector:
-              matchLabels:
-                app: staking-api-service
-            topologyKey: topology.kubernetes.io/zone
-          weight: 1
 service:
   type: NodePort
   ports:
