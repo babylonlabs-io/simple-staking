@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { Hash } from "../Hash/Hash";
+import { Hash } from "@/app/components/Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
 
 interface FinalityProviderProps {

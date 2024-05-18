@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { initBTCCurve } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { networks } from "bitcoinjs-lib";
 
 import {
   getWallet,
@@ -12,15 +12,11 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import {
-  FinalityProvider,
-  getFinalityProviders,
-} from "./api/getFinalityProviders";
+import { getFinalityProviders } from "./api/getFinalityProviders";
 import { Delegation, getDelegations } from "./api/getDelegations";
 import { Staking } from "./components/Staking/Staking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
-import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { useTheme } from "./hooks/useTheme";
 import { Header } from "./components/Header/Header";
@@ -32,14 +28,11 @@ import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
-import { signForm } from "@/utils/signForm";
-import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 
-interface HomeProps { }
+interface HomeProps {}
 
-const stakingFee = 500;
 const withdrawalFee = 500;
 
 const Home: React.FC<HomeProps> = () => {
@@ -51,9 +44,6 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [term, setTerm] = useState(0);
-  const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
   const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
     useQuery({
@@ -176,78 +166,6 @@ const Home: React.FC<HomeProps> = () => {
     }
   }, [btcWallet]);
 
-  // Select the finality provider from the list
-  const handleChooseFinalityProvider = (btcPkHex: string) => {
-    if (!finalityProvidersData) {
-      return;
-    }
-    const found = finalityProvidersData.find((fp) => fp?.btc_pk === btcPkHex);
-    if (found) {
-      setFinalityProvider(found);
-    }
-  };
-
-  const handleSign = async () => {
-    if (!btcWallet) {
-      throw new Error("Wallet not connected");
-    } else if (!btcWalletNetwork) {
-      throw new Error("Wallet network not connected");
-    } else if (!paramWithContext || !paramWithContext.currentVersion) {
-      throw new Error("Global params not loaded");
-    } else if (!finalityProvider) {
-      throw new Error("Finality provider not selected");
-    }
-    const { currentVersion: globalParamsVersion } = paramWithContext;
-    // Rounding the input since 0.0006 * 1e8 is is 59999.999
-    // which won't be accepted by the mempool API
-    const stakingAmount = Math.round(Number(amount) * 1e8);
-    const stakingTerm = getStakingTerm(globalParamsVersion, term);
-    let signedTxHex: string;
-    try {
-      signedTxHex = await signForm(
-        globalParamsVersion,
-        btcWallet,
-        finalityProvider,
-        stakingTerm,
-        btcWalletNetwork,
-        stakingAmount,
-        address,
-        stakingFee,
-        publicKeyNoCoord,
-      );
-    } catch (error: Error | any) {
-      // TODO Show Popup
-      console.error(error?.message || "Error signing the form");
-      throw error;
-    }
-
-    let txID;
-    try {
-      txID = await btcWallet.pushTx(signedTxHex);
-    } catch (error: Error | any) {
-      console.error(error?.message || "Broadcasting staking transaction error");
-      throw error;
-    }
-
-    // Update the local state with the new delegation
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(signedTxHex).getId(),
-        publicKeyNoCoord,
-        finalityProvider.btc_pk,
-        stakingAmount,
-        signedTxHex,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
-
-    // Clear the form
-    setAmount(0);
-    setTerm(0);
-    setFinalityProvider(undefined);
-  };
-
   // Remove the delegations that are already present in the API
   useEffect(() => {
     if (!delegationsData) {
@@ -315,20 +233,17 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            amount={amount}
-            onAmountChange={setAmount}
-            term={term}
-            onTermChange={setTerm}
             finalityProviders={finalityProvidersData}
-            selectedFinalityProvider={finalityProvider}
-            onFinalityProviderChange={handleChooseFinalityProvider}
-            onSign={handleSign}
-            stakingParams={paramWithContext?.currentVersion}
+            paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
             isLoading={isLoadingCurrentParams}
-            isUpgrading={paramWithContext?.isApprochingNextVersion}
+            btcWallet={btcWallet}
+            btcWalletNetwork={btcWalletNetwork}
+            address={address}
+            publicKeyNoCoord={publicKeyNoCoord}
+            setDelegationsLocalStorage={setDelegationsLocalStorage}
           />
           {btcWallet &&
             delegationsData &&

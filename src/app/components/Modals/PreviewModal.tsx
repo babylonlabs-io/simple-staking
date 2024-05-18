@@ -3,22 +3,23 @@ import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
 import { useTheme } from "@/app/hooks/useTheme";
+import { blocksToTime } from "@/utils/blocksToTime";
 
 interface PreviewModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
   onSign: () => void;
   finalityProvider: string | undefined;
-  amount: number;
-  term: number;
+  amountSat: number;
+  termBlocks: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
   open,
   onClose,
   finalityProvider,
-  amount,
-  term,
+  amountSat,
+  termBlocks,
   onSign,
 }) => {
   const modalRef = useRef(null);
@@ -59,13 +60,13 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${+(amount / 1e8).toFixed(6)} Signet BTC`}</p>
+            <p>{`${+(amountSat / 1e8).toFixed(6)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex gap-4">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{term}</p>
+            <p>{blocksToTime(termBlocks)}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
@@ -96,13 +97,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           >
             Cancel
           </button>
-          <button
-            className="btn-primary btn flex-1"
-            onClick={() => {
-              onClose(false);
-              onSign();
-            }}
-          >
+          <button className="btn-primary btn flex-1" onClick={onSign}>
             Stake
           </button>
         </div>
