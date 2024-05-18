@@ -91,7 +91,7 @@ export const Footer: React.FC<FooterProps> = () => {
           </div>
         ))}
       </div>
-      <div className="flex justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
+      <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
         {iconLinks.map(({ name, url, Icon }) => (
           <div
             key={name}
