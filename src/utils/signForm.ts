@@ -67,7 +67,11 @@ export const signForm = async (
       btcWalletNetwork,
       isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
       dataEmbedScript,
-      params.activationHeight,
+      // `lockHeight` is exclusive of the provided value.
+      // For example, if a Bitcoin height of X is provided, 
+      // the transaction will be included starting from height X+1.
+      // https://learnmeabitcoin.com/technical/transaction/locktime/
+      params.activationHeight - 1,
     );
   } catch (error: Error | any) {
     throw new Error(
