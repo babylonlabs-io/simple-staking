@@ -4,7 +4,7 @@ import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
 // The current version is the one that is active at the current height
 // Return currentVersion being undefined if no version is found,
 // which means the current height is lower than the first version
-export const getCurrentGlobalParamsVersion = async (
+export const getCurrentGlobalParamsVersion = (
   height: number,
   versionedParams: GlobalParamsVersion[],
 ) => {
