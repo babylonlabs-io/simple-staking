@@ -37,7 +37,7 @@ import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const stakingFee = 500;
 const withdrawalFee = 500;
