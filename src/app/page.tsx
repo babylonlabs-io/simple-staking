@@ -37,7 +37,7 @@ import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const stakingFee = 500;
 const withdrawalFee = 500;
@@ -64,7 +64,7 @@ const Home: React.FC<HomeProps> = () => {
           getGlobalParams(),
         ]);
         try {
-          return await getCurrentGlobalParamsVersion(height + 1, versions);
+          return getCurrentGlobalParamsVersion(height + 1, versions);
         } catch (error) {
           // No global params version found, it means the staking is not yet enabled
           return {
