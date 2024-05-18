@@ -12,7 +12,7 @@ interface RegularProps {
   maxStakingTime: number;
 }
 
-// Staking form for fixed term
+// Regular term + amount form with fp check
 export const Regular: React.FC<RegularProps> = ({
   onSign,
   selectedFinalityProvider,

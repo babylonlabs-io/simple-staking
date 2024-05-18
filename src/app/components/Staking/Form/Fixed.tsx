@@ -12,7 +12,7 @@ interface FixedProps {
   stakingTime: number;
 }
 
-// Staking form for fixed term
+// Fixed term + amount with fp check
 export const Fixed: React.FC<FixedProps> = ({
   onSign,
   selectedFinalityProvider,
