@@ -57,7 +57,7 @@ export const Stats: React.FC<StatsProps> = ({
           ? formatter.format(data.total_delegations as number)
           : 0,
         icon: delegations,
-        tooltip: "Delegations information",
+        tooltip: "Total number of stake delegations",
       },
       {
         title: "Stakers",
