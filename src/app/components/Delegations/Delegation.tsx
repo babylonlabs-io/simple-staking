@@ -44,7 +44,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div>
           <button
-            className="btn btn-link btn-xs inline-flex text-sm font-normal text-primary no-underline"
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
             onClick={() => onUnbond(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_UNBONDING
@@ -58,7 +58,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div>
           <button
-            className="btn btn-link btn-xs inline-flex text-sm font-normal text-primary no-underline"
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
             onClick={() => onWithdraw(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
@@ -111,19 +111,17 @@ export const Delegation: React.FC<DelegationProps> = ({
           {trim(stakingTxHash)}
         </a>
         <div className="flex">
-          <div className="card border bg-base-300 px-2 py-1 dark:border-0">
-            <div className="flex items-center gap-1">
-              <p>{renderState()}</p>
-              <span
-                className="cursor-pointer text-xs"
-                data-tooltip-id={`tooltip-${stakingTxHash}`}
-                data-tooltip-content={renderStateTooltip()}
-                data-tooltip-place="top"
-              >
-                <AiOutlineInfoCircle />
-              </span>
-              <Tooltip id={`tooltip-${stakingTxHash}`} />
-            </div>
+          <div className="flex items-center gap-1">
+            <p>{renderState()}</p>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id={`tooltip-${stakingTxHash}`}
+              data-tooltip-content={renderStateTooltip()}
+              data-tooltip-place="top"
+            >
+              <AiOutlineInfoCircle />
+            </span>
+            <Tooltip id={`tooltip-${stakingTxHash}`} />
           </div>
         </div>
         {generateActionButton()}
