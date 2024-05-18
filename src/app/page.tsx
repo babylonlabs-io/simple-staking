@@ -64,7 +64,7 @@ const Home: React.FC<HomeProps> = () => {
           getGlobalParams(),
         ]);
         try {
-          return await getCurrentGlobalParamsVersion(height + 1, versions);
+          return getCurrentGlobalParamsVersion(height + 1, versions);
         } catch (error) {
           // No global params version found, it means the staking is not yet enabled
           return {

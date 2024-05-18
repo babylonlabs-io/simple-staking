@@ -98,7 +98,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const paramVersions = await getGlobalParams();
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
-      await getCurrentGlobalParamsVersion(
+      getCurrentGlobalParamsVersion(
         delegation.staking_tx.start_height,
         paramVersions,
       );
@@ -198,7 +198,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const paramVersions = await getGlobalParams();
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
-      await getCurrentGlobalParamsVersion(
+      getCurrentGlobalParamsVersion(
         delegation.staking_tx.start_height,
         paramVersions,
       );
@@ -306,7 +306,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.staking_tx_hash_hex ===
-                intermediateDelegation?.staking_tx_hash_hex &&
+              intermediateDelegation?.staking_tx_hash_hex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),

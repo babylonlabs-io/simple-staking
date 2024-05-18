@@ -67,6 +67,7 @@ export const signForm = async (
       btcWalletNetwork,
       isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
       dataEmbedScript,
+      params.activationHeight,
     );
   } catch (error: Error | any) {
     throw new Error(
