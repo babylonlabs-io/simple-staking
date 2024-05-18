@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { initBTCCurve } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
@@ -289,9 +289,12 @@ const Home: React.FC<HomeProps> = () => {
       ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
       : false;
 
+  const modalContainerRef = useRef(null);
+
   return (
     <main
       className={`main-app relative h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
+      ref={modalContainerRef}
     >
       <NetworkBadge />
       <Header
@@ -329,6 +332,7 @@ const Home: React.FC<HomeProps> = () => {
             onConnect={handleConnectModal}
             isLoading={isLoadingCurrentParams}
             isUpgrading={paramWithContext?.isApprochingNextVersion}
+            modalContainerRef={modalContainerRef}
           />
           {btcWallet &&
             delegationsData &&
@@ -347,6 +351,7 @@ const Home: React.FC<HomeProps> = () => {
                 address={address}
                 signPsbt={btcWallet.signPsbt}
                 pushTx={btcWallet.pushTx}
+                modalContainerRef={modalContainerRef}
               />
             )}
           {/* At this point of time is not used */}
@@ -364,6 +369,7 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+        modalContainerRef={modalContainerRef}
       />
     </main>
   );

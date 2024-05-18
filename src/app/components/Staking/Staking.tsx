@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { MutableRefObject, useState } from "react";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
@@ -31,6 +31,7 @@ interface StakingProps {
   isUpgrading: boolean | undefined;
   // if the staking cap is reached, the user can't stake
   onConnect: () => void;
+  modalContainerRef: MutableRefObject<null>;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -48,6 +49,7 @@ export const Staking: React.FC<StakingProps> = ({
   onConnect,
   isLoading,
   isUpgrading,
+  modalContainerRef,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
@@ -228,6 +230,7 @@ export const Staking: React.FC<StakingProps> = ({
               finalityProvider={selectedFinalityProvider?.description.moniker}
               amount={amount * 1e8}
               term={term}
+              modalContainerRef={modalContainerRef}
             />
           </div>
         </>

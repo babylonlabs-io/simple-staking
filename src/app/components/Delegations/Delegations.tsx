@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 import {
@@ -40,6 +40,7 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
+  modalContainerRef: MutableRefObject<null>;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -54,6 +55,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
   signPsbt,
   pushTx,
+  modalContainerRef,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -374,6 +376,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
                 : handleWithdrawWithErrors(txID);
             }}
             mode={modalMode}
+            modalContainerRef={modalContainerRef}
           />
         )}
       </div>

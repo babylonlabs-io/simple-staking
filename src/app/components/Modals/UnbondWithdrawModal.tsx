@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { MutableRefObject, useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
@@ -13,6 +13,7 @@ interface PreviewModalProps {
   onClose: (value: boolean) => void;
   onProceed: () => void;
   mode: MODE;
+  modalContainerRef: MutableRefObject<null>;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -20,6 +21,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onClose,
   onProceed,
   mode,
+  modalContainerRef,
 }) => {
   const modalRef = useRef(null);
   const { lightSelected } = useTheme();
@@ -47,6 +49,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
           "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[24rem] md:rounded-b-2xl",
       }}
       showCloseIcon={false}
+      container={modalContainerRef?.current}
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>

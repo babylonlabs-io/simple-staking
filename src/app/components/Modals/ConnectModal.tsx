@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { MutableRefObject, useRef, useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
@@ -10,6 +10,7 @@ interface ConnectModalProps {
   onClose: (value: boolean) => void;
   onConnect: () => void;
   connectDisabled: boolean;
+  modalContainerRef: MutableRefObject<null>;
 }
 
 export const ConnectModal: React.FC<ConnectModalProps> = ({
@@ -17,6 +18,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   onClose,
   onConnect,
   connectDisabled,
+  modalContainerRef,
 }) => {
   const modalRef = useRef(null);
   const { lightSelected } = useTheme();
@@ -35,6 +37,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem]",
       }}
       showCloseIcon={false}
+      container={modalContainerRef?.current}
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">Connect wallet</h3>
