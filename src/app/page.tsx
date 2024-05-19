@@ -276,7 +276,8 @@ const Home: React.FC<HomeProps> = () => {
   // these constants are needed for easier prop passing
   const overTheCap =
     paramWithContext?.currentVersion && stakingStats
-      ? paramWithContext.currentVersion.stakingCapSat <= stakingStats.activeTVLSat
+      ? paramWithContext.currentVersion.stakingCapSat <=
+        stakingStats.activeTVLSat
       : false;
 
   return (
@@ -329,7 +330,9 @@ const Home: React.FC<HomeProps> = () => {
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFeeSat={paramWithContext.currentVersion.unbondingFeeSat}
+                unbondingFeeSat={
+                  paramWithContext.currentVersion.unbondingFeeSat
+                }
                 withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}

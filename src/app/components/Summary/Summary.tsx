@@ -23,7 +23,8 @@ export const Summary: React.FC<SummaryProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="font-semibold">
-              {totalStakedSat ? satoshiToBtc(totalStakedSat).toFixed(6) : 0} Signet BTC
+              {totalStakedSat ? satoshiToBtc(totalStakedSat).toFixed(6) : 0}{" "}
+              Signet BTC
             </p>
           </div>
         </div>

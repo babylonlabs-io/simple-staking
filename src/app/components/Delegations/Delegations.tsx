@@ -7,7 +7,10 @@ import {
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
 
-import { Delegation as DelegationInterface, DelegationState } from "@/app/types/delegations";
+import {
+  Delegation as DelegationInterface,
+  DelegationState,
+} from "@/app/types/delegations";
 import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getGlobalParams } from "@/app/api/getGlobalParams";

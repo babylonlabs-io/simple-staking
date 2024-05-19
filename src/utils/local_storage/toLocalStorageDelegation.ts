@@ -21,5 +21,5 @@ export const toLocalStorageDelegation = (
     timelock,
   },
   isOverflow: false,
-  unbondingTx: undefined
+  unbondingTx: undefined,
 });

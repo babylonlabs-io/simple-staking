@@ -2,7 +2,7 @@ import { encode } from "url-safe-base64";
 
 import { apiWrapper } from "./apiWrapper";
 
-import { Delegation } from "../types/delegations"
+import { Delegation } from "../types/delegations";
 
 export interface PaginatedDelegations {
   delegations: Delegation[];
@@ -14,8 +14,8 @@ export interface DelegationsPagination {
 }
 
 interface DelegationsAPI {
-  data: DelegationAPI[]
-  pagination: PaginationAPI
+  data: DelegationAPI[];
+  pagination: PaginationAPI;
 }
 
 interface DelegationAPI {
@@ -73,7 +73,8 @@ export const getDelegations = async (
 
   const delegationsAPI: DelegationsAPI = response.data;
 
-  const delegations: Delegation[] = delegationsAPI.data.map((apiDelegation: DelegationAPI): Delegation => ({
+  const delegations: Delegation[] = delegationsAPI.data.map(
+    (apiDelegation: DelegationAPI): Delegation => ({
       stakingTxHashHex: apiDelegation.staking_tx_hash_hex,
       stakerPkHex: apiDelegation.staker_pk_hex,
       finalityProviderPkHex: apiDelegation.finality_provider_pk_hex,
@@ -87,14 +88,17 @@ export const getDelegations = async (
         timelock: apiDelegation.staking_tx.timelock,
       },
       isOverflow: apiDelegation.is_overflow,
-      unbondingTx: apiDelegation.unbonding_tx ? {
-        txHex: apiDelegation.unbonding_tx.tx_hex,
-        outputIndex: apiDelegation.unbonding_tx.output_index,
-      } : undefined
-  }))
+      unbondingTx: apiDelegation.unbonding_tx
+        ? {
+            txHex: apiDelegation.unbonding_tx.tx_hex,
+            outputIndex: apiDelegation.unbonding_tx.output_index,
+          }
+        : undefined,
+    }),
+  );
 
   const pagination: DelegationsPagination = {
-    nextKey: delegationsAPI.pagination.next_key
-  }
+    nextKey: delegationsAPI.pagination.next_key,
+  };
   return { delegations, pagination };
 };

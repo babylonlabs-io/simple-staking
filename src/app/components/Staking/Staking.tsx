@@ -182,11 +182,11 @@ export const Staking: React.FC<StakingProps> = ({
 
       const signReady =
         amountReady && stakingTimeReady && selectedFinalityProvider;
-      
+
       // Do the conversion to BTC for presentational purposes
-      const minStakingAmountBtc = satoshiToBtc(minStakingAmountSat)
-      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmountSat)
-      const selectedStakingAmountBtc = satoshiToBtc(amountSat)
+      const minStakingAmountBtc = satoshiToBtc(minStakingAmountSat);
+      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmountSat);
+      const selectedStakingAmountBtc = satoshiToBtc(amountSat);
 
       return (
         <>
@@ -210,7 +210,9 @@ export const Staking: React.FC<StakingProps> = ({
                   step={0.00001}
                   value={selectedStakingAmountBtc}
                   // Convert the BTC amount to satoshis to keep internal values only in satoshis
-                  onChange={(e) => onAmountSatChange(btcToSatoshi(Number(e.target.value)))}
+                  onChange={(e) =>
+                    onAmountSatChange(btcToSatoshi(Number(e.target.value)))
+                  }
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">

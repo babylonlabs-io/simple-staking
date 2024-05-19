@@ -1,5 +1,5 @@
 import { apiWrapper } from "./apiWrapper";
-import { StakingStats } from "../types/stakingStats"
+import { StakingStats } from "../types/stakingStats";
 
 interface StatsAPIResponse {
   data: StatsAPI;
@@ -26,5 +26,5 @@ export const getStats = async (): Promise<StakingStats> => {
     totalDelegations: statsAPI.total_delegations,
     totalStakers: statsAPI.total_stakers,
     unconfirmedTVLSat: statsAPI.unconfirmed_tvl,
-  }
+  };
 };

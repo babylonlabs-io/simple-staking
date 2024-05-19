@@ -11,14 +11,14 @@ export const postUnbonding = async (
   stakerSignedSignatureHex: string,
   stakingTxHashHex: string,
   unbondingTxHashHex: string,
-  unbondingTxHex: string
+  unbondingTxHex: string,
 ) => {
   const payload: UnbondingPayload = {
     staker_signed_signature_hex: stakerSignedSignatureHex,
     staking_tx_hash_hex: stakingTxHashHex,
     unbonding_tx_hash_hex: unbondingTxHashHex,
     unbonding_tx_hex: unbondingTxHex,
-  }
+  };
 
   const response = await apiWrapper(
     "POST",

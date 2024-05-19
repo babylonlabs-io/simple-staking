@@ -30,7 +30,10 @@ export const signForm = async (
 
   let inputUTXOs = [];
   try {
-    inputUTXOs = await btcWallet.getUtxos(address, stakingAmountSat + stakingFeeSat);
+    inputUTXOs = await btcWallet.getUtxos(
+      address,
+      stakingAmountSat + stakingFeeSat,
+    );
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
   }
@@ -68,7 +71,7 @@ export const signForm = async (
       isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
       dataEmbedScript,
       // `lockHeight` is exclusive of the provided value.
-      // For example, if a Bitcoin height of X is provided, 
+      // For example, if a Bitcoin height of X is provided,
       // the transaction will be included starting from height X+1.
       // https://learnmeabitcoin.com/technical/transaction/locktime/
       params.activationHeight - 1,
