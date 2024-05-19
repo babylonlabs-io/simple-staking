@@ -1,4 +1,4 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
 import { Loading } from "../Loading";
 
@@ -43,13 +43,13 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
         {finalityProviders?.map((fp) => (
           <FinalityProvider
-            key={fp.btc_pk}
+            key={fp.btcPk}
             moniker={fp.description.moniker}
-            pkHex={fp.btc_pk}
-            stake={fp.active_tvl}
+            pkHex={fp.btcPk}
+            stakeSat={fp.activeTVLSat}
             comission={fp.commission}
-            selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
-            onClick={() => onFinalityProviderChange(fp.btc_pk)}
+            selected={selectedFinalityProvider?.btcPk === fp.btcPk}
+            onClick={() => onFinalityProviderChange(fp.btcPk)}
           />
         ))}
       </div>

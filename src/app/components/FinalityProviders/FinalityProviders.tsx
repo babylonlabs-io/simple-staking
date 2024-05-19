@@ -1,8 +1,8 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import { FinalityProvider } from "./FinalityProvider";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 
 interface FinalityProvidersProps {
   data: FinalityProviderInterface[] | undefined;

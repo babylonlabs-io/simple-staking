@@ -20,27 +20,10 @@ import { stakingSignReady } from "@/utils/stakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
 
-const stakingFee = 500;
-
-interface StakingParams {
-  minStakingAmountSat: number;
-  maxStakingAmountSat: number;
-  minStakingTime: number;
-  maxStakingTime: number;
-  stakingCapSat: number;
-}
+const stakingFeeSat = 500;
 
 interface StakingProps {
-  amountSat: number;
-  onAmountSatChange: (amountSat: number) => void;
-  term: number;
-  onTermChange: (term: number) => void;
   finalityProviders: FinalityProviderInterface[] | undefined;
-  selectedFinalityProvider: FinalityProviderInterface | undefined;
-  // called when the user selects a finality provider
-  onFinalityProviderChange: (btcPkHex: string) => void;
-  onSign: () => void;
-  stakingParams: StakingParams | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
   overTheCap: boolean;
@@ -106,7 +89,7 @@ export const Staking: React.FC<StakingProps> = ({
         btcWalletNetwork,
         stakingAmountSat,
         address,
-        stakingFee,
+        stakingFeeSat,
         publicKeyNoCoord,
       );
     } catch (error: Error | any) {

@@ -9,7 +9,7 @@ export interface GlobalParamsVersion {
   unbondingFeeSat: number;
   maxStakingAmountSat: number;
   minStakingAmountSat: number;
-  maxStakingTime: number;
-  minStakingTime: number;
+  maxStakingTimeBlocks: number;
+  minStakingTimeBlocks: number;
   confirmationDepth: number;
 }
