@@ -19,6 +19,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
+import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 
 const stakingFeeSat = 500;
 
@@ -214,8 +215,7 @@ export const Staking: React.FC<StakingProps> = ({
 
       // Staking time is fixed
       const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
-      // Rounding the input since 0.0006 * 1e8 is is 59999.999
-      const amountSat = Math.round(stakingAmountBTC * 1e8);
+      const amountSat = Math.round(btcToSatoshi(stakingAmountBTC));
 
       return (
         <>
@@ -229,8 +229,8 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingTimeChange={handleStakingTimeChange}
               />
               <StakingAmount
-                minStakingAmountBTC={minStakingAmountSat / 1e8}
-                maxStakingAmountBTC={maxStakingAmountSat / 1e8}
+                minStakingAmountBTC={satoshiToBtc(minStakingAmountSat)}
+                maxStakingAmountBTC={satoshiToBtc(maxStakingAmountSat)}
                 stakingAmountBTC={stakingAmountBTC}
                 onStakingAmountChange={handleStakingAmountChange}
               />

@@ -1,4 +1,5 @@
 import { FinalityProvider } from "@/app/types/finalityProviders";
+import { satoshiToBtc } from "./btcConversions";
 
 // Check if the staking transaction is ready to be signed
 export const stakingSignReady = (
@@ -18,8 +19,8 @@ export const stakingSignReady = (
   const stakingAmountAPIReady = minStakingAmountSat && maxStakingAmountSat;
   // App inputs are filled
   const stakingAmountAppReady =
-    stakingAmountBTC >= minStakingAmountSat / 1e8 &&
-    stakingAmountBTC <= maxStakingAmountSat / 1e8;
+    stakingAmountBTC >= satoshiToBtc(minStakingAmountSat) &&
+    stakingAmountBTC <= satoshiToBtc(maxStakingAmountSat);
   // Amount is ready
   const stakingAmountReady = stakingAmountAPIReady && stakingAmountAppReady;
 
