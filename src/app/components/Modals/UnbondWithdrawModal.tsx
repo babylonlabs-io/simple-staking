@@ -2,8 +2,6 @@ import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
-import { useTheme } from "@/app/hooks/useTheme";
-
 export const MODE_UNBOND = "unbond";
 export const MODE_WITHDRAW = "withdraw";
 export type MODE = typeof MODE_UNBOND | typeof MODE_WITHDRAW;
@@ -22,7 +20,6 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   mode,
 }) => {
   const modalRef = useRef(null);
-  const { lightSelected } = useTheme();
 
   const unbondTitle = "Unbond";
   const unbondContent =
@@ -41,7 +38,6 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
       open={open}
       onClose={() => onClose(false)}
       classNames={{
-        root: `${lightSelected ? "light" : "dark"}`,
         modalContainer: "flex items-end justify-center md:items-center",
         modal:
           "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[24rem] md:rounded-b-2xl",

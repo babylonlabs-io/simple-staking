@@ -26,7 +26,7 @@ input[type="number"] {
   }
 }
 
-.dark .gradient-primary {
+[data-theme="dark"] .gradient-primary {
   background: linear-gradient(
     97.5deg,
     rgba(255, 124, 42, 0.2) 2.43%,
@@ -34,7 +34,7 @@ input[type="number"] {
   );
 }
 
-.light .gradient-primary {
+[data-theme="light"] .gradient-primary {
   background: linear-gradient(98.35deg, #fff3ea 2.4%, #fff6ef 117.66%);
 }
 
@@ -75,12 +75,12 @@ input[type="number"] {
   width: 1px !important;
 }
 
-.main-app.dark {
-  background: rgb(43, 43, 43) url("./assets/testnet-bg-pattern.svg") center
-    center/auto repeat content-box fixed;
+[data-theme="dark"] .main-app {
+  background: rgb(43, 43, 43) url("./assets/testnet-bg-pattern.svg") left
+    top/auto repeat;
 }
 
-.main-app.light {
-  background: rgb(236, 236, 236) url("./assets/testnet-bg-pattern.svg") center
-    center/auto repeat content-box fixed;
+[data-theme="light"] .main-app {
+  background: rgb(236, 236, 236) url("./assets/testnet-bg-pattern.svg") left
+    top/auto repeat;
 }

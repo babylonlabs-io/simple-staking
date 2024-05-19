@@ -32,7 +32,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   return address ? (
     <div className="relative mr-[-10px] flex text-sm" ref={ref}>
       <button
-        className="flex cursor-pointer"
+        className="flex cursor-pointer outline-none"
         onClick={() => setShowMenu(!showMenu)}
       >
         <div className="rounded-lg border border-base-200/75 p-2 pr-4">
@@ -49,7 +49,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       </button>
       {showMenu && (
         <div
-          className="absolute right-[10px] top-0 z-10 mt-[4.5rem] flex flex-col gap-4 rounded-lg bg-base-300 p-4 shadow-lg dark:bg-base-200"
+          className="absolute right-[10px] top-0 z-10 mt-[4.5rem] flex flex-col gap-4 rounded-lg bg-base-300 p-4 shadow-lg"
           style={{
             // margin - border
             width: "calc(100% - 8px)",
