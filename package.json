@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check src",
-    "format:fix": "prettier --write src"
+    "format:fix": "prettier --write src",
+    "clean": "rm -r node_modules",
+    "build-docker": "docker build -t babylonchain/simple-staking .",
+    "clean-docker": "docker rmi babylonchain/simple-staking 2>/dev/null; true"
   },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
