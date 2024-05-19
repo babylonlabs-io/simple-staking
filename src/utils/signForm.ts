@@ -1,7 +1,7 @@
 import { Psbt, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
-import { FinalityProvider } from "@/app/api/getFinalityProviders";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { FinalityProvider } from "@/app/types/finalityProviders";
 import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";
@@ -14,7 +14,7 @@ export const signForm = async (
   btcWalletNetwork: networks.Network,
   stakingAmountSat: number,
   address: string,
-  stakingFee: number,
+  stakingFeeSat: number,
   publicKeyNoCoord: string,
 ): Promise<string> => {
   if (
@@ -32,7 +32,7 @@ export const signForm = async (
   try {
     inputUTXOs = await btcWallet.getUtxos(
       address,
-      stakingAmountSat + stakingFee,
+      stakingAmountSat + stakingFeeSat,
     );
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
@@ -44,7 +44,7 @@ export const signForm = async (
   let scripts;
   try {
     scripts = apiDataToStakingScripts(
-      finalityProvider.btc_pk,
+      finalityProvider.btcPk,
       stakingTerm,
       params,
       publicKeyNoCoord,
@@ -64,12 +64,17 @@ export const signForm = async (
       unbondingScript,
       slashingScript,
       stakingAmountSat,
-      stakingFee,
+      stakingFeeSat,
       address,
       inputUTXOs,
       btcWalletNetwork,
       isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
       dataEmbedScript,
+      // `lockHeight` is exclusive of the provided value.
+      // For example, if a Bitcoin height of X is provided,
+      // the transaction will be included starting from height X+1.
+      // https://learnmeabitcoin.com/technical/transaction/locktime/
+      params.activationHeight - 1,
     );
   } catch (error: Error | any) {
     throw new Error(

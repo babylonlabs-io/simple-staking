@@ -1,11 +1,13 @@
 import { apiWrapper } from "./apiWrapper";
 
-interface FinalityProviders {
-  data: FinalityProvider[];
+import { FinalityProvider, Description } from "../types/finalityProviders";
+
+interface FinalityProvidersAPIResponse {
+  data: FinalityProviderAPI[];
 }
 
-export interface FinalityProvider {
-  description: Description;
+interface FinalityProviderAPI {
+  description: DescriptionAPI;
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -14,7 +16,7 @@ export interface FinalityProvider {
   total_delegations: number;
 }
 
-interface Description {
+interface DescriptionAPI {
   moniker: string;
   identity: string;
   website: string;
@@ -22,11 +24,36 @@ interface Description {
   details: string;
 }
 
-export const getFinalityProviders = async (): Promise<FinalityProviders> => {
-  const reponse = await apiWrapper(
+// TODO: implement pagination
+export const getFinalityProviders = async (): Promise<FinalityProvider[]> => {
+  const response = await apiWrapper(
     "GET",
     "/v1/finality-providers",
     "Error getting finality providers",
   );
-  return reponse.data;
+
+  const finalityProvidersAPIResponse: FinalityProvidersAPIResponse =
+    response.data;
+  const finalityProvidersAPI: FinalityProviderAPI[] =
+    finalityProvidersAPIResponse.data;
+
+  const finalityProviders = finalityProvidersAPI.map(
+    (fp: FinalityProviderAPI): FinalityProvider => ({
+      description: {
+        moniker: fp.description.moniker,
+        identity: fp.description.identity,
+        website: fp.description.website,
+        securityContact: fp.description.security_contact,
+        details: fp.description.details,
+      },
+      commission: fp.commission,
+      btcPk: fp.btc_pk,
+      activeTVLSat: fp.active_tvl,
+      totalTVLSat: fp.total_tvl,
+      activeDelegations: fp.active_delegations,
+      totalDelegations: fp.total_delegations,
+    }),
+  );
+
+  return finalityProviders;
 };

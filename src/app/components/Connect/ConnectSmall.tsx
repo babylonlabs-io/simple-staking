@@ -5,20 +5,21 @@ import { IoMdClose } from "react-icons/io";
 import { useOnClickOutside } from "usehooks-ts";
 
 import { trim } from "@/utils/trim";
+import { satoshiToBtc } from "@/utils/btcConversions";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import { Hash } from "../Hash/Hash";
 
 interface ConnectSmallProps {
   onConnect: () => void;
   address: string;
-  balance: number;
+  balanceSat: number;
   onDisconnect: () => void;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   onConnect,
   address,
-  balance,
+  balanceSat,
   onDisconnect,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -32,14 +33,14 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   return address ? (
     <div className="relative mr-[-10px] flex text-sm" ref={ref}>
       <button
-        className="flex cursor-pointer"
+        className="flex cursor-pointer outline-none"
         onClick={() => setShowMenu(!showMenu)}
       >
         <div className="rounded-lg border border-base-200/75 p-2 pr-4">
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" />
             <p>
-              <strong>{+(balance / 1e8).toFixed(6) || 0} BTC</strong>
+              <strong>{satoshiToBtc(balanceSat).toFixed(6) || 0} BTC</strong>
             </p>
           </div>
         </div>
@@ -49,7 +50,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       </button>
       {showMenu && (
         <div
-          className="absolute right-[10px] top-0 z-10 mt-[4.5rem] flex flex-col gap-4 rounded-lg bg-base-300 p-4 shadow-lg dark:bg-base-200"
+          className="absolute right-[10px] top-0 z-10 mt-[4.5rem] flex flex-col gap-4 rounded-lg bg-base-300 p-4 shadow-lg"
           style={{
             // margin - border
             width: "calc(100% - 8px)",

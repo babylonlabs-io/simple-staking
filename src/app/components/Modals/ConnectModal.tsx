@@ -3,8 +3,6 @@ import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 
-import { useTheme } from "@/app/hooks/useTheme";
-
 interface ConnectModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
@@ -19,7 +17,6 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   connectDisabled,
 }) => {
   const modalRef = useRef(null);
-  const { lightSelected } = useTheme();
 
   const [accepted, setAccepted] = useState(false);
 
@@ -29,7 +26,6 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
       open={open}
       onClose={() => onClose(false)}
       classNames={{
-        root: `${lightSelected ? "light" : "dark"}`,
         modalContainer: "flex items-end justify-center md:items-center",
         modal:
           "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem]",

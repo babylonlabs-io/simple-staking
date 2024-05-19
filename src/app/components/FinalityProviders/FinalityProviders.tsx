@@ -1,4 +1,4 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
@@ -6,12 +6,12 @@ import { FinalityProvider } from "./FinalityProvider";
 
 interface FinalityProvidersProps {
   data: FinalityProviderInterface[] | undefined;
-  totalActiveTVL?: number;
+  totalActiveTVLSat?: number;
 }
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   data,
-  totalActiveTVL,
+  totalActiveTVLSat,
 }) => {
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
@@ -24,7 +24,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
             <span
               className="cursor-pointer text-xs"
               data-tooltip-id="tooltip-delegations"
-              data-tooltip-content="Delegations information"
+              data-tooltip-content="Total number of stake delegations"
               data-tooltip-place="top"
             >
               <AiOutlineInfoCircle />
@@ -47,12 +47,12 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         {data ? (
           data.map((finalityProvider) => (
             <FinalityProvider
-              key={finalityProvider.btc_pk}
+              key={finalityProvider.btcPk}
               moniker={finalityProvider?.description?.moniker}
-              pkHex={finalityProvider.btc_pk}
-              delegations={finalityProvider.active_delegations}
-              stake={finalityProvider.active_tvl}
-              totalActiveTVL={totalActiveTVL}
+              pkHex={finalityProvider.btcPk}
+              delegations={finalityProvider.activeDelegations}
+              stakeSat={finalityProvider.activeTVLSat}
+              totalActiveTVLSat={totalActiveTVLSat}
             />
           ))
         ) : (

@@ -2,11 +2,12 @@ import Image from "next/image";
 
 import { Hash } from "@/app/components/Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface FinalityProviderProps {
   moniker: string;
   pkHex: string;
-  stake: number;
+  stakeSat: number;
   comission: string;
   onClick: () => void;
   selected: boolean;
@@ -15,7 +16,7 @@ interface FinalityProviderProps {
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   moniker,
   pkHex,
-  stake,
+  stakeSat,
   comission,
   onClick,
   selected,
@@ -40,7 +41,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           )}
         </div>
         <Hash value={pkHex} address small noFade />
-        <p>{+(stake / 1e8).toFixed(6)} Signet BTC</p>
+        <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
         <div>{Number(comission) * 100}%</div>
       </div>
     </div>

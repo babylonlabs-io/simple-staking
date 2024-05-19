@@ -13,17 +13,16 @@ import {
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
 import { getFinalityProviders } from "./api/getFinalityProviders";
-import { Delegation, getDelegations } from "./api/getDelegations";
+import { getDelegations } from "./api/getDelegations";
+import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
-import { useTheme } from "./hooks/useTheme";
 import { Header } from "./components/Header/Header";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
-import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -33,13 +32,11 @@ import { getGlobalParams } from "./api/getGlobalParams";
 
 interface HomeProps {}
 
-const withdrawalFee = 500;
+const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
-  const { lightSelected } = useTheme();
-
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
-  const [btcWalletBalance, setBTCWalletBalance] = useState(0);
+  const [btcWalletBalanceSat, setBTCWalletBalanceSat] = useState(0);
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
@@ -54,7 +51,7 @@ const Home: React.FC<HomeProps> = () => {
           getGlobalParams(),
         ]);
         try {
-          return await getCurrentGlobalParamsVersion(height + 1, versions);
+          return getCurrentGlobalParamsVersion(height + 1, versions);
         } catch (error) {
           // No global params version found, it means the staking is not yet enabled
           return {
@@ -72,26 +69,24 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
   });
 
-  const { data: delegationsData, fetchNextPage: _fetchNextDelegationsPage } =
+  const { data: delegations, fetchNextPage: _fetchNextDelegationsPage } =
     useInfiniteQuery({
       queryKey: ["delegations", address],
       queryFn: ({ pageParam = "" }) =>
         getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
+      getNextPageParam: (lastPage) => lastPage?.pagination?.nextKey,
       initialPageParam: "",
       refetchInterval: 60000, // 1 minute
       enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => data?.pages?.flatMap((page) => page?.data),
+      select: (data) => data?.pages?.flatMap((page) => page?.delegations),
     });
 
-  const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
+  const { data: stakingStats, isLoading: stakingStatsIsLoading } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
   });
 
   // Initializing btc curve is a required one-time operation
@@ -115,7 +110,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
-    setBTCWalletBalance(0);
+    setBTCWalletBalanceSat(0);
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
@@ -137,12 +132,12 @@ const Home: React.FC<HomeProps> = () => {
         );
       }
 
-      const balance = await walletProvider.getBalance();
+      const balanceSat = await walletProvider.getBalance();
       const publicKeyNoCoord = getPublicKeyNoCoord(
         await walletProvider.getPublicKeyHex(),
       );
       setBTCWallet(walletProvider);
-      setBTCWalletBalance(balance);
+      setBTCWalletBalanceSat(balanceSat);
       setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
@@ -168,68 +163,67 @@ const Home: React.FC<HomeProps> = () => {
 
   // Remove the delegations that are already present in the API
   useEffect(() => {
-    if (!delegationsData) {
+    if (!delegations) {
       return;
     }
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegationsData?.find(
+          !delegations?.find(
             (delegation) =>
-              delegation?.staking_tx_hash_hex ===
-              localDelegation?.staking_tx_hash_hex,
+              delegation?.stakingTxHashHex ===
+              localDelegation?.stakingTxHashHex,
           ),
       ),
     );
-  }, [delegationsData, setDelegationsLocalStorage]);
+  }, [delegations, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
   const finalityProvidersKV = finalityProvidersData?.reduce(
-    (acc, fp) => ({ ...acc, [fp?.btc_pk]: fp?.description?.moniker }),
+    (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
     {},
   );
 
-  let totalStaked = 0;
+  let totalStakedSat = 0;
 
-  if (delegationsData) {
-    totalStaked = delegationsData
+  if (delegations) {
+    totalStakedSat = delegations
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
-        (accumulator: number, item) => accumulator + item?.staking_value,
+        (accumulator: number, item) => accumulator + item?.stakingValueSat,
         0,
       );
   }
 
   // these constants are needed for easier prop passing
   const overTheCap =
-    paramWithContext?.currentVersion && statsData
-      ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
+    paramWithContext?.currentVersion && stakingStats
+      ? paramWithContext.currentVersion.stakingCapSat <=
+        stakingStats.activeTVLSat
       : false;
 
   return (
-    <main
-      className={`main-app relative h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
-    >
+    <main className="main-app relative h-full min-h-svh w-full">
       <NetworkBadge />
       <Header
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
         address={address}
-        balance={btcWalletBalance}
+        balanceSat={btcWalletBalanceSat}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           <Stats
-            data={statsData}
-            isLoading={statsDataIsLoading}
-            stakingCap={paramWithContext?.currentVersion?.stakingCap}
+            stakingStats={stakingStats}
+            isLoading={stakingStatsIsLoading}
+            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
-          {address && btcWalletBalance && (
+          {address && btcWalletBalanceSat && (
             <Summary
               address={address}
-              totalStaked={totalStaked}
-              balance={btcWalletBalance}
+              totalStakedSat={totalStakedSat}
+              balanceSat={btcWalletBalanceSat}
             />
           )}
           <Staking
@@ -246,18 +240,20 @@ const Home: React.FC<HomeProps> = () => {
             setDelegationsLocalStorage={setDelegationsLocalStorage}
           />
           {btcWallet &&
-            delegationsData &&
+            delegations &&
             paramWithContext?.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
-                delegationsAPI={delegationsData}
+                delegationsAPI={delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={paramWithContext.currentVersion.unbondingFee}
-                withdrawalFee={withdrawalFee}
+                unbondingFeeSat={
+                  paramWithContext.currentVersion.unbondingFeeSat
+                }
+                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}
@@ -267,7 +263,7 @@ const Home: React.FC<HomeProps> = () => {
           {/* At this point of time is not used */}
           {/* <StakersFinalityProviders
             finalityProviders={finalityProvidersData}
-            totalActiveTVL={statsData?.active_tvl}
+            totalActiveTVLSat={stakingStats?.activeTVL}
             connected={!!btcWallet}
           /> */}
         </div>

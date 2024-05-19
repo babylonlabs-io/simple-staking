@@ -2,8 +2,8 @@ import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
-import { useTheme } from "@/app/hooks/useTheme";
 import { blocksToTime } from "@/utils/blocksToTime";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface PreviewModalProps {
   open: boolean;
@@ -23,7 +23,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   onSign,
 }) => {
   const modalRef = useRef(null);
-  const { lightSelected } = useTheme();
 
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
@@ -34,7 +33,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
       open={open}
       onClose={() => onClose(false)}
       classNames={{
-        root: `${lightSelected ? "light" : "dark"}`,
         modalContainer: "flex items-end justify-center md:items-center",
         modal:
           "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem]",
@@ -60,7 +58,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${+(amountSat / 1e8).toFixed(6)} Signet BTC`}</p>
+            <p>{`${satoshiToBtc(amountSat).toFixed(6)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex gap-4">

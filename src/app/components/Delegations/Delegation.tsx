@@ -2,16 +2,16 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import { IoIosWarning } from "react-icons/io";
 
-import { StakingTx } from "@/app/api/getDelegations";
-import { DelegationState } from "@/app/types/delegationState";
+import { StakingTx, DelegationState } from "@/app/types/delegations";
 import { durationTillNow } from "@/utils/formatTime";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { trim } from "@/utils/trim";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
   stakingTx: StakingTx;
-  stakingValue: number;
+  stakingValueSat: number;
   stakingTxHash: string;
   state: string;
   onUnbond: (id: string) => void;
@@ -27,13 +27,13 @@ export const Delegation: React.FC<DelegationProps> = ({
   stakingTx,
   stakingTxHash,
   state,
-  stakingValue,
+  stakingValueSat,
   onUnbond,
   onWithdraw,
   intermediateState,
   isOverflow,
 }) => {
-  const { start_timestamp } = stakingTx;
+  const { startTimestamp } = stakingTx;
 
   const generateActionButton = () => {
     // This function generates the unbond or withdraw button
@@ -44,7 +44,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div>
           <button
-            className="btn btn-link btn-xs inline-flex text-sm font-normal text-primary no-underline"
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
             onClick={() => onUnbond(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_UNBONDING
@@ -58,7 +58,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div>
           <button
-            className="btn btn-link btn-xs inline-flex text-sm font-normal text-primary no-underline"
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
             onClick={() => onWithdraw(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
@@ -100,8 +100,8 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
-        <p>{+(stakingValue / 1e8).toFixed(6)} Signet BTC</p>
-        <p>{durationTillNow(start_timestamp)}</p>
+        <p>{satoshiToBtc(stakingValueSat).toFixed(6)} Signet BTC</p>
+        <p>{durationTillNow(startTimestamp)}</p>
         <a
           href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
           target="_blank"
@@ -111,19 +111,17 @@ export const Delegation: React.FC<DelegationProps> = ({
           {trim(stakingTxHash)}
         </a>
         <div className="flex">
-          <div className="card border bg-base-300 px-2 py-1 dark:border-0">
-            <div className="flex items-center gap-1">
-              <p>{renderState()}</p>
-              <span
-                className="cursor-pointer text-xs"
-                data-tooltip-id={`tooltip-${stakingTxHash}`}
-                data-tooltip-content={renderStateTooltip()}
-                data-tooltip-place="top"
-              >
-                <AiOutlineInfoCircle />
-              </span>
-              <Tooltip id={`tooltip-${stakingTxHash}`} />
-            </div>
+          <div className="flex items-center gap-1">
+            <p>{renderState()}</p>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id={`tooltip-${stakingTxHash}`}
+              data-tooltip-content={renderStateTooltip()}
+              data-tooltip-place="top"
+            >
+              <AiOutlineInfoCircle />
+            </span>
+            <Tooltip id={`tooltip-${stakingTxHash}`} />
           </div>
         </div>
         {generateActionButton()}

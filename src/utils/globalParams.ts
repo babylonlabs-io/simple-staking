@@ -1,10 +1,10 @@
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 
 // This function returns the current global params version and whether the next version is approaching
 // The current version is the one that is active at the current height
 // Return currentVersion being undefined if no version is found,
 // which means the current height is lower than the first version
-export const getCurrentGlobalParamsVersion = async (
+export const getCurrentGlobalParamsVersion = (
   height: number,
   versionedParams: GlobalParamsVersion[],
 ) => {

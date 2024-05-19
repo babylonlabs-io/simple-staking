@@ -1,14 +1,12 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
 
-import { FinalityProvider } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { Delegation } from "@/app/api/getDelegations";
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Loading } from "./Loading";
 import { Message } from "./Form/States/Message";
@@ -19,17 +17,30 @@ import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { stakingSignReady } from "@/utils/stakingSignReady";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { Delegation } from "@/app/types/delegations";
 
 const stakingFee = 500;
 
+interface StakingParams {
+  minStakingAmountSat: number;
+  maxStakingAmountSat: number;
+  minStakingTime: number;
+  maxStakingTime: number;
+  stakingCapSat: number;
+}
+
 interface StakingProps {
-  finalityProviders: FinalityProvider[] | undefined;
-  paramWithContext:
-    | {
-        currentVersion: GlobalParamsVersion | undefined;
-        isApprochingNextVersion: boolean | undefined;
-      }
-    | undefined;
+  amountSat: number;
+  onAmountSatChange: (amountSat: number) => void;
+  term: number;
+  onTermChange: (term: number) => void;
+  finalityProviders: FinalityProviderInterface[] | undefined;
+  selectedFinalityProvider: FinalityProviderInterface | undefined;
+  // called when the user selects a finality provider
+  onFinalityProviderChange: (btcPkHex: string) => void;
+  onSign: () => void;
+  stakingParams: StakingParams | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
   overTheCap: boolean;
@@ -39,6 +50,12 @@ interface StakingProps {
   address: string | undefined;
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
+  paramWithContext:
+    | {
+        currentVersion: GlobalParamsVersion | undefined;
+        isApprochingNextVersion: boolean | undefined;
+      }
+    | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -57,7 +74,8 @@ export const Staking: React.FC<StakingProps> = ({
   // Staking form state
   const [stakingAmountBTC, setStakingAmountBTC] = useState(0);
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
-  const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
+  const [finalityProvider, setFinalityProvider] =
+    useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const stakingParams = paramWithContext?.currentVersion;
@@ -110,7 +128,7 @@ export const Staking: React.FC<StakingProps> = ({
       toLocalStorageDelegation(
         Transaction.fromHex(signedTxHex).getId(),
         publicKeyNoCoord,
-        finalityProvider.btc_pk,
+        finalityProvider.btcPk,
         stakingAmountSat,
         signedTxHex,
         stakingTerm,
@@ -129,7 +147,7 @@ export const Staking: React.FC<StakingProps> = ({
     if (!finalityProviders) {
       return;
     }
-    const found = finalityProviders.find((fp) => fp?.btc_pk === btcPkHex);
+    const found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
     if (found) {
       setFinalityProvider(found);
     }

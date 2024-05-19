@@ -1,17 +1,18 @@
 import { FaBitcoin } from "react-icons/fa";
 
 import { trim } from "@/utils/trim";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface SummaryProps {
   address: string;
-  totalStaked: number;
-  balance: number;
+  totalStakedSat: number;
+  balanceSat: number;
 }
 
 export const Summary: React.FC<SummaryProps> = ({
   address,
-  totalStaked,
-  balance,
+  totalStakedSat,
+  balanceSat,
 }) => {
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm xl:flex-row xl:items-center xl:justify-between xl:gap-4">
@@ -22,7 +23,8 @@ export const Summary: React.FC<SummaryProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="font-semibold">
-              {totalStaked ? +(totalStaked / 1e8).toFixed(6) : 0} Signet BTC
+              {totalStakedSat ? satoshiToBtc(totalStakedSat).toFixed(6) : 0}{" "}
+              Signet BTC
             </p>
           </div>
         </div>
@@ -32,7 +34,7 @@ export const Summary: React.FC<SummaryProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="font-semibold">
-              {balance ? +(balance / 1e8).toFixed(6) : 0} Signet BTC
+              {balanceSat ? satoshiToBtc(balanceSat).toFixed(6) : 0} Signet BTC
             </p>
           </div>
           <p className="hidden xl:flex xl:text-sm 2xl:ml-2">{trim(address)}</p>

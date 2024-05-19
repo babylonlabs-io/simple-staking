@@ -1,5 +1,6 @@
 import { AxiosResponse } from "axios";
 import { apiWrapper } from "./apiWrapper";
+import { GlobalParamsVersion } from "../types/globalParams";
 
 interface GlobalParamsDataResponse {
   versions: {
@@ -19,22 +20,6 @@ interface GlobalParamsDataResponse {
   }[];
 }
 
-export interface GlobalParamsVersion {
-  version: number;
-  activationHeight: number;
-  stakingCap: number;
-  tag: string;
-  covenantPks: string[];
-  covenantQuorum: number;
-  unbondingTime: number;
-  unbondingFee: number;
-  maxStakingAmountSat: number;
-  minStakingAmountSat: number;
-  maxStakingTimeBlocks: number;
-  minStakingTimeBlocks: number;
-  confirmationDepth: number;
-}
-
 export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
   const { data } = (await apiWrapper(
     "GET",
@@ -47,12 +32,12 @@ export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
   return versions.map((v) => ({
     version: v.version,
     activationHeight: v.activation_height,
-    stakingCap: v.staking_cap,
+    stakingCapSat: v.staking_cap,
     tag: v.tag,
     covenantPks: v.covenant_pks,
     covenantQuorum: v.covenant_quorum,
     unbondingTime: v.unbonding_time,
-    unbondingFee: v.unbonding_fee,
+    unbondingFeeSat: v.unbonding_fee,
     maxStakingAmountSat: v.max_staking_amount,
     minStakingAmountSat: v.min_staking_amount,
     maxStakingTimeBlocks: v.max_staking_time,

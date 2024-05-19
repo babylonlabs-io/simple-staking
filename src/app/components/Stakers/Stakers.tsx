@@ -26,7 +26,7 @@ export const Stakers: React.FC<StakersProps> = () => {
             <span
               className="cursor-pointer text-xs"
               data-tooltip-id="tooltip-delegations"
-              data-tooltip-content="Delegations information"
+              data-tooltip-content="Total number of stake delegations"
               data-tooltip-place="top"
             >
               <AiOutlineInfoCircle />
@@ -55,7 +55,7 @@ export const Stakers: React.FC<StakersProps> = () => {
                   key={staker.staker_pk_hex}
                   pkHex={staker.staker_pk_hex}
                   delegations={staker.active_delegations}
-                  activeTVL={staker.active_tvl}
+                  activeTVLSat={staker.active_tvl}
                 />
               ),
           )

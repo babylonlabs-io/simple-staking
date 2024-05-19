@@ -1,4 +1,4 @@
-import { DelegationState } from "@/app/types/delegationState";
+import { DelegationState } from "@/app/types/delegations";
 
 // Convert state to human readable format
 export const getState = (state: string) => {
@@ -42,9 +42,8 @@ export const getStateTooltip = (state: string) => {
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:
       return "Stake has been withdrawn";
-    // TODO  Add the x/6 that we had before?
     case DelegationState.PENDING:
-      return "Stake has not received sufficient confirmations";
+      return "Stake is pending 6 Bitcoin confirmations";
     case DelegationState.OVERFLOW:
       return "Stake is over the staking cap";
     case DelegationState.EXPIRED:
