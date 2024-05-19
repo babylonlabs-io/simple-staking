@@ -92,7 +92,7 @@ const Home: React.FC<HomeProps> = () => {
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
     queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
-    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key ?? null,
+    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key !== "" ? lastPage?.pagination?.next_key : null,
     initialPageParam: "",
     refetchInterval: 60000, // 1 minute
     select: (data) => {
@@ -118,7 +118,7 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["delegations", address, publicKeyNoCoord],
     queryFn: ({ pageParam = "" }) =>
       getDelegations(pageParam, publicKeyNoCoord),
-    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key ?? null,
+    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key !== "" ? lastPage?.pagination?.next_key : null,
     initialPageParam: "",
     refetchInterval: 60000, // 1 minute
     enabled: !!(btcWallet && publicKeyNoCoord && address),
