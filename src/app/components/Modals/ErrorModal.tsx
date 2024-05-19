@@ -54,6 +54,10 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return "Unbounding Eligiblity Error";
       case ErrorState.SWITCH_NETWORK:
         return "Network Error";
+      case ErrorState.WITHDRAW:
+        return "Withdraw Error";
+      case ErrorState.STAKE:
+        return "Stake Error";
       default:
         return "Unknown Error";
     }
@@ -77,6 +81,10 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return `Failed to fetch unbounding eligiblity due to: ${errorMessage}`;
       case ErrorState.SWITCH_NETWORK:
         return `Failed to switch network due to: ${errorMessage}`;
+      case ErrorState.WITHDRAW:
+        return `Failed to withdraw due to: ${errorMessage}`;
+      case ErrorState.STAKE:
+        return `Failed to stake due to ${errorMessage}`;
       default:
         return errorMessage;
     }

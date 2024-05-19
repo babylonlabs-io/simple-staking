@@ -8,6 +8,7 @@ export enum ErrorState {
   POST_UNBOUNDING = "POST_UNBOUNDING",
   SWITCH_NETWORK = "SWITCH_NETWORK",
   WITHDRAW = "WITHDRAW",
+  STAKE = "STAKE"
 }
 
 export interface ErrorType {

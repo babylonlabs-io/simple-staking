@@ -303,7 +303,14 @@ const Home: React.FC<HomeProps> = () => {
         publicKeyNoCoord,
       );
     } catch (error: Error | any) {
-      // TODO Show Popup
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.STAKE,
+          errorTime: new Date(),
+        },
+        retryAction: handleSign,
+      });
       console.error(error?.message || "Error signing the form");
       throw error;
     }
