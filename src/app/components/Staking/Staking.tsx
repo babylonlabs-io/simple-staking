@@ -3,6 +3,7 @@ import { Transaction, networks } from "bitcoinjs-lib";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
+import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
@@ -19,7 +20,6 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
-import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 
 const stakingFeeSat = 500;
 
