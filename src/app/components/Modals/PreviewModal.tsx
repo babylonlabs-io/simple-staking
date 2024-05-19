@@ -8,7 +8,7 @@ import { blocksToTime } from "@/utils/blocksToTime";
 interface PreviewModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
-  onSign: () => void;
+  onSign: (amountSat: number, stakingTimeBlocks: number) => Promise<void>;
   finalityProvider: string | undefined;
   amountSat: number;
   stakingTimeBlocks: number;
@@ -97,7 +97,10 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           >
             Cancel
           </button>
-          <button className="btn-primary btn flex-1" onClick={onSign}>
+          <button
+            className="btn-primary btn flex-1"
+            onClick={() => onSign(amountSat, stakingTimeBlocks)}
+          >
             Stake
           </button>
         </div>
