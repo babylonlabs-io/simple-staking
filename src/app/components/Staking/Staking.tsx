@@ -139,7 +139,7 @@ export const Staking: React.FC<StakingProps> = ({
     setStakingAmountSat(inputAmountSat);
   };
 
-  const handleStakingTimeChange = (inputTimeBlocks: number) => {
+  const handleStakingTimeBlocksChange = (inputTimeBlocks: number) => {
     setStakingTimeBlocks(inputTimeBlocks);
   };
 
@@ -223,7 +223,7 @@ export const Staking: React.FC<StakingProps> = ({
                 minStakingTimeBlocks={minStakingTimeBlocks}
                 maxStakingTimeBlocks={maxStakingTimeBlocks}
                 stakingTimeBlocks={stakingTimeBlocks}
-                onStakingTimeChange={handleStakingTimeChange}
+                onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
               />
               <StakingAmount
                 minStakingAmountSat={minStakingAmountSat}

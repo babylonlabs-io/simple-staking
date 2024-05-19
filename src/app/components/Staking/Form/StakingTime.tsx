@@ -4,14 +4,14 @@ interface StakingTimeProps {
   minStakingTimeBlocks: number;
   maxStakingTimeBlocks: number;
   stakingTimeBlocks: number;
-  onStakingTimeChange: (inputTimeBlocks: number) => void;
+  onStakingTimeBlocksChange: (inputTimeBlocks: number) => void;
 }
 
 export const StakingTime: React.FC<StakingTimeProps> = ({
   minStakingTimeBlocks,
   maxStakingTimeBlocks,
   stakingTimeBlocks,
-  onStakingTimeChange,
+  onStakingTimeBlocksChange,
 }) => {
   const isFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
   if (isFixed) {
@@ -44,7 +44,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
         min={minStakingTimeBlocks}
         max={maxStakingTimeBlocks}
         value={stakingTimeBlocks}
-        onChange={(e) => onStakingTimeChange(Number(e.target.value))}
+        onChange={(e) => onStakingTimeBlocksChange(Number(e.target.value))}
       />
       <div className="label flex justify-end">
         <span className="label-text-alt">
