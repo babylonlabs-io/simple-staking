@@ -1,14 +1,16 @@
+import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
+
 interface StakingAmountProps {
-  minStakingAmountBTC: number;
-  maxStakingAmountBTC: number;
-  stakingAmountBTC: number;
-  onStakingAmountChange: (inputAmountBTC: number) => void;
+  minStakingAmountSat: number;
+  maxStakingAmountSat: number;
+  stakingAmountSat: number;
+  onStakingAmountChange: (inputAmountSat: number) => void;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
-  minStakingAmountBTC,
-  maxStakingAmountBTC,
-  stakingAmountBTC,
+  minStakingAmountSat,
+  maxStakingAmountSat,
+  stakingAmountSat,
   onStakingAmountChange,
 }) => {
   return (
@@ -20,15 +22,17 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         type="number"
         placeholder="BTC"
         className="no-focus input input-bordered w-full"
-        min={minStakingAmountBTC}
-        max={maxStakingAmountBTC}
+        min={satoshiToBtc(minStakingAmountSat)}
+        max={satoshiToBtc(maxStakingAmountSat)}
         step={0.00001}
-        value={stakingAmountBTC}
-        onChange={(e) => onStakingAmountChange(Number(e.target.value))}
+        value={satoshiToBtc(stakingAmountSat)}
+        onChange={(e) =>
+          onStakingAmountChange(btcToSatoshi(Number(e.target.value)))
+        }
       />
       <div className="label flex justify-end">
         <span className="label-text-alt">
-          min stake is {minStakingAmountBTC} Signet BTC
+          min stake is {satoshiToBtc(minStakingAmountSat)} Signet BTC
         </span>
       </div>
     </label>

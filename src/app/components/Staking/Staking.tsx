@@ -3,7 +3,6 @@ import { Transaction, networks } from "bitcoinjs-lib";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
-import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
@@ -56,7 +55,7 @@ export const Staking: React.FC<StakingProps> = ({
   setDelegationsLocalStorage,
 }) => {
   // Staking form state
-  const [stakingAmountBTC, setStakingAmountBTC] = useState(0);
+  const [stakingAmountSat, setStakingAmountSat] = useState(0);
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
@@ -78,7 +77,6 @@ export const Staking: React.FC<StakingProps> = ({
       throw new Error("Finality provider not selected");
     }
     const { currentVersion: globalParamsVersion } = paramWithContext;
-    const stakingAmountSat = amountSat;
     const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
     let signedTxHex: string;
     try {
@@ -88,7 +86,7 @@ export const Staking: React.FC<StakingProps> = ({
         finalityProvider,
         stakingTerm,
         btcWalletNetwork,
-        stakingAmountSat,
+        amountSat,
         address,
         stakingFeeSat,
         publicKeyNoCoord,
@@ -121,7 +119,7 @@ export const Staking: React.FC<StakingProps> = ({
     ]);
 
     setFinalityProvider(undefined);
-    setStakingAmountBTC(0);
+    setStakingAmountSat(0);
     setStakingTimeBlocks(0);
     setPreviewModalOpen(false);
   };
@@ -137,8 +135,8 @@ export const Staking: React.FC<StakingProps> = ({
     }
   };
 
-  const handleStakingAmountChange = (inputAmountBTC: number) => {
-    setStakingAmountBTC(inputAmountBTC);
+  const handleStakingAmountChange = (inputAmountSat: number) => {
+    setStakingAmountSat(inputAmountSat);
   };
 
   const handleStakingTimeChange = (inputTimeBlocks: number) => {
@@ -208,14 +206,14 @@ export const Staking: React.FC<StakingProps> = ({
         maxStakingAmountSat,
         minStakingTimeBlocks,
         maxStakingTimeBlocks,
-        stakingAmountBTC,
+        stakingAmountSat,
         stakingTimeBlocks,
         finalityProvider,
       );
 
       // Staking time is fixed
       const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
-      const amountSat = Math.round(btcToSatoshi(stakingAmountBTC));
+      const amountSat = Math.round(stakingAmountSat);
 
       return (
         <>
@@ -229,9 +227,9 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingTimeChange={handleStakingTimeChange}
               />
               <StakingAmount
-                minStakingAmountBTC={satoshiToBtc(minStakingAmountSat)}
-                maxStakingAmountBTC={satoshiToBtc(maxStakingAmountSat)}
-                stakingAmountBTC={stakingAmountBTC}
+                minStakingAmountSat={minStakingAmountSat}
+                maxStakingAmountSat={maxStakingAmountSat}
+                stakingAmountSat={stakingAmountSat}
                 onStakingAmountChange={handleStakingAmountChange}
               />
             </div>
