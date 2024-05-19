@@ -18,6 +18,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
+import { stakingSignReady } from "@/utils/stakingSignReady";
 
 const stakingFee = 500;
 
@@ -199,32 +200,19 @@ export const Staking: React.FC<StakingProps> = ({
         maxStakingTimeBlocks,
       } = stakingParams;
 
-      const minAmountBTC = minStakingAmountSat ? minStakingAmountSat / 1e8 : 0;
-      const maxAmountBTC = maxStakingAmountSat ? maxStakingAmountSat / 1e8 : 0;
+      // Check if the staking transaction is ready to be signed
+      const signReady = stakingSignReady(
+        minStakingAmountSat,
+        maxStakingAmountSat,
+        minStakingTimeBlocks,
+        maxStakingTimeBlocks,
+        stakingAmountBTC,
+        stakingTimeBlocks,
+        finalityProvider,
+      );
 
-      // API data is ready
-      const stakingAmountAPIReady = minStakingAmountSat && maxStakingAmountSat;
-      // App inputs are filled
-      const stakingAmountAppReady =
-        stakingAmountBTC >= minAmountBTC && stakingAmountBTC <= maxAmountBTC;
-      // Amount is ready
-      const stakingAmountReady = stakingAmountAPIReady && stakingAmountAppReady;
-
-      // API data is ready
-      const stakingTimeAPIReady = minStakingTimeBlocks && maxStakingTimeBlocks;
-      // App inputs are filled
-      const stakingTimeAppReady =
-        stakingTimeBlocks >= minStakingTimeBlocks &&
-        stakingTimeBlocks <= maxStakingTimeBlocks;
       // Staking time is fixed
       const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
-      // Staking time is ready
-      const stakingTimeReady =
-        stakingTimeAPIReady && (stakingTimeAppReady || stakingTimeFixed);
-
-      const signReady =
-        stakingAmountReady && stakingTimeReady && finalityProvider;
-
       // Rounding the input since 0.0006 * 1e8 is is 59999.999
       const amountSat = Math.round(stakingAmountBTC * 1e8);
 
@@ -240,8 +228,8 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingTimeChange={handleStakingTimeChange}
               />
               <StakingAmount
-                minStakingAmountBTC={minAmountBTC}
-                maxStakingAmountBTC={maxAmountBTC}
+                minStakingAmountBTC={minStakingAmountSat / 1e8}
+                maxStakingAmountBTC={maxStakingAmountSat / 1e8}
                 stakingAmountBTC={stakingAmountBTC}
                 onStakingAmountChange={handleStakingAmountChange}
               />
