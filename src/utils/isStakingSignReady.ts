@@ -23,10 +23,8 @@ export const isStakingSignReady = (
   const timeParametersReady = minTime && maxTime;
   // App values are filled
   const timeValuesReady = time >= minTime && time <= maxTime;
-  // Staking time is fixed
-  const timeIsFixed = minTime === maxTime;
   // Staking time is ready
-  const timeIsReady = timeParametersReady && (timeValuesReady || timeIsFixed);
+  const timeIsReady = timeParametersReady && timeValuesReady;
 
   return amountIsReady && timeIsReady && itemSelected;
 };

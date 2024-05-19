@@ -207,6 +207,14 @@ export const Staking: React.FC<StakingProps> = ({
         maxStakingTimeBlocks,
       } = stakingParams;
 
+      // Staking time is fixed
+      const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
+
+      // Takes into account the fixed staking time
+      const stakingTimeBlocksWithFixed = stakingTimeFixed
+        ? minStakingTimeBlocks
+        : stakingTimeBlocks;
+
       // Check if the staking transaction is ready to be signed
       const signReady = isStakingSignReady(
         minStakingAmountSat,
@@ -214,12 +222,9 @@ export const Staking: React.FC<StakingProps> = ({
         minStakingTimeBlocks,
         maxStakingTimeBlocks,
         stakingAmountSat,
-        stakingTimeBlocks,
+        stakingTimeBlocksWithFixed,
         !!finalityProvider,
       );
-
-      // Staking time is fixed
-      const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
 
       return (
         <>
@@ -252,9 +257,7 @@ export const Staking: React.FC<StakingProps> = ({
               onSign={handleSign}
               finalityProvider={finalityProvider?.description.moniker}
               stakingAmountSat={stakingAmountSat}
-              stakingTimeBlocks={
-                stakingTimeFixed ? minStakingTimeBlocks : stakingTimeBlocks
-              }
+              stakingTimeBlocks={stakingTimeBlocksWithFixed}
             />
           </div>
         </>
