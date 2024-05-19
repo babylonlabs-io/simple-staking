@@ -6,14 +6,14 @@ import { Logo } from "./Logo";
 interface HeaderProps {
   onConnect: () => void;
   address: string;
-  balance: number;
+  balanceSat: number;
   onDisconnect: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onConnect,
   address,
-  balance,
+  balanceSat,
   onDisconnect,
 }) => {
   return (
@@ -29,7 +29,7 @@ export const Header: React.FC<HeaderProps> = ({
           <ConnectSmall
             onConnect={onConnect}
             address={address}
-            balance={balance}
+            balanceSat={balanceSat}
             onDisconnect={onDisconnect}
           />
           {!address && <ThemeToggle />}

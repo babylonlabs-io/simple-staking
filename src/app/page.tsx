@@ -38,17 +38,17 @@ import { getGlobalParams } from "./api/getGlobalParams";
 
 interface HomeProps {}
 
-const stakingFee = 500;
-const withdrawalFee = 500;
+const stakingFeeSat = 500;
+const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
-  const [btcWalletBalance, setBTCWalletBalance] = useState(0);
+  const [btcWalletBalanceSat, setBTCWalletBalanceSat] = useState(0);
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState(0);
+  const [amountSat, setAmountSat] = useState(0);
   const [term, setTerm] = useState(0);
   const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
@@ -122,7 +122,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
-    setBTCWalletBalance(0);
+    setBTCWalletBalanceSat(0);
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
@@ -144,12 +144,12 @@ const Home: React.FC<HomeProps> = () => {
         );
       }
 
-      const balance = await walletProvider.getBalance();
+      const balanceSat = await walletProvider.getBalance();
       const publicKeyNoCoord = getPublicKeyNoCoord(
         await walletProvider.getPublicKeyHex(),
       );
       setBTCWallet(walletProvider);
-      setBTCWalletBalance(balance);
+      setBTCWalletBalanceSat(balanceSat);
       setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
@@ -195,9 +195,6 @@ const Home: React.FC<HomeProps> = () => {
       throw new Error("Finality provider not selected");
     }
     const { currentVersion: globalParamsVersion } = paramWithContext;
-    // Rounding the input since 0.0006 * 1e8 is is 59999.999
-    // which won't be accepted by the mempool API
-    const stakingAmount = Math.round(Number(amount) * 1e8);
     const stakingTerm = getStakingTerm(globalParamsVersion, term);
     let signedTxHex: string;
     try {
@@ -207,9 +204,9 @@ const Home: React.FC<HomeProps> = () => {
         finalityProvider,
         stakingTerm,
         btcWalletNetwork,
-        stakingAmount,
+        amountSat,
         address,
-        stakingFee,
+        stakingFeeSat,
         publicKeyNoCoord,
       );
     } catch (error: Error | any) {
@@ -232,7 +229,7 @@ const Home: React.FC<HomeProps> = () => {
         Transaction.fromHex(signedTxHex).getId(),
         publicKeyNoCoord,
         finalityProvider.btc_pk,
-        stakingAmount,
+        amountSat,
         signedTxHex,
         stakingTerm,
       ),
@@ -240,7 +237,7 @@ const Home: React.FC<HomeProps> = () => {
     ]);
 
     // Clear the form
-    setAmount(0);
+    setAmountSat(0);
     setTerm(0);
     setFinalityProvider(undefined);
   };
@@ -268,10 +265,10 @@ const Home: React.FC<HomeProps> = () => {
     {},
   );
 
-  let totalStaked = 0;
+  let totalStakedSat = 0;
 
   if (delegationsData) {
-    totalStaked = delegationsData
+    totalStakedSat = delegationsData
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
@@ -283,7 +280,7 @@ const Home: React.FC<HomeProps> = () => {
   // these constants are needed for easier prop passing
   const overTheCap =
     paramWithContext?.currentVersion && statsData
-      ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
+      ? paramWithContext.currentVersion.stakingCapSat <= statsData.active_tvl
       : false;
 
   return (
@@ -293,25 +290,25 @@ const Home: React.FC<HomeProps> = () => {
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
         address={address}
-        balance={btcWalletBalance}
+        balanceSat={btcWalletBalanceSat}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
-            stakingCap={paramWithContext?.currentVersion?.stakingCap}
+            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
-          {address && btcWalletBalance && (
+          {address && btcWalletBalanceSat && (
             <Summary
               address={address}
-              totalStaked={totalStaked}
-              balance={btcWalletBalance}
+              totalStakedSat={totalStakedSat}
+              balanceSat={btcWalletBalanceSat}
             />
           )}
           <Staking
-            amount={amount}
-            onAmountChange={setAmount}
+            amountSat={amountSat}
+            onAmountSatChange={setAmountSat}
             term={term}
             onTermChange={setTerm}
             finalityProviders={finalityProvidersData}
@@ -336,8 +333,8 @@ const Home: React.FC<HomeProps> = () => {
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={paramWithContext.currentVersion.unbondingFee}
-                withdrawalFee={withdrawalFee}
+                unbondingFeeSat={paramWithContext.currentVersion.unbondingFeeSat}
+                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}
@@ -347,7 +344,7 @@ const Home: React.FC<HomeProps> = () => {
           {/* At this point of time is not used */}
           {/* <StakersFinalityProviders
             finalityProviders={finalityProvidersData}
-            totalActiveTVL={statsData?.active_tvl}
+            totalActiveTVLSat={statsData?.active_tvl}
             connected={!!btcWallet}
           /> */}
         </div>
