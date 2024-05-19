@@ -2,8 +2,6 @@ import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
-import { useTheme } from "@/app/hooks/useTheme";
-
 interface PreviewModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
@@ -22,7 +20,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   onSign,
 }) => {
   const modalRef = useRef(null);
-  const { lightSelected } = useTheme();
 
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
@@ -33,7 +30,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
       open={open}
       onClose={() => onClose(false)}
       classNames={{
-        root: `${lightSelected ? "light" : "dark"}`,
         modalContainer: "flex items-end justify-center md:items-center",
         modal:
           "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem]",

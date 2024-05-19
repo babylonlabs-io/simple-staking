@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  darkMode: "class",
+  darkMode: ["selector", '[data-theme="dark"]'],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -29,6 +29,9 @@ const config: Config = {
   },
   plugins: [require("daisyui")],
   daisyui: {
+    darkTheme: "dark", // name of one of the included themes for dark mode
+    // base: true,
+    logs: false,
     themes: [
       {
         light: {
