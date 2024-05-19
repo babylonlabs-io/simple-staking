@@ -1,4 +1,3 @@
-import { encode } from "url-safe-base64";
 import { generateRandomDelegationData } from "./mockGenerateDelegationsData";
 import { Delegations } from "@/app/api/getDelegations";
 

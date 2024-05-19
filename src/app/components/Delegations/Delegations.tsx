@@ -6,6 +6,7 @@ import {
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { Delegation as DelegationInterface } from "@/app/api/getDelegations";
 import { Delegation } from "./Delegation";
@@ -21,7 +22,6 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import InfiniteScroll from "react-infinite-scroll-component";
 import {
   UnbondWithdrawModal,
   MODE,
@@ -388,8 +388,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
                     stakingValue={staking_value}
                     stakingTxHash={staking_tx_hash_hex}
                     state={state}
-                    onUnbond={handleUnbondWithErrors}
-                    onWithdraw={handleWithdrawWithErrors}
+                    onUnbond={() => handleModal(staking_tx_hash_hex, MODE_UNBOND)}
+                    onWithdraw={() => handleModal(staking_tx_hash_hex, MODE_WITHDRAW)}
                     intermediateState={intermediateDelegation?.state}
                     isOverflow={is_overflow}
                   />

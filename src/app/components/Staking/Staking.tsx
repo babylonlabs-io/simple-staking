@@ -1,11 +1,11 @@
 import { useState } from "react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
 import { PreviewModal } from "../Modals/PreviewModal";
 import { blocksToTime } from "@/utils/blocksToTime";
 import { ConnectLarge } from "../Connect/ConnectLarge";
-import InfiniteScroll from "react-infinite-scroll-component";
 
 interface StakingParams {
   minStakingAmount: number;

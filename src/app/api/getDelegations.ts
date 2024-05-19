@@ -43,8 +43,8 @@ export const getDelegations = async (
     throw new Error("No public key provided");
   }
 
-  const limit = 100;
-  const reverse = false;
+  // const limit = 100;
+  // const reverse = false;
 
   const params = {
     pagination_key: encode(key),

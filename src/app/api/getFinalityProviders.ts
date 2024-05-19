@@ -31,8 +31,8 @@ interface Description {
 export const getFinalityProviders = async (
   key: string,
 ): Promise<FinalityProviders> => {
-  const limit = 100;
-  const reverse = false;
+  // const limit = 100;
+  // const reverse = false;
 
   const params = {
     pagination_key: encode(key),

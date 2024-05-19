@@ -1,8 +1,8 @@
 import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import { FinalityProvider } from "./FinalityProvider";
-import InfiniteScroll from "react-infinite-scroll-component";
 
 import { Tooltip } from "react-tooltip";
 
