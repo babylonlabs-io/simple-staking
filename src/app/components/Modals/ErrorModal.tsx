@@ -1,9 +1,9 @@
 import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
-import { useTheme } from "@/app/hooks/useTheme";
 import { format } from "date-fns";
 import { ErrorState } from "@/app/types/errorState";
+import { useTheme } from "next-themes";
 
 interface ErrorModalProps {
   open: boolean;
@@ -23,7 +23,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   errorTime,
 }) => {
   const modalRef = useRef(null);
-  const { lightSelected } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const lightSelected = resolvedTheme === "light";
 
   const handleRetry = () => {
     if (onRetry) {

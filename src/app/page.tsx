@@ -96,7 +96,10 @@ const Home: React.FC<HomeProps> = () => {
         retryAction: refetchGlobalParamsVersion,
       });
     }
-  }, [globalParamsVersionError, showError, refetchGlobalParamsVersion]);
+    return () => {
+      hideError();
+    };
+  }, [globalParamsVersionError, refetchGlobalParamsVersion, showError, hideError]);
 
   const {
     data: finalityProvidersData,
@@ -121,7 +124,10 @@ const Home: React.FC<HomeProps> = () => {
         retryAction: refetchFinalityProvidersData,
       });
     }
-  }, [finalityProvidersError, showError, refetchFinalityProvidersData]);
+    return () => {
+      hideError();
+    };
+  }, [finalityProvidersError, refetchFinalityProvidersData, showError, hideError]);
 
   const {
     data: delegationsData,
@@ -152,7 +158,10 @@ const Home: React.FC<HomeProps> = () => {
         retryAction: refetchDelegationData,
       });
     }
-  }, [delegationError, refetchDelegationData, showError]);
+    return () => {
+      hideError();
+    };
+  }, [delegationError, refetchDelegationData, showError, hideError]);
 
   const {
     data: statsData,
@@ -178,7 +187,10 @@ const Home: React.FC<HomeProps> = () => {
         retryAction: refetchStats,
       });
     }
-  }, [statsError, showError, refetchStats]);
+    return () => {
+      hideError();
+    };
+  }, [statsError, refetchStats, showError, hideError]);
 
   // Initializing btc curve is a required one-time operation
   useEffect(() => {

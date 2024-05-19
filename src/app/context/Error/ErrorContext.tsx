@@ -34,7 +34,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     errorCode: "",
     errorTime: new Date(),
     errorState: undefined,
-    metadata: undefined,
   });
   const [retryErrorAction, setRetryErrorAction] = useState<
     (() => void) | undefined
@@ -53,7 +52,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       errorCode: "",
       errorTime: new Date(),
       errorState: undefined,
-      metadata: undefined,
     });
     setRetryErrorAction(undefined);
   }, []);

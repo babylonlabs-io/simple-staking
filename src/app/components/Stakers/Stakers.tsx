@@ -11,7 +11,7 @@ import { ErrorState } from "@/app/types/errorState";
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { showError } = useError();
+  const { showError, hideError } = useError();
 
   const {
     data: stakersData,
@@ -36,7 +36,10 @@ export const Stakers: React.FC<StakersProps> = () => {
         retryAction: refetch,
       });
     }
-  }, [error, showError, refetch]);
+    return () => {
+      hideError();
+    };
+  }, [error, refetch, showError, hideError]);
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
