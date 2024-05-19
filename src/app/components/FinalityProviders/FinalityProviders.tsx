@@ -37,7 +37,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
             <span
               className="cursor-pointer text-xs"
               data-tooltip-id="tooltip-delegations"
-              data-tooltip-content="Delegations information"
+              data-tooltip-content="Total number of stake delegations"
               data-tooltip-place="top"
             >
               <AiOutlineInfoCircle />
