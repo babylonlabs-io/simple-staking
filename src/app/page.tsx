@@ -22,7 +22,6 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
-import { useTheme } from "./hooks/useTheme";
 import { Header } from "./components/Header/Header";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
@@ -43,8 +42,6 @@ const stakingFee = 500;
 const withdrawalFee = 500;
 
 const Home: React.FC<HomeProps> = () => {
-  const { lightSelected } = useTheme();
-
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletBalance, setBTCWalletBalance] = useState(0);
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
@@ -290,9 +287,7 @@ const Home: React.FC<HomeProps> = () => {
       : false;
 
   return (
-    <main
-      className={`main-app relative h-full min-h-svh w-full ${lightSelected ? "light" : "dark"}`}
-    >
+    <main className="main-app relative h-full min-h-svh w-full">
       <NetworkBadge />
       <Header
         onConnect={handleConnectModal}

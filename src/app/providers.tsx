@@ -10,7 +10,7 @@ function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(new QueryClient());
 
   return (
-    <ThemeProvider defaultTheme="dark" enableSystem={false}>
+    <ThemeProvider defaultTheme="dark" attribute="data-theme">
       <QueryClientProvider client={client}>
         <ReactQueryStreamedHydration>{children}</ReactQueryStreamedHydration>
         <ReactQueryDevtools
