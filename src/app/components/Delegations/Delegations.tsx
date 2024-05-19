@@ -354,7 +354,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
               key={staking_tx_hash_hex + staking_tx.start_height}
               finalityProviderMoniker={finalityProviderMoniker}
               stakingTx={staking_tx}
-              stakingValue={staking_value}
+              stakingValueSat={staking_value}
               stakingTxHash={staking_tx_hash_hex}
               state={state}
               onUnbond={() => handleModal(staking_tx_hash_hex, MODE_UNBOND)}

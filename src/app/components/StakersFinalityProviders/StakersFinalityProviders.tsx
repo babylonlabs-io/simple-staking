@@ -6,19 +6,19 @@ import { FinalityProviders } from "../FinalityProviders/FinalityProviders";
 
 interface StakersFinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
-  totalActiveTVL?: number;
+  totalActiveTVLSat?: number;
   connected?: boolean;
 }
 
 export const StakersFinalityProviders: React.FC<
   StakersFinalityProvidersProps
-> = ({ finalityProviders, totalActiveTVL, connected }) => {
+> = ({ finalityProviders, totalActiveTVLSat, connected }) => {
   // At this point of time we disable the Stakers tab
   return (
     <div>
       <FinalityProviders
         data={finalityProviders}
-        totalActiveTVL={totalActiveTVL}
+        totalActiveTVLSat={totalActiveTVLSat}
       />
     </div>
   );

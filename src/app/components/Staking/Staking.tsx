@@ -5,6 +5,7 @@ import { FinalityProvider } from "./FinalityProvider";
 import { PreviewModal } from "../Modals/PreviewModal";
 import { blocksToTime } from "@/utils/blocksToTime";
 import { ConnectLarge } from "../Connect/ConnectLarge";
+import { satoshiToBtc, btcToSatoshi } from "@/utils/btcConversions";
 
 interface StakingParams {
   minStakingAmount: number;
@@ -15,8 +16,8 @@ interface StakingParams {
 }
 
 interface StakingProps {
-  amount: number;
-  onAmountChange: (amount: number) => void;
+  amountSat: number;
+  onAmountSatChange: (amount: number) => void;
   term: number;
   onTermChange: (term: number) => void;
   finalityProviders: FinalityProviderInterface[] | undefined;
@@ -34,8 +35,8 @@ interface StakingProps {
 }
 
 export const Staking: React.FC<StakingProps> = ({
-  amount,
-  onAmountChange,
+  amountSat,
+  onAmountSatChange,
   term,
   onTermChange,
   finalityProviders,
@@ -173,17 +174,20 @@ export const Staking: React.FC<StakingProps> = ({
         minStakingTime === maxStakingTime ||
         (term >= minStakingTime && term <= maxStakingTime);
 
-      const minAmountBTC = minStakingAmount ? minStakingAmount / 1e8 : 0;
-      const maxAmountBTC = maxStakingAmount ? maxStakingAmount / 1e8 : 0;
-
       const amountReady =
-        minAmountBTC &&
-        maxAmountBTC &&
-        amount >= minAmountBTC &&
-        amount <= maxAmountBTC;
+        minStakingAmount &&
+        maxStakingAmount &&
+        amountSat >= minStakingAmount &&
+        amountSat <= maxStakingAmount;
 
       const signReady =
         amountReady && stakingTimeReady && selectedFinalityProvider;
+      
+      // Do the conversion to BTC for presentational purposes
+      const minStakingAmountBtc = satoshiToBtc(minStakingAmount)
+      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmount)
+      const selectedStakingAmountBtc = satoshiToBtc(amountSat)
+
       return (
         <>
           <div className="flex flex-col gap-1">
@@ -201,15 +205,16 @@ export const Staking: React.FC<StakingProps> = ({
                   type="number"
                   placeholder="BTC"
                   className="no-focus input input-bordered w-full"
-                  min={minAmountBTC}
-                  max={maxAmountBTC}
+                  min={minStakingAmountBtc}
+                  max={maxStakingAmountBtc}
                   step={0.00001}
-                  value={amount}
-                  onChange={(e) => onAmountChange(Number(e.target.value))}
+                  value={selectedStakingAmountBtc}
+                  // Convert the BTC amount to satoshis to keep internal values only in satoshis
+                  onChange={(e) => onAmountSatChange(btcToSatoshi(Number(e.target.value)))}
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
-                    min stake is {minAmountBTC} Signet BTC
+                    min stake is {minStakingAmountBtc} Signet BTC
                   </span>
                 </div>
               </label>
@@ -226,7 +231,7 @@ export const Staking: React.FC<StakingProps> = ({
               onClose={setPreviewModalOpen}
               onSign={onSign}
               finalityProvider={selectedFinalityProvider?.description.moniker}
-              amount={amount * 1e8}
+              amountSat={amountSat}
               term={term}
             />
           </div>
@@ -266,7 +271,7 @@ export const Staking: React.FC<StakingProps> = ({
                 key={fp.btc_pk}
                 moniker={fp.description.moniker}
                 pkHex={fp.btc_pk}
-                stake={fp.active_tvl}
+                stakeSat={fp.active_tvl}
                 comission={fp.commission}
                 selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
                 onClick={() => onFinalityProviderChange(fp.btc_pk)}

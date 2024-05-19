@@ -5,24 +5,25 @@ import Image from "next/image";
 
 import { Hash } from "../Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface FinalityProviderProps {
   pkHex: string;
   delegations: number;
-  stake: number;
+  stakeSat: number;
   moniker?: string;
-  totalActiveTVL?: number;
+  totalActiveTVLSat?: number;
 }
 
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   pkHex,
   delegations,
-  stake,
+  stakeSat,
   moniker,
-  totalActiveTVL,
+  totalActiveTVLSat,
 }) => {
-  const percentage = totalActiveTVL
-    ? `${Math.round((stake / totalActiveTVL) * 100)}%`
+  const percentage = totalActiveTVLSat
+    ? `${Math.round((stakeSat / totalActiveTVLSat) * 100)}%`
     : "-";
 
   const generateFpNoInfoTooltip = (defaultValue: string, tooltip: string) => {
@@ -65,9 +66,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div>
         <p>{delegations}</p>
         <div className="flex gap-1 lg:hidden">
-          {stake ? (
+          {stakeSat ? (
             <>
-              <p>{+(stake / 1e8).toFixed(6)} Signet BTC</p>
+              <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
@@ -76,9 +77,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         </div>
       </div>
       <div className="hidden gap-1 lg:flex">
-        {stake ? (
+        {stakeSat ? (
           <>
-            <p>{+(stake / 1e8).toFixed(6)} Signet BTC</p>
+            <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (

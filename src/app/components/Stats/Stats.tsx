@@ -9,6 +9,7 @@ import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface StatsProps {
   data: StatsData | undefined;
@@ -31,21 +32,21 @@ export const Stats: React.FC<StatsProps> = ({
       {
         title: "Staking TVL Cap",
         value: stakingCap
-          ? `${+(stakingCap / 1e8).toFixed(6)} Signet BTC`
+          ? `${satoshiToBtc(stakingCap).toFixed(6)} Signet BTC`
           : "-",
         icon: stakingTvlCap,
       },
       {
         title: "Confirmed TVL",
         value: data?.active_tvl
-          ? `${+(data.active_tvl / 1e8).toFixed(6)} Signet BTC`
+          ? `${satoshiToBtc(data.active_tvl).toFixed(6)} Signet BTC`
           : 0,
         icon: confirmedTvl,
       },
       {
         title: "Pending Stake",
         value: data?.unconfirmed_tvl
-          ? `${+((data.unconfirmed_tvl - data.active_tvl) / 1e8).toFixed(6)} Signet BTC`
+          ? `${satoshiToBtc(data.unconfirmed_tvl - data.active_tvl).toFixed(6)} Signet BTC`
           : 0,
         icon: pendingStake,
       },
