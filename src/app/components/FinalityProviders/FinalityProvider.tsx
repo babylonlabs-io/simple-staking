@@ -3,9 +3,9 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import Image from "next/image";
 
-import { Hash } from "../Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { Hash } from "../Hash/Hash";
 
 interface FinalityProviderProps {
   pkHex: string;

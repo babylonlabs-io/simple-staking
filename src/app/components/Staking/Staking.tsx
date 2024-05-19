@@ -7,8 +7,11 @@ import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { WalletNotConnected } from "./Form/States/WalletNotConnected";
+import { stakingSignReady } from "@/utils/stakingSignReady";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { Delegation } from "@/app/types/delegations";
 import { Loading } from "./Loading";
+import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
 import { StakingTime } from "./Form/StakingTime";
 import { StakingAmount } from "./Form/StakingAmount";
@@ -16,9 +19,6 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
-import { stakingSignReady } from "@/utils/stakingSignReady";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { Delegation } from "@/app/types/delegations";
 
 const stakingFeeSat = 500;
 

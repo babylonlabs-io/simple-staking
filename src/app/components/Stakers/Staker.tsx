@@ -1,5 +1,5 @@
-import { Hash } from "../Hash/Hash";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { Hash } from "../Hash/Hash";
 
 interface StakerProps {
   pkHex: string;
