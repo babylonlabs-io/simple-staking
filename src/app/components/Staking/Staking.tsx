@@ -64,6 +64,13 @@ export const Staking: React.FC<StakingProps> = ({
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
 
+  const handleResetState = () => {
+    setFinalityProvider(undefined);
+    setStakingAmountSat(0);
+    setStakingTimeBlocks(0);
+    setPreviewModalOpen(false);
+  };
+
   const handleSign = async () => {
     if (!btcWallet) {
       throw new Error("Wallet not connected");
@@ -118,10 +125,7 @@ export const Staking: React.FC<StakingProps> = ({
       ...delegations,
     ]);
 
-    setFinalityProvider(undefined);
-    setStakingAmountSat(0);
-    setStakingTimeBlocks(0);
-    setPreviewModalOpen(false);
+    handleResetState();
   };
 
   // Select the finality provider from the list
