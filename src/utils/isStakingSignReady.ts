@@ -2,35 +2,31 @@ import { FinalityProvider } from "@/app/types/finalityProviders";
 
 // Check if the staking transaction is ready to be signed
 export const isStakingSignReady = (
-  // API values
-  minStakingAmountSat: number,
-  maxStakingAmountSat: number,
-  minStakingTimeBlocks: number,
-  maxStakingTimeBlocks: number,
-  // Input values
-  stakingAmountSat: number,
-  stakingTimeBlocks: number,
+  // Parameter min and max values
+  minAmount: number,
+  maxAmount: number,
+  minTime: number,
+  maxTime: number,
+  // Actual values
+  amount: number,
+  time: number,
   finalityProvider: FinalityProvider | undefined,
 ) => {
   if (!finalityProvider) return false;
 
   // API data is ready
-  const stakingAmountAPIReady = minStakingAmountSat && maxStakingAmountSat;
+  const stakingAmountAPIReady = minAmount && maxAmount;
   // App inputs are filled
-  const stakingAmountAppReady =
-    stakingAmountSat >= minStakingAmountSat &&
-    stakingAmountSat <= maxStakingAmountSat;
+  const stakingAmountAppReady = amount >= minAmount && amount <= maxAmount;
   // Amount is ready
   const stakingAmountReady = stakingAmountAPIReady && stakingAmountAppReady;
 
   // API data is ready
-  const stakingTimeAPIReady = minStakingTimeBlocks && maxStakingTimeBlocks;
+  const stakingTimeAPIReady = minTime && maxTime;
   // App inputs are filled
-  const stakingTimeAppReady =
-    stakingTimeBlocks >= minStakingTimeBlocks &&
-    stakingTimeBlocks <= maxStakingTimeBlocks;
+  const stakingTimeAppReady = time >= minTime && time <= maxTime;
   // Staking time is fixed
-  const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
+  const stakingTimeFixed = minTime === maxTime;
   // Staking time is ready
   const stakingTimeReady =
     stakingTimeAPIReady && (stakingTimeAppReady || stakingTimeFixed);
