@@ -131,9 +131,14 @@ export const Staking: React.FC<StakingProps> = ({
   // Select the finality provider from the list
   const handleChooseFinalityProvider = (btcPkHex: string) => {
     if (!finalityProviders) {
-      return;
+      throw new Error("Finality providers not loaded");
     }
+
     const found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
+    if (!found) {
+      throw new Error("Finality provider not found");
+    }
+
     setFinalityProvider(found);
   };
 
