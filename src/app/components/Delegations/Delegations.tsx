@@ -7,19 +7,19 @@ import {
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
 
-import { Delegation as DelegationInterface } from "@/app/api/getDelegations";
+import {
+  Delegation as DelegationInterface,
+  DelegationState,
+} from "@/app/types/delegations";
 import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import {
-  GlobalParamsVersion,
-  getGlobalParams,
-} from "@/app/api/getGlobalParams";
+import { getGlobalParams } from "@/app/api/getGlobalParams";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { DelegationState } from "@/app/types/delegationState";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import {
   UnbondWithdrawModal,
@@ -81,7 +81,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Find the delegation in the delegations retrieved from the API
     const delegation = delegationsAPI.find(
-      (delegation) => delegation.staking_tx_hash_hex === id,
+      (delegation) => delegation.stakingTxHashHex === id,
     );
     if (!delegation) {
       throw new Error("Delegation not found");
@@ -89,7 +89,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Check if the unbonding is possible
     const unbondingEligibility = await getUnbondingEligibility(
-      delegation.staking_tx_hash_hex,
+      delegation.stakingTxHashHex,
     );
     if (!unbondingEligibility) {
       throw new Error("Not eligible for unbonding");
@@ -99,14 +99,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
       getCurrentGlobalParamsVersion(
-        delegation.staking_tx.start_height,
+        delegation.stakingTx.startHeight,
         paramVersions,
       );
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
-      delegation.finality_provider_pk_hex,
-      delegation.staking_tx.timelock,
+      delegation.finalityProviderPkHex,
+      delegation.stakingTx.timelock,
       globalParamsWhenStaking,
       publicKeyNoCoord,
     );
@@ -125,10 +125,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
       unbondingTimelockScript,
       timelockScript,
       slashingScript,
-      Transaction.fromHex(delegation.staking_tx.tx_hex),
+      Transaction.fromHex(delegation.stakingTx.txHex),
       unbondingFeeSat,
       btcWalletNetwork,
-      delegation.staking_tx.output_index,
+      delegation.stakingTx.outputIndex,
     );
 
     // Sign the unbonding transaction
@@ -143,22 +143,22 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
 
     // POST unbonding to the API
-    const _response = postUnbonding({
-      staker_signed_signature_hex: stakerSignature,
-      staking_tx_hash_hex: delegation.staking_tx_hash_hex,
-      unbonding_tx_hash_hex: Transaction.fromHex(unbondingTx.toHex()).getId(),
-      unbonding_tx_hex: unbondingTx.toHex(),
-    });
+    const _response = postUnbonding(
+      stakerSignature,
+      delegation.stakingTxHashHex,
+      Transaction.fromHex(unbondingTx.toHex()).getId(),
+      unbondingTx.toHex(),
+    );
 
     // Update the local state with the new delegation
     setIntermediateDelegationsLocalStorage((delegations) => [
       toLocalStorageIntermediateDelegation(
-        delegation.staking_tx_hash_hex,
+        delegation.stakingTxHashHex,
         publicKeyNoCoord,
-        delegation.finality_provider_pk_hex,
-        delegation.staking_value,
-        delegation.staking_tx.tx_hex,
-        delegation.staking_tx.timelock,
+        delegation.finalityProviderPkHex,
+        delegation.stakingValueSat,
+        delegation.stakingTx.txHex,
+        delegation.stakingTx.timelock,
         DelegationState.INTERMEDIATE_UNBONDING,
       ),
       ...delegations,
@@ -189,7 +189,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Find the delegation in the delegations retrieved from the API
     const delegation = delegationsAPI.find(
-      (delegation) => delegation.staking_tx_hash_hex === id,
+      (delegation) => delegation.stakingTxHashHex === id,
     );
     if (!delegation) {
       throw new Error("Delegation not found");
@@ -199,14 +199,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
       getCurrentGlobalParamsVersion(
-        delegation.staking_tx.start_height,
+        delegation.stakingTx.startHeight,
         paramVersions,
       );
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
-      delegation.finality_provider_pk_hex,
-      delegation.staking_tx.timelock,
+      delegation.finalityProviderPkHex,
+      delegation.stakingTx.timelock,
       globalParamsWhenStaking,
       publicKeyNoCoord,
     );
@@ -221,16 +221,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
     // Create the withdrawal transaction
     let unsignedWithdrawalTx;
-    if (delegation?.unbonding_tx) {
+    if (delegation?.unbondingTx) {
       // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
       unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
         unbondingTimelockScript,
         slashingScript,
-        Transaction.fromHex(delegation.unbonding_tx.tx_hex),
+        Transaction.fromHex(delegation.unbondingTx.txHex),
         address,
         withdrawalFeeSat,
         btcWalletNetwork,
-        delegation.staking_tx.output_index,
+        delegation.stakingTx.outputIndex,
       );
     } else {
       // Withdraw funds from a staking transaction in which the timelock naturally expired
@@ -238,11 +238,11 @@ export const Delegations: React.FC<DelegationsProps> = ({
         timelockScript,
         slashingScript,
         unbondingScript,
-        Transaction.fromHex(delegation.staking_tx.tx_hex),
+        Transaction.fromHex(delegation.stakingTx.txHex),
         address,
         withdrawalFeeSat,
         btcWalletNetwork,
-        delegation.staking_tx.output_index,
+        delegation.stakingTx.outputIndex,
       );
     }
 
@@ -260,12 +260,12 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // Update the local state with the new delegation
     setIntermediateDelegationsLocalStorage((delegations) => [
       toLocalStorageIntermediateDelegation(
-        delegation.staking_tx_hash_hex,
+        delegation.stakingTxHashHex,
         publicKeyNoCoord,
-        delegation.finality_provider_pk_hex,
-        delegation.staking_value,
-        delegation.staking_tx.tx_hex,
-        delegation.staking_tx.timelock,
+        delegation.finalityProviderPkHex,
+        delegation.stakingValueSat,
+        delegation.stakingTx.txHex,
+        delegation.stakingTx.timelock,
         DelegationState.INTERMEDIATE_WITHDRAWAL,
       ),
       ...delegations,
@@ -305,8 +305,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
         (intermediateDelegation) =>
           !delegationsAPI?.find(
             (delegation) =>
-              delegation?.staking_tx_hash_hex ===
-                intermediateDelegation?.staking_tx_hash_hex &&
+              delegation?.stakingTxHashHex ===
+                intermediateDelegation?.stakingTxHashHex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),
@@ -334,33 +334,33 @@ export const Delegations: React.FC<DelegationsProps> = ({
           if (!delegation) return null;
 
           const {
-            staking_value,
-            staking_tx,
-            staking_tx_hash_hex,
-            finality_provider_pk_hex,
+            stakingValueSat,
+            stakingTx,
+            stakingTxHashHex,
+            finalityProviderPkHex,
             state,
-            is_overflow,
+            isOverflow,
           } = delegation;
           // Get the moniker of the finality provider
           const finalityProviderMoniker =
-            finalityProvidersKV[finality_provider_pk_hex];
+            finalityProvidersKV[finalityProviderPkHex];
           const intermediateDelegation =
             intermediateDelegationsLocalStorage.find(
-              (item) => item.staking_tx_hash_hex === staking_tx_hash_hex,
+              (item) => item.stakingTxHashHex === stakingTxHashHex,
             );
 
           return (
             <Delegation
-              key={staking_tx_hash_hex + staking_tx.start_height}
+              key={stakingTxHashHex + stakingTx.startHeight}
               finalityProviderMoniker={finalityProviderMoniker}
-              stakingTx={staking_tx}
-              stakingValueSat={staking_value}
-              stakingTxHash={staking_tx_hash_hex}
+              stakingTx={stakingTx}
+              stakingValueSat={stakingValueSat}
+              stakingTxHash={stakingTxHashHex}
               state={state}
-              onUnbond={() => handleModal(staking_tx_hash_hex, MODE_UNBOND)}
-              onWithdraw={() => handleModal(staking_tx_hash_hex, MODE_WITHDRAW)}
+              onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
+              onWithdraw={() => handleModal(stakingTxHashHex, MODE_WITHDRAW)}
               intermediateState={intermediateDelegation?.state}
-              isOverflow={is_overflow}
+              isOverflow={isOverflow}
             />
           );
         })}

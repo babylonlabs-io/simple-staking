@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
 import { PreviewModal } from "../Modals/PreviewModal";
 import { blocksToTime } from "@/utils/blocksToTime";
@@ -182,11 +182,11 @@ export const Staking: React.FC<StakingProps> = ({
 
       const signReady =
         amountReady && stakingTimeReady && selectedFinalityProvider;
-      
+
       // Do the conversion to BTC for presentational purposes
-      const minStakingAmountBtc = satoshiToBtc(minStakingAmountSat)
-      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmountSat)
-      const selectedStakingAmountBtc = satoshiToBtc(amountSat)
+      const minStakingAmountBtc = satoshiToBtc(minStakingAmountSat);
+      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmountSat);
+      const selectedStakingAmountBtc = satoshiToBtc(amountSat);
 
       return (
         <>
@@ -210,7 +210,9 @@ export const Staking: React.FC<StakingProps> = ({
                   step={0.00001}
                   value={selectedStakingAmountBtc}
                   // Convert the BTC amount to satoshis to keep internal values only in satoshis
-                  onChange={(e) => onAmountSatChange(btcToSatoshi(Number(e.target.value)))}
+                  onChange={(e) =>
+                    onAmountSatChange(btcToSatoshi(Number(e.target.value)))
+                  }
                 />
                 <div className="label flex justify-end">
                   <span className="label-text-alt">
@@ -268,13 +270,13 @@ export const Staking: React.FC<StakingProps> = ({
           <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
             {finalityProviders?.map((fp) => (
               <FinalityProvider
-                key={fp.btc_pk}
+                key={fp.btcPk}
                 moniker={fp.description.moniker}
-                pkHex={fp.btc_pk}
-                stakeSat={fp.active_tvl}
+                pkHex={fp.btcPk}
+                stakeSat={fp.activeTVLSat}
                 comission={fp.commission}
-                selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
-                onClick={() => onFinalityProviderChange(fp.btc_pk)}
+                selected={selectedFinalityProvider?.btcPk === fp.btcPk}
+                onClick={() => onFinalityProviderChange(fp.btcPk)}
               />
             ))}
           </div>

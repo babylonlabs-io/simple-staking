@@ -1,16 +1,24 @@
 import { apiWrapper } from "./apiWrapper";
 
-export interface UnbondingPayload {
+interface UnbondingPayload {
   staker_signed_signature_hex: string;
   staking_tx_hash_hex: string;
   unbonding_tx_hash_hex: string;
   unbonding_tx_hex: string;
 }
 
-export const postUnbonding = async (payload: UnbondingPayload) => {
-  if (!payload) {
-    throw new Error("No payload provided");
-  }
+export const postUnbonding = async (
+  stakerSignedSignatureHex: string,
+  stakingTxHashHex: string,
+  unbondingTxHashHex: string,
+  unbondingTxHex: string,
+) => {
+  const payload: UnbondingPayload = {
+    staker_signed_signature_hex: stakerSignedSignatureHex,
+    staking_tx_hash_hex: stakingTxHashHex,
+    unbonding_tx_hash_hex: unbondingTxHashHex,
+    unbonding_tx_hex: unbondingTxHex,
+  };
 
   const response = await apiWrapper(
     "POST",

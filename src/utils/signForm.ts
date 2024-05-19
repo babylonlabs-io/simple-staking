@@ -1,7 +1,7 @@
 import { Psbt, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
-import { FinalityProvider } from "@/app/api/getFinalityProviders";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { FinalityProvider } from "@/app/types/finalityProviders";
 import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";
@@ -30,7 +30,10 @@ export const signForm = async (
 
   let inputUTXOs = [];
   try {
-    inputUTXOs = await btcWallet.getUtxos(address, stakingAmountSat + stakingFeeSat);
+    inputUTXOs = await btcWallet.getUtxos(
+      address,
+      stakingAmountSat + stakingFeeSat,
+    );
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
   }
@@ -41,7 +44,7 @@ export const signForm = async (
   let scripts;
   try {
     scripts = apiDataToStakingScripts(
-      finalityProvider.btc_pk,
+      finalityProvider.btcPk,
       stakingTerm,
       params,
       publicKeyNoCoord,
@@ -68,7 +71,7 @@ export const signForm = async (
       isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
       dataEmbedScript,
       // `lockHeight` is exclusive of the provided value.
-      // For example, if a Bitcoin height of X is provided, 
+      // For example, if a Bitcoin height of X is provided,
       // the transaction will be included starting from height X+1.
       // https://learnmeabitcoin.com/technical/transaction/locktime/
       params.activationHeight - 1,
