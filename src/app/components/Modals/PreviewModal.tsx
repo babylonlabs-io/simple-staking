@@ -8,9 +8,9 @@ import { satoshiToBtc } from "@/utils/btcConversions";
 interface PreviewModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
-  onSign: (amountSat: number, stakingTimeBlocks: number) => Promise<void>;
+  onSign: () => void;
   finalityProvider: string | undefined;
-  amountSat: number;
+  stakingAmountSat: number;
   stakingTimeBlocks: number;
 }
 
@@ -18,7 +18,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   open,
   onClose,
   finalityProvider,
-  amountSat,
+  stakingAmountSat,
   stakingTimeBlocks,
   onSign,
 }) => {
@@ -58,7 +58,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${satoshiToBtc(amountSat).toFixed(6)} Signet BTC`}</p>
+            <p>{`${+satoshiToBtc(stakingAmountSat).toFixed(6)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex gap-4">
@@ -95,10 +95,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           >
             Cancel
           </button>
-          <button
-            className="btn-primary btn flex-1"
-            onClick={() => onSign(amountSat, stakingTimeBlocks)}
-          >
+          <button className="btn-primary btn flex-1" onClick={onSign}>
             Stake
           </button>
         </div>

@@ -64,7 +64,7 @@ export const Staking: React.FC<StakingProps> = ({
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
 
-  const handleSign = async (amountSat: number, stakingTimeBlocks: number) => {
+  const handleSign = async () => {
     if (!btcWallet) {
       throw new Error("Wallet not connected");
     } else if (!address) {
@@ -86,7 +86,7 @@ export const Staking: React.FC<StakingProps> = ({
         finalityProvider,
         stakingTerm,
         btcWalletNetwork,
-        amountSat,
+        stakingAmountSat,
         address,
         stakingFeeSat,
         publicKeyNoCoord,
@@ -213,7 +213,6 @@ export const Staking: React.FC<StakingProps> = ({
 
       // Staking time is fixed
       const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
-      const amountSat = Math.round(stakingAmountSat);
 
       return (
         <>
@@ -245,7 +244,7 @@ export const Staking: React.FC<StakingProps> = ({
               onClose={setPreviewModalOpen}
               onSign={handleSign}
               finalityProvider={finalityProvider?.description.moniker}
-              amountSat={amountSat}
+              stakingAmountSat={stakingAmountSat}
               stakingTimeBlocks={
                 stakingTimeFixed ? minStakingTimeBlocks : stakingTimeBlocks
               }
