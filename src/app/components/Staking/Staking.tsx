@@ -134,9 +134,7 @@ export const Staking: React.FC<StakingProps> = ({
       return;
     }
     const found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
-    if (found) {
-      setFinalityProvider(found);
-    }
+    setFinalityProvider(found);
   };
 
   const handleStakingAmountSatChange = (inputAmountSat: number) => {
