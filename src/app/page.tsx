@@ -38,8 +38,8 @@ import { getGlobalParams } from "./api/getGlobalParams";
 
 interface HomeProps {}
 
-const stakingFee = 500;
-const withdrawalFee = 500;
+const stakingFeeSat = 500;
+const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -206,7 +206,7 @@ const Home: React.FC<HomeProps> = () => {
         btcWalletNetwork,
         amountSat,
         address,
-        stakingFee,
+        stakingFeeSat,
         publicKeyNoCoord,
       );
     } catch (error: Error | any) {
@@ -280,7 +280,7 @@ const Home: React.FC<HomeProps> = () => {
   // these constants are needed for easier prop passing
   const overTheCap =
     paramWithContext?.currentVersion && statsData
-      ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
+      ? paramWithContext.currentVersion.stakingCapSat <= statsData.active_tvl
       : false;
 
   return (
@@ -297,7 +297,7 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
-            stakingCap={paramWithContext?.currentVersion?.stakingCap}
+            stakingCap={paramWithContext?.currentVersion?.stakingCapSat}
           />
           {address && btcWalletBalanceSat && (
             <Summary
@@ -333,8 +333,8 @@ const Home: React.FC<HomeProps> = () => {
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={paramWithContext.currentVersion.unbondingFee}
-                withdrawalFee={withdrawalFee}
+                unbondingFeeSat={paramWithContext.currentVersion.unbondingFeeSat}
+                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}

@@ -8,16 +8,16 @@ import { ConnectLarge } from "../Connect/ConnectLarge";
 import { satoshiToBtc, btcToSatoshi } from "@/utils/btcConversions";
 
 interface StakingParams {
-  minStakingAmount: number;
-  maxStakingAmount: number;
+  minStakingAmountSat: number;
+  maxStakingAmountSat: number;
   minStakingTime: number;
   maxStakingTime: number;
-  stakingCap: number;
+  stakingCapSat: number;
 }
 
 interface StakingProps {
   amountSat: number;
-  onAmountSatChange: (amount: number) => void;
+  onAmountSatChange: (amountSat: number) => void;
   term: number;
   onTermChange: (term: number) => void;
   finalityProviders: FinalityProviderInterface[] | undefined;
@@ -167,25 +167,25 @@ export const Staking: React.FC<StakingProps> = ({
       const {
         minStakingTime,
         maxStakingTime,
-        minStakingAmount,
-        maxStakingAmount,
+        minStakingAmountSat,
+        maxStakingAmountSat,
       } = stakingParams;
       const stakingTimeReady =
         minStakingTime === maxStakingTime ||
         (term >= minStakingTime && term <= maxStakingTime);
 
       const amountReady =
-        minStakingAmount &&
-        maxStakingAmount &&
-        amountSat >= minStakingAmount &&
-        amountSat <= maxStakingAmount;
+        minStakingAmountSat &&
+        maxStakingAmountSat &&
+        amountSat >= minStakingAmountSat &&
+        amountSat <= maxStakingAmountSat;
 
       const signReady =
         amountReady && stakingTimeReady && selectedFinalityProvider;
       
       // Do the conversion to BTC for presentational purposes
-      const minStakingAmountBtc = satoshiToBtc(minStakingAmount)
-      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmount)
+      const minStakingAmountBtc = satoshiToBtc(minStakingAmountSat)
+      const maxStakingAmountBtc = satoshiToBtc(maxStakingAmountSat)
       const selectedStakingAmountBtc = satoshiToBtc(amountSat)
 
       return (
