@@ -7,7 +7,7 @@ import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { stakingSignReady } from "@/utils/stakingSignReady";
+import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
 import { Loading } from "./Loading";
@@ -203,7 +203,7 @@ export const Staking: React.FC<StakingProps> = ({
       } = stakingParams;
 
       // Check if the staking transaction is ready to be signed
-      const signReady = stakingSignReady(
+      const signReady = isStakingSignReady(
         minStakingAmountSat,
         maxStakingAmountSat,
         minStakingTimeBlocks,

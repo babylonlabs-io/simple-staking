@@ -1,7 +1,7 @@
 import { FinalityProvider } from "@/app/types/finalityProviders";
 
 // Check if the staking transaction is ready to be signed
-export const stakingSignReady = (
+export const isStakingSignReady = (
   // API values
   minStakingAmountSat: number,
   maxStakingAmountSat: number,
