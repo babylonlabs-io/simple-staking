@@ -14,13 +14,13 @@ import { satoshiToBtc } from "@/utils/btcConversions";
 interface StatsProps {
   data: StatsData | undefined;
   isLoading: boolean;
-  stakingCap?: number;
+  stakingCapSat?: number;
 }
 
 export const Stats: React.FC<StatsProps> = ({
   data,
   isLoading,
-  stakingCap,
+  stakingCapSat,
 }) => {
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",
@@ -31,8 +31,8 @@ export const Stats: React.FC<StatsProps> = ({
     [
       {
         title: "Staking TVL Cap",
-        value: stakingCap
-          ? `${satoshiToBtc(stakingCap).toFixed(6)} Signet BTC`
+        value: stakingCapSat
+          ? `${satoshiToBtc(stakingCapSat).toFixed(6)} Signet BTC`
           : "-",
         icon: stakingTvlCap,
       },

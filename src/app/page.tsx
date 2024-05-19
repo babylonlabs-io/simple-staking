@@ -297,7 +297,7 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             data={statsData}
             isLoading={statsDataIsLoading}
-            stakingCap={paramWithContext?.currentVersion?.stakingCapSat}
+            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
           {address && btcWalletBalanceSat && (
             <Summary
