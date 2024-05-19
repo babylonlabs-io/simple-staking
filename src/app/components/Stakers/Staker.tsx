@@ -21,13 +21,13 @@ export const Staker: React.FC<StakerProps> = ({
           <Hash value={pkHex} address small noFade />
         </div>
         <div>
-          <p className="text-xs dark:text-neutral-content lg:hidden">
+          <p className="text-xs lg:hidden dark:text-neutral-content">
             Delegations
           </p>
           <p>{delegations || 0}</p>
         </div>
         <div>
-          <p className="text-xs dark:text-neutral-content lg:hidden">Stake</p>
+          <p className="text-xs lg:hidden dark:text-neutral-content">Stake</p>
           <p>{activeTVL ? `${+(activeTVL / 1e8).toFixed(6)} Signet BTC` : 0}</p>
         </div>
       </div>

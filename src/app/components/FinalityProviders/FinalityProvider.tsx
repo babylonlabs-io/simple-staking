@@ -42,7 +42,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   };
 
   return (
-    <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200 lg:grid-cols-finalityProviders">
+    <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm lg:grid-cols-finalityProviders dark:border-0 dark:bg-base-200">
       <div className="flex gap-2">
         <FaBitcoin size={16} className="mt-1 text-primary" />
         <div className="flex flex-col">

@@ -233,7 +233,6 @@ const Home: React.FC<HomeProps> = () => {
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
-      console.error(error?.message || error);
       showError({
         error: {
           message: error.message,
@@ -272,71 +271,72 @@ const Home: React.FC<HomeProps> = () => {
   };
 
   const handleSign = async () => {
-    if (!btcWallet) {
-      throw new Error("Wallet not connected");
-    } else if (!btcWalletNetwork) {
-      throw new Error("Wallet network not connected");
-    } else if (!paramWithContext || !paramWithContext.currentVersion) {
-      throw new Error("Global params not loaded");
-    } else if (!finalityProvider) {
-      throw new Error("Finality provider not selected");
-    }
-    const { currentVersion: globalParamsVersion } = paramWithContext;
-    // Rounding the input since 0.0006 * 1e8 is is 59999.999
-    // which won't be accepted by the mempool API
-    const stakingAmount = Math.round(Number(amount) * 1e8);
-    const stakingTerm = getStakingTerm(globalParamsVersion, term);
-    let signedTxHex: string;
     try {
-      signedTxHex = await signForm(
-        globalParamsVersion,
-        btcWallet,
-        finalityProvider,
-        stakingTerm,
-        btcWalletNetwork,
-        stakingAmount,
-        address,
-        stakingFee,
-        publicKeyNoCoord,
-      );
+      if (!btcWallet) {
+        throw new Error("Wallet not connected");
+      } else if (!btcWalletNetwork) {
+        throw new Error("Wallet network not connected");
+      } else if (!paramWithContext || !paramWithContext.currentVersion) {
+        throw new Error("Global params not loaded");
+      } else if (!finalityProvider) {
+        throw new Error("Finality provider not selected");
+      }
+      const { currentVersion: globalParamsVersion } = paramWithContext;
+      // Rounding the input since 0.0006 * 1e8 is is 59999.999
+      // which won't be accepted by the mempool API
+      const stakingAmount = Math.round(Number(amount) * 1e8);
+      const stakingTerm = getStakingTerm(globalParamsVersion, term);
+      let signedTxHex: string;
+      try {
+        signedTxHex = await signForm(
+          globalParamsVersion,
+          btcWallet,
+          finalityProvider,
+          stakingTerm,
+          btcWalletNetwork,
+          stakingAmount,
+          address,
+          stakingFee,
+          publicKeyNoCoord,
+        );
+      } catch (error: Error | any) {
+        throw error;
+      }
+
+      let txID;
+      try {
+        txID = await btcWallet.pushTx(signedTxHex);
+      } catch (error: Error | any) {
+        throw error;
+      }
+
+      // Update the local state with the new delegation
+      setDelegationsLocalStorage((delegations) => [
+        toLocalStorageDelegation(
+          Transaction.fromHex(signedTxHex).getId(),
+          publicKeyNoCoord,
+          finalityProvider.btc_pk,
+          stakingAmount,
+          signedTxHex,
+          stakingTerm,
+        ),
+        ...delegations,
+      ]);
+
+      // Clear the form
+      setAmount(0);
+      setTerm(0);
+      setFinalityProvider(undefined);
     } catch (error: Error | any) {
       showError({
         error: {
           message: error.message,
-          errorState: ErrorState.STAKE,
+          errorState: ErrorState.STAKING,
           errorTime: new Date(),
         },
         retryAction: handleSign,
       });
-      console.error(error?.message || "Error signing the form");
-      throw error;
     }
-
-    let txID;
-    try {
-      txID = await btcWallet.pushTx(signedTxHex);
-    } catch (error: Error | any) {
-      console.error(error?.message || "Broadcasting staking transaction error");
-      throw error;
-    }
-
-    // Update the local state with the new delegation
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(signedTxHex).getId(),
-        publicKeyNoCoord,
-        finalityProvider.btc_pk,
-        stakingAmount,
-        signedTxHex,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
-
-    // Clear the form
-    setAmount(0);
-    setTerm(0);
-    setFinalityProvider(undefined);
   };
 
   // Remove the delegations that are already present in the API
@@ -456,11 +456,9 @@ const Home: React.FC<HomeProps> = () => {
       />
       <ErrorModal
         open={isErrorOpen}
-        errorCode={error.errorCode}
         errorMessage={error.message}
         errorState={error.errorState}
         errorTime={error.errorTime}
-        errorMetadata={error.metadata}
         onClose={hideError}
         onRetry={retryErrorAction}
       />

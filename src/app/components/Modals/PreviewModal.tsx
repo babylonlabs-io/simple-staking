@@ -21,8 +21,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 }) => {
   const modalRef = useRef(null);
 
-  
-
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
 

@@ -8,7 +8,7 @@ export enum ErrorState {
   POST_UNBOUNDING = "POST_UNBOUNDING",
   SWITCH_NETWORK = "SWITCH_NETWORK",
   WITHDRAW = "WITHDRAW",
-  STAKE = "STAKE"
+  STAKING = "STAKING",
 }
 
 export interface ErrorType {
@@ -16,10 +16,4 @@ export interface ErrorType {
   errorCode?: string;
   errorState?: ErrorState;
   errorTime: Date;
-  metadata?: ErrorMetadata;
-}
-
-export interface ErrorMetadata {
-  btcAmount?: number;
-  network?: string;
 }

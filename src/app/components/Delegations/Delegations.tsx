@@ -174,7 +174,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
     try {
       handleUnbond(id);
     } catch (error: Error | any) {
-      console.error(error?.message || error);
       showError({
         error: {
           message: error.message,

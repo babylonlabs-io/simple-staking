@@ -3,28 +3,24 @@ import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { useTheme } from "@/app/hooks/useTheme";
 import { format } from "date-fns";
-import { ErrorMetadata, ErrorState } from "@/app/types/errorState";
+import { ErrorState } from "@/app/types/errorState";
 
 interface ErrorModalProps {
   open: boolean;
   onClose: () => void;
   onRetry?: () => void;
-  errorCode?: string;
   errorMessage: string;
   errorState?: ErrorState;
   errorTime: Date;
-  errorMetadata?: ErrorMetadata;
 }
 
 export const ErrorModal: React.FC<ErrorModalProps> = ({
   open,
   onClose,
   onRetry,
-  errorCode,
   errorMessage,
   errorState,
   errorTime,
-  errorMetadata,
 }) => {
   const modalRef = useRef(null);
   const { lightSelected } = useTheme();
@@ -56,7 +52,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return "Network Error";
       case ErrorState.WITHDRAW:
         return "Withdraw Error";
-      case ErrorState.STAKE:
+      case ErrorState.STAKING:
         return "Stake Error";
       default:
         return "Unknown Error";
@@ -83,7 +79,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return `Failed to switch network due to: ${errorMessage}`;
       case ErrorState.WITHDRAW:
         return `Failed to withdraw due to: ${errorMessage}`;
-      case ErrorState.STAKE:
+      case ErrorState.STAKING:
         return `Failed to stake due to ${errorMessage}`;
       default:
         return errorMessage;

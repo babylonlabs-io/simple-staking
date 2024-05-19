@@ -1,4 +1,3 @@
-import { ErrorState, ErrorType } from "@/app/types/errorState";
 import React, {
   createContext,
   useContext,
@@ -6,6 +5,8 @@ import React, {
   useCallback,
   ReactNode,
 } from "react";
+
+import { ErrorType } from "@/app/types/errorState";
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 

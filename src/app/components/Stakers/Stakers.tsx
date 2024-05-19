@@ -25,7 +25,6 @@ export const Stakers: React.FC<StakersProps> = () => {
     retry: false,
   });
 
-
   useEffect(() => {
     if (error) {
       showError({
