@@ -4,14 +4,14 @@ interface StakingAmountProps {
   minStakingAmountSat: number;
   maxStakingAmountSat: number;
   stakingAmountSat: number;
-  onStakingAmountChange: (inputAmountSat: number) => void;
+  onStakingAmountSatChange: (inputAmountSat: number) => void;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
   minStakingAmountSat,
   maxStakingAmountSat,
   stakingAmountSat,
-  onStakingAmountChange,
+  onStakingAmountSatChange,
 }) => {
   return (
     <label className="form-control w-full flex-1">
@@ -27,7 +27,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         step={0.00001}
         value={satoshiToBtc(stakingAmountSat)}
         onChange={(e) =>
-          onStakingAmountChange(btcToSatoshi(Number(e.target.value)))
+          onStakingAmountSatChange(btcToSatoshi(Number(e.target.value)))
         }
       />
       <div className="label flex justify-end">

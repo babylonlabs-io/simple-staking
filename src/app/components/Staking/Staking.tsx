@@ -135,7 +135,7 @@ export const Staking: React.FC<StakingProps> = ({
     }
   };
 
-  const handleStakingAmountChange = (inputAmountSat: number) => {
+  const handleStakingAmountSatChange = (inputAmountSat: number) => {
     setStakingAmountSat(inputAmountSat);
   };
 
@@ -229,7 +229,7 @@ export const Staking: React.FC<StakingProps> = ({
                 minStakingAmountSat={minStakingAmountSat}
                 maxStakingAmountSat={maxStakingAmountSat}
                 stakingAmountSat={stakingAmountSat}
-                onStakingAmountChange={handleStakingAmountChange}
+                onStakingAmountSatChange={handleStakingAmountSatChange}
               />
             </div>
             <button
