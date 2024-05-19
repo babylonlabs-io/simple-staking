@@ -11,7 +11,7 @@ interface PreviewModalProps {
   onSign: () => void;
   finalityProvider: string | undefined;
   amountSat: number;
-  termBlocks: number;
+  stakingTimeBlocks: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -19,7 +19,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   onClose,
   finalityProvider,
   amountSat,
-  termBlocks,
+  stakingTimeBlocks,
   onSign,
 }) => {
   const modalRef = useRef(null);
@@ -66,7 +66,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         <div className="flex gap-4">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToTime(termBlocks)}</p>
+            <p>{blocksToTime(stakingTimeBlocks)}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">

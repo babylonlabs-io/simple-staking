@@ -5,27 +5,27 @@ import { blocksToTime } from "@/utils/blocksToTime";
 import { PreviewModal } from "@/app/components/Modals/PreviewModal";
 
 interface FixedProps {
-  onSign: (amountSat: number, termBlocks: number) => Promise<void>;
+  onSign: (amountSat: number, stakingTimeBlocks: number) => Promise<void>;
   selectedFinalityProvider: FinalityProviderInterface | undefined;
-  minStakingAmount: number;
-  maxStakingAmount: number;
-  stakingTime: number;
+  minStakingAmountSat: number;
+  maxStakingAmountSat: number;
+  stakingTimeBlocks: number;
 }
 
 // Fixed term + amount with fp check
 export const Fixed: React.FC<FixedProps> = ({
   onSign,
   selectedFinalityProvider,
-  minStakingAmount,
-  maxStakingAmount,
-  stakingTime,
+  minStakingAmountSat,
+  maxStakingAmountSat,
+  stakingTimeBlocks,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const [amountBTC, setAmountBTC] = useState(minStakingAmount / 1e8);
+  const [amountBTC, setAmountBTC] = useState(minStakingAmountSat / 1e8);
 
   // TODO extract BTC <- -> sBTC conversion to a helper function
-  const minAmountBTC = minStakingAmount ? minStakingAmount / 1e8 : 0;
-  const maxAmountBTC = maxStakingAmount ? maxStakingAmount / 1e8 : 0;
+  const minAmountBTC = minStakingAmountSat ? minStakingAmountSat / 1e8 : 0;
+  const maxAmountBTC = maxStakingAmountSat ? maxStakingAmountSat / 1e8 : 0;
 
   const amountReady =
     minAmountBTC &&
@@ -39,7 +39,7 @@ export const Fixed: React.FC<FixedProps> = ({
   const handleSign = () => {
     setAmountBTC(0);
     setPreviewModalOpen(false);
-    onSign(amountSat, stakingTime);
+    onSign(amountSat, stakingTimeBlocks);
   };
 
   // Rounding the input since 0.0006 * 1e8 is is 59999.999
@@ -53,11 +53,11 @@ export const Fixed: React.FC<FixedProps> = ({
           <div className="card mb-2 bg-base-200 p-4">
             <p>
               Your Signet BTC will be staked for a fixed term of{" "}
-              {blocksToTime(stakingTime)}.
+              {blocksToTime(stakingTimeBlocks)}.
             </p>
             <p>
-              But you can unbond and withdraw your Signet BTC anytime through
-              this dashboard with an unbond time of 10 days.
+              You can unbond and withdraw your Signet BTC anytime through this
+              dashboard with an unbond time of 10 days.
             </p>
             <p>
               The above times are approximates based on average Bitcoin block
@@ -98,7 +98,7 @@ export const Fixed: React.FC<FixedProps> = ({
           onSign={handleSign}
           finalityProvider={selectedFinalityProvider?.description.moniker}
           amountSat={amountSat}
-          termBlocks={stakingTime}
+          stakingTimeBlocks={stakingTimeBlocks}
         />
       </div>
     </>

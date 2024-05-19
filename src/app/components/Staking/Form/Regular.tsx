@@ -4,30 +4,30 @@ import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFina
 import { PreviewModal } from "@/app/components/Modals/PreviewModal";
 
 interface RegularProps {
-  onSign: (amountSat: number, termBlocks: number) => Promise<void>;
+  onSign: (amountSat: number, stakingTimeBlocks: number) => Promise<void>;
   selectedFinalityProvider: FinalityProviderInterface | undefined;
-  minStakingAmount: number;
-  maxStakingAmount: number;
-  minStakingTime: number;
-  maxStakingTime: number;
+  minStakingAmountSat: number;
+  maxStakingAmountSat: number;
+  minStakingTimeBlocks: number;
+  maxStakingTimeBlocks: number;
 }
 
 // Regular term + amount form with fp check
 export const Regular: React.FC<RegularProps> = ({
   onSign,
   selectedFinalityProvider,
-  minStakingAmount,
-  maxStakingAmount,
-  minStakingTime,
-  maxStakingTime,
+  minStakingAmountSat,
+  maxStakingAmountSat,
+  minStakingTimeBlocks,
+  maxStakingTimeBlocks,
 }) => {
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const [amountBTC, setAmountBTC] = useState(minStakingAmount / 1e8);
-  const [termBlocks, setTermBlocks] = useState(minStakingTime);
+  const [amountBTC, setAmountBTC] = useState(minStakingAmountSat / 1e8);
+  const [stakingTimeBlocks, setStakingTimeBlocks] = useState(minStakingTimeBlocks);
 
   // TODO extract BTC <- -> sBTC conversion to a helper function
-  const minAmountBTC = minStakingAmount ? minStakingAmount / 1e8 : 0;
-  const maxAmountBTC = maxStakingAmount ? maxStakingAmount / 1e8 : 0;
+  const minAmountBTC = minStakingAmountSat ? minStakingAmountSat / 1e8 : 0;
+  const maxAmountBTC = maxStakingAmountSat ? maxStakingAmountSat / 1e8 : 0;
 
   const amountReady =
     minAmountBTC &&
@@ -36,16 +36,16 @@ export const Regular: React.FC<RegularProps> = ({
     amountBTC <= maxAmountBTC;
 
   const stakingTimeReady =
-    termBlocks >= minStakingTime && termBlocks <= maxStakingTime;
+    stakingTimeBlocks >= minStakingTimeBlocks && stakingTimeBlocks <= maxStakingTimeBlocks;
 
   const signReady = amountReady && stakingTimeReady && selectedFinalityProvider;
 
   // reset the component state
   const handleSign = () => {
     setAmountBTC(0);
-    setTermBlocks(0);
+    setStakingTimeBlocks(0);
     setPreviewModalOpen(false);
-    onSign(amountSat, termBlocks);
+    onSign(amountSat, stakingTimeBlocks);
   };
 
   // Rounding the input since 0.0006 * 1e8 is is 59999.999
@@ -64,14 +64,14 @@ export const Regular: React.FC<RegularProps> = ({
               type="number"
               placeholder="Blocks"
               className="no-focus input input-bordered w-full"
-              min={minStakingTime}
-              max={maxStakingTime}
-              value={termBlocks}
-              onChange={(e) => setTermBlocks(Number(e.target.value))}
+              min={minStakingTimeBlocks}
+              max={maxStakingTimeBlocks}
+              value={stakingTimeBlocks}
+              onChange={(e) => setStakingTimeBlocks(Number(e.target.value))}
             />
             <div className="label flex justify-end">
               <span className="label-text-alt">
-                min term is {minStakingTime} blocks
+                min term is {minStakingTimeBlocks} blocks
               </span>
             </div>
           </label>
@@ -109,7 +109,7 @@ export const Regular: React.FC<RegularProps> = ({
           onSign={handleSign}
           finalityProvider={selectedFinalityProvider?.description.moniker}
           amountSat={amountSat}
-          termBlocks={termBlocks}
+          stakingTimeBlocks={stakingTimeBlocks}
         />
       </div>
     </>

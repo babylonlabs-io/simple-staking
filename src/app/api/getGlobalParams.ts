@@ -28,10 +28,10 @@ export interface GlobalParamsVersion {
   covenantQuorum: number;
   unbondingTime: number;
   unbondingFee: number;
-  maxStakingAmount: number;
-  minStakingAmount: number;
-  maxStakingTime: number;
-  minStakingTime: number;
+  maxStakingAmountSat: number;
+  minStakingAmountSat: number;
+  maxStakingTimeBlocks: number;
+  minStakingTimeBlocks: number;
   confirmationDepth: number;
 }
 
@@ -53,10 +53,10 @@ export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
     covenantQuorum: v.covenant_quorum,
     unbondingTime: v.unbonding_time,
     unbondingFee: v.unbonding_fee,
-    maxStakingAmount: v.max_staking_amount,
-    minStakingAmount: v.min_staking_amount,
-    maxStakingTime: v.max_staking_time,
-    minStakingTime: v.min_staking_time,
+    maxStakingAmountSat: v.max_staking_amount,
+    minStakingAmountSat: v.min_staking_amount,
+    maxStakingTimeBlocks: v.max_staking_time,
+    minStakingTimeBlocks: v.min_staking_time,
     confirmationDepth: v.confirmation_depth,
   }));
 };

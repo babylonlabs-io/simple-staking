@@ -6,7 +6,7 @@ import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDe
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
-import { Form } from "./Form/Form";
+import { StakingForm } from "./Form/StakingForm";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegation } from "@/app/api/getDelegations";
 import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
@@ -50,7 +50,7 @@ export const Staking: React.FC<StakingProps> = ({
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
 
-  const handleSign = async (amountSat: number, termBlocks: number) => {
+  const handleSign = async (amountSat: number, stakingTimeBlocks: number) => {
     if (!btcWallet) {
       throw new Error("Wallet not connected");
     } else if (!address) {
@@ -63,8 +63,8 @@ export const Staking: React.FC<StakingProps> = ({
       throw new Error("Finality provider not selected");
     }
     const { currentVersion: globalParamsVersion } = paramWithContext;
-    const stakingAmount = amountSat;
-    const stakingTerm = getStakingTerm(globalParamsVersion, termBlocks);
+    const stakingAmountSat = amountSat;
+    const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
     let signedTxHex: string;
     try {
       signedTxHex = await signForm(
@@ -73,7 +73,7 @@ export const Staking: React.FC<StakingProps> = ({
         finalityProvider,
         stakingTerm,
         btcWalletNetwork,
-        stakingAmount,
+        stakingAmountSat,
         address,
         stakingFee,
         publicKeyNoCoord,
@@ -98,7 +98,7 @@ export const Staking: React.FC<StakingProps> = ({
         Transaction.fromHex(signedTxHex).getId(),
         publicKeyNoCoord,
         finalityProvider.btc_pk,
-        stakingAmount,
+        stakingAmountSat,
         signedTxHex,
         stakingTerm,
       ),
@@ -132,7 +132,7 @@ export const Staking: React.FC<StakingProps> = ({
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />
         <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
-          <Form
+          <StakingForm
             isWalletConnected={isWalletConnected}
             isLoading={isLoading}
             stakingParams={stakingParams}

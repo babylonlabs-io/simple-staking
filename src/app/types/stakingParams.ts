@@ -1,7 +1,7 @@
 export interface StakingParams {
-  minStakingAmount: number;
-  maxStakingAmount: number;
-  minStakingTime: number;
-  maxStakingTime: number;
+  minStakingAmountSat: number;
+  maxStakingAmountSat: number;
+  minStakingTimeBlocks: number;
+  maxStakingTimeBlocks: number;
   stakingCap: number;
 }
