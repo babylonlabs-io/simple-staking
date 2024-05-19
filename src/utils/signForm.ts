@@ -12,7 +12,7 @@ export const signForm = async (
   finalityProvider: FinalityProvider,
   stakingTerm: number,
   btcWalletNetwork: networks.Network,
-  stakingAmountSat: number, // in satoshis
+  stakingAmountSat: number,
   address: string,
   stakingFeeSat: number,
   publicKeyNoCoord: string,
@@ -21,8 +21,8 @@ export const signForm = async (
     !finalityProvider ||
     stakingAmountSat < params.minStakingAmountSat ||
     stakingAmountSat > params.maxStakingAmountSat ||
-    stakingTerm < params.minStakingTime ||
-    stakingTerm > params.maxStakingTime
+    stakingTerm < params.minStakingTimeBlocks ||
+    stakingTerm > params.maxStakingTimeBlocks
   ) {
     // TODO Show Popup
     throw new Error("Invalid staking data");

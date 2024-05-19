@@ -40,7 +40,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" />
             <p>
-              <strong>{satoshiToBtc(balanceSat).toFixed(6) || 0} BTC</strong>
+              <strong>{+satoshiToBtc(balanceSat).toFixed(6) || 0} BTC</strong>
             </p>
           </div>
         </div>

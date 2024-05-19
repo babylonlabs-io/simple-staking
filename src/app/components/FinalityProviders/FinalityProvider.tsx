@@ -3,9 +3,9 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import Image from "next/image";
 
-import { Hash } from "../Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { Hash } from "../Hash/Hash";
 
 interface FinalityProviderProps {
   pkHex: string;
@@ -43,7 +43,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   };
 
   return (
-    <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm lg:grid-cols-finalityProviders dark:border-0 dark:bg-base-200">
+    <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200 lg:grid-cols-finalityProviders">
       <div className="flex gap-2">
         <FaBitcoin size={16} className="mt-1 text-primary" />
         <div className="flex flex-col">
@@ -68,7 +68,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         <div className="flex gap-1 lg:hidden">
           {stakeSat ? (
             <>
-              <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
+              <p>{+satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
@@ -79,7 +79,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="hidden gap-1 lg:flex">
         {stakeSat ? (
           <>
-            <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
+            <p>{+satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (

@@ -1,6 +1,5 @@
 import { apiWrapper } from "./apiWrapper";
-
-import { FinalityProvider, Description } from "../types/finalityProviders";
+import { FinalityProvider } from "../types/finalityProviders";
 
 interface FinalityProvidersAPIResponse {
   data: FinalityProviderAPI[];

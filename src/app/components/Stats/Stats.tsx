@@ -32,21 +32,21 @@ export const Stats: React.FC<StatsProps> = ({
       {
         title: "Staking TVL Cap",
         value: stakingCapSat
-          ? `${satoshiToBtc(stakingCapSat).toFixed(6)} Signet BTC`
+          ? `${+satoshiToBtc(stakingCapSat).toFixed(6)} Signet BTC`
           : "-",
         icon: stakingTvlCap,
       },
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
-          ? `${satoshiToBtc(stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
+          ? `${+satoshiToBtc(stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
           : 0,
         icon: confirmedTvl,
       },
       {
         title: "Pending Stake",
         value: stakingStats?.unconfirmedTVLSat
-          ? `${satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
+          ? `${+satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
           : 0,
         icon: pendingStake,
       },

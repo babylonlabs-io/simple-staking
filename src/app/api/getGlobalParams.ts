@@ -1,4 +1,5 @@
 import { AxiosResponse } from "axios";
+
 import { apiWrapper } from "./apiWrapper";
 import { GlobalParamsVersion } from "../types/globalParams";
 
@@ -40,8 +41,8 @@ export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
     unbondingFeeSat: v.unbonding_fee,
     maxStakingAmountSat: v.max_staking_amount,
     minStakingAmountSat: v.min_staking_amount,
-    maxStakingTime: v.max_staking_time,
-    minStakingTime: v.min_staking_time,
+    maxStakingTimeBlocks: v.max_staking_time,
+    minStakingTimeBlocks: v.min_staking_time,
     confirmationDepth: v.confirmation_depth,
   }));
 };
