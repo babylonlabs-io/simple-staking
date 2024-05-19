@@ -1,7 +1,7 @@
 import { Psbt, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
-import { FinalityProvider } from "@/app/api/getFinalityProviders";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { FinalityProvider } from "@/app/types/finalityProviders";
 import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";
@@ -41,7 +41,7 @@ export const signForm = async (
   let scripts;
   try {
     scripts = apiDataToStakingScripts(
-      finalityProvider.btc_pk,
+      finalityProvider.btcPk,
       stakingTerm,
       params,
       publicKeyNoCoord,

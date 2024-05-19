@@ -1,25 +1,25 @@
-import { Delegation } from "@/app/api/getDelegations";
-import { DelegationState } from "@/app/types/delegationState";
+import { Delegation, DelegationState } from "@/app/types/delegations";
 
 export const toLocalStorageDelegation = (
   stakingTxHashHex: string,
   stakerPkHex: string,
   finalityProviderPkHex: string,
-  stakingValue: number,
+  stakingValueSat: number,
   stakingTxHex: string,
   timelock: number,
 ): Delegation => ({
-  staking_tx_hash_hex: stakingTxHashHex,
-  staker_pk_hex: stakerPkHex,
-  finality_provider_pk_hex: finalityProviderPkHex,
+  stakingTxHashHex: stakingTxHashHex,
+  stakerPkHex: stakerPkHex,
+  finalityProviderPkHex: finalityProviderPkHex,
   state: DelegationState.PENDING,
-  staking_value: stakingValue,
-  staking_tx: {
-    tx_hex: stakingTxHex,
-    output_index: 0,
-    start_timestamp: new Date().toISOString(),
-    start_height: 0,
+  stakingValueSat: stakingValueSat,
+  stakingTx: {
+    txHex: stakingTxHex,
+    outputIndex: 0,
+    startTimestamp: new Date().toISOString(),
+    startHeight: 0,
     timelock,
   },
-  is_overflow: false,
+  isOverflow: false,
+  unbondingTx: undefined
 });

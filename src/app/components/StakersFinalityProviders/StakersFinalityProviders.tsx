@@ -1,6 +1,6 @@
 // import { useState } from "react";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { FinalityProviders } from "../FinalityProviders/FinalityProviders";
 // import { Stakers } from "../Stakers/Stakers";
 
