@@ -210,7 +210,7 @@ export const Staking: React.FC<StakingProps> = ({
         maxStakingTimeBlocks,
         stakingAmountSat,
         stakingTimeBlocks,
-        finalityProvider,
+        !!finalityProvider,
       );
 
       // Staking time is fixed
