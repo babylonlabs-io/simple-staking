@@ -5,6 +5,7 @@ import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { ThemeProvider } from "next-themes";
+
 import { ErrorProvider } from "./context/Error/ErrorContext";
 
 function Providers({ children }: React.PropsWithChildren) {
