@@ -70,7 +70,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <p className="text-xs dark:text-neutral-content">
               On-demand unbonding
             </p>
-            <p>Enabled (10 days unbonding time)</p>
+            <p>Enabled (7 days unbonding time)</p>
           </div>
         </div>
         <h4 className="text-center text-base">Attention!</h4>
