@@ -81,7 +81,7 @@ export const Stakers: React.FC<StakersProps> = () => {
                   key={staker.staker_pk_hex}
                   pkHex={staker.staker_pk_hex}
                   delegations={staker.active_delegations}
-                  activeTVL={staker.active_tvl}
+                  activeTVLSat={staker.active_tvl}
                 />
               ),
           )

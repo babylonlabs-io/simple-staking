@@ -47,13 +47,15 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
   const hideError = useCallback(() => {
     setIsErrorOpen(false);
-    setError({
-      message: "",
-      errorCode: "",
-      errorTime: new Date(),
-      errorState: undefined,
-    });
-    setRetryErrorAction(undefined);
+    setTimeout(() => {
+      setError({
+        message: "",
+        errorCode: "",
+        errorTime: new Date(),
+        errorState: undefined,
+      });
+      setRetryErrorAction(undefined);
+    }, 300);
   }, []);
 
   const value: ErrorContextType = {

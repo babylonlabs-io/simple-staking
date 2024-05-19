@@ -6,12 +6,12 @@ import { FinalityProvider } from "./FinalityProvider";
 
 interface FinalityProvidersProps {
   data: FinalityProviderInterface[] | undefined;
-  totalActiveTVL?: number;
+  totalActiveTVLSat?: number;
 }
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   data,
-  totalActiveTVL,
+  totalActiveTVLSat,
 }) => {
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
@@ -51,8 +51,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
               moniker={finalityProvider?.description?.moniker}
               pkHex={finalityProvider.btc_pk}
               delegations={finalityProvider.active_delegations}
-              stake={finalityProvider.active_tvl}
-              totalActiveTVL={totalActiveTVL}
+              stakeSat={finalityProvider.active_tvl}
+              totalActiveTVLSat={totalActiveTVLSat}
             />
           ))
         ) : (

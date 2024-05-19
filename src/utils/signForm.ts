@@ -12,15 +12,15 @@ export const signForm = async (
   finalityProvider: FinalityProvider,
   stakingTerm: number,
   btcWalletNetwork: networks.Network,
-  stakingAmount: number, // in satoshis
+  stakingAmountSat: number, // in satoshis
   address: string,
-  stakingFee: number,
+  stakingFeeSat: number,
   publicKeyNoCoord: string,
 ): Promise<string> => {
   if (
     !finalityProvider ||
-    stakingAmount < params.minStakingAmount ||
-    stakingAmount > params.maxStakingAmount ||
+    stakingAmountSat < params.minStakingAmountSat ||
+    stakingAmountSat > params.maxStakingAmountSat ||
     stakingTerm < params.minStakingTime ||
     stakingTerm > params.maxStakingTime
   ) {
@@ -30,7 +30,7 @@ export const signForm = async (
 
   let inputUTXOs = [];
   try {
-    inputUTXOs = await btcWallet.getUtxos(address, stakingAmount + stakingFee);
+    inputUTXOs = await btcWallet.getUtxos(address, stakingAmountSat + stakingFeeSat);
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
   }
@@ -60,8 +60,8 @@ export const signForm = async (
       timelockScript,
       unbondingScript,
       slashingScript,
-      stakingAmount,
-      stakingFee,
+      stakingAmountSat,
+      stakingFeeSat,
       address,
       inputUTXOs,
       btcWalletNetwork,

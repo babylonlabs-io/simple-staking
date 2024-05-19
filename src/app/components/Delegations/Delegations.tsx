@@ -36,8 +36,8 @@ interface DelegationsProps {
   delegationsLocalStorage: DelegationInterface[];
   globalParamsVersion: GlobalParamsVersion;
   publicKeyNoCoord: string;
-  unbondingFee: number;
-  withdrawalFee: number;
+  unbondingFeeSat: number;
+  withdrawalFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
   signPsbt: WalletProvider["signPsbt"];
@@ -50,8 +50,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
   delegationsLocalStorage,
   globalParamsVersion,
   publicKeyNoCoord,
-  unbondingFee,
-  withdrawalFee,
+  unbondingFeeSat,
+  withdrawalFeeSat,
   btcWalletNetwork,
   address,
   signPsbt,
@@ -129,7 +129,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       timelockScript,
       slashingScript,
       Transaction.fromHex(delegation.staking_tx.tx_hex),
-      unbondingFee,
+      unbondingFeeSat,
       btcWalletNetwork,
       delegation.staking_tx.output_index,
     );
@@ -238,7 +238,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         slashingScript,
         Transaction.fromHex(delegation.unbonding_tx.tx_hex),
         address,
-        withdrawalFee,
+        withdrawalFeeSat,
         btcWalletNetwork,
         delegation.staking_tx.output_index,
       );
@@ -250,7 +250,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         unbondingScript,
         Transaction.fromHex(delegation.staking_tx.tx_hex),
         address,
-        withdrawalFee,
+        withdrawalFeeSat,
         btcWalletNetwork,
         delegation.staking_tx.output_index,
       );
@@ -371,7 +371,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
               key={staking_tx_hash_hex + staking_tx.start_height}
               finalityProviderMoniker={finalityProviderMoniker}
               stakingTx={staking_tx}
-              stakingValue={staking_value}
+              stakingValueSat={staking_value}
               stakingTxHash={staking_tx_hash_hex}
               state={state}
               onUnbond={() => handleModal(staking_tx_hash_hex, MODE_UNBOND)}

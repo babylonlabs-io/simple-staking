@@ -1,13 +1,14 @@
 import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface PreviewModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
   onSign: () => void;
   finalityProvider: string | undefined;
-  amount: number;
+  amountSat: number;
   term: number;
 }
 
@@ -15,7 +16,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   open,
   onClose,
   finalityProvider,
-  amount,
+  amountSat,
   term,
   onSign,
 }) => {
@@ -55,7 +56,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${+(amount / 1e8).toFixed(6)} Signet BTC`}</p>
+            <p>{`${satoshiToBtc(amountSat).toFixed(6)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex gap-4">
