@@ -66,11 +66,6 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             </button>
           </div>
           <div className="flex flex-col">
-            <div className="flex items-center justify-between text-xs">
-              <p>Light/Dark mode</p>
-              <ThemeToggle />
-            </div>
-            <div className="divider my-0" />
             <Hash value={address} address noFade fullWidth />
           </div>
           <button
