@@ -102,7 +102,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       <div className="label pt-0">
         <span className="label-text-alt text-base">Amount</span>
         <span className="label-text-alt opacity-50">
-          min stake is {satoshiToBtc(minStakingAmountSat)} Signet BTC
+          min stake is {maxDecimals(satoshiToBtc(minStakingAmountSat), 8)}{" "}
+          Signet BTC
         </span>
       </div>
       <input
