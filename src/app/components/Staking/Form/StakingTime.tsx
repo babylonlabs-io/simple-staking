@@ -22,6 +22,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
 
   const label = "Staking term";

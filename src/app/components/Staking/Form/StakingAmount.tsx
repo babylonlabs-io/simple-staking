@@ -25,6 +25,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
 
   const label = "Staking amount";
