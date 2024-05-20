@@ -85,7 +85,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       case ErrorState.WITHDRAW:
         return `Failed to withdraw due to: ${errorMessage}`;
       case ErrorState.STAKING:
-        return `Failed to stake due to ${errorMessage}`;
+        return `Failed to stake due to: ${errorMessage}`;
       case ErrorState.SWITCH_NETWORK:
         return `Failed to switch network due to: ${errorMessage}`;
       default:
@@ -124,14 +124,14 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         </div>
         <div className="mt-4 flex justify-around gap-4">
           <button
-            className="`btn btn-outline h-[2.5rem] min-h-[2.5rem] flex-1 rounded-lg px-2"
+            className="btn btn-outline flex-1 rounded-lg px-2"
             onClick={() => onClose()}
           >
             Cancel
           </button>
           {onRetry && (
             <button
-              className="btn-primary btn h-[2.5rem] min-h-[2.5rem] flex-1 rounded-lg px-2 text-white"
+              className="btn-primary btn flex-1 rounded-lg px-2 text-white"
               onClick={handleRetry}
             >
               Try Again

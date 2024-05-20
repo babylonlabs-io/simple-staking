@@ -73,7 +73,9 @@ const Home: React.FC<HomeProps> = () => {
     refetchInterval: 60000, // 1 minute
     // Should be enabled only when the wallet is connected
     enabled: !!btcWallet,
-    retry: false,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   const {
@@ -86,7 +88,9 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
-    retry: false,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   const {
@@ -104,7 +108,9 @@ const Home: React.FC<HomeProps> = () => {
     refetchInterval: 60000, // 1 minute
     enabled: !!(btcWallet && publicKeyNoCoord && address),
     select: (data) => data?.pages?.flatMap((page) => page?.delegations),
-    retry: false,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   const {
@@ -117,7 +123,9 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
-    retry: false,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   useEffect(() => {

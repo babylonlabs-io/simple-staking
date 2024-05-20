@@ -12,7 +12,7 @@ import { ErrorState } from "@/app/types/errors";
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { showError, hideError } = useError();
+  const { showError, hideError, isErrorOpen } = useError();
 
   const {
     data: stakersData,
@@ -23,7 +23,9 @@ export const Stakers: React.FC<StakersProps> = () => {
     queryFn: getStakers,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.data,
-    retry: false,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   useEffect(() => {
