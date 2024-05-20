@@ -1,4 +1,4 @@
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 
 // This function returns the current global params version and whether the next version is approaching
 // The current version is the one that is active at the current height

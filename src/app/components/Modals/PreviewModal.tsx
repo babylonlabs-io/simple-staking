@@ -1,6 +1,8 @@
 import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
+
+import { blocksToTime } from "@/utils/blocksToTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface PreviewModalProps {
@@ -8,16 +10,16 @@ interface PreviewModalProps {
   onClose: (value: boolean) => void;
   onSign: () => void;
   finalityProvider: string | undefined;
-  amountSat: number;
-  term: number;
+  stakingAmountSat: number;
+  stakingTimeBlocks: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
   open,
   onClose,
   finalityProvider,
-  amountSat,
-  term,
+  stakingAmountSat,
+  stakingTimeBlocks,
   onSign,
 }) => {
   const modalRef = useRef(null);
@@ -56,19 +58,19 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${satoshiToBtc(amountSat).toFixed(6)} Signet BTC`}</p>
+            <p>{`${+satoshiToBtc(stakingAmountSat).toFixed(6)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex gap-4">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{term}</p>
+            <p>{blocksToTime(stakingTimeBlocks)}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
               On-demand unbonding
             </p>
-            <p>Enabled (10 days unbonding time)</p>
+            <p>Enabled (7 days unbonding time)</p>
           </div>
         </div>
         <h4 className="text-center text-base">Attention!</h4>
@@ -93,13 +95,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           >
             Cancel
           </button>
-          <button
-            className="btn-primary btn flex-1"
-            onClick={() => {
-              onClose(false);
-              onSign();
-            }}
-          >
+          <button className="btn-primary btn flex-1" onClick={onSign}>
             Stake
           </button>
         </div>

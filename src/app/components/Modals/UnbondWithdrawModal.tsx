@@ -23,7 +23,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
 
   const unbondTitle = "Unbond";
   const unbondContent =
-    "You are going to request stake unbonding before your stake expires. The expected approval and unbond time will be about 10 days. OK to proceed?";
+    "You are going to request stake unbonding before your stake expires. The expected approval and unbond time will be about 7 days. OK to proceed?";
 
   const withdrawTitle = "Withdraw";
   const withdrawContent =

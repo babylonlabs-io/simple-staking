@@ -1,7 +1,7 @@
 import { Psbt, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
-import { GlobalParamsVersion } from "@/app/api/getGlobalParams";
-import { FinalityProvider } from "@/app/api/getFinalityProviders";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { FinalityProvider } from "@/app/types/finalityProviders";
 import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";
@@ -12,7 +12,7 @@ export const signForm = async (
   finalityProvider: FinalityProvider,
   stakingTerm: number,
   btcWalletNetwork: networks.Network,
-  stakingAmountSat: number, // in satoshis
+  stakingAmountSat: number,
   address: string,
   stakingFeeSat: number,
   publicKeyNoCoord: string,
@@ -21,8 +21,8 @@ export const signForm = async (
     !finalityProvider ||
     stakingAmountSat < params.minStakingAmountSat ||
     stakingAmountSat > params.maxStakingAmountSat ||
-    stakingTerm < params.minStakingTime ||
-    stakingTerm > params.maxStakingTime
+    stakingTerm < params.minStakingTimeBlocks ||
+    stakingTerm > params.maxStakingTimeBlocks
   ) {
     // TODO Show Popup
     throw new Error("Invalid staking data");
@@ -30,7 +30,10 @@ export const signForm = async (
 
   let inputUTXOs = [];
   try {
-    inputUTXOs = await btcWallet.getUtxos(address, stakingAmountSat + stakingFeeSat);
+    inputUTXOs = await btcWallet.getUtxos(
+      address,
+      stakingAmountSat + stakingFeeSat,
+    );
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
   }
@@ -41,7 +44,7 @@ export const signForm = async (
   let scripts;
   try {
     scripts = apiDataToStakingScripts(
-      finalityProvider.btc_pk,
+      finalityProvider.btcPk,
       stakingTerm,
       params,
       publicKeyNoCoord,

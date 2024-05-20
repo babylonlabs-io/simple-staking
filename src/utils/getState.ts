@@ -1,4 +1,4 @@
-import { DelegationState } from "@/app/types/delegationState";
+import { DelegationState } from "@/app/types/delegations";
 
 // Convert state to human readable format
 export const getState = (state: string) => {
@@ -37,7 +37,7 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding requested";
     case DelegationState.UNBONDING:
-      return "Unbonding process of 10 days has started";
+      return "Unbonding process of 7 days has started";
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:

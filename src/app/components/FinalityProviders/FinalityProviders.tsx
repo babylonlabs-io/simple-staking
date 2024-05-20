@@ -1,8 +1,8 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import { FinalityProvider } from "./FinalityProvider";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 
 interface FinalityProvidersProps {
   data: FinalityProviderInterface[] | undefined;
@@ -47,11 +47,11 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         {data ? (
           data.map((finalityProvider) => (
             <FinalityProvider
-              key={finalityProvider.btc_pk}
+              key={finalityProvider.btcPk}
               moniker={finalityProvider?.description?.moniker}
-              pkHex={finalityProvider.btc_pk}
-              delegations={finalityProvider.active_delegations}
-              stakeSat={finalityProvider.active_tvl}
+              pkHex={finalityProvider.btcPk}
+              delegations={finalityProvider.activeDelegations}
+              stakeSat={finalityProvider.activeTVLSat}
               totalActiveTVLSat={totalActiveTVLSat}
             />
           ))

@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { initBTCCurve } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { networks } from "bitcoinjs-lib";
 
 import {
   getWallet,
@@ -12,36 +12,29 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import {
-  FinalityProvider,
-  getFinalityProviders,
-} from "./api/getFinalityProviders";
-import { Delegation, getDelegations } from "./api/getDelegations";
+import { getFinalityProviders } from "./api/getFinalityProviders";
+import { getDelegations } from "./api/getDelegations";
+import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
-import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { Header } from "./components/Header/Header";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
-import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
-import { signForm } from "@/utils/signForm";
-import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
-import { ErrorState } from "./types/errorState";
+import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
 interface HomeProps { }
 
-const stakingFeeSat = 500;
 const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
@@ -51,12 +44,9 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-  const [amountSat, setAmountSat] = useState(0);
-  const [term, setTerm] = useState(0);
-  const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
-
+  
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -109,88 +99,87 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
-    retry: false,
+    retry: false
   });
 
-  useEffect(() => {
-    if (finalityProvidersError) {
-      showError({
-        error: {
-          message: finalityProvidersError.message,
-          errorState: ErrorState.GET_FINALITY_PROVIDER,
-          errorTime: new Date(),
-        },
-        retryAction: refetchFinalityProvidersData,
-      });
-    }
-    return () => {
-      hideError();
-    };
-  }, [finalityProvidersError, refetchFinalityProvidersData, showError, hideError]);
-
   const {
-    data: delegationsData,
+    data: delegations,
     fetchNextPage: _fetchNextDelegationsPage,
-    refetch: refetchDelegationData,
-    error: delegationError,
-    isLoading,
-  } = useInfiniteQuery({
-    queryKey: ["delegations", address],
-    queryFn: ({ pageParam = "" }) =>
-      getDelegations(pageParam, publicKeyNoCoord),
-    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key,
-    initialPageParam: "",
-    refetchInterval: 60000, // 1 minute
-    enabled: !!(btcWallet && publicKeyNoCoord && address),
-    select: (data) => data?.pages?.flatMap((page) => page?.data),
-    retry: false,
-  });
-
-  useEffect(() => {
-    if (delegationError) {
-      showError({
-        error: {
-          message: delegationError.message,
-          errorState: ErrorState.GET_DELEGATION,
-          errorTime: new Date(),
-        },
-        retryAction: refetchDelegationData,
-      });
-    }
-    return () => {
-      hideError();
-    };
-  }, [delegationError, refetchDelegationData, showError, hideError]);
+    error: delegationsError,
+    refetch: refetchDelegationData
+  } =
+    useInfiniteQuery({
+      queryKey: ["delegations", address],
+      queryFn: ({ pageParam = "" }) =>
+        getDelegations(pageParam, publicKeyNoCoord),
+      getNextPageParam: (lastPage) => lastPage?.pagination?.nextKey,
+      initialPageParam: "",
+      refetchInterval: 60000, // 1 minute
+      enabled: !!(btcWallet && publicKeyNoCoord && address),
+      select: (data) => data?.pages?.flatMap((page) => page?.delegations),
+      retry: false
+    });
 
   const {
-    data: statsData,
-    isLoading: statsDataIsLoading,
-    refetch: refetchStats,
+    data: stakingStats,
+    isLoading: stakingStatsIsLoading,
     error: statsError,
+    refetch: refetchStats,
   } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
-    retry: false,
+    retry: false
   });
 
+
   useEffect(() => {
-    if (statsError) {
-      showError({
-        error: {
-          message: statsError.message,
-          errorState: ErrorState.GET_STATS,
-          errorTime: new Date(),
-        },
-        retryAction: refetchStats,
-      });
-    }
+    const handleError = ({
+      error,
+      errorState,
+      refetchFunction
+    }: ErrorHandlerParam) => {
+      if (error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState: errorState,
+            errorTime: new Date(),
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    };
+
+    handleError({
+      error: finalityProvidersError,
+      errorState: ErrorState.GET_FINALITY_PROVIDER,
+      refetchFunction: refetchFinalityProvidersData
+    });
+    handleError({
+      error: delegationsError,
+      errorState: ErrorState.GET_DELEGATION,
+      refetchFunction: refetchDelegationData
+    });
+    handleError({
+      error: statsError,
+      errorState: ErrorState.GET_STATS,
+      refetchFunction: refetchStats
+    });
+
     return () => {
       hideError();
     };
-  }, [statsError, refetchStats, showError, hideError]);
+  }, [
+    finalityProvidersError,
+    delegationsError,
+    statsError,
+    refetchFinalityProvidersData,
+    refetchDelegationData,
+    refetchStats,
+    showError,
+    hideError,
+  ]);
 
   // Initializing btc curve is a required one-time operation
   useEffect(() => {
@@ -271,122 +260,46 @@ const Home: React.FC<HomeProps> = () => {
     }
   }, [btcWallet]);
 
-  // Select the finality provider from the list
-  const handleChooseFinalityProvider = (btcPkHex: string) => {
-    if (!finalityProvidersData) {
-      return;
-    }
-    const found = finalityProvidersData.find((fp) => fp?.btc_pk === btcPkHex);
-    if (found) {
-      setFinalityProvider(found);
-    }
-  };
-
-  const handleSign = async () => {
-    try {
-      if (!btcWallet) {
-        throw new Error("Wallet not connected");
-      } else if (!btcWalletNetwork) {
-        throw new Error("Wallet network not connected");
-      } else if (!paramWithContext || !paramWithContext.currentVersion) {
-        throw new Error("Global params not loaded");
-      } else if (!finalityProvider) {
-        throw new Error("Finality provider not selected");
-      }
-      const { currentVersion: globalParamsVersion } = paramWithContext;
-      const stakingTerm = getStakingTerm(globalParamsVersion, term);
-      let signedTxHex: string;
-      try {
-        signedTxHex = await signForm(
-          globalParamsVersion,
-          btcWallet,
-          finalityProvider,
-          stakingTerm,
-          btcWalletNetwork,
-          amountSat,
-          address,
-          stakingFeeSat,
-          publicKeyNoCoord,
-        );
-      } catch (error: Error | any) {
-        throw error;
-      }
-
-      let txID;
-      try {
-        txID = await btcWallet.pushTx(signedTxHex);
-      } catch (error: Error | any) {
-        throw error;
-      }
-
-      // Update the local state with the new delegation
-      setDelegationsLocalStorage((delegations) => [
-        toLocalStorageDelegation(
-          Transaction.fromHex(signedTxHex).getId(),
-          publicKeyNoCoord,
-          finalityProvider.btc_pk,
-          amountSat,
-          signedTxHex,
-          stakingTerm,
-        ),
-        ...delegations,
-      ]);
-
-      // Clear the form
-      setAmountSat(0);
-      setTerm(0);
-      setFinalityProvider(undefined);
-    } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.STAKING,
-          errorTime: new Date(),
-        },
-        retryAction: handleSign,
-      });
-    }
-  };
-
   // Remove the delegations that are already present in the API
   useEffect(() => {
-    if (!delegationsData) {
+    if (!delegations) {
       return;
     }
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegationsData?.find(
+          !delegations?.find(
             (delegation) =>
-              delegation?.staking_tx_hash_hex ===
-              localDelegation?.staking_tx_hash_hex,
+              delegation?.stakingTxHashHex ===
+              localDelegation?.stakingTxHashHex,
           ),
       ),
     );
-  }, [delegationsData, setDelegationsLocalStorage]);
+  }, [delegations, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
   const finalityProvidersKV = finalityProvidersData?.reduce(
-    (acc, fp) => ({ ...acc, [fp?.btc_pk]: fp?.description?.moniker }),
+    (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
     {},
   );
 
   let totalStakedSat = 0;
 
-  if (delegationsData) {
-    totalStakedSat = delegationsData
+  if (delegations) {
+    totalStakedSat = delegations
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
-        (accumulator: number, item) => accumulator + item?.staking_value,
+        (accumulator: number, item) => accumulator + item?.stakingValueSat,
         0,
       );
   }
 
   // these constants are needed for easier prop passing
   const overTheCap =
-    paramWithContext?.currentVersion && statsData
-      ? paramWithContext.currentVersion.stakingCapSat <= statsData.active_tvl
+    paramWithContext?.currentVersion && stakingStats
+      ? paramWithContext.currentVersion.stakingCapSat <=
+        stakingStats.activeTVLSat
       : false;
 
   return (
@@ -401,8 +314,8 @@ const Home: React.FC<HomeProps> = () => {
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           <Stats
-            data={statsData}
-            isLoading={statsDataIsLoading}
+            stakingStats={stakingStats}
+            isLoading={stakingStatsIsLoading}
             stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
           {address && btcWalletBalanceSat && (
@@ -413,33 +326,32 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            amountSat={amountSat}
-            onAmountSatChange={setAmountSat}
-            term={term}
-            onTermChange={setTerm}
             finalityProviders={finalityProvidersData}
-            selectedFinalityProvider={finalityProvider}
-            onFinalityProviderChange={handleChooseFinalityProvider}
-            onSign={handleSign}
-            stakingParams={paramWithContext?.currentVersion}
+            paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
             isLoading={isLoadingCurrentParams}
-            isUpgrading={paramWithContext?.isApprochingNextVersion}
+            btcWallet={btcWallet}
+            btcWalletNetwork={btcWalletNetwork}
+            address={address}
+            publicKeyNoCoord={publicKeyNoCoord}
+            setDelegationsLocalStorage={setDelegationsLocalStorage}
           />
           {btcWallet &&
-            delegationsData &&
+            delegations &&
             paramWithContext?.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
-                delegationsAPI={delegationsData}
+                delegationsAPI={delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFeeSat={paramWithContext.currentVersion.unbondingFeeSat}
+                unbondingFeeSat={
+                  paramWithContext.currentVersion.unbondingFeeSat
+                }
                 withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
@@ -450,7 +362,7 @@ const Home: React.FC<HomeProps> = () => {
           {/* At this point of time is not used */}
           {/* <StakersFinalityProviders
             finalityProviders={finalityProvidersData}
-            totalActiveTVLSat={statsData?.active_tvl}
+            totalActiveTVLSat={stakingStats?.activeTVL}
             connected={!!btcWallet}
           /> */}
         </div>

@@ -3,9 +3,9 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import Image from "next/image";
 
-import { Hash } from "../Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { Hash } from "../Hash/Hash";
 
 interface FinalityProviderProps {
   pkHex: string;
@@ -68,7 +68,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         <div className="flex gap-1 lg:hidden">
           {stakeSat ? (
             <>
-              <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
+              <p>{+satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
@@ -79,7 +79,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="hidden gap-1 lg:flex">
         {stakeSat ? (
           <>
-            <p>{satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
+            <p>{+satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (
