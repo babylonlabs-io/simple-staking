@@ -73,8 +73,13 @@ export const Delegation: React.FC<DelegationProps> = ({
     }
   };
 
+  const isActive =
+    intermediateState === DelegationState.ACTIVE ||
+    state === DelegationState.ACTIVE;
+
   const renderState = () => {
-    if (isOverflow) {
+    // overflow should be shown only on active state
+    if (isOverflow && isActive) {
       return getState(DelegationState.OVERFLOW);
     } else {
       return getState(intermediateState || state);
@@ -82,7 +87,8 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const renderStateTooltip = () => {
-    if (isOverflow) {
+    // overflow should be shown only on active state
+    if (isOverflow && isActive) {
       return getStateTooltip(DelegationState.OVERFLOW);
     } else {
       return getStateTooltip(intermediateState || state);
