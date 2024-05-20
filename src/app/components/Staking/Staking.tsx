@@ -1,5 +1,4 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
 import { Transaction, networks } from "bitcoinjs-lib";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
@@ -11,7 +10,7 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
-import { Loading } from "./Loading";
+import { LoadingView } from "../Loading/Loading";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
 import { StakingTime } from "./Form/StakingTime";
@@ -31,7 +30,6 @@ interface StakingProps {
   onConnect: () => void;
   finalityProvidersFetchNext: () => void;
   finalityProvidersHasNext: boolean;
-  finalityProvidersIsLoading: boolean;
   finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
   btcWalletNetwork: networks.Network | undefined;
@@ -53,7 +51,6 @@ export const Staking: React.FC<StakingProps> = ({
   onConnect,
   finalityProvidersFetchNext,
   finalityProvidersHasNext,
-  finalityProvidersIsLoading,
   finalityProvidersIsFetchingMore,
   isLoading,
   paramWithContext,
@@ -167,7 +164,7 @@ export const Staking: React.FC<StakingProps> = ({
     }
     // 2. Wallet is connected but we are still loading the staking params
     else if (isLoading) {
-      return <Loading />;
+      return <LoadingView />;
     }
     // 3. Staking has not started yet
     else if (!stakingParams) {

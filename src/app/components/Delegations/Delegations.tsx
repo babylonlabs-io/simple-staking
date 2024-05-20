@@ -28,6 +28,7 @@ import {
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
+import { LoadingTableList, LoadingView } from "../Loading/Loading";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -44,7 +45,6 @@ interface DelegationsProps {
   next: () => void;
   hasMore: boolean;
   isFetchingMore: boolean;
-  isLoading: boolean;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -62,7 +62,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
   next,
   hasMore,
   isFetchingMore,
-  isLoading,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -315,7 +314,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
-                intermediateDelegation?.stakingTxHashHex &&
+              intermediateDelegation?.stakingTxHashHex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),
@@ -331,88 +330,79 @@ export const Delegations: React.FC<DelegationsProps> = ({
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Staking history</h3>
-      {isLoading ? (
-        <div className="flex items-center justify-center p-4">
-          <span className="loading loading-spinner text-primary" />
-        </div>
-      ) : (
-        <>
-          <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
-            <p>Amount</p>
-            <p>Inception</p>
-            <p>Transaction hash</p>
-            <p>Status</p>
-            <p>Action</p>
-          </div>
-          <div
-            id="staking-history"
-            className="no-scrollbar max-h-[21rem] overflow-y-auto"
-          >
-            <InfiniteScroll
-              className="flex flex-col gap-4"
-              dataLength={combinedDelegationsData.length}
-              next={next}
-              hasMore={hasMore}
-              loader={
-                isFetchingMore ? (
-                  <div className="col-span-full w-full text-center">
-                    <span className="loading loading-spinner text-primary" />
-                  </div>
-                ) : null
-              }
-              scrollableTarget="staking-history"
+      {
+        combinedDelegationsData.length === 0 ?
+          <LoadingView /> :
+          <>
+            <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
+              <p>Amount</p>
+              <p>Inception</p>
+              <p>Transaction hash</p>
+              <p>Status</p>
+              <p>Action</p>
+            </div>
+            <div
+              id="staking-history"
+              className="no-scrollbar max-h-[21rem] overflow-y-auto"
             >
-              {combinedDelegationsData?.map((delegation) => {
-                if (!delegation) return null;
-                const {
-                  stakingValueSat,
-                  stakingTx,
-                  stakingTxHashHex,
-                  finalityProviderPkHex,
-                  state,
-                  isOverflow,
-                } = delegation;
-                // Get the moniker of the finality provider
-                const finalityProviderMoniker =
-                  finalityProvidersKV[finalityProviderPkHex];
-                const intermediateDelegation =
-                  intermediateDelegationsLocalStorage.find(
-                    (item) => item.stakingTxHashHex === stakingTxHashHex,
+              <InfiniteScroll
+                className="flex flex-col gap-4"
+                dataLength={combinedDelegationsData.length}
+                next={next}
+                hasMore={hasMore}
+                loader={isFetchingMore ? <LoadingTableList /> : null}
+                scrollableTarget="staking-history"
+              >
+                {combinedDelegationsData?.map((delegation) => {
+                  if (!delegation) return null;
+                  const {
+                    stakingValueSat,
+                    stakingTx,
+                    stakingTxHashHex,
+                    finalityProviderPkHex,
+                    state,
+                    isOverflow,
+                  } = delegation;
+                  // Get the moniker of the finality provider
+                  const finalityProviderMoniker =
+                    finalityProvidersKV[finalityProviderPkHex];
+                  const intermediateDelegation =
+                    intermediateDelegationsLocalStorage.find(
+                      (item) => item.stakingTxHashHex === stakingTxHashHex,
+                    );
+
+                  return (
+                    <Delegation
+                      key={stakingTxHashHex + stakingTx.startHeight}
+                      finalityProviderMoniker={finalityProviderMoniker}
+                      stakingTx={stakingTx}
+                      stakingValueSat={stakingValueSat}
+                      stakingTxHash={stakingTxHashHex}
+                      state={state}
+                      onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
+                      onWithdraw={() => handleModal(stakingTxHashHex, MODE_WITHDRAW)}
+                      intermediateState={intermediateDelegation?.state}
+                      isOverflow={isOverflow}
+                    />
                   );
+                })}
+              </InfiniteScroll>
+            </div>
+          </>
+      }
 
-                return (
-                  <Delegation
-                    key={stakingTxHashHex + stakingTx.startHeight}
-                    finalityProviderMoniker={finalityProviderMoniker}
-                    stakingTx={stakingTx}
-                    stakingValueSat={stakingValueSat}
-                    stakingTxHash={stakingTxHashHex}
-                    state={state}
-                    onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
-                    onWithdraw={() =>
-                      handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                    }
-                    intermediateState={intermediateDelegation?.state}
-                    isOverflow={isOverflow}
-                  />
-                );
-              })}
-            </InfiniteScroll>
-          </div>
 
-          {modalMode && txID && modalOpen && (
-            <UnbondWithdrawModal
-              open={modalOpen}
-              onClose={() => setModalOpen(false)}
-              onProceed={() => {
-                modalMode === MODE_UNBOND
-                  ? handleUnbondWithErrors(txID)
-                  : handleWithdrawWithErrors(txID);
-              }}
-              mode={modalMode}
-            />
-          )}
-        </>
+      {modalMode && txID && modalOpen && (
+        <UnbondWithdrawModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onProceed={() => {
+            modalMode === MODE_UNBOND
+              ? handleUnbondWithErrors(txID)
+              : handleWithdrawWithErrors(txID);
+          }}
+          mode={modalMode}
+        />
       )}
     </div>
   );

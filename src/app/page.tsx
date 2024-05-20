@@ -70,8 +70,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const {
     data: finalityProviders,
-    isLoading: isLoadingFinalityProviders,
-    fetchNextPage: _fetchNextFinalityProvidersPage,
+    fetchNextPage: fetchNextFinalityProvidersPage,
     hasNextPage: hasNextFinalityProvidersPage,
     isFetchingNextPage: isFetchingNextFinalityProvidersPage,
   } = useInfiniteQuery({
@@ -98,10 +97,9 @@ const Home: React.FC<HomeProps> = () => {
 
   const {
     data: delegations,
-    fetchNextPage: _fetchNextDelegationsPage,
+    fetchNextPage: fetchNextDelegationsPage,
     hasNextPage: hasNextDelegationsPage,
     isFetchingNextPage: isFetchingNextDelegationsPage,
-    isLoading: isLoadingDelegationsData,
   } = useInfiniteQuery({
     queryKey: ["delegations", address, publicKeyNoCoord],
     queryFn: ({ pageParam = "" }) =>
@@ -276,9 +274,8 @@ const Home: React.FC<HomeProps> = () => {
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
-            finalityProvidersFetchNext={_fetchNextFinalityProvidersPage}
+            finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
-            finalityProvidersIsLoading={isLoadingFinalityProviders}
             finalityProvidersIsFetchingMore={
               isFetchingNextFinalityProvidersPage
             }
@@ -308,10 +305,9 @@ const Home: React.FC<HomeProps> = () => {
                 address={address}
                 signPsbt={btcWallet.signPsbt}
                 pushTx={btcWallet.pushTx}
-                next={_fetchNextDelegationsPage}
+                next={fetchNextDelegationsPage}
                 hasMore={hasNextDelegationsPage}
                 isFetchingMore={isFetchingNextDelegationsPage}
-                isLoading={isLoadingDelegationsData}
               />
             )}
           {/* At this point of time is not used */}

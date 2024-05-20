@@ -2,7 +2,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
-import { Loading } from "../Loading";
+import { LoadingTableList, LoadingView } from "../../Loading/Loading";
 
 interface FinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
@@ -25,7 +25,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
 }) => {
   // If there are no finality providers, show loading
   if (!finalityProviders || finalityProviders.length === 0) {
-    return <Loading />;
+    return <LoadingView />;
   }
 
   return (
@@ -57,13 +57,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           dataLength={finalityProviders?.length || 0}
           next={finalityProvidersFetchNext}
           hasMore={finalityProvidersHasNext}
-          loader={
-            finalityProvidersIsFetchingMore ? (
-              <div className="w-full text-center">
-                <span className="loading loading-spinner text-primary" />
-              </div>
-            ) : null
-          }
+          loader={finalityProvidersIsFetchingMore ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
           {" "}
