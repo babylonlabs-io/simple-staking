@@ -46,31 +46,26 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       if (retryErrorParam.retryAction) {
         retryErrorParam.retryAction();
       };
-    }, 3000);
-  }
+    }, 300);
+  };
 
   const getErrorTitle = () => {
     switch (errorState) {
-      case ErrorState.POST_UNBOUNDING:
-        return "Unbounding Error";
       case ErrorState.GET_STAKING:
-        return "Staking Error";
       case ErrorState.GET_DELEGATION:
-        return "Delegation Error";
-      case ErrorState.GET_FINALITY_PROVIDER:
-        return "Finality Provider Error";
       case ErrorState.GET_STATS:
-        return "Stats Error";
+      case ErrorState.GET_FINALITY_PROVIDER:
       case ErrorState.GET_GLOBAL_PARAMS:
-        return "Global Params Error";
       case ErrorState.GET_UNBOUNDING_ELIGIBILITY:
-        return "Unbounding Eligiblity Error";
+        return "Connection Error";
       case ErrorState.SWITCH_NETWORK:
         return "Network Error";
       case ErrorState.WITHDRAW:
         return "Withdraw Error";
       case ErrorState.STAKING:
         return "Stake Error";
+      case ErrorState.UNBOUNDING:
+        return "Unbounding Error";
       default:
         return "Unknown Error";
     }
@@ -78,26 +73,21 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
 
   const getErrorMessage = () => {
     switch (errorState) {
-      case ErrorState.POST_UNBOUNDING:
-        return `Your request to unbound failed due to: ${errorMessage}`;
       case ErrorState.GET_STAKING:
-        return `Failed to fetch staking data due to: ${errorMessage}`;
       case ErrorState.GET_DELEGATION:
-        return `Failed to fetch delegation data due to: ${errorMessage}`;
       case ErrorState.GET_FINALITY_PROVIDER:
-        return `Failed to fetch finality provider data due to: ${errorMessage}`;
       case ErrorState.GET_STATS:
-        return `Failed to fetch stats due to: ${errorMessage}`;
       case ErrorState.GET_GLOBAL_PARAMS:
-        return `Failed to fetch global params due to: ${errorMessage}`;
       case ErrorState.GET_UNBOUNDING_ELIGIBILITY:
-        return `Failed to fetch unbounding eligiblity due to: ${errorMessage}`;
-      case ErrorState.SWITCH_NETWORK:
-        return `Failed to switch network due to: ${errorMessage}`;
+        return `Error fetching data`;
+      case ErrorState.UNBOUNDING:
+        return `Your request to unbound failed due to: ${errorMessage}`;
       case ErrorState.WITHDRAW:
         return `Failed to withdraw due to: ${errorMessage}`;
       case ErrorState.STAKING:
         return `Failed to stake due to ${errorMessage}`;
+      case ErrorState.SWITCH_NETWORK:
+        return `Failed to switch network due to: ${errorMessage}`;
       default:
         return errorMessage;
     }
