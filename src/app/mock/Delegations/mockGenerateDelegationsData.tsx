@@ -1,3 +1,5 @@
+import { Delegation } from "@/app/types/delegations";
+
 function generateRandomHex(size: number) {
   return [...Array(size)]
     .map(() => Math.floor(Math.random() * 16).toString(16))
@@ -10,7 +12,7 @@ function getRandomState() {
 }
 
 export function generateRandomDelegationData(count: number) {
-  const data = [];
+  const data: Delegation[] = [];
 
   for (let i = 0; i < count; i++) {
     const staking_value = Math.floor(Math.random() * 2000) + 1000; // Random value between 1000 and 3000
@@ -19,26 +21,24 @@ export function generateRandomDelegationData(count: number) {
     const is_overflow = Math.random() > 0.5; // Randomly true or false
 
     data.push({
-      staking_tx_hash_hex: generateRandomHex(32),
-      staker_pk_hex: generateRandomHex(32),
-      finality_provider_pk_hex: generateRandomHex(32),
+      stakingTxHashHex: generateRandomHex(32),
+      stakerPkHex: generateRandomHex(32),
+      finalityProviderPkHex: generateRandomHex(32),
       state: getRandomState(),
-      staking_value: staking_value,
-      staking_tx: {
-        id: i + 1,
-        date: `2024-${Math.floor(Math.random() * 12 + 1)
-          .toString()
-          .padStart(2, "0")}-${Math.floor(Math.random() * 28 + 1)
-          .toString()
-          .padStart(2, "0")}`,
-        amount: staking_value,
-        start_height: start_height,
-        start_timestamp: start_timestamp,
-        tx_hex: generateRandomHex(32),
-        output_index: 2,
+      stakingValueSat: staking_value,
+      stakingTx: {
+        startHeight: start_height,
+        startTimestamp: start_timestamp,
+        txHex: generateRandomHex(32),
+        outputIndex: 2,
         timelock: 1,
       },
-      is_overflow: is_overflow,
+      unbondingTx: {
+        txHex: generateRandomHex(32),
+        outputIndex: 2,
+      },
+      isOverflow: is_overflow,
+
     });
   }
 
