@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
@@ -68,6 +68,8 @@ export const Staking: React.FC<StakingProps> = ({
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [currentBlockHeight, setCurrentBlockHeight] = useState(0);
+  const pollingInterval = 60000; // 60 seconds fetch interval
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
@@ -79,6 +81,28 @@ export const Staking: React.FC<StakingProps> = ({
     setStakingTimeBlocks(0);
     setPreviewModalOpen(false);
   };
+
+  useEffect(() => {
+    let intervalId;
+
+    const fetchBlockHeight = async () => {
+      if (!btcWallet) return;
+
+      try {
+        const height = await btcWallet.getBTCTipHeight();
+        setCurrentBlockHeight(height);
+      } catch (error) {
+        console.error("Error fetching current block height.");
+      }
+    };
+    fetchBlockHeight();
+
+    intervalId = setInterval(fetchBlockHeight, pollingInterval);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [btcWallet, pollingInterval]);
 
   const handleSign = async () => {
     try {
@@ -218,7 +242,20 @@ export const Staking: React.FC<StakingProps> = ({
         />
       );
     }
-    // 6. Staking form
+    // 6. Current block height has not reached activation block height
+    else if (currentBlockHeight < stakingParams.activationHeight) {
+      return (
+        <Message
+          title="Staking has not yet started"
+          messages={[
+            `The staking application will open once the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}) has been reached.`,
+            `The current Bitcoin block height is ${currentBlockHeight || "-"}.`,
+          ]}
+          icon={stakingNotStarted}
+        />
+      );
+    }
+    // 7. Staking form
     else {
       const {
         minStakingAmountSat,
