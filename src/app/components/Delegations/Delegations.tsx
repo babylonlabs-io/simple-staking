@@ -29,6 +29,7 @@ import {
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
 import { LoadingTableList, LoadingView } from "../Loading/Loading";
+import { QueryMeta } from "@/app/types/api";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -42,9 +43,7 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
-  next: () => void;
-  hasMore: boolean;
-  isFetchingMore: boolean;
+  queryMeta: QueryMeta;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -59,9 +58,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
   signPsbt,
   pushTx,
-  next,
-  hasMore,
-  isFetchingMore,
+  queryMeta
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -348,9 +345,9 @@ export const Delegations: React.FC<DelegationsProps> = ({
               <InfiniteScroll
                 className="flex flex-col gap-4"
                 dataLength={combinedDelegationsData.length}
-                next={next}
-                hasMore={hasMore}
-                loader={isFetchingMore ? <LoadingTableList /> : null}
+                next={queryMeta.next}
+                hasMore={queryMeta.hasMore}
+                loader={queryMeta.isFetchingMore ? <LoadingTableList /> : null}
                 scrollableTarget="staking-history"
               >
                 {combinedDelegationsData?.map((delegation) => {

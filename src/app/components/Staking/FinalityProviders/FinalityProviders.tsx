@@ -3,15 +3,14 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { FinalityProvider } from "./FinalityProvider";
 import { LoadingTableList, LoadingView } from "../../Loading/Loading";
+import { QueryMeta } from "@/app/types/api";
 
 interface FinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   selectedFinalityProvider: FinalityProviderInterface | undefined;
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
-  finalityProvidersFetchNext: () => void;
-  finalityProvidersHasNext: boolean;
-  finalityProvidersIsFetchingMore: boolean;
+  queryMeta: QueryMeta
 }
 
 // Staking form finality providers
@@ -19,9 +18,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   finalityProviders,
   selectedFinalityProvider,
   onFinalityProviderChange,
-  finalityProvidersFetchNext,
-  finalityProvidersHasNext,
-  finalityProvidersIsFetchingMore,
+  queryMeta,
 }) => {
   // If there are no finality providers, show loading
   if (!finalityProviders || finalityProviders.length === 0) {
@@ -55,9 +52,9 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <InfiniteScroll
           className="flex flex-col gap-4"
           dataLength={finalityProviders?.length || 0}
-          next={finalityProvidersFetchNext}
-          hasMore={finalityProvidersHasNext}
-          loader={finalityProvidersIsFetchingMore ? <LoadingTableList /> : null}
+          next={queryMeta.next}
+          hasMore={queryMeta.hasMore}
+          loader={queryMeta.isFetchingMore ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
           {" "}

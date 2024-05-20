@@ -2,19 +2,16 @@ import { encode } from "url-safe-base64";
 
 import { apiWrapper } from "./apiWrapper";
 import { Delegation } from "../types/delegations";
+import { Pagination } from "../types/api";
 
 export interface PaginatedDelegations {
   data: Delegation[];
-  pagination: DelegationsPagination;
-}
-
-export interface DelegationsPagination {
-  next_key: string;
+  pagination: Pagination;
 }
 
 interface DelegationsAPIResponse {
   data: DelegationAPI[];
-  pagination: DelegationsPagination;
+  pagination: Pagination;
 }
 
 interface DelegationAPI {
@@ -92,7 +89,7 @@ export const getDelegations = async (
     }),
   );
 
-  const pagination: DelegationsPagination = {
+  const pagination: Pagination = {
     next_key: delegationsAPIResponse.pagination.next_key,
   };
   return { data: delegations, pagination };

@@ -2,7 +2,6 @@ import { apiWrapper } from "./apiWrapper";
 
 export interface Stakers {
   data: StakersData[];
-  pagination: Pagination;
 }
 
 export interface StakersData {
@@ -11,10 +10,6 @@ export interface StakersData {
   total_tvl: number;
   active_delegations: number;
   total_delegations: number;
-}
-
-export interface Pagination {
-  next_key: string;
 }
 
 export const getStakers = async (): Promise<Stakers> => {

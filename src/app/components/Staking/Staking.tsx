@@ -280,9 +280,11 @@ export const Staking: React.FC<StakingProps> = ({
             finalityProviders={finalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
-            finalityProvidersIsFetchingMore={finalityProvidersIsFetchingMore}
-            finalityProvidersHasNext={finalityProvidersHasNext}
-            finalityProvidersFetchNext={finalityProvidersFetchNext}
+            queryMeta={{
+              next: finalityProvidersFetchNext,
+              hasMore: finalityProvidersHasNext,
+              isFetchingMore: finalityProvidersIsFetchingMore,
+            }}
           />
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />

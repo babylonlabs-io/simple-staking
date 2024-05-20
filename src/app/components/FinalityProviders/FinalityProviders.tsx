@@ -5,22 +5,18 @@ import { Tooltip } from "react-tooltip";
 import { FinalityProvider } from "./FinalityProvider";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { LoadingTableList, LoadingView } from "../Loading/Loading";
+import { QueryMeta } from "@/app/types/api";
 
 interface FinalityProvidersProps {
-  data: FinalityProviderInterface[] | undefined;
-  next: () => void;
-  hasMore: boolean;
-  isFetchingMore: boolean;
-  isLoading: boolean;
+  data: FinalityProviderInterface[] | undefined; 
   totalActiveTVLSat?: number;
+  queryMeta: QueryMeta;
 }
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   data,
-  next,
-  hasMore,
-  isFetchingMore,
   totalActiveTVLSat,
+  queryMeta
 }) => {
   if (!data || data.length === 0) {
     return <LoadingView />;
@@ -61,9 +57,9 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <InfiniteScroll
           className="flex flex-col gap-4"
           dataLength={data?.length || 0}
-          next={next}
-          hasMore={hasMore}
-          loader={isFetchingMore ? <LoadingTableList /> : null}
+          next={queryMeta.next}
+          hasMore={queryMeta.hasMore}
+          loader={queryMeta.isFetchingMore ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
           {data ? (

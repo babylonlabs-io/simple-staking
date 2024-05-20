@@ -1,18 +1,16 @@
 import { encode } from "url-safe-base64";
 import { apiWrapper } from "./apiWrapper";
 import { FinalityProvider } from "../types/finalityProviders";
+import { Pagination } from "../types/api";
 
 export interface PaginatedFinalityProviders {
   data: FinalityProvider[];
-  pagination: FinalityPagination;
+  pagination: Pagination;
 }
 
-interface FinalityPagination {
-  next_key: string;
-}
 interface FinalityProvidersAPIResponse {
   data: FinalityProviderAPI[];
-  pagination: FinalityPagination;
+  pagination: Pagination;
 }
 
 interface FinalityProviderAPI {
@@ -75,7 +73,7 @@ export const getFinalityProviders = async (
     }),
   );
 
-  const pagination: FinalityPagination = {
+  const pagination: Pagination = {
     next_key: finalityProvidersAPIResponse.pagination.next_key,
   };
 
