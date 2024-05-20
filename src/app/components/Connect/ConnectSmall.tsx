@@ -41,7 +41,9 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" />
             <p>
-              <strong>{maxDecimals(satoshiToBtc(balanceSat), 8) || 0} BTC</strong>
+              <strong>
+                {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} BTC
+              </strong>
             </p>
           </div>
         </div>
