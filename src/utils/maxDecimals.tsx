@@ -10,6 +10,9 @@
  * maxDecimals(1.005, 2);           // returns 1.01
  * maxDecimals(10, 0);              // returns 10
  * maxDecimals(0.00010000, 8);      // returns 0.0001
+ * maxDecimals(0.00010000, 8);      // returns 0.0001
+ * maxDecimals(3.141, 3);           // returns 3.141
+ * maxDecimals(3.149, 3);           // returns 3.149
  */
 
 export const maxDecimals = (value: number, maxDecimals: number): number => {
