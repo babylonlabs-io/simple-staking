@@ -28,7 +28,7 @@ import {
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errorState";
+import { ErrorState } from "@/app/types/errors";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -180,7 +180,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           errorState: ErrorState.POST_UNBOUNDING,
           errorTime: new Date(),
         },
-        retryAction: async () => await handleUnbondWithErrors(id),
+        retryAction: () => handleModal(id, MODE_UNBOND),
       });
     } finally {
       setModalOpen(false);
@@ -294,7 +294,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           errorState: ErrorState.WITHDRAW,
           errorTime: new Date(),
         },
-        retryAction: async () => await handleWithdrawWithErrors(id),
+        retryAction: () => handleModal(id, MODE_WITHDRAW),
       });
     } finally {
       setModalOpen(false);

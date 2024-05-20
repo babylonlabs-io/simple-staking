@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 
-import { ErrorType } from "@/app/types/errorState";
+import { ErrorType } from "@/app/types/errors";
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 

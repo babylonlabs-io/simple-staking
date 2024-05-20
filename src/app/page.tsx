@@ -33,7 +33,7 @@ import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const withdrawalFeeSat = 500;
 
@@ -46,7 +46,7 @@ const Home: React.FC<HomeProps> = () => {
   const [address, setAddress] = useState("");
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
-  
+
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -89,7 +89,12 @@ const Home: React.FC<HomeProps> = () => {
     return () => {
       hideError();
     };
-  }, [globalParamsVersionError, refetchGlobalParamsVersion, showError, hideError]);
+  }, [
+    globalParamsVersionError,
+    refetchGlobalParamsVersion,
+    showError,
+    hideError,
+  ]);
 
   const {
     data: finalityProvidersData,
@@ -99,26 +104,25 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
     refetchInterval: 60000, // 1 minute
-    retry: false
+    retry: false,
   });
 
   const {
     data: delegations,
     fetchNextPage: _fetchNextDelegationsPage,
     error: delegationsError,
-    refetch: refetchDelegationData
-  } =
-    useInfiniteQuery({
-      queryKey: ["delegations", address],
-      queryFn: ({ pageParam = "" }) =>
-        getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.nextKey,
-      initialPageParam: "",
-      refetchInterval: 60000, // 1 minute
-      enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => data?.pages?.flatMap((page) => page?.delegations),
-      retry: false
-    });
+    refetch: refetchDelegationData,
+  } = useInfiniteQuery({
+    queryKey: ["delegations", address],
+    queryFn: ({ pageParam = "" }) =>
+      getDelegations(pageParam, publicKeyNoCoord),
+    getNextPageParam: (lastPage) => lastPage?.pagination?.nextKey,
+    initialPageParam: "",
+    refetchInterval: 60000, // 1 minute
+    enabled: !!(btcWallet && publicKeyNoCoord && address),
+    select: (data) => data?.pages?.flatMap((page) => page?.delegations),
+    retry: false,
+  });
 
   const {
     data: stakingStats,
@@ -129,15 +133,14 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
-    retry: false
+    retry: false,
   });
-
 
   useEffect(() => {
     const handleError = ({
       error,
       errorState,
-      refetchFunction
+      refetchFunction,
     }: ErrorHandlerParam) => {
       if (error) {
         showError({
@@ -154,17 +157,17 @@ const Home: React.FC<HomeProps> = () => {
     handleError({
       error: finalityProvidersError,
       errorState: ErrorState.GET_FINALITY_PROVIDER,
-      refetchFunction: refetchFinalityProvidersData
+      refetchFunction: refetchFinalityProvidersData,
     });
     handleError({
       error: delegationsError,
       errorState: ErrorState.GET_DELEGATION,
-      refetchFunction: refetchDelegationData
+      refetchFunction: refetchDelegationData,
     });
     handleError({
       error: statsError,
       errorState: ErrorState.GET_STATS,
-      refetchFunction: refetchStats
+      refetchFunction: refetchStats,
     });
 
     return () => {

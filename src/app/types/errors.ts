@@ -17,3 +17,9 @@ export interface ErrorType {
   errorState?: ErrorState;
   errorTime: Date;
 }
+
+export interface ErrorHandlerParam {
+  error: Error | null;
+  errorState: ErrorState;
+  refetchFunction: () => void;
+}

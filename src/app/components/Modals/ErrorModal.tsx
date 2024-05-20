@@ -2,8 +2,9 @@ import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { format } from "date-fns";
-import { ErrorState } from "@/app/types/errorState";
 import { useTheme } from "next-themes";
+
+import { ErrorState } from "@/app/types/errors";
 
 interface ErrorModalProps {
   open: boolean;

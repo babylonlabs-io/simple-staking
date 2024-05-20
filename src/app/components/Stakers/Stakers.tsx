@@ -6,7 +6,8 @@ import { getStakers } from "@/app/api/getStakers";
 import { Staker } from "./Staker";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useEffect } from "react";
-import { ErrorState } from "@/app/types/errorState";
+
+import { ErrorState } from "@/app/types/errors";
 
 interface StakersProps {}
 
@@ -75,7 +76,6 @@ export const Stakers: React.FC<StakersProps> = () => {
         {stakersData ? (
           stakersData.map(
             (staker) =>
-              // TODO handle API data errors with a proper error boundary
               staker && (
                 <Staker
                   key={staker.staker_pk_hex}
