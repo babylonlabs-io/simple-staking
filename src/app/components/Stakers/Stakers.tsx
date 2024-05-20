@@ -4,6 +4,7 @@ import { Tooltip } from "react-tooltip";
 
 import { getStakers } from "@/app/api/getStakers";
 import { Staker } from "./Staker";
+import { LoadingView } from "../Loading/Loading";
 
 interface StakersProps {}
 
@@ -60,9 +61,7 @@ export const Stakers: React.FC<StakersProps> = () => {
               ),
           )
         ) : (
-          <div className="flex justify-center py-4">
-            <span className="loading loading-spinner text-primary" />
-          </div>
+          <LoadingView />
         )}
       </div>
       <Tooltip id="tooltip-delegations" />

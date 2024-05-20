@@ -10,7 +10,7 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
-import { Loading } from "./Loading";
+import { LoadingView } from "../Loading/Loading";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
 import { StakingTime } from "./Form/StakingTime";
@@ -28,6 +28,9 @@ interface StakingProps {
   isLoading: boolean;
   overTheCap: boolean;
   onConnect: () => void;
+  finalityProvidersFetchNext: () => void;
+  finalityProvidersHasNext: boolean;
+  finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
   btcWalletNetwork: networks.Network | undefined;
   address: string | undefined;
@@ -44,9 +47,12 @@ interface StakingProps {
 export const Staking: React.FC<StakingProps> = ({
   finalityProviders,
   isWalletConnected,
-  isLoading,
   overTheCap,
   onConnect,
+  finalityProvidersFetchNext,
+  finalityProvidersHasNext,
+  finalityProvidersIsFetchingMore,
+  isLoading,
   paramWithContext,
   btcWallet,
   btcWalletNetwork,
@@ -158,7 +164,7 @@ export const Staking: React.FC<StakingProps> = ({
     }
     // 2. Wallet is connected but we are still loading the staking params
     else if (isLoading) {
-      return <Loading />;
+      return <LoadingView />;
     }
     // 3. Staking has not started yet
     else if (!stakingParams) {
@@ -274,6 +280,11 @@ export const Staking: React.FC<StakingProps> = ({
             finalityProviders={finalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
+            queryMeta={{
+              next: finalityProvidersFetchNext,
+              hasMore: finalityProvidersHasNext,
+              isFetchingMore: finalityProvidersIsFetchingMore,
+            }}
           />
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />

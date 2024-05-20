@@ -2,19 +2,16 @@ import { encode } from "url-safe-base64";
 
 import { apiWrapper } from "./apiWrapper";
 import { Delegation } from "../types/delegations";
+import { Pagination } from "../types/api";
 
 export interface PaginatedDelegations {
-  delegations: Delegation[];
-  pagination: DelegationsPagination;
+  data: Delegation[];
+  pagination: Pagination;
 }
 
-export interface DelegationsPagination {
-  nextKey: string;
-}
-
-interface DelegationsAPI {
+interface DelegationsAPIResponse {
   data: DelegationAPI[];
-  pagination: PaginationAPI;
+  pagination: Pagination;
 }
 
 interface DelegationAPI {
@@ -41,10 +38,6 @@ interface UnbondingTxAPI {
   output_index: number;
 }
 
-interface PaginationAPI {
-  next_key: string;
-}
-
 export const getDelegations = async (
   key: string,
   publicKeyNoCoord?: string,
@@ -53,13 +46,13 @@ export const getDelegations = async (
     throw new Error("No public key provided");
   }
 
-  const limit = 100;
-  const reverse = false;
+  // const limit = 100;
+  // const reverse = false;
 
   const params = {
-    "pagination.key": encode(key),
-    "pagination.reverse": reverse,
-    "pagination.limit": limit,
+    pagination_key: encode(key),
+    // "pagination_reverse": reverse,
+    // "pagination_limit": limit,
     staker_btc_pk: encode(publicKeyNoCoord),
   };
 
@@ -70,9 +63,9 @@ export const getDelegations = async (
     params,
   );
 
-  const delegationsAPI: DelegationsAPI = response.data;
+  const delegationsAPIResponse: DelegationsAPIResponse = response.data;
 
-  const delegations: Delegation[] = delegationsAPI.data.map(
+  const delegations: Delegation[] = delegationsAPIResponse.data.map(
     (apiDelegation: DelegationAPI): Delegation => ({
       stakingTxHashHex: apiDelegation.staking_tx_hash_hex,
       stakerPkHex: apiDelegation.staker_pk_hex,
@@ -96,8 +89,8 @@ export const getDelegations = async (
     }),
   );
 
-  const pagination: DelegationsPagination = {
-    nextKey: delegationsAPI.pagination.next_key,
+  const pagination: Pagination = {
+    next_key: delegationsAPIResponse.pagination.next_key,
   };
-  return { delegations, pagination };
+  return { data: delegations, pagination };
 };
