@@ -308,7 +308,7 @@ const Home: React.FC<HomeProps> = () => {
                 queryMeta={{
                   next: fetchNextDelegationsPage,
                   hasMore: hasNextDelegationsPage,
-                  isFetchingMore: isFetchingNextDelegationsPage
+                  isFetchingMore: isFetchingNextDelegationsPage,
                 }}
               />
             )}

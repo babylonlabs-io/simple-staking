@@ -10,7 +10,7 @@ interface FinalityProvidersProps {
   selectedFinalityProvider: FinalityProviderInterface | undefined;
   // called when the user selects a finality provider
   onFinalityProviderChange: (btcPkHex: string) => void;
-  queryMeta: QueryMeta
+  queryMeta: QueryMeta;
 }
 
 // Staking form finality providers

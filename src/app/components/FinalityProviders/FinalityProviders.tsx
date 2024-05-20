@@ -8,7 +8,7 @@ import { LoadingTableList, LoadingView } from "../Loading/Loading";
 import { QueryMeta } from "@/app/types/api";
 
 interface FinalityProvidersProps {
-  data: FinalityProviderInterface[] | undefined; 
+  data: FinalityProviderInterface[] | undefined;
   totalActiveTVLSat?: number;
   queryMeta: QueryMeta;
 }
@@ -16,7 +16,7 @@ interface FinalityProvidersProps {
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   data,
   totalActiveTVLSat,
-  queryMeta
+  queryMeta,
 }) => {
   if (!data || data.length === 0) {
     return <LoadingView />;

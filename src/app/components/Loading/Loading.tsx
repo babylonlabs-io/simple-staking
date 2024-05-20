@@ -1,4 +1,4 @@
-interface LoadingProps { }
+interface LoadingProps {}
 
 export const LoadingView: React.FC<LoadingProps> = () => {
   return (

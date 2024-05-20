@@ -2,39 +2,30 @@
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { FinalityProviders } from "../FinalityProviders/FinalityProviders";
+import { QueryMeta } from "@/app/types/api";
 // import { Stakers } from "../Stakers/Stakers";
 
 interface StakersFinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   totalActiveTVLSat?: number;
   connected?: boolean;
-  next: () => void;
-  hasMore: boolean;
-  isFetchingMore: boolean;
-  isLoading: boolean;
+  queryMeta: QueryMeta;
 }
 
 export const StakersFinalityProviders: React.FC<
   StakersFinalityProvidersProps
-> = ({
-  finalityProviders,
-  totalActiveTVLSat,
-  connected,
-  next,
-  hasMore,
-  isFetchingMore,
-  isLoading,
-}) => {
+> = ({ finalityProviders, totalActiveTVLSat, connected, queryMeta }) => {
   // At this point of time we disable the Stakers tab
   return (
     <div>
       <FinalityProviders
         data={finalityProviders}
         totalActiveTVLSat={totalActiveTVLSat}
-        next={next}
-        hasMore={hasMore}
-        isFetchingMore={isFetchingMore}
-        isLoading={isLoading}
+        queryMeta={{
+          next: queryMeta.next,
+          hasMore: queryMeta.hasMore,
+          isFetchingMore: queryMeta.isFetchingMore,
+        }}
       />
     </div>
   );

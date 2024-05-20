@@ -61,7 +61,7 @@ export const Stakers: React.FC<StakersProps> = () => {
               ),
           )
         ) : (
-            <LoadingView />
+          <LoadingView />
         )}
       </div>
       <Tooltip id="tooltip-delegations" />
