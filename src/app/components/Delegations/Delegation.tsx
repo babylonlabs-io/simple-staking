@@ -7,6 +7,7 @@ import { durationTillNow } from "@/utils/formatTime";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
@@ -100,7 +101,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
-        <p>{+satoshiToBtc(stakingValueSat).toFixed(6)} Signet BTC</p>
+        <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} Signet BTC</p>
         <p>{durationTillNow(startTimestamp)}</p>
         <a
           href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}

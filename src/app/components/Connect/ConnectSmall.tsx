@@ -6,6 +6,7 @@ import { useOnClickOutside } from "usehooks-ts";
 
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import { Hash } from "../Hash/Hash";
 
@@ -40,7 +41,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" />
             <p>
-              <strong>{+satoshiToBtc(balanceSat).toFixed(6) || 0} BTC</strong>
+              <strong>{maxDecimals(satoshiToBtc(balanceSat), 8) || 0} BTC</strong>
             </p>
           </div>
         </div>

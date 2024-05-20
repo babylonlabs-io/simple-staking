@@ -29,6 +29,7 @@ interface StakingProps {
   overTheCap: boolean;
   onConnect: () => void;
   btcWallet: WalletProvider | undefined;
+  btcWalletBalanceSat: number;
   btcWalletNetwork: networks.Network | undefined;
   address: string | undefined;
   publicKeyNoCoord: string;
@@ -53,6 +54,7 @@ export const Staking: React.FC<StakingProps> = ({
   address,
   publicKeyNoCoord,
   setDelegationsLocalStorage,
+  btcWalletBalanceSat,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -234,13 +236,12 @@ export const Staking: React.FC<StakingProps> = ({
               <StakingTime
                 minStakingTimeBlocks={minStakingTimeBlocks}
                 maxStakingTimeBlocks={maxStakingTimeBlocks}
-                stakingTimeBlocks={stakingTimeBlocks}
                 onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
               />
               <StakingAmount
                 minStakingAmountSat={minStakingAmountSat}
                 maxStakingAmountSat={maxStakingAmountSat}
-                stakingAmountSat={stakingAmountSat}
+                btcWalletBalanceSat={btcWalletBalanceSat}
                 onStakingAmountSatChange={handleStakingAmountSatChange}
               />
             </div>

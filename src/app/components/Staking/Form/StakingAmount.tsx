@@ -1,39 +1,101 @@
+import { ChangeEvent, FocusEvent, useState } from "react";
+
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
+import {
+  validateDecimalPoints,
+  validateMax,
+  validateMin,
+  validateNotZero,
+  validateNumber,
+} from "./validation/validation";
 
 interface StakingAmountProps {
   minStakingAmountSat: number;
   maxStakingAmountSat: number;
-  stakingAmountSat: number;
+  btcWalletBalanceSat: number;
   onStakingAmountSatChange: (inputAmountSat: number) => void;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
   minStakingAmountSat,
   maxStakingAmountSat,
-  stakingAmountSat,
+  btcWalletBalanceSat,
   onStakingAmountSatChange,
 }) => {
+  const [value, setValue] = useState("");
+  const [error, setError] = useState("");
+  const [touched, setTouched] = useState(false);
+
+  const label = "Staking amount";
+  const generalErrorMessage = "You should input staking amount";
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+
+    // Allow the input to be changed freely
+    setValue(newValue);
+
+    if (touched && newValue === "") {
+      setError(generalErrorMessage);
+    } else {
+      setError("");
+    }
+  };
+
+  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
+    setTouched(true);
+
+    if (value === "") {
+      onStakingAmountSatChange(0);
+      setError(generalErrorMessage);
+      return;
+    }
+
+    const numValue = parseFloat(value);
+    const satoshis = btcToSatoshi(numValue);
+
+    // Run all validations
+    const validations = [
+      validateNumber(value, label),
+      validateNotZero(numValue, label),
+      validateMin(numValue, satoshiToBtc(minStakingAmountSat), label),
+      validateMax(numValue, satoshiToBtc(maxStakingAmountSat), label),
+      validateMax(numValue, satoshiToBtc(btcWalletBalanceSat), label),
+      validateDecimalPoints(value, label),
+    ];
+
+    // Find the first error message
+    const errorMessage = validations.find((msg) => msg !== "");
+
+    if (errorMessage) {
+      onStakingAmountSatChange(0);
+      setError(errorMessage);
+    } else {
+      setError("");
+      onStakingAmountSatChange(satoshis);
+      setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
+    }
+  };
+
   return (
     <label className="form-control w-full flex-1">
       <div className="label pt-0">
         <span className="label-text-alt text-base">Amount</span>
-      </div>
-      <input
-        type="number"
-        placeholder="BTC"
-        className="no-focus input input-bordered w-full"
-        min={satoshiToBtc(minStakingAmountSat)}
-        max={satoshiToBtc(maxStakingAmountSat)}
-        step={0.00001}
-        value={satoshiToBtc(stakingAmountSat)}
-        onChange={(e) =>
-          onStakingAmountSatChange(btcToSatoshi(Number(e.target.value)))
-        }
-      />
-      <div className="label flex justify-end">
-        <span className="label-text-alt">
+        <span className="label-text-alt opacity-50">
           min stake is {satoshiToBtc(minStakingAmountSat)} Signet BTC
         </span>
+      </div>
+      <input
+        type="string"
+        className={`no-focus input input-bordered w-full ${error && "input-error"}`}
+        value={value}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        placeholder="Signet BTC"
+      />
+      <div className="mb-2 mt-4 min-h-[20px]">
+        <p className="text text-center text-sm text-error">{error}</p>
       </div>
     </label>
   );
