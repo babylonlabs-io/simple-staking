@@ -69,11 +69,14 @@ export const Staking: React.FC<StakingProps> = ({
     useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [currentBlockHeight, setCurrentBlockHeight] = useState(0);
+  const { showError } = useError();
   const pollingInterval = 60000; // 60 seconds fetch interval
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
-  const { showError } = useError();
+  const isBlockHeightUnderActivation =
+    !stakingParams || currentBlockHeight < stakingParams.activationHeight;
+  
 
   const handleResetState = () => {
     setFinalityProvider(undefined);
@@ -243,7 +246,7 @@ export const Staking: React.FC<StakingProps> = ({
       );
     }
     // 6. Current block height has not reached activation block height
-    else if (currentBlockHeight < stakingParams.activationHeight) {
+    else if (isBlockHeightUnderActivation) {
       return (
         <Message
           title="Staking has not yet started"
