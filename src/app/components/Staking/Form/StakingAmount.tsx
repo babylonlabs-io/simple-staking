@@ -28,7 +28,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
 
-  const label = "Staking amount";
+  const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -58,20 +58,38 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
     // Run all validations
     const validations = [
-      validateNumber(value, label),
-      validateNotZero(numValue, label),
-      validateMin(numValue, satoshiToBtc(minStakingAmountSat), label),
-      validateMax(numValue, satoshiToBtc(maxStakingAmountSat), label),
-      validateMax(numValue, satoshiToBtc(btcWalletBalanceSat), label),
-      validateDecimalPoints(value, label),
+      {
+        valid: validateNumber(value),
+        message: `${errorLabel} must be a valid number.`,
+      },
+      {
+        valid: validateNotZero(numValue),
+        message: `${errorLabel} must be greater than 0.`,
+      },
+      {
+        valid: validateMin(satoshis, minStakingAmountSat),
+        message: `${errorLabel} must be at least ${satoshiToBtc(minStakingAmountSat)} Signet BTC.`,
+      },
+      {
+        valid: validateMax(satoshis, maxStakingAmountSat),
+        message: `${errorLabel} must be no more than ${satoshiToBtc(maxStakingAmountSat)} Signet BTC.`,
+      },
+      {
+        valid: validateMax(satoshis, btcWalletBalanceSat),
+        message: `${errorLabel} must be no more than ${satoshiToBtc(btcWalletBalanceSat)} wallet balance.`,
+      },
+      {
+        valid: validateDecimalPoints(value),
+        message: `${errorLabel} must have no more than 8 decimal points.`,
+      },
     ];
 
-    // Find the first error message
-    const errorMessage = validations.find((msg) => msg !== "");
+    // Find the first failing validation
+    const firstInvalid = validations.find((validation) => !validation.valid);
 
-    if (errorMessage) {
+    if (firstInvalid) {
       onStakingAmountSatChange(0);
-      setError(errorMessage);
+      setError(firstInvalid.message);
     } else {
       setError("");
       onStakingAmountSatChange(satoshis);

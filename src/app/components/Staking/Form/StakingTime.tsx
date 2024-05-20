@@ -25,7 +25,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
   // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
 
-  const label = "Staking term";
+  const errorLabel = "Staking time";
   const generalErrorMessage = "You should input staking term";
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -54,19 +54,34 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
     // Run all validations
     const validations = [
-      validateNumber(value, label),
-      validateNotZero(numValue, label),
-      validateNoDecimalPoints(value, label),
-      validateMin(numValue, minStakingTimeBlocks, label),
-      validateMax(numValue, maxStakingTimeBlocks, label),
+      {
+        valid: validateNumber(value),
+        message: `${errorLabel} must be a valid number.`,
+      },
+      {
+        valid: validateNotZero(numValue),
+        message: `${errorLabel} must be greater than 0.`,
+      },
+      {
+        valid: validateNoDecimalPoints(value),
+        message: `${errorLabel} must not have decimal points.`,
+      },
+      {
+        valid: validateMin(numValue, minStakingTimeBlocks),
+        message: `${errorLabel} must be at least ${minStakingTimeBlocks} blocks.`,
+      },
+      {
+        valid: validateMax(numValue, maxStakingTimeBlocks),
+        message: `${errorLabel} must be no more than ${maxStakingTimeBlocks} blocks.`,
+      },
     ];
 
-    // Find the first error message
-    const errorMessage = validations.find((msg) => msg !== "");
+    // Find the first failing validation
+    const firstInvalid = validations.find((validation) => !validation.valid);
 
-    if (errorMessage) {
+    if (firstInvalid) {
       onStakingTimeBlocksChange(0);
-      setError(errorMessage);
+      setError(firstInvalid.message);
     } else {
       setError("");
       onStakingTimeBlocksChange(numValue);
