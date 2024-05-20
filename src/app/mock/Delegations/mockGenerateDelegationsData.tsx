@@ -38,7 +38,6 @@ export function generateRandomDelegationData(count: number) {
         outputIndex: 2,
       },
       isOverflow: is_overflow,
-
     });
   }
 
