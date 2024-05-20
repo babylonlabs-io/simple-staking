@@ -13,13 +13,19 @@ export enum ErrorState {
 
 export interface ErrorType {
   message: string;
-  errorCode?: string;
   errorState?: ErrorState;
   errorTime: Date;
 }
 
 export interface ErrorHandlerParam {
   error: Error | null;
+  hasError: boolean;
   errorState: ErrorState;
   refetchFunction: () => void;
+}
+
+
+export interface ShowErrorParams {
+  error: ErrorType;
+  retryAction?: () => void;
 }

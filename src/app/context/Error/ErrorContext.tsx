@@ -6,7 +6,7 @@ import React, {
   ReactNode,
 } from "react";
 
-import { ErrorType } from "@/app/types/errors";
+import { ErrorType, ShowErrorParams } from "@/app/types/errors";
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 
@@ -22,16 +22,10 @@ interface ErrorContextType {
   hideError: () => void;
 }
 
-interface ShowErrorParams {
-  error: ErrorType;
-  retryAction?: () => void;
-}
-
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [isErrorOpen, setIsErrorOpen] = useState(false);
   const [error, setError] = useState<ErrorType>({
     message: "",
-    errorCode: "",
     errorTime: new Date(),
     errorState: undefined,
   });
@@ -50,7 +44,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     setTimeout(() => {
       setError({
         message: "",
-        errorCode: "",
         errorTime: new Date(),
         errorState: undefined,
       });

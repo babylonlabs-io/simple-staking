@@ -4,7 +4,8 @@ import { IoMdClose } from "react-icons/io";
 import { format } from "date-fns";
 import { useTheme } from "next-themes";
 
-import { ErrorState } from "@/app/types/errors";
+import { ErrorState, ShowErrorParams } from "@/app/types/errors";
+import { useError } from "@/app/context/Error/ErrorContext";
 
 interface ErrorModalProps {
   open: boolean;
@@ -26,13 +27,27 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const modalRef = useRef(null);
   const { resolvedTheme } = useTheme();
   const lightSelected = resolvedTheme === "light";
+  const { error, retryErrorAction } =
+    useError();
 
   const handleRetry = () => {
-    if (onRetry) {
-      onRetry();
-    }
+    const retryErrorParam: ShowErrorParams = {
+      error: {
+        message: error.message,
+        errorState: error.errorState,
+        errorTime: new Date(),
+      },
+      retryAction: retryErrorAction
+    };
+
     onClose();
-  };
+
+    setTimeout(() => {
+      if (retryErrorParam.retryAction) {
+        retryErrorParam.retryAction();
+      };
+    }, 3000);
+  }
 
   const getErrorTitle = () => {
     switch (errorState) {

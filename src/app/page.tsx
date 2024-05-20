@@ -51,6 +51,7 @@ const Home: React.FC<HomeProps> = () => {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
     error: globalParamsVersionError,
+    isError: hasGlobalParamsVersionError,
     refetch: refetchGlobalParamsVersion,
   } = useQuery({
     queryKey: ["global params"],
@@ -75,31 +76,12 @@ const Home: React.FC<HomeProps> = () => {
     retry: false,
   });
 
-  useEffect(() => {
-    if (globalParamsVersionError) {
-      showError({
-        error: {
-          message: globalParamsVersionError.message,
-          errorState: ErrorState.GET_GLOBAL_PARAMS,
-          errorTime: new Date(),
-        },
-        retryAction: refetchGlobalParamsVersion,
-      });
-    }
-    return () => {
-      hideError();
-    };
-  }, [
-    globalParamsVersionError,
-    refetchGlobalParamsVersion,
-    showError,
-    hideError,
-  ]);
-
   const {
     data: finalityProvidersData,
     error: finalityProvidersError,
+    isError: hasFinalityProvidersError,
     refetch: refetchFinalityProvidersData,
+    isRefetchError: isRefetchFinalityProvidersError,
   } = useQuery({
     queryKey: ["finality providers"],
     queryFn: getFinalityProviders,
@@ -111,6 +93,7 @@ const Home: React.FC<HomeProps> = () => {
     data: delegations,
     fetchNextPage: _fetchNextDelegationsPage,
     error: delegationsError,
+    isError: hasDelegationsError,
     refetch: refetchDelegationData,
   } = useInfiniteQuery({
     queryKey: ["delegations", address],
@@ -128,6 +111,7 @@ const Home: React.FC<HomeProps> = () => {
     data: stakingStats,
     isLoading: stakingStatsIsLoading,
     error: statsError,
+    isError: hasStatsError,
     refetch: refetchStats,
   } = useQuery({
     queryKey: ["stats"],
@@ -139,10 +123,11 @@ const Home: React.FC<HomeProps> = () => {
   useEffect(() => {
     const handleError = ({
       error,
+      hasError,
       errorState,
       refetchFunction,
     }: ErrorHandlerParam) => {
-      if (error) {
+      if (hasError && error) {
         showError({
           error: {
             message: error.message,
@@ -156,32 +141,34 @@ const Home: React.FC<HomeProps> = () => {
 
     handleError({
       error: finalityProvidersError,
+      hasError: hasFinalityProvidersError,
       errorState: ErrorState.GET_FINALITY_PROVIDER,
       refetchFunction: refetchFinalityProvidersData,
     });
     handleError({
       error: delegationsError,
+      hasError: hasDelegationsError,
       errorState: ErrorState.GET_DELEGATION,
       refetchFunction: refetchDelegationData,
     });
     handleError({
       error: statsError,
+      hasError: hasStatsError,
       errorState: ErrorState.GET_STATS,
       refetchFunction: refetchStats,
     });
-
-    return () => {
-      hideError();
-    };
+    handleError({
+      error: globalParamsVersionError,
+      hasError: hasGlobalParamsVersionError,
+      errorState: ErrorState.GET_GLOBAL_PARAMS,
+      refetchFunction: refetchGlobalParamsVersion,
+    });
   }, [
-    finalityProvidersError,
-    delegationsError,
-    statsError,
-    refetchFinalityProvidersData,
-    refetchDelegationData,
-    refetchStats,
-    showError,
-    hideError,
+    hasFinalityProvidersError,
+    hasGlobalParamsVersionError,
+    hasDelegationsError,
+    hasStatsError,
+    isRefetchFinalityProvidersError
   ]);
 
   // Initializing btc curve is a required one-time operation
