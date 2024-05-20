@@ -27,8 +27,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const modalRef = useRef(null);
   const { resolvedTheme } = useTheme();
   const lightSelected = resolvedTheme === "light";
-  const { error, retryErrorAction } =
-    useError();
+  const { error, retryErrorAction } = useError();
 
   const handleRetry = () => {
     const retryErrorParam: ShowErrorParams = {
@@ -37,7 +36,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         errorState: error.errorState,
         errorTime: new Date(),
       },
-      retryAction: retryErrorAction
+      retryAction: retryErrorAction,
     };
 
     onClose();
@@ -45,7 +44,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     setTimeout(() => {
       if (retryErrorParam.retryAction) {
         retryErrorParam.retryAction();
-      };
+      }
     }, 300);
   };
 

@@ -176,7 +176,7 @@ const Home: React.FC<HomeProps> = () => {
     hasGlobalParamsVersionError,
     hasDelegationsError,
     hasStatsError,
-    isRefetchFinalityProvidersError
+    isRefetchFinalityProvidersError,
   ]);
 
   // Initializing btc curve is a required one-time operation

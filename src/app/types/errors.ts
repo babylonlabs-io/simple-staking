@@ -24,7 +24,6 @@ export interface ErrorHandlerParam {
   refetchFunction: () => void;
 }
 
-
 export interface ShowErrorParams {
   error: ErrorType;
   retryAction?: () => void;
