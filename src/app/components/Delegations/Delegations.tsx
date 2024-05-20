@@ -23,13 +23,13 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { QueryMeta } from "@/app/types/api";
+import { LoadingTableList, LoadingView } from "@/app/components/Loading/Loading";
 import {
   UnbondWithdrawModal,
   MODE,
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
-import { LoadingTableList, LoadingView } from "../Loading/Loading";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;

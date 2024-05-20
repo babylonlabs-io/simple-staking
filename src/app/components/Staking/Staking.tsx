@@ -10,7 +10,7 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
-import { LoadingView } from "../Loading/Loading";
+import { LoadingView } from "@/app/components/Loading/Loading";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
 import { StakingTime } from "./Form/StakingTime";

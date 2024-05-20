@@ -4,7 +4,7 @@ import { Tooltip } from "react-tooltip";
 
 import { FinalityProvider } from "./FinalityProvider";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
-import { LoadingTableList, LoadingView } from "../Loading/Loading";
+import { LoadingTableList, LoadingView } from "@/app/components/Loading/Loading";
 import { QueryMeta } from "@/app/types/api";
 
 interface FinalityProvidersProps {
