@@ -6,7 +6,6 @@ import { useOnClickOutside } from "usehooks-ts";
 
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import { Hash } from "../Hash/Hash";
 
 interface ConnectSmallProps {
