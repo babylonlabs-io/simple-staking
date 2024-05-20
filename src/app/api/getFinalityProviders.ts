@@ -1,17 +1,22 @@
 import { encode } from "url-safe-base64";
 import { apiWrapper } from "./apiWrapper";
+import { FinalityProvider } from "../types/finalityProviders";
 
-export interface FinalityProviders {
+export interface PaginatedFinalityProviders {
   data: FinalityProvider[];
-  pagination: Pagination;
+  pagination: FinalityPagination;
 }
 
-interface Pagination {
+interface FinalityPagination {
   next_key: string;
 }
+interface FinalityProvidersAPIResponse {
+  data: FinalityProviderAPI[];
+  pagination: FinalityPagination;
+}
 
-export interface FinalityProvider {
-  description: Description;
+interface FinalityProviderAPI {
+  description: DescriptionAPI;
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -20,7 +25,7 @@ export interface FinalityProvider {
   total_delegations: number;
 }
 
-interface Description {
+interface DescriptionAPI {
   moniker: string;
   identity: string;
   website: string;
@@ -30,7 +35,7 @@ interface Description {
 
 export const getFinalityProviders = async (
   key: string,
-): Promise<FinalityProviders> => {
+): Promise<PaginatedFinalityProviders> => {
   // const limit = 100;
   // const reverse = false;
 
@@ -40,12 +45,39 @@ export const getFinalityProviders = async (
     // "pagination_limit": limit,
   };
 
-  const reponse = await apiWrapper(
+  const response = await apiWrapper(
     "GET",
     "/v1/finality-providers",
     "Error getting finality providers",
     params,
   );
 
-  return reponse.data;
+  const finalityProvidersAPIResponse: FinalityProvidersAPIResponse =
+    response.data;
+  const finalityProvidersAPI: FinalityProviderAPI[] =
+    finalityProvidersAPIResponse.data;
+
+  const data = finalityProvidersAPI.map(
+    (fp: FinalityProviderAPI): FinalityProvider => ({
+      description: {
+        moniker: fp.description.moniker,
+        identity: fp.description.identity,
+        website: fp.description.website,
+        securityContact: fp.description.security_contact,
+        details: fp.description.details,
+      },
+      commission: fp.commission,
+      btcPk: fp.btc_pk,
+      activeTVLSat: fp.active_tvl,
+      totalTVLSat: fp.total_tvl,
+      activeDelegations: fp.active_delegations,
+      totalDelegations: fp.total_delegations,
+    }),
+  );
+
+  const pagination: FinalityPagination = {
+    next_key: finalityProvidersAPIResponse.pagination.next_key,
+  };
+
+  return { data, pagination };
 };

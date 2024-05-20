@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { initBTCCurve } from "btc-staking-ts";
 import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { networks } from "bitcoinjs-lib";
 
 import {
   getWallet,
@@ -13,49 +13,37 @@ import {
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
 import {
-  FinalityProvider,
-  FinalityProviders as FinalityProvidersType,
   getFinalityProviders,
+  PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
-import {
-  Delegation,
-  Delegations as DelegationsType,
-  getDelegations,
-} from "./api/getDelegations";
+import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
+import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
-import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { Header } from "./components/Header/Header";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
-import { DelegationState } from "./types/delegationState";
 import { Footer } from "./components/Footer/Footer";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
-import { signForm } from "@/utils/signForm";
-import { getStakingTerm } from "@/utils/getStakingTerm";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 
 interface HomeProps {}
 
-const stakingFee = 500;
-const withdrawalFee = 500;
+const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
-  const [btcWalletBalance, setBTCWalletBalance] = useState(0);
+  const [btcWalletBalanceSat, setBTCWalletBalanceSat] = useState(0);
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [term, setTerm] = useState(0);
-  const [finalityProvider, setFinalityProvider] = useState<FinalityProvider>();
 
   const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
     useQuery({
@@ -81,19 +69,22 @@ const Home: React.FC<HomeProps> = () => {
     });
 
   const {
-    data: finalityProvidersData,
-    isLoading: isLoadingFinalityProvidersData,
+    data: finalityProviders,
+    isLoading: isLoadingFinalityProviders,
     fetchNextPage: _fetchNextFinalityProvidersPage,
     hasNextPage: hasNextFinalityProvidersPage,
     isFetchingNextPage: isFetchingNextFinalityProvidersPage,
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
     queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
-    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key !== "" ? lastPage?.pagination?.next_key : null,
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.next_key !== ""
+        ? lastPage?.pagination?.next_key
+        : null,
     initialPageParam: "",
     refetchInterval: 60000, // 1 minute
     select: (data) => {
-      const flattenedData = data.pages.reduce<FinalityProvidersType>(
+      const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
         (acc, page) => {
           acc.data.push(...page.data);
           acc.pagination = page.pagination;
@@ -106,7 +97,7 @@ const Home: React.FC<HomeProps> = () => {
   });
 
   const {
-    data: delegationsData,
+    data: delegations,
     fetchNextPage: _fetchNextDelegationsPage,
     hasNextPage: hasNextDelegationsPage,
     isFetchingNextPage: isFetchingNextDelegationsPage,
@@ -115,12 +106,15 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["delegations", address, publicKeyNoCoord],
     queryFn: ({ pageParam = "" }) =>
       getDelegations(pageParam, publicKeyNoCoord),
-    getNextPageParam: (lastPage) => lastPage?.pagination?.next_key !== "" ? lastPage?.pagination?.next_key : null,
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.next_key !== ""
+        ? lastPage?.pagination?.next_key
+        : null,
     initialPageParam: "",
     refetchInterval: 60000, // 1 minute
     enabled: !!(btcWallet && publicKeyNoCoord && address),
     select: (data) => {
-      const flattenedData = data.pages.reduce<DelegationsType>(
+      const flattenedData = data.pages.reduce<PaginatedDelegations>(
         (acc, page) => {
           acc.data.push(...page.data);
           acc.pagination = page.pagination;
@@ -133,11 +127,10 @@ const Home: React.FC<HomeProps> = () => {
     },
   });
 
-  const { data: statsData, isLoading: statsDataIsLoading } = useQuery({
+  const { data: stakingStats, isLoading: stakingStatsIsLoading } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
   });
 
   // Initializing btc curve is a required one-time operation
@@ -161,7 +154,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
-    setBTCWalletBalance(0);
+    setBTCWalletBalanceSat(0);
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
@@ -183,12 +176,12 @@ const Home: React.FC<HomeProps> = () => {
         );
       }
 
-      const balance = await walletProvider.getBalance();
+      const balanceSat = await walletProvider.getBalance();
       const publicKeyNoCoord = getPublicKeyNoCoord(
         await walletProvider.getPublicKeyHex(),
       );
       setBTCWallet(walletProvider);
-      setBTCWalletBalance(balance);
+      setBTCWalletBalanceSat(balanceSat);
       setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
@@ -212,119 +205,46 @@ const Home: React.FC<HomeProps> = () => {
     }
   }, [btcWallet]);
 
-  // Select the finality provider from the list
-  const handleChooseFinalityProvider = (btcPkHex: string) => {
-    if (!finalityProvidersData) {
-      return;
-    }
-    const found = finalityProvidersData.data.find(
-      (fp) => fp?.btc_pk === btcPkHex,
-    );
-    if (found) {
-      setFinalityProvider(found);
-    }
-  };
-
-  const handleSign = async () => {
-    if (!btcWallet) {
-      throw new Error("Wallet not connected");
-    } else if (!btcWalletNetwork) {
-      throw new Error("Wallet network not connected");
-    } else if (!paramWithContext || !paramWithContext.currentVersion) {
-      throw new Error("Global params not loaded");
-    } else if (!finalityProvider) {
-      throw new Error("Finality provider not selected");
-    }
-    const { currentVersion: globalParamsVersion } = paramWithContext;
-    // Rounding the input since 0.0006 * 1e8 is is 59999.999
-    // which won't be accepted by the mempool API
-    const stakingAmount = Math.round(Number(amount) * 1e8);
-    const stakingTerm = getStakingTerm(globalParamsVersion, term);
-    let signedTxHex: string;
-    try {
-      signedTxHex = await signForm(
-        globalParamsVersion,
-        btcWallet,
-        finalityProvider,
-        stakingTerm,
-        btcWalletNetwork,
-        stakingAmount,
-        address,
-        stakingFee,
-        publicKeyNoCoord,
-      );
-    } catch (error: Error | any) {
-      // TODO Show Popup
-      console.error(error?.message || "Error signing the form");
-      throw error;
-    }
-
-    let txID;
-    try {
-      txID = await btcWallet.pushTx(signedTxHex);
-    } catch (error: Error | any) {
-      console.error(error?.message || "Broadcasting staking transaction error");
-      throw error;
-    }
-
-    // Update the local state with the new delegation
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(signedTxHex).getId(),
-        publicKeyNoCoord,
-        finalityProvider.btc_pk,
-        stakingAmount,
-        signedTxHex,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
-
-    // Clear the form
-    setAmount(0);
-    setTerm(0);
-    setFinalityProvider(undefined);
-  };
-
   // Remove the delegations that are already present in the API
   useEffect(() => {
-    if (!delegationsData) {
+    if (!delegations) {
       return;
     }
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegationsData?.data.find(
+          !delegations?.data.find(
             (delegation) =>
-              delegation?.staking_tx_hash_hex ===
-              localDelegation?.staking_tx_hash_hex,
+              delegation?.stakingTxHashHex ===
+              localDelegation?.stakingTxHashHex,
           ),
       ),
     );
-  }, [delegationsData, setDelegationsLocalStorage]);
+  }, [delegations, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = finalityProvidersData?.data.reduce(
-    (acc, fp) => ({ ...acc, [fp?.btc_pk]: fp?.description?.moniker }),
+  const finalityProvidersKV = finalityProviders?.data.reduce(
+    (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
     {},
   );
 
-  let totalStaked = 0;
+  let totalStakedSat = 0;
 
-  if (delegationsData) {
-    totalStaked = delegationsData.data
+  if (delegations) {
+    totalStakedSat = delegations.data
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
-        (accumulator: number, item) => accumulator + item?.staking_value,
+        (accumulator: number, item) => accumulator + item?.stakingValueSat,
         0,
       );
   }
 
   // these constants are needed for easier prop passing
   const overTheCap =
-    paramWithContext?.currentVersion && statsData
-      ? paramWithContext.currentVersion.stakingCap <= statsData.active_tvl
+    paramWithContext?.currentVersion && stakingStats
+      ? paramWithContext.currentVersion.stakingCapSat <=
+        stakingStats.activeTVLSat
       : false;
 
   return (
@@ -334,59 +254,56 @@ const Home: React.FC<HomeProps> = () => {
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
         address={address}
-        balance={btcWalletBalance}
+        balanceSat={btcWalletBalanceSat}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           <Stats
-            data={statsData}
-            isLoading={statsDataIsLoading}
-            stakingCap={paramWithContext?.currentVersion?.stakingCap}
+            stakingStats={stakingStats}
+            isLoading={stakingStatsIsLoading}
+            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
-          {address && btcWalletBalance && (
+          {address && btcWalletBalanceSat && (
             <Summary
               address={address}
-              totalStaked={totalStaked}
-              balance={btcWalletBalance}
+              totalStakedSat={totalStakedSat}
+              balanceSat={btcWalletBalanceSat}
             />
           )}
           <Staking
-            amount={amount}
-            onAmountChange={setAmount}
-            term={term}
-            onTermChange={setTerm}
-            finalityProviders={
-              finalityProvidersData && finalityProvidersData.data
-            }
-            selectedFinalityProvider={finalityProvider}
-            onFinalityProviderChange={handleChooseFinalityProvider}
-            onSign={handleSign}
-            stakingParams={paramWithContext?.currentVersion}
+            finalityProviders={finalityProviders?.data}
+            paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
             finalityProvidersFetchNext={_fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
-            finalityProvidersIsLoading={isLoadingFinalityProvidersData}
+            finalityProvidersIsLoading={isLoadingFinalityProviders}
             finalityProvidersIsFetchingMore={
               isFetchingNextFinalityProvidersPage
             }
             isLoading={isLoadingCurrentParams}
-            isUpgrading={paramWithContext?.isApprochingNextVersion}
+            btcWallet={btcWallet}
+            btcWalletNetwork={btcWalletNetwork}
+            address={address}
+            publicKeyNoCoord={publicKeyNoCoord}
+            setDelegationsLocalStorage={setDelegationsLocalStorage}
           />
           {btcWallet &&
-            delegationsData &&
+            delegations &&
             paramWithContext?.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
-                delegationsAPI={delegationsData.data}
+                delegationsAPI={delegations.data}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFee={paramWithContext.currentVersion.unbondingFee}
-                withdrawalFee={withdrawalFee}
+                unbondingFeeSat={
+                  paramWithContext.currentVersion.unbondingFeeSat
+                }
+                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}
@@ -400,7 +317,7 @@ const Home: React.FC<HomeProps> = () => {
           {/* At this point of time is not used */}
           {/* <StakersFinalityProviders
             finalityProviders={finalityProvidersData}
-            totalActiveTVL={statsData?.active_tvl}
+            totalActiveTVLSat={stakingStats?.activeTVL}
             connected={!!btcWallet}
           /> */}
         </div>

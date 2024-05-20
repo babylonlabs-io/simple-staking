@@ -3,23 +3,24 @@ import Image from "next/image";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-import { StatsData } from "@/app/api/getStats";
+import { StakingStats } from "@/app/types/stakingStats";
 import confirmedTvl from "./icons/confirmed-tvl.svg";
 import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
+import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface StatsProps {
-  data: StatsData | undefined;
+  stakingStats: StakingStats | undefined;
   isLoading: boolean;
-  stakingCap?: number;
+  stakingCapSat?: number;
 }
 
 export const Stats: React.FC<StatsProps> = ({
-  data,
+  stakingStats,
   isLoading,
-  stakingCap,
+  stakingCapSat,
 }) => {
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",
@@ -30,22 +31,22 @@ export const Stats: React.FC<StatsProps> = ({
     [
       {
         title: "Staking TVL Cap",
-        value: stakingCap
-          ? `${+(stakingCap / 1e8).toFixed(6)} Signet BTC`
+        value: stakingCapSat
+          ? `${+satoshiToBtc(stakingCapSat).toFixed(6)} Signet BTC`
           : "-",
         icon: stakingTvlCap,
       },
       {
         title: "Confirmed TVL",
-        value: data?.active_tvl
-          ? `${+(data.active_tvl / 1e8).toFixed(6)} Signet BTC`
+        value: stakingStats?.activeTVLSat
+          ? `${+satoshiToBtc(stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
           : 0,
         icon: confirmedTvl,
       },
       {
         title: "Pending Stake",
-        value: data?.unconfirmed_tvl
-          ? `${+((data.unconfirmed_tvl - data.active_tvl) / 1e8).toFixed(6)} Signet BTC`
+        value: stakingStats?.unconfirmedTVLSat
+          ? `${+satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
           : 0,
         icon: pendingStake,
       },
@@ -53,16 +54,16 @@ export const Stats: React.FC<StatsProps> = ({
     [
       {
         title: "Delegations",
-        value: data?.active_delegations
-          ? formatter.format(data.total_delegations as number)
+        value: stakingStats?.activeDelegations
+          ? formatter.format(stakingStats.activeDelegations as number)
           : 0,
         icon: delegations,
         tooltip: "Total number of stake delegations",
       },
       {
         title: "Stakers",
-        value: data?.total_stakers
-          ? formatter.format(data.total_stakers as number)
+        value: stakingStats?.totalStakers
+          ? formatter.format(stakingStats.totalStakers as number)
           : 0,
         icon: stakers,
       },

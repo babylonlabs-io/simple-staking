@@ -1,15 +1,16 @@
+import { satoshiToBtc } from "@/utils/btcConversions";
 import { Hash } from "../Hash/Hash";
 
 interface StakerProps {
   pkHex: string;
   delegations: number;
-  activeTVL: number;
+  activeTVLSat: number;
 }
 
 export const Staker: React.FC<StakerProps> = ({
   pkHex,
   delegations,
-  activeTVL,
+  activeTVLSat,
 }) => {
   return (
     <div className="card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
@@ -21,14 +22,18 @@ export const Staker: React.FC<StakerProps> = ({
           <Hash value={pkHex} address small noFade />
         </div>
         <div>
-          <p className="text-xs dark:text-neutral-content lg:hidden">
+          <p className="text-xs lg:hidden dark:text-neutral-content">
             Delegations
           </p>
           <p>{delegations || 0}</p>
         </div>
         <div>
-          <p className="text-xs dark:text-neutral-content lg:hidden">Stake</p>
-          <p>{activeTVL ? `${+(activeTVL / 1e8).toFixed(6)} Signet BTC` : 0}</p>
+          <p className="text-xs lg:hidden dark:text-neutral-content">Stake</p>
+          <p>
+            {activeTVLSat
+              ? `${+satoshiToBtc(activeTVLSat).toFixed(6)} Signet BTC`
+              : 0}
+          </p>
         </div>
       </div>
     </div>

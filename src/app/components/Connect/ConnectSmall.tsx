@@ -5,20 +5,21 @@ import { IoMdClose } from "react-icons/io";
 import { useOnClickOutside } from "usehooks-ts";
 
 import { trim } from "@/utils/trim";
+import { satoshiToBtc } from "@/utils/btcConversions";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import { Hash } from "../Hash/Hash";
 
 interface ConnectSmallProps {
   onConnect: () => void;
   address: string;
-  balance: number;
+  balanceSat: number;
   onDisconnect: () => void;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   onConnect,
   address,
-  balance,
+  balanceSat,
   onDisconnect,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -39,7 +40,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" />
             <p>
-              <strong>{+(balance / 1e8).toFixed(6) || 0} BTC</strong>
+              <strong>{+satoshiToBtc(balanceSat).toFixed(6) || 0} BTC</strong>
             </p>
           </div>
         </div>

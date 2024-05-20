@@ -1,3 +1,27 @@
+export interface Delegation {
+  stakingTxHashHex: string;
+  stakerPkHex: string;
+  finalityProviderPkHex: string;
+  state: string;
+  stakingValueSat: number;
+  stakingTx: StakingTx;
+  unbondingTx: UnbondingTx | undefined;
+  isOverflow: boolean;
+}
+
+export interface StakingTx {
+  txHex: string;
+  outputIndex: number;
+  startTimestamp: string;
+  startHeight: number;
+  timelock: number;
+}
+
+export interface UnbondingTx {
+  txHex: string;
+  outputIndex: number;
+}
+
 export const ACTIVE = "active";
 export const UNBONDING_REQUESTED = "unbonding_requested";
 export const UNBONDING = "unbonding";

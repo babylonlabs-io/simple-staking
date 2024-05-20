@@ -1,53 +1,53 @@
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { Transaction, networks } from "bitcoinjs-lib";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/api/getFinalityProviders";
-import { FinalityProvider } from "./FinalityProvider";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
+import { signForm } from "@/utils/signForm";
+import { getStakingTerm } from "@/utils/getStakingTerm";
+import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { isStakingSignReady } from "@/utils/isStakingSignReady";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { Delegation } from "@/app/types/delegations";
+import { Loading } from "./Loading";
+import { WalletNotConnected } from "./Form/States/WalletNotConnected";
+import { Message } from "./Form/States/Message";
+import { StakingTime } from "./Form/StakingTime";
+import { StakingAmount } from "./Form/StakingAmount";
 import { PreviewModal } from "../Modals/PreviewModal";
-import { blocksToTime } from "@/utils/blocksToTime";
-import { ConnectLarge } from "../Connect/ConnectLarge";
+import stakingCapReached from "./Form/States/staking-cap-reached.svg";
+import stakingNotStarted from "./Form/States/staking-not-started.svg";
+import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 
-interface StakingParams {
-  minStakingAmount: number;
-  maxStakingAmount: number;
-  minStakingTime: number;
-  maxStakingTime: number;
-  stakingCap: number;
-}
+const stakingFeeSat = 500;
 
 interface StakingProps {
-  amount: number;
-  onAmountChange: (amount: number) => void;
-  term: number;
-  onTermChange: (term: number) => void;
   finalityProviders: FinalityProviderInterface[] | undefined;
-  selectedFinalityProvider: FinalityProviderInterface | undefined;
-  // called when the user selects a finality provider
-  onFinalityProviderChange: (btcPkHex: string) => void;
-  onSign: () => void;
-  stakingParams: StakingParams | undefined;
   isWalletConnected: boolean;
-  overTheCap: boolean;
   isLoading: boolean;
-  isUpgrading: boolean | undefined;
-  // if the staking cap is reached, the user can't stake
+  overTheCap: boolean;
   onConnect: () => void;
   finalityProvidersFetchNext: () => void;
   finalityProvidersHasNext: boolean;
   finalityProvidersIsLoading: boolean;
   finalityProvidersIsFetchingMore: boolean;
+  btcWallet: WalletProvider | undefined;
+  btcWalletNetwork: networks.Network | undefined;
+  address: string | undefined;
+  publicKeyNoCoord: string;
+  setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
+  paramWithContext:
+    | {
+        currentVersion: GlobalParamsVersion | undefined;
+        isApprochingNextVersion: boolean | undefined;
+      }
+    | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
-  amount,
-  onAmountChange,
-  term,
-  onTermChange,
   finalityProviders,
-  selectedFinalityProvider,
-  onFinalityProviderChange,
-  onSign,
-  stakingParams,
   isWalletConnected,
   overTheCap,
   onConnect,
@@ -56,172 +56,202 @@ export const Staking: React.FC<StakingProps> = ({
   finalityProvidersIsLoading,
   finalityProvidersIsFetchingMore,
   isLoading,
-  isUpgrading,
+  paramWithContext,
+  btcWallet,
+  btcWalletNetwork,
+  address,
+  publicKeyNoCoord,
+  setDelegationsLocalStorage,
 }) => {
+  // Staking form state
+  const [stakingAmountSat, setStakingAmountSat] = useState(0);
+  const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
+  const [finalityProvider, setFinalityProvider] =
+    useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
-  const renderFixedTerm = (params: StakingParams) => {
-    const { minStakingTime, maxStakingTime } = params;
-    if (minStakingTime && maxStakingTime && minStakingTime === maxStakingTime) {
-      return (
-        <div className="card mb-2 bg-base-200 p-4">
-          <p>
-            Your Signet BTC will be staked for a fixed term of{" "}
-            {blocksToTime(minStakingTime)}.
-          </p>
-          <p>
-            But you can unbond and withdraw your Signet BTC anytime through this
-            dashboard with an unbond time of 10 days.
-          </p>
-          <p>
-            The above times are approximates based on average Bitcoin block
-            times.
-          </p>
-        </div>
-      );
-    } else {
-      return (
-        <label className="form-control w-full flex-1">
-          <div className="label">
-            <span className="label-text-alt text-base">Term</span>
-          </div>
-          <input
-            type="number"
-            placeholder="Blocks"
-            className="no-focus input input-bordered w-full"
-            min={minStakingTime}
-            max={maxStakingTime}
-            value={term}
-            onChange={(e) => onTermChange(Number(e.target.value))}
-          />
-          <div className="label flex justify-end">
-            <span className="label-text-alt">
-              min term is {minStakingTime} blocks
-            </span>
-          </div>
-        </label>
-      );
-    }
+  const stakingParams = paramWithContext?.currentVersion;
+  const isUpgrading = paramWithContext?.isApprochingNextVersion;
+
+  const handleResetState = () => {
+    setFinalityProvider(undefined);
+    setStakingAmountSat(0);
+    setStakingTimeBlocks(0);
+    setPreviewModalOpen(false);
   };
 
-  const renderContentForm = () => {
-    // 1. wallet is not connected
+  const handleSign = async () => {
+    if (!btcWallet) {
+      throw new Error("Wallet not connected");
+    } else if (!address) {
+      throw new Error("Address is not set");
+    } else if (!btcWalletNetwork) {
+      throw new Error("Wallet network not connected");
+    } else if (!paramWithContext || !paramWithContext.currentVersion) {
+      throw new Error("Global params not loaded");
+    } else if (!finalityProvider) {
+      throw new Error("Finality provider not selected");
+    }
+    const { currentVersion: globalParamsVersion } = paramWithContext;
+    const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
+    let signedTxHex: string;
+    try {
+      signedTxHex = await signForm(
+        globalParamsVersion,
+        btcWallet,
+        finalityProvider,
+        stakingTerm,
+        btcWalletNetwork,
+        stakingAmountSat,
+        address,
+        stakingFeeSat,
+        publicKeyNoCoord,
+      );
+    } catch (error: Error | any) {
+      // TODO Show Popup
+      console.error(error?.message || "Error signing the form");
+      throw error;
+    }
+
+    let txID;
+    try {
+      txID = await btcWallet.pushTx(signedTxHex);
+    } catch (error: Error | any) {
+      console.error(error?.message || "Broadcasting staking transaction error");
+      throw error;
+    }
+
+    // Update the local state with the new delegation
+    setDelegationsLocalStorage((delegations) => [
+      toLocalStorageDelegation(
+        Transaction.fromHex(signedTxHex).getId(),
+        publicKeyNoCoord,
+        finalityProvider.btcPk,
+        stakingAmountSat,
+        signedTxHex,
+        stakingTerm,
+      ),
+      ...delegations,
+    ]);
+
+    handleResetState();
+  };
+
+  // Select the finality provider from the list
+  const handleChooseFinalityProvider = (btcPkHex: string) => {
+    if (!finalityProviders) {
+      throw new Error("Finality providers not loaded");
+    }
+
+    const found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
+    if (!found) {
+      throw new Error("Finality provider not found");
+    }
+
+    setFinalityProvider(found);
+  };
+
+  const handleStakingAmountSatChange = (inputAmountSat: number) => {
+    setStakingAmountSat(inputAmountSat);
+  };
+
+  const handleStakingTimeBlocksChange = (inputTimeBlocks: number) => {
+    setStakingTimeBlocks(inputTimeBlocks);
+  };
+
+  const renderStakingForm = () => {
+    // States of the staking form:
+    // 1. Wallet is not connected
     if (!isWalletConnected) {
-      return (
-        <div className="flex flex-1 flex-col gap-1">
-          <p className="mb-2 text-sm dark:text-neutral-content">
-            Please connect wallet to start staking
-          </p>
-          <div className="flex flex-1 flex-col md:justify-center">
-            <ConnectLarge onConnect={onConnect} />
-          </div>
-        </div>
-      );
+      return <WalletNotConnected onConnect={onConnect} />;
     }
-    // 2. wallet is connected but we are still loading the staking params
+    // 2. Wallet is connected but we are still loading the staking params
     else if (isLoading) {
-      return (
-        <div className="flex justify-center py-4">
-          <span className="loading loading-spinner text-primary" />
-        </div>
-      );
+      return <Loading />;
     }
-    // 3. wallet is connected but staking has not started
+    // 3. Staking has not started yet
     else if (!stakingParams) {
       return (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm dark:text-neutral-content">
-            Staking has not started
-          </p>
-          <p>Staking app is not yet activated</p>
-          <p>
-            Please check back later or follow our social media channels for
-            updates.
-          </p>
-        </div>
+        <Message
+          title="Staking has not yet started"
+          messages={[
+            "The staking application will open once the staking activation height has been reached.",
+          ]}
+          icon={stakingNotStarted}
+        />
       );
     }
-    // 4. Global params are transitioning into a new version
+    // 4. Staking params upgrading
     else if (isUpgrading) {
       return (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm dark:text-neutral-content">
-            Staking upgrade in progress
-          </p>
-          <p>The staking parameters are getting upgraded.</p>
-          <p>
-            Please check back later or follow our social media channels for
-            updates.
-          </p>
-        </div>
+        <Message
+          title="Staking parameters upgrading"
+          messages={[
+            "The staking parameters are getting upgraded, staking will be re-enabled soon.",
+          ]}
+          icon={stakingUpgrading}
+        />
       );
     }
-    // 4. wallet is connected but staking cap is reached
+    // 5. Staking cap reached
     else if (overTheCap) {
       return (
-        <div className="flex flex-col gap-1">
-          <p className="text-sm dark:text-neutral-content">
-            Staking cap reached
-          </p>
-          <p>Staking is temporarily disabled due to cap reached.</p>
-          <p>
-            Please check your staking history to see if any of your stake is
-            tagged overflow.
-          </p>
-          <p>Overflow stake should be unbonded and withdrawn.</p>
-        </div>
+        <Message
+          title="Staking cap reached"
+          messages={[
+            "Staking is temporarily disabled due to the staking cap getting reached.",
+            "Please check your staking history to see if any of your stake is tagged overflow.",
+            "Overflow stake should be unbonded and withdrawn.",
+          ]}
+          icon={stakingCapReached}
+        />
       );
-    } else {
+    }
+    // 6. Staking form
+    else {
       const {
-        minStakingTime,
-        maxStakingTime,
-        minStakingAmount,
-        maxStakingAmount,
+        minStakingAmountSat,
+        maxStakingAmountSat,
+        minStakingTimeBlocks,
+        maxStakingTimeBlocks,
       } = stakingParams;
-      const stakingTimeReady =
-        minStakingTime === maxStakingTime ||
-        (term >= minStakingTime && term <= maxStakingTime);
 
-      const minAmountBTC = minStakingAmount ? minStakingAmount / 1e8 : 0;
-      const maxAmountBTC = maxStakingAmount ? maxStakingAmount / 1e8 : 0;
+      // Staking time is fixed
+      const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
 
-      const amountReady =
-        minAmountBTC &&
-        maxAmountBTC &&
-        amount >= minAmountBTC &&
-        amount <= maxAmountBTC;
+      // Takes into account the fixed staking time
+      const stakingTimeBlocksWithFixed = stakingTimeFixed
+        ? minStakingTimeBlocks
+        : stakingTimeBlocks;
 
-      const signReady =
-        amountReady && stakingTimeReady && selectedFinalityProvider;
+      // Check if the staking transaction is ready to be signed
+      const signReady = isStakingSignReady(
+        minStakingAmountSat,
+        maxStakingAmountSat,
+        minStakingTimeBlocks,
+        maxStakingTimeBlocks,
+        stakingAmountSat,
+        stakingTimeBlocksWithFixed,
+        !!finalityProvider,
+      );
+
       return (
         <>
-          <div className="flex flex-col gap-1">
-            <p className="text-sm dark:text-neutral-content">Step 2</p>
-            <p>Set up staking terms</p>
-          </div>
+          <p>Set up staking terms</p>
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
-              {renderFixedTerm(stakingParams)}
-              <label className="form-control w-full flex-1">
-                <div className="label pt-0">
-                  <span className="label-text-alt text-base">Amount</span>
-                </div>
-                <input
-                  type="number"
-                  placeholder="BTC"
-                  className="no-focus input input-bordered w-full"
-                  min={minAmountBTC}
-                  max={maxAmountBTC}
-                  step={0.00001}
-                  value={amount}
-                  onChange={(e) => onAmountChange(Number(e.target.value))}
-                />
-                <div className="label flex justify-end">
-                  <span className="label-text-alt">
-                    min stake is {minAmountBTC} Signet BTC
-                  </span>
-                </div>
-              </label>
+              <StakingTime
+                minStakingTimeBlocks={minStakingTimeBlocks}
+                maxStakingTimeBlocks={maxStakingTimeBlocks}
+                stakingTimeBlocks={stakingTimeBlocks}
+                onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
+              />
+              <StakingAmount
+                minStakingAmountSat={minStakingAmountSat}
+                maxStakingAmountSat={maxStakingAmountSat}
+                stakingAmountSat={stakingAmountSat}
+                onStakingAmountSatChange={handleStakingAmountSatChange}
+              />
             </div>
             <button
               className="btn-primary btn mt-2 w-full"
@@ -233,80 +263,13 @@ export const Staking: React.FC<StakingProps> = ({
             <PreviewModal
               open={previewModalOpen}
               onClose={setPreviewModalOpen}
-              onSign={onSign}
-              finalityProvider={selectedFinalityProvider?.description.moniker}
-              amount={amount * 1e8}
-              term={term}
+              onSign={handleSign}
+              finalityProvider={finalityProvider?.description.moniker}
+              stakingAmountSat={stakingAmountSat}
+              stakingTimeBlocks={stakingTimeBlocksWithFixed}
             />
           </div>
         </>
-      );
-    }
-  };
-
-  const renderFinalityProviders = () => {
-    if (finalityProviders && finalityProviders.length > 0) {
-      return (
-        <>
-          <div className="flex flex-col gap-1">
-            <p className="text-sm dark:text-neutral-content">Step 1</p>
-            <p>
-              Select a BTC Finality Provider or{" "}
-              <a
-                href="https://github.com/babylonchain/networks/tree/main/bbn-test-4/finality-providers"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sublink text-primary hover:underline"
-              >
-                create your own
-              </a>
-              .
-            </p>
-          </div>
-          <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProviders">
-            <p>Finality Provider</p>
-            <p>BTC PK</p>
-            <p>Delegation</p>
-            <p>Comission</p>
-          </div>
-          <div
-            id="finality-providers"
-            className="no-scrollbar max-h-[21rem] overflow-y-auto"
-          >
-            <InfiniteScroll
-              className="flex flex-col gap-4"
-              dataLength={finalityProviders?.length || 0}
-              next={finalityProvidersFetchNext}
-              hasMore={finalityProvidersHasNext}
-              loader={
-                finalityProvidersIsFetchingMore ? (
-                  <div className="w-full text-center">
-                    <span className="loading loading-spinner text-primary" />
-                  </div>
-                ) : null
-              }
-              scrollableTarget="finality-providers"
-            >
-              {finalityProviders?.map((fp) => (
-                <FinalityProvider
-                  key={fp.btc_pk}
-                  moniker={fp.description.moniker}
-                  pkHex={fp.btc_pk}
-                  stake={fp.active_tvl}
-                  comission={fp.commission}
-                  selected={selectedFinalityProvider?.btc_pk === fp.btc_pk}
-                  onClick={() => onFinalityProviderChange(fp.btc_pk)}
-                />
-              ))}
-            </InfiniteScroll>
-          </div>
-        </>
-      );
-    } else {
-      return (
-        <div className="flex flex-1 items-center justify-center py-4">
-          <span className="loading loading-spinner text-primary" />
-        </div>
       );
     }
   };
@@ -316,10 +279,18 @@ export const Staking: React.FC<StakingProps> = ({
       <h3 className="mb-4 font-bold">Staking</h3>
       <div className="flex flex-col gap-4 lg:flex-row">
         <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
-          {renderFinalityProviders()}
+          <FinalityProviders
+            finalityProviders={finalityProviders}
+            selectedFinalityProvider={finalityProvider}
+            onFinalityProviderChange={handleChooseFinalityProvider}
+            finalityProvidersIsFetchingMore={finalityProvidersIsFetchingMore}
+            finalityProvidersHasNext={finalityProvidersHasNext}
+            finalityProvidersFetchNext={finalityProvidersFetchNext}
+          />
         </div>
+        <div className="divider m-0 lg:divider-horizontal lg:m-0" />
         <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
-          {renderContentForm()}
+          {renderStakingForm()}
         </div>
       </div>
     </div>
