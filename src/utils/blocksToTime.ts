@@ -1,5 +1,3 @@
-import { formatDuration, intervalToDuration } from "date-fns";
-
 interface Duration {
   years?: number;
   months?: number;
@@ -10,27 +8,55 @@ interface Duration {
   seconds?: number;
 }
 
-export const blocksToTime = (blocks: number) => {
+const BLOCKS_PER_HOUR = 6;
+const HOURS_IN_DAY = 24;
+const DAYS_IN_WEEK = 7;
+const DAYS_IN_MONTH = 30;
+const DAYS_IN_YEAR = 365;
+const MINUTES_IN_HOUR = 60;
+const SECONDS_IN_MINUTE = 60;
+
+export const blocksToTime = (
+  blocks: number,
+  unit: keyof Duration = "years",
+) => {
   if (!blocks) return "-";
 
-  const averageBlockTime = 10;
-  const amountSeconds = blocks * averageBlockTime * 60 * 1000;
+  const hours = blocks / BLOCKS_PER_HOUR;
+  const days = hours / HOURS_IN_DAY;
+  const weeks = days / DAYS_IN_WEEK;
+  const months = days / DAYS_IN_MONTH;
+  const years = days / DAYS_IN_YEAR;
+  const minutes = hours * MINUTES_IN_HOUR;
+  const seconds = minutes * SECONDS_IN_MINUTE;
 
-  const duration = intervalToDuration({
-    start: 0,
-    end: amountSeconds,
-  });
-  let format: (keyof Duration)[] = [
-    "years",
-    "months",
-    "days",
-    "hours",
-    "minutes",
-  ];
+  let value: number;
 
-  const formattedTime = formatDuration(duration, {
-    format,
-  });
+  switch (unit) {
+    case "years":
+      value = years;
+      break;
+    case "months":
+      value = months;
+      break;
+    case "weeks":
+      value = weeks;
+      break;
+    case "days":
+      value = days;
+      break;
+    case "hours":
+      value = hours;
+      break;
+    case "minutes":
+      value = minutes;
+      break;
+    case "seconds":
+      value = seconds;
+      break;
+    default:
+      value = 0;
+  }
 
-  return `${formattedTime}`;
+  return `${Math.floor(value)} ${unit}`;
 };

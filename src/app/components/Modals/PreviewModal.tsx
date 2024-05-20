@@ -49,7 +49,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         </button>
       </div>
       <div className="flex flex-col gap-4 text-sm">
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">
               Finality Provider
@@ -61,10 +61,10 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <p>{`${+satoshiToBtc(stakingAmountSat).toFixed(6)} Signet BTC`}</p>
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToTime(stakingTimeBlocks)}</p>
+            <p>{blocksToTime(stakingTimeBlocks, "weeks")}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">

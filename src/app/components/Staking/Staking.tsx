@@ -184,20 +184,20 @@ export const Staking: React.FC<StakingProps> = ({
         />
       );
     }
-    // 5. Staking cap reached
-    else if (overTheCap) {
-      return (
-        <Message
-          title="Staking cap reached"
-          messages={[
-            "Staking is temporarily disabled due to the staking cap getting reached.",
-            "Please check your staking history to see if any of your stake is tagged overflow.",
-            "Overflow stake should be unbonded and withdrawn.",
-          ]}
-          icon={stakingCapReached}
-        />
-      );
-    }
+    // // 5. Staking cap reached
+    // else if (overTheCap) {
+    //   return (
+    //     <Message
+    //       title="Staking cap reached"
+    //       messages={[
+    //         "Staking is temporarily disabled due to the staking cap getting reached.",
+    //         "Please check your staking history to see if any of your stake is tagged overflow.",
+    //         "Overflow stake should be unbonded and withdrawn.",
+    //       ]}
+    //       icon={stakingCapReached}
+    //     />
+    //   );
+    // }
     // 6. Staking form
     else {
       const {
