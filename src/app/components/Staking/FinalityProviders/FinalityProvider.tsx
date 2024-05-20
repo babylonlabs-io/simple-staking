@@ -42,7 +42,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         </div>
         <Hash value={pkHex} address small noFade />
         <div className="flex gap-1">
-          <p className="lg:hidden">Delegation:</p>
+          <p className="lg:hidden">Total Delegation:</p>
           <p>{+satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
         </div>
         <div className="flex gap-1">
