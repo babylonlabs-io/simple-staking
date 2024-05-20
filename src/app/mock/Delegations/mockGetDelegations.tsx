@@ -1,12 +1,18 @@
+import { Delegation } from "@/app/types/delegations";
 import { generateRandomDelegationData } from "./mockGenerateDelegationsData";
-import { Delegations } from "@/app/api/getDelegations";
+import { Pagination } from "@/app/types/api";
 
 const allMockData = generateRandomDelegationData(1000);
+
+export interface PaginatedDelegations {
+  data: Delegation[];
+  pagination: Pagination;
+}
 
 export const mockGetDelegations = async (
   key: string,
   publicKeyNoCoord?: string,
-): Promise<Delegations> => {
+): Promise<PaginatedDelegations> => {
   if (!publicKeyNoCoord) {
     throw new Error("No public key provided");
   }
