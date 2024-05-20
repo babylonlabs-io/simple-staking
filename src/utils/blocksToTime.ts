@@ -36,7 +36,7 @@ const SECONDS_IN_MINUTE = 60;
  * blocksToTime(100, "seconds"); // "60000 seconds"
  * blocksToTime(10000, "invalidUnit"); // "-"
  */
-export const blocksToTime = (blocks: number, unit?: keyof Duration) => {
+export const blocksToTime = (blocks: number, unit?: keyof Duration): string => {
   if (!blocks) return "-";
 
   // Convert blocks to different time units based on the average blocks per hour
