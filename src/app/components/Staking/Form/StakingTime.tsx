@@ -1,4 +1,4 @@
-import { blocksToTime } from "@/utils/blocksToTime";
+import { blocksToWeeks } from "@/utils/blocksToWeeks";
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;
@@ -19,7 +19,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
       <div className="card mb-2 bg-base-200 p-4">
         <p>
           Your Signet BTC will be staked for a fixed term of{" "}
-          {blocksToTime(minStakingTimeBlocks)}.
+          {blocksToWeeks(minStakingTimeBlocks, 5)}.
         </p>
         <p>
           You can unbond and withdraw your Signet BTC anytime through this
