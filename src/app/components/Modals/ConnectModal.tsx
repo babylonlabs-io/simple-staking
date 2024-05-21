@@ -2,11 +2,15 @@ import { useRef, useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
+import Image from "next/image";
+
+import { walletList } from "@/utils/wallet/list";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 interface ConnectModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
-  onConnect: () => void;
+  onConnect: (walletProvider: WalletProvider) => void;
   connectDisabled: boolean;
 }
 
@@ -17,8 +21,22 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   connectDisabled,
 }) => {
   const modalRef = useRef(null);
-
   const [accepted, setAccepted] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState<string>("");
+
+  const handleConnect = async () => {
+    if (selectedWallet) {
+      const walletProvider = walletList.find(
+        (w) => w.name === selectedWallet,
+      )?.wallet;
+      if (!walletProvider) {
+        throw new Error("Wallet provider not found");
+      } else {
+        const walletInstance = new walletProvider();
+        onConnect(walletInstance);
+      }
+    }
+  };
 
   return (
     <Modal
@@ -43,7 +61,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
       </div>
       <div className="flex flex-col justify-center gap-4">
         <div className="form-control">
-          <label className="label cursor-pointer justify-start gap-2">
+          <label className="label cursor-pointer justify-start gap-2 rounded-xl bg-base-100 p-4">
             <input
               type="checkbox"
               className="checkbox-primary checkbox"
@@ -64,10 +82,32 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             </span>
           </label>
         </div>
+        <div className="my-4 flex flex-col gap-4">
+          <h3 className="text-center font-semibold">Choose wallet</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {walletList.map((wallet) => (
+              <div
+                key={wallet.name}
+                className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === wallet.name ? "border-primary" : "border-base-100"}`}
+                onClick={() => setSelectedWallet(wallet.name)}
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border bg-white p-2">
+                  <Image
+                    src={wallet.icon}
+                    alt={wallet.name}
+                    width={32}
+                    height={32}
+                  />
+                </div>
+                <p>{wallet.name}</p>
+              </div>
+            ))}
+          </div>
+        </div>
         <button
           className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-lg px-2 text-white"
-          onClick={onConnect}
-          disabled={connectDisabled || !accepted}
+          onClick={handleConnect}
+          disabled={connectDisabled || !accepted || !selectedWallet}
         >
           <PiWalletBold size={20} />
           Connect to BTC signet network

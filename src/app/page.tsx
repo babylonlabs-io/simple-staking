@@ -7,7 +7,6 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
 
 import {
-  getWallet,
   toNetwork,
   isSupportedAddressType,
   getPublicKeyNoCoord,
@@ -248,12 +247,11 @@ const Home: React.FC<HomeProps> = () => {
     setAddress("");
   };
 
-  const handleConnectBTC = async () => {
+  const handleConnectBTC = async (walletProvider: WalletProvider) => {
     // close the modal
     setConnectModalOpen(false);
 
     try {
-      const walletProvider = getWallet();
       await walletProvider.connectWallet();
       const address = await walletProvider.getAddress();
       // check if the wallet address type is supported in babylon
@@ -280,7 +278,7 @@ const Home: React.FC<HomeProps> = () => {
           errorState: ErrorState.WALLET,
           errorTime: new Date(),
         },
-        retryAction: handleConnectBTC,
+        retryAction: () => handleConnectBTC(walletProvider),
       });
     }
   };
@@ -291,7 +289,7 @@ const Home: React.FC<HomeProps> = () => {
       let once = false;
       btcWallet.on("accountChanged", () => {
         if (!once) {
-          handleConnectBTC();
+          handleConnectBTC(btcWallet);
         }
       });
       return () => {
