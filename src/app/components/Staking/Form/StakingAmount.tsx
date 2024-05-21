@@ -2,13 +2,7 @@ import { ChangeEvent, FocusEvent, useState } from "react";
 
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import {
-  validateDecimalPoints,
-  validateMax,
-  validateMin,
-  validateNotZero,
-  validateNumber,
-} from "./validation/validation";
+import { validateDecimalPoints } from "./validation/validation";
 
 interface StakingAmountProps {
   minStakingAmountSat: number;
@@ -59,23 +53,23 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     // Run all validations
     const validations = [
       {
-        valid: validateNumber(value),
+        valid: !isNaN(Number(value)),
         message: `${errorLabel} must be a valid number.`,
       },
       {
-        valid: validateNotZero(numValue),
+        valid: numValue !== 0,
         message: `${errorLabel} must be greater than 0.`,
       },
       {
-        valid: validateMin(satoshis, minStakingAmountSat),
+        valid: satoshis >= minStakingAmountSat,
         message: `${errorLabel} must be at least ${satoshiToBtc(minStakingAmountSat)} Signet BTC.`,
       },
       {
-        valid: validateMax(satoshis, maxStakingAmountSat),
+        valid: satoshis <= maxStakingAmountSat,
         message: `${errorLabel} must be no more than ${satoshiToBtc(maxStakingAmountSat)} Signet BTC.`,
       },
       {
-        valid: validateMax(satoshis, btcWalletBalanceSat),
+        valid: satoshis <= btcWalletBalanceSat,
         message: `${errorLabel} must be no more than ${satoshiToBtc(btcWalletBalanceSat)} wallet balance.`,
       },
       {

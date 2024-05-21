@@ -1,13 +1,7 @@
 import { ChangeEvent, FocusEvent, useState } from "react";
 
 import { blocksToTime } from "@/utils/blocksToTime";
-import {
-  validateMax,
-  validateMin,
-  validateNotZero,
-  validateNumber,
-  validateNoDecimalPoints,
-} from "./validation/validation";
+import { validateNoDecimalPoints } from "./validation/validation";
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;
@@ -55,11 +49,11 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
     // Run all validations
     const validations = [
       {
-        valid: validateNumber(value),
+        valid: !isNaN(Number(value)),
         message: `${errorLabel} must be a valid number.`,
       },
       {
-        valid: validateNotZero(numValue),
+        valid: numValue !== 0,
         message: `${errorLabel} must be greater than 0.`,
       },
       {
@@ -67,11 +61,11 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
         message: `${errorLabel} must not have decimal points.`,
       },
       {
-        valid: validateMin(numValue, minStakingTimeBlocks),
+        valid: numValue >= minStakingTimeBlocks,
         message: `${errorLabel} must be at least ${minStakingTimeBlocks} blocks.`,
       },
       {
-        valid: validateMax(numValue, maxStakingTimeBlocks),
+        valid: numValue <= maxStakingTimeBlocks,
         message: `${errorLabel} must be no more than ${maxStakingTimeBlocks} blocks.`,
       },
     ];
