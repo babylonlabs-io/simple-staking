@@ -76,12 +76,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         </div>
         <h4 className="text-center text-base">Attention!</h4>
         <p className="dark:text-neutral-content">
-          1. There is a delay between the actual TVL and its display in this
-          dashboard. The current staking cap may already be filled when your
-          staking transaction is included in the Bitcoin chain. In that case,
-          the dashboard will mark your stake as &quot;overflow&quot; and request
-          you to unbond and withdraw, which will cause extra transaction fees.
-          Therefore please stake wisely.
+          1. Your stake may &quot;overflow&quot; the staking TVL cap and need to
+          be unbonded and withdrawn, which will cost you extra transaction fees.
+          So please stake wisely.
         </p>
         <p className="dark:text-neutral-content">
           2. No third party possesses your staked Signet BTC. You are the only
