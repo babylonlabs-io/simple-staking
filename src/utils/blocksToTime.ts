@@ -11,7 +11,7 @@ interface Duration {
 }
 
 export const blocksToTime = (blocks: number) => {
-  if (!blocks) return "-";
+  if (!blocks) throw new Error("No blocks provided.");
 
   const averageBlockTime = 10;
   const amountSeconds = blocks * averageBlockTime * 60 * 1000;
