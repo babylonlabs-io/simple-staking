@@ -50,14 +50,9 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
 
   const getErrorTitle = () => {
     switch (errorState) {
-      case ErrorState.GET_STAKING:
-      case ErrorState.GET_DELEGATION:
-      case ErrorState.GET_STATS:
-      case ErrorState.GET_FINALITY_PROVIDER:
-      case ErrorState.GET_GLOBAL_PARAMS:
-      case ErrorState.GET_UNBOUNDING_ELIGIBILITY:
-        return "Connection Error";
-      case ErrorState.SWITCH_NETWORK:
+      case ErrorState.SERVER_ERROR:
+        return "Server Error";
+      case ErrorState.WALLET:
         return "Network Error";
       case ErrorState.WITHDRAW:
         return "Withdraw Error";
@@ -72,12 +67,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
 
   const getErrorMessage = () => {
     switch (errorState) {
-      case ErrorState.GET_STAKING:
-      case ErrorState.GET_DELEGATION:
-      case ErrorState.GET_FINALITY_PROVIDER:
-      case ErrorState.GET_STATS:
-      case ErrorState.GET_GLOBAL_PARAMS:
-      case ErrorState.GET_UNBOUNDING_ELIGIBILITY:
+      case ErrorState.SERVER_ERROR:
         return `Error fetching data`;
       case ErrorState.UNBOUNDING:
         return `Your request to unbound failed due to: ${errorMessage}`;
@@ -85,7 +75,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return `Failed to withdraw due to: ${errorMessage}`;
       case ErrorState.STAKING:
         return `Failed to stake due to: ${errorMessage}`;
-      case ErrorState.SWITCH_NETWORK:
+      case ErrorState.WALLET:
         return `Failed to switch network due to: ${errorMessage}`;
       default:
         return errorMessage;

@@ -1,13 +1,12 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import { getStakers } from "@/app/api/getStakers";
-import { Staker } from "./Staker";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useEffect } from "react";
-
 import { ErrorState } from "@/app/types/errors";
+import { Staker } from "./Staker";
 
 interface StakersProps {}
 
@@ -33,15 +32,12 @@ export const Stakers: React.FC<StakersProps> = () => {
       showError({
         error: {
           message: error.message,
-          errorState: ErrorState.GET_STAKING,
+          errorState: ErrorState.SERVER_ERROR,
           errorTime: new Date(),
         },
         retryAction: refetch,
       });
     }
-    return () => {
-      hideError();
-    };
   }, [error, refetch, showError, hideError]);
 
   return (

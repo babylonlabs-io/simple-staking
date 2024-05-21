@@ -12,11 +12,12 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { getFinalityProviders } from "./api/getFinalityProviders";
 import { getDelegations } from "./api/getDelegations";
 import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { Header } from "./components/Header/Header";
@@ -24,7 +25,6 @@ import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { Footer } from "./components/Footer/Footer";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
@@ -150,25 +150,25 @@ const Home: React.FC<HomeProps> = () => {
     handleError({
       error: finalityProvidersError,
       hasError: hasFinalityProvidersError,
-      errorState: ErrorState.GET_FINALITY_PROVIDER,
+      errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchFinalityProvidersData,
     });
     handleError({
       error: delegationsError,
       hasError: hasDelegationsError,
-      errorState: ErrorState.GET_DELEGATION,
+      errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchDelegationData,
     });
     handleError({
       error: statsError,
       hasError: hasStatsError,
-      errorState: ErrorState.GET_STATS,
+      errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchStats,
     });
     handleError({
       error: globalParamsVersionError,
       hasError: hasGlobalParamsVersionError,
-      errorState: ErrorState.GET_GLOBAL_PARAMS,
+      errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchGlobalParamsVersion,
     });
   }, [
@@ -235,7 +235,7 @@ const Home: React.FC<HomeProps> = () => {
       showError({
         error: {
           message: error.message,
-          errorState: ErrorState.SWITCH_NETWORK,
+          errorState: ErrorState.WALLET,
           errorTime: new Date(),
         },
         retryAction: handleConnectBTC,
