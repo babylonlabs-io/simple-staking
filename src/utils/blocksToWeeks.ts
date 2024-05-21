@@ -14,8 +14,8 @@ const BLOCKS_PER_HOUR = 6;
  * blocksToWeeks(63000, 5); // "65 weeks"
  */
 export const blocksToWeeks = (blocks: number, precision?: number): string => {
-  // If no blocks are provided, return "-"
-  if (!blocks) return "-";
+  // If no blocks are provided, throw an error
+  if (!blocks) throw new Error("No blocks provided");
 
   // Calculate the equivalent time in hours
   const hours = blocks / BLOCKS_PER_HOUR;
