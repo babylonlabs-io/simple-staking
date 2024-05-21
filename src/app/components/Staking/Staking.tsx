@@ -77,7 +77,9 @@ export const Staking: React.FC<StakingProps> = ({
   const isBlockHeightUnderActivation =
     !stakingParams ||
     !paramWithContext.currentHeight ||
-    paramWithContext?.currentHeight < stakingParams.activationHeight;
+    // The staking parameters are retrieved based on the current height + 1
+    // so this verification should take this into account.
+    paramWithContext?.currentHeight + 1 < stakingParams.activationHeight;
   const { showError } = useError();
 
   const handleResetState = () => {
