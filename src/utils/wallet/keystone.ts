@@ -1,7 +1,9 @@
 'use client';
 
 import KeystoneSDK, { UR, URType } from "@keystonehq/keystone-sdk"
-import sdk, { ReadStatus, SupportedResult } from '@keystonehq/sdk';
+// import { genPsbtOfBIP322Simple, getSignatureFromPsbtOfBIP322Simple } from '@unisat/wallet-sdk/lib/message';
+import { NetworkType } from "@unisat/wallet-sdk/lib/network";
+import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
 import * as bitcoin from 'bitcoinjs-lib';
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371';
 import { HDKey } from "@scure/bip32";
@@ -14,6 +16,7 @@ import {
     getNetworkFees,
     pushTx,
 } from "../mempool_api";
+import { Psbt } from "bitcoinjs-lib";
 
 
 type KeystoneWalletInfo = {
@@ -27,19 +30,20 @@ type KeystoneWalletInfo = {
 
 export class KeystoneWallet extends WalletProvider {
     private keystoneWaleltInfo: KeystoneWalletInfo | undefined;
-    private sdk: typeof sdk;
+    private viewSdk: typeof sdk;
+    private dataSdk: KeystoneSDK;
 
     constructor() {
         super();
         sdk.bootstrap();
-        this.sdk = sdk;
+        this.viewSdk = sdk;
+        this.dataSdk = new KeystoneSDK({
+            origin: "babylon staking app"
+        });;
     }
 
     async connectWallet(): Promise<this> {
-        const keystoneContainer = this.sdk.getSdk();
-        const keystoneSdk = new KeystoneSDK({
-            origin: "babylon staking app"
-        });
+        const keystoneContainer = this.viewSdk.getSdk();
         const decodedResult = await keystoneContainer.read(
             [SupportedResult.UR_CRYPTO_ACCOUNT],
             {
@@ -47,7 +51,7 @@ export class KeystoneWallet extends WalletProvider {
                 description: "Please scan the QR code displayed on your Keystone, Currently Only the first Taproot Adress will be used",
                 renderInitial: {
                     walletMode: "Web3",
-                    link: "https://keyst.one",
+                    link: ""
                 },
                 URTypeErrorMessage:
                     "The scanned QR code is not the sync code from the Keystone hardware wallet. Please verify the code and try again.",
@@ -55,7 +59,7 @@ export class KeystoneWallet extends WalletProvider {
         );
 
         if (decodedResult.status === ReadStatus.success) {
-            const accountData = keystoneSdk.parseAccount(decodedResult.result);
+            const accountData = this.dataSdk.parseAccount(decodedResult.result);
             let xpub = accountData.keys[3].extendedPublicKey;
             this.keystoneWaleltInfo = {
                 mfp: accountData.masterFingerprint,
@@ -94,7 +98,43 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     async signPsbt(psbtHex: string): Promise<string> {
-        throw new Error("Method not implemented.");
+        let psbt = Psbt.fromHex(psbtHex);
+        const bip32Derivation = {
+            masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
+            path: `${this.keystoneWaleltInfo!.path!}/0/0`,
+            pubkey: Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex')
+        };
+
+        psbt.data.inputs.forEach((input) => {
+            input.tapBip32Derivation = [{
+                ...bip32Derivation,
+                pubkey: bip32Derivation.pubkey.slice(1),
+                leafHashes: []
+            }]
+        })
+        let enhancedPsbt = psbt.toHex();
+
+        const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
+        const keystoneContainer = this.viewSdk.getSdk();
+        const status = await keystoneContainer.play(ur);
+        if (status === PlayStatus.success) {
+            let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
+                title: "Get the Signature from Keystone",
+                description: "Please scan the QR code displayed on your Keystone",
+                URTypeErrorMessage:
+                    "The scanned QR code can't be read. Please verify and try again.",
+            });
+            if (urResult.status === ReadStatus.success) {
+                const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
+                let psbt = Psbt.fromHex(signedPsbt)
+                psbt.finalizeAllInputs()
+                return psbt.toHex();
+            } else {
+                throw new Error("Extracting signature error, Please try again.")
+            }
+        } else {
+            throw new Error("Error genering the QR code, Please try again.")
+        }
     }
 
     async signPsbts(psbtsHexes: string[]): Promise<string[]> {
@@ -111,7 +151,39 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     async signMessageBIP322(message: string): Promise<string> {
-        throw new Error("Method not implemented.");
+        // const psbt = genPsbtOfBIP322Simple({
+        //     message,
+        //     address: this.keystoneWaleltInfo!.address!,
+        //     networkType: NetworkType.TESTNET,
+        // });
+
+        // const ur = this.dataSdk.btc.generatePSBT(Buffer.from(psbt.toHex(), 'hex'));
+
+        // const keystoneContainer = this.viewSdk.getSdk();
+        // const status = await keystoneContainer.play(ur);
+        // if (status === PlayStatus.success) {
+        //     let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
+        //         title: "Get the Signature from Keystone",
+        //         description: "Please scan the QR code displayed on your Keystone",
+        //         renderInitial: {
+        //             walletMode: "Web3",
+        //             link: "",
+        //         },
+        //         URTypeErrorMessage:
+        //             "The scanned QR code can't be read. Please verify and try again.",
+        //     });
+        //     if (urResult.status === ReadStatus.success) {
+        //         const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
+        //         let psbt = Psbt.fromHex(signedPsbt)
+        //         const signature = getSignatureFromPsbtOfBIP322Simple(psbt);
+        //         return signature;
+        //     } else {
+        //         throw new Error("Extracting signature error, Please try again.")
+        //     }
+        // } else {
+        //     throw new Error("Error genering the QR code, Please try again.")
+        // }
+        throw new Error("Get Key error.");
     }
 
     on(eventName: string, callBack: () => void): void {
