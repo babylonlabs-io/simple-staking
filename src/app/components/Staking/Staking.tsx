@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
@@ -40,6 +40,7 @@ interface StakingProps {
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
     | {
+        currentHeight: number | undefined;
         currentVersion: GlobalParamsVersion | undefined;
         isApprochingNextVersion: boolean | undefined;
       }
@@ -71,6 +72,10 @@ export const Staking: React.FC<StakingProps> = ({
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
+  const isBlockHeightUnderActivation =
+    !stakingParams ||
+    !paramWithContext.currentHeight ||
+    paramWithContext?.currentHeight < stakingParams.activationHeight;
   const { showError } = useError();
 
   const handleResetState = () => {
@@ -181,12 +186,13 @@ export const Staking: React.FC<StakingProps> = ({
       return <LoadingView />;
     }
     // 3. Staking has not started yet
-    else if (!stakingParams) {
+    else if (isBlockHeightUnderActivation) {
       return (
         <Message
           title="Staking has not yet started"
           messages={[
-            "The staking application will open once the staking activation height has been reached.",
+            `The staking application will open once the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}) has been reached.`,
+            `The current Bitcoin block height is ${paramWithContext?.currentHeight || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
