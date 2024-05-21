@@ -60,7 +60,7 @@ const iconLinks = [
 
 const textLinks = [
   {
-    name: "Terms",
+    name: "Term of Use",
     url: "/babylonchain_terms_of_use.doc",
     isExternal: false,
   },
@@ -76,10 +76,7 @@ export const Footer: React.FC<FooterProps> = () => {
       </div>
       <div className="flex justify-center gap-8 p-2">
         {textLinks.map(({ name, url, isExternal }) => (
-          <div
-            key={name}
-            className="flex w-4 items-center justify-center text-sm"
-          >
+          <div key={name} className="flex items-center justify-center text-sm">
             <a
               href={url}
               target={isExternal ? "_blank" : "_self"}
