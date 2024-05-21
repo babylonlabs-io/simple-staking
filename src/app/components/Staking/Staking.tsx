@@ -19,6 +19,8 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errors";
 
 const stakingFeeSat = 500;
 
@@ -69,6 +71,7 @@ export const Staking: React.FC<StakingProps> = ({
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
+  const { showError } = useError();
 
   const handleResetState = () => {
     setFinalityProvider(undefined);
@@ -78,60 +81,71 @@ export const Staking: React.FC<StakingProps> = ({
   };
 
   const handleSign = async () => {
-    if (!btcWallet) {
-      throw new Error("Wallet not connected");
-    } else if (!address) {
-      throw new Error("Address is not set");
-    } else if (!btcWalletNetwork) {
-      throw new Error("Wallet network not connected");
-    } else if (!paramWithContext || !paramWithContext.currentVersion) {
-      throw new Error("Global params not loaded");
-    } else if (!finalityProvider) {
-      throw new Error("Finality provider not selected");
-    }
-    const { currentVersion: globalParamsVersion } = paramWithContext;
-    const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
-    let signedTxHex: string;
     try {
-      signedTxHex = await signForm(
+      if (!btcWallet) {
+        throw new Error("Wallet not connected");
+      } else if (!address) {
+        throw new Error("Address is not set");
+      } else if (!btcWalletNetwork) {
+        throw new Error("Wallet network not connected");
+      } else if (!paramWithContext || !paramWithContext.currentVersion) {
+        throw new Error("Global params not loaded");
+      } else if (!finalityProvider) {
+        throw new Error("Finality provider not selected");
+      }
+      const { currentVersion: globalParamsVersion } = paramWithContext;
+      const stakingTerm = getStakingTerm(
         globalParamsVersion,
-        btcWallet,
-        finalityProvider,
-        stakingTerm,
-        btcWalletNetwork,
-        stakingAmountSat,
-        address,
-        stakingFeeSat,
-        publicKeyNoCoord,
+        stakingTimeBlocks,
       );
+      let signedTxHex: string;
+      try {
+        signedTxHex = await signForm(
+          globalParamsVersion,
+          btcWallet,
+          finalityProvider,
+          stakingTerm,
+          btcWalletNetwork,
+          stakingAmountSat,
+          address,
+          stakingFeeSat,
+          publicKeyNoCoord,
+        );
+      } catch (error: Error | any) {
+        throw error;
+      }
+
+      let txID;
+      try {
+        txID = await btcWallet.pushTx(signedTxHex);
+      } catch (error: Error | any) {
+        throw error;
+      }
+
+      // Update the local state with the new delegation
+      setDelegationsLocalStorage((delegations) => [
+        toLocalStorageDelegation(
+          Transaction.fromHex(signedTxHex).getId(),
+          publicKeyNoCoord,
+          finalityProvider.btcPk,
+          stakingAmountSat,
+          signedTxHex,
+          stakingTerm,
+        ),
+        ...delegations,
+      ]);
+
+      handleResetState();
     } catch (error: Error | any) {
-      // TODO Show Popup
-      console.error(error?.message || "Error signing the form");
-      throw error;
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.STAKING,
+          errorTime: new Date(),
+        },
+        retryAction: handleSign,
+      });
     }
-
-    let txID;
-    try {
-      txID = await btcWallet.pushTx(signedTxHex);
-    } catch (error: Error | any) {
-      console.error(error?.message || "Broadcasting staking transaction error");
-      throw error;
-    }
-
-    // Update the local state with the new delegation
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(signedTxHex).getId(),
-        publicKeyNoCoord,
-        finalityProvider.btcPk,
-        stakingAmountSat,
-        signedTxHex,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
-
-    handleResetState();
   };
 
   // Select the finality provider from the list
