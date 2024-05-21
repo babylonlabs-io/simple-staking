@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
+import { LoadingView } from "@/app/components/Loading/Loading";
 import { getStakers } from "@/app/api/getStakers";
 import { Staker } from "./Staker";
 
@@ -12,7 +13,7 @@ export const Stakers: React.FC<StakersProps> = () => {
     queryKey: ["stakers"],
     queryFn: getStakers,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.data,
+    select: (data) => data.stakers,
   });
 
   return (
@@ -60,9 +61,7 @@ export const Stakers: React.FC<StakersProps> = () => {
               ),
           )
         ) : (
-          <div className="flex justify-center py-4">
-            <span className="loading loading-spinner text-primary" />
-          </div>
+          <LoadingView />
         )}
       </div>
       <Tooltip id="tooltip-delegations" />
