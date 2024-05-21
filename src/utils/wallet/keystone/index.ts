@@ -1,22 +1,23 @@
 'use client';
 
 import KeystoneSDK, { UR, URType } from "@keystonehq/keystone-sdk"
-// import { genPsbtOfBIP322Simple, getSignatureFromPsbtOfBIP322Simple } from '@unisat/wallet-sdk/lib/message';
-import { NetworkType } from "@unisat/wallet-sdk/lib/network";
 import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
 import * as bitcoin from 'bitcoinjs-lib';
+import { Psbt } from "bitcoinjs-lib";
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371';
 import { HDKey } from "@scure/bip32";
 
-import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
+import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
+import { generatePsbtOfBIP322Simple, extractSignatureFromPsbtOfBIP322Simple, NetworkType } from './lib';
 import {
     getAddressBalance,
     getTipHeight,
     getFundingUTXOs,
     getNetworkFees,
     pushTx,
-} from "../mempool_api";
-import { Psbt } from "bitcoinjs-lib";
+} from "../../mempool_api";
+import { log } from "console";
+
 
 
 type KeystoneWalletInfo = {
@@ -60,11 +61,12 @@ export class KeystoneWallet extends WalletProvider {
 
         if (decodedResult.status === ReadStatus.success) {
             const accountData = this.dataSdk.parseAccount(decodedResult.result);
-            let xpub = accountData.keys[3].extendedPublicKey;
+            console.log('accountData', accountData);
+            let xpub = accountData.keys[0].extendedPublicKey;
             this.keystoneWaleltInfo = {
                 mfp: accountData.masterFingerprint,
                 extendedPublicKey: xpub,
-                path: accountData.keys[3].path,
+                path: accountData.keys[0].path,
                 address: undefined,
                 publicKeyHex: undefined,
             }
@@ -126,8 +128,8 @@ export class KeystoneWallet extends WalletProvider {
             });
             if (urResult.status === ReadStatus.success) {
                 const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
-                let psbt = Psbt.fromHex(signedPsbt)
-                psbt.finalizeAllInputs()
+                let psbt = Psbt.fromHex(signedPsbt);
+                psbt.finalizeAllInputs();
                 return psbt.toHex();
             } else {
                 throw new Error("Extracting signature error, Please try again.")
@@ -151,39 +153,54 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     async signMessageBIP322(message: string): Promise<string> {
-        // const psbt = genPsbtOfBIP322Simple({
-        //     message,
-        //     address: this.keystoneWaleltInfo!.address!,
-        //     networkType: NetworkType.TESTNET,
-        // });
+        const psbt = generatePsbtOfBIP322Simple({
+            message,
+            address: this.keystoneWaleltInfo!.address!,
+            networkType: NetworkType.TESTNET,
+        });
 
-        // const ur = this.dataSdk.btc.generatePSBT(Buffer.from(psbt.toHex(), 'hex'));
+        const bip32Derivation = {
+            masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
+            path: `${this.keystoneWaleltInfo!.path!}/0/0`,
+            pubkey: Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex')
+        };
+        
+        console.log('psbt', psbt);
+        console.log('bip32', bip32Derivation);
 
-        // const keystoneContainer = this.viewSdk.getSdk();
-        // const status = await keystoneContainer.play(ur);
-        // if (status === PlayStatus.success) {
-        //     let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
-        //         title: "Get the Signature from Keystone",
-        //         description: "Please scan the QR code displayed on your Keystone",
-        //         renderInitial: {
-        //             walletMode: "Web3",
-        //             link: "",
-        //         },
-        //         URTypeErrorMessage:
-        //             "The scanned QR code can't be read. Please verify and try again.",
-        //     });
-        //     if (urResult.status === ReadStatus.success) {
-        //         const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
-        //         let psbt = Psbt.fromHex(signedPsbt)
-        //         const signature = getSignatureFromPsbtOfBIP322Simple(psbt);
-        //         return signature;
-        //     } else {
-        //         throw new Error("Extracting signature error, Please try again.")
-        //     }
-        // } else {
-        //     throw new Error("Error genering the QR code, Please try again.")
-        // }
-        throw new Error("Get Key error.");
+        psbt.data.inputs.forEach((input) => {
+            input.bip32Derivation = [{
+                ...bip32Derivation,                
+            }]
+        });
+
+        let enhancedPsbt = psbt.toHex();
+
+        const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
+
+        const keystoneContainer = this.viewSdk.getSdk();
+        const status = await keystoneContainer.play(ur);
+        if (status === PlayStatus.success) {
+            let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
+                title: "Get the Signature from Keystone",
+                description: "Please scan the QR code displayed on your Keystone",
+                URTypeErrorMessage:
+                    "The scanned QR code can't be read. Please verify and try again.",
+            });
+            if (urResult.status === ReadStatus.success) {
+                const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
+                let psbt = Psbt.fromHex(signedPsbt)
+                console.log('called---------------')
+                psbt.finalizeAllInputs();
+                const signature = extractSignatureFromPsbtOfBIP322Simple(psbt);
+                console.log('signature', signature)
+                return signature;
+            } else {
+                throw new Error("Extracting signature error, Please try again.")
+            }
+        } else {
+            throw new Error("Error genering the QR code, Please try again.")
+        }
     }
 
     on(eventName: string, callBack: () => void): void {
@@ -222,9 +239,25 @@ function generateBitcoinAddressFromXpub(xpub: string, path: string, network: bit
     const derivedNode = hdNode.derive(path);
     let pubkeyBuffer = Buffer.from(derivedNode.publicKey!);
     const childNodeXOnlyPubkey = toXOnly(pubkeyBuffer);
-    const { address } = bitcoin.payments.p2tr({
-        internalPubkey: childNodeXOnlyPubkey,
+    // const { address } = bitcoin.payments.p2tr({
+    //     internalPubkey: childNodeXOnlyPubkey,
+    //     network: bitcoin.networks.testnet
+    // });
+    const {address, output } = bitcoin.payments.p2wpkh({
+        pubkey: pubkeyBuffer,
         network: bitcoin.networks.testnet
-    });
+      })
     return { address: address!, pubkeyHex: pubkeyBuffer.toString('hex') }
+}
+
+enum AddressType {
+    P2PKH,
+    P2WPKH,
+    P2TR,
+    P2SH_P2WPKH,
+    M44_P2WPKH, // deprecated
+    M44_P2TR, // deprecated
+    P2WSH,
+    P2SH,
+    UNKNOWN,
 }
