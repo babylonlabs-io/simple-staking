@@ -23,7 +23,10 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { QueryMeta } from "@/app/types/api";
-import { LoadingTableList, LoadingView } from "@/app/components/Loading/Loading";
+import {
+  LoadingTableList,
+  LoadingView,
+} from "@/app/components/Loading/Loading";
 import {
   UnbondWithdrawModal,
   MODE,

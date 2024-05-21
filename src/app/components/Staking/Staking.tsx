@@ -40,6 +40,7 @@ interface StakingProps {
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
     | {
+        currentHeight: number | undefined;
         currentVersion: GlobalParamsVersion | undefined;
         isApprochingNextVersion: boolean | undefined;
       }
@@ -68,15 +69,14 @@ export const Staking: React.FC<StakingProps> = ({
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const [currentBlockHeight, setCurrentBlockHeight] = useState(0);
-  const { showError } = useError();
-  const pollingInterval = 60000; // 60 seconds fetch interval
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
   const isBlockHeightUnderActivation =
-    !stakingParams || currentBlockHeight < stakingParams.activationHeight;
-  
+    !stakingParams ||
+    !paramWithContext.currentHeight ||
+    paramWithContext?.currentHeight < stakingParams.activationHeight;
+  const { showError } = useError();
 
   const handleResetState = () => {
     setFinalityProvider(undefined);
@@ -84,28 +84,6 @@ export const Staking: React.FC<StakingProps> = ({
     setStakingTimeBlocks(0);
     setPreviewModalOpen(false);
   };
-
-  useEffect(() => {
-    let intervalId;
-
-    const fetchBlockHeight = async () => {
-      if (!btcWallet) return;
-
-      try {
-        const height = await btcWallet.getBTCTipHeight();
-        setCurrentBlockHeight(height);
-      } catch (error) {
-        console.error("Error fetching current block height.");
-      }
-    };
-    fetchBlockHeight();
-
-    intervalId = setInterval(fetchBlockHeight, pollingInterval);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [btcWallet, pollingInterval]);
 
   const handleSign = async () => {
     try {
@@ -208,12 +186,13 @@ export const Staking: React.FC<StakingProps> = ({
       return <LoadingView />;
     }
     // 3. Staking has not started yet
-    else if (!stakingParams) {
+    else if (isBlockHeightUnderActivation) {
       return (
         <Message
           title="Staking has not yet started"
           messages={[
-            "The staking application will open once the staking activation height has been reached.",
+            `The staking application will open once the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}) has been reached.`,
+            `The current Bitcoin block height is ${paramWithContext?.currentHeight || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
@@ -245,20 +224,7 @@ export const Staking: React.FC<StakingProps> = ({
         />
       );
     }
-    // 6. Current block height has not reached activation block height
-    else if (isBlockHeightUnderActivation) {
-      return (
-        <Message
-          title="Staking has not yet started"
-          messages={[
-            `The staking application will open once the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}) has been reached.`,
-            `The current Bitcoin block height is ${currentBlockHeight || "-"}.`,
-          ]}
-          icon={stakingNotStarted}
-        />
-      );
-    }
-    // 7. Staking form
+    // 6. Staking form
     else {
       const {
         minStakingAmountSat,
