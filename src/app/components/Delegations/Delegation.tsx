@@ -103,15 +103,21 @@ export const Delegation: React.FC<DelegationProps> = ({
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
         <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} Signet BTC</p>
         <p>{durationTillNow(startTimestamp)}</p>
-        <a
-          href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden text-primary hover:underline lg:flex"
-        >
-          {trim(stakingTxHash)}
-        </a>
-        <div className="flex">
+        <div className="hidden justify-center lg:flex">
+          <a
+            href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary hover:underline"
+          >
+            {trim(stakingTxHash)}
+          </a>
+        </div>
+        {/*
+        we need to center the text without the tooltip
+        add its size 12px and gap 4px, 16/2 = 8px
+        */}
+        <div className="relative flex lg:left-[8px] lg:justify-center">
           <div className="flex items-center gap-1">
             <p>{renderState()}</p>
             <span
