@@ -23,7 +23,7 @@ const config: Config = {
       },
       gridTemplateColumns: {
         finalityProviders: "2fr 1fr 1.75fr",
-        stakingFinalityProviders: "2fr 1fr 2fr 0.75fr",
+        stakingFinalityProviders: "2fr 1.5fr 2fr 0.75fr",
       },
     },
   },
