@@ -5,7 +5,6 @@ import { Tooltip } from "react-tooltip";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { getStakers } from "@/app/api/getStakers";
 import { Staker } from "./Staker";
-import { LoadingView } from "@/app/components/Loading/Loading";
 
 interface StakersProps {}
 
