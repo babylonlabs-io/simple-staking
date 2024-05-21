@@ -45,7 +45,7 @@ export const blocksToTime = (
   if (!blocks) return "-";
 
   // If no unit is provided, return the number of blocks
-  if (!unit) return `${blocks} blocks`;
+  if (!unit) return `${blocks}`;
 
   // Convert blocks to different time units based on the average blocks per hour
   const hours = blocks / BLOCKS_PER_HOUR;
