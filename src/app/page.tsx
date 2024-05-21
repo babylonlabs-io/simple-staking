@@ -64,17 +64,16 @@ const Home: React.FC<HomeProps> = () => {
         getGlobalParams(),
       ]);
       try {
-        // The staking parameters are retrieved based on the current height + 1
-        // so this verification should take this into account.
-        const currentHeight = height + 1;
         return {
-          currentHeight,
-          ...getCurrentGlobalParamsVersion(currentHeight, versions),
+          // The staking parameters are retrieved based on the current height + 1
+          // so this verification should take this into account.
+          height: height + 1,
+          ...getCurrentGlobalParamsVersion(height + 1, versions),
         };
       } catch (error) {
         // No global params version found, it means the staking is not yet enabled
         return {
-          currentHeight: undefined,
+          height: undefined,
           currentVersion: undefined,
           isApprochingNextVersion: false,
         };
