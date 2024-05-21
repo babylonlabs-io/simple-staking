@@ -12,8 +12,11 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import { getFinalityProviders } from "./api/getFinalityProviders";
-import { getDelegations } from "./api/getDelegations";
+import {
+  getFinalityProviders,
+  PaginatedFinalityProviders,
+} from "./api/getFinalityProviders";
+import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -65,23 +68,62 @@ const Home: React.FC<HomeProps> = () => {
       enabled: !!btcWallet,
     });
 
-  const { data: finalityProvidersData } = useQuery({
+  const {
+    data: finalityProviders,
+    fetchNextPage: fetchNextFinalityProvidersPage,
+    hasNextPage: hasNextFinalityProvidersPage,
+    isFetchingNextPage: isFetchingNextFinalityProvidersPage,
+  } = useInfiniteQuery({
     queryKey: ["finality providers"],
-    queryFn: getFinalityProviders,
+    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.next_key !== ""
+        ? lastPage?.pagination?.next_key
+        : null,
+    initialPageParam: "",
     refetchInterval: 60000, // 1 minute
+    select: (data) => {
+      const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
+        (acc, page) => {
+          acc.finalityProviders.push(...page.finalityProviders);
+          acc.pagination = page.pagination;
+          return acc;
+        },
+        { finalityProviders: [], pagination: { next_key: "" } },
+      );
+      return flattenedData;
+    },
   });
 
-  const { data: delegations, fetchNextPage: _fetchNextDelegationsPage } =
-    useInfiniteQuery({
-      queryKey: ["delegations", address],
-      queryFn: ({ pageParam = "" }) =>
-        getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.nextKey,
-      initialPageParam: "",
-      refetchInterval: 60000, // 1 minute
-      enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => data?.pages?.flatMap((page) => page?.delegations),
-    });
+  const {
+    data: delegations,
+    fetchNextPage: fetchNextDelegationsPage,
+    hasNextPage: hasNextDelegationsPage,
+    isFetchingNextPage: isFetchingNextDelegationsPage,
+  } = useInfiniteQuery({
+    queryKey: ["delegations", address, publicKeyNoCoord],
+    queryFn: ({ pageParam = "" }) =>
+      getDelegations(pageParam, publicKeyNoCoord),
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.next_key !== ""
+        ? lastPage?.pagination?.next_key
+        : null,
+    initialPageParam: "",
+    refetchInterval: 60000, // 1 minute
+    enabled: !!(btcWallet && publicKeyNoCoord && address),
+    select: (data) => {
+      const flattenedData = data.pages.reduce<PaginatedDelegations>(
+        (acc, page) => {
+          acc.delegations.push(...page.delegations);
+          acc.pagination = page.pagination;
+          return acc;
+        },
+        { delegations: [], pagination: { next_key: "" } },
+      );
+
+      return flattenedData;
+    },
+  });
 
   const { data: stakingStats, isLoading: stakingStatsIsLoading } = useQuery({
     queryKey: ["stats"],
@@ -169,7 +211,7 @@ const Home: React.FC<HomeProps> = () => {
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegations?.find(
+          !delegations?.delegations.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
               localDelegation?.stakingTxHashHex,
@@ -179,7 +221,7 @@ const Home: React.FC<HomeProps> = () => {
   }, [delegations, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = finalityProvidersData?.reduce(
+  const finalityProvidersKV = finalityProviders?.finalityProviders.reduce(
     (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
     {},
   );
@@ -187,7 +229,7 @@ const Home: React.FC<HomeProps> = () => {
   let totalStakedSat = 0;
 
   if (delegations) {
-    totalStakedSat = delegations
+    totalStakedSat = delegations.delegations
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
@@ -227,11 +269,16 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            finalityProviders={finalityProvidersData}
+            finalityProviders={finalityProviders?.finalityProviders}
             paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
             onConnect={handleConnectModal}
+            finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
+            finalityProvidersHasNext={hasNextFinalityProvidersPage}
+            finalityProvidersIsFetchingMore={
+              isFetchingNextFinalityProvidersPage
+            }
             isLoading={isLoadingCurrentParams}
             btcWallet={btcWallet}
             btcWalletNetwork={btcWalletNetwork}
@@ -246,7 +293,7 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
-                delegationsAPI={delegations}
+                delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
@@ -258,6 +305,11 @@ const Home: React.FC<HomeProps> = () => {
                 address={address}
                 signPsbt={btcWallet.signPsbt}
                 pushTx={btcWallet.pushTx}
+                queryMeta={{
+                  next: fetchNextDelegationsPage,
+                  hasMore: hasNextDelegationsPage,
+                  isFetchingMore: isFetchingNextDelegationsPage,
+                }}
               />
             )}
           {/* At this point of time is not used */}

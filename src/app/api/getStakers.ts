@@ -1,11 +1,10 @@
 import { apiWrapper } from "./apiWrapper";
 
 export interface Stakers {
-  data: StakersData[];
-  pagination: Pagination;
+  stakers: StakersAPI[];
 }
 
-export interface StakersData {
+export interface StakersAPI {
   staker_pk_hex: string;
   active_tvl: number;
   total_tvl: number;
@@ -13,8 +12,8 @@ export interface StakersData {
   total_delegations: number;
 }
 
-export interface Pagination {
-  next_key: string;
+interface StakersAPIResponse {
+  data: StakersAPI[];
 }
 
 export const getStakers = async (): Promise<Stakers> => {
@@ -35,5 +34,10 @@ export const getStakers = async (): Promise<Stakers> => {
     params,
   );
 
-  return response.data;
+  const stakersAPIResponse: StakersAPIResponse = response.data;
+  const stakersAPI: StakersAPI[] = stakersAPIResponse.data;
+
+  return {
+    stakers: stakersAPI,
+  };
 };
