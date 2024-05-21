@@ -4,6 +4,7 @@ import { IoMdClose } from "react-icons/io";
 
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 
 interface PreviewModalProps {
   open: boolean;
@@ -58,7 +59,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${+satoshiToBtc(stakingAmountSat).toFixed(6)} Signet BTC`}</p>
+            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">

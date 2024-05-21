@@ -378,6 +378,7 @@ const Home: React.FC<HomeProps> = () => {
             }
             isLoading={isLoadingCurrentParams}
             btcWallet={btcWallet}
+            btcWalletBalanceSat={btcWalletBalanceSat}
             btcWalletNetwork={btcWalletNetwork}
             address={address}
             publicKeyNoCoord={publicKeyNoCoord}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Hash } from "@/app/components/Hash/Hash";
 import blue from "@/app/assets/blue-check.svg";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 
 interface FinalityProviderProps {
   moniker: string;
@@ -43,7 +44,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         <Hash value={pkHex} address small noFade />
         <div className="flex gap-1">
           <p className="lg:hidden">Total Delegation:</p>
-          <p>{+satoshiToBtc(stakeSat).toFixed(6)} Signet BTC</p>
+          <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} Signet BTC</p>
         </div>
         <div className="flex gap-1">
           <p className="lg:hidden">Comission:</p>

@@ -2,6 +2,7 @@ import { FaBitcoin } from "react-icons/fa";
 
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 
 interface SummaryProps {
   address: string;
@@ -23,7 +24,9 @@ export const Summary: React.FC<SummaryProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="font-semibold">
-              {totalStakedSat ? +satoshiToBtc(totalStakedSat).toFixed(6) : 0}{" "}
+              {totalStakedSat
+                ? maxDecimals(satoshiToBtc(totalStakedSat), 8)
+                : 0}{" "}
               Signet BTC
             </p>
           </div>
@@ -34,7 +37,8 @@ export const Summary: React.FC<SummaryProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="font-semibold">
-              {balanceSat ? +satoshiToBtc(balanceSat).toFixed(6) : 0} Signet BTC
+              {balanceSat ? maxDecimals(satoshiToBtc(balanceSat), 8) : 0} Signet
+              BTC
             </p>
           </div>
           <p className="hidden xl:flex xl:text-sm 2xl:ml-2">{trim(address)}</p>
