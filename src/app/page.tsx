@@ -12,6 +12,8 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import {
   getFinalityProviders,
   PaginatedFinalityProviders,
@@ -19,7 +21,6 @@ import {
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { Header } from "./components/Header/Header";
@@ -27,11 +28,13 @@ import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { Footer } from "./components/Footer/Footer";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
+import { ErrorModal } from "./components/Modals/ErrorModal";
+import { useError } from "./context/Error/ErrorContext";
+import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
 interface HomeProps {}
 
@@ -44,35 +47,49 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
+  const { error, isErrorOpen, showError, hideError, retryErrorAction } =
+    useError();
 
-  const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
-    useQuery({
-      queryKey: ["global params"],
-      queryFn: async () => {
-        const [height, versions] = await Promise.all([
-          btcWallet!.getBTCTipHeight(),
-          getGlobalParams(),
-        ]);
-        try {
-          return getCurrentGlobalParamsVersion(height + 1, versions);
-        } catch (error) {
-          // No global params version found, it means the staking is not yet enabled
-          return {
-            currentVersion: undefined,
-            isApprochingNextVersion: false,
-          };
-        }
-      },
-      refetchInterval: 60000, // 1 minute
-      // Should be enabled only when the wallet is connected
-      enabled: !!btcWallet,
-    });
+  const {
+    data: paramWithContext,
+    isLoading: isLoadingCurrentParams,
+    error: globalParamsVersionError,
+    isError: hasGlobalParamsVersionError,
+    refetch: refetchGlobalParamsVersion,
+  } = useQuery({
+    queryKey: ["global params"],
+    queryFn: async () => {
+      const [height, versions] = await Promise.all([
+        btcWallet!.getBTCTipHeight(),
+        getGlobalParams(),
+      ]);
+      try {
+        return await getCurrentGlobalParamsVersion(height + 1, versions);
+      } catch (error) {
+        // No global params version found, it means the staking is not yet enabled
+        return {
+          currentVersion: undefined,
+          isApprochingNextVersion: false,
+        };
+      }
+    },
+    refetchInterval: 60000, // 1 minute
+    // Should be enabled only when the wallet is connected
+    enabled: !!btcWallet,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
+  });
 
   const {
     data: finalityProviders,
     fetchNextPage: fetchNextFinalityProvidersPage,
     hasNextPage: hasNextFinalityProvidersPage,
     isFetchingNextPage: isFetchingNextFinalityProvidersPage,
+    error: finalityProvidersError,
+    isError: hasFinalityProvidersError,
+    refetch: refetchFinalityProvidersData,
+    isRefetchError: isRefetchFinalityProvidersError,
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
     queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
@@ -92,7 +109,10 @@ const Home: React.FC<HomeProps> = () => {
         { finalityProviders: [], pagination: { next_key: "" } },
       );
       return flattenedData;
-    },
+  },
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    }
   });
 
   const {
@@ -100,6 +120,9 @@ const Home: React.FC<HomeProps> = () => {
     fetchNextPage: fetchNextDelegationsPage,
     hasNextPage: hasNextDelegationsPage,
     isFetchingNextPage: isFetchingNextDelegationsPage,
+    error: delegationsError,
+    isError: hasDelegationsError,
+    refetch: refetchDelegationData,
   } = useInfiniteQuery({
     queryKey: ["delegations", address, publicKeyNoCoord],
     queryFn: ({ pageParam = "" }) =>
@@ -122,14 +145,77 @@ const Home: React.FC<HomeProps> = () => {
       );
 
       return flattenedData;
-    },
+  },
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    }
   });
 
-  const { data: stakingStats, isLoading: stakingStatsIsLoading } = useQuery({
+  const {
+    data: stakingStats,
+    isLoading: stakingStatsIsLoading,
+    error: statsError,
+    isError: hasStatsError,
+    refetch: refetchStats,
+  } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
+
+  useEffect(() => {
+    const handleError = ({
+      error,
+      hasError,
+      errorState,
+      refetchFunction,
+    }: ErrorHandlerParam) => {
+      if (hasError && error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState: errorState,
+            errorTime: new Date(),
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    };
+
+    handleError({
+      error: finalityProvidersError,
+      hasError: hasFinalityProvidersError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchFinalityProvidersData,
+    });
+    handleError({
+      error: delegationsError,
+      hasError: hasDelegationsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchDelegationData,
+    });
+    handleError({
+      error: statsError,
+      hasError: hasStatsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchStats,
+    });
+    handleError({
+      error: globalParamsVersionError,
+      hasError: hasGlobalParamsVersionError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchGlobalParamsVersion,
+    });
+  }, [
+    hasFinalityProvidersError,
+    hasGlobalParamsVersionError,
+    hasDelegationsError,
+    hasStatsError,
+    isRefetchFinalityProvidersError,
+  ]);
 
   // Initializing btc curve is a required one-time operation
   useEffect(() => {
@@ -170,7 +256,7 @@ const Home: React.FC<HomeProps> = () => {
       const supported = isSupportedAddressType(address);
       if (!supported) {
         throw new Error(
-          "Invalid address type. Please use a Native SegWit or Taptoor",
+          "Invalid address type. Please use a Native SegWit or Taproot",
         );
       }
 
@@ -184,7 +270,14 @@ const Home: React.FC<HomeProps> = () => {
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
-      console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.WALLET,
+          errorTime: new Date(),
+        },
+        retryAction: handleConnectBTC,
+      });
     }
   };
 
@@ -328,6 +421,14 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <ErrorModal
+        open={isErrorOpen}
+        errorMessage={error.message}
+        errorState={error.errorState}
+        errorTime={error.errorTime}
+        onClose={hideError}
+        onRetry={retryErrorAction}
       />
     </main>
   );

@@ -1,20 +1,45 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { getStakers } from "@/app/api/getStakers";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errors";
 import { Staker } from "./Staker";
 
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { data: stakersData } = useQuery({
+  const { showError, hideError, isErrorOpen } = useError();
+
+  const {
+    data: stakersData,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["stakers"],
     queryFn: getStakers,
     refetchInterval: 60000, // 1 minute
     select: (data) => data.stakers,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
+
+  useEffect(() => {
+    if (error) {
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.SERVER_ERROR,
+          errorTime: new Date(),
+        },
+        retryAction: refetch,
+      });
+    }
+  }, [error, refetch, showError, hideError]);
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
@@ -50,7 +75,6 @@ export const Stakers: React.FC<StakersProps> = () => {
         {stakersData ? (
           stakersData.map(
             (staker) =>
-              // TODO handle API data errors with a proper error boundary
               staker && (
                 <Staker
                   key={staker.staker_pk_hex}
