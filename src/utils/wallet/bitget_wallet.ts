@@ -8,27 +8,46 @@ import {
 } from "../mempool_api";
 import { Psbt } from 'bitcoinjs-lib'
 
+type BitgetWalletInfo = {
+  publicKeyHex: string;
+  address: string;
+};
+
 export class BitgetWallet extends WalletProvider {
+  private bitgetWalletInfo: BitgetWalletInfo | undefined;
+  private provider = window?.bitkeep?.unisat
   constructor() {
     super();
   }
 
   connectWallet = async (): Promise<any> => {
     // check whether there is an Bitget Wallet extension
-    if (!window?.bitkeep?.unisat) {
+    if (!this.provider) {
       throw new Error("Bitget Wallet extension not found");
     }
 
     try {
-      const wallet = await window?.bitkeep?.unisat?.requestAccounts() // Connect to Bitget Wallet extension
-      await window?.bitkeep?.unisat?.switchNetwork('signet')
-      return wallet
+      await this.provider?.requestAccounts() // Connect to Bitget Wallet extension
+      await this.provider?.switchNetwork('signet')
     } catch (error) {
       if ((error as Error)?.message?.includes('rejected')) {
         throw new Error('Connection to Bitget Wallet was rejected')
       } else {
         throw new Error((error as Error)?.message)
       }
+    }
+
+    const address = await this.getAddress()
+    const publicKeyHex = await this.getPublicKeyHex()
+
+    if (address && publicKeyHex) {
+      this.bitgetWalletInfo = {
+        publicKeyHex,
+        address,
+      };
+      return this;
+    } else {
+      throw new Error("Could not connect to Bitget Wallet");
     }
   };
 
@@ -37,12 +56,12 @@ export class BitgetWallet extends WalletProvider {
   };
 
   getAddress = async (): Promise<string> => {
-    let accounts = (await window?.bitkeep?.unisat?.getAccounts()) || []
+    let accounts = (await this.provider?.getAccounts()) || []
     return accounts[0]
   };
 
   getPublicKeyHex = async (): Promise<string> => {
-    let publicKey = await window?.bitkeep?.unisat?.getPublicKey()
+    let publicKey = await this.provider?.getPublicKey()
     if (!publicKey) {
       console.log('bitget Wallet not connected')
       return ''
@@ -54,7 +73,7 @@ export class BitgetWallet extends WalletProvider {
     const data = {
       method: 'signPsbt',
       params: {
-        from: window?.bitkeep?.unisat?.selectedAddress,
+        from: this.provider?.selectedAddress,
         __internalFunc: '__signPsbt_babylon',
         psbtHex,
         options: {
@@ -63,7 +82,7 @@ export class BitgetWallet extends WalletProvider {
       }
     }
 
-    let signedPsbt = await window?.bitkeep?.unisat?.request('dappsSign', data)
+    let signedPsbt = await this.provider?.request('dappsSign', data)
     let psbt = Psbt.fromHex(signedPsbt)
     try {
       psbt.finalizeAllInputs()
@@ -87,7 +106,7 @@ export class BitgetWallet extends WalletProvider {
     const data = {
       method: 'signPsbt',
       params: {
-        from: window?.bitkeep?.unisat?.selectedAddress,
+        from: this.provider?.selectedAddress,
         __internalFunc: '__signPsbts_babylon',
         psbtHex: '_',
         psbtsHexes,
@@ -96,7 +115,7 @@ export class BitgetWallet extends WalletProvider {
     }
 
     try {
-      let signedPsbts = await window?.bitkeep?.unisat?.request('dappsSign', data)
+      let signedPsbts = await this.provider?.request('dappsSign', data)
       signedPsbts = signedPsbts.split(',')
       return signedPsbts.map((tx:string) => {
         let psbt = Psbt.fromHex(tx)
@@ -115,11 +134,11 @@ export class BitgetWallet extends WalletProvider {
   };
 
   signMessageBIP322 = async (message: string): Promise<string> => {
-    return await window?.bitkeep?.unisat?.signMessage(message, 'bip322-simple')
+    return await this.provider?.signMessage(message, 'bip322-simple')
   };
 
   getNetwork = async (): Promise<Network> => {
-    let network = await window?.bitkeep?.unisat?.getNetwork()
+    let network = await this.provider?.getNetwork()
 
     if (network === 'signet') {
       return 'testnet'
@@ -128,7 +147,7 @@ export class BitgetWallet extends WalletProvider {
   };
 
   on = (eventName: string, callBack: () => void) => {
-    return window?.bitkeep?.unisat?.on(eventName, callBack);
+    return this.provider?.on(eventName, callBack);
   };
 
   // Mempool calls
