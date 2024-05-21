@@ -64,10 +64,14 @@ const Home: React.FC<HomeProps> = () => {
         getGlobalParams(),
       ]);
       try {
-        return await getCurrentGlobalParamsVersion(height + 1, versions);
+        return {
+          currentHeight: height,
+          ...getCurrentGlobalParamsVersion(height + 1, versions),
+        };
       } catch (error) {
         // No global params version found, it means the staking is not yet enabled
         return {
+          currentHeight: height,
           currentVersion: undefined,
           isApprochingNextVersion: false,
         };
@@ -109,10 +113,10 @@ const Home: React.FC<HomeProps> = () => {
         { finalityProviders: [], pagination: { next_key: "" } },
       );
       return flattenedData;
-  },
+    },
     retry: (failureCount, error) => {
       return !isErrorOpen && failureCount <= 3;
-    }
+    },
   });
 
   const {
@@ -145,10 +149,10 @@ const Home: React.FC<HomeProps> = () => {
       );
 
       return flattenedData;
-  },
+    },
     retry: (failureCount, error) => {
       return !isErrorOpen && failureCount <= 3;
-    }
+    },
   });
 
   const {
