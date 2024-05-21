@@ -114,7 +114,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
         {/*
         we need to center the text without the tooltip
-        add it's size 12px and gap 4px, 16/2 = 8px
+        add its size 12px and gap 4px, 16/2 = 8px
         */}
         <div className="relative flex lg:left-[8px] lg:justify-center">
           <div className="flex items-center gap-1">
