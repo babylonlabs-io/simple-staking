@@ -19,7 +19,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
   // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
 
-  const errorLabel = "Staking time";
+  const errorLabel = "Staking term";
   const generalErrorMessage = "You should input staking term";
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
