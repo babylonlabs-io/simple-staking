@@ -195,7 +195,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `The staking application will open once the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}) has been reached.`,
+            `The staking application will open once the block prior to the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}) has been reached.`,
             `The current Bitcoin block height is ${paramWithContext?.currentHeight || "-"}.`,
           ]}
           icon={stakingNotStarted}
