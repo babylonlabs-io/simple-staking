@@ -63,10 +63,10 @@ const Home: React.FC<HomeProps> = () => {
         btcWallet!.getBTCTipHeight(),
         getGlobalParams(),
       ]);
-      // The staking parameters are retrieved based on the current height + 1
-      // so this verification should take this into account.
-      const currentHeight = height + 1;
       try {
+        // The staking parameters are retrieved based on the current height + 1
+        // so this verification should take this into account.
+        const currentHeight = height + 1;
         return {
           currentHeight,
           ...getCurrentGlobalParamsVersion(currentHeight, versions),
