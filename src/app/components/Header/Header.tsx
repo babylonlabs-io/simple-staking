@@ -32,7 +32,7 @@ export const Header: React.FC<HeaderProps> = ({
             balanceSat={balanceSat}
             onDisconnect={onDisconnect}
           />
-          {!address && <ThemeToggle />}
+          <ThemeToggle />
         </div>
       </div>
       <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
