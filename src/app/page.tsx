@@ -85,11 +85,11 @@ const Home: React.FC<HomeProps> = () => {
     select: (data) => {
       const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
         (acc, page) => {
-          acc.data.push(...page.data);
+          acc.finalityProviders.push(...page.finalityProviders);
           acc.pagination = page.pagination;
           return acc;
         },
-        { data: [], pagination: { next_key: "" } },
+        { finalityProviders: [], pagination: { next_key: "" } },
       );
       return flattenedData;
     },
@@ -114,11 +114,11 @@ const Home: React.FC<HomeProps> = () => {
     select: (data) => {
       const flattenedData = data.pages.reduce<PaginatedDelegations>(
         (acc, page) => {
-          acc.data.push(...page.data);
+          acc.delegations.push(...page.delegations);
           acc.pagination = page.pagination;
           return acc;
         },
-        { data: [], pagination: { next_key: "" } },
+        { delegations: [], pagination: { next_key: "" } },
       );
 
       return flattenedData;
@@ -211,7 +211,7 @@ const Home: React.FC<HomeProps> = () => {
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegations?.data.find(
+          !delegations?.delegations.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
               localDelegation?.stakingTxHashHex,
@@ -221,7 +221,7 @@ const Home: React.FC<HomeProps> = () => {
   }, [delegations, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = finalityProviders?.data.reduce(
+  const finalityProvidersKV = finalityProviders?.finalityProviders.reduce(
     (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
     {},
   );
@@ -229,7 +229,7 @@ const Home: React.FC<HomeProps> = () => {
   let totalStakedSat = 0;
 
   if (delegations) {
-    totalStakedSat = delegations.data
+    totalStakedSat = delegations.delegations
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
@@ -269,7 +269,7 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            finalityProviders={finalityProviders?.data}
+            finalityProviders={finalityProviders?.finalityProviders}
             paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             overTheCap={overTheCap}
@@ -293,7 +293,7 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
-                delegationsAPI={delegations.data}
+                delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}

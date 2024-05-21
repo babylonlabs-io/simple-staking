@@ -4,7 +4,7 @@ import { FinalityProvider } from "../types/finalityProviders";
 import { Pagination } from "../types/api";
 
 export interface PaginatedFinalityProviders {
-  data: FinalityProvider[];
+  finalityProviders: FinalityProvider[];
   pagination: Pagination;
 }
 
@@ -55,7 +55,7 @@ export const getFinalityProviders = async (
   const finalityProvidersAPI: FinalityProviderAPI[] =
     finalityProvidersAPIResponse.data;
 
-  const data = finalityProvidersAPI.map(
+  const finalityProviders = finalityProvidersAPI.map(
     (fp: FinalityProviderAPI): FinalityProvider => ({
       description: {
         moniker: fp.description.moniker,
@@ -77,5 +77,5 @@ export const getFinalityProviders = async (
     next_key: finalityProvidersAPIResponse.pagination.next_key,
   };
 
-  return { data, pagination };
+  return { finalityProviders, pagination };
 };

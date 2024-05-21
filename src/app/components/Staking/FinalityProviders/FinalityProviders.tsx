@@ -1,12 +1,12 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
-import { FinalityProvider } from "./FinalityProvider";
 import {
   LoadingTableList,
   LoadingView,
 } from "@/app/components/Loading/Loading";
 import { QueryMeta } from "@/app/types/api";
+import { FinalityProvider } from "./FinalityProvider";
 
 interface FinalityProvidersProps {
   finalityProviders: FinalityProviderInterface[] | undefined;

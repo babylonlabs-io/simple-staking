@@ -5,7 +5,7 @@ import { Delegation } from "../types/delegations";
 import { Pagination } from "../types/api";
 
 export interface PaginatedDelegations {
-  data: Delegation[];
+  delegations: Delegation[];
   pagination: Pagination;
 }
 
@@ -92,5 +92,5 @@ export const getDelegations = async (
   const pagination: Pagination = {
     next_key: delegationsAPIResponse.pagination.next_key,
   };
-  return { data: delegations, pagination };
+  return { delegations: delegations, pagination };
 };
