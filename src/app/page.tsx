@@ -218,7 +218,7 @@ const Home: React.FC<HomeProps> = () => {
       const supported = isSupportedAddressType(address);
       if (!supported) {
         throw new Error(
-          "Invalid address type. Please use a Native SegWit or Taptoor",
+          "Invalid address type. Please use a Native SegWit or Taproot",
         );
       }
 
