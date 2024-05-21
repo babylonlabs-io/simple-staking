@@ -1,4 +1,4 @@
-import { OKXWallet } from "./okx_wallet";
+import { OKXWallet } from "./providers/okx_wallet";
 import okxIcon from "./icons/okx.svg";
 
 export const walletList = [
