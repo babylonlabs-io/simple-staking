@@ -23,7 +23,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   return (
     <>
       <p>
-        Select a BTC Finality Provider or{" "}
+        Select a finality provider or{" "}
         <a
           href="https://github.com/babylonchain/networks/tree/main/bbn-test-4/finality-providers"
           target="_blank"
