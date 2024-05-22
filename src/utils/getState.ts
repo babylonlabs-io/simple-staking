@@ -21,9 +21,9 @@ export const getState = (state: string) => {
       return "Expired";
     // Intermediate local storage states
     case DelegationState.INTERMEDIATE_UNBONDING:
-      return "Unbonding";
+      return "Requesting Unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
-      return "Withdrawing";
+      return "Requesting Withdrawing";
     default:
       return "Unknown";
   }
@@ -50,9 +50,9 @@ export const getStateTooltip = (state: string) => {
       return "Stake timelock has expired";
     // Intermediate local storage states
     case DelegationState.INTERMEDIATE_UNBONDING:
-      return "Stake is unbonding";
+      return "Stake is requesting unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
-      return "Stake is withdrawing";
+      return "Stake is requesting withdrawing";
     default:
       return "Unknown";
   }
