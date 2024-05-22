@@ -118,7 +118,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
         placeholder="Blocks"
       />
       <div className="mb-2 mt-4 min-h-[20px]">
-        <p className="text text-center text-sm text-error">{error}</p>
+        <p className="text-center text-sm text-error">{error}</p>
       </div>
     </label>
   );

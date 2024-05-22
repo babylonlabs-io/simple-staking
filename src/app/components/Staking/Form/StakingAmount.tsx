@@ -91,13 +91,14 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     }
   };
 
+  const minStakeAmount = maxDecimals(satoshiToBtc(minStakingAmountSat), 8)
+  const maxStakeAmount = maxDecimals(satoshiToBtc(maxStakingAmountSat), 8)
   return (
     <label className="form-control w-full flex-1">
       <div className="label pt-0">
         <span className="label-text-alt text-base">Amount</span>
         <span className="label-text-alt opacity-50">
-          min stake is {maxDecimals(satoshiToBtc(minStakingAmountSat), 8)}{" "}
-          Signet BTC
+          min/max: {minStakeAmount}/{maxStakeAmount}{" "} Signet BTC
         </span>
       </div>
       <input
@@ -109,7 +110,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         placeholder="Signet BTC"
       />
       <div className="mb-2 mt-4 min-h-[20px]">
-        <p className="text text-center text-sm text-error">{error}</p>
+        <p className="text-center text-sm text-error">{error}</p>
       </div>
     </label>
   );

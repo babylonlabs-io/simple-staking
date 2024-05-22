@@ -35,6 +35,7 @@ import {
 } from "../Modals/UnbondWithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
+import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -43,7 +44,6 @@ interface DelegationsProps {
   globalParamsVersion: GlobalParamsVersion;
   publicKeyNoCoord: string;
   unbondingFeeSat: number;
-  withdrawalFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
   signPsbt: WalletProvider["signPsbt"];
@@ -58,7 +58,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
   globalParamsVersion,
   publicKeyNoCoord,
   unbondingFeeSat,
-  withdrawalFeeSat,
   btcWalletNetwork,
   address,
   signPsbt,
@@ -185,7 +184,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       showError({
         error: {
           message: error.message,
-          errorState: ErrorState.UNBOUNDING,
+          errorState: ErrorState.UNBONDING,
           errorTime: new Date(),
         },
         retryAction: () => handleModal(id, MODE_UNBOND),
@@ -246,7 +245,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         slashingScript,
         Transaction.fromHex(delegation.unbondingTx.txHex),
         address,
-        withdrawalFeeSat,
+        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
         delegation.stakingTx.outputIndex,
       );
@@ -258,7 +257,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         unbondingScript,
         Transaction.fromHex(delegation.stakingTx.txHex),
         address,
-        withdrawalFeeSat,
+        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
         delegation.stakingTx.outputIndex,
       );
@@ -350,8 +349,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
       <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
         <p>Amount</p>
         <p>Inception</p>
-        <p>Transaction hash</p>
-        <p>Status</p>
+        <p className="text-center">Transaction hash</p>
+        <p className="text-center">Status</p>
         <p>Action</p>
       </div>
       <div

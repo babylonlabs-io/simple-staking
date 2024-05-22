@@ -58,8 +58,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return "Withdraw Error";
       case ErrorState.STAKING:
         return "Stake Error";
-      case ErrorState.UNBOUNDING:
-        return "Unbounding Error";
+      case ErrorState.UNBONDING:
+        return "Unbonding Error";
       default:
         return "Unknown Error";
     }
@@ -69,7 +69,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     switch (errorState) {
       case ErrorState.SERVER_ERROR:
         return `Error fetching data`;
-      case ErrorState.UNBOUNDING:
+      case ErrorState.UNBONDING:
         return `Your request to unbound failed due to: ${errorMessage}`;
       case ErrorState.WITHDRAW:
         return `Failed to withdraw due to: ${errorMessage}`;

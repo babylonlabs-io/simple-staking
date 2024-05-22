@@ -7,7 +7,6 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
 
 import {
-  getWallet,
   toNetwork,
   isSupportedAddressType,
   getPublicKeyNoCoord,
@@ -35,10 +34,9 @@ import { getGlobalParams } from "./api/getGlobalParams";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
+import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 
 interface HomeProps {}
-
-const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -49,7 +47,6 @@ const Home: React.FC<HomeProps> = () => {
   const [address, setAddress] = useState("");
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
-
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -239,7 +236,13 @@ const Home: React.FC<HomeProps> = () => {
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   const handleConnectModal = () => {
-    setConnectModalOpen(true);
+    // check if there's a window.btcwallet and use the default wallet provider
+    if (window.btcwallet) {
+      handleConnectBTC(window.btcwallet);
+    } else {
+      // show a wallet selection modal
+      setConnectModalOpen(true);
+    }
   };
 
   const handleDisconnectBTC = () => {
@@ -250,12 +253,11 @@ const Home: React.FC<HomeProps> = () => {
     setAddress("");
   };
 
-  const handleConnectBTC = async () => {
+  const handleConnectBTC = async (walletProvider: WalletProvider) => {
     // close the modal
     setConnectModalOpen(false);
 
     try {
-      const walletProvider = getWallet();
       await walletProvider.connectWallet();
       const address = await walletProvider.getAddress();
       // check if the wallet address type is supported in babylon
@@ -282,7 +284,7 @@ const Home: React.FC<HomeProps> = () => {
           errorState: ErrorState.WALLET,
           errorTime: new Date(),
         },
-        retryAction: handleConnectBTC,
+        retryAction: () => handleConnectBTC(walletProvider),
       });
     }
   };
@@ -293,7 +295,7 @@ const Home: React.FC<HomeProps> = () => {
       let once = false;
       btcWallet.on("accountChanged", () => {
         if (!once) {
-          handleConnectBTC();
+          handleConnectBTC(btcWallet);
         }
       });
       return () => {
@@ -337,12 +339,21 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  // overflow properties to indicate the current state of the staking cap with the tvl
   // these constants are needed for easier prop passing
-  const overTheCap =
-    paramWithContext?.currentVersion && stakingStats
-      ? paramWithContext.currentVersion.stakingCapSat <=
-        stakingStats.activeTVLSat
-      : false;
+  let overflow = {
+    isOverTheCap: false,
+    isApprochingCap: false,
+  };
+  if (paramWithContext?.currentVersion && stakingStats) {
+    const { stakingCapSat } = paramWithContext.currentVersion;
+    const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
+    overflow = {
+      isOverTheCap: stakingCapSat <= activeTVLSat,
+      isApprochingCap:
+        stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
+    };
+  }
 
   return (
     <main className="main-app relative h-full min-h-svh w-full">
@@ -371,8 +382,8 @@ const Home: React.FC<HomeProps> = () => {
             finalityProviders={finalityProviders?.finalityProviders}
             paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
-            overTheCap={overTheCap}
             onConnect={handleConnectModal}
+            overflow={overflow}
             finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
             finalityProvidersIsFetchingMore={
@@ -400,7 +411,6 @@ const Home: React.FC<HomeProps> = () => {
                 unbondingFeeSat={
                   paramWithContext.currentVersion.unbondingFeeSat
                 }
-                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}
