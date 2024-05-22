@@ -275,7 +275,7 @@ export const Staking: React.FC<StakingProps> = ({
               />
             </div>
             {overflow.isApprochingCap ? (
-              <p className="dark:text-neutral-content">
+              <p className="text-center text-sm text-error">
                 Staking cap is filling up. Your stake may <b>overflow</b>!
               </p>
             ) : null}
