@@ -353,8 +353,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
           <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
             <p>Amount</p>
             <p>Inception</p>
-            <p>Transaction hash</p>
-            <p>Status</p>
+            <p className="text-center">Transaction hash</p>
+            <p className="text-center">Status</p>
             <p>Action</p>
           </div>
           <div
