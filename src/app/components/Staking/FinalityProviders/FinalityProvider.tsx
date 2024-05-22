@@ -48,7 +48,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         </div>
         <div className="flex gap-1">
           <p className="lg:hidden">Comission:</p>
-          {Number(comission) * 100}%
+          {maxDecimals(Number(comission) * 100, 2)}%
         </div>
       </div>
     </div>
