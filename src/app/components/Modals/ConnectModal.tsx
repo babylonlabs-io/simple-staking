@@ -44,7 +44,10 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
     if (selectedWallet) {
       let walletInstance: WalletProvider;
 
-      if (isInjectable && selectedWallet === BROWSER) {
+      if (selectedWallet === BROWSER) {
+        if (!isInjectable) {
+          throw new Error("Browser selected without an injectable interface");
+        }
         // we are using the browser wallet
         walletInstance = window[BROWSER];
       } else {
