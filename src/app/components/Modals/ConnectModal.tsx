@@ -31,10 +31,9 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
       )?.wallet;
       if (!walletProvider) {
         throw new Error("Wallet provider not found");
-      } else {
-        const walletInstance = new walletProvider();
-        onConnect(walletInstance);
       }
+      const walletInstance = new walletProvider();
+      onConnect(walletInstance);
     }
   };
 
