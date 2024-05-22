@@ -236,13 +236,7 @@ const Home: React.FC<HomeProps> = () => {
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   const handleConnectModal = () => {
-    // check if there's a window.btcwallet and use the default wallet provider
-    if (window.btcwallet) {
-      handleConnectBTC(window.btcwallet);
-    } else {
-      // show a wallet selection modal
-      setConnectModalOpen(true);
-    }
+    setConnectModalOpen(true);
   };
 
   const handleDisconnectBTC = () => {
