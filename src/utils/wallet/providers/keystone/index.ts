@@ -11,7 +11,7 @@ import { PsbtInput } from 'bip174/src/lib/interfaces';
 import { HDKey } from "@scure/bip32";
 
 
-import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
+import { WalletProvider, Network, Fees, UTXO } from "../../wallet_provider";
 import { generatePsbtOfBIP322Simple, extractSignatureFromPsbtOfBIP322Simple, NetworkType } from './lib';
 import {
     getAddressBalance,
@@ -19,11 +19,10 @@ import {
     getFundingUTXOs,
     getNetworkFees,
     pushTx,
-} from "../../mempool_api";
+} from "../../../mempool_api";
 
 
 type KeystoneWalletInfo = {
-    //   publicKeyHex: string;
     extendedPublicKey: string | undefined;
     path: string | undefined;
     address: string | undefined;
@@ -51,7 +50,7 @@ export class KeystoneWallet extends WalletProvider {
             [SupportedResult.UR_CRYPTO_ACCOUNT],
             {
                 title: "Sync Keystone with Babylon Staking App",
-                description: "Please scan the QR code displayed on your Keystone, Currently Only the first Taproot Adress will be used",
+                description: "Please scan the QR code displayed on your Keystone, Currently Only the first Taproot Address will be used",
                 renderInitial: {
                     walletMode: "btc",
                     link: "",
@@ -94,17 +93,19 @@ export class KeystoneWallet extends WalletProvider {
     async getWalletProviderName(): Promise<string> {
         return "Keystone";
     }
+
     async getAddress(): Promise<string> {
         if (this.keystoneWaleltInfo?.address) {
             return this.keystoneWaleltInfo?.address;
         }
-        throw new Error("Get Address error.");
+        throw new Error("Could not retrieve the address");
     }
+
     async getPublicKeyHex(): Promise<string> {
         if (this.keystoneWaleltInfo?.publicKeyHex) {
             return this.keystoneWaleltInfo?.publicKeyHex;
         }
-        throw new Error("Get Key error.");
+        throw new Error("Could not retrieve the BTC public key");
     }
 
     signPsbt = async (psbtHex: string): Promise<string> => {
@@ -127,13 +128,16 @@ export class KeystoneWallet extends WalletProvider {
 
         const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
         const keystoneContainer = this.viewSdk.getSdk();
-        const status = await keystoneContainer.play(ur);
+        const status = await keystoneContainer.play(ur, {
+            title: "Scan the QR Code",
+            description: "Please scan the QR code with your Keystone device.",
+        });
         if (status === PlayStatus.success) {
             let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
                 title: "Get the Signature from Keystone",
                 description: "Please scan the QR code displayed on your Keystone",
                 URTypeErrorMessage:
-                    "The scanned QR code can't be read. Please verify and try again.",
+                    "The scanned QR code can't be read. please verify and try again.",
             });
             if (urResult.status === ReadStatus.success) {
                 const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
@@ -141,10 +145,10 @@ export class KeystoneWallet extends WalletProvider {
                 psbt.finalizeAllInputs();
                 return psbt.toHex();
             } else {
-                throw new Error("Extracting signature error, Please try again.")
+                throw new Error("Could not extract the signature, please try again.")
             }
         } else {
-            throw new Error("Error genering the QR code, Please try again.")
+            throw new Error("Could not generate the QR code, please try again.")
         }
     }
 
@@ -191,7 +195,7 @@ export class KeystoneWallet extends WalletProvider {
                 title: "Get the Signature from Keystone",
                 description: "Please scan the QR code displayed on your Keystone",
                 URTypeErrorMessage:
-                    "The scanned QR code can't be read. Please verify and try again.",
+                    "The scanned QR code can't be read, please verify and try again.",
             });
             if (urResult.status === ReadStatus.success) {
                 const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
@@ -200,17 +204,16 @@ export class KeystoneWallet extends WalletProvider {
                 const signature = extractSignatureFromPsbtOfBIP322Simple(psbt);
                 return signature;
             } else {
-                throw new Error("Extracting signature error, Please try again.")
+                throw new Error("Could not extract the signature, please try again.")
             }
         } else {
-            throw new Error("Error genering the QR code, Please try again.")
+            throw new Error("Could not generate the QR code, please try again.")
         }
     }
 
     on(eventName: string, callBack: () => void): void {
         console.error('this function is not supported on Keystone', eventName)
     }
-
 
     // Mempool calls
 
@@ -250,6 +253,12 @@ function generateBitcoinAddressFromXpub(xpub: string, path: string, network: bit
     return { address: address!, pubkeyHex: pubkeyBuffer.toString('hex') }
 }
 
+/**
+ * Calculates the tap leaf hashes for a given PsbtInput and public key.
+ * @param input - The PsbtInput object.
+ * @param pubkey - The public key as a Buffer.
+ * @returns An array of tap leaf hashes.
+ */
 const caculateTapLeafHash = (input: PsbtInput, pubkey: Buffer) => {
     if (input.tapInternalKey && !input.tapLeafScript) {
         return [];
@@ -263,7 +272,7 @@ const caculateTapLeafHash = (input: PsbtInput, pubkey: Buffer) => {
                 });
                 return Object.assign({ hash }, tapLeaf);
             })
-        
+
         return tapLeafHashes.map(each => each.hash);
     }
 }
