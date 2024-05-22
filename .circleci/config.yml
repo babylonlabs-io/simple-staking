@@ -175,7 +175,7 @@ workflows:
                 - main
       - push_docker:
           requires:
-            - build
+            - build_docker
           filters:
             tags:
               only: /.*/
