@@ -2,6 +2,7 @@ import { Fees, Network, UTXO, WalletProvider } from "./wallet_provider";
 import {
   getAddressBalance,
   getFundingUTXOs,
+  getNetworkFees,
 } from "../mempool_api";
 
 export class OneKeyWallet extends WalletProvider {
@@ -24,11 +25,11 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async signPsbt(psbtHex: string): Promise<string> {
-    return this.provider.signPsbt(psbtHex);
+    return window.$onekey.btc.signPsbt(psbtHex);
   }
 
   async signPsbts(psbtsHexes: string[]): Promise<string[]> {
-    return this.provider.signPsbts(psbtsHexes);
+    return window.$onekey.btc.signPsbts(psbtsHexes);
   }
 
   async getNetwork(): Promise<Network> {
@@ -49,7 +50,8 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async getNetworkFees(): Promise<Fees> {
-    return this.provider.getNetworkFees();
+    // mempool call
+    return getNetworkFees();
   }
 
   async pushTx(txHex: string): Promise<string> {
