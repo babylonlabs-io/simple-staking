@@ -32,11 +32,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   }, []);
 
   if (!mounted) {
-    return (
-      <div className="flex h-[40px] w-[68px] items-center justify-center gap-1 rounded-full bg-base-100 p-2">
-        <span className="loading loading-spinner loading-xs text-primary" />
-      </div>
-    );
+    return null;
   }
 
   // This constant is used to identify the browser wallet
