@@ -185,7 +185,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       showError({
         error: {
           message: error.message,
-          errorState: ErrorState.UNBOUNDING,
+          errorState: ErrorState.UNBONDING,
           errorTime: new Date(),
         },
         retryAction: () => handleModal(id, MODE_UNBOND),
