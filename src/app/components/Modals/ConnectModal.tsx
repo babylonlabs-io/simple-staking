@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import Image from "next/image";
+import { FaWallet } from "react-icons/fa";
 
 import { walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -23,16 +24,43 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   const modalRef = useRef(null);
   const [accepted, setAccepted] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return null;
+  }
+
+  // This constant is used to identify the browser wallet
+  // And whether or not it should be injected
+  const BROWSER = "btcwallet";
+  const isInjectable = !!window[BROWSER];
 
   const handleConnect = async () => {
     if (selectedWallet) {
-      const walletProvider = walletList.find(
-        (w) => w.name === selectedWallet,
-      )?.wallet;
-      if (!walletProvider) {
-        throw new Error("Wallet provider not found");
+      let walletInstance: WalletProvider;
+
+      if (selectedWallet === BROWSER) {
+        if (!isInjectable) {
+          throw new Error("Browser selected without an injectable interface");
+        }
+        // we are using the browser wallet
+        walletInstance = window[BROWSER];
+      } else {
+        // we are using a custom wallet
+        const walletProvider = walletList.find(
+          (w) => w.name === selectedWallet,
+        )?.wallet;
+        if (!walletProvider) {
+          throw new Error("Wallet provider not found");
+        }
+        walletInstance = new walletProvider();
       }
-      const walletInstance = new walletProvider();
+
       onConnect(walletInstance);
     }
   };
@@ -83,24 +111,43 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
         </div>
         <div className="my-4 flex flex-col gap-4">
           <h3 className="text-center font-semibold">Choose wallet</h3>
-          <div className="grid grid-cols-2 gap-4">
-            {walletList.map((wallet) => (
-              <div
-                key={wallet.name}
-                className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === wallet.name ? "border-primary" : "border-base-100"}`}
-                onClick={() => setSelectedWallet(wallet.name)}
+          <div className="grid max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
+            {walletList.map((wallet) => {
+              const walletAvailable = !!window[wallet.provider as any];
+              return (
+                <a
+                  key={wallet.name}
+                  className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === wallet.name ? "border-primary" : "border-base-100"} ${!walletAvailable ? "opacity-50" : ""}`}
+                  onClick={() =>
+                    walletAvailable && setSelectedWallet(wallet.name)
+                  }
+                  href={!walletAvailable ? wallet.linkToDocs : undefined}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2">
+                    <Image
+                      src={wallet.icon}
+                      alt={wallet.name}
+                      width={26}
+                      height={26}
+                    />
+                  </div>
+                  <p>{wallet.name}</p>
+                </a>
+              );
+            })}
+            {isInjectable && (
+              <button
+                className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
+                onClick={() => setSelectedWallet(BROWSER)}
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-full border bg-white p-2">
-                  <Image
-                    src={wallet.icon}
-                    alt={wallet.name}
-                    width={32}
-                    height={32}
-                  />
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2 text-black">
+                  <FaWallet size={26} />
                 </div>
-                <p>{wallet.name}</p>
-              </div>
-            ))}
+                <p>Browser</p>
+              </button>
+            )}
           </div>
         </div>
         <button
