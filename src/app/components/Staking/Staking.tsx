@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
@@ -10,7 +10,7 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
-import { Loading } from "./Loading";
+import { LoadingView } from "@/app/components/Loading/Loading";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
 import { StakingTime } from "./Form/StakingTime";
@@ -19,22 +19,32 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errors";
+import { STAKING_FEE_SAT } from "@/app/common/constants";
 
-const stakingFeeSat = 500;
-
+interface OverflowProperties {
+  isOverTheCap: boolean;
+  isApprochingCap: boolean;
+}
 interface StakingProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
-  overTheCap: boolean;
+  overflow: OverflowProperties;
   onConnect: () => void;
+  finalityProvidersFetchNext: () => void;
+  finalityProvidersHasNext: boolean;
+  finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
+  btcWalletBalanceSat: number;
   btcWalletNetwork: networks.Network | undefined;
   address: string | undefined;
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
     | {
+        height: number | undefined;
         currentVersion: GlobalParamsVersion | undefined;
         isApprochingNextVersion: boolean | undefined;
       }
@@ -44,15 +54,19 @@ interface StakingProps {
 export const Staking: React.FC<StakingProps> = ({
   finalityProviders,
   isWalletConnected,
-  isLoading,
-  overTheCap,
+  overflow,
   onConnect,
+  finalityProvidersFetchNext,
+  finalityProvidersHasNext,
+  finalityProvidersIsFetchingMore,
+  isLoading,
   paramWithContext,
   btcWallet,
   btcWalletNetwork,
   address,
   publicKeyNoCoord,
   setDelegationsLocalStorage,
+  btcWalletBalanceSat,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -63,6 +77,11 @@ export const Staking: React.FC<StakingProps> = ({
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
+  const isBlockHeightUnderActivation =
+    !stakingParams ||
+    !paramWithContext.height ||
+    paramWithContext.height < stakingParams.activationHeight;
+  const { showError } = useError();
 
   const handleResetState = () => {
     setFinalityProvider(undefined);
@@ -72,60 +91,71 @@ export const Staking: React.FC<StakingProps> = ({
   };
 
   const handleSign = async () => {
-    if (!btcWallet) {
-      throw new Error("Wallet not connected");
-    } else if (!address) {
-      throw new Error("Address is not set");
-    } else if (!btcWalletNetwork) {
-      throw new Error("Wallet network not connected");
-    } else if (!paramWithContext || !paramWithContext.currentVersion) {
-      throw new Error("Global params not loaded");
-    } else if (!finalityProvider) {
-      throw new Error("Finality provider not selected");
-    }
-    const { currentVersion: globalParamsVersion } = paramWithContext;
-    const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
-    let signedTxHex: string;
     try {
-      signedTxHex = await signForm(
+      if (!btcWallet) {
+        throw new Error("Wallet not connected");
+      } else if (!address) {
+        throw new Error("Address is not set");
+      } else if (!btcWalletNetwork) {
+        throw new Error("Wallet network not connected");
+      } else if (!paramWithContext || !paramWithContext.currentVersion) {
+        throw new Error("Global params not loaded");
+      } else if (!finalityProvider) {
+        throw new Error("Finality provider not selected");
+      }
+      const { currentVersion: globalParamsVersion } = paramWithContext;
+      const stakingTerm = getStakingTerm(
         globalParamsVersion,
-        btcWallet,
-        finalityProvider,
-        stakingTerm,
-        btcWalletNetwork,
-        stakingAmountSat,
-        address,
-        stakingFeeSat,
-        publicKeyNoCoord,
+        stakingTimeBlocks,
       );
+      let signedTxHex: string;
+      try {
+        signedTxHex = await signForm(
+          globalParamsVersion,
+          btcWallet,
+          finalityProvider,
+          stakingTerm,
+          btcWalletNetwork,
+          stakingAmountSat,
+          address,
+          STAKING_FEE_SAT,
+          publicKeyNoCoord,
+        );
+      } catch (error: Error | any) {
+        throw error;
+      }
+
+      let txID;
+      try {
+        txID = await btcWallet.pushTx(signedTxHex);
+      } catch (error: Error | any) {
+        throw error;
+      }
+
+      // Update the local state with the new delegation
+      setDelegationsLocalStorage((delegations) => [
+        toLocalStorageDelegation(
+          Transaction.fromHex(signedTxHex).getId(),
+          publicKeyNoCoord,
+          finalityProvider.btcPk,
+          stakingAmountSat,
+          signedTxHex,
+          stakingTerm,
+        ),
+        ...delegations,
+      ]);
+
+      handleResetState();
     } catch (error: Error | any) {
-      // TODO Show Popup
-      console.error(error?.message || "Error signing the form");
-      throw error;
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.STAKING,
+          errorTime: new Date(),
+        },
+        retryAction: handleSign,
+      });
     }
-
-    let txID;
-    try {
-      txID = await btcWallet.pushTx(signedTxHex);
-    } catch (error: Error | any) {
-      console.error(error?.message || "Broadcasting staking transaction error");
-      throw error;
-    }
-
-    // Update the local state with the new delegation
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(signedTxHex).getId(),
-        publicKeyNoCoord,
-        finalityProvider.btcPk,
-        stakingAmountSat,
-        signedTxHex,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
-
-    handleResetState();
   };
 
   // Select the finality provider from the list
@@ -158,15 +188,16 @@ export const Staking: React.FC<StakingProps> = ({
     }
     // 2. Wallet is connected but we are still loading the staking params
     else if (isLoading) {
-      return <Loading />;
+      return <LoadingView />;
     }
     // 3. Staking has not started yet
-    else if (!stakingParams) {
+    else if (isBlockHeightUnderActivation) {
       return (
         <Message
           title="Staking has not yet started"
           messages={[
-            "The staking application will open once the staking activation height has been reached.",
+            `The staking application will open once the next Bitcoin block height is the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}).`,
+            `The next Bitcoin block height is ${paramWithContext?.height || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
@@ -185,7 +216,7 @@ export const Staking: React.FC<StakingProps> = ({
       );
     }
     // 5. Staking cap reached
-    else if (overTheCap) {
+    else if (overflow.isOverTheCap) {
       return (
         <Message
           title="Staking cap reached"
@@ -234,16 +265,20 @@ export const Staking: React.FC<StakingProps> = ({
               <StakingTime
                 minStakingTimeBlocks={minStakingTimeBlocks}
                 maxStakingTimeBlocks={maxStakingTimeBlocks}
-                stakingTimeBlocks={stakingTimeBlocks}
                 onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
               />
               <StakingAmount
                 minStakingAmountSat={minStakingAmountSat}
                 maxStakingAmountSat={maxStakingAmountSat}
-                stakingAmountSat={stakingAmountSat}
+                btcWalletBalanceSat={btcWalletBalanceSat}
                 onStakingAmountSatChange={handleStakingAmountSatChange}
               />
             </div>
+            {overflow.isApprochingCap && (
+              <p className="text-center text-sm text-error">
+                Staking cap is filling up. Your stake may <b>overflow</b>!
+              </p>
+            )}
             <button
               className="btn-primary btn mt-2 w-full"
               disabled={!signReady}
@@ -274,6 +309,11 @@ export const Staking: React.FC<StakingProps> = ({
             finalityProviders={finalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
+            queryMeta={{
+              next: finalityProvidersFetchNext,
+              hasMore: finalityProvidersHasNext,
+              isFetchingMore: finalityProvidersIsFetchingMore,
+            }}
           />
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />

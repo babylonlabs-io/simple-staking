@@ -2,8 +2,9 @@ import { useRef } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
-import { blocksToTime } from "@/utils/blocksToTime";
+import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 
 interface PreviewModalProps {
   open: boolean;
@@ -49,7 +50,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         </button>
       </div>
       <div className="flex flex-col gap-4 text-sm">
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">
               Finality Provider
@@ -58,13 +59,13 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${+satoshiToBtc(stakingAmountSat).toFixed(6)} Signet BTC`}</p>
+            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} Signet BTC`}</p>
           </div>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToTime(stakingTimeBlocks)}</p>
+            <p>{blocksToWeeks(stakingTimeBlocks, 5)}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
@@ -75,12 +76,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         </div>
         <h4 className="text-center text-base">Attention!</h4>
         <p className="dark:text-neutral-content">
-          1. There is a delay between the actual TVL and its display in this
-          dashboard. The current staking cap may already be filled when your
-          staking transaction is included in the Bitcoin chain. In that case,
-          the dashboard will mark your stake as &quot;overflow&quot; and request
-          you to unbond and withdraw, which will cause extra transaction fees.
-          Therefore please stake wisely.
+          1. Your stake may &quot;overflow&quot; the staking TVL cap and need to
+          be unbonded and withdrawn, which will cost you extra transaction fees.
+          So please stake wisely.
         </p>
         <p className="dark:text-neutral-content">
           2. No third party possesses your staked Signet BTC. You are the only

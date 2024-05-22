@@ -1,11 +1,11 @@
-import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
+import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
 import {
   getAddressBalance,
   getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
   pushTx,
-} from "../mempool_api";
+} from "../../mempool_api";
 
 type OKXWalletInfo = {
   publicKeyHex: string;

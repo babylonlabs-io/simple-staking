@@ -1,14 +1,9 @@
-import { OKXWallet } from "./okx_wallet";
-import { Network, WalletProvider } from "./wallet_provider";
 import { networks } from "bitcoinjs-lib";
+
+import { Network } from "./wallet_provider";
 
 const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;
-
-// Get the wallet provider from the window object, default to OKXWallet if not found.
-export const getWallet = (): WalletProvider => {
-  return window.btcwallet ? window.btcwallet : new OKXWallet();
-};
 
 export const toNetwork = (network: Network): networks.Network => {
   switch (network) {

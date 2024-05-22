@@ -6,6 +6,7 @@ import {
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import {
   Delegation as DelegationInterface,
@@ -21,12 +22,20 @@ import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { QueryMeta } from "@/app/types/api";
+import {
+  LoadingTableList,
+  LoadingView,
+} from "@/app/components/Loading/Loading";
 import {
   UnbondWithdrawModal,
   MODE,
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errors";
+import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -35,11 +44,11 @@ interface DelegationsProps {
   globalParamsVersion: GlobalParamsVersion;
   publicKeyNoCoord: string;
   unbondingFeeSat: number;
-  withdrawalFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
+  queryMeta: QueryMeta;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -49,15 +58,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
   globalParamsVersion,
   publicKeyNoCoord,
   unbondingFeeSat,
-  withdrawalFeeSat,
   btcWalletNetwork,
   address,
   signPsbt,
   pushTx,
+  queryMeta,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
+  const { showError } = useError();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -171,7 +181,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
     try {
       handleUnbond(id);
     } catch (error: Error | any) {
-      console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.UNBOUNDING,
+          errorTime: new Date(),
+        },
+        retryAction: () => handleModal(id, MODE_UNBOND),
+      });
     } finally {
       setModalOpen(false);
       setTxID("");
@@ -228,7 +245,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         slashingScript,
         Transaction.fromHex(delegation.unbondingTx.txHex),
         address,
-        withdrawalFeeSat,
+        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
         delegation.stakingTx.outputIndex,
       );
@@ -240,7 +257,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         unbondingScript,
         Transaction.fromHex(delegation.stakingTx.txHex),
         address,
-        withdrawalFeeSat,
+        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
         delegation.stakingTx.outputIndex,
       );
@@ -278,7 +295,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
     try {
       handleWithdraw(id);
     } catch (error: Error | any) {
-      console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.WITHDRAW,
+          errorTime: new Date(),
+        },
+        retryAction: () => handleModal(id, MODE_WITHDRAW),
+      });
     } finally {
       setModalOpen(false);
       setTxID("");
@@ -322,61 +346,81 @@ export const Delegations: React.FC<DelegationsProps> = ({
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
       <h3 className="mb-4 font-bold">Staking history</h3>
-      <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
-        <p>Amount</p>
-        <p>Inception</p>
-        <p>Transaction hash</p>
-        <p>Status</p>
-        <p>Action</p>
-      </div>
-      <div className="no-scrollbar flex max-h-[21rem] flex-col gap-4 overflow-y-auto">
-        {combinedDelegationsData?.map((delegation) => {
-          if (!delegation) return null;
+      {combinedDelegationsData.length === 0 ? (
+        <LoadingView />
+      ) : (
+        <>
+          <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
+            <p>Amount</p>
+            <p>Inception</p>
+            <p className="text-center">Transaction hash</p>
+            <p className="text-center">Status</p>
+            <p>Action</p>
+          </div>
+          <div
+            id="staking-history"
+            className="no-scrollbar max-h-[21rem] overflow-y-auto"
+          >
+            <InfiniteScroll
+              className="flex flex-col gap-4"
+              dataLength={combinedDelegationsData.length}
+              next={queryMeta.next}
+              hasMore={queryMeta.hasMore}
+              loader={queryMeta.isFetchingMore ? <LoadingTableList /> : null}
+              scrollableTarget="staking-history"
+            >
+              {combinedDelegationsData?.map((delegation) => {
+                if (!delegation) return null;
+                const {
+                  stakingValueSat,
+                  stakingTx,
+                  stakingTxHashHex,
+                  finalityProviderPkHex,
+                  state,
+                  isOverflow,
+                } = delegation;
+                // Get the moniker of the finality provider
+                const finalityProviderMoniker =
+                  finalityProvidersKV[finalityProviderPkHex];
+                const intermediateDelegation =
+                  intermediateDelegationsLocalStorage.find(
+                    (item) => item.stakingTxHashHex === stakingTxHashHex,
+                  );
 
-          const {
-            stakingValueSat,
-            stakingTx,
-            stakingTxHashHex,
-            finalityProviderPkHex,
-            state,
-            isOverflow,
-          } = delegation;
-          // Get the moniker of the finality provider
-          const finalityProviderMoniker =
-            finalityProvidersKV[finalityProviderPkHex];
-          const intermediateDelegation =
-            intermediateDelegationsLocalStorage.find(
-              (item) => item.stakingTxHashHex === stakingTxHashHex,
-            );
+                return (
+                  <Delegation
+                    key={stakingTxHashHex + stakingTx.startHeight}
+                    finalityProviderMoniker={finalityProviderMoniker}
+                    stakingTx={stakingTx}
+                    stakingValueSat={stakingValueSat}
+                    stakingTxHash={stakingTxHashHex}
+                    state={state}
+                    onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
+                    onWithdraw={() =>
+                      handleModal(stakingTxHashHex, MODE_WITHDRAW)
+                    }
+                    intermediateState={intermediateDelegation?.state}
+                    isOverflow={isOverflow}
+                  />
+                );
+              })}
+            </InfiniteScroll>
+          </div>
+        </>
+      )}
 
-          return (
-            <Delegation
-              key={stakingTxHashHex + stakingTx.startHeight}
-              finalityProviderMoniker={finalityProviderMoniker}
-              stakingTx={stakingTx}
-              stakingValueSat={stakingValueSat}
-              stakingTxHash={stakingTxHashHex}
-              state={state}
-              onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
-              onWithdraw={() => handleModal(stakingTxHashHex, MODE_WITHDRAW)}
-              intermediateState={intermediateDelegation?.state}
-              isOverflow={isOverflow}
-            />
-          );
-        })}
-        {modalMode && txID && modalOpen && (
-          <UnbondWithdrawModal
-            open={modalOpen}
-            onClose={() => setModalOpen(false)}
-            onProceed={() => {
-              modalMode === MODE_UNBOND
-                ? handleUnbondWithErrors(txID)
-                : handleWithdrawWithErrors(txID);
-            }}
-            mode={modalMode}
-          />
-        )}
-      </div>
+      {modalMode && txID && modalOpen && (
+        <UnbondWithdrawModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onProceed={() => {
+            modalMode === MODE_UNBOND
+              ? handleUnbondWithErrors(txID)
+              : handleWithdrawWithErrors(txID);
+          }}
+          mode={modalMode}
+        />
+      )}
     </div>
   );
 };

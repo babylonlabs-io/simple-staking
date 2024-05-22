@@ -7,16 +7,19 @@ import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
 
 import {
-  getWallet,
   toNetwork,
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import { getFinalityProviders } from "./api/getFinalityProviders";
-import { getDelegations } from "./api/getDelegations";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import {
+  getFinalityProviders,
+  PaginatedFinalityProviders,
+} from "./api/getFinalityProviders";
+import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { Delegations } from "./components/Delegations/Delegations";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { Header } from "./components/Header/Header";
@@ -24,15 +27,16 @@ import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
 import { Summary } from "./components/Summary/Summary";
 import { Footer } from "./components/Footer/Footer";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { FAQ } from "./components/FAQ/FAQ";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
+import { ErrorModal } from "./components/Modals/ErrorModal";
+import { useError } from "./context/Error/ErrorContext";
+import { ErrorHandlerParam, ErrorState } from "./types/errors";
+import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 
 interface HomeProps {}
-
-const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -41,53 +45,180 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-
-  const { data: paramWithContext, isLoading: isLoadingCurrentParams } =
-    useQuery({
-      queryKey: ["global params"],
-      queryFn: async () => {
-        const [height, versions] = await Promise.all([
-          btcWallet!.getBTCTipHeight(),
-          getGlobalParams(),
-        ]);
-        try {
-          return getCurrentGlobalParamsVersion(height + 1, versions);
-        } catch (error) {
-          // No global params version found, it means the staking is not yet enabled
-          return {
-            currentVersion: undefined,
-            isApprochingNextVersion: false,
-          };
-        }
-      },
-      refetchInterval: 60000, // 1 minute
-      // Should be enabled only when the wallet is connected
-      enabled: !!btcWallet,
-    });
-
-  const { data: finalityProvidersData } = useQuery({
-    queryKey: ["finality providers"],
-    queryFn: getFinalityProviders,
+  const { error, isErrorOpen, showError, hideError, retryErrorAction } =
+    useError();
+  const {
+    data: paramWithContext,
+    isLoading: isLoadingCurrentParams,
+    error: globalParamsVersionError,
+    isError: hasGlobalParamsVersionError,
+    refetch: refetchGlobalParamsVersion,
+  } = useQuery({
+    queryKey: ["global params"],
+    queryFn: async () => {
+      const [height, versions] = await Promise.all([
+        btcWallet!.getBTCTipHeight(),
+        getGlobalParams(),
+      ]);
+      try {
+        return {
+          // The staking parameters are retrieved based on the current height + 1
+          // so this verification should take this into account.
+          height: height + 1,
+          ...getCurrentGlobalParamsVersion(height + 1, versions),
+        };
+      } catch (error) {
+        // No global params version found, it means the staking is not yet enabled
+        return {
+          height: undefined,
+          currentVersion: undefined,
+          isApprochingNextVersion: false,
+        };
+      }
+    },
     refetchInterval: 60000, // 1 minute
+    // Should be enabled only when the wallet is connected
+    enabled: !!btcWallet,
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
-  const { data: delegations, fetchNextPage: _fetchNextDelegationsPage } =
-    useInfiniteQuery({
-      queryKey: ["delegations", address],
-      queryFn: ({ pageParam = "" }) =>
-        getDelegations(pageParam, publicKeyNoCoord),
-      getNextPageParam: (lastPage) => lastPage?.pagination?.nextKey,
-      initialPageParam: "",
-      refetchInterval: 60000, // 1 minute
-      enabled: !!(btcWallet && publicKeyNoCoord && address),
-      select: (data) => data?.pages?.flatMap((page) => page?.delegations),
-    });
+  const {
+    data: finalityProviders,
+    fetchNextPage: fetchNextFinalityProvidersPage,
+    hasNextPage: hasNextFinalityProvidersPage,
+    isFetchingNextPage: isFetchingNextFinalityProvidersPage,
+    error: finalityProvidersError,
+    isError: hasFinalityProvidersError,
+    refetch: refetchFinalityProvidersData,
+    isRefetchError: isRefetchFinalityProvidersError,
+  } = useInfiniteQuery({
+    queryKey: ["finality providers"],
+    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.next_key !== ""
+        ? lastPage?.pagination?.next_key
+        : null,
+    initialPageParam: "",
+    refetchInterval: 60000, // 1 minute
+    select: (data) => {
+      const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
+        (acc, page) => {
+          acc.finalityProviders.push(...page.finalityProviders);
+          acc.pagination = page.pagination;
+          return acc;
+        },
+        { finalityProviders: [], pagination: { next_key: "" } },
+      );
+      return flattenedData;
+    },
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
+  });
 
-  const { data: stakingStats, isLoading: stakingStatsIsLoading } = useQuery({
+  const {
+    data: delegations,
+    fetchNextPage: fetchNextDelegationsPage,
+    hasNextPage: hasNextDelegationsPage,
+    isFetchingNextPage: isFetchingNextDelegationsPage,
+    error: delegationsError,
+    isError: hasDelegationsError,
+    refetch: refetchDelegationData,
+  } = useInfiniteQuery({
+    queryKey: ["delegations", address, publicKeyNoCoord],
+    queryFn: ({ pageParam = "" }) =>
+      getDelegations(pageParam, publicKeyNoCoord),
+    getNextPageParam: (lastPage) =>
+      lastPage?.pagination?.next_key !== ""
+        ? lastPage?.pagination?.next_key
+        : null,
+    initialPageParam: "",
+    refetchInterval: 60000, // 1 minute
+    enabled: !!(btcWallet && publicKeyNoCoord && address),
+    select: (data) => {
+      const flattenedData = data.pages.reduce<PaginatedDelegations>(
+        (acc, page) => {
+          acc.delegations.push(...page.delegations);
+          acc.pagination = page.pagination;
+          return acc;
+        },
+        { delegations: [], pagination: { next_key: "" } },
+      );
+
+      return flattenedData;
+    },
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
+  });
+
+  const {
+    data: stakingStats,
+    isLoading: stakingStatsIsLoading,
+    error: statsError,
+    isError: hasStatsError,
+    refetch: refetchStats,
+  } = useQuery({
     queryKey: ["stats"],
     queryFn: getStats,
     refetchInterval: 60000, // 1 minute
+    retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
+
+  useEffect(() => {
+    const handleError = ({
+      error,
+      hasError,
+      errorState,
+      refetchFunction,
+    }: ErrorHandlerParam) => {
+      if (hasError && error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState: errorState,
+            errorTime: new Date(),
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    };
+
+    handleError({
+      error: finalityProvidersError,
+      hasError: hasFinalityProvidersError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchFinalityProvidersData,
+    });
+    handleError({
+      error: delegationsError,
+      hasError: hasDelegationsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchDelegationData,
+    });
+    handleError({
+      error: statsError,
+      hasError: hasStatsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchStats,
+    });
+    handleError({
+      error: globalParamsVersionError,
+      hasError: hasGlobalParamsVersionError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchGlobalParamsVersion,
+    });
+  }, [
+    hasFinalityProvidersError,
+    hasGlobalParamsVersionError,
+    hasDelegationsError,
+    hasStatsError,
+    isRefetchFinalityProvidersError,
+  ]);
 
   // Initializing btc curve is a required one-time operation
   useEffect(() => {
@@ -105,7 +236,13 @@ const Home: React.FC<HomeProps> = () => {
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   const handleConnectModal = () => {
-    setConnectModalOpen(true);
+    // check if there's a window.btcwallet and use the default wallet provider
+    if (window.btcwallet) {
+      handleConnectBTC(window.btcwallet);
+    } else {
+      // show a wallet selection modal
+      setConnectModalOpen(true);
+    }
   };
 
   const handleDisconnectBTC = () => {
@@ -116,19 +253,18 @@ const Home: React.FC<HomeProps> = () => {
     setAddress("");
   };
 
-  const handleConnectBTC = async () => {
+  const handleConnectBTC = async (walletProvider: WalletProvider) => {
     // close the modal
     setConnectModalOpen(false);
 
     try {
-      const walletProvider = getWallet();
       await walletProvider.connectWallet();
       const address = await walletProvider.getAddress();
       // check if the wallet address type is supported in babylon
       const supported = isSupportedAddressType(address);
       if (!supported) {
         throw new Error(
-          "Invalid address type. Please use a Native SegWit or Taptoor",
+          "Invalid address type. Please use a Native SegWit or Taproot",
         );
       }
 
@@ -142,7 +278,14 @@ const Home: React.FC<HomeProps> = () => {
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
-      console.error(error?.message || error);
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.WALLET,
+          errorTime: new Date(),
+        },
+        retryAction: () => handleConnectBTC(walletProvider),
+      });
     }
   };
 
@@ -152,7 +295,7 @@ const Home: React.FC<HomeProps> = () => {
       let once = false;
       btcWallet.on("accountChanged", () => {
         if (!once) {
-          handleConnectBTC();
+          handleConnectBTC(btcWallet);
         }
       });
       return () => {
@@ -169,7 +312,7 @@ const Home: React.FC<HomeProps> = () => {
     setDelegationsLocalStorage((localDelegations) =>
       localDelegations?.filter(
         (localDelegation) =>
-          !delegations?.find(
+          !delegations?.delegations.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
               localDelegation?.stakingTxHashHex,
@@ -179,7 +322,7 @@ const Home: React.FC<HomeProps> = () => {
   }, [delegations, setDelegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = finalityProvidersData?.reduce(
+  const finalityProvidersKV = finalityProviders?.finalityProviders.reduce(
     (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
     {},
   );
@@ -187,7 +330,7 @@ const Home: React.FC<HomeProps> = () => {
   let totalStakedSat = 0;
 
   if (delegations) {
-    totalStakedSat = delegations
+    totalStakedSat = delegations.delegations
       // using only active delegations
       .filter((delegation) => delegation?.state === DelegationState.ACTIVE)
       .reduce(
@@ -196,12 +339,21 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  // overflow properties to indicate the current state of the staking cap with the tvl
   // these constants are needed for easier prop passing
-  const overTheCap =
-    paramWithContext?.currentVersion && stakingStats
-      ? paramWithContext.currentVersion.stakingCapSat <=
-        stakingStats.activeTVLSat
-      : false;
+  let overflow = {
+    isOverTheCap: false,
+    isApprochingCap: false,
+  };
+  if (paramWithContext?.currentVersion && stakingStats) {
+    const { stakingCapSat } = paramWithContext.currentVersion;
+    const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
+    overflow = {
+      isOverTheCap: stakingCapSat <= activeTVLSat,
+      isApprochingCap:
+        stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
+    };
+  }
 
   return (
     <main className="main-app relative h-full min-h-svh w-full">
@@ -227,13 +379,19 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            finalityProviders={finalityProvidersData}
+            finalityProviders={finalityProviders?.finalityProviders}
             paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
-            overTheCap={overTheCap}
             onConnect={handleConnectModal}
+            overflow={overflow}
+            finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
+            finalityProvidersHasNext={hasNextFinalityProvidersPage}
+            finalityProvidersIsFetchingMore={
+              isFetchingNextFinalityProvidersPage
+            }
             isLoading={isLoadingCurrentParams}
             btcWallet={btcWallet}
+            btcWalletBalanceSat={btcWalletBalanceSat}
             btcWalletNetwork={btcWalletNetwork}
             address={address}
             publicKeyNoCoord={publicKeyNoCoord}
@@ -246,18 +404,22 @@ const Home: React.FC<HomeProps> = () => {
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
-                delegationsAPI={delegations}
+                delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
                 unbondingFeeSat={
                   paramWithContext.currentVersion.unbondingFeeSat
                 }
-                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}
                 pushTx={btcWallet.pushTx}
+                queryMeta={{
+                  next: fetchNextDelegationsPage,
+                  hasMore: hasNextDelegationsPage,
+                  isFetchingMore: isFetchingNextDelegationsPage,
+                }}
               />
             )}
           {/* At this point of time is not used */}
@@ -275,6 +437,14 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <ErrorModal
+        open={isErrorOpen}
+        errorMessage={error.message}
+        errorState={error.errorState}
+        errorTime={error.errorTime}
+        onClose={hideError}
+        onRetry={retryErrorAction}
       />
     </main>
   );

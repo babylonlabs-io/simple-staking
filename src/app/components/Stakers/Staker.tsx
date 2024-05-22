@@ -1,4 +1,5 @@
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 import { Hash } from "../Hash/Hash";
 
 interface StakerProps {
@@ -31,7 +32,7 @@ export const Staker: React.FC<StakerProps> = ({
           <p className="text-xs lg:hidden dark:text-neutral-content">Stake</p>
           <p>
             {activeTVLSat
-              ? `${+satoshiToBtc(activeTVLSat).toFixed(6)} Signet BTC`
+              ? `${maxDecimals(satoshiToBtc(activeTVLSat), 8)} Signet BTC`
               : 0}
           </p>
         </div>

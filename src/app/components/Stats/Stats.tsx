@@ -4,12 +4,13 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import { StakingStats } from "@/app/types/stakingStats";
+import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
 import confirmedTvl from "./icons/confirmed-tvl.svg";
 import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
-import { satoshiToBtc } from "@/utils/btcConversions";
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;
@@ -32,21 +33,21 @@ export const Stats: React.FC<StatsProps> = ({
       {
         title: "Staking TVL Cap",
         value: stakingCapSat
-          ? `${+satoshiToBtc(stakingCapSat).toFixed(6)} Signet BTC`
+          ? `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} Signet BTC`
           : "-",
         icon: stakingTvlCap,
       },
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
-          ? `${+satoshiToBtc(stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 8)} Signet BTC`
           : 0,
         icon: confirmedTvl,
       },
       {
         title: "Pending Stake",
         value: stakingStats?.unconfirmedTVLSat
-          ? `${+satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat).toFixed(6)} Signet BTC`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 8)} Signet BTC`
           : 0,
         icon: pendingStake,
       },
