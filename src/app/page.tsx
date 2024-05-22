@@ -35,10 +35,9 @@ import { getGlobalParams } from "./api/getGlobalParams";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
+import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 
 interface HomeProps {}
-
-const withdrawalFeeSat = 500;
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -49,7 +48,6 @@ const Home: React.FC<HomeProps> = () => {
   const [address, setAddress] = useState("");
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
-
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -337,12 +335,21 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  // overflow properties to indicate the current state of the staking cap with the tvl
   // these constants are needed for easier prop passing
-  const overTheCap =
-    paramWithContext?.currentVersion && stakingStats
-      ? paramWithContext.currentVersion.stakingCapSat <=
-        stakingStats.activeTVLSat
-      : false;
+  let overflow = {
+    isOverTheCap: false,
+    isApprochingCap: false,
+  };
+  if (paramWithContext?.currentVersion && stakingStats) {
+    const { stakingCapSat } = paramWithContext.currentVersion;
+    const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
+    overflow = {
+      isOverTheCap: stakingCapSat <= activeTVLSat,
+      isApprochingCap:
+        stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
+    };
+  }
 
   return (
     <main className="main-app relative h-full min-h-svh w-full">
@@ -371,8 +378,8 @@ const Home: React.FC<HomeProps> = () => {
             finalityProviders={finalityProviders?.finalityProviders}
             paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
-            overTheCap={overTheCap}
             onConnect={handleConnectModal}
+            overflow={overflow}
             finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
             finalityProvidersIsFetchingMore={
@@ -400,7 +407,6 @@ const Home: React.FC<HomeProps> = () => {
                 unbondingFeeSat={
                   paramWithContext.currentVersion.unbondingFeeSat
                 }
-                withdrawalFeeSat={withdrawalFeeSat}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbt={btcWallet.signPsbt}

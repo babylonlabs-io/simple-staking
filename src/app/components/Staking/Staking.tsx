@@ -21,14 +21,17 @@ import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
+import { STAKING_FEE_SAT } from "@/app/common/constants";
 
-const stakingFeeSat = 500;
-
+interface OverflowProperties {
+  isOverTheCap: boolean;
+  isApprochingCap: boolean;
+}
 interface StakingProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
-  overTheCap: boolean;
+  overflow: OverflowProperties;
   onConnect: () => void;
   finalityProvidersFetchNext: () => void;
   finalityProvidersHasNext: boolean;
@@ -51,7 +54,7 @@ interface StakingProps {
 export const Staking: React.FC<StakingProps> = ({
   finalityProviders,
   isWalletConnected,
-  overTheCap,
+  overflow,
   onConnect,
   finalityProvidersFetchNext,
   finalityProvidersHasNext,
@@ -115,7 +118,7 @@ export const Staking: React.FC<StakingProps> = ({
           btcWalletNetwork,
           stakingAmountSat,
           address,
-          stakingFeeSat,
+          STAKING_FEE_SAT,
           publicKeyNoCoord,
         );
       } catch (error: Error | any) {
@@ -213,7 +216,7 @@ export const Staking: React.FC<StakingProps> = ({
       );
     }
     // 5. Staking cap reached
-    else if (overTheCap) {
+    else if (overflow.isOverTheCap) {
       return (
         <Message
           title="Staking cap reached"
@@ -271,6 +274,11 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingAmountSatChange={handleStakingAmountSatChange}
               />
             </div>
+            {overflow.isApprochingCap && (
+              <p className="text-center text-sm text-error">
+                Staking cap is filling up. Your stake may <b>overflow</b>!
+              </p>
+            )}
             <button
               className="btn-primary btn mt-2 w-full"
               disabled={!signReady}
