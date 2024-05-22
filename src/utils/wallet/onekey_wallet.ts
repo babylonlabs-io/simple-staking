@@ -1,4 +1,4 @@
-import { Fees, Network, UTXO, WalletProvider } from "./wallet_provider";
+import { Fees, Network, UTXO, WalletInfo, WalletProvider } from "./wallet_provider";
 import {
   getAddressBalance,
   getFundingUTXOs,
@@ -7,9 +7,17 @@ import {
 
 export class OneKeyWallet extends WalletProvider {
   private provider = window.$onekey.btcwallet;
+  private onekeyWalletInfo: WalletInfo | undefined;
 
   async connectWallet(): Promise<this> {
-    return this.provider.connectWallet();
+    const self = await this.provider.connectWallet();
+    const address = await this.getAddress()
+    const publicKeyHex = await this.getPublicKeyHex()
+    this.onekeyWalletInfo = {
+      address,
+      publicKeyHex
+    }
+    return self
   }
 
   async getWalletProviderName(): Promise<string> {
@@ -17,11 +25,17 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async getAddress(): Promise<string> {
-    return this.provider.getAddress();
+    if (!this.onekeyWalletInfo) {
+      return this.provider.getAddress();
+    }
+    return this.onekeyWalletInfo.address;
   }
 
   async getPublicKeyHex(): Promise<string> {
-    return this.provider.getPublicKeyHex();
+    if (!this.onekeyWalletInfo) {
+      return this.provider.getPublicKeyHex();
+    }
+    return this.onekeyWalletInfo.publicKeyHex;
   }
 
   async signPsbt(psbtHex: string): Promise<string> {

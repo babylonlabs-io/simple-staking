@@ -1,4 +1,4 @@
-import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
+import { WalletProvider, Network, Fees, UTXO, WalletInfo } from "../wallet_provider";
 import {
   getAddressBalance,
   getTipHeight,
@@ -7,13 +7,8 @@ import {
   pushTx,
 } from "../../mempool_api";
 
-type OKXWalletInfo = {
-  publicKeyHex: string;
-  address: string;
-};
-
 export class OKXWallet extends WalletProvider {
-  private okxWalletInfo: OKXWalletInfo | undefined;
+  private okxWalletInfo: WalletInfo | undefined;
 
   constructor() {
     super();
