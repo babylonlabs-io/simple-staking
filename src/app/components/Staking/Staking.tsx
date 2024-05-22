@@ -274,11 +274,11 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingAmountSatChange={handleStakingAmountSatChange}
               />
             </div>
-            {overflow.isApprochingCap ? (
+            {overflow.isApprochingCap && (
               <p className="text-center text-sm text-error">
                 Staking cap is filling up. Your stake may <b>overflow</b>!
               </p>
-            ) : null}
+            )}
             <button
               className="btn-primary btn mt-2 w-full"
               disabled={!signReady}
