@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
@@ -21,14 +21,28 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   onConnect,
   connectDisabled,
 }) => {
+  const modalRef = useRef(null);
+  const [accepted, setAccepted] = useState(false);
+  const [selectedWallet, setSelectedWallet] = useState<string>("");
+  const [mounted, setMounted] = useState(false);
+
+  // useEffect only runs on the client, so now we can safely show the UI
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="flex h-[40px] w-[68px] items-center justify-center gap-1 rounded-full bg-base-100 p-2">
+        <span className="loading loading-spinner loading-xs text-primary" />
+      </div>
+    );
+  }
+
   // This constant is used to identify the browser wallet
   // And whether or not it should be injected
   const BROWSER = "btcwallet";
   const isInjectable = !!window[BROWSER];
-
-  const modalRef = useRef(null);
-  const [accepted, setAccepted] = useState(false);
-  const [selectedWallet, setSelectedWallet] = useState<string>("");
 
   const handleConnect = async () => {
     if (selectedWallet) {
