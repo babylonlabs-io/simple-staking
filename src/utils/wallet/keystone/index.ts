@@ -1,6 +1,6 @@
 'use client';
 
-import KeystoneSDK, { UR, URType } from "@keystonehq/keystone-sdk"
+import KeystoneSDK from "@keystonehq/keystone-sdk"
 import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
 import * as bitcoin from 'bitcoinjs-lib';
 import { Psbt } from "bitcoinjs-lib";
@@ -20,8 +20,6 @@ import {
     getNetworkFees,
     pushTx,
 } from "../../mempool_api";
-import { log } from "console";
-
 
 
 type KeystoneWalletInfo = {
@@ -72,7 +70,6 @@ export class KeystoneWallet extends WalletProvider {
 
         if (decodedResult.status === ReadStatus.success) {
             const accountData = this.dataSdk.parseAccount(decodedResult.result);
-            console.log('accountData', accountData);
             let xpub = accountData.keys[3].extendedPublicKey;
             this.keystoneWaleltInfo = {
                 mfp: accountData.masterFingerprint,
@@ -177,9 +174,6 @@ export class KeystoneWallet extends WalletProvider {
             pubkey: Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex')
         };
 
-        console.log('psbt', psbt);
-        console.log('bip32', bip32Derivation);
-
         psbt.data.inputs.forEach((input) => {
             input.bip32Derivation = [{
                 ...bip32Derivation,
@@ -202,10 +196,8 @@ export class KeystoneWallet extends WalletProvider {
             if (urResult.status === ReadStatus.success) {
                 const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
                 let psbt = Psbt.fromHex(signedPsbt)
-                console.log('called---------------')
                 psbt.finalizeAllInputs();
                 const signature = extractSignatureFromPsbtOfBIP322Simple(psbt);
-                console.log('signature', signature)
                 return signature;
             } else {
                 throw new Error("Extracting signature error, Please try again.")
@@ -269,7 +261,6 @@ const caculateTapLeafHash = (input: PsbtInput, pubkey: Buffer) => {
                     output: tapLeaf.script,
                     version: tapLeaf.leafVersion,
                 });
-                console.log('hash', hash.toString('hex'))
                 return Object.assign({ hash }, tapLeaf);
             })
         
