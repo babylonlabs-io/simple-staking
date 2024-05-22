@@ -4,8 +4,12 @@ import KeystoneSDK, { UR, URType } from "@keystonehq/keystone-sdk"
 import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
 import * as bitcoin from 'bitcoinjs-lib';
 import { Psbt } from "bitcoinjs-lib";
+import { tapleafHash } from 'bitcoinjs-lib/src/payments/bip341';
+import { pubkeyInScript } from 'bitcoinjs-lib/src/psbt/psbtutils';
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371';
+import { PsbtInput } from 'bip174/src/lib/interfaces';
 import { HDKey } from "@scure/bip32";
+
 
 import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
 import { generatePsbtOfBIP322Simple, extractSignatureFromPsbtOfBIP322Simple, NetworkType } from './lib';
@@ -51,8 +55,15 @@ export class KeystoneWallet extends WalletProvider {
                 title: "Sync Keystone with Babylon Staking App",
                 description: "Please scan the QR code displayed on your Keystone, Currently Only the first Taproot Adress will be used",
                 renderInitial: {
-                    walletMode: "Web3",
-                    link: ""
+                    walletMode: "btc",
+                    link: "",
+                    description: [
+                        '1. Turn on your Keystone 3 with BTC only firmware.',
+                        '2. Click connect software wallet and use "Sparrow" for connection.',
+                        '3. Press the "Scan Keystone" button and scan the QR Code displayed on your Keystone hardware wallet',
+                        '4. The first Taproot address will be used for staking.'
+                    ],
+
                 },
                 URTypeErrorMessage:
                     "The scanned QR code is not the sync code from the Keystone hardware wallet. Please verify the code and try again.",
@@ -62,11 +73,11 @@ export class KeystoneWallet extends WalletProvider {
         if (decodedResult.status === ReadStatus.success) {
             const accountData = this.dataSdk.parseAccount(decodedResult.result);
             console.log('accountData', accountData);
-            let xpub = accountData.keys[0].extendedPublicKey;
+            let xpub = accountData.keys[3].extendedPublicKey;
             this.keystoneWaleltInfo = {
                 mfp: accountData.masterFingerprint,
                 extendedPublicKey: xpub,
-                path: accountData.keys[0].path,
+                path: accountData.keys[3].path,
                 address: undefined,
                 publicKeyHex: undefined,
             }
@@ -99,7 +110,7 @@ export class KeystoneWallet extends WalletProvider {
         throw new Error("Get Key error.");
     }
 
-    async signPsbt(psbtHex: string): Promise<string> {
+    signPsbt = async (psbtHex: string): Promise<string> => {
         let psbt = Psbt.fromHex(psbtHex);
         const bip32Derivation = {
             masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
@@ -111,9 +122,10 @@ export class KeystoneWallet extends WalletProvider {
             input.tapBip32Derivation = [{
                 ...bip32Derivation,
                 pubkey: bip32Derivation.pubkey.slice(1),
-                leafHashes: []
+                leafHashes: caculateTapLeafHash(input, bip32Derivation.pubkey)
             }]
-        })
+        });
+
         let enhancedPsbt = psbt.toHex();
 
         const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
@@ -164,13 +176,13 @@ export class KeystoneWallet extends WalletProvider {
             path: `${this.keystoneWaleltInfo!.path!}/0/0`,
             pubkey: Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex')
         };
-        
+
         console.log('psbt', psbt);
         console.log('bip32', bip32Derivation);
 
         psbt.data.inputs.forEach((input) => {
             input.bip32Derivation = [{
-                ...bip32Derivation,                
+                ...bip32Derivation,
             }]
         });
 
@@ -239,25 +251,28 @@ function generateBitcoinAddressFromXpub(xpub: string, path: string, network: bit
     const derivedNode = hdNode.derive(path);
     let pubkeyBuffer = Buffer.from(derivedNode.publicKey!);
     const childNodeXOnlyPubkey = toXOnly(pubkeyBuffer);
-    // const { address } = bitcoin.payments.p2tr({
-    //     internalPubkey: childNodeXOnlyPubkey,
-    //     network: bitcoin.networks.testnet
-    // });
-    const {address, output } = bitcoin.payments.p2wpkh({
-        pubkey: pubkeyBuffer,
+    const { address } = bitcoin.payments.p2tr({
+        internalPubkey: childNodeXOnlyPubkey,
         network: bitcoin.networks.testnet
-      })
+    });
     return { address: address!, pubkeyHex: pubkeyBuffer.toString('hex') }
 }
 
-enum AddressType {
-    P2PKH,
-    P2WPKH,
-    P2TR,
-    P2SH_P2WPKH,
-    M44_P2WPKH, // deprecated
-    M44_P2TR, // deprecated
-    P2WSH,
-    P2SH,
-    UNKNOWN,
+const caculateTapLeafHash = (input: PsbtInput, pubkey: Buffer) => {
+    if (input.tapInternalKey && !input.tapLeafScript) {
+        return [];
+    } else {
+        const tapLeafHashes = (input.tapLeafScript || [])
+            .filter(tapLeaf => pubkeyInScript(pubkey, tapLeaf.script))
+            .map(tapLeaf => {
+                const hash = tapleafHash({
+                    output: tapLeaf.script,
+                    version: tapLeaf.leafVersion,
+                });
+                console.log('hash', hash.toString('hex'))
+                return Object.assign({ hash }, tapLeaf);
+            })
+        
+        return tapLeafHashes.map(each => each.hash);
+    }
 }
