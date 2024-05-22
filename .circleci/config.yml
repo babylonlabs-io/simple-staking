@@ -151,6 +151,9 @@ workflows:
           filters:
             tags:
               only: /.*/
+            branches:
+              only:
+                - main
       - push:
           requires:
             - build
