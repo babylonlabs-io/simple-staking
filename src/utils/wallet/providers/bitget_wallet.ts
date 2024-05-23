@@ -1,21 +1,19 @@
 import { Psbt } from 'bitcoinjs-lib'
-import { WalletProvider, Network, Fees, UTXO } from "./wallet_provider";
+import { WalletProvider, Network, Fees, UTXO, WalletInfo, } from "../wallet_provider";
 import {
   getAddressBalance,
   getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
   pushTx,
-} from "../mempool_api";
+} from "../../mempool_api";
 
-type BitgetWalletInfo = {
-  publicKeyHex: string;
-  address: string;
-};
+// window object for Bitget Wallet extension
+export const bitgetWalletProvider = "bitkeep";
 
 export class BitgetWallet extends WalletProvider {
-  private bitgetWalletInfo: BitgetWalletInfo | undefined;
-  private provider = window?.bitkeep?.unisat
+  private bitgetWalletInfo: WalletInfo | undefined;
+  private provider = window?.[bitgetWalletProvider]?.unisat
   constructor() {
     super();
   }
@@ -85,13 +83,10 @@ export class BitgetWallet extends WalletProvider {
 
     let signedPsbt = await this.provider?.request('dappsSign', data)
     let psbt = Psbt.fromHex(signedPsbt)
-    try {
-      const allFinalized = psbt.data.inputs.every(input => input.finalScriptWitness || input.finalScriptSig);
-      if(!allFinalized){
-        psbt.finalizeAllInputs()
-      }
-    } catch (error) {
-      throw new Error((error as Error)?.message)
+
+    const allFinalized = psbt.data.inputs.every(input => input.finalScriptWitness || input.finalScriptSig);
+    if(!allFinalized){
+      psbt.finalizeAllInputs()
     }
 
     return psbt.toHex()
@@ -123,13 +118,9 @@ export class BitgetWallet extends WalletProvider {
       return signedPsbts.map((tx:string) => {
         let psbt = Psbt.fromHex(tx)
 
-        try {
-          const allFinalized = psbt.data.inputs.every(input => input.finalScriptWitness || input.finalScriptSig);
-          if(!allFinalized){
-            psbt.finalizeAllInputs()
-          }
-        } catch (error) {
-          throw new Error((error as Error)?.message)
+        const allFinalized = psbt.data.inputs.every(input => input.finalScriptWitness || input.finalScriptSig);
+        if(!allFinalized){
+          psbt.finalizeAllInputs()
         }
 
         return psbt.toHex()
