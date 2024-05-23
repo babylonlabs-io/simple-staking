@@ -25,7 +25,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const unbondContent = (
     <>
       You are about to unbond your stake before its expiration. The expected
-      unbonding time will be about <strong>10 days</strong>.<br />
+      unbonding time will be about <strong>7 days</strong>.<br />
       After unbonded, you will need to use this dashboard to withdraw your stake
       for it to appear in your wallet. OK to proceed?
     </>
