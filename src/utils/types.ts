@@ -4,10 +4,10 @@ export {};
 
 declare global {
   interface Window {
+    btcwallet: WalletProvider;
     btc: any;
     keplr: any;
     okxwallet: any;
-    btcwallet: WalletProvider;
     $onekey: any;
   }
 }

@@ -26,10 +26,11 @@ export interface UTXO {
 // supported networks
 export type Network = "mainnet" | "testnet" | "regtest" | "signet";
 
+// WalletInfo is a structure defining attributes for a wallet
 export type WalletInfo = {
   publicKeyHex: string;
   address: string;
-}
+};
 
 /**
  * Abstract class representing a wallet provider.

@@ -1,4 +1,10 @@
-import { WalletProvider, Network, Fees, UTXO, WalletInfo } from "../wallet_provider";
+import {
+  WalletProvider,
+  Network,
+  Fees,
+  UTXO,
+  WalletInfo,
+} from "../wallet_provider";
 import {
   getAddressBalance,
   getTipHeight,
@@ -6,6 +12,9 @@ import {
   getNetworkFees,
   pushTx,
 } from "../../mempool_api";
+
+// window object for OKX Wallet extension
+export const okxProvider = "okxwallet";
 
 export class OKXWallet extends WalletProvider {
   private okxWalletInfo: WalletInfo | undefined;
@@ -17,16 +26,16 @@ export class OKXWallet extends WalletProvider {
   connectWallet = async (): Promise<this> => {
     const workingVersion = "2.83.26";
     // check whether there is an OKX Wallet extension
-    if (!window.okxwallet) {
+    if (!window[okxProvider]) {
       throw new Error("OKX Wallet extension not found");
     }
 
-    const version = await window.okxwallet.getVersion();
+    const version = await window[okxProvider].getVersion();
     if (version < workingVersion) {
       throw new Error("Please update OKX Wallet to the latest version");
     }
 
-    const okxwallet = window.okxwallet;
+    const okxwallet = window[okxProvider];
     try {
       await okxwallet.enable(); // Connect to OKX Wallet extension
     } catch (error) {
@@ -88,14 +97,14 @@ export class OKXWallet extends WalletProvider {
       throw new Error("OKX Wallet not connected");
     }
     // sign the PSBTs
-    return await window?.okxwallet?.bitcoinSignet?.signPsbts(psbtsHexes);
+    return await window[okxProvider]?.bitcoinSignet?.signPsbts(psbtsHexes);
   };
 
   signMessageBIP322 = async (message: string): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
-    return await window?.okxwallet?.bitcoinSignet?.signMessage(
+    return await window[okxProvider].bitcoinSignet?.signMessage(
       message,
       "bip322-simple",
     );
@@ -111,7 +120,7 @@ export class OKXWallet extends WalletProvider {
     }
     // subscribe to account change event
     if (eventName === "accountChanged") {
-      return window.okxwallet.bitcoinSignet.on(eventName, callBack);
+      return window[okxProvider].bitcoinSignet.on(eventName, callBack);
     }
   };
 
