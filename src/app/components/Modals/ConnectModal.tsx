@@ -145,16 +145,6 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                         </div>
                       )}
                     </div>
-                    {isQRWallet && (
-                      <a
-                        href={linkToDocs}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mr-4 text-xs text-primary hover:underline"
-                      >
-                        Documentation
-                      </a>
-                    )}
                   </a>
                 );
               },
