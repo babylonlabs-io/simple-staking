@@ -4,6 +4,8 @@ import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import Image from "next/image";
 import { FaWallet } from "react-icons/fa";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { Tooltip } from "react-tooltip";
 
 import { walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -112,31 +114,41 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
         <div className="my-4 flex flex-col gap-4">
           <h3 className="text-center font-semibold">Choose wallet</h3>
           <div className="grid max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
-            {walletList.map((wallet) => {
-              const walletAvailable = !!window[wallet.provider as any];
-              return (
-                <a
-                  key={wallet.name}
-                  className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === wallet.name ? "border-primary" : "border-base-100"} ${!walletAvailable ? "opacity-50" : ""}`}
-                  onClick={() =>
-                    walletAvailable && setSelectedWallet(wallet.name)
-                  }
-                  href={!walletAvailable ? wallet.linkToDocs : undefined}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2">
-                    <Image
-                      src={wallet.icon}
-                      alt={wallet.name}
-                      width={26}
-                      height={26}
-                    />
-                  </div>
-                  <p>{wallet.name}</p>
-                </a>
-              );
-            })}
+            {walletList.map(
+              ({ provider, name, linkToDocs, icon, isQRWallet }) => {
+                const walletAvailable = isQRWallet || !!window[provider as any];
+                return (
+                  <a
+                    key={name}
+                    className={`relative flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === name ? "border-primary" : "border-base-100"} ${!walletAvailable ? "opacity-50" : ""}`}
+                    onClick={() => walletAvailable && setSelectedWallet(name)}
+                    href={!walletAvailable ? linkToDocs : undefined}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className="flex flex-1 items-center gap-2">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2">
+                        <Image src={icon} alt={name} width={26} height={26} />
+                      </div>
+                      <p>{name}</p>
+                      {isQRWallet && (
+                        <div>
+                          <span
+                            className="cursor-pointer text-xs"
+                            data-tooltip-id={name}
+                            data-tooltip-content="QR codes used for connection/signing"
+                            data-tooltip-place="top"
+                          >
+                            <AiOutlineInfoCircle />
+                          </span>
+                          <Tooltip id={name} />
+                        </div>
+                      )}
+                    </div>
+                  </a>
+                );
+              },
+            )}
             {isInjectable && (
               <button
                 className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
