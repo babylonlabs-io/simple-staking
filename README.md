@@ -10,8 +10,7 @@ staking website.
 To set up a development environment, first specify the required environment
 variables in the `.env.local` file in the root directory:
 ```
-NEXT_PUBLIC_MEMPOOL_API=https://babylon.mempool.space
-NEXT_PUBLIC_API_URL=https://staking-api.babylonchain.io
+cp .env.example .env.local
 ```
 
 where,
