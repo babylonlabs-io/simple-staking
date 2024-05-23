@@ -35,8 +35,9 @@ import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
+import { signPsbtTransaction } from "./common/utils/psbt";
 
-interface HomeProps {}
+interface HomeProps { }
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -407,9 +408,8 @@ const Home: React.FC<HomeProps> = () => {
                 }
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
-                signPsbt={btcWallet.signPsbt}
+                signPsbtTx={signPsbtTransaction(btcWallet)}
                 pushTx={btcWallet.pushTx}
-                convertSignedPsbtToTransaction={btcWallet.convertSignedPsbtToTransaction}
                 queryMeta={{
                   next: fetchNextDelegationsPage,
                   hasMore: hasNextDelegationsPage,

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import { Psbt, Transaction, networks } from "bitcoinjs-lib";
+import { Transaction, networks } from "bitcoinjs-lib";
 import {
   unbondingTransaction,
   withdrawEarlyUnbondedTransaction,
@@ -25,7 +25,6 @@ import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { QueryMeta } from "@/app/types/api";
 import {
   LoadingTableList,
-  LoadingView,
 } from "@/app/components/Loading/Loading";
 import {
   UnbondWithdrawModal,
@@ -36,6 +35,7 @@ import {
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
+import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -46,9 +46,8 @@ interface DelegationsProps {
   unbondingFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
-  signPsbt: WalletProvider["signPsbt"];
+  signPsbtTx: SignPsbtTransaction
   pushTx: WalletProvider["pushTx"];
-  convertSignedPsbtToTransaction: WalletProvider['convertSignedPsbtToTransaction'];
   queryMeta: QueryMeta;
 }
 
@@ -61,9 +60,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
   unbondingFeeSat,
   btcWalletNetwork,
   address,
-  signPsbt,
+  signPsbtTx,
   pushTx,
-  convertSignedPsbtToTransaction,
   queryMeta,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -146,8 +144,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // Sign the unbonding transaction
     let unbondingTx: Transaction;
     try {
-      const signedPsbt = await signPsbt(unsignedUnbondingTx.toHex());
-      unbondingTx = await convertSignedPsbtToTransaction(signedPsbt);
+      unbondingTx = await signPsbtTx(unsignedUnbondingTx.toHex());
     } catch (error) {
       throw new Error("Failed to sign PSBT for the unbonding transaction");
     }
@@ -155,10 +152,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
 
     // POST unbonding to the API
-    const _response = postUnbonding(
+    postUnbonding(
       stakerSignature,
       delegation.stakingTxHashHex,
-      Transaction.fromHex(unbondingTx.toHex()).getId(),
+      unbondingTx.getId(),
       unbondingTx.toHex(),
     );
 
@@ -268,8 +265,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // Sign the withdrawal transaction
     let withdrawalTransaction: Transaction;
     try {
-      const signedPsbt = await signPsbt(unsignedWithdrawalTx.toHex());
-      withdrawalTransaction = await convertSignedPsbtToTransaction(signedPsbt); 
+      withdrawalTransaction = await signPsbtTx(unsignedWithdrawalTx.toHex());
     } catch (error) {
       throw new Error("Failed to sign PSBT for the withdrawal transaction");
     }
@@ -332,7 +328,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
-                intermediateDelegation?.stakingTxHashHex &&
+              intermediateDelegation?.stakingTxHashHex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),

@@ -4,7 +4,6 @@ import {
   getFundingUTXOs,
   getNetworkFees,
 } from "../../mempool_api";
-import { Transaction } from "bitcoinjs-lib";
 
 export const oneKeyProvider = '$onekey'
 
@@ -74,16 +73,12 @@ export class OneKeyWallet extends WalletProvider {
     return window[oneKeyProvider].btcwallet.pushTx(txHex);
   }
 
-  async getUtxos (address: string, amount: number): Promise<UTXO[]>  {
+  async getUtxos(address: string, amount: number): Promise<UTXO[]> {
     // mempool call
     return getFundingUTXOs(address, amount);
   };
 
   async getBTCTipHeight(): Promise<number> {
     return window[oneKeyProvider].btcwallet.getBTCTipHeight();
-  }
-
-  convertSignedPsbtToTransaction(signedPsbtHex: string): Promise<Transaction> {
-    return Promise.resolve(Transaction.fromHex(signedPsbtHex));
   }
 }

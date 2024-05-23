@@ -1,10 +1,11 @@
-import { Psbt, networks } from "bitcoinjs-lib";
+import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";
+import { signPsbtTransaction } from "@/app/common/utils/psbt";
 
 export const signForm = async (
   params: GlobalParamsVersion,
@@ -81,13 +82,12 @@ export const signForm = async (
       error?.message || "Cannot build unsigned staking transaction",
     );
   }
-  let stakingTx: string;
+  let stakingTx: Transaction;
   try {
-    const signedPsbt = await btcWallet.signPsbt(unsignedStakingTx.toHex());
-    stakingTx = (await btcWallet.convertSignedPsbtToTransaction(signedPsbt)).toHex();
+    stakingTx = await signPsbtTransaction(btcWallet)(unsignedStakingTx.toHex());
   } catch (error: Error | any) {
     throw new Error(error?.message || "Staking transaction signing PSBT error");
   }
 
-  return stakingTx;
+  return stakingTx.toHex();
 };
