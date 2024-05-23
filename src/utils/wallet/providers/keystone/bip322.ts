@@ -18,11 +18,10 @@ class BIP322 {
      * @param message Message to be hashed
      * @returns Hashed message
      */
-    public static hashMessage(message: string) {
+    public static hashMessage(message: string): Buffer {
         // Compute the message hash - SHA256(SHA256(tag) || SHA256(tag) || message)
         const { sha256 } = bitcoin.crypto;
-        const tag = 'BIP0322-signed-message';
-        const tagHash = sha256(Buffer.from(tag))
+        const tagHash = sha256(this.TAG);
         const result = sha256(
             Buffer.concat([tagHash, tagHash, Buffer.from(message)])
         )
@@ -35,7 +34,7 @@ class BIP322 {
      * @param scriptPublicKey The script public key for the signing wallet
      * @returns Bitcoin transaction that correspond to the to_spend transaction
      */
-    public static buildToSpendTx(message: string, scriptPublicKey: Buffer) {
+    public static buildToSpendTx(message: string, scriptPublicKey: Buffer): bitcoin.Transaction {
         // Create PSBT object for constructing the transaction
         const psbt = new bitcoin.Psbt();
         // Set default value for nVersion and nLockTime
@@ -75,7 +74,7 @@ class BIP322 {
      * @param tapInternalKey Used to set the taproot internal public key of a taproot signing address when provided, default to undefined
      * @returns Ready-to-be-signed bitcoinjs.Psbt transaction
      */
-    public static buildToSignTx(toSpendTxId: string, witnessScript: Buffer, isRedeemScript: boolean = false, tapInternalKey?: Buffer) {
+    public static buildToSignTx(toSpendTxId: string, witnessScript: Buffer, isRedeemScript: boolean = false, tapInternalKey?: Buffer): bitcoin.Psbt {
         // Create PSBT object for constructing the transaction
         const psbt = new bitcoin.Psbt();
         // Set default value for nVersion and nLockTime
@@ -117,17 +116,15 @@ class BIP322 {
      * @param signedPsbt Signed PSBT
      * @returns Base-64 encoded witness data
      */
-    public static encodeWitness(signedPsbt: bitcoin.Psbt) {
+    public static encodeWitness(signedPsbt: bitcoin.Psbt): string {
         // Obtain the signed witness data
         const witness = signedPsbt.data.inputs[0].finalScriptWitness;
         // Check if the witness data is present
-        if (witness) {
-            // Return the base-64 encoded witness stack
-            return witness.toString('base64');
-        }
-        else {
+        if (!witness) {
             throw new Error('Cannot encode empty witness stack.');
         }
+        // Return the base-64 encoded witness stack
+        return witness.toString('base64');
     }
 
 }

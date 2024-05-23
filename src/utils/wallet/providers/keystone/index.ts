@@ -58,7 +58,7 @@ export class KeystoneWallet extends WalletProvider {
             [SupportedResult.UR_CRYPTO_ACCOUNT],
             {
                 title: "Sync Keystone with Babylon Staking App",
-                description: "Please scan the QR code displayed on your Keystone, Currently Only the first Taproot Address will be used",
+                description: "Please scan the QR code displayed on your Keystone, Currently only the first Taproot Address will be used",
                 renderInitial: {
                     walletMode: "btc",
                     link: "",
@@ -102,7 +102,6 @@ export class KeystoneWallet extends WalletProvider {
         this.keystoneWaleltInfo.publicKeyHex = pubkeyHex;
         this.keystoneWaleltInfo.scriptPubKeyHex = scriptPubKeyHex;
         return (this);
-
     }
 
     getWalletProviderName = async (): Promise<string> => {
@@ -284,7 +283,6 @@ const composeQRProcess = (destinationDataType: SupportedResult) => async (contai
  * @param network - The Bitcoin network.
  * @returns The Bitcoin address and the public key as a hex string.
  */
-
 const generateP2trAddressFromXpub = (xpub: string, path: string, network: BitcoinNetwork): { address: string, pubkeyHex: string, scriptPubKeyHex: string } => {
     const hdNode = HDKey.fromExtendedKey(xpub);
     const derivedNode = hdNode.derive(path);
