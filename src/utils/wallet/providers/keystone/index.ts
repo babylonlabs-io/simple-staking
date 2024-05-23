@@ -12,6 +12,7 @@ import { HDKey } from "@scure/bip32";
 
 
 import { WalletProvider, Network, Fees, UTXO } from "../../wallet_provider";
+import { toNetwork } from "../..";
 import { generatePsbtOfBIP322Simple, extractSignatureFromPsbtOfBIP322Simple, NetworkType } from './lib';
 import {
     getAddressBalance,
@@ -44,8 +45,10 @@ export class KeystoneWallet extends WalletProvider {
         });;
     }
 
-    async connectWallet(): Promise<this> {
+    connectWallet = async (): Promise<this> => {
         const keystoneContainer = this.viewSdk.getSdk();
+
+        // Initialize the Keystone container and read the QR code for sync keystone device with the staking app.
         const decodedResult = await keystoneContainer.read(
             [SupportedResult.UR_CRYPTO_ACCOUNT],
             {
@@ -67,41 +70,46 @@ export class KeystoneWallet extends WalletProvider {
             }
         );
 
-        if (decodedResult.status === ReadStatus.success) {
-            const accountData = this.dataSdk.parseAccount(decodedResult.result);
-            let xpub = accountData.keys[3].extendedPublicKey;
-            this.keystoneWaleltInfo = {
-                mfp: accountData.masterFingerprint,
-                extendedPublicKey: xpub,
-                path: accountData.keys[3].path,
-                address: undefined,
-                publicKeyHex: undefined,
-            }
+        if (decodedResult.status !== ReadStatus.success) throw new Error("Error reading QR code, Please try again.");
 
-            if (this.keystoneWaleltInfo.extendedPublicKey) {
-                const { address, pubkeyHex } = generateBitcoinAddressFromXpub(this.keystoneWaleltInfo.extendedPublicKey, "M/0/0", bitcoin.networks.testnet);
-                this.keystoneWaleltInfo.address = address;
-                this.keystoneWaleltInfo.publicKeyHex = pubkeyHex;
-            }
-        } else {
-            throw new Error("Error reading QR code, Please try again.")
+        // parse the QR Code and get extended public key and other required information
+        const accountData = this.dataSdk.parseAccount(decodedResult.result);
+
+        // currently only the p2tr address will be used.
+        const P2TRINDEX = 3;
+        let xpub = accountData.keys[P2TRINDEX].extendedPublicKey;
+
+        this.keystoneWaleltInfo = {
+            mfp: accountData.masterFingerprint,
+            extendedPublicKey: xpub,
+            path: accountData.keys[P2TRINDEX].path,
+            address: undefined,
+            publicKeyHex: undefined,
         }
 
-        return (this)
+        if (!this.keystoneWaleltInfo.extendedPublicKey) throw new Error("Could not retrieve the extended public key");
+
+        // generate the address and public key based on the xpub
+        const curentNetwork = await this.getNetwork();
+        const { address, pubkeyHex } = generateBitcoinAddressFromXpub(this.keystoneWaleltInfo.extendedPublicKey, "M/0/0", toNetwork(curentNetwork));
+        this.keystoneWaleltInfo.address = address;
+        this.keystoneWaleltInfo.publicKeyHex = pubkeyHex;
+        return (this);
 
     }
-    async getWalletProviderName(): Promise<string> {
+
+    getWalletProviderName = async (): Promise<string> => {
         return "Keystone";
     }
 
-    async getAddress(): Promise<string> {
+    getAddress = async (): Promise<string> => {
         if (this.keystoneWaleltInfo?.address) {
             return this.keystoneWaleltInfo?.address;
         }
         throw new Error("Could not retrieve the address");
     }
 
-    async getPublicKeyHex(): Promise<string> {
+    getPublicKeyHex = async (): Promise<string> => {
         if (this.keystoneWaleltInfo?.publicKeyHex) {
             return this.keystoneWaleltInfo?.publicKeyHex;
         }
@@ -152,7 +160,7 @@ export class KeystoneWallet extends WalletProvider {
         }
     }
 
-    async signPsbts(psbtsHexes: string[]): Promise<string[]> {
+    signPsbts = async (psbtsHexes: string[]): Promise<string[]> => {
         let result = [];
         for (const psbt of psbtsHexes) {
             const signedHex = await this.signPsbt(psbt);
@@ -161,11 +169,11 @@ export class KeystoneWallet extends WalletProvider {
         return result;
     }
 
-    async getNetwork(): Promise<Network> {
-        return "testnet"
+    getNetwork = async (): Promise<Network> => {
+        return "signet"
     }
 
-    async signMessageBIP322(message: string): Promise<string> {
+    signMessageBIP322 = async (message: string): Promise<string> => {
         const psbt = generatePsbtOfBIP322Simple({
             message,
             address: this.keystoneWaleltInfo!.address!,
@@ -211,8 +219,8 @@ export class KeystoneWallet extends WalletProvider {
         }
     }
 
-    on(eventName: string, callBack: () => void): void {
-        console.error('this function is not supported on Keystone', eventName)
+    on = (eventName: string, callBack: () => void): void => {
+        console.error('this function currently is not supported on Keystone', eventName)
     }
 
     // Mempool calls
@@ -240,15 +248,22 @@ export class KeystoneWallet extends WalletProvider {
 
 }
 
+/**
+ * Generates the p2tr Bitcoin address from an extended public key and a path.
+ * @param xpub - The extended public key.
+ * @param path - The derivation path.
+ * @param network - The Bitcoin network.
+ * @returns The Bitcoin address and the public key as a hex string.
+ */
 
-function generateBitcoinAddressFromXpub(xpub: string, path: string, network: bitcoin.Network): { address: string, pubkeyHex: string } {
+const generateBitcoinAddressFromXpub = (xpub: string, path: string, network: bitcoin.Network): { address: string, pubkeyHex: string } => {
     const hdNode = HDKey.fromExtendedKey(xpub);
     const derivedNode = hdNode.derive(path);
     let pubkeyBuffer = Buffer.from(derivedNode.publicKey!);
     const childNodeXOnlyPubkey = toXOnly(pubkeyBuffer);
     const { address } = bitcoin.payments.p2tr({
         internalPubkey: childNodeXOnlyPubkey,
-        network: bitcoin.networks.testnet
+        network,
     });
     return { address: address!, pubkeyHex: pubkeyBuffer.toString('hex') }
 }
