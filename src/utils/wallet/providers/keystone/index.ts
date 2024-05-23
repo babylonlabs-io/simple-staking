@@ -2,18 +2,15 @@
 
 import KeystoneSDK, { UR } from "@keystonehq/keystone-sdk"
 import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
-import * as bitcoin from 'bitcoinjs-lib';
-import { Psbt } from "bitcoinjs-lib";
+import { Psbt, Network as BitcoinNetwork, payments, Transaction } from "bitcoinjs-lib";
 import { tapleafHash } from 'bitcoinjs-lib/src/payments/bip341';
 import { pubkeyInScript } from 'bitcoinjs-lib/src/psbt/psbtutils';
 import { toXOnly } from 'bitcoinjs-lib/src/psbt/bip371';
 import { PsbtInput } from 'bip174/src/lib/interfaces';
 import { HDKey } from "@scure/bip32";
 
-
 import { WalletProvider, Network, Fees, UTXO } from "../../wallet_provider";
 import { toNetwork } from "../..";
-import { generatePsbtOfBIP322Simple, extractSignatureFromPsbtOfBIP322Simple, NetworkType } from './lib';
 import {
     getAddressBalance,
     getTipHeight,
@@ -21,15 +18,18 @@ import {
     getNetworkFees,
     pushTx,
 } from "../../../mempool_api";
+import BIP322 from "./bip322";
 
 
 type KeystoneWalletInfo = {
+    mfp: string | undefined;
     extendedPublicKey: string | undefined;
     path: string | undefined;
     address: string | undefined;
     publicKeyHex: string | undefined;
-    mfp: string | undefined;
+    scriptPubKeyHex: string | undefined;
 };
+
 
 export class KeystoneWallet extends WalletProvider {
     private keystoneWaleltInfo: KeystoneWalletInfo | undefined;
@@ -90,15 +90,17 @@ export class KeystoneWallet extends WalletProvider {
             path: accountData.keys[P2TRINDEX].path,
             address: undefined,
             publicKeyHex: undefined,
+            scriptPubKeyHex: undefined
         }
 
         if (!this.keystoneWaleltInfo.extendedPublicKey) throw new Error("Could not retrieve the extended public key");
 
         // generate the address and public key based on the xpub
         const curentNetwork = await this.getNetwork();
-        const { address, pubkeyHex } = generateBitcoinAddressFromXpub(this.keystoneWaleltInfo.extendedPublicKey, "M/0/0", toNetwork(curentNetwork));
+        const { address, pubkeyHex, scriptPubKeyHex } = generateBitcoinAddressFromXpub(this.keystoneWaleltInfo.extendedPublicKey, "M/0/0", toNetwork(curentNetwork));
         this.keystoneWaleltInfo.address = address;
         this.keystoneWaleltInfo.publicKeyHex = pubkeyHex;
+        this.keystoneWaleltInfo.scriptPubKeyHex = scriptPubKeyHex;
         return (this);
 
     }
@@ -122,38 +124,13 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     signPsbt = async (psbtHex: string): Promise<string> => {
-        // Add the BIP32 derivation information for each input.
-        // The Keystone device is stateless, so it needs to know which key to use to sign the PSBT.
-        // Therefore, add the Taproot BIP32 derivation information to the PSBT.
-        // https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki#Specification
+        // ehance the PSBT with the BIP32 derivation information
+        // to tell keystone which key to use to sign the PSBT
         let psbt = Psbt.fromHex(psbtHex);
-        const bip32Derivation = {
-            masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
-            path: `${this.keystoneWaleltInfo!.path!}/0/0`,
-            pubkey: Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex')
-        };
-        psbt.data.inputs.forEach((input) => {
-            input.tapBip32Derivation = [{
-                ...bip32Derivation,
-                pubkey: toXOnly(bip32Derivation.pubkey),
-                leafHashes: caculateTapLeafHash(input, bip32Derivation.pubkey)
-            }]
-        });
-
-        // generate the UR code for the PSBT
+        psbt = this.enhancePsbt(psbt);
         let enhancedPsbt = psbt.toHex();
-        const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
-
-        // compose the signing process for the Keystone device
-        const signPsbt = composeQRProcess(SupportedResult.UR_PSBT);
-
-        const keystoneContainer = this.viewSdk.getSdk();
-        const signePsbtUR = await signPsbt(keystoneContainer, ur);
-
-        // extract the signed PSBT from the UR
-        const signedPsbtHex = this.dataSdk.btc.parsePSBT(signePsbtUR);
-        let signedPsbt = Psbt.fromHex(signedPsbtHex);
-        signedPsbt.finalizeAllInputs();
+        // sign the psbt with keystone
+        const signedPsbt = await this.sign(enhancedPsbt);
         return signedPsbt.toHex();
     }
 
@@ -167,16 +144,57 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     getNetwork = async (): Promise<Network> => {
-        return "signet"
+        return "signet";
     }
 
+    /**
+     * https://github.com/bitcoin/bips/blob/master/bip-0322.mediawiki
+     * signMessageBIP322 signs a message using the BIP322 standard.
+     * @param message 
+     * @returns signature
+     */
     signMessageBIP322 = async (message: string): Promise<string> => {
-        const psbt = generatePsbtOfBIP322Simple({
-            message,
-            address: this.keystoneWaleltInfo!.address!,
-            networkType: NetworkType.TESTNET,
+        // construct the psbt of Bip322 message signing
+        const scriptPubKey = Buffer.from(this.keystoneWaleltInfo!.scriptPubKeyHex!, 'hex');
+        const toSpendTx = BIP322.buildToSpendTx(message, scriptPubKey);
+        const internalPublicKey = toXOnly(Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex'));
+        let psbt = BIP322.buildToSignTx(toSpendTx.getId(), scriptPubKey, false, internalPublicKey);
+        // Set the sighashType to bitcoin.Transaction.SIGHASH_ALL since it defaults to SIGHASH_DEFAULT
+        psbt.updateInput(0, {
+            sighashType: Transaction.SIGHASH_ALL
         });
 
+        // ehance the PSBT with the BIP32 derivation information
+        psbt = this.enhancePsbt(psbt);
+        const signedPsbt = await this.sign(psbt.toHex());
+        return BIP322.encodeWitness(signedPsbt);
+    };
+
+    private sign = async (psbtHex: string): Promise<Psbt> => {
+        const ur = this.dataSdk.btc.generatePSBT(Buffer.from(psbtHex, 'hex'));
+
+        // compose the signing process for the Keystone device
+        const signPsbt = composeQRProcess(SupportedResult.UR_PSBT);
+
+        const keystoneContainer = this.viewSdk.getSdk();
+        const signePsbtUR = await signPsbt(keystoneContainer, ur);
+
+        // extract the signed PSBT from the UR
+        const signedPsbtHex = this.dataSdk.btc.parsePSBT(signePsbtUR);
+        let signedPsbt = Psbt.fromHex(signedPsbtHex);
+        signedPsbt.finalizeAllInputs();
+        return signedPsbt;
+    };
+
+    /**
+     * Add the BIP32 derivation information for each input.
+     * The Keystone device is stateless, so it needs to know which key to use to sign the PSBT.
+     * Therefore, add the Taproot BIP32 derivation information to the PSBT.
+     * https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki#Specification
+     * @param psbt - The PSBT object.
+     * @returns The PSBT object with the BIP32 derivation information added.
+     */
+    private enhancePsbt =  (psbt: Psbt): Psbt => {
         const bip32Derivation = {
             masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
             path: `${this.keystoneWaleltInfo!.path!}/0/0`,
@@ -184,41 +202,18 @@ export class KeystoneWallet extends WalletProvider {
         };
 
         psbt.data.inputs.forEach((input) => {
-            input.bip32Derivation = [{
+            input.tapBip32Derivation = [{
                 ...bip32Derivation,
+                pubkey: toXOnly(bip32Derivation.pubkey),
+                leafHashes: caculateTapLeafHash(input, bip32Derivation.pubkey)
             }]
         });
-
-        let enhancedPsbt = psbt.toHex();
-
-        const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
-
-        const keystoneContainer = this.viewSdk.getSdk();
-        const status = await keystoneContainer.play(ur);
-        if (status === PlayStatus.success) {
-            let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
-                title: "Get the Signature from Keystone",
-                description: "Please scan the QR code displayed on your Keystone",
-                URTypeErrorMessage:
-                    "The scanned QR code can't be read, please verify and try again.",
-            });
-            if (urResult.status === ReadStatus.success) {
-                const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
-                let psbt = Psbt.fromHex(signedPsbt)
-                psbt.finalizeAllInputs();
-                const signature = extractSignatureFromPsbtOfBIP322Simple(psbt);
-                return signature;
-            } else {
-                throw new Error("Could not extract the signature, please try again.")
-            }
-        } else {
-            throw new Error("Could not generate the QR code, please try again.")
-        }
-    }
+        return psbt;
+    };
 
     on = (eventName: string, callBack: () => void): void => {
         console.error('this function currently is not supported on Keystone', eventName)
-    }
+    };
 
     // Mempool calls
 
@@ -286,16 +281,16 @@ const composeQRProcess = (destinationDataType: SupportedResult) => async (contai
  * @returns The Bitcoin address and the public key as a hex string.
  */
 
-const generateBitcoinAddressFromXpub = (xpub: string, path: string, network: bitcoin.Network): { address: string, pubkeyHex: string } => {
+const generateBitcoinAddressFromXpub = (xpub: string, path: string, network:BitcoinNetwork): { address: string, pubkeyHex: string, scriptPubKeyHex: string } => {
     const hdNode = HDKey.fromExtendedKey(xpub);
     const derivedNode = hdNode.derive(path);
     let pubkeyBuffer = Buffer.from(derivedNode.publicKey!);
     const childNodeXOnlyPubkey = toXOnly(pubkeyBuffer);
-    const { address } = bitcoin.payments.p2tr({
+    const { address, output } = payments.p2tr({
         internalPubkey: childNodeXOnlyPubkey,
         network,
     });
-    return { address: address!, pubkeyHex: pubkeyBuffer.toString('hex') }
+    return { address: address!, pubkeyHex: pubkeyBuffer.toString('hex'), scriptPubKeyHex: output!.toString('hex') };
 }
 
 /**
