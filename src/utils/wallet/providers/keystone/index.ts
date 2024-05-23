@@ -1,6 +1,6 @@
 'use client';
 
-import KeystoneSDK from "@keystonehq/keystone-sdk"
+import KeystoneSDK, { UR } from "@keystonehq/keystone-sdk"
 import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
 import * as bitcoin from 'bitcoinjs-lib';
 import { Psbt } from "bitcoinjs-lib";
@@ -45,6 +45,11 @@ export class KeystoneWallet extends WalletProvider {
         });;
     }
 
+    /**
+     * Connects the staking app to the Keystone device and retrieves the necessary information.
+     * @returns A Promise that resolves to the current instance of the class.
+     * @throws An error if there is an issue reading the QR code or retrieving the extended public key.
+     */
     connectWallet = async (): Promise<this> => {
         const keystoneContainer = this.viewSdk.getSdk();
 
@@ -117,47 +122,39 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     signPsbt = async (psbtHex: string): Promise<string> => {
+        // Add the BIP32 derivation information for each input.
+        // The Keystone device is stateless, so it needs to know which key to use to sign the PSBT.
+        // Therefore, add the Taproot BIP32 derivation information to the PSBT.
+        // https://github.com/bitcoin/bips/blob/master/bip-0174.mediawiki#Specification
         let psbt = Psbt.fromHex(psbtHex);
         const bip32Derivation = {
             masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
             path: `${this.keystoneWaleltInfo!.path!}/0/0`,
             pubkey: Buffer.from(this.keystoneWaleltInfo!.publicKeyHex!, 'hex')
         };
-
         psbt.data.inputs.forEach((input) => {
             input.tapBip32Derivation = [{
                 ...bip32Derivation,
-                pubkey: bip32Derivation.pubkey.slice(1),
+                pubkey: toXOnly(bip32Derivation.pubkey),
                 leafHashes: caculateTapLeafHash(input, bip32Derivation.pubkey)
             }]
         });
 
+        // generate the UR code for the PSBT
         let enhancedPsbt = psbt.toHex();
-
         const ur = this.dataSdk.btc.generatePSBT(Buffer.from(enhancedPsbt, 'hex'));
+
+        // compose the signing process for the Keystone device
+        const signPsbt = composeQRProcess(SupportedResult.UR_PSBT);
+
         const keystoneContainer = this.viewSdk.getSdk();
-        const status = await keystoneContainer.play(ur, {
-            title: "Scan the QR Code",
-            description: "Please scan the QR code with your Keystone device.",
-        });
-        if (status === PlayStatus.success) {
-            let urResult = await keystoneContainer.read([SupportedResult.UR_PSBT], {
-                title: "Get the Signature from Keystone",
-                description: "Please scan the QR code displayed on your Keystone",
-                URTypeErrorMessage:
-                    "The scanned QR code can't be read. please verify and try again.",
-            });
-            if (urResult.status === ReadStatus.success) {
-                const signedPsbt = this.dataSdk.btc.parsePSBT(urResult.result);
-                let psbt = Psbt.fromHex(signedPsbt);
-                psbt.finalizeAllInputs();
-                return psbt.toHex();
-            } else {
-                throw new Error("Could not extract the signature, please try again.")
-            }
-        } else {
-            throw new Error("Could not generate the QR code, please try again.")
-        }
+        const signePsbtUR = await signPsbt(keystoneContainer, ur);
+
+        // extract the signed PSBT from the UR
+        const signedPsbtHex = this.dataSdk.btc.parsePSBT(signePsbtUR);
+        let signedPsbt = Psbt.fromHex(signedPsbtHex);
+        signedPsbt.finalizeAllInputs();
+        return signedPsbt.toHex();
     }
 
     signPsbts = async (psbtsHexes: string[]): Promise<string[]> => {
@@ -247,6 +244,39 @@ export class KeystoneWallet extends WalletProvider {
     };
 
 }
+
+
+/**
+ * High order function to compose the QR generation and scanning process for specific data types.
+ * Composes the QR code process for the Keystone device.
+ * @param destinationDataType - The type of data to be read from the QR code.
+ * @returns A function that plays the UR in the QR code and reads the result.
+ */
+
+//TODO: Add the containe type in the sdk
+const composeQRProcess = (destinationDataType: SupportedResult) => async (container: any, ur: UR): Promise<UR> => {
+
+    // make the container play the UR in the QR code
+    const status: PlayStatus = await container.play(ur, {
+        title: "Scan the QR Code",
+        description: "Please scan the QR code with your Keystone device.",
+    });
+
+    // if the QR code is scanned successfully, read the result 
+    if (status !== PlayStatus.success) throw new Error("Could not generate the QR code, please try again.");
+
+    let urResult = await container.read([destinationDataType], {
+        title: "Get the Signature from Keystone",
+        description: "Please scan the QR code displayed on your Keystone",
+        URTypeErrorMessage:
+            "The scanned QR code can't be read. please verify and try again.",
+    });
+
+    // return the result if the QR code data(UR) of scanned successfully
+    if (urResult.status !== ReadStatus.success) throw new Error("Could not extract the signature, please try again.");
+    return urResult.result;
+}
+
 
 /**
  * Generates the p2tr Bitcoin address from an extended public key and a path.
