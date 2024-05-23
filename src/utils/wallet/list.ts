@@ -1,7 +1,7 @@
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";
 import okxIcon from "./icons/okx.svg";
-import onekeyIcon from "./icons/onekey.svg";
-import { OneKeyWallet } from "./onekey_wallet";
+import oneKeyIcon from "./icons/onekey.svg";
+import { OneKeyWallet, oneKeyProvider } from "./providers/onekey_wallet";
 
 export const walletList = [
   {
@@ -13,7 +13,9 @@ export const walletList = [
   },
   {
     name: "OneKey",
-    icon: onekeyIcon,
-    wallet: OneKeyWallet
+    icon: oneKeyIcon,
+    wallet: OneKeyWallet,
+    provider: oneKeyProvider,
+    linkToDocs: 'https://onekey.so/download'  
   }
 ];

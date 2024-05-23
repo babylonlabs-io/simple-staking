@@ -1,19 +1,20 @@
-import { Fees, Network, UTXO, WalletInfo, WalletProvider } from "./wallet_provider";
+import { Fees, Network, UTXO, WalletInfo, WalletProvider } from "../wallet_provider";
 import {
   getAddressBalance,
   getFundingUTXOs,
   getNetworkFees,
-} from "../mempool_api";
+} from "../../mempool_api";
+
+export const oneKeyProvider = '$onekey'
 
 export class OneKeyWallet extends WalletProvider {
-  private provider = window.$onekey.btcwallet;
-  private onekeyWalletInfo: WalletInfo | undefined;
+  private oneKeyWalletInfo: WalletInfo | undefined;
 
   async connectWallet(): Promise<this> {
-    const self = await this.provider.connectWallet();
+    const self = await window[oneKeyProvider].btcwallet.connectWallet();
     const address = await this.getAddress()
     const publicKeyHex = await this.getPublicKeyHex()
-    this.onekeyWalletInfo = {
+    this.oneKeyWalletInfo = {
       address,
       publicKeyHex
     }
@@ -21,41 +22,41 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async getWalletProviderName(): Promise<string> {
-    return this.provider.getWalletProviderName();
+    return window[oneKeyProvider].btcwallet.getWalletProviderName();
   }
 
   async getAddress(): Promise<string> {
-    if (!this.onekeyWalletInfo) {
-      return this.provider.getAddress();
+    if (!this.oneKeyWalletInfo) {
+      return window[oneKeyProvider].btcwallet.getAddress();
     }
-    return this.onekeyWalletInfo.address;
+    return this.oneKeyWalletInfo.address;
   }
 
   async getPublicKeyHex(): Promise<string> {
-    if (!this.onekeyWalletInfo) {
-      return this.provider.getPublicKeyHex();
+    if (!this.oneKeyWalletInfo) {
+      return window[oneKeyProvider].btcwallet.getPublicKeyHex();
     }
-    return this.onekeyWalletInfo.publicKeyHex;
+    return this.oneKeyWalletInfo.publicKeyHex;
   }
 
   async signPsbt(psbtHex: string): Promise<string> {
-    return window.$onekey.btc.signPsbt(psbtHex);
+    return window[oneKeyProvider].btc.signPsbt(psbtHex);
   }
 
   async signPsbts(psbtsHexes: string[]): Promise<string[]> {
-    return window.$onekey.btc.signPsbts(psbtsHexes);
+    return window[oneKeyProvider].btc.signPsbts(psbtsHexes);
   }
 
   async getNetwork(): Promise<Network> {
-    return this.provider.getNetwork();
+    return window[oneKeyProvider].btcwallet.getNetwork();
   }
 
   async signMessageBIP322(message: string): Promise<string> {
-    return this.provider.signMessageBIP322(message);
+    return window[oneKeyProvider].btcwallet.signMessageBIP322(message);
   }
 
   on(eventName: string, callBack: () => void): void {
-    this.provider.on(eventName, callBack);
+    window[oneKeyProvider].btcwallet.on(eventName, callBack);
   }
 
   async getBalance(): Promise<number> {
@@ -69,7 +70,7 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async pushTx(txHex: string): Promise<string> {
-    return this.provider.pushTx(txHex);
+    return window[oneKeyProvider].btcwallet.pushTx(txHex);
   }
 
   async getUtxos (address: string, amount: number): Promise<UTXO[]>  {
@@ -78,6 +79,6 @@ export class OneKeyWallet extends WalletProvider {
   };
 
   async getBTCTipHeight(): Promise<number> {
-    return this.provider.getBTCTipHeight();
+    return window[oneKeyProvider].btcwallet.getBTCTipHeight();
   }
 }
