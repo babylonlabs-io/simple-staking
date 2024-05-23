@@ -97,7 +97,7 @@ export class KeystoneWallet extends WalletProvider {
 
         // generate the address and public key based on the xpub
         const curentNetwork = await this.getNetwork();
-        const { address, pubkeyHex, scriptPubKeyHex } = generateBitcoinAddressFromXpub(this.keystoneWaleltInfo.extendedPublicKey, "M/0/0", toNetwork(curentNetwork));
+        const { address, pubkeyHex, scriptPubKeyHex } = generateP2trAddressFromXpub(this.keystoneWaleltInfo.extendedPublicKey, "M/0/0", toNetwork(curentNetwork));
         this.keystoneWaleltInfo.address = address;
         this.keystoneWaleltInfo.publicKeyHex = pubkeyHex;
         this.keystoneWaleltInfo.scriptPubKeyHex = scriptPubKeyHex;
@@ -170,6 +170,12 @@ export class KeystoneWallet extends WalletProvider {
         return BIP322.encodeWitness(signedPsbt);
     };
 
+    /** 
+     * Sign the PSBT with the Keystone device.
+     * 
+     * @param psbtHex - The PSBT in hex format.
+     *  @returns The signed PSBT in hex format.
+     * */
     private sign = async (psbtHex: string): Promise<Psbt> => {
         const ur = this.dataSdk.btc.generatePSBT(Buffer.from(psbtHex, 'hex'));
 
@@ -194,7 +200,7 @@ export class KeystoneWallet extends WalletProvider {
      * @param psbt - The PSBT object.
      * @returns The PSBT object with the BIP32 derivation information added.
      */
-    private enhancePsbt =  (psbt: Psbt): Psbt => {
+    private enhancePsbt = (psbt: Psbt): Psbt => {
         const bip32Derivation = {
             masterFingerprint: Buffer.from(this.keystoneWaleltInfo!.mfp!, 'hex'),
             path: `${this.keystoneWaleltInfo!.path!}/0/0`,
@@ -281,7 +287,7 @@ const composeQRProcess = (destinationDataType: SupportedResult) => async (contai
  * @returns The Bitcoin address and the public key as a hex string.
  */
 
-const generateBitcoinAddressFromXpub = (xpub: string, path: string, network:BitcoinNetwork): { address: string, pubkeyHex: string, scriptPubKeyHex: string } => {
+const generateP2trAddressFromXpub = (xpub: string, path: string, network: BitcoinNetwork): { address: string, pubkeyHex: string, scriptPubKeyHex: string } => {
     const hdNode = HDKey.fromExtendedKey(xpub);
     const derivedNode = hdNode.derive(path);
     let pubkeyBuffer = Buffer.from(derivedNode.publicKey!);
@@ -302,17 +308,16 @@ const generateBitcoinAddressFromXpub = (xpub: string, path: string, network:Bitc
 const caculateTapLeafHash = (input: PsbtInput, pubkey: Buffer) => {
     if (input.tapInternalKey && !input.tapLeafScript) {
         return [];
-    } else {
-        const tapLeafHashes = (input.tapLeafScript || [])
-            .filter(tapLeaf => pubkeyInScript(pubkey, tapLeaf.script))
-            .map(tapLeaf => {
-                const hash = tapleafHash({
-                    output: tapLeaf.script,
-                    version: tapLeaf.leafVersion,
-                });
-                return Object.assign({ hash }, tapLeaf);
-            })
-
-        return tapLeafHashes.map(each => each.hash);
     }
+    const tapLeafHashes = (input.tapLeafScript || [])
+        .filter(tapLeaf => pubkeyInScript(pubkey, tapLeaf.script))
+        .map(tapLeaf => {
+            const hash = tapleafHash({
+                output: tapLeaf.script,
+                version: tapLeaf.leafVersion,
+            });
+            return Object.assign({ hash }, tapLeaf);
+        })
+
+    return tapLeafHashes.map(each => each.hash);
 }
