@@ -409,6 +409,7 @@ const Home: React.FC<HomeProps> = () => {
                 address={address}
                 signPsbt={btcWallet.signPsbt}
                 pushTx={btcWallet.pushTx}
+                convertSignedPsbtToTransaction={btcWallet.convertSignedPsbtToTransaction}
                 queryMeta={{
                   next: fetchNextDelegationsPage,
                   hasMore: hasNextDelegationsPage,

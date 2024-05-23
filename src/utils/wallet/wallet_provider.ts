@@ -1,3 +1,6 @@
+import { baseConvertSignedPsbtToTransaction } from ".";
+import type { Transaction } from "bitcoinjs-lib";
+
 export type Fees = {
   // fee for inclusion in the next block
   fastestFee: number;
@@ -132,4 +135,13 @@ export abstract class WalletProvider {
    * @returns A promise that resolves to the block height.
    */
   abstract getBTCTipHeight(): Promise<number>;
+
+  /**
+   * Converts a signed PSBT to transaction.
+   * @param signedPsbtHex - The hex string of the signed PSBT.
+   * @returns A promise that resolves to the hex string of thetransaction.
+   */
+  async convertSignedPsbtToTransaction(signedPsbtHex: string): Promise<Transaction> {
+    return baseConvertSignedPsbtToTransaction(signedPsbtHex);
+  }
 }

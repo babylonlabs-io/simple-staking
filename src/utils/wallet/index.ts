@@ -1,4 +1,4 @@
-import { networks } from "bitcoinjs-lib";
+import { networks, Transaction, Psbt } from "bitcoinjs-lib";
 
 import { Network } from "./wallet_provider";
 
@@ -34,3 +34,12 @@ export const getPublicKeyNoCoord = (pkHex: string): Buffer => {
   const publicKey = Buffer.from(pkHex, "hex");
   return publicKey.subarray(1, 33);
 };
+
+/**
+ * Base implementation for converting a signed PSBT to a transaction.
+ * @param signedPsbtHex - The hex string of the signed PSBT.
+ * @returns A promise that resolves to the hex string of the transaction.
+ */
+export const baseConvertSignedPsbtToTransaction = (signedPsbtHex: string): Promise<Transaction> => {
+  return Promise.resolve(Psbt.fromHex(signedPsbtHex).extractTransaction())
+}

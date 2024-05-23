@@ -84,7 +84,7 @@ export const signForm = async (
   let stakingTx: string;
   try {
     const signedPsbt = await btcWallet.signPsbt(unsignedStakingTx.toHex());
-    stakingTx = Psbt.fromHex(signedPsbt).extractTransaction().toHex();
+    stakingTx = (await btcWallet.convertSignedPsbtToTransaction(signedPsbt)).toHex();
   } catch (error: Error | any) {
     throw new Error(error?.message || "Staking transaction signing PSBT error");
   }

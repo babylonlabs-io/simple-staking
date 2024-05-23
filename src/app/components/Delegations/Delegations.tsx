@@ -48,6 +48,7 @@ interface DelegationsProps {
   address: string;
   signPsbt: WalletProvider["signPsbt"];
   pushTx: WalletProvider["pushTx"];
+  convertSignedPsbtToTransaction: WalletProvider['convertSignedPsbtToTransaction'];
   queryMeta: QueryMeta;
 }
 
@@ -62,6 +63,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   address,
   signPsbt,
   pushTx,
+  convertSignedPsbtToTransaction,
   queryMeta,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
@@ -145,7 +147,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     let unbondingTx: Transaction;
     try {
       const signedPsbt = await signPsbt(unsignedUnbondingTx.toHex());
-      unbondingTx = Psbt.fromHex(signedPsbt).extractTransaction();
+      unbondingTx = await convertSignedPsbtToTransaction(signedPsbt);
     } catch (error) {
       throw new Error("Failed to sign PSBT for the unbonding transaction");
     }
@@ -267,7 +269,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     let withdrawalTransaction: Transaction;
     try {
       const signedPsbt = await signPsbt(unsignedWithdrawalTx.toHex());
-      withdrawalTransaction = Psbt.fromHex(signedPsbt).extractTransaction();
+      withdrawalTransaction = await convertSignedPsbtToTransaction(signedPsbt); 
     } catch (error) {
       throw new Error("Failed to sign PSBT for the withdrawal transaction");
     }
