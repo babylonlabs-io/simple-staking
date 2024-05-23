@@ -1,7 +1,7 @@
 'use client';
 
 import KeystoneSDK, { UR } from "@keystonehq/keystone-sdk"
-import sdk, { PlayStatus, ReadStatus, SupportedResult } from '@keystonehq/sdk';
+import sdk, { PlayStatus, ReadStatus, SupportedResult, SDK } from '@keystonehq/sdk';
 import { Psbt, Network as BitcoinNetwork, payments, Transaction } from "bitcoinjs-lib";
 import { tapleafHash } from 'bitcoinjs-lib/src/payments/bip341';
 import { pubkeyInScript } from 'bitcoinjs-lib/src/psbt/psbtutils';
@@ -124,7 +124,7 @@ export class KeystoneWallet extends WalletProvider {
     }
 
     signPsbt = async (psbtHex: string): Promise<string> => {
-        // ehance the PSBT with the BIP32 derivation information
+        // enhance the PSBT with the BIP32 derivation information
         // to tell keystone which key to use to sign the PSBT
         let psbt = Psbt.fromHex(psbtHex);
         psbt = this.enhancePsbt(psbt);
@@ -253,9 +253,7 @@ export class KeystoneWallet extends WalletProvider {
  * @param destinationDataType - The type of data to be read from the QR code.
  * @returns A function that plays the UR in the QR code and reads the result.
  */
-
-//TODO: Add the containe type in the sdk
-const composeQRProcess = (destinationDataType: SupportedResult) => async (container: any, ur: UR): Promise<UR> => {
+const composeQRProcess = (destinationDataType: SupportedResult) => async (container: SDK, ur: UR): Promise<UR> => {
 
     // make the container play the UR in the QR code
     const status: PlayStatus = await container.play(ur, {
