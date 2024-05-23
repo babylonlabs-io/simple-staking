@@ -31,7 +31,7 @@ service:
       name: simple-staking
 ingress:
   enabled: true
-  tlsCertArn: arn:aws:acm:us-east-2:490721144737:certificate/2c6cb5ad-8899-4871-9206-ea8e978aebae
+  tlsCertArn: arn:aws:acm:us-east-2:490721144737:certificate/a18510a6-948f-4595-87d1-e43c8b2e0c8f
   groupName: "testnet3-internal"
   scheme: "internal"
   hosts:
