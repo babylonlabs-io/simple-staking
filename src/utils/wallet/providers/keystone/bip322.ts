@@ -44,7 +44,9 @@ class BIP322 {
         // Compute the message hash - SHA256(SHA256(tag) || SHA256(tag) || message)
         const messageHash = this.hashMessage(message);
         // Construct the scriptSig - OP_0 PUSH32[ message_hash ]
-        const scriptSigPartOne = new Uint8Array([0x00, 0x20]); // OP_0 PUSH32
+        const OP_0_CODE = 0x00; // OP_0
+        const PUSH32_CODE = 0x20; // PUSH32
+        const scriptSigPartOne = new Uint8Array([OP_0_CODE, PUSH32_CODE]); // OP_0 PUSH32
         const scriptSig = new Uint8Array(scriptSigPartOne.length + messageHash.length);
         scriptSig.set(scriptSigPartOne);
         scriptSig.set(messageHash, scriptSigPartOne.length);
