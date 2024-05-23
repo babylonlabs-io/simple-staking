@@ -10,7 +10,7 @@ staking website.
 To set up a development environment, first specify the required environment
 variables in the `.env.local` file in the root directory:
 ```
-cp env.example .env.local
+cp .env.example .env.local
 ```
 
 where,
