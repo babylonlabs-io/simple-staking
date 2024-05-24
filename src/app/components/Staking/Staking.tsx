@@ -45,6 +45,7 @@ interface StakingProps {
   paramWithContext:
     | {
         height: number | undefined;
+        firstActivationHeight: number | undefined;
         currentVersion: GlobalParamsVersion | undefined;
         isApprochingNextVersion: boolean | undefined;
       }
@@ -77,11 +78,12 @@ export const Staking: React.FC<StakingProps> = ({
   const [resetFormInputs, setResetFormInputs] = useState(false);
 
   const stakingParams = paramWithContext?.currentVersion;
+  const firstActivationHeight = paramWithContext?.firstActivationHeight;
+  const height = paramWithContext?.height;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
   const isBlockHeightUnderActivation =
     !stakingParams ||
-    !paramWithContext.height ||
-    paramWithContext.height < stakingParams.activationHeight;
+    (height && firstActivationHeight && height < firstActivationHeight);
   const { showError } = useError();
 
   const handleResetState = () => {
@@ -198,8 +200,8 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `The staking application will open once the next Bitcoin block height is the activation Bitcoin block height (${stakingParams?.activationHeight || "-"}).`,
-            `The next Bitcoin block height is ${paramWithContext?.height || "-"}.`,
+            `The staking application will open once the next Bitcoin block height is the activation Bitcoin block height (${firstActivationHeight || "-"}).`,
+            `The next Bitcoin block height is ${height || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />

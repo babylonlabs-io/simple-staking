@@ -61,21 +61,12 @@ const Home: React.FC<HomeProps> = () => {
         btcWallet!.getBTCTipHeight(),
         getGlobalParams(),
       ]);
-      try {
-        return {
-          // The staking parameters are retrieved based on the current height + 1
-          // so this verification should take this into account.
-          height: height + 1,
-          ...getCurrentGlobalParamsVersion(height + 1, versions),
-        };
-      } catch (error) {
-        // No global params version found, it means the staking is not yet enabled
-        return {
-          height: undefined,
-          currentVersion: undefined,
-          isApprochingNextVersion: false,
-        };
-      }
+      return {
+        // The staking parameters are retrieved based on the current height + 1
+        // so this verification should take this into account.
+        height: height + 1,
+        ...getCurrentGlobalParamsVersion(height + 1, versions),
+      };
     },
     refetchInterval: 60000, // 1 minute
     // Should be enabled only when the wallet is connected
