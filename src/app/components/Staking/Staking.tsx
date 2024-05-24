@@ -21,7 +21,7 @@ import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
-import { STAKING_FEE_SAT } from "@/app/common/constants";
+import { STAKING_FEE_SAT } from "./constants";
 
 interface OverflowProperties {
   isOverTheCap: boolean;

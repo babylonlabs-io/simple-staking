@@ -34,7 +34,7 @@ import {
 } from "../Modals/UnbondWithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
-import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
+import { WITHDRAWAL_FEE_SAT } from "./constants";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 
 interface DelegationsProps {
