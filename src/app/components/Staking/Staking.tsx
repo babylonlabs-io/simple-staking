@@ -43,12 +43,12 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-    | {
-        height: number | undefined;
-        currentVersion: GlobalParamsVersion | undefined;
-        isApprochingNextVersion: boolean | undefined;
-      }
-    | undefined;
+  | {
+    height: number | undefined;
+    currentVersion: GlobalParamsVersion | undefined;
+    isApprochingNextVersion: boolean | undefined;
+  }
+  | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -74,6 +74,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
+  const [resetFormInputs, setResetFormInputs] = useState(false);
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
@@ -88,6 +89,7 @@ export const Staking: React.FC<StakingProps> = ({
     setStakingAmountSat(0);
     setStakingTimeBlocks(0);
     setPreviewModalOpen(false);
+    setResetFormInputs(!resetFormInputs);
   };
 
   const handleSign = async () => {
@@ -266,12 +268,14 @@ export const Staking: React.FC<StakingProps> = ({
                 minStakingTimeBlocks={minStakingTimeBlocks}
                 maxStakingTimeBlocks={maxStakingTimeBlocks}
                 onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
+                reset={resetFormInputs}
               />
               <StakingAmount
                 minStakingAmountSat={minStakingAmountSat}
                 maxStakingAmountSat={maxStakingAmountSat}
                 btcWalletBalanceSat={btcWalletBalanceSat}
                 onStakingAmountSatChange={handleStakingAmountSatChange}
+                reset={resetFormInputs}
               />
             </div>
             {overflow.isApprochingCap && (

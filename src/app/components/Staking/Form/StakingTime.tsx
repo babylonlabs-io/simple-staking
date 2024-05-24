@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, useState } from "react";
+import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
@@ -7,12 +7,14 @@ interface StakingTimeProps {
   minStakingTimeBlocks: number;
   maxStakingTimeBlocks: number;
   onStakingTimeBlocksChange: (inputTimeBlocks: number) => void;
+  reset: boolean;
 }
 
 export const StakingTime: React.FC<StakingTimeProps> = ({
   minStakingTimeBlocks,
   maxStakingTimeBlocks,
   onStakingTimeBlocksChange,
+  reset,
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -21,6 +23,13 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
   const errorLabel = "Staking term";
   const generalErrorMessage = "You should input staking term";
+
+  // Use effect to reset the state when reset prop changes
+  useEffect(() => {
+    setValue("");
+    setError("");
+    setTouched(false);
+  }, [reset]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
