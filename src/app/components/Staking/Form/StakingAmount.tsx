@@ -1,4 +1,4 @@
-import { ChangeEvent, FocusEvent, useState } from "react";
+import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
 
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -9,6 +9,7 @@ interface StakingAmountProps {
   maxStakingAmountSat: number;
   btcWalletBalanceSat: number;
   onStakingAmountSatChange: (inputAmountSat: number) => void;
+  reset: boolean;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
@@ -16,6 +17,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   maxStakingAmountSat,
   btcWalletBalanceSat,
   onStakingAmountSatChange,
+  reset,
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -24,6 +26,13 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
   const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
+
+  // Use effect to reset the state when reset prop changes
+  useEffect(() => {
+    setValue("");
+    setError("");
+    setTouched(false);
+  }, [reset]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;

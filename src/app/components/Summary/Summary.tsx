@@ -23,7 +23,7 @@ export const Summary: React.FC<SummaryProps> = ({
           <p className="dark:text-neutral-content">Total staked</p>
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
-            <p className="font-semibold whitespace-nowrap">
+            <p className="whitespace-nowrap font-semibold">
               {totalStakedSat
                 ? maxDecimals(satoshiToBtc(totalStakedSat), 8)
                 : 0}{" "}
@@ -36,7 +36,7 @@ export const Summary: React.FC<SummaryProps> = ({
           <p className="dark:text-neutral-content">Balance</p>
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
-            <p className="font-semibold whitespace-nowrap">
+            <p className="whitespace-nowrap font-semibold">
               {balanceSat ? maxDecimals(satoshiToBtc(balanceSat), 8) : 0} Signet
               BTC
             </p>
