@@ -23,7 +23,7 @@ export const getState = (state: string) => {
     case DelegationState.INTERMEDIATE_UNBONDING:
       return "Requesting Unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
-      return "Requesting Withdrawing";
+      return "Withdrawal Submitted";
     default:
       return "Unknown";
   }
@@ -52,7 +52,7 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.INTERMEDIATE_UNBONDING:
       return "Stake is requesting unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
-      return "Stake is requesting withdrawing";
+      return "Withdrawal transaction pending confirmation on Bitcoin";
     default:
       return "Unknown";
   }
