@@ -51,7 +51,7 @@ export class KeystoneWallet extends WalletProvider {
      * @throws An error if there is an issue reading the QR code or retrieving the extended public key.
      */
     connectWallet = async (): Promise<this> => {
-        const keystoneContainer = this.viewSdk.getSdk();
+        const keystoneContainer = await this.viewSdk.getSdk();
 
         // Initialize the Keystone container and read the QR code for sync keystone device with the staking app.
         const decodedResult = await keystoneContainer.read(
@@ -65,7 +65,7 @@ export class KeystoneWallet extends WalletProvider {
                     description: [
                         '1. Turn on your Keystone 3 with BTC only firmware.',
                         '2. Click connect software wallet and use "Sparrow" for connection.',
-                        '3. Press the "Scan Keystone" button and scan the QR Code displayed on your Keystone hardware wallet',
+                        '3. Press the "Sync Keystone" button and scan the QR Code displayed on your Keystone hardware wallet',
                         '4. The first Taproot address will be used for staking.'
                     ],
 
@@ -181,7 +181,7 @@ export class KeystoneWallet extends WalletProvider {
         // compose the signing process for the Keystone device
         const signPsbt = composeQRProcess(SupportedResult.UR_PSBT);
 
-        const keystoneContainer = this.viewSdk.getSdk();
+        const keystoneContainer = await this.viewSdk.getSdk();
         const signePsbtUR = await signPsbt(keystoneContainer, ur);
 
         // extract the signed PSBT from the UR

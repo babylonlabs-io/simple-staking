@@ -5,7 +5,7 @@ import { KeystoneWallet } from "./providers/keystone";
 import okxIcon from "./icons/okx.svg";
 import oneKeyIcon from "./icons/onekey.svg";
 import bitgetWalletIcon from "./icons/bitget-wallet.svg";
-import keystoneIcon from "./icons/keystone.png";
+import keystoneIcon from "./icons/keystone.svg";
 
 interface IntegratedWallet {
   name: string;
@@ -42,5 +42,7 @@ export const walletList: IntegratedWallet[] = [
     name: "Keystone",
     icon: keystoneIcon,
     wallet: KeystoneWallet,
+    linkToDocs: "https://www.keyst.one/btc-only",
+    isQRWallet: true
   },
 ];
