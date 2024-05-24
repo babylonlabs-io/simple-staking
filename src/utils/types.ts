@@ -9,5 +9,7 @@ declare global {
     keplr: any;
     okxwallet: any;
     tomo_btc: any;
+    $onekey: any;
+    bitkeep: any;
   }
 }
