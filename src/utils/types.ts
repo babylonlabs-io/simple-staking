@@ -8,6 +8,7 @@ declare global {
     btc: any;
     keplr: any;
     okxwallet: any;
+    $onekey: any;
     bitkeep: any;
   }
 }
