@@ -11,8 +11,16 @@ export class TomoWallet extends WalletProvider{
   }
 
   connectWallet = async (): Promise<this> => {
+    const workingVersion = "1.2.0"
     if (!window[tomoProvider]) {
       throw new Error("Tomo Wallet extension not found");
+    }
+
+    if (window[tomoProvider].getVersion) {
+      const version = await window[tomoProvider].getVersion();
+      if (version < workingVersion) {
+        throw new Error("Please update Tomo Wallet to the latest version");
+      }
     }
 
     let addresses = null;
