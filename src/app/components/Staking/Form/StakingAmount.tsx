@@ -87,12 +87,12 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     } else {
       setError("");
       onStakingAmountSatChange(satoshis);
-      setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
+      setValue(maxDecimals(satoshiToBtc(satoshis), 6).toString());
     }
   };
 
-  const minStakeAmount = maxDecimals(satoshiToBtc(minStakingAmountSat), 8);
-  const maxStakeAmount = maxDecimals(satoshiToBtc(maxStakingAmountSat), 8);
+  const minStakeAmount = maxDecimals(satoshiToBtc(minStakingAmountSat), 6);
+  const maxStakeAmount = maxDecimals(satoshiToBtc(maxStakingAmountSat), 6);
   return (
     <label className="form-control w-full flex-1">
       <div className="label pt-0">

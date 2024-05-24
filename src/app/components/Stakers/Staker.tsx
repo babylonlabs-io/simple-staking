@@ -32,7 +32,7 @@ export const Staker: React.FC<StakerProps> = ({
           <p className="text-xs lg:hidden dark:text-neutral-content">Stake</p>
           <p>
             {activeTVLSat
-              ? `${maxDecimals(satoshiToBtc(activeTVLSat), 8)} Signet BTC`
+              ? `${maxDecimals(satoshiToBtc(activeTVLSat), 6)} Signet BTC`
               : 0}
           </p>
         </div>
