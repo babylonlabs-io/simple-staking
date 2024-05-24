@@ -59,7 +59,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 6)} Signet BTC`}</p>
+            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} Signet BTC`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">

@@ -41,7 +41,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             <FaBitcoin className="text-primary" />
             <p>
               <strong>
-                {maxDecimals(satoshiToBtc(balanceSat), 6) || 0} BTC
+                {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} BTC
               </strong>
             </p>
           </div>
