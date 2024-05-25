@@ -38,7 +38,7 @@ export const walletList: IntegratedWallet[] = [
     icon: oneKeyIcon,
     wallet: OneKeyWallet,
     provider: oneKeyProvider,
-    linkToDocs: 'https://onekey.so/download'  
+    linkToDocs: "https://onekey.so/download",
   },
   {
     name: "Bitget Wallet",
@@ -52,6 +52,6 @@ export const walletList: IntegratedWallet[] = [
     icon: keystoneIcon,
     wallet: KeystoneWallet,
     linkToDocs: "https://www.keyst.one/btc-only",
-    isQRWallet: true
+    isQRWallet: true,
   },
 ];
