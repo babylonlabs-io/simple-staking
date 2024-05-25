@@ -342,20 +342,23 @@ export const Delegations: React.FC<DelegationsProps> = ({
     );
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
-  // Combine the delegations from the API and local storage
+  // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-  ? [
-      ...delegationsAPI,
-      ...delegationsLocalStorage.filter(
-        (localDelegation) =>
-          !delegationsAPI.find(
-            (apiDelegation) =>
-              apiDelegation.stakingTxHashHex ===
-              localDelegation.stakingTxHashHex,
-          ),
-      ),
-    ]
-  : delegationsLocalStorage;
+    ? [
+        ...delegationsAPI,
+        // filter local storage delegations to EXCLUDE those already present in the API
+        ...delegationsLocalStorage.filter(
+          (localDelegation) =>
+            !delegationsAPI.find(
+              (apiDelegation) =>
+                // match delegations by their staking tx hash
+                apiDelegation.stakingTxHashHex ===
+                localDelegation.stakingTxHashHex,
+            ),
+        ),
+      ]
+    : // if no API data, fallback to using only local storage delegations
+      delegationsLocalStorage;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
