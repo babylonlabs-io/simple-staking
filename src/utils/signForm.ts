@@ -1,7 +1,7 @@
 import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { FinalityProvider } from "@/app/types/finalityProviders";
+import { GlobalParamsVersion } from "@/app/common/types/globalParams";
+import { FinalityProvider } from "@/app/common/types/finalityProviders";
 import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";

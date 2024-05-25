@@ -1,8 +1,8 @@
 import { encode } from "url-safe-base64";
 
 import { apiWrapper } from "./apiWrapper";
-import { Delegation } from "../types/delegations";
-import { Pagination } from "../types/api";
+import { Pagination } from "./types";
+import { Delegation } from "../components/Delegations/types";
 
 export interface PaginatedDelegations {
   delegations: Delegation[];

@@ -1,4 +1,4 @@
-import { Delegation } from "@/app/types/delegations";
+import { Delegation } from "@/app/components/Delegations/types";
 
 export const toLocalStorageIntermediateDelegation = (
   stakingTxHashHex: string,

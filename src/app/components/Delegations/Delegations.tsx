@@ -8,24 +8,18 @@ import {
 } from "btc-staking-ts";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import {
-  Delegation as DelegationInterface,
-  DelegationState,
-} from "@/app/types/delegations";
+import { Delegation as DelegationInterface, DelegationState } from "./types";
 import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getGlobalParams } from "@/app/api/getGlobalParams";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { GlobalParamsVersion } from "@/app/common/types/globalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import { QueryMeta } from "@/app/types/api";
-import {
-  LoadingTableList,
-} from "@/app/components/Loading/Loading";
+import { LoadingTableList } from "@/app/components/Loading/Loading";
 import {
   UnbondWithdrawModal,
   MODE,
@@ -33,9 +27,10 @@ import {
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorState } from "@/app/common/types/errors";
 import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
+import { QueryMeta } from "@/app/api/types";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;
@@ -46,7 +41,7 @@ interface DelegationsProps {
   unbondingFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
-  signPsbtTx: SignPsbtTransaction
+  signPsbtTx: SignPsbtTransaction;
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
 }
@@ -328,7 +323,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
-              intermediateDelegation?.stakingTxHashHex &&
+                intermediateDelegation?.stakingTxHashHex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),

@@ -4,7 +4,7 @@ import { IoMdClose } from "react-icons/io";
 import { format } from "date-fns";
 import { useTheme } from "next-themes";
 
-import { ErrorState, ShowErrorParams } from "@/app/types/errors";
+import { ErrorState, ShowErrorParams } from "@/app/common/types/errors";
 import { useError } from "@/app/context/Error/ErrorContext";
 
 interface ErrorModalProps {

@@ -1,4 +1,4 @@
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { GlobalParamsVersion } from "@/app/common/types/globalParams";
 
 export const getStakingTerm = (params: GlobalParamsVersion, term: number) => {
   // check if term is fixed

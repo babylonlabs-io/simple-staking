@@ -1,15 +1,14 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/common/types/finalityProviders";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { Delegation } from "@/app/types/delegations";
+import { GlobalParamsVersion } from "@/app/common/types/globalParams";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
@@ -20,8 +19,9 @@ import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorState } from "@/app/common/types/errors";
 import { STAKING_FEE_SAT } from "@/app/common/constants";
+import { Delegation } from "../Delegations/types";
 
 interface OverflowProperties {
   isOverTheCap: boolean;

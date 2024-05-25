@@ -2,12 +2,12 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import { IoIosWarning } from "react-icons/io";
 
-import { StakingTx, DelegationState } from "@/app/types/delegations";
 import { durationTillNow } from "@/utils/formatTime";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { DelegationState, StakingTx } from "./types";
 
 interface DelegationProps {
   finalityProviderMoniker: string;

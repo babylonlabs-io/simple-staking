@@ -3,7 +3,6 @@ import Image from "next/image";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-import { StakingStats } from "@/app/types/stakingStats";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import confirmedTvl from "./icons/confirmed-tvl.svg";
@@ -11,6 +10,7 @@ import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
+import { StakingStats } from "./types";
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;

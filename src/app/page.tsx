@@ -18,7 +18,6 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
-import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
 import { Delegations } from "./components/Delegations/Delegations";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
@@ -33,9 +32,10 @@ import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { useError } from "./context/Error/ErrorContext";
-import { ErrorHandlerParam, ErrorState } from "./types/errors";
+import { ErrorHandlerParam, ErrorState } from "./common/types/errors";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
+import { Delegation, DelegationState } from "./components/Delegations/types";
 
 interface HomeProps { }
 

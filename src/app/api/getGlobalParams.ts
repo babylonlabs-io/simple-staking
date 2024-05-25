@@ -1,7 +1,7 @@
 import { AxiosResponse } from "axios";
 
 import { apiWrapper } from "./apiWrapper";
-import { GlobalParamsVersion } from "../types/globalParams";
+import { GlobalParamsVersion } from "../common/types/globalParams";
 
 interface GlobalParamsDataResponse {
   versions: {

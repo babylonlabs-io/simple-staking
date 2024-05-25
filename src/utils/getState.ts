@@ -1,4 +1,4 @@
-import { DelegationState } from "@/app/types/delegations";
+import { DelegationState } from "@/app/components/Delegations/types";
 
 // Convert state to human readable format
 export const getState = (state: string) => {

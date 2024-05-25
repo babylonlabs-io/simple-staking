@@ -1,5 +1,5 @@
+import { StakingStats } from "../components/Stats/types";
 import { apiWrapper } from "./apiWrapper";
-import { StakingStats } from "../types/stakingStats";
 
 interface StatsAPIResponse {
   data: StatsAPI;
