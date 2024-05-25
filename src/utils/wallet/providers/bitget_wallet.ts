@@ -168,7 +168,7 @@ export class BitgetWallet extends WalletProvider {
     return await pushTx(txHex);
   };
 
-  getUtxos = async (address: string, amount: number): Promise<UTXO[]> => {
+  getUtxos = async (address: string, amount?: number): Promise<UTXO[]> => {
     return await getFundingUTXOs(address, amount);
   };
 

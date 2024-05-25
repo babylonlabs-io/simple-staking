@@ -32,7 +32,6 @@ import {
 } from "../Modals/UnbondWithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
-import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 
 interface DelegationsProps {
@@ -47,6 +46,7 @@ interface DelegationsProps {
   signPsbtTx: SignPsbtTransaction;
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
+  getNetworkFees: WalletProvider["getNetworkFees"];
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -61,6 +61,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   signPsbtTx,
   pushTx,
   queryMeta,
+  getNetworkFees,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -132,16 +133,19 @@ export const Delegations: React.FC<DelegationsProps> = ({
     } = data;
 
     // Create the unbonding transaction
-    const unsignedUnbondingTx = unbondingTransaction(
-      unbondingScript,
-      unbondingTimelockScript,
-      timelockScript,
-      slashingScript,
+    const { psbt: unsignedUnbondingTx } = unbondingTransaction(
+      {
+        unbondingScript,
+        unbondingTimelockScript,
+        timelockScript,
+        slashingScript,
+      },
       Transaction.fromHex(delegation.stakingTx.txHex),
       unbondingFeeSat,
       btcWalletNetwork,
       delegation.stakingTx.outputIndex,
     );
+
 
     // Sign the unbonding transaction
     let unbondingTx: Transaction;
@@ -213,7 +217,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Delegation not found");
     }
 
-    const paramVersions = await getGlobalParams();
+    const [paramVersions, fees] = await Promise.all([getGlobalParams(), getNetworkFees()]);
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
       getCurrentGlobalParamsVersion(
@@ -242,28 +246,32 @@ export const Delegations: React.FC<DelegationsProps> = ({
     } = data;
 
     // Create the withdrawal transaction
-    let unsignedWithdrawalTx;
+    let transactionResult;
     if (delegation?.unbondingTx) {
       // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
-      unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
-        unbondingTimelockScript,
-        slashingScript,
+      transactionResult = withdrawEarlyUnbondedTransaction(
+        {
+          unbondingTimelockScript,
+          slashingScript,
+        },
         Transaction.fromHex(delegation.unbondingTx.txHex),
         address,
-        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
+        fees.fastestFee,
         delegation.stakingTx.outputIndex,
       );
     } else {
       // Withdraw funds from a staking transaction in which the timelock naturally expired
-      unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
-        timelockScript,
-        slashingScript,
-        unbondingScript,
+      transactionResult = withdrawTimelockUnbondedTransaction(
+        {
+          timelockScript,
+          slashingScript,
+          unbondingScript,
+        },
         Transaction.fromHex(delegation.stakingTx.txHex),
         address,
-        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
+        fees.fastestFee,
         delegation.stakingTx.outputIndex,
       );
     }
@@ -271,7 +279,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // Sign the withdrawal transaction
     let withdrawalTransaction: Transaction;
     try {
-      withdrawalTransaction = await signPsbtTx(unsignedWithdrawalTx.toHex());
+      withdrawalTransaction = await signPsbtTx(transactionResult.psbt.toHex());
     } catch (error) {
       throw new Error("Failed to sign PSBT for the withdrawal transaction");
     }

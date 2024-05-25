@@ -79,7 +79,7 @@ export class OneKeyWallet extends WalletProvider {
     return window[oneKeyProvider].btcwallet.pushTx(txHex);
   }
 
-  async getUtxos(address: string, amount: number): Promise<UTXO[]> {
+  async getUtxos(address: string, amount?: number): Promise<UTXO[]> {
     // mempool call
     return getFundingUTXOs(address, amount);
   }

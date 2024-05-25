@@ -114,16 +114,16 @@ export async function getTipHeight(): Promise<number> {
 }
 
 /**
- * Retrieve a set of UTXOs that are available to an address and are enough to
- * fund a transaction with a total `amount` of Satoshis in its output. The UTXOs
- * are chosen based on descending amount order.
+ * Retrieve a set of UTXOs that are available to an address
+ * and satisfy the `amount` requirement if provided.
+ * The UTXOs are chosen based on descending amount order.
  * @param address - The Bitcoin address in string format.
  * @param amount - The amount we expect the resulting UTXOs to satisfy.
  * @returns A promise that resolves into a list of UTXOs.
  */
 export async function getFundingUTXOs(
   address: string,
-  amount: number,
+  amount?: number,
 ): Promise<UTXO[]> {
   // Get all UTXOs for the given address
 
@@ -144,19 +144,22 @@ export async function getFundingUTXOs(
     .filter((utxo: any) => utxo.status.confirmed)
     .sort((a: any, b: any) => b.value - a.value);
 
-  // Reduce the list of UTXOs into a list that contains just enough
-  // UTXOs to satisfy the `amount` requirement.
-  var sum = 0;
-  for (var i = 0; i < confirmedUTXOs.length; ++i) {
-    sum += confirmedUTXOs[i].value;
-    if (sum > amount) {
-      break;
+  // If amount is provided, reduce the list of UTXOs into a list that 
+  // contains just enough UTXOs to satisfy the `amount` requirement.
+  let sliced = confirmedUTXOs
+  if (amount) {
+    var sum = 0;
+    for (var i = 0; i < confirmedUTXOs.length; ++i) {
+      sum += confirmedUTXOs[i].value;
+      if (sum > amount) {
+        break;
+      }
     }
+    if (sum < amount) {
+      return [];
+    }
+    sliced = confirmedUTXOs.slice(0, i + 1);
   }
-  if (sum < amount) {
-    return [];
-  }
-  const sliced = confirmedUTXOs.slice(0, i + 1);
 
   // Iterate through the final list of UTXOs to construct the result list.
   // The result contains some extra information,

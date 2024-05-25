@@ -263,7 +263,7 @@ export class KeystoneWallet extends WalletProvider {
     return await pushTx(txHex);
   };
 
-  getUtxos = async (address: string, amount: number): Promise<UTXO[]> => {
+  getUtxos = async (address: string, amount?: number): Promise<UTXO[]> => {
     // mempool call
     return await getFundingUTXOs(address, amount);
   };
@@ -281,29 +281,29 @@ export class KeystoneWallet extends WalletProvider {
  */
 const composeQRProcess =
   (destinationDataType: SupportedResult) =>
-  async (container: SDK, ur: UR): Promise<UR> => {
-    // make the container play the UR in the QR code
-    const status: PlayStatus = await container.play(ur, {
-      title: "Scan the QR Code",
-      description: "Please scan the QR code with your Keystone device.",
-    });
+    async (container: SDK, ur: UR): Promise<UR> => {
+      // make the container play the UR in the QR code
+      const status: PlayStatus = await container.play(ur, {
+        title: "Scan the QR Code",
+        description: "Please scan the QR code with your Keystone device.",
+      });
 
-    // if the QR code is scanned successfully, read the result
-    if (status !== PlayStatus.success)
-      throw new Error("Could not generate the QR code, please try again.");
+      // if the QR code is scanned successfully, read the result
+      if (status !== PlayStatus.success)
+        throw new Error("Could not generate the QR code, please try again.");
 
-    let urResult = await container.read([destinationDataType], {
-      title: "Get the Signature from Keystone",
-      description: "Please scan the QR code displayed on your Keystone",
-      URTypeErrorMessage:
-        "The scanned QR code can't be read. please verify and try again.",
-    });
+      let urResult = await container.read([destinationDataType], {
+        title: "Get the Signature from Keystone",
+        description: "Please scan the QR code displayed on your Keystone",
+        URTypeErrorMessage:
+          "The scanned QR code can't be read. please verify and try again.",
+      });
 
-    // return the result if the QR code data(UR) of scanned successfully
-    if (urResult.status !== ReadStatus.success)
-      throw new Error("Could not extract the signature, please try again.");
-    return urResult.result;
-  };
+      // return the result if the QR code data(UR) of scanned successfully
+      if (urResult.status !== ReadStatus.success)
+        throw new Error("Could not extract the signature, please try again.");
+      return urResult.result;
+    };
 
 /**
  * Generates the p2tr Bitcoin address from an extended public key and a path.

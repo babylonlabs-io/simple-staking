@@ -125,7 +125,7 @@ export abstract class WalletProvider {
    * @param amount - The amount of funds required.
    * @returns A promise that resolves to an array of UTXOs.
    */
-  abstract getUtxos(address: string, amount: number): Promise<UTXO[]>;
+  abstract getUtxos(address: string, amount?: number): Promise<UTXO[]>;
 
   /**
    * Retrieves the tip height of the BTC chain.

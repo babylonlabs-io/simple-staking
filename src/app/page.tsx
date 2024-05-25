@@ -11,7 +11,7 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { Fees, WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import {
   getFinalityProviders,
@@ -406,6 +406,7 @@ const Home: React.FC<HomeProps> = () => {
                   hasMore: hasNextDelegationsPage,
                   isFetchingMore: isFetchingNextDelegationsPage,
                 }}
+                getNetworkFees={btcWallet.getNetworkFees}
               />
             )}
           {/* At this point of time is not used */}
