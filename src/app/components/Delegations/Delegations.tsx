@@ -154,7 +154,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
 
     // POST unbonding to the API
-    postUnbonding(
+    await postUnbonding(
       stakerSignature,
       delegation.stakingTxHashHex,
       unbondingTx.getId(),
@@ -344,8 +344,18 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
   // Combine the delegations from the API and local storage
   const combinedDelegationsData = delegationsAPI
-    ? [...delegationsLocalStorage, ...delegationsAPI]
-    : delegationsLocalStorage;
+  ? [
+      ...delegationsAPI,
+      ...delegationsLocalStorage.filter(
+        (localDelegation) =>
+          !delegationsAPI.find(
+            (apiDelegation) =>
+              apiDelegation.stakingTxHashHex ===
+              localDelegation.stakingTxHashHex,
+          ),
+      ),
+    ]
+  : delegationsLocalStorage;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
