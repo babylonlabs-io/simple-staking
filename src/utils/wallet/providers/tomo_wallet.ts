@@ -1,9 +1,21 @@
-import { getAddressBalance, getFundingUTXOs, getNetworkFees, getTipHeight, pushTx } from "@/utils/mempool_api";
-import { Fees, Network, UTXO, WalletInfo, WalletProvider } from "../wallet_provider";
+import {
+  getAddressBalance,
+  getFundingUTXOs,
+  getNetworkFees,
+  getTipHeight,
+  pushTx,
+} from "@/utils/mempool_api";
+import {
+  Fees,
+  Network,
+  UTXO,
+  WalletInfo,
+  WalletProvider,
+} from "../wallet_provider";
 
 export const tomoProvider = "tomo_btc";
 
-export class TomoWallet extends WalletProvider{
+export class TomoWallet extends WalletProvider {
   private tomoWalletInfo: WalletInfo | undefined;
 
   constructor() {
@@ -11,7 +23,7 @@ export class TomoWallet extends WalletProvider{
   }
 
   connectWallet = async (): Promise<this> => {
-    const workingVersion = "1.2.0"
+    const workingVersion = "1.2.0";
     if (!window[tomoProvider]) {
       throw new Error("Tomo Wallet extension not found");
     }
@@ -30,7 +42,7 @@ export class TomoWallet extends WalletProvider{
       addresses = await window[tomoProvider].connectWallet();
       pubKey = await window[tomoProvider].getPublicKey();
       if (!addresses || addresses.length === 0 || !pubKey) {
-        throw new Error("BTC is not enabled in Tomo Wallet")
+        throw new Error("BTC is not enabled in Tomo Wallet");
       }
     } catch (error) {
       throw new Error("BTC is not enabled in Tomo Wallet");
@@ -38,9 +50,9 @@ export class TomoWallet extends WalletProvider{
 
     this.tomoWalletInfo = {
       publicKeyHex: pubKey,
-      address: addresses[0]
-    }
-    return this
+      address: addresses[0],
+    };
+    return this;
   };
 
   getWalletProviderName = async (): Promise<string> => {
@@ -82,18 +94,15 @@ export class TomoWallet extends WalletProvider{
     if (!this.tomoWalletInfo) {
       throw new Error("Tomo Wallet not connected");
     }
-    return await window[tomoProvider]?.signMessage(
-      message,
-      "bip322-simple",
-    );
+    return await window[tomoProvider]?.signMessage(message, "bip322-simple");
   };
 
   getNetwork = async (): Promise<Network> => {
     let network = await window[tomoProvider]?.getNetwork();
-    if (network === 'mainnet') {
-      throw new Error("On mainnet now, please switch to signet in wallet")
+    if (network === "mainnet") {
+      throw new Error("On mainnet now, please switch to signet in wallet");
     }
-    return network
+    return network;
   };
 
   on = (eventName: string, callBack: () => void) => {

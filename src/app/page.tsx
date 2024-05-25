@@ -37,7 +37,7 @@ import { ErrorHandlerParam, ErrorState } from "./types/errors";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();

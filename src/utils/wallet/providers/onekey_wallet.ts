@@ -1,24 +1,30 @@
-import { Fees, Network, UTXO, WalletInfo, WalletProvider } from "../wallet_provider";
+import {
+  Fees,
+  Network,
+  UTXO,
+  WalletInfo,
+  WalletProvider,
+} from "../wallet_provider";
 import {
   getAddressBalance,
   getFundingUTXOs,
   getNetworkFees,
 } from "../../mempool_api";
 
-export const oneKeyProvider = '$onekey'
+export const oneKeyProvider = "$onekey";
 
 export class OneKeyWallet extends WalletProvider {
   private oneKeyWalletInfo: WalletInfo | undefined;
 
   async connectWallet(): Promise<this> {
     const self = await window[oneKeyProvider].btcwallet.connectWallet();
-    const address = await this.getAddress()
-    const publicKeyHex = await this.getPublicKeyHex()
+    const address = await this.getAddress();
+    const publicKeyHex = await this.getPublicKeyHex();
     this.oneKeyWalletInfo = {
       address,
-      publicKeyHex
-    }
-    return self
+      publicKeyHex,
+    };
+    return self;
   }
 
   async getWalletProviderName(): Promise<string> {
@@ -76,7 +82,7 @@ export class OneKeyWallet extends WalletProvider {
   async getUtxos(address: string, amount: number): Promise<UTXO[]> {
     // mempool call
     return getFundingUTXOs(address, amount);
-  };
+  }
 
   async getBTCTipHeight(): Promise<number> {
     return window[oneKeyProvider].btcwallet.getBTCTipHeight();

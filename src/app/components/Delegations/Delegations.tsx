@@ -23,9 +23,7 @@ import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLo
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { QueryMeta } from "@/app/types/api";
-import {
-  LoadingTableList,
-} from "@/app/components/Loading/Loading";
+import { LoadingTableList } from "@/app/components/Loading/Loading";
 import {
   UnbondWithdrawModal,
   MODE,
@@ -46,7 +44,7 @@ interface DelegationsProps {
   unbondingFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
-  signPsbtTx: SignPsbtTransaction
+  signPsbtTx: SignPsbtTransaction;
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
 }
@@ -328,7 +326,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
           !delegationsAPI?.find(
             (delegation) =>
               delegation?.stakingTxHashHex ===
-              intermediateDelegation?.stakingTxHashHex &&
+                intermediateDelegation?.stakingTxHashHex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),
