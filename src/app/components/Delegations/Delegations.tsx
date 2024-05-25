@@ -146,7 +146,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
       delegation.stakingTx.outputIndex,
     );
 
-
     // Sign the unbonding transaction
     let unbondingTx: Transaction;
     try {
@@ -217,7 +216,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Delegation not found");
     }
 
-    const [paramVersions, fees] = await Promise.all([getGlobalParams(), getNetworkFees()]);
+    const [paramVersions, fees] = await Promise.all([
+      getGlobalParams(),
+      getNetworkFees(),
+    ]);
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
       getCurrentGlobalParamsVersion(

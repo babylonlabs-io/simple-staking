@@ -144,9 +144,9 @@ export async function getFundingUTXOs(
     .filter((utxo: any) => utxo.status.confirmed)
     .sort((a: any, b: any) => b.value - a.value);
 
-  // If amount is provided, reduce the list of UTXOs into a list that 
+  // If amount is provided, reduce the list of UTXOs into a list that
   // contains just enough UTXOs to satisfy the `amount` requirement.
-  let sliced = confirmedUTXOs
+  let sliced = confirmedUTXOs;
   if (amount) {
     var sum = 0;
     for (var i = 0; i < confirmedUTXOs.length; ++i) {
