@@ -266,7 +266,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // Sign the withdrawal transaction
     let withdrawalTransaction: Transaction;
     try {
-      const { psbt } = withdrawPsbtTxResult
+      const { psbt } = withdrawPsbtTxResult;
       withdrawalTransaction = await signPsbtTx(psbt.toHex());
     } catch (error) {
       throw new Error("Failed to sign PSBT for the withdrawal transaction");

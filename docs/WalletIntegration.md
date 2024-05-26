@@ -147,7 +147,6 @@ export abstract class WalletProvider {
 
   /**
    * Retrieves the unspent transaction outputs (UTXOs) for a given address and amount.
-   * 
    * If the amount is provided, it will return UTXOs that cover the specified amount.
    * If the amount is not provided, it will return all available UTXOs for the address.
    *
