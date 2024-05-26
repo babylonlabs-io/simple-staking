@@ -344,19 +344,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-    ? [
-        ...delegationsAPI,
-        // filter local storage delegations to EXCLUDE those already present in the API
-        ...delegationsLocalStorage.filter(
-          (localDelegation) =>
-            !delegationsAPI.find(
-              (apiDelegation) =>
-                // match delegations by their staking tx hash
-                apiDelegation.stakingTxHashHex ===
-                localDelegation.stakingTxHashHex,
-            ),
-        ),
-      ]
+  ? [...delegationsLocalStorage, ...delegationsAPI]
     : // if no API data, fallback to using only local storage delegations
       delegationsLocalStorage;
 
