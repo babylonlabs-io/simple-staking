@@ -117,29 +117,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // Recreate the staking scripts
-    const data = apiDataToStakingScripts(
+    const scripts = apiDataToStakingScripts(
       delegation.finalityProviderPkHex,
       delegation.stakingTx.timelock,
       globalParamsWhenStaking,
       publicKeyNoCoord,
     );
 
-    // Destructure the staking scripts
-    const {
-      timelockScript,
-      slashingScript,
-      unbondingScript,
-      unbondingTimelockScript,
-    } = data;
-
     // Create the unbonding transaction
     const { psbt: unsignedUnbondingTx } = unbondingTransaction(
-      {
-        unbondingScript,
-        unbondingTimelockScript,
-        timelockScript,
-        slashingScript,
-      },
+      scripts,
       Transaction.fromHex(delegation.stakingTx.txHex),
       unbondingFeeSat,
       btcWalletNetwork,
@@ -232,20 +219,17 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // Recreate the staking scripts
-    const data = apiDataToStakingScripts(
-      delegation.finalityProviderPkHex,
-      delegation.stakingTx.timelock,
-      globalParamsWhenStaking,
-      publicKeyNoCoord,
-    );
-
-    // Destructure the staking scripts
     const {
       timelockScript,
       slashingScript,
       unbondingScript,
       unbondingTimelockScript,
-    } = data;
+    } = apiDataToStakingScripts(
+      delegation.finalityProviderPkHex,
+      delegation.stakingTx.timelock,
+      globalParamsWhenStaking,
+      publicKeyNoCoord,
+    );
 
     // Create the withdrawal transaction
     let transactionResult;
@@ -286,7 +270,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Failed to sign PSBT for the withdrawal transaction");
     }
     // Broadcast withdrawal transaction
-    const _txID = await pushTx(withdrawalTransaction.toHex());
+    await pushTx(withdrawalTransaction.toHex());
 
     // Update the local state with the new delegation
     setIntermediateDelegationsLocalStorage((delegations) => [

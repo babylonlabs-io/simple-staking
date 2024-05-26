@@ -56,7 +56,7 @@ export const signForm = async (
   } catch (error) {
     throw new Error("Cannot get network fees");
   }
-  let unsignedPsbt;
+  let unsignedStakingPsbt;
   try {
     const { psbt } = stakingTransaction(
       scripts,
@@ -72,7 +72,7 @@ export const signForm = async (
       // https://learnmeabitcoin.com/technical/transaction/locktime/
       params.activationHeight - 1,
     );
-    unsignedPsbt = psbt;
+    unsignedStakingPsbt = psbt;
   } catch (error: Error | any) {
     throw new Error(
       error?.message || "Cannot build unsigned staking transaction",
@@ -80,7 +80,9 @@ export const signForm = async (
   }
   let stakingTx: Transaction;
   try {
-    stakingTx = await signPsbtTransaction(btcWallet)(unsignedPsbt.toHex());
+    stakingTx = await signPsbtTransaction(btcWallet)(
+      unsignedStakingPsbt.toHex(),
+    );
   } catch (error: Error | any) {
     throw new Error(error?.message || "Staking transaction signing PSBT error");
   }
