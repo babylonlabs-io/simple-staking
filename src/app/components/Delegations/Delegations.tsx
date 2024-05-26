@@ -154,7 +154,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const stakerSignature = unbondingTx.ins[0].witness[0].toString("hex");
 
     // POST unbonding to the API
-    postUnbonding(
+    await postUnbonding(
       stakerSignature,
       delegation.stakingTxHashHex,
       unbondingTx.getId(),
@@ -320,32 +320,48 @@ export const Delegations: React.FC<DelegationsProps> = ({
     setModalMode(mode);
   };
 
-  // Remove the intermediate delegations that are already present in the API
   useEffect(() => {
     if (!delegationsAPI) {
       return;
     }
-
-    // check if delegationsAPI has status of unbonded or withdrawn
-    // if it does, remove the intermediate delegation from local storage
-    setIntermediateDelegationsLocalStorage((intermediateDelegations) =>
-      intermediateDelegations?.filter(
-        (intermediateDelegation) =>
-          !delegationsAPI?.find(
-            (delegation) =>
-              delegation?.stakingTxHashHex ===
-                intermediateDelegation?.stakingTxHashHex &&
-              (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
-                delegation?.state === DelegationState.WITHDRAWN),
-          ),
-      ),
-    );
+  
+    setIntermediateDelegationsLocalStorage((intermediateDelegations) => {
+      if (!intermediateDelegations) {
+        return [];
+      }
+  
+      return intermediateDelegations.filter((intermediateDelegation) => {
+        const matchingDelegation = delegationsAPI.find(
+          (delegation) => delegation?.stakingTxHashHex === intermediateDelegation?.stakingTxHashHex,
+        );
+  
+        if (!matchingDelegation) {
+          return true; // keep intermediate state if no matching state is found in the API
+        }
+  
+        // conditions based on intermediate states
+        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_UNBONDING) {
+          return !(
+            matchingDelegation.state === DelegationState.UNBONDING_REQUESTED ||
+            matchingDelegation.state === DelegationState.UNBONDING ||
+            matchingDelegation.state === DelegationState.UNBONDED
+          );
+        }
+  
+        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_WITHDRAWAL) {
+          return matchingDelegation.state !== DelegationState.WITHDRAWN;
+        }
+  
+        return true;
+      });
+    });
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
-  // Combine the delegations from the API and local storage
+  // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-    ? [...delegationsLocalStorage, ...delegationsAPI]
-    : delegationsLocalStorage;
+  ? [...delegationsLocalStorage, ...delegationsAPI]
+    : // if no API data, fallback to using only local storage delegations
+      delegationsLocalStorage;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
