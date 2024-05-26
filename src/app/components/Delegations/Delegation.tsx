@@ -8,6 +8,7 @@ import { getState, getStateTooltip } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { useEffect, useState } from "react";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
@@ -35,6 +36,15 @@ export const Delegation: React.FC<DelegationProps> = ({
   isOverflow,
 }) => {
   const { startTimestamp } = stakingTx;
+  const [ currentTime, setCurrentTime ] = useState(Date.now())
+
+  useEffect(() => {
+    const timerId = setInterval(() => {
+        setCurrentTime(Date.now());
+    }, 60000); // set the refresh interval to 60 seconds
+
+    return () => clearInterval(timerId);
+}, []);
 
   const generateActionButton = () => {
     // This function generates the unbond or withdraw button
@@ -108,7 +118,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
         <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} Signet BTC</p>
-        <p>{durationTillNow(startTimestamp)}</p>
+        <p>{durationTillNow(startTimestamp, currentTime)}</p>
         <div className="hidden justify-center lg:flex">
           <a
             href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
