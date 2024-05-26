@@ -115,7 +115,7 @@ export async function getTipHeight(): Promise<number> {
 
 /**
  * Retrieve a set of UTXOs that are available to an address
- * and satisfy the `amount` requirement if provided.
+ * and satisfy the `amount` requirement if provided. Otherwise, fetch all UTXOs.
  * The UTXOs are chosen based on descending amount order.
  * @param address - The Bitcoin address in string format.
  * @param amount - The amount we expect the resulting UTXOs to satisfy.
