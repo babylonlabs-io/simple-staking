@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
+import { useLocalStorage } from "usehooks-ts";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
@@ -22,6 +23,7 @@ import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { STAKING_FEE_SAT } from "@/app/common/constants";
+import { FeedbackModal } from "../Modals/FeedbackModal";
 
 interface OverflowProperties {
   isOverTheCap: boolean;
@@ -75,6 +77,14 @@ export const Staking: React.FC<StakingProps> = ({
     useState<FinalityProviderInterface>();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
+  const [feedbackModal, setFeedbackModal] = useState<{
+    type: "success" | "cancel" | null;
+    isOpen: boolean;
+  }>({ type: null, isOpen: false });
+  const [successFeedbackModalOpened, setSuccessFeedbackModalOpened] =
+    useLocalStorage<boolean>("successFeedbackModalOpened", false);
+  const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
+    useLocalStorage<boolean>("cancelFeedbackModalOpened", false);
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
@@ -123,6 +133,13 @@ export const Staking: React.FC<StakingProps> = ({
           STAKING_FEE_SAT,
           publicKeyNoCoord,
         );
+        if (
+          !feedbackModal.isOpen &&
+          feedbackModal.type !== "success" &&
+          !successFeedbackModalOpened
+        ) {
+          setFeedbackModal({ type: "success", isOpen: true });
+        }
       } catch (error: Error | any) {
         throw error;
       }
@@ -180,6 +197,26 @@ export const Staking: React.FC<StakingProps> = ({
 
   const handleStakingTimeBlocksChange = (inputTimeBlocks: number) => {
     setStakingTimeBlocks(inputTimeBlocks);
+  };
+
+  const handlePreviewModalClose = (isOpen: boolean) => {
+    setPreviewModalOpen(isOpen);
+    if (
+      !feedbackModal.isOpen &&
+      feedbackModal.type !== "cancel" &&
+      !cancelFeedbackModalOpened
+    ) {
+      setFeedbackModal({ type: "cancel", isOpen: true });
+    }
+  };
+
+  const handleCloseFeedbackModal = () => {
+    if (feedbackModal.type === "success") {
+      setSuccessFeedbackModalOpened(true);
+    } else if (feedbackModal.type === "cancel") {
+      setCancelFeedbackModalOpened(true);
+    }
+    setFeedbackModal({ type: null, isOpen: false });
   };
 
   const renderStakingForm = () => {
@@ -292,7 +329,7 @@ export const Staking: React.FC<StakingProps> = ({
             </button>
             <PreviewModal
               open={previewModalOpen}
-              onClose={setPreviewModalOpen}
+              onClose={handlePreviewModalClose}
               onSign={handleSign}
               finalityProvider={finalityProvider?.description.moniker}
               stakingAmountSat={stakingAmountSat}
@@ -325,6 +362,13 @@ export const Staking: React.FC<StakingProps> = ({
           {renderStakingForm()}
         </div>
       </div>
+      {feedbackModal.isOpen && (
+        <FeedbackModal
+          open={feedbackModal.isOpen}
+          onClose={handleCloseFeedbackModal}
+          type={feedbackModal.type}
+        />
+      )}
     </div>
   );
 };
