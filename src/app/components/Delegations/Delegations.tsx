@@ -320,28 +320,41 @@ export const Delegations: React.FC<DelegationsProps> = ({
     setModalMode(mode);
   };
 
-  // Remove the intermediate delegations that are already present in the API
   useEffect(() => {
     if (!delegationsAPI) {
       return;
     }
-
-    // check if delegationsAPI has status of unbonding_requested, unbonding, unbonded or withdrawn
-    // if it does, remove the intermediate delegation from local storage
-    setIntermediateDelegationsLocalStorage((intermediateDelegations) =>
-      intermediateDelegations?.filter(
-        (intermediateDelegation) =>
-          !delegationsAPI?.find(
-            (delegation) =>
-              delegation?.stakingTxHashHex ===
-                intermediateDelegation?.stakingTxHashHex &&
-              (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
-                delegation?.state === DelegationState.UNBONDING ||
-                delegation?.state === DelegationState.UNBONDED ||
-                delegation?.state === DelegationState.WITHDRAWN),
-          ),
-      ),
-    );
+  
+    setIntermediateDelegationsLocalStorage((intermediateDelegations) => {
+      if (!intermediateDelegations) {
+        return [];
+      }
+  
+      return intermediateDelegations.filter((intermediateDelegation) => {
+        const matchingDelegation = delegationsAPI.find(
+          (delegation) => delegation?.stakingTxHashHex === intermediateDelegation?.stakingTxHashHex,
+        );
+  
+        if (!matchingDelegation) {
+          return true; // keep intermediate state if no matching state is found in the API
+        }
+  
+        // conditions based on intermediate states
+        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_UNBONDING) {
+          return !(
+            matchingDelegation.state === DelegationState.UNBONDING_REQUESTED ||
+            matchingDelegation.state === DelegationState.UNBONDING ||
+            matchingDelegation.state === DelegationState.UNBONDED
+          );
+        }
+  
+        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_WITHDRAWAL) {
+          return matchingDelegation.state !== DelegationState.WITHDRAWN;
+        }
+  
+        return true;
+      });
+    });
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
   // combine delegations from the API and local storage, prioritizing API data
