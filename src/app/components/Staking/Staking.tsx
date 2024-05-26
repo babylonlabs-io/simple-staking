@@ -82,9 +82,9 @@ export const Staking: React.FC<StakingProps> = ({
     isOpen: boolean;
   }>({ type: null, isOpen: false });
   const [successFeedbackModalOpened, setSuccessFeedbackModalOpened] =
-    useLocalStorage<boolean>("successFeedbackModalOpened", false);
+    useLocalStorage<boolean>("bbn-staking-successFeedbackModalOpened", false);
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
-    useLocalStorage<boolean>("cancelFeedbackModalOpened", false);
+    useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
   const stakingParams = paramWithContext?.currentVersion;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
