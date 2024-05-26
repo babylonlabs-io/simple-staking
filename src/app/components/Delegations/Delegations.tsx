@@ -326,7 +326,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       return;
     }
 
-    // check if delegationsAPI has status of unbonded or withdrawn
+    // check if delegationsAPI has status of unbonding_requested, unbonding, unbonded or withdrawn
     // if it does, remove the intermediate delegation from local storage
     setIntermediateDelegationsLocalStorage((intermediateDelegations) =>
       intermediateDelegations?.filter(
@@ -336,6 +336,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
               delegation?.stakingTxHashHex ===
                 intermediateDelegation?.stakingTxHashHex &&
               (delegation?.state === DelegationState.UNBONDING_REQUESTED ||
+                delegation?.state === DelegationState.UNBONDING ||
+                delegation?.state === DelegationState.UNBONDED ||
                 delegation?.state === DelegationState.WITHDRAWN),
           ),
       ),
