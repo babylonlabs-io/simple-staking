@@ -13,6 +13,8 @@ export const getCurrentGlobalParamsVersion = (
     (a, b) => b.activationHeight - a.activationHeight,
   );
 
+  const firstActivationHeight = sorted[sorted.length - 1].activationHeight;
+
   for (let i = 0; i < sorted.length; i++) {
     const curr = sorted[i];
     let isApprochingNextVersion = false;
@@ -30,9 +32,14 @@ export const getCurrentGlobalParamsVersion = (
       return {
         currentVersion: curr,
         isApprochingNextVersion,
+        firstActivationHeight,
       };
     }
+    return {
+      currentVersion: undefined,
+      isApprochingNextVersion,
+      firstActivationHeight,
+    };
   }
-
   throw new Error("No global params version found");
 };

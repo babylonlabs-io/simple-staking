@@ -111,6 +111,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
         paramVersions,
       );
 
+    if (!globalParamsWhenStaking) {
+      throw new Error("Current version not found");
+    }
+
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
       delegation.finalityProviderPkHex,
@@ -216,6 +220,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
         delegation.stakingTx.startHeight,
         paramVersions,
       );
+
+    if (!globalParamsWhenStaking) {
+      throw new Error("Current version not found");
+    }
 
     // Recreate the staking scripts
     const data = apiDataToStakingScripts(
