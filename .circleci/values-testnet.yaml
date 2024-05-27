@@ -41,8 +41,8 @@ service:
 ingress:
   enabled: true
   tlsCertArn: arn:aws:acm:us-east-2:490721144737:certificate/2c6cb5ad-8899-4871-9206-ea8e978aebae
-  groupName: "testnet3-internal"
-  scheme: "internal"
+  groupName: "testnet3-public"
+  scheme: "internet-facing"
   hosts:
     - host: DASHBOARD_FQDN
       http:
