@@ -24,7 +24,11 @@ export interface UTXO {
 }
 
 // supported networks
-export type Network = "mainnet" | "testnet" | "regtest" | "signet";
+export enum Network {
+  MAINNET = "mainnet",
+  TESTNET = "testnet",
+  SIGNET = "signet",
+}
 
 // WalletInfo is a structure defining attributes for a wallet
 export type WalletInfo = {

@@ -1,6 +1,7 @@
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Hash } from "../Hash/Hash";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface StakerProps {
   pkHex: string;
@@ -13,6 +14,9 @@ export const Staker: React.FC<StakerProps> = ({
   delegations,
   activeTVLSat,
 }) => {
+
+  const { coinName } = getNetworkConfig();
+
   return (
     <div className="card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">
       <div className="mb-2 block lg:hidden">
@@ -32,7 +36,7 @@ export const Staker: React.FC<StakerProps> = ({
           <p className="text-xs lg:hidden dark:text-neutral-content">Stake</p>
           <p>
             {activeTVLSat
-              ? `${maxDecimals(satoshiToBtc(activeTVLSat), 8)} Signet BTC`
+              ? `${maxDecimals(satoshiToBtc(activeTVLSat), 8)} ${coinName}`
               : 0}
           </p>
         </div>

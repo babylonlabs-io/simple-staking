@@ -9,6 +9,7 @@ import { Tooltip } from "react-tooltip";
 
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface ConnectModalProps {
   open: boolean;
@@ -41,6 +42,8 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   // And whether or not it should be injected
   const BROWSER = "btcwallet";
   const isInjectable = !!window[BROWSER];
+
+  const { networkName } = getNetworkConfig();
 
   const handleConnect = async () => {
     if (selectedWallet) {
@@ -178,7 +181,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           disabled={connectDisabled || !accepted || !selectedWallet}
         >
           <PiWalletBold size={20} />
-          Connect to BTC signet network
+          Connect to {networkName} network
         </button>
       </div>
     </Modal>

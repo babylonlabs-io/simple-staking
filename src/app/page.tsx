@@ -11,8 +11,10 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import { Fees, WalletProvider } from "@/utils/wallet/wallet_provider";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { Network } from "@/utils/wallet/wallet_provider";
+
 import {
   getFinalityProviders,
   PaginatedFinalityProviders,
@@ -36,6 +38,7 @@ import { useError } from "./context/Error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
+import { network } from "@/config/network.config";
 
 interface HomeProps {}
 
@@ -342,7 +345,7 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   return (
-    <main className="main-app relative h-full min-h-svh w-full">
+    <main className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? 'main-app-mainnet' : 'main-app-testnet'}`}>
       <NetworkBadge />
       <Header
         onConnect={handleConnectModal}

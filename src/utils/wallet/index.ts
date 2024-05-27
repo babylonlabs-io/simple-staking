@@ -7,13 +7,11 @@ const taprootAddressLength = 62;
 
 export const toNetwork = (network: Network): networks.Network => {
   switch (network) {
-    case "mainnet":
+    case Network.MAINNET:
       return networks.bitcoin;
-    case "testnet":
-    case "signet":
+    case Network.TESTNET:
+    case Network.SIGNET:
       return networks.testnet;
-    case "regtest":
-      return networks.regtest;
     default:
       throw new Error("Unsupported network");
   }

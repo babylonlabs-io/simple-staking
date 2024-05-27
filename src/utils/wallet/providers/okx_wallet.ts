@@ -1,3 +1,4 @@
+import { network, validateAddress } from "@/config/network.config";
 import {
   WalletProvider,
   Network,
@@ -18,26 +19,31 @@ export const okxProvider = "okxwallet";
 
 export class OKXWallet extends WalletProvider {
   private okxWalletInfo: WalletInfo | undefined;
+  private okxWallet: any;
+  private bitcoinNetwork: any;
 
   constructor() {
     super();
-  }
-
-  connectWallet = async (): Promise<this> => {
-    const workingVersion = "2.83.26";
+    
     // check whether there is an OKX Wallet extension
     if (!window[okxProvider]) {
       throw new Error("OKX Wallet extension not found");
     }
+
+    this.okxWallet = window[okxProvider];
+    this.bitcoinNetwork = this.okxWallet?.bitcoinSignet;
+  }
+
+  connectWallet = async (): Promise<this> => {
+    const workingVersion = "2.83.26";
 
     const version = await window[okxProvider].getVersion();
     if (version < workingVersion) {
       throw new Error("Please update OKX Wallet to the latest version");
     }
 
-    const okxwallet = window[okxProvider];
     try {
-      await okxwallet.enable(); // Connect to OKX Wallet extension
+      await this.okxWallet.enable(); // Connect to OKX Wallet extension
     } catch (error) {
       if ((error as Error)?.message?.includes("rejected")) {
         throw new Error("Connection to OKX Wallet was rejected");
@@ -48,12 +54,14 @@ export class OKXWallet extends WalletProvider {
     let result = null;
     try {
       // this will not throw an error even if user has no BTC Signet enabled
-      result = await okxwallet?.bitcoinSignet?.connect();
+      result = await this.bitcoinNetwork.connect();
     } catch (error) {
       throw new Error("BTC Signet is not enabled in OKX Wallet");
     }
 
     const { address, compressedPublicKey } = result;
+
+    validateAddress(network, address)
 
     if (compressedPublicKey && address) {
       this.okxWalletInfo = {
@@ -97,21 +105,21 @@ export class OKXWallet extends WalletProvider {
       throw new Error("OKX Wallet not connected");
     }
     // sign the PSBTs
-    return await window[okxProvider]?.bitcoinSignet?.signPsbts(psbtsHexes);
+    return await this.bitcoinNetwork.signPsbts(psbtsHexes);
   };
 
   signMessageBIP322 = async (message: string): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
-    return await window[okxProvider].bitcoinSignet?.signMessage(
+    return await this.bitcoinNetwork?.signMessage(
       message,
       "bip322-simple",
     );
   };
 
   getNetwork = async (): Promise<Network> => {
-    return "testnet";
+    return Network.SIGNET;
   };
 
   on = (eventName: string, callBack: () => void) => {
@@ -120,7 +128,7 @@ export class OKXWallet extends WalletProvider {
     }
     // subscribe to account change event
     if (eventName === "accountChanged") {
-      return window[okxProvider].bitcoinSignet.on(eventName, callBack);
+      return this.okxWallet.on(eventName, callBack);
     }
   };
 
