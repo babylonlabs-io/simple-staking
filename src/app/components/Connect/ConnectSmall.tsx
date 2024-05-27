@@ -31,7 +31,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   const ref = useRef(null);
   useOnClickOutside(ref, handleClickOutside);
 
-  const { coinName, coinSymbol } = getNetworkConfig();
+  const { coinName, networkName } = getNetworkConfig();
 
   return address ? (
     <div className="relative mr-[-10px] flex text-sm" ref={ref}>
@@ -44,7 +44,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             <FaBitcoin className="text-primary" />
             <p>
               <strong>
-                {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} {coinSymbol}
+                {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} {coinName}
               </strong>
             </p>
           </div>
@@ -92,7 +92,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       disabled={!!address}
     >
       <PiWalletBold size={20} className="flex md:hidden" />
-      <span className="hidden md:flex">Connect to {coinName} network</span>
+      <span className="hidden md:flex">Connect to {networkName} network</span>
     </button>
   );
 };

@@ -5,18 +5,21 @@ const network = process.env.NEXT_PUBLIC_NETWORK as Network;
 interface NetworkConfig {
   coinName: string;
   coinSymbol: string;
+  networkName: string;
   mempoolApiUrl: string;
 }
 
 const mainnetConfig: NetworkConfig = {
   coinName: "BTC",
   coinSymbol: "BTC",
+  networkName: "BTC",
   mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}`,
 };
 
 const signetConfig: NetworkConfig = {
   coinName: "Signet BTC",
   coinSymbol: "sBTC",
+  networkName: "BTC signet",
   mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet`,
 };
 

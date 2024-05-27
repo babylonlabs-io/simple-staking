@@ -43,7 +43,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   const BROWSER = "btcwallet";
   const isInjectable = !!window[BROWSER];
 
-  const { coinName } = getNetworkConfig();
+  const { networkName } = getNetworkConfig();
 
   const handleConnect = async () => {
     if (selectedWallet) {
@@ -181,7 +181,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           disabled={connectDisabled || !accepted || !selectedWallet}
         >
           <PiWalletBold size={20} />
-          Connect to {coinName} network
+          Connect to {networkName} network
         </button>
       </div>
     </Modal>
