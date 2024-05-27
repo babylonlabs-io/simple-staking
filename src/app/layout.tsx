@@ -20,6 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <meta property="og:title" content="Babylon - Staking Dashboard" />
       <meta name="description" content="BTC Staking Dashboard" key="desc" />
       <meta property="og:description" content="BTC Staking Dashboard" />
