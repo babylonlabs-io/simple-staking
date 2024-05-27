@@ -11,7 +11,6 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { useEffect, useState } from "react";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 
 interface DelegationProps {
   finalityProviderMoniker: string;

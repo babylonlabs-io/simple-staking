@@ -52,7 +52,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         </div>
         <div className="flex items-center gap-1">
           <p className="hidden sm:flex lg:hidden">Delegation:</p>
-          <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} Signet BTC</p>
+          <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}</p>
           <span
             className="inline-flex cursor-pointer text-xs sm:hidden"
             data-tooltip-id={`tooltip-delegation-${pkHex}`}

@@ -1,4 +1,4 @@
-import { validAddress } from "@/config/network.config";
+import { validateAddress } from "@/config/network.config";
 import {
   WalletProvider,
   Network,
@@ -63,7 +63,7 @@ export class OKXWallet extends WalletProvider {
 
     const { address, compressedPublicKey } = result;
 
-    validAddress(network, address)
+    validateAddress(network, address)
 
     if (compressedPublicKey && address) {
       this.okxWalletInfo = {
