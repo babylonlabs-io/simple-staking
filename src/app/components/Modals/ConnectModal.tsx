@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { Modal } from "react-responsive-modal";
+import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import Image from "next/image";
@@ -9,6 +8,7 @@ import { Tooltip } from "react-tooltip";
 
 import { walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { GeneralModal } from "./GeneralModal";
 
 interface ConnectModalProps {
   open: boolean;
@@ -23,20 +23,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   onConnect,
   connectDisabled,
 }) => {
-  const modalRef = useRef(null);
   const [accepted, setAccepted] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    if (open) {
-      document.body.classList.add("modal-open");
-    } else {
-      document.body.classList.remove("modal-open");
-    }
-  }, [open]);
-
   // useEffect only runs on the client, so now we can safely show the UI
+  // this is needed for window object to be available
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -76,18 +68,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   };
 
   return (
-    <Modal
-      ref={modalRef}
-      open={open}
-      onClose={() => onClose(false)}
-      classNames={{
-        modalContainer: "flex items-end justify-center md:items-center",
-        modal:
-          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem] max-h-[85svh]",
-      }}
-      showCloseIcon={false}
-      blockScroll={false}
-    >
+    <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">Connect wallet</h3>
         <button
@@ -180,6 +161,6 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           Connect to BTC signet network
         </button>
       </div>
-    </Modal>
+    </GeneralModal>
   );
 };
