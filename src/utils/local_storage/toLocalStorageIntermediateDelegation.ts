@@ -8,6 +8,7 @@ export const toLocalStorageIntermediateDelegation = (
   stakingTxHex: string,
   timelock: number,
   state: string,
+  startHeight: number,
 ): Delegation => ({
   stakingTxHashHex,
   stakerPkHex,
@@ -18,7 +19,7 @@ export const toLocalStorageIntermediateDelegation = (
     txHex: stakingTxHex,
     outputIndex: 0,
     startTimestamp: new Date().toISOString(),
-    startHeight: 0,
+    startHeight,
     timelock,
   },
   isOverflow: false,

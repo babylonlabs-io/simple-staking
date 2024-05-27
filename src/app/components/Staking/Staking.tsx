@@ -45,8 +45,8 @@ interface StakingProps {
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
     | {
-        height: number | undefined;
-        firstActivationHeight: number | undefined;
+        height: number;
+        firstActivationHeight: number;
         currentVersion: GlobalParamsVersion | undefined;
         isApprochingNextVersion: boolean | undefined;
       }
@@ -160,6 +160,7 @@ export const Staking: React.FC<StakingProps> = ({
           stakingAmountSat,
           signedTxHex,
           stakingTerm,
+          height ? height : 0,
         ),
         ...delegations,
       ]);

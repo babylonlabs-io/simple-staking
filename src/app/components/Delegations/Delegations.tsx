@@ -162,6 +162,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         delegation.stakingTx.txHex,
         delegation.stakingTx.timelock,
         DelegationState.INTERMEDIATE_UNBONDING,
+        delegation.stakingTx.startHeight,
       ),
       ...delegations,
     ]);
@@ -284,6 +285,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         delegation.stakingTx.txHex,
         delegation.stakingTx.timelock,
         DelegationState.INTERMEDIATE_WITHDRAWAL,
+        delegation.stakingTx.startHeight
       ),
       ...delegations,
     ]);
