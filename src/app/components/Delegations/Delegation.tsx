@@ -25,7 +25,7 @@ interface DelegationProps {
   // has not had time to reflect this change yet
   intermediateState?: string;
   isOverflow: boolean;
-  globalParamsVersion: GlobalParamsVersion
+  globalParamsVersion: GlobalParamsVersion;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({

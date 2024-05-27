@@ -36,7 +36,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       className={`${generalStyles} ${selected ? "fp-selected" : ""}`}
       onClick={onClick}
     >
-      <div className="grid-cols-stakingFinalityProvidersMobile lg:grid-cols-stakingFinalityProvidersDesktop grid grid-rows-2 items-center gap-2 lg:grid-rows-1">
+      <div className="grid grid-cols-stakingFinalityProvidersMobile grid-rows-2 items-center gap-2 lg:grid-cols-stakingFinalityProvidersDesktop lg:grid-rows-1">
         <div>
           {moniker ? (
             <div className="flex items-center gap-1">

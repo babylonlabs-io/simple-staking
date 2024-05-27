@@ -86,7 +86,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
         <p>Browser</p>
       </button>
     );
-  }
+  };
 
   return (
     <Modal
