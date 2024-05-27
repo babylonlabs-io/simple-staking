@@ -9,6 +9,7 @@ import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { useEffect, useState } from "react";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
@@ -23,6 +24,7 @@ interface DelegationProps {
   // has not had time to reflect this change yet
   intermediateState?: string;
   isOverflow: boolean;
+  globalParamsVersion: GlobalParamsVersion
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
@@ -34,6 +36,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   onWithdraw,
   intermediateState,
   isOverflow,
+  globalParamsVersion,
 }) => {
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -98,11 +101,12 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const renderStateTooltip = () => {
+    const confirmationDepth = globalParamsVersion?.confirmationDepth;
     // overflow should be shown only on active state
     if (isOverflow && isActive) {
-      return getStateTooltip(DelegationState.OVERFLOW);
+      return getStateTooltip(DelegationState.OVERFLOW, confirmationDepth);
     } else {
-      return getStateTooltip(intermediateState || state);
+      return getStateTooltip(intermediateState || state, confirmationDepth);
     }
   };
 
