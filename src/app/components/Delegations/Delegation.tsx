@@ -9,6 +9,8 @@ import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { useEffect, useState } from "react";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
@@ -23,6 +25,7 @@ interface DelegationProps {
   // has not had time to reflect this change yet
   intermediateState?: string;
   isOverflow: boolean;
+  globalParamsVersion: GlobalParamsVersion
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
@@ -34,6 +37,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   onWithdraw,
   intermediateState,
   isOverflow,
+  globalParamsVersion,
 }) => {
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -98,13 +102,16 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const renderStateTooltip = () => {
+    const confirmationDepth = globalParamsVersion?.confirmationDepth;
     // overflow should be shown only on active state
     if (isOverflow && isActive) {
-      return getStateTooltip(DelegationState.OVERFLOW);
+      return getStateTooltip(DelegationState.OVERFLOW, confirmationDepth);
     } else {
-      return getStateTooltip(intermediateState || state);
+      return getStateTooltip(intermediateState || state, confirmationDepth);
     }
   };
+
+  const { coinName, mempoolApiUrl } = getNetworkConfig();
 
   return (
     <div
@@ -117,11 +124,11 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
-        <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} Signet BTC</p>
+        <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}</p>
         <p>{durationTillNow(startTimestamp, currentTime)}</p>
         <div className="hidden justify-center lg:flex">
           <a
-            href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
+            href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"

@@ -13,6 +13,8 @@ deployment:
       value: https://babylon.mempool.space
     - name: API_URL
       value: API_FQDN
+    - name: NETWORK
+      value: signet
   resources:
     requests:
       memory: 100Mi
@@ -65,4 +67,12 @@ externalDns:
   fqdn: DASHBOARD_FQDN
   ttl: 60
 purgeCloudflareCache:
-  enabled: false
+  enabled: true
+  image: 490721144737.dkr.ecr.us-east-1.amazonaws.com/infra-toolkit
+  version: v0.0.7
+  hosts:
+    - "https://$DASHBOARD_FQDN"
+encryptedConfig:
+  cloudflareApiKey: AgBnGZ+hi3nFWQRxqu3utitXDmaRdyY/sGwGfJ7Rpa/Sb2Tgl6WhVKjWbugagCnJECsrifPhCpxGJ1rCxScOEOZ30mletKXOPtzjxNLzC3wxX0R/lA9ZKwCzsHlL2Cn/dSg/rZN5N1EL2qEL0cZx3jN12ulYIDx9QJ78lFJw2FZpSJ/yRS8JzKFOXuLa2lsLtK+UWxHkW1B+0Ot7VimqqBDKh3gBWBFLYEP0EBJ/RPMtngnR7hE9thsr0/Ax1dWqe8ru++RME+xNLOJ9/2sTwwtA6qNObjSMERkjMcwpkxurdOqVSBKgDs/jPph4NYwTJMh82ZM2I5h/LaElDR7V4WibDIWV+A/V+CBG+c7YGpa7DU/R4iwzN2DntknAheDRq1P8RJdEKxaU1eFtfcQXcwgUe24mnm3ZS+ubWWEDC+cba0DVPxW0OlfhuK+xCo6r6tMHqt3D3oq6Ulwd/eT5JQFfA5DJfwPBG+l2jszhkZQ502ZNo5goHQZG0A/NwExfALOSl6q9v8EylMNoJKu6taEElwUd4c7t3CNrlbnOfVPY/C3klehzsidfm2KDKa33FeAABG10oWUVNihqSB2Dy3Nv7gct1pnvqAfr17RYnVR5YmMN2Hz0Fqm1zK+IC5mXSkc3+ChyLMQZEHRO2eQn0mp9z7XVG54KyOgicieowmoFUiIq3M6Osd2ZbFufST/9cvqk+A04EIB+frHYPsVdRdiS0SGVXr5jt48dXA6H8t586inV1WEI
+  cloudflareEmail: AgAOzSfPDy5xaGSGH2+fEYsavgEUzIzzu4pRMEaX+3/b1bt04q9DYhF9QVadq+qtZBufYIUUvq3S2T9qVzGaCyVBrdd1d/RpD6GRDyBXFjoA+gPx9xXrxi5gN116f/LkNEbpqw7KN+F5iCu8QXd4QNgxZRoKgY7C00+w52uoiRz04P+VoMR1DXQJ8VtsZqHr6sOAn7gfpoTN0ckeo+rn2BaU9E2aTQ78BI2ZA5r/V6u9CRA50VsYX0yGOuLBBSCHwFIul0DIKXVtefkP4CcpHjlYG4Q9eoPF80QmK7/d/I9VTlbLnXjyfnFNEZwWxeqA9mscKJvp8FAYEEW2kksHylPBHnw1VKqinx17gRyVO4ahbQPVNWvE7c+4hvp0tVapRoAs8I5tfp74bXFxluLYXV+OT7QUTv3P61SIZWPJ7yG57EQHugjwp9XNVes//Tam8eJlomXlCmv6FQozFPuL3FuesN7D2tN2THouAn5du1Uq7zVcuKd0kNw5VC4kie0IAL/xjdiR4E5BPlNFshYF+dpYzAmqGA5FF9yJp4Y6tHapnDWxn6uC6H5L/WvVQO00vYp81as/ukB6mqtdTUCYvIhAepC6Wj8avsvKg9AI/jdpj3WUHpB0GlZgTW4/FwmAKE+F8Qig3lSTGYLVkxT4AdZJTrN54z6YUjW6kQP1Q3YFdwcy1YNUMeV26mrhjfdJJsrnvuoJTZVShF5Kakh67QyET+a/ssGlh6Q=
+  cloudflareZoneId: AgCQtx3/mVYqGfJCxpXPoS8ypr+NczwnilvgDhuLz4GmUw11IyBaN/GuP+iCweFj2RSVFeLbvtikL2Tpbvio/+/IOBPeO086PiHmzKAbhC/HukhD/gTt/WlpPwSaaElnkNzDfniYeTg45KzryYneSwc/QZYUlf+fAiRByfvZeHySjL8xiBk/6qiK7jTt0WUxESuFd5F4bH9cqxDso5bALMpJ6BUPI0CX6EZAnq2pvXopM8vDBboGHd4DNq7JIgveBNkMw5x3AXeW7PJHHV7CS9k0VHk0PvRR/FdYYDyk0dAv1BcrRNw2hNJmLljo2plalks0AWSmubu8OMdfVEhYM3VMbjZovNNjUxZZtDcB+VZGUJETaj7dT0JFeMtt3aUuFEOwg5oMor7mxfpJIbj6fqq0PJ6LNBtjQ3LMsVcDpJ+7sbJ9lwDQefhSDJh0YM59i7orA6wjllvclAdAcUzlMA5d59ibqFczgFN6NE5HnpFejnjIUBOejwpdTdYkRKyt7LftpmUWcpvzuUDw+LPHxNb976YRdZ+VL2nAjBGU8NJ7xzVboAIRAGKIP3X5ZQR7tjowFS8jcN0DGM4j+RjE+pRL7PeeIVPBUMQIC/pCwU6hLKNN2nmpMEp5zruz6XFTYWzEWvVuey/sIchPo9oS7zIY5gKSsuBx1CrFucoc4WilxyLurSleGe49NnUAqTzJgn64NuocbymfsKpV40R85YKjUCrSIFajPUiYZM9rjjiTww==

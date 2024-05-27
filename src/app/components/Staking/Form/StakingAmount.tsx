@@ -2,7 +2,9 @@ import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
 
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+
 import { validateDecimalPoints } from "./validation/validation";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface StakingAmountProps {
   minStakingAmountSat: number;
@@ -26,6 +28,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 
   const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
+
+  const { coinName } = getNetworkConfig();
 
   // Use effect to reset the state when reset prop changes
   useEffect(() => {
@@ -71,11 +75,11 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       },
       {
         valid: satoshis >= minStakingAmountSat,
-        message: `${errorLabel} must be at least ${satoshiToBtc(minStakingAmountSat)} Signet BTC.`,
+        message: `${errorLabel} must be at least ${satoshiToBtc(minStakingAmountSat)} ${coinName}.`,
       },
       {
         valid: satoshis <= maxStakingAmountSat,
-        message: `${errorLabel} must be no more than ${satoshiToBtc(maxStakingAmountSat)} Signet BTC.`,
+        message: `${errorLabel} must be no more than ${satoshiToBtc(maxStakingAmountSat)} ${coinName}.`,
       },
       {
         valid: satoshis <= btcWalletBalanceSat,
@@ -107,8 +111,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       <div className="label pt-0">
         <span className="label-text-alt text-base">Amount</span>
         <span className="label-text-alt opacity-50">
-          min/max: {minStakeAmount}/{maxStakeAmount} Signet BTC
-        </span>
+          min/max: {minStakeAmount}/{maxStakeAmount} {coinName}</span>
       </div>
       <input
         type="string"
@@ -116,7 +119,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
-        placeholder="Signet BTC"
+        placeholder={coinName}
       />
       <div className="mb-2 mt-4 min-h-[20px]">
         <p className="text-center text-sm text-error">{error}</p>

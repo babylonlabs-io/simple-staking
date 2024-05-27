@@ -99,7 +99,7 @@ export class TomoWallet extends WalletProvider {
 
   getNetwork = async (): Promise<Network> => {
     let network = await window[tomoProvider]?.getNetwork();
-    if (network === "mainnet") {
+    if (network === Network.MAINNET) {
       throw new Error("On mainnet now, please switch to signet in wallet");
     }
     return network;

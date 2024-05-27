@@ -22,8 +22,8 @@ const config: Config = {
         "base-400": "hsl(var(--base-400) / <alpha-value>)",
       },
       gridTemplateColumns: {
-        finalityProviders: "2fr 1fr 1.75fr",
-        stakingFinalityProviders: "2fr 1.5fr 2fr 0.75fr",
+        stakingFinalityProvidersMobile: "2fr 1fr",
+        stakingFinalityProvidersDesktop: "2fr 1.5fr 2fr 0.75fr",
       },
     },
   },

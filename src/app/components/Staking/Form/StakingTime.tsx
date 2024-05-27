@@ -2,6 +2,8 @@ import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
+import { getNetworkConfig } from "@/config/network.config";
+
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;
@@ -23,6 +25,8 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
   const errorLabel = "Staking term";
   const generalErrorMessage = "You should input staking term";
+
+  const { coinName } = getNetworkConfig();
 
   // Use effect to reset the state when reset prop changes
   useEffect(() => {
@@ -96,11 +100,11 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
     return (
       <div className="card mb-2 bg-base-200 p-4">
         <p>
-          Your Signet BTC will be staked for a fixed term of{" "}
+          Your {coinName} will be staked for a fixed term of{" "}
           {blocksToWeeks(minStakingTimeBlocks, 5)}.
         </p>
         <p>
-          You can unbond and withdraw your Signet BTC anytime through this
+          You can unbond and withdraw your {coinName} anytime through this
           dashboard with an unbond time of 7 days.
         </p>
         <p>

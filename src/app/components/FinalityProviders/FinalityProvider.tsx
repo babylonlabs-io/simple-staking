@@ -7,6 +7,7 @@ import blue from "@/app/assets/blue-check.svg";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Hash } from "../Hash/Hash";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface FinalityProviderProps {
   pkHex: string;
@@ -43,6 +44,8 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
     );
   };
 
+  const { coinName } = getNetworkConfig();
+
   return (
     <div className="card grid grid-cols-2 gap-2 border bg-base-300 p-4 text-sm lg:grid-cols-finalityProviders dark:border-0 dark:bg-base-200">
       <div className="flex gap-2">
@@ -69,7 +72,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         <div className="flex gap-1 lg:hidden">
           {stakeSat ? (
             <>
-              <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} Signet BTC</p>
+              <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}</p>
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
@@ -80,7 +83,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="hidden gap-1 lg:flex">
         {stakeSat ? (
           <>
-            <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} Signet BTC</p>
+            <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}</p>
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (

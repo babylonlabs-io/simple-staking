@@ -16,8 +16,7 @@ const SuccessContent = () => {
         <p>
           Note that for your Bitcoin Stake to become Active it needs to be
           included in a Bitcoin block with sufficient confirmations. This might
-          take up to an hour and you can monitor the confirmations on this page,
-          so stay tuned!
+          take up to two hours, so stay tuned!
         </p>
         <p>
           Your participation is crucial to our testnet’s success. We invite you
@@ -28,7 +27,7 @@ const SuccessContent = () => {
         <p>
           Visit the{" "}
           <a
-            href="https://forum.babylonlabs.io/t/feedback-megathread/183"
+            href="https://forum.babylonlabs.io/c/testnet/41"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary"

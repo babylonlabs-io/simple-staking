@@ -4,6 +4,7 @@ import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { GeneralModal } from "./GeneralModal";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface PreviewModalProps {
   open: boolean;
@@ -24,6 +25,8 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 }) => {
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
+  
+  const { coinName } = getNetworkConfig();
 
   return (
     <GeneralModal open={open} onClose={onClose}>
@@ -46,7 +49,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
-            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} Signet BTC`}</p>
+            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
@@ -68,7 +71,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           So please stake wisely.
         </p>
         <p className="dark:text-neutral-content">
-          2. No third party possesses your staked Signet BTC. You are the only
+          2. No third party possesses your staked {coinName}. You are the only
           one who can unbond and withdraw your stake.
         </p>
         <div className="flex gap-4">
