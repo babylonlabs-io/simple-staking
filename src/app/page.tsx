@@ -11,8 +11,10 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { isMainnet } from "@/config/network.config";
+
 import {
   getFinalityProviders,
   PaginatedFinalityProviders,
@@ -46,8 +48,6 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-  const network = process.env.NEXT_PUBLIC_NETWORK as Network;
-  const isMainnet = network === Network.MAINNET;
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
   const {

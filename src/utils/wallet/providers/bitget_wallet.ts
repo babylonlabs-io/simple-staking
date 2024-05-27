@@ -13,9 +13,7 @@ import {
   getNetworkFees,
   pushTx,
 } from "../../mempool_api";
-
-const network = process.env.NEXT_PUBLIC_NETWORK as Network;
-const isMainnet = network === Network.MAINNET;
+import { isMainnet } from "@/config/network.config";
 
 // window object for Bitget Wallet extension
 export const bitgetWalletProvider = "bitkeep";
@@ -36,9 +34,7 @@ export class BitgetWallet extends WalletProvider {
     try {
       await this.provider?.requestAccounts(); // Connect to Bitget Wallet extension
 
-      isMainnet ?
-        await this.provider?.switchNetwork("livenet") :
-        await this.provider?.switchNetwork("signet");
+      await this.provider?.switchNetwork("signet");
       
     } catch (error) {
       if ((error as Error)?.message?.includes("rejected")) {

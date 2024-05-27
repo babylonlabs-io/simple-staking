@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 import testnetIcon from "./testnet-icon.png";
-import { Network } from "@/utils/wallet/wallet_provider";
+import { isMainnet } from "@/config/network.config";
 
 // This component can also be used rendering based on the network type
 interface NetworkBadgeProps {}
@@ -10,8 +10,7 @@ export const NetworkBadge: React.FC<NetworkBadgeProps> = () => {
   return (
     <div className="absolute left-2 top-[6rem]">
       {
-        process.env.NEXT_PUBLIC_NETWORK === Network.TESTNET ||
-        process.env.NEXT_PUBLIC_NETWORK === Network.SIGNET &&
+        !isMainnet &&
         <>
           <Image src={testnetIcon} alt="Testnet" className="w-[10rem]" />
           {/* 

@@ -1,3 +1,4 @@
+import { isMainnet, validAddress } from "@/config/network.config";
 import {
   WalletProvider,
   Network,
@@ -14,7 +15,6 @@ import {
 } from "../../mempool_api";
 
 const network = process.env.NEXT_PUBLIC_NETWORK as Network;
-const isMainnet = network === Network.MAINNET;
 
 // window object for OKX Wallet extension
 export const okxProvider = "okxwallet";
@@ -33,9 +33,7 @@ export class OKXWallet extends WalletProvider {
     }
 
     this.okxWallet = window[okxProvider];
-    this.bitcoinNetwork = isMainnet
-      ? this.okxWallet?.bitcoin
-      : this.okxWallet?.bitcoinSignet;
+    this.bitcoinNetwork = this.okxWallet?.bitcoinSignet;
   }
 
   connectWallet = async (): Promise<this> => {
@@ -65,15 +63,7 @@ export class OKXWallet extends WalletProvider {
 
     const { address, compressedPublicKey } = result;
 
-    if (isMainnet && !address.startsWith("bc1")) {
-      throw new Error(
-        "Incorrect address prefix for Mainnet. Expected address to start with 'bc1'.",
-      );
-    } else if (!isMainnet && !address.startsWith("tb1")) {
-      throw new Error(
-        "Incorrect address prefix for Testnet. Expected address to start with 'tb1'.",
-      );
-    }
+    validAddress(network, address)
 
     if (compressedPublicKey && address) {
       this.okxWalletInfo = {
