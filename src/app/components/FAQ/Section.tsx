@@ -28,9 +28,8 @@ export const Section: React.FC<SectionProps> = ({ title, content }) => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="mt-4"
-          >
-            {content}
-          </motion.p>
+            dangerouslySetInnerHTML={{ __html: content }}
+          />
         )}
       </AnimatePresence>
     </div>
