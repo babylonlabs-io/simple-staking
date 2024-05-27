@@ -1,10 +1,9 @@
-import { useRef } from "react";
-import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
 
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { GeneralModal } from "./GeneralModal";
 
 interface PreviewModalProps {
   open: boolean;
@@ -23,23 +22,11 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   stakingTimeBlocks,
   onSign,
 }) => {
-  const modalRef = useRef(null);
-
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
 
-  return open ? (
-    <Modal
-      ref={modalRef}
-      open={open}
-      onClose={() => onClose(false)}
-      classNames={{
-        modalContainer: "flex items-end justify-center md:items-center",
-        modal:
-          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem]",
-      }}
-      showCloseIcon={false}
-    >
+  return (
+    <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">Preview</h3>
         <button
@@ -98,6 +85,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </button>
         </div>
       </div>
-    </Modal>
-  ) : null;
+    </GeneralModal>
+  );
 };

@@ -1,4 +1,4 @@
-import { useRef, ReactNode, useEffect, useState } from "react";
+import { useRef, ReactNode, useEffect } from "react";
 import { Modal } from "react-responsive-modal";
 
 interface GeneralModalProps {
@@ -13,7 +13,6 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   children,
 }) => {
   const modalRef = useRef(null);
-  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     if (open) {
@@ -22,15 +21,6 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       document.body.classList.remove("modal-open");
     }
   }, [open]);
-
-  // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return null;
-  }
 
   return (
     <Modal
