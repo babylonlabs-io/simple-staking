@@ -1,4 +1,4 @@
-import { validateAddress } from "@/config/network.config";
+import { network, validateAddress } from "@/config/network.config";
 import {
   WalletProvider,
   Network,
@@ -13,8 +13,6 @@ import {
   getNetworkFees,
   pushTx,
 } from "../../mempool_api";
-
-const network = process.env.NEXT_PUBLIC_NETWORK as Network;
 
 // window object for OKX Wallet extension
 export const okxProvider = "okxwallet";
