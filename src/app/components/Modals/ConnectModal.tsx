@@ -7,7 +7,7 @@ import { FaWallet } from "react-icons/fa";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-import { walletList } from "@/utils/wallet/list";
+import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 interface ConnectModalProps {
@@ -67,6 +67,24 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
     }
   };
 
+  const buildInjectableWallet = (shouldDisplay: boolean) => {
+    if (!shouldDisplay) {
+      return null;
+    }
+
+    return (
+      <button
+        className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
+        onClick={() => setSelectedWallet(BROWSER)}
+      >
+        <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2 text-black">
+          <FaWallet size={26} />
+        </div>
+        <p>Browser</p>
+      </button>
+    );
+  }
+
   return (
     <Modal
       ref={modalRef}
@@ -116,6 +134,9 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           <div className="grid max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
             {walletList.map(
               ({ provider, name, linkToDocs, icon, isQRWallet }) => {
+                if (name === BROWSER_INJECTED_WALLET_NAME) {
+                  return buildInjectableWallet(isInjectable);
+                }
                 const walletAvailable = isQRWallet || !!window[provider as any];
                 return (
                   <a
@@ -148,17 +169,6 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                   </a>
                 );
               },
-            )}
-            {isInjectable && (
-              <button
-                className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
-                onClick={() => setSelectedWallet(BROWSER)}
-              >
-                <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2 text-black">
-                  <FaWallet size={26} />
-                </div>
-                <p>Browser</p>
-              </button>
             )}
           </div>
         </div>
