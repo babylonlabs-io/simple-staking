@@ -28,7 +28,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
     if (small) {
       return "md:max-w-[25rem]";
     } else {
-      return "md:max-w-[45rem] lg:max-w-[55rem] max-h-[85svh]";
+      return "md:max-w-[45rem] lg:max-w-[55rem]";
     }
   };
 
@@ -39,7 +39,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       onClose={() => onClose(false)}
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
-        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl ${getSize()}`,
+        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[85svh] ${getSize()}`,
       }}
       showCloseIcon={false}
       blockScroll={false}
