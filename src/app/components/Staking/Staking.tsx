@@ -88,7 +88,7 @@ export const Staking: React.FC<StakingProps> = ({
 
   const stakingParams = paramWithContext?.currentVersion;
   const firstActivationHeight = paramWithContext?.firstActivationHeight;
-  const height = paramWithContext?.height;
+  const height = paramWithContext ? paramWithContext.height : 0;
   const isUpgrading = paramWithContext?.isApprochingNextVersion;
   const isBlockHeightUnderActivation =
     !stakingParams ||
@@ -160,7 +160,7 @@ export const Staking: React.FC<StakingProps> = ({
           stakingAmountSat,
           signedTxHex,
           stakingTerm,
-          height ? height : 0,
+          height,
         ),
         ...delegations,
       ]);
