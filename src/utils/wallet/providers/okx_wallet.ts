@@ -1,4 +1,4 @@
-import { isMainnet, validAddress } from "@/config/network.config";
+import { validAddress } from "@/config/network.config";
 import {
   WalletProvider,
   Network,
@@ -121,7 +121,7 @@ export class OKXWallet extends WalletProvider {
   };
 
   getNetwork = async (): Promise<Network> => {
-    return Network.TESTNET;
+    return Network.SIGNET;
   };
 
   on = (eventName: string, callBack: () => void) => {

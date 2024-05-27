@@ -27,7 +27,6 @@ export interface UTXO {
 export enum Network {
   MAINNET = "mainnet",
   TESTNET = "testnet",
-  REGTEST = "regtest",
   SIGNET = "signet",
 }
 

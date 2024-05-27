@@ -13,7 +13,6 @@ import {
   getNetworkFees,
   pushTx,
 } from "../../mempool_api";
-import { isMainnet } from "@/config/network.config";
 
 // window object for Bitget Wallet extension
 export const bitgetWalletProvider = "bitkeep";

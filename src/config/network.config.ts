@@ -1,6 +1,6 @@
 import { Network } from "@/utils/wallet/wallet_provider";
 
-const network = process.env.NEXT_PUBLIC_NETWORK as Network;
+export const network = process.env.NEXT_PUBLIC_NETWORK as Network;
 
 interface NetworkConfig {
   coinName: string;
@@ -23,17 +23,25 @@ const signetConfig: NetworkConfig = {
   mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet`,
 };
 
+const testnetConfig: NetworkConfig = {
+  coinName: "Testnet BTC",
+  coinSymbol: "tBTC",
+  networkName: "BTC testnet",
+  mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}/testnet`,
+};
+
 const config: Record<string, NetworkConfig> = {
   mainnet: mainnetConfig,
-  testnet: signetConfig,
+  signet: signetConfig,
+  testnet: testnetConfig,
 };
 
 export function getNetworkConfig(): NetworkConfig {
   switch (network) {
     case Network.MAINNET:
       return config.mainnet;
-    case Network.REGTEST:
     case Network.SIGNET:
+      return config.signet;
     case Network.TESTNET:
       return config.testnet;
     default:
@@ -41,18 +49,16 @@ export function getNetworkConfig(): NetworkConfig {
   }
 }
 
-export const isMainnet = network === Network.MAINNET;
-
 export function validAddress(network: Network, address: string): void {
-  if (isMainnet && !address.startsWith("bc1")) {
+  if (network === Network.MAINNET && !address.startsWith("bc1")) {
     throw new Error(
       "Incorrect address prefix for Mainnet. Expected address to start with 'bc1'.",
     );
-  } else if (!isMainnet && !address.startsWith("tb1")) {
+  } else if (![Network.SIGNET, Network.TESTNET].includes(network) && !address.startsWith("tb1")) {
     throw new Error(
-      "Incorrect address prefix for Testnet. Expected address to start with 'tb1'.",
+      "Incorrect address prefix for Testnet / Signet. Expected address to start with 'tb1'.",
     );
-  } else if (!isMainnet && ![Network.REGTEST, Network.SIGNET, Network.TESTNET].includes(network)) {
+  } else if (![Network.MAINNET, Network.SIGNET, Network.TESTNET].includes(network)) {
     throw new Error(
       `Unsupported network: ${network}. Please provide a valid network.`,
     );
