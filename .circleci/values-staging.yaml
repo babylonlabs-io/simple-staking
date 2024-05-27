@@ -13,6 +13,8 @@ deployment:
       value: https://babylon.mempool.space
     - name: API_URL
       value: API_STAGING_FQDN
+    - name: NETWORK
+      value: signet
   resources:
     requests:
       memory: 100Mi
