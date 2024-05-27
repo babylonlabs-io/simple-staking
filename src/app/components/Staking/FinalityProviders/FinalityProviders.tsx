@@ -42,7 +42,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         </a>
         .
       </p>
-      <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProviders">
+      <div className="lg:grid-cols-stakingFinalityProvidersDesktop hidden gap-2 px-4 lg:grid">
         <p>Finality Provider</p>
         <p>BTC PK</p>
         <p>Total Delegation</p>
