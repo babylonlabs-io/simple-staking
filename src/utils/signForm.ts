@@ -1,4 +1,4 @@
-import { Psbt, Transaction, networks } from "bitcoinjs-lib";
+import { Transaction, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { FinalityProvider } from "@/app/types/finalityProviders";
@@ -15,7 +15,6 @@ export const signForm = async (
   btcWalletNetwork: networks.Network,
   stakingAmountSat: number,
   address: string,
-  stakingFeeSat: number,
   publicKeyNoCoord: string,
 ): Promise<string> => {
   if (
@@ -31,10 +30,7 @@ export const signForm = async (
 
   let inputUTXOs = [];
   try {
-    inputUTXOs = await btcWallet.getUtxos(
-      address,
-      stakingAmountSat + stakingFeeSat,
-    );
+    inputUTXOs = await btcWallet.getUtxos(address);
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
   }
@@ -53,30 +49,30 @@ export const signForm = async (
   } catch (error: Error | any) {
     throw new Error(error?.message || "Cannot build staking scripts");
   }
-
-  const timelockScript = scripts.timelockScript;
-  const dataEmbedScript = scripts.dataEmbedScript;
-  const unbondingScript = scripts.unbondingScript;
-  const slashingScript = scripts.slashingScript;
-  let unsignedStakingTx;
+  let feeRate: number;
   try {
-    unsignedStakingTx = stakingTransaction(
-      timelockScript,
-      unbondingScript,
-      slashingScript,
+    const netWorkFee = await btcWallet.getNetworkFees();
+    feeRate = netWorkFee.fastestFee;
+  } catch (error) {
+    throw new Error("Cannot get network fees");
+  }
+  let unsignedStakingPsbt;
+  try {
+    const { psbt } = stakingTransaction(
+      scripts,
       stakingAmountSat,
-      stakingFeeSat,
       address,
       inputUTXOs,
       btcWalletNetwork,
+      feeRate,
       isTaproot(address) ? Buffer.from(publicKeyNoCoord, "hex") : undefined,
-      dataEmbedScript,
       // `lockHeight` is exclusive of the provided value.
       // For example, if a Bitcoin height of X is provided,
       // the transaction will be included starting from height X+1.
       // https://learnmeabitcoin.com/technical/transaction/locktime/
       params.activationHeight - 1,
     );
+    unsignedStakingPsbt = psbt;
   } catch (error: Error | any) {
     throw new Error(
       error?.message || "Cannot build unsigned staking transaction",
@@ -84,7 +80,9 @@ export const signForm = async (
   }
   let stakingTx: Transaction;
   try {
-    stakingTx = await signPsbtTransaction(btcWallet)(unsignedStakingTx.toHex());
+    stakingTx = await signPsbtTransaction(btcWallet)(
+      unsignedStakingPsbt.toHex(),
+    );
   } catch (error: Error | any) {
     throw new Error(error?.message || "Staking transaction signing PSBT error");
   }

@@ -121,11 +121,15 @@ export abstract class WalletProvider {
 
   /**
    * Retrieves the unspent transaction outputs (UTXOs) for a given address and amount.
+   *
+   * If the amount is provided, it will return UTXOs that cover the specified amount.
+   * If the amount is not provided, it will return all available UTXOs for the address.
+   *
    * @param address - The address to retrieve UTXOs for.
-   * @param amount - The amount of funds required.
+   * @param amount - Optional amount of funds required.
    * @returns A promise that resolves to an array of UTXOs.
    */
-  abstract getUtxos(address: string, amount: number): Promise<UTXO[]>;
+  abstract getUtxos(address: string, amount?: number): Promise<UTXO[]>;
 
   /**
    * Retrieves the tip height of the BTC chain.

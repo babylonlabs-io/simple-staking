@@ -263,7 +263,7 @@ export class KeystoneWallet extends WalletProvider {
     return await pushTx(txHex);
   };
 
-  getUtxos = async (address: string, amount: number): Promise<UTXO[]> => {
+  getUtxos = async (address: string, amount?: number): Promise<UTXO[]> => {
     // mempool call
     return await getFundingUTXOs(address, amount);
   };

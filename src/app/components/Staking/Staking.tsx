@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -22,7 +22,6 @@ import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
-import { STAKING_FEE_SAT } from "@/app/common/constants";
 import { FeedbackModal } from "../Modals/FeedbackModal";
 
 interface OverflowProperties {
@@ -132,7 +131,6 @@ export const Staking: React.FC<StakingProps> = ({
           btcWalletNetwork,
           stakingAmountSat,
           address,
-          STAKING_FEE_SAT,
           publicKeyNoCoord,
         );
         if (

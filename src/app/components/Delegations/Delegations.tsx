@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { Transaction, networks } from "bitcoinjs-lib";
 import {
+  PsbtTransactionResult,
   unbondingTransaction,
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
@@ -32,7 +33,6 @@ import {
 } from "../Modals/UnbondWithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
-import { WITHDRAWAL_FEE_SAT } from "@/app/common/constants";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 
 interface DelegationsProps {
@@ -47,6 +47,7 @@ interface DelegationsProps {
   signPsbtTx: SignPsbtTransaction;
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
+  getNetworkFees: WalletProvider["getNetworkFees"];
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -61,6 +62,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   signPsbtTx,
   pushTx,
   queryMeta,
+  getNetworkFees,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -116,27 +118,16 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // Recreate the staking scripts
-    const data = apiDataToStakingScripts(
+    const scripts = apiDataToStakingScripts(
       delegation.finalityProviderPkHex,
       delegation.stakingTx.timelock,
       globalParamsWhenStaking,
       publicKeyNoCoord,
     );
 
-    // Destructure the staking scripts
-    const {
-      timelockScript,
-      slashingScript,
-      unbondingScript,
-      unbondingTimelockScript,
-    } = data;
-
     // Create the unbonding transaction
-    const unsignedUnbondingTx = unbondingTransaction(
-      unbondingScript,
-      unbondingTimelockScript,
-      timelockScript,
-      slashingScript,
+    const { psbt: unsignedUnbondingTx } = unbondingTransaction(
+      scripts,
       Transaction.fromHex(delegation.stakingTx.txHex),
       unbondingFeeSat,
       btcWalletNetwork,
@@ -213,7 +204,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
       throw new Error("Delegation not found");
     }
 
-    const paramVersions = await getGlobalParams();
+    const [paramVersions, fees] = await Promise.all([
+      getGlobalParams(),
+      getNetworkFees(),
+    ]);
     // State of global params when the staking transaction was submitted
     const { currentVersion: globalParamsWhenStaking } =
       getCurrentGlobalParamsVersion(
@@ -226,44 +220,45 @@ export const Delegations: React.FC<DelegationsProps> = ({
     }
 
     // Recreate the staking scripts
-    const data = apiDataToStakingScripts(
+    const {
+      timelockScript,
+      slashingScript,
+      unbondingScript,
+      unbondingTimelockScript,
+    } = apiDataToStakingScripts(
       delegation.finalityProviderPkHex,
       delegation.stakingTx.timelock,
       globalParamsWhenStaking,
       publicKeyNoCoord,
     );
 
-    // Destructure the staking scripts
-    const {
-      timelockScript,
-      slashingScript,
-      unbondingScript,
-      unbondingTimelockScript,
-    } = data;
-
     // Create the withdrawal transaction
-    let unsignedWithdrawalTx;
+    let withdrawPsbtTxResult: PsbtTransactionResult;
     if (delegation?.unbondingTx) {
       // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
-      unsignedWithdrawalTx = withdrawEarlyUnbondedTransaction(
-        unbondingTimelockScript,
-        slashingScript,
+      withdrawPsbtTxResult = withdrawEarlyUnbondedTransaction(
+        {
+          unbondingTimelockScript,
+          slashingScript,
+        },
         Transaction.fromHex(delegation.unbondingTx.txHex),
         address,
-        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
+        fees.fastestFee,
         delegation.stakingTx.outputIndex,
       );
     } else {
       // Withdraw funds from a staking transaction in which the timelock naturally expired
-      unsignedWithdrawalTx = withdrawTimelockUnbondedTransaction(
-        timelockScript,
-        slashingScript,
-        unbondingScript,
+      withdrawPsbtTxResult = withdrawTimelockUnbondedTransaction(
+        {
+          timelockScript,
+          slashingScript,
+          unbondingScript,
+        },
         Transaction.fromHex(delegation.stakingTx.txHex),
         address,
-        WITHDRAWAL_FEE_SAT,
         btcWalletNetwork,
+        fees.fastestFee,
         delegation.stakingTx.outputIndex,
       );
     }
@@ -271,12 +266,13 @@ export const Delegations: React.FC<DelegationsProps> = ({
     // Sign the withdrawal transaction
     let withdrawalTransaction: Transaction;
     try {
-      withdrawalTransaction = await signPsbtTx(unsignedWithdrawalTx.toHex());
+      const { psbt } = withdrawPsbtTxResult;
+      withdrawalTransaction = await signPsbtTx(psbt.toHex());
     } catch (error) {
       throw new Error("Failed to sign PSBT for the withdrawal transaction");
     }
     // Broadcast withdrawal transaction
-    const _txID = await pushTx(withdrawalTransaction.toHex());
+    await pushTx(withdrawalTransaction.toHex());
 
     // Update the local state with the new delegation
     setIntermediateDelegationsLocalStorage((delegations) => [
@@ -324,34 +320,42 @@ export const Delegations: React.FC<DelegationsProps> = ({
     if (!delegationsAPI) {
       return;
     }
-  
+
     setIntermediateDelegationsLocalStorage((intermediateDelegations) => {
       if (!intermediateDelegations) {
         return [];
       }
-  
+
       return intermediateDelegations.filter((intermediateDelegation) => {
         const matchingDelegation = delegationsAPI.find(
-          (delegation) => delegation?.stakingTxHashHex === intermediateDelegation?.stakingTxHashHex,
+          (delegation) =>
+            delegation?.stakingTxHashHex ===
+            intermediateDelegation?.stakingTxHashHex,
         );
-  
+
         if (!matchingDelegation) {
           return true; // keep intermediate state if no matching state is found in the API
         }
-  
+
         // conditions based on intermediate states
-        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_UNBONDING) {
+        if (
+          intermediateDelegation.state ===
+          DelegationState.INTERMEDIATE_UNBONDING
+        ) {
           return !(
             matchingDelegation.state === DelegationState.UNBONDING_REQUESTED ||
             matchingDelegation.state === DelegationState.UNBONDING ||
             matchingDelegation.state === DelegationState.UNBONDED
           );
         }
-  
-        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_WITHDRAWAL) {
+
+        if (
+          intermediateDelegation.state ===
+          DelegationState.INTERMEDIATE_WITHDRAWAL
+        ) {
           return matchingDelegation.state !== DelegationState.WITHDRAWN;
         }
-  
+
         return true;
       });
     });
@@ -359,7 +363,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-  ? [...delegationsLocalStorage, ...delegationsAPI]
+    ? [...delegationsLocalStorage, ...delegationsAPI]
     : // if no API data, fallback to using only local storage delegations
       delegationsLocalStorage;
 
