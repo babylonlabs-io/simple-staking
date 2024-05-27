@@ -40,8 +40,7 @@ export const Summary: React.FC<SummaryProps> = ({
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="whitespace-nowrap font-semibold">
-              {balanceSat ? maxDecimals(satoshiToBtc(balanceSat), 8) : 0} Signet
-              BTC
+              {balanceSat ? maxDecimals(satoshiToBtc(balanceSat), 8) : 0} {coinName}
             </p>
           </div>
           <p className="hidden xl:flex xl:text-sm 2xl:ml-2">{trim(address)}</p>
