@@ -4,6 +4,7 @@ import { Modal } from "react-responsive-modal";
 interface GeneralModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
+  small?: boolean;
   children: ReactNode;
 }
 
@@ -11,6 +12,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   open,
   onClose,
   children,
+  small,
 }) => {
   const modalRef = useRef(null);
 
@@ -22,6 +24,14 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
     }
   }, [open]);
 
+  const getSize = () => {
+    if (small) {
+      return "md:max-w-[25rem]";
+    } else {
+      return "md:max-w-[45rem] lg:max-w-[55rem] max-h-[85svh]";
+    }
+  };
+
   return (
     <Modal
       ref={modalRef}
@@ -29,8 +39,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       onClose={() => onClose(false)}
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
-        modal:
-          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem] max-h-[85svh]",
+        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl ${getSize()}`,
       }}
       showCloseIcon={false}
       blockScroll={false}

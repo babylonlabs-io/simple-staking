@@ -1,6 +1,6 @@
-import { useRef } from "react";
-import { Modal } from "react-responsive-modal";
 import { IoMdClose } from "react-icons/io";
+
+import { GeneralModal } from "./GeneralModal";
 
 export const MODE_UNBOND = "unbond";
 export const MODE_WITHDRAW = "withdraw";
@@ -19,8 +19,6 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onProceed,
   mode,
 }) => {
-  const modalRef = useRef(null);
-
   const unbondTitle = "Unbond";
   const unbondContent = (
     <>
@@ -39,17 +37,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const content = mode === MODE_UNBOND ? unbondContent : withdrawContent;
 
   return (
-    <Modal
-      ref={modalRef}
-      open={open}
-      onClose={() => onClose(false)}
-      classNames={{
-        modalContainer: "flex items-end justify-center md:items-center",
-        modal:
-          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[24rem] md:rounded-b-2xl",
-      }}
-      showCloseIcon={false}
-    >
+    <GeneralModal open={open} onClose={onClose} small>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>
         <button
@@ -81,6 +69,6 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
           </button>
         </div>
       </div>
-    </Modal>
+    </GeneralModal>
   );
 };
