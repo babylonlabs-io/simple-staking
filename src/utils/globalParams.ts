@@ -35,11 +35,10 @@ export const getCurrentGlobalParamsVersion = (
         firstActivationHeight,
       };
     }
-    return {
-      currentVersion: undefined,
-      isApprochingNextVersion,
-      firstActivationHeight,
-    };
   }
-  throw new Error("No global params version found");
+  return {
+    currentVersion: undefined,
+    isApprochingNextVersion: false,
+    firstActivationHeight,
+  };
 };
