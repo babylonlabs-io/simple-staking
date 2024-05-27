@@ -31,7 +31,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   const ref = useRef(null);
   useOnClickOutside(ref, handleClickOutside);
 
-  const { coinSymbol, coinName } = getNetworkConfig();
+  const { coinName, coinSymbol } = getNetworkConfig();
 
   return address ? (
     <div className="relative mr-[-10px] flex text-sm" ref={ref}>

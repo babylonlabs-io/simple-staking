@@ -1,7 +1,7 @@
 import { getNetworkConfig } from "@/config/network.config";
 import { Fees, UTXO } from "./wallet/wallet_provider";
 
-const { explorerUrl } = getNetworkConfig();
+const { mempoolApiUrl } = getNetworkConfig();
 
 /*
     URL Construction methods
@@ -9,7 +9,7 @@ const { explorerUrl } = getNetworkConfig();
 // The base URL for the signet API
 // Utilises an environment variable specifying the mempool API we intend to
 // utilise
-const mempoolAPI = `${explorerUrl}/api/`;
+const mempoolAPI = `${mempoolApiUrl}/api/`;
 
 // URL for the address info endpoint
 function addressInfoUrl(address: string): URL {

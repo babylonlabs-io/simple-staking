@@ -112,7 +112,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     }
   };
 
-  const { coinName, explorerUrl } = getNetworkConfig();
+  const { coinName, mempoolApiUrl } = getNetworkConfig();
 
   return (
     <div
@@ -129,7 +129,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         <p>{durationTillNow(startTimestamp, currentTime)}</p>
         <div className="hidden justify-center lg:flex">
           <a
-            href={`${explorerUrl}/tx/${stakingTxHash}`}
+            href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
