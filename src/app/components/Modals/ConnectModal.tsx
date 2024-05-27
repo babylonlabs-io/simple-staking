@@ -28,6 +28,14 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   const [selectedWallet, setSelectedWallet] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
+  useEffect(() => {
+    if (open) {
+      document.body.classList.add("modal-open");
+    } else {
+      document.body.classList.remove("modal-open");
+    }
+  }, [open]);
+
   // useEffect only runs on the client, so now we can safely show the UI
   useEffect(() => {
     setMounted(true);
@@ -75,9 +83,10 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
         modal:
-          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem]",
+          "m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:max-w-[45rem] md:rounded-b-2xl lg:max-w-[55rem] max-h-[85svh]",
       }}
       showCloseIcon={false}
+      blockScroll={false}
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">Connect wallet</h3>
