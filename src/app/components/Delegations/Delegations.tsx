@@ -436,7 +436,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         </>
       )}
 
-      {modalMode && txID && modalOpen && (
+      {modalMode && txID && (
         <UnbondWithdrawModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}

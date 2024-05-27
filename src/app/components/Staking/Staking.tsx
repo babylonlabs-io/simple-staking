@@ -362,13 +362,11 @@ export const Staking: React.FC<StakingProps> = ({
           {renderStakingForm()}
         </div>
       </div>
-      {feedbackModal.isOpen && (
-        <FeedbackModal
-          open={feedbackModal.isOpen}
-          onClose={handleCloseFeedbackModal}
-          type={feedbackModal.type}
-        />
-      )}
+      <FeedbackModal
+        open={feedbackModal.isOpen}
+        onClose={handleCloseFeedbackModal}
+        type={feedbackModal.type}
+      />
     </div>
   );
 };

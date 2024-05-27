@@ -104,3 +104,7 @@ input[type="number"] {
   background-color: #fff;
   color: #000;
 }
+
+body.modal-open {
+  overflow: hidden;
+}
