@@ -13,6 +13,9 @@ import {
   WalletProvider,
 } from "../wallet_provider";
 
+const network = process.env.NEXT_PUBLIC_NETWORK as Network;
+const isMainnet = network === Network.MAINNET;
+
 export const tomoProvider = "tomo_btc";
 
 export class TomoWallet extends WalletProvider {
@@ -99,9 +102,9 @@ export class TomoWallet extends WalletProvider {
 
   getNetwork = async (): Promise<Network> => {
     let network = await window[tomoProvider]?.getNetwork();
-    if (network === "mainnet") {
-      throw new Error("On mainnet now, please switch to signet in wallet");
-    }
+    // if (network === Network.MAINNET) {
+    //   throw new Error("On mainnet now, please switch to signet in wallet");
+    // }
     return network;
   };
 

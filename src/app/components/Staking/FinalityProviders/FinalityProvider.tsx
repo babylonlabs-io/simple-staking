@@ -6,6 +6,8 @@ import blue from "@/app/assets/blue-check.svg";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { getNetworkConfig } from "@/config/network.config";
+
 
 interface FinalityProviderProps {
   moniker: string;
@@ -26,6 +28,8 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
 }) => {
   const generalStyles =
     "card relative cursor-pointer border bg-base-300 p-4 text-sm transition-shadow hover:shadow-md dark:border-transparent dark:bg-base-200";
+  
+  const { coinName } = getNetworkConfig();
 
   return (
     <div

@@ -11,6 +11,8 @@ import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
+import { getNetworkConfig } from "@/config/network.config";
+
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;
@@ -28,26 +30,28 @@ export const Stats: React.FC<StatsProps> = ({
     maximumFractionDigits: 2,
   });
 
+  const { coinName } = getNetworkConfig();
+
   const sections = [
     [
       {
         title: "Staking TVL Cap",
         value: stakingCapSat
-          ? `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} Signet BTC`
+          ? `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`
           : "-",
         icon: stakingTvlCap,
       },
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 8)} Signet BTC`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 8)} ${coinName}`
           : 0,
         icon: confirmedTvl,
       },
       {
         title: "Pending Stake",
         value: stakingStats?.unconfirmedTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 8)} Signet BTC`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 8)} ${coinName}`
           : 0,
         icon: pendingStake,
       },

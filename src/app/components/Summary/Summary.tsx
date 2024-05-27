@@ -3,6 +3,8 @@ import { FaBitcoin } from "react-icons/fa";
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { getNetworkConfig } from "@/config/network.config";
+
 
 interface SummaryProps {
   address: string;
@@ -15,6 +17,7 @@ export const Summary: React.FC<SummaryProps> = ({
   totalStakedSat,
   balanceSat,
 }) => {
+  const { coinName } = getNetworkConfig();
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm xl:flex-row xl:items-center xl:justify-between xl:gap-4">
       <h3 className="mb-4 font-bold xl:mb-0">Your staking summary</h3>
@@ -27,7 +30,7 @@ export const Summary: React.FC<SummaryProps> = ({
               {totalStakedSat
                 ? maxDecimals(satoshiToBtc(totalStakedSat), 8)
                 : 0}{" "}
-              Signet BTC
+              {coinName}
             </p>
           </div>
         </div>

@@ -11,7 +11,7 @@ import {
   isSupportedAddressType,
   getPublicKeyNoCoord,
 } from "@/utils/wallet/index";
-import { Fees, WalletProvider } from "@/utils/wallet/wallet_provider";
+import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import {
   getFinalityProviders,
@@ -46,6 +46,8 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
+  const network = process.env.NEXT_PUBLIC_NETWORK as Network;
+  const isMainnet = network === Network.MAINNET;
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
   const {
@@ -342,7 +344,7 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   return (
-    <main className="main-app relative h-full min-h-svh w-full">
+    <main className={`relative h-full min-h-svh w-full ${isMainnet ? 'main-app-mainnet' : 'main-app-testnet'}`}>
       <NetworkBadge />
       <Header
         onConnect={handleConnectModal}

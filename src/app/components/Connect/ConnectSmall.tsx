@@ -8,6 +8,7 @@ import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Hash } from "../Hash/Hash";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface ConnectSmallProps {
   onConnect: () => void;
@@ -30,6 +31,8 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   const ref = useRef(null);
   useOnClickOutside(ref, handleClickOutside);
 
+  const { coinSymbol, coinName } = getNetworkConfig();
+
   return address ? (
     <div className="relative mr-[-10px] flex text-sm" ref={ref}>
       <button
@@ -41,7 +44,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             <FaBitcoin className="text-primary" />
             <p>
               <strong>
-                {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} BTC
+                {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} {coinSymbol}
               </strong>
             </p>
           </div>
@@ -89,7 +92,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       disabled={!!address}
     >
       <PiWalletBold size={20} className="flex md:hidden" />
-      <span className="hidden md:flex">Connect to BTC signet network</span>
+      <span className="hidden md:flex">Connect to {coinName} network</span>
     </button>
   );
 };

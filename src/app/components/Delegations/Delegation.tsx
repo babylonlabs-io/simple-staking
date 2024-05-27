@@ -10,6 +10,7 @@ import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { useEffect, useState } from "react";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
@@ -110,6 +111,8 @@ export const Delegation: React.FC<DelegationProps> = ({
     }
   };
 
+  const { coinName, explorerUrl } = getNetworkConfig();
+
   return (
     <div
       className={`card relative border bg-base-300 p-4 text-sm dark:bg-base-200 ${isOverflow ? "border-primary" : "dark:border-0"}`}
@@ -121,11 +124,11 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
-        <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} Signet BTC</p>
+        <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}</p>
         <p>{durationTillNow(startTimestamp, currentTime)}</p>
         <div className="hidden justify-center lg:flex">
           <a
-            href={`${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet/tx/${stakingTxHash}`}
+            href={`${explorerUrl}/tx/${stakingTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
