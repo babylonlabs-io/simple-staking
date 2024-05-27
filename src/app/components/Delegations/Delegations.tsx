@@ -328,7 +328,9 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
       return intermediateDelegations.filter((intermediateDelegation) => {
         const matchingDelegation = delegationsAPI.find(
-          (delegation) => delegation?.stakingTxHashHex === intermediateDelegation?.stakingTxHashHex,
+          (delegation) =>
+            delegation?.stakingTxHashHex ===
+            intermediateDelegation?.stakingTxHashHex,
         );
 
         if (!matchingDelegation) {
@@ -336,7 +338,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
         }
 
         // conditions based on intermediate states
-        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_UNBONDING) {
+        if (
+          intermediateDelegation.state ===
+          DelegationState.INTERMEDIATE_UNBONDING
+        ) {
           return !(
             matchingDelegation.state === DelegationState.UNBONDING_REQUESTED ||
             matchingDelegation.state === DelegationState.UNBONDING ||
@@ -344,7 +349,10 @@ export const Delegations: React.FC<DelegationsProps> = ({
           );
         }
 
-        if (intermediateDelegation.state === DelegationState.INTERMEDIATE_WITHDRAWAL) {
+        if (
+          intermediateDelegation.state ===
+          DelegationState.INTERMEDIATE_WITHDRAWAL
+        ) {
           return matchingDelegation.state !== DelegationState.WITHDRAWN;
         }
 
@@ -357,7 +365,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const combinedDelegationsData = delegationsAPI
     ? [...delegationsLocalStorage, ...delegationsAPI]
     : // if no API data, fallback to using only local storage delegations
-    delegationsLocalStorage;
+      delegationsLocalStorage;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">

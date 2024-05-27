@@ -36,15 +36,15 @@ export const Delegation: React.FC<DelegationProps> = ({
   isOverflow,
 }) => {
   const { startTimestamp } = stakingTx;
-  const [ currentTime, setCurrentTime ] = useState(Date.now())
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
   useEffect(() => {
     const timerId = setInterval(() => {
-        setCurrentTime(Date.now());
+      setCurrentTime(Date.now());
     }, 60000); // set the refresh interval to 60 seconds
 
     return () => clearInterval(timerId);
-}, []);
+  }, []);
 
   const generateActionButton = () => {
     // This function generates the unbond or withdraw button

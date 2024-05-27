@@ -44,13 +44,13 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-  | {
-    height: number | undefined;
-    firstActivationHeight: number | undefined;
-    currentVersion: GlobalParamsVersion | undefined;
-    isApprochingNextVersion: boolean | undefined;
-  }
-  | undefined;
+    | {
+        height: number | undefined;
+        firstActivationHeight: number | undefined;
+        currentVersion: GlobalParamsVersion | undefined;
+        isApprochingNextVersion: boolean | undefined;
+      }
+    | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({

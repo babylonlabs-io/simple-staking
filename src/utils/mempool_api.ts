@@ -13,11 +13,6 @@ function addressInfoUrl(address: string): URL {
   return new URL(mempoolAPI + "address/" + address);
 }
 
-// URL for the transactions info endpoint
-function txInfoUrl(txid: string): URL {
-  return new URL(mempoolAPI + "tx/" + txid);
-}
-
 // URL for the push transaction endpoint
 function pushTxUrl(): URL {
   return new URL(mempoolAPI + "tx");
@@ -36,6 +31,12 @@ function networkFeesUrl(): URL {
 // URL for retrieving the tip height of the BTC chain
 function btcTipHeightUrl(): URL {
   return new URL(mempoolAPI + "blocks/tip/height");
+}
+
+// URL for validating an address which contains a set of information about the address
+// including the scriptPubKey
+function validateAddressUrl(address: string): URL {
+  return new URL(mempoolAPI + "v1/validate-address/" + address);
 }
 
 /**
@@ -161,18 +162,21 @@ export async function getFundingUTXOs(
     sliced = confirmedUTXOs.slice(0, i + 1);
   }
 
+  const response = await fetch(validateAddressUrl(address));
+  const addressInfo = await response.json();
+  const { isvalid, scriptPubKey } = addressInfo;
+  if (!isvalid) {
+    throw new Error("Invalid address");
+  }
+
   // Iterate through the final list of UTXOs to construct the result list.
   // The result contains some extra information,
-  var result = [];
-  for (var i = 0; i < sliced.length; ++i) {
-    const response = await fetch(txInfoUrl(sliced[i].txid));
-    const transactionInfo = await response.json();
-    result.push({
-      txid: sliced[i].txid,
-      vout: sliced[i].vout,
-      value: sliced[i].value,
-      scriptPubKey: transactionInfo.vout[sliced[i].vout].scriptpubkey,
-    });
-  }
-  return result;
+  return sliced.map((s: any) => {
+    return {
+      txid: s.txid,
+      vout: s.vout,
+      value: s.value,
+      scriptPubKey: scriptPubKey,
+    };
+  });
 }
