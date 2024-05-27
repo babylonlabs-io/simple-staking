@@ -30,7 +30,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       className={`${generalStyles} ${selected ? "fp-selected" : ""}`}
       onClick={onClick}
     >
-      <div className="grid grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-cols-stakingFinalityProviders lg:grid-rows-1">
+      <div className="grid-cols-stakingFinalityProvidersMobile lg:grid-cols-stakingFinalityProvidersDesktop grid grid-rows-2 items-center gap-2 lg:grid-rows-1">
         <div>
           {moniker ? (
             <div className="flex items-center gap-1">
@@ -41,13 +41,15 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             "-"
           )}
         </div>
-        <Hash value={pkHex} address small noFade />
-        <div className="flex gap-1">
-          <p className="lg:hidden">Total Delegation:</p>
-          <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} Signet BTC</p>
+        <div className="flex justify-end lg:justify-start">
+          <Hash value={pkHex} address small noFade />
         </div>
         <div className="flex gap-1">
-          <p className="lg:hidden">Comission:</p>
+          <p className="hidden sm:flex lg:hidden">Delegation:</p>
+          <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} Signet BTC</p>
+        </div>
+        <div className="flex justify-end gap-1 lg:justify-start">
+          <p className="hidden sm:flex lg:hidden">Comission:</p>
           {maxDecimals(Number(comission) * 100, 2)}%
         </div>
       </div>
