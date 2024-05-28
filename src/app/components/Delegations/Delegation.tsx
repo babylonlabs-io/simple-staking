@@ -40,15 +40,15 @@ export const Delegation: React.FC<DelegationProps> = ({
   globalParamsVersion,
 }) => {
   const { startTimestamp } = stakingTx;
-  const [currentTime, setCurrentTime] = useState(Date.now());
+  // const [currentTime, setCurrentTime] = useState(Date.now());
 
-  useEffect(() => {
-    const timerId = setInterval(() => {
-      setCurrentTime(Date.now());
-    }, 60000); // set the refresh interval to 60 seconds
+  // useEffect(() => {
+  //   const timerId = setInterval(() => {
+  //     setCurrentTime(Date.now());
+  //   }, 60000); // set the refresh interval to 60 seconds
 
-    return () => clearInterval(timerId);
-  }, []);
+  //   return () => clearInterval(timerId);
+  // }, []);
 
   const generateActionButton = () => {
     // This function generates the unbond or withdraw button
@@ -125,7 +125,8 @@ export const Delegation: React.FC<DelegationProps> = ({
       )}
       <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
         <p>{maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}</p>
-        <p>{durationTillNow(startTimestamp, currentTime)}</p>
+        {/* <p>{durationTillNow(startTimestamp, currentTime)}</p> */}
+        <p>{durationTillNow(startTimestamp)}</p>
         <div className="hidden justify-center lg:flex">
           <a
             href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
