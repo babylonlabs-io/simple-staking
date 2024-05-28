@@ -77,6 +77,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
 
     return (
       <button
+        key={BROWSER}
         className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
         onClick={() => setSelectedWallet(BROWSER)}
       >
