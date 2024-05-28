@@ -34,7 +34,6 @@ export class BitgetWallet extends WalletProvider {
       await this.provider?.requestAccounts(); // Connect to Bitget Wallet extension
 
       await this.provider?.switchNetwork("signet");
-      
     } catch (error) {
       if ((error as Error)?.message?.includes("rejected")) {
         throw new Error("Connection to Bitget Wallet was rejected");

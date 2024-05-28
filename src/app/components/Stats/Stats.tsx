@@ -13,7 +13,6 @@ import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
 import { getNetworkConfig } from "@/config/network.config";
 
-
 interface StatsProps {
   stakingStats: StakingStats | undefined;
   isLoading: boolean;

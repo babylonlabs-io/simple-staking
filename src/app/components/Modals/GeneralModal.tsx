@@ -19,7 +19,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   useEffect(() => {
     if (open) {
       document.body.classList.add("modal-open");
-    } 
+    }
 
     return () => {
       document.body.classList.remove("modal-open");
