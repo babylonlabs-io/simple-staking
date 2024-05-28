@@ -173,6 +173,7 @@ workflows:
             branches:
               only:
                 - main
+                - fix-docker
       - push_docker:
           requires:
             - build_docker
