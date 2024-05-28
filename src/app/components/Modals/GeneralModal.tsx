@@ -22,6 +22,10 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
     } else {
       document.body.classList.remove("modal-open");
     }
+
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
   }, [open]);
 
   const getSize = () => {
