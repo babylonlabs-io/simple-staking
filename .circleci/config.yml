@@ -173,6 +173,7 @@ workflows:
             branches:
               only:
                 - main
+                - fix/hydration-fail
       - push_docker:
           requires:
             - build_docker
@@ -182,6 +183,7 @@ workflows:
             branches:
               only:
                 - main
+                - fix/hydration-fail
       - deploy_staging:
           requires:
             - push_docker
