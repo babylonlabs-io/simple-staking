@@ -183,6 +183,7 @@ workflows:
             branches:
               only:
                 - main
+                - fix-warning
       - deploy_staging:
           requires:
             - push_docker
@@ -190,6 +191,7 @@ workflows:
             branches:
               only:
                 - main
+                - fix-warning
       - require_approval_deploy:
           type: approval
           requires:
