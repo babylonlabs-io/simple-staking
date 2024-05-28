@@ -45,7 +45,7 @@ export function getNetworkConfig(): NetworkConfig {
     case Network.TESTNET:
       return config.testnet;
     default:
-      throw new Error(`Unsupported network: ${network}`);
+      return config.signet;
   }
 }
 
