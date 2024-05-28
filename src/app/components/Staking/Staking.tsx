@@ -44,13 +44,13 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-    | {
-        height: number | undefined;
-        firstActivationHeight: number | undefined;
-        currentVersion: GlobalParamsVersion | undefined;
-        isApprochingNextVersion: boolean | undefined;
-      }
-    | undefined;
+  | {
+    height: number | undefined;
+    firstActivationHeight: number | undefined;
+    currentVersion: GlobalParamsVersion | undefined;
+    isApprochingNextVersion: boolean | undefined;
+  }
+  | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -235,8 +235,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `The staking application will open once the next Bitcoin block height is the activation Bitcoin block height (${firstActivationHeight || "-"}).`,
-            `The next Bitcoin block height is ${height || "-"}.`,
+            `Staking will be activated at Signet BTC block height ${firstActivationHeight || "-"}. The current Signet BTC block height is ${height || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />

@@ -46,7 +46,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <p>Finality Provider</p>
         <p>BTC PK</p>
         <p>Total Delegation</p>
-        <p>Comission</p>
+        <p>Commission</p>
       </div>
       <div
         id="finality-providers"
