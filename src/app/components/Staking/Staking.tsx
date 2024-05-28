@@ -235,7 +235,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated at Signet BTC block height ${firstActivationHeight || "-"}. The current Signet BTC block height is ${height || "-"}.`,
+            `Staking will be activated at Signet BTC block height ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current Signet BTC block height is ${height || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
