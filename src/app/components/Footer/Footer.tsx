@@ -60,13 +60,13 @@ const iconLinks = [
 
 const textLinks = [
   {
-    name: "Term of Use",
+    name: "Terms of Use",
     url: "/babylonchain_terms_of_use.doc",
     isExternal: false,
   },
 ];
 
-interface FooterProps {}
+interface FooterProps { }
 
 export const Footer: React.FC<FooterProps> = () => {
   return (
