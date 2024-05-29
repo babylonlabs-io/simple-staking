@@ -365,7 +365,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const combinedDelegationsData = delegationsAPI
     ? [...delegationsLocalStorage, ...delegationsAPI]
     : // if no API data, fallback to using only local storage delegations
-    delegationsLocalStorage;
+      delegationsLocalStorage;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
