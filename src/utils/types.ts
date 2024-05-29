@@ -1,10 +1,8 @@
-import { WalletProvider } from "./wallet/wallet_provider";
-
 export {};
 
 declare global {
   interface Window {
-    btcwallet: WalletProvider;
+    btcwallet: any;
     btc: any;
     keplr: any;
     okxwallet: any;

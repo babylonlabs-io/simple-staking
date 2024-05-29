@@ -29,21 +29,41 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   const [selectedWallet, setSelectedWallet] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
-  // useEffect only runs on the client, so now we can safely show the UI
-  // this is needed for window object to be available
+  const [injectedWalletProviderName, setInjectedWalletProviderName] =
+    useState("Browser");
+  const [injectedWalletProviderIcon, setInjectedWalletProviderIcon] =
+    useState("");
+
+  // This constant is used to identify the browser wallet
+  // And whether or not it should be injected
+  const BROWSER = "btcwallet";
+
   useEffect(() => {
+    const fetchWalletProviderDetails = async () => {
+      // Check if the browser wallet is injectable
+      if (window[BROWSER]) {
+        // Get the name and icon of the injected wallet
+        const name =
+          window[BROWSER].getWalletProviderName &&
+          (await window[BROWSER].getWalletProviderName());
+        const icon =
+          window[BROWSER].getWalletProviderIcon &&
+          (await window[BROWSER].getWalletProviderIcon());
+        // Set the name and icon of the injected wallet if they exist
+        name && setInjectedWalletProviderName(`${name} (Browser)`);
+        icon && setInjectedWalletProviderIcon(icon);
+      }
+    };
+
     setMounted(true);
+    fetchWalletProviderDetails();
   }, []);
 
   if (!mounted) {
     return null;
   }
 
-  // This constant is used to identify the browser wallet
-  // And whether or not it should be injected
-  const BROWSER = "btcwallet";
   const isInjectable = !!window[BROWSER];
-
   const { networkName } = getNetworkConfig();
 
   const handleConnect = async () => {
@@ -83,9 +103,18 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
         onClick={() => setSelectedWallet(BROWSER)}
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2 text-black">
-          <FaWallet size={26} />
+          {injectedWalletProviderIcon ? (
+            <Image
+              src={injectedWalletProviderIcon}
+              alt={injectedWalletProviderName}
+              width={26}
+              height={26}
+            />
+          ) : (
+            <FaWallet size={26} />
+          )}
         </div>
-        <p>Browser</p>
+        <p>{injectedWalletProviderName}</p>
       </button>
     );
   };
