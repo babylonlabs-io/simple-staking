@@ -1,4 +1,29 @@
 {
   "extends": ["next/core-web-vitals", "prettier"],
-  "plugins": ["@tanstack/query"]
+  "plugins": ["@tanstack/query", "import"],
+  "rules": {
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          ["builtin", "external"],
+          ["internal", "parent", "sibling", "index"]
+        ],
+        "pathGroups": [
+          {
+            "pattern": "@/**",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "./**",
+            "group": "sibling",
+            "position": "after"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin", "external"],
+        "newlines-between": "always"
+      }
+    ]
+  }
 }
