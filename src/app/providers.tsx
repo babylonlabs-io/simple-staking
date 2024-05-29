@@ -6,7 +6,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { ThemeProvider } from "next-themes";
 
-import { ErrorProvider } from "./context/error/ErrorContext";
+import { ErrorProvider } from "./context/Error/ErrorContext";
 import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 import { GlobalParamsProvider } from "./context/api/GlobalParamsProvider";
 

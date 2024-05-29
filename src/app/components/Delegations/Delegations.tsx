@@ -31,7 +31,7 @@ import {
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
-import { useError } from "@/app/context/error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 
@@ -365,7 +365,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
   const combinedDelegationsData = delegationsAPI
     ? [...delegationsLocalStorage, ...delegationsAPI]
     : // if no API data, fallback to using only local storage delegations
-      delegationsLocalStorage;
+    delegationsLocalStorage;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">

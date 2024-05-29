@@ -2,7 +2,7 @@ import { IoMdClose } from "react-icons/io";
 import { format } from "date-fns";
 
 import { ErrorState, ShowErrorParams } from "@/app/types/errors";
-import { useError } from "@/app/context/error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorContext";
 import { GeneralModal } from "./GeneralModal";
 
 interface ErrorModalProps {

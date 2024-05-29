@@ -20,7 +20,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
-import { useError } from "@/app/context/error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { FeedbackModal } from "../Modals/FeedbackModal";
 
@@ -44,13 +44,13 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-    | {
-        height: number | undefined;
-        firstActivationHeight: number | undefined;
-        currentVersion: GlobalParamsVersion | undefined;
-        isApprochingNextVersion: boolean | undefined;
-      }
-    | undefined;
+  | {
+    height: number | undefined;
+    firstActivationHeight: number | undefined;
+    currentVersion: GlobalParamsVersion | undefined;
+    isApprochingNextVersion: boolean | undefined;
+  }
+  | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({

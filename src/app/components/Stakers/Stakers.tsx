@@ -5,11 +5,11 @@ import { Tooltip } from "react-tooltip";
 
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { getStakers } from "@/app/api/getStakers";
-import { useError } from "@/app/context/error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { Staker } from "./Staker";
 
-interface StakersProps {}
+interface StakersProps { }
 
 export const Stakers: React.FC<StakersProps> = () => {
   const { showError, hideError, isErrorOpen } = useError();
