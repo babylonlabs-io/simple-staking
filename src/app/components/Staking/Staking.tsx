@@ -6,24 +6,25 @@ import { FinalityProvider as FinalityProviderInterface } from "@/app/types/final
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { signForm } from "@/utils/signForm";
 import { getStakingTerm } from "@/utils/getStakingTerm";
-import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { Delegation } from "@/app/types/delegations";
 import { LoadingView } from "@/app/components/Loading/Loading";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errors";
+import { getNetworkConfig } from "@/config/network.config";
+
+import { PreviewModal } from "../Modals/PreviewModal";
+import { FeedbackModal } from "../Modals/FeedbackModal";
+import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
 import { StakingTime } from "./Form/StakingTime";
 import { StakingAmount } from "./Form/StakingAmount";
-import { PreviewModal } from "../Modals/PreviewModal";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
-import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
-import { FeedbackModal } from "../Modals/FeedbackModal";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface OverflowProperties {
   isOverTheCap: boolean;
@@ -45,13 +46,13 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-    | {
-        height: number | undefined;
-        firstActivationHeight: number | undefined;
-        currentVersion: GlobalParamsVersion | undefined;
-        isApprochingNextVersion: boolean | undefined;
-      }
-    | undefined;
+  | {
+    height: number | undefined;
+    firstActivationHeight: number | undefined;
+    currentVersion: GlobalParamsVersion | undefined;
+    isApprochingNextVersion: boolean | undefined;
+  }
+  | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({

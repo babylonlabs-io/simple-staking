@@ -1,4 +1,5 @@
 import Image from "next/image";
+
 import { network } from "@/config/network.config";
 import { Network } from "@/utils/wallet/wallet_provider";
 

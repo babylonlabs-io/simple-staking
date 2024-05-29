@@ -6,15 +6,16 @@ import { Tooltip } from "react-tooltip";
 import { StakingStats } from "@/app/types/stakingStats";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { getNetworkConfig } from "@/config/network.config";
+import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+
 import confirmedTvl from "./icons/confirmed-tvl.svg";
 import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
-import { getNetworkConfig } from "@/config/network.config";
-import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
-import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;

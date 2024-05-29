@@ -8,8 +8,9 @@ import { Tooltip } from "react-tooltip";
 
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { GeneralModal } from "./GeneralModal";
 import { getNetworkConfig } from "@/config/network.config";
+
+import { GeneralModal } from "./GeneralModal";
 
 interface ConnectModalProps {
   open: boolean;

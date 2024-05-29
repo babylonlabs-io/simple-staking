@@ -1,5 +1,6 @@
 import { Delegation } from "@/app/types/delegations";
 import { Pagination } from "@/app/types/api";
+
 import { generateRandomDelegationData } from "./mockGenerateDelegationsData";
 
 const allMockData = generateRandomDelegationData(1000);

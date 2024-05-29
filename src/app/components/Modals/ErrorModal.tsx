@@ -3,6 +3,7 @@ import { format } from "date-fns";
 
 import { ErrorState, ShowErrorParams } from "@/app/types/errors";
 import { useError } from "@/app/context/Error/ErrorContext";
+
 import { GeneralModal } from "./GeneralModal";
 
 interface ErrorModalProps {

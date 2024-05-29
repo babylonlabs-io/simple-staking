@@ -14,6 +14,8 @@ import {
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { Network } from "@/utils/wallet/wallet_provider";
+import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { network } from "@/config/network.config";
 
 import {
   getFinalityProviders,
@@ -23,7 +25,6 @@ import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { Delegation, DelegationState } from "./types/delegations";
 import { Staking } from "./components/Staking/Staking";
 import { Delegations } from "./components/Delegations/Delegations";
-import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { Header } from "./components/Header/Header";
 import { Stats } from "./components/Stats/Stats";
 import { getStats } from "./api/getStats";
@@ -38,7 +39,6 @@ import { useError } from "./context/Error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
-import { network } from "@/config/network.config";
 
 interface HomeProps {}
 

@@ -13,7 +13,6 @@ import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { Delegation } from "./Delegation";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
@@ -25,15 +24,18 @@ import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { QueryMeta } from "@/app/types/api";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState } from "@/app/types/errors";
+import { SignPsbtTransaction } from "@/app/common/utils/psbt";
+
 import {
   UnbondWithdrawModal,
   MODE,
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
-import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
+
+import { Delegation } from "./Delegation";
 
 interface DelegationsProps {
   finalityProvidersKV: Record<string, string>;

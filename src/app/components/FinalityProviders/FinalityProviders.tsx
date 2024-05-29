@@ -8,6 +8,7 @@ import {
   LoadingView,
 } from "@/app/components/Loading/Loading";
 import { QueryMeta } from "@/app/types/api";
+
 import { FinalityProvider } from "./FinalityProvider";
 
 interface FinalityProvidersProps {

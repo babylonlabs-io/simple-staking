@@ -1,8 +1,9 @@
 import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
 
-import { validateNoDecimalPoints } from "./validation/validation";
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { getNetworkConfig } from "@/config/network.config";
+
+import { validateNoDecimalPoints } from "./validation/validation";
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;

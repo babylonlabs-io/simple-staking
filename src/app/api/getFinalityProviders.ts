@@ -1,7 +1,9 @@
 import { encode } from "url-safe-base64";
-import { apiWrapper } from "./apiWrapper";
+
 import { FinalityProvider } from "../types/finalityProviders";
 import { Pagination } from "../types/api";
+
+import { apiWrapper } from "./apiWrapper";
 
 export interface PaginatedFinalityProviders {
   finalityProviders: FinalityProvider[];

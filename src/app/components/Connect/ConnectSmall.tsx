@@ -7,8 +7,9 @@ import { useOnClickOutside } from "usehooks-ts";
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import { Hash } from "../Hash/Hash";
 import { getNetworkConfig } from "@/config/network.config";
+
+import { Hash } from "../Hash/Hash";
 
 interface ConnectSmallProps {
   onConnect: () => void;

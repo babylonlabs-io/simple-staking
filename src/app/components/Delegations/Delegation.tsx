@@ -1,6 +1,7 @@
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import { IoIosWarning } from "react-icons/io";
+import { useEffect, useState } from "react";
 
 import { StakingTx, DelegationState } from "@/app/types/delegations";
 import { durationTillNow } from "@/utils/formatTime";
@@ -8,7 +9,6 @@ import { getState, getStateTooltip } from "@/utils/getState";
 import { trim } from "@/utils/trim";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import { useEffect, useState } from "react";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 

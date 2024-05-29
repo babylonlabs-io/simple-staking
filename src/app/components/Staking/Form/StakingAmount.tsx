@@ -2,9 +2,9 @@ import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
 
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { getNetworkConfig } from "@/config/network.config";
 
 import { validateDecimalPoints } from "./validation/validation";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface StakingAmountProps {
   minStakingAmountSat: number;
