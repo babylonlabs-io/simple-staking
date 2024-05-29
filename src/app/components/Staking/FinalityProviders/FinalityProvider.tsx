@@ -8,7 +8,6 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { getNetworkConfig } from "@/config/network.config";
 
-
 interface FinalityProviderProps {
   moniker: string;
   pkHex: string;
@@ -28,7 +27,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
 }) => {
   const generalStyles =
     "card relative cursor-pointer border bg-base-300 p-4 text-sm transition-shadow hover:shadow-md dark:border-transparent dark:bg-base-200";
-  
+
   const { coinName } = getNetworkConfig();
 
   return (
@@ -52,7 +51,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         </div>
         <div className="flex items-center gap-1">
           <p className="hidden sm:flex lg:hidden">Delegation:</p>
-          <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}</p>
+          <p>
+            {maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}
+          </p>
           <span
             className="inline-flex cursor-pointer text-xs sm:hidden"
             data-tooltip-id={`tooltip-delegation-${pkHex}`}

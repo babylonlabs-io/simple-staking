@@ -34,7 +34,7 @@ import { ConnectModal } from "./components/Modals/ConnectModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { ErrorModal } from "./components/Modals/ErrorModal";
-import { useError } from "./context/Error/ErrorContext";
+import { useError } from "./context/error/ErrorContext";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
@@ -345,7 +345,9 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   return (
-    <main className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? 'main-app-mainnet' : 'main-app-testnet'}`}>
+    <main
+      className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
+    >
       <NetworkBadge />
       <Header
         onConnect={handleConnectModal}
@@ -358,7 +360,6 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             stakingStats={stakingStats}
             isLoading={stakingStatsIsLoading}
-            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
           {address && btcWalletBalanceSat && (
             <Summary

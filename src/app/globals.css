@@ -76,13 +76,13 @@ input[type="number"] {
 }
 
 [data-theme="dark"] .main-app-mainnet {
-  background: rgb(43, 43, 43) url("./assets/bg-pattern.svg") left
-    top/auto repeat;
+  background: rgb(43, 43, 43) url("./assets/bg-pattern.svg") left top/auto
+    repeat;
 }
 
 [data-theme="light"] .main-app-mainnet {
-  background: rgb(236, 236, 236) url("./assets/bg-pattern.svg") left
-    top/auto repeat;
+  background: rgb(236, 236, 236) url("./assets/bg-pattern.svg") left top/auto
+    repeat;
 }
 
 [data-theme="dark"] .main-app-testnet {

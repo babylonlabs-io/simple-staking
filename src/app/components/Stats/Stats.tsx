@@ -12,19 +12,27 @@ import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
 import { getNetworkConfig } from "@/config/network.config";
-
+import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;
   isLoading: boolean;
-  stakingCapSat?: number;
 }
 
-export const Stats: React.FC<StatsProps> = ({
-  stakingStats,
-  isLoading,
-  stakingCapSat,
-}) => {
+export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
+  const btcHeight = useBtcHeight();
+  const globalParams = useGlobalParams();
+  let stakingCapSat = 0;
+  if (btcHeight && globalParams) {
+    const { currentVersion } = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams,
+    );
+    stakingCapSat = currentVersion?.stakingCapSat || 0;
+  }
+
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",
     maximumFractionDigits: 2,

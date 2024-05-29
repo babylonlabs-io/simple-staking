@@ -31,7 +31,7 @@ import {
   MODE_UNBOND,
   MODE_WITHDRAW,
 } from "../Modals/UnbondWithdrawModal";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 
