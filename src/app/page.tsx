@@ -345,7 +345,9 @@ const Home: React.FC<HomeProps> = () => {
   }
 
   return (
-    <main className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? 'main-app-mainnet' : 'main-app-testnet'}`}>
+    <main
+      className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
+    >
       <NetworkBadge />
       <Header
         onConnect={handleConnectModal}
@@ -358,7 +360,6 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             stakingStats={stakingStats}
             isLoading={stakingStatsIsLoading}
-            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
           {address && btcWalletBalanceSat && (
             <Summary

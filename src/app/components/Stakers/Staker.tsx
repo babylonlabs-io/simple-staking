@@ -14,7 +14,6 @@ export const Staker: React.FC<StakerProps> = ({
   delegations,
   activeTVLSat,
 }) => {
-
   const { coinName } = getNetworkConfig();
 
   return (

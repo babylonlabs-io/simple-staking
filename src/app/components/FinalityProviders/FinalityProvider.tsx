@@ -72,7 +72,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         <div className="flex gap-1 lg:hidden">
           {stakeSat ? (
             <>
-              <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}</p>
+              <p>
+                {maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}
+              </p>
               <p className="dark:text-neutral-content">{percentage}</p>
             </>
           ) : (
@@ -83,7 +85,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="hidden gap-1 lg:flex">
         {stakeSat ? (
           <>
-            <p>{maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}</p>
+            <p>
+              {maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}
+            </p>
             <p className="dark:text-neutral-content">{percentage}</p>
           </>
         ) : (
