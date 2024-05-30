@@ -1,0 +1,4 @@
+npm run sort-imports
+npm run format:fix
+
+git add .

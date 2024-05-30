@@ -1,9 +1,9 @@
 import { FaBitcoin } from "react-icons/fa";
 
-import { trim } from "@/utils/trim";
+import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import { getNetworkConfig } from "@/config/network.config";
+import { trim } from "@/utils/trim";
 
 interface SummaryProps {
   address: string;

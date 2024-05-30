@@ -1,15 +1,16 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { FaWallet } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
-import Image from "next/image";
-import { FaWallet } from "react-icons/fa";
-import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
+import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
+
 import { GeneralModal } from "./GeneralModal";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface ConnectModalProps {
   open: boolean;

@@ -4,30 +4,31 @@ import KeystoneSDK, { UR } from "@keystonehq/keystone-sdk";
 import sdk, {
   PlayStatus,
   ReadStatus,
-  SupportedResult,
   SDK,
+  SupportedResult,
 } from "@keystonehq/sdk";
+import { HDKey } from "@scure/bip32";
+import { PsbtInput } from "bip174/src/lib/interfaces";
 import {
-  Psbt,
   Network as BitcoinNetwork,
-  payments,
+  Psbt,
   Transaction,
+  payments,
 } from "bitcoinjs-lib";
 import { tapleafHash } from "bitcoinjs-lib/src/payments/bip341";
-import { pubkeyInScript } from "bitcoinjs-lib/src/psbt/psbtutils";
 import { toXOnly } from "bitcoinjs-lib/src/psbt/bip371";
-import { PsbtInput } from "bip174/src/lib/interfaces";
-import { HDKey } from "@scure/bip32";
+import { pubkeyInScript } from "bitcoinjs-lib/src/psbt/psbtutils";
 
-import { WalletProvider, Network, Fees, UTXO } from "../../wallet_provider";
 import { toNetwork } from "../..";
 import {
   getAddressBalance,
-  getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
+  getTipHeight,
   pushTx,
 } from "../../../mempool_api";
+import { Fees, Network, UTXO, WalletProvider } from "../../wallet_provider";
+
 import BIP322 from "./bip322";
 
 type KeystoneWalletInfo = {

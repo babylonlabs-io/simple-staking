@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useTheme } from "next-themes";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 import darkLogo from "@/app/assets/logo-black.svg";
 import lightLogo from "@/app/assets/logo-white.svg";

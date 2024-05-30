@@ -1,7 +1,8 @@
+import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+
 import { Hash } from "../Hash/Hash";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface StakerProps {
   pkHex: string;

@@ -1,18 +1,19 @@
 import { Psbt } from "bitcoinjs-lib";
-import {
-  WalletProvider,
-  Network,
-  Fees,
-  UTXO,
-  WalletInfo,
-} from "../wallet_provider";
+
 import {
   getAddressBalance,
-  getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
+  getTipHeight,
   pushTx,
 } from "../../mempool_api";
+import {
+  Fees,
+  Network,
+  UTXO,
+  WalletInfo,
+  WalletProvider,
+} from "../wallet_provider";
 
 // window object for Bitget Wallet extension
 export const bitgetWalletProvider = "bitkeep";

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
-import { FiSun, FiMoon } from "react-icons/fi";
+import { useEffect, useState } from "react";
+import { FiMoon, FiSun } from "react-icons/fi";
 
 interface ThemeToggleProps {}
 

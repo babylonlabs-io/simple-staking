@@ -1,16 +1,16 @@
-import { AiOutlineInfoCircle } from "react-icons/ai";
-import { Tooltip } from "react-tooltip";
-import { IoIosWarning } from "react-icons/io";
-
-import { StakingTx, DelegationState } from "@/app/types/delegations";
-import { durationTillNow } from "@/utils/formatTime";
-import { getState, getStateTooltip } from "@/utils/getState";
-import { trim } from "@/utils/trim";
-import { satoshiToBtc } from "@/utils/btcConversions";
-import { maxDecimals } from "@/utils/maxDecimals";
 import { useEffect, useState } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { IoIosWarning } from "react-icons/io";
+import { Tooltip } from "react-tooltip";
+
+import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
+import { satoshiToBtc } from "@/utils/btcConversions";
+import { durationTillNow } from "@/utils/formatTime";
+import { getState, getStateTooltip } from "@/utils/getState";
+import { maxDecimals } from "@/utils/maxDecimals";
+import { trim } from "@/utils/trim";
 
 interface DelegationProps {
   finalityProviderMoniker: string;

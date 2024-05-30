@@ -1,14 +1,14 @@
 "use client";
 
-import React from "react";
-import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { ThemeProvider } from "next-themes";
+import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
-import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 import { GlobalParamsProvider } from "./context/api/GlobalParamsProvider";
+import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(new QueryClient());
