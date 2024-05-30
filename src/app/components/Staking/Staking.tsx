@@ -23,6 +23,7 @@ import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { FeedbackModal } from "../Modals/FeedbackModal";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface OverflowProperties {
   isOverTheCap: boolean;
@@ -86,6 +87,8 @@ export const Staking: React.FC<StakingProps> = ({
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
+
+  const { coinName } = getNetworkConfig()
   const stakingParams = paramWithContext?.currentVersion;
   const firstActivationHeight = paramWithContext?.firstActivationHeight;
   const height = paramWithContext?.height;
@@ -235,7 +238,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated once Signet BTC block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current Signet BTC block height is ${height || "-"}.`,
+            `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${height || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
