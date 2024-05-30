@@ -1,12 +1,13 @@
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-import { LoadingView } from "@/app/components/Loading/Loading";
 import { getStakers } from "@/app/api/getStakers";
+import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
+
 import { Staker } from "./Staker";
 
 interface StakersProps {}

@@ -1,5 +1,5 @@
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { FaMinus, FaPlus } from "react-icons/fa";
 
 interface SectionProps {

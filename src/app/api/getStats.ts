@@ -1,5 +1,6 @@
-import { apiWrapper } from "./apiWrapper";
 import { StakingStats } from "../types/stakingStats";
+
+import { apiWrapper } from "./apiWrapper";
 
 interface StatsAPIResponse {
   data: StatsAPI;

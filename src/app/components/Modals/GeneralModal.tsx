@@ -1,4 +1,4 @@
-import { useRef, ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Modal } from "react-responsive-modal";
 
 interface GeneralModalProps {

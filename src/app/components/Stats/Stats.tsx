@@ -1,20 +1,21 @@
-import { Fragment } from "react";
 import Image from "next/image";
+import { Fragment } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
 import { StakingStats } from "@/app/types/stakingStats";
+import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
+
 import confirmedTvl from "./icons/confirmed-tvl.svg";
 import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
-import { getNetworkConfig } from "@/config/network.config";
-import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
-import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;

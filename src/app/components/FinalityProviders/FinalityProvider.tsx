@@ -1,13 +1,14 @@
-import { FaBitcoin } from "react-icons/fa";
-import { AiOutlineInfoCircle } from "react-icons/ai";
-import { Tooltip } from "react-tooltip";
 import Image from "next/image";
+import { AiOutlineInfoCircle } from "react-icons/ai";
+import { FaBitcoin } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 
 import blue from "@/app/assets/blue-check.svg";
+import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+
 import { Hash } from "../Hash/Hash";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface FinalityProviderProps {
   pkHex: string;

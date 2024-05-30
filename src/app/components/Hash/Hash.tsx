@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { IoIosCheckmarkCircle } from "react-icons/io";
 import { FiCopy } from "react-icons/fi";
+import { IoIosCheckmarkCircle } from "react-icons/io";
 import { useCopyToClipboard } from "usehooks-ts";
 
 import { trim } from "@/utils/trim";

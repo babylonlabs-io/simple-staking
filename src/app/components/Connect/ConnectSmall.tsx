@@ -1,14 +1,15 @@
 import { useRef, useState } from "react";
-import { PiWalletBold } from "react-icons/pi";
 import { FaBitcoin } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
+import { PiWalletBold } from "react-icons/pi";
 import { useOnClickOutside } from "usehooks-ts";
 
-import { trim } from "@/utils/trim";
+import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { trim } from "@/utils/trim";
+
 import { Hash } from "../Hash/Hash";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface ConnectSmallProps {
   onConnect: () => void;
