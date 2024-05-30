@@ -1,19 +1,19 @@
 import { network, validateAddress } from "@/config/network.config";
 
 import {
-  WalletProvider,
-  Network,
-  Fees,
-  UTXO,
-  WalletInfo,
-} from "../wallet_provider";
-import {
   getAddressBalance,
-  getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
+  getTipHeight,
   pushTx,
 } from "../../mempool_api";
+import {
+  Fees,
+  Network,
+  UTXO,
+  WalletInfo,
+  WalletProvider,
+} from "../wallet_provider";
 
 // window object for OKX Wallet extension
 export const okxProvider = "okxwallet";

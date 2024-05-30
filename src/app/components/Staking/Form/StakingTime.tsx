@@ -1,7 +1,7 @@
-import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
-import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { getNetworkConfig } from "@/config/network.config";
+import { blocksToWeeks } from "@/utils/blocksToWeeks";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 

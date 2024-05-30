@@ -1,5 +1,3 @@
-import { useEffect, useState } from "react";
-import { useLocalStorage } from "usehooks-ts";
 import { Transaction, networks } from "bitcoinjs-lib";
 import {
   PsbtTransactionResult,
@@ -7,32 +5,34 @@ import {
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
 } from "btc-staking-ts";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useLocalStorage } from "usehooks-ts";
 
+import { getGlobalParams } from "@/app/api/getGlobalParams";
+import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
+import { postUnbonding } from "@/app/api/postUnbonding";
+import { SignPsbtTransaction } from "@/app/common/utils/psbt";
+import { LoadingTableList } from "@/app/components/Loading/Loading";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { QueryMeta } from "@/app/types/api";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { getGlobalParams } from "@/app/api/getGlobalParams";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
-import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
-import { postUnbonding } from "@/app/api/postUnbonding";
-import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
-import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import { QueryMeta } from "@/app/types/api";
-import { LoadingTableList } from "@/app/components/Loading/Loading";
-import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import {
-  UnbondWithdrawModal,
   MODE,
   MODE_UNBOND,
   MODE_WITHDRAW,
+  UnbondWithdrawModal,
 } from "../Modals/UnbondWithdrawModal";
 
 import { Delegation } from "./Delegation";

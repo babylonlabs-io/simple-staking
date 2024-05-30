@@ -1,7 +1,6 @@
-import React, { ReactNode, createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
+import React, { ReactNode, createContext, useContext } from "react";
 
-import { getTipHeight } from "@/utils/mempool_api";
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 

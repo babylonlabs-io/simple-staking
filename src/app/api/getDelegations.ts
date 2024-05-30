@@ -1,7 +1,7 @@
 import { encode } from "url-safe-base64";
 
-import { Delegation } from "../types/delegations";
 import { Pagination } from "../types/api";
+import { Delegation } from "../types/delegations";
 
 import { apiWrapper } from "./apiWrapper";
 

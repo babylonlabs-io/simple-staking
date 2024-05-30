@@ -1,14 +1,14 @@
 import {
+  BsDiscord,
   BsGithub,
-  BsTelegram,
   BsLinkedin,
   BsMedium,
-  BsDiscord,
+  BsTelegram,
 } from "react-icons/bs";
-import { GoHome } from "react-icons/go";
-import { MdAlternateEmail } from "react-icons/md";
 import { FaXTwitter } from "react-icons/fa6";
+import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
+import { MdAlternateEmail } from "react-icons/md";
 
 const iconLinks = [
   {

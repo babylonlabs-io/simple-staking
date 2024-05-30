@@ -1,7 +1,7 @@
 import { encode } from "url-safe-base64";
 
-import { FinalityProvider } from "../types/finalityProviders";
 import { Pagination } from "../types/api";
+import { FinalityProvider } from "../types/finalityProviders";
 
 import { apiWrapper } from "./apiWrapper";
 

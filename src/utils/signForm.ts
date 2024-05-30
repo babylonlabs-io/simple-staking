@@ -1,13 +1,13 @@
 import { Transaction, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
 
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { FinalityProvider } from "@/app/types/finalityProviders";
 import { signPsbtTransaction } from "@/app/common/utils/psbt";
+import { FinalityProvider } from "@/app/types/finalityProviders";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 
-import { WalletProvider } from "./wallet/wallet_provider";
 import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
 import { isTaproot } from "./wallet";
+import { WalletProvider } from "./wallet/wallet_provider";
 
 export const signForm = async (
   params: GlobalParamsVersion,

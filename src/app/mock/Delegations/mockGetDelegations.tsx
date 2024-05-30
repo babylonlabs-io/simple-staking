@@ -1,5 +1,5 @@
-import { Delegation } from "@/app/types/delegations";
 import { Pagination } from "@/app/types/api";
+import { Delegation } from "@/app/types/delegations";
 
 import { generateRandomDelegationData } from "./mockGenerateDelegationsData";
 

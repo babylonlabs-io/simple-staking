@@ -1,8 +1,8 @@
-import { IoMdClose } from "react-icons/io";
 import { format } from "date-fns";
+import { IoMdClose } from "react-icons/io";
 
-import { ErrorState, ShowErrorParams } from "@/app/types/errors";
 import { useError } from "@/app/context/Error/ErrorContext";
+import { ErrorState, ShowErrorParams } from "@/app/types/errors";
 
 import { GeneralModal } from "./GeneralModal";
 

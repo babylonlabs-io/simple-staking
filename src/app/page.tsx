@@ -1,44 +1,43 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { initBTCCurve } from "btc-staking-ts";
-import { useLocalStorage } from "usehooks-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
+import { initBTCCurve } from "btc-staking-ts";
+import { useEffect, useState } from "react";
+import { useLocalStorage } from "usehooks-ts";
 
-import {
-  toNetwork,
-  isSupportedAddressType,
-  getPublicKeyNoCoord,
-} from "@/utils/wallet/index";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import { Network } from "@/utils/wallet/wallet_provider";
-import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { network } from "@/config/network.config";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import {
+  getPublicKeyNoCoord,
+  isSupportedAddressType,
+  toNetwork,
+} from "@/utils/wallet/index";
+import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
+import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import {
   getFinalityProviders,
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
-import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
-import { Delegation, DelegationState } from "./types/delegations";
-import { Staking } from "./components/Staking/Staking";
-import { Delegations } from "./components/Delegations/Delegations";
-import { Header } from "./components/Header/Header";
-import { Stats } from "./components/Stats/Stats";
-import { getStats } from "./api/getStats";
-import { Summary } from "./components/Summary/Summary";
-import { Footer } from "./components/Footer/Footer";
-import { FAQ } from "./components/FAQ/FAQ";
-import { ConnectModal } from "./components/Modals/ConnectModal";
-import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { ErrorModal } from "./components/Modals/ErrorModal";
-import { useError } from "./context/Error/ErrorContext";
-import { ErrorHandlerParam, ErrorState } from "./types/errors";
+import { getStats } from "./api/getStats";
 import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
+import { Delegations } from "./components/Delegations/Delegations";
+import { FAQ } from "./components/FAQ/FAQ";
+import { Footer } from "./components/Footer/Footer";
+import { Header } from "./components/Header/Header";
+import { ConnectModal } from "./components/Modals/ConnectModal";
+import { ErrorModal } from "./components/Modals/ErrorModal";
+import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
+import { Staking } from "./components/Staking/Staking";
+import { Stats } from "./components/Stats/Stats";
+import { Summary } from "./components/Summary/Summary";
+import { useError } from "./context/Error/ErrorContext";
+import { Delegation, DelegationState } from "./types/delegations";
+import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
 interface HomeProps {}
 

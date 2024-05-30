@@ -1,9 +1,9 @@
 import { IoMdClose } from "react-icons/io";
 
+import { getNetworkConfig } from "@/config/network.config";
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import { getNetworkConfig } from "@/config/network.config";
 
 import { GeneralModal } from "./GeneralModal";
 
