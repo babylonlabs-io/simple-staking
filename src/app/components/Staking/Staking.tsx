@@ -17,6 +17,7 @@ import { getNetworkConfig } from "@/config/network.config";
 
 import { PreviewModal } from "../Modals/PreviewModal";
 import { FeedbackModal } from "../Modals/FeedbackModal";
+
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import { Message } from "./Form/States/Message";
@@ -46,13 +47,13 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-  | {
-    height: number | undefined;
-    firstActivationHeight: number | undefined;
-    currentVersion: GlobalParamsVersion | undefined;
-    isApprochingNextVersion: boolean | undefined;
-  }
-  | undefined;
+    | {
+        height: number | undefined;
+        firstActivationHeight: number | undefined;
+        currentVersion: GlobalParamsVersion | undefined;
+        isApprochingNextVersion: boolean | undefined;
+      }
+    | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -88,8 +89,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
-
-  const { coinName } = getNetworkConfig()
+  const { coinName } = getNetworkConfig();
   const stakingParams = paramWithContext?.currentVersion;
   const firstActivationHeight = paramWithContext?.firstActivationHeight;
   const height = paramWithContext?.height;

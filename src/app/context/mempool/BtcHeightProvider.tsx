@@ -1,5 +1,6 @@
 import React, { ReactNode, createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
+
 import { getTipHeight } from "@/utils/mempool_api";
 
 interface BtcHeightProviderProps {
