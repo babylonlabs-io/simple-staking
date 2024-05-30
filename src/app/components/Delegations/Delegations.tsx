@@ -390,7 +390,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
             className="no-scrollbar max-h-[21rem] overflow-y-auto"
           >
             <InfiniteScroll
-              className="flex flex-col gap-4"
+              className="flex flex-col gap-4 pt-3"
               dataLength={combinedDelegationsData.length}
               next={queryMeta.next}
               hasMore={queryMeta.hasMore}

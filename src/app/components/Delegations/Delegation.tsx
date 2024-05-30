@@ -57,7 +57,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     // is in an intermediate state (local storage)
     if (state === DelegationState.ACTIVE) {
       return (
-        <div>
+        <div className="flex justify-end lg:justify-start">
           <button
             className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
             onClick={() => onUnbond(stakingTxHash)}
@@ -71,7 +71,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       );
     } else if (state === DelegationState.UNBONDED) {
       return (
-        <div>
+        <div className="flex justify-end lg:justify-start">
           <button
             className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
             onClick={() => onWithdraw(stakingTxHash)}
@@ -118,8 +118,8 @@ export const Delegation: React.FC<DelegationProps> = ({
       className={`card relative border bg-base-300 p-4 text-sm dark:bg-base-200 ${isOverflow ? "border-primary" : "dark:border-0"}`}
     >
       {isOverflow && (
-        <div className="absolute right-2 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-md bg-primary px-2 py-1 text-sm text-white">
-          <IoIosWarning size={20} />
+        <div className="absolute -top-1 right-1/2 flex translate-x-1/2 items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs text-white lg:right-2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0">
+          <IoIosWarning size={16} />
           <p>overflow</p>
         </div>
       )}
@@ -142,7 +142,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         we need to center the text without the tooltip
         add its size 12px and gap 4px, 16/2 = 8px
         */}
-        <div className="relative flex lg:left-[8px] lg:justify-center">
+        <div className="relative flex justify-end lg:left-[8px] lg:justify-center">
           <div className="flex items-center gap-1">
             <p>{renderState()}</p>
             <span
