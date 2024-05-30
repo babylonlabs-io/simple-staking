@@ -70,13 +70,14 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
     }
   };
 
-  const buildInjectableWallet = (shouldDisplay: boolean) => {
+  const buildInjectableWallet = (shouldDisplay: boolean, name: string) => {
     if (!shouldDisplay) {
       return null;
     }
 
     return (
       <button
+        key={name}
         className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
         onClick={() => setSelectedWallet(BROWSER)}
       >
@@ -128,7 +129,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             {walletList.map(
               ({ provider, name, linkToDocs, icon, isQRWallet }) => {
                 if (name === BROWSER_INJECTED_WALLET_NAME) {
-                  return buildInjectableWallet(isInjectable);
+                  return buildInjectableWallet(isInjectable, name);
                 }
                 const walletAvailable = isQRWallet || !!window[provider as any];
                 return (
