@@ -360,7 +360,6 @@ const Home: React.FC<HomeProps> = () => {
           <Stats
             stakingStats={stakingStats}
             isLoading={stakingStatsIsLoading}
-            stakingCapSat={paramWithContext?.currentVersion?.stakingCapSat}
           />
           {address && btcWalletBalanceSat && (
             <Summary

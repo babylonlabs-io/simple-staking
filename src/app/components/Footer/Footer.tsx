@@ -66,7 +66,7 @@ const textLinks = [
   },
 ];
 
-interface FooterProps { }
+interface FooterProps {}
 
 export const Footer: React.FC<FooterProps> = () => {
   return (
