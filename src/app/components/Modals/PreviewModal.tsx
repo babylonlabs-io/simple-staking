@@ -1,10 +1,11 @@
 import { IoMdClose } from "react-icons/io";
 
+import { getNetworkConfig } from "@/config/network.config";
 import { blocksToWeeks } from "@/utils/blocksToWeeks";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
+
 import { GeneralModal } from "./GeneralModal";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface PreviewModalProps {
   open: boolean;
@@ -25,7 +26,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 }) => {
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
-  
+
   const { coinName } = getNetworkConfig();
 
   return (

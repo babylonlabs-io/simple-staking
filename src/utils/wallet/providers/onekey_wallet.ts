@@ -1,15 +1,15 @@
 import {
+  getAddressBalance,
+  getFundingUTXOs,
+  getNetworkFees,
+} from "../../mempool_api";
+import {
   Fees,
   Network,
   UTXO,
   WalletInfo,
   WalletProvider,
 } from "../wallet_provider";
-import {
-  getAddressBalance,
-  getFundingUTXOs,
-  getNetworkFees,
-} from "../../mempool_api";
 
 export const oneKeyProvider = "$onekey";
 

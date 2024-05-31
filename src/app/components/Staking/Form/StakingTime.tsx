@@ -1,9 +1,9 @@
-import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+
+import { getNetworkConfig } from "@/config/network.config";
+import { blocksToWeeks } from "@/utils/blocksToWeeks";
 
 import { validateNoDecimalPoints } from "./validation/validation";
-import { blocksToWeeks } from "@/utils/blocksToWeeks";
-import { getNetworkConfig } from "@/config/network.config";
-
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;
@@ -100,15 +100,20 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
     return (
       <div className="card mb-2 bg-base-200 p-4">
         <p>
-          Your {coinName} will be staked for a fixed term of{" "}
+          You can unbond and withdraw your stake anytime with an unbonding time
+          of 7 days.
+        </p>
+        <p>
+          There is also a build-in maximum staking period of{" "}
           {blocksToWeeks(minStakingTimeBlocks, 5)}.
         </p>
         <p>
-          You can unbond and withdraw your {coinName} anytime through this
-          dashboard with an unbond time of 7 days.
+          If the stake is not unbonded before the end of this period, it will
+          automatically become withdrawable by you anytime afterwards.
         </p>
         <p>
-          The above times are approximates based on average Bitcoin block times.
+          The above times are approximates based on average {coinName} block
+          time.
         </p>
       </div>
     );

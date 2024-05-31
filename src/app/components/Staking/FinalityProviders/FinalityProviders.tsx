@@ -1,11 +1,12 @@
 import InfiniteScroll from "react-infinite-scroll-component";
 
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import {
   LoadingTableList,
   LoadingView,
 } from "@/app/components/Loading/Loading";
 import { QueryMeta } from "@/app/types/api";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+
 import { FinalityProvider } from "./FinalityProvider";
 
 interface FinalityProvidersProps {
@@ -46,7 +47,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <p>Finality Provider</p>
         <p>BTC PK</p>
         <p>Total Delegation</p>
-        <p>Comission</p>
+        <p>Commission</p>
       </div>
       <div
         id="finality-providers"

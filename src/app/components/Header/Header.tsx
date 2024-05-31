@@ -1,6 +1,7 @@
-import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
+
 import { Logo } from "./Logo";
 
 interface HeaderProps {

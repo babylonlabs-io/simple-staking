@@ -1,4 +1,4 @@
-import { useRef, ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import { Modal } from "react-responsive-modal";
 
 interface GeneralModalProps {
@@ -22,6 +22,10 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
     } else {
       document.body.classList.remove("modal-open");
     }
+
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
   }, [open]);
 
   const getSize = () => {
@@ -39,7 +43,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       onClose={() => onClose(false)}
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
-        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[85svh] ${getSize()}`,
+        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[85svh] min-w-[20rem] md:min-w-[30rem] ${getSize()}`,
       }}
       showCloseIcon={false}
       blockScroll={false}

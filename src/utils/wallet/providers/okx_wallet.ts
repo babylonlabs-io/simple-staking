@@ -1,18 +1,19 @@
 import { network, validateAddress } from "@/config/network.config";
-import {
-  WalletProvider,
-  Network,
-  Fees,
-  UTXO,
-  WalletInfo,
-} from "../wallet_provider";
+
 import {
   getAddressBalance,
-  getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
+  getTipHeight,
   pushTx,
 } from "../../mempool_api";
+import {
+  Fees,
+  Network,
+  UTXO,
+  WalletInfo,
+  WalletProvider,
+} from "../wallet_provider";
 
 // window object for OKX Wallet extension
 export const okxProvider = "okxwallet";
@@ -24,7 +25,7 @@ export class OKXWallet extends WalletProvider {
 
   constructor() {
     super();
-    
+
     // check whether there is an OKX Wallet extension
     if (!window[okxProvider]) {
       throw new Error("OKX Wallet extension not found");
@@ -61,7 +62,7 @@ export class OKXWallet extends WalletProvider {
 
     const { address, compressedPublicKey } = result;
 
-    validateAddress(network, address)
+    validateAddress(network, address);
 
     if (compressedPublicKey && address) {
       this.okxWalletInfo = {
@@ -112,10 +113,7 @@ export class OKXWallet extends WalletProvider {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
-    return await this.bitcoinNetwork?.signMessage(
-      message,
-      "bip322-simple",
-    );
+    return await this.bitcoinNetwork?.signMessage(message, "bip322-simple");
   };
 
   getNetwork = async (): Promise<Network> => {

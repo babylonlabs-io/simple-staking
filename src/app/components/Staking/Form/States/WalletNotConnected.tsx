@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import walletIcon from "./wallet-icon.svg";
 import connectIcon from "./connect-icon.svg";
+import walletIcon from "./wallet-icon.svg";
 
 interface WalletNotConnectedProps {
   onConnect: () => void;
