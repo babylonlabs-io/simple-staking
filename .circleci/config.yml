@@ -172,7 +172,6 @@ workflows:
               only: /.*/
             branches:
               only:
-                - dev
                 - main
       - push_docker:
           requires:
@@ -182,7 +181,6 @@ workflows:
               only: /.*/
             branches:
               only:
-                - dev
                 - main
       - deploy_staging:
           requires:
@@ -190,11 +188,11 @@ workflows:
           filters:
             branches:
               only:
-                - dev
+                - main
       - require_approval_deploy:
           type: approval
           requires:
-            - push_docker
+            - deploy_staging
           filters:
             branches:
               only:
