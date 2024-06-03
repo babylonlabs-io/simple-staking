@@ -23,7 +23,7 @@ export const Stakers: React.FC<StakersProps> = () => {
     queryKey: ["stakers"],
     queryFn: getStakers,
     refetchInterval: 60000, // 1 minute
-    select: (data) => data.stakers,
+    select: (data) => data,
     retry: (failureCount, error) => {
       return !isErrorOpen && failureCount <= 3;
     },
@@ -78,10 +78,10 @@ export const Stakers: React.FC<StakersProps> = () => {
             (staker) =>
               staker && (
                 <Staker
-                  key={staker.staker_pk_hex}
-                  pkHex={staker.staker_pk_hex}
-                  delegations={staker.active_delegations}
-                  activeTVLSat={staker.active_tvl}
+                  key={staker.stakerPkHex}
+                  pkHex={staker.stakerPkHex}
+                  delegations={staker.activeDelegations}
+                  activeTVLSat={staker.activeTVL}
                 />
               ),
           )

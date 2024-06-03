@@ -1,8 +1,6 @@
-import { apiWrapper } from "./apiWrapper";
+import { Staker } from "../types/stakers";
 
-export interface Stakers {
-  stakers: StakersAPI[];
-}
+import { apiWrapper } from "./apiWrapper";
 
 export interface StakersAPI {
   staker_pk_hex: string;
@@ -16,32 +14,32 @@ interface StakersAPIResponse {
   data: StakersAPI[];
 }
 
-export const getStakers = async (): Promise<Stakers> => {
-  try {
-    // Intentionally used without pagination for now
-    const limit = 50;
-    // const reverse = false;
+export const getStakers = async (): Promise<Staker[]> => {
+  // Intentionally used without pagination for now
+  const limit = 50;
+  // const reverse = false;
 
-    const params = {
-      // "pagination_key": encode(key),
-      // "pagination_reverse": reverse,
-      pagination_limit: limit,
-    };
+  const params = {
+    // "pagination_key": encode(key),
+    // "pagination_reverse": reverse,
+    pagination_limit: limit,
+  };
 
-    const response = await apiWrapper(
-      "GET",
-      "/v1/stats/staker",
-      "Error getting stakers",
-      params,
-    );
+  const response = await apiWrapper(
+    "GET",
+    "/v1/stats/staker",
+    "Error getting stakers",
+    params,
+  );
 
-    const stakersAPIResponse: StakersAPIResponse = response.data;
-    const stakersAPI: StakersAPI[] = stakersAPIResponse.data;
+  const stakersAPIResponse: StakersAPIResponse = response.data;
+  const stakersAPI: StakersAPI[] = stakersAPIResponse.data;
 
-    return {
-      stakers: stakersAPI,
-    };
-  } catch (error) {
-    throw error;
-  }
+  return stakersAPI.map((staker) => ({
+    stakerPkHex: staker.staker_pk_hex,
+    activeTVL: staker.active_tvl,
+    totalTVL: staker.total_tvl,
+    activeDelegations: staker.active_delegations,
+    totalDelegations: staker.total_delegations,
+  }));
 };
