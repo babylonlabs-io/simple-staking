@@ -19,7 +19,7 @@
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@keystonehq/animated-qr": "^0.8.6",
     "@keystonehq/keystone-sdk": "^0.4.1",
-    "@keystonehq/sdk": "0.21.2",
+    "@keystonehq/sdk": "0.21.3",
     "@scure/bip32": "^1.4.0",
     "@tanstack/react-query": "^5.28.14",
     "@tanstack/react-query-next-experimental": "^5.28.14",
