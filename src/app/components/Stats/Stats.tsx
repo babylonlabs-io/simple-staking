@@ -1,30 +1,39 @@
-import { Fragment } from "react";
 import Image from "next/image";
+import { Fragment } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
 import { StakingStats } from "@/app/types/stakingStats";
+import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
+
 import confirmedTvl from "./icons/confirmed-tvl.svg";
 import delegations from "./icons/delegations.svg";
 import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
-import { getNetworkConfig } from "@/config/network.config";
-
 
 interface StatsProps {
   stakingStats: StakingStats | undefined;
   isLoading: boolean;
-  stakingCapSat?: number;
 }
 
-export const Stats: React.FC<StatsProps> = ({
-  stakingStats,
-  isLoading,
-  stakingCapSat,
-}) => {
+export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
+  const btcHeight = useBtcHeight();
+  const globalParams = useGlobalParams();
+  let stakingCapSat = 0;
+  if (btcHeight && globalParams) {
+    const { currentVersion } = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams,
+    );
+    stakingCapSat = currentVersion?.stakingCapSat || 0;
+  }
+
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",
     maximumFractionDigits: 2,

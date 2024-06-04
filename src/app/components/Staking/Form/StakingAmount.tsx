@@ -1,10 +1,10 @@
-import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
+import { getNetworkConfig } from "@/config/network.config";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { validateDecimalPoints } from "./validation/validation";
-import { getNetworkConfig } from "@/config/network.config";
 
 interface StakingAmountProps {
   minStakingAmountSat: number;
@@ -111,7 +111,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       <div className="label pt-0">
         <span className="label-text-alt text-base">Amount</span>
         <span className="label-text-alt opacity-50">
-          min/max: {minStakeAmount}/{maxStakeAmount} {coinName}</span>
+          min/max: {minStakeAmount}/{maxStakeAmount} {coinName}
+        </span>
       </div>
       <input
         type="string"

@@ -1,5 +1,6 @@
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { QueryMeta } from "@/app/types/api";
+import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+
 import { FinalityProviders } from "../FinalityProviders/FinalityProviders";
 // import { Stakers } from "../Stakers/Stakers";
 

@@ -1,9 +1,9 @@
-import { ChangeEvent, FocusEvent, useState, useEffect } from "react";
+import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+
+import { getNetworkConfig } from "@/config/network.config";
+import { blocksToWeeks } from "@/utils/blocksToWeeks";
 
 import { validateNoDecimalPoints } from "./validation/validation";
-import { blocksToWeeks } from "@/utils/blocksToWeeks";
-import { getNetworkConfig } from "@/config/network.config";
-
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;
@@ -104,15 +104,16 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
           of 7 days.
         </p>
         <p>
-          There is also a build-in maximum staking period of {" "}
+          There is also a build-in maximum staking period of{" "}
           {blocksToWeeks(minStakingTimeBlocks, 5)}.
         </p>
         <p>
-          If the stake is not unbonded before the end of this period,
-          it will automatically become withdrawable by you anytime afterwards.
+          If the stake is not unbonded before the end of this period, it will
+          automatically become withdrawable by you anytime afterwards.
         </p>
         <p>
-          The above times are approximates based on average {coinName} block time.
+          The above times are approximates based on average {coinName} block
+          time.
         </p>
       </div>
     );

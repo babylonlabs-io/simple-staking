@@ -1,28 +1,31 @@
-import { Dispatch, SetStateAction, useState } from "react";
 import { Transaction, networks } from "bitcoinjs-lib";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { LoadingView } from "@/app/components/Loading/Loading";
+import { useError } from "@/app/context/Error/ErrorContext";
+import { Delegation } from "@/app/types/delegations";
+import { ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { getNetworkConfig } from "@/config/network.config";
+import { getStakingTerm } from "@/utils/getStakingTerm";
+import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { signForm } from "@/utils/signForm";
-import { getStakingTerm } from "@/utils/getStakingTerm";
-import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
-import { isStakingSignReady } from "@/utils/isStakingSignReady";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { Delegation } from "@/app/types/delegations";
-import { LoadingView } from "@/app/components/Loading/Loading";
-import { WalletNotConnected } from "./Form/States/WalletNotConnected";
-import { Message } from "./Form/States/Message";
-import { StakingTime } from "./Form/StakingTime";
-import { StakingAmount } from "./Form/StakingAmount";
+
+import { FeedbackModal } from "../Modals/FeedbackModal";
 import { PreviewModal } from "../Modals/PreviewModal";
+
+import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
+import { StakingAmount } from "./Form/StakingAmount";
+import { StakingTime } from "./Form/StakingTime";
+import { Message } from "./Form/States/Message";
+import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
-import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
-import { FeedbackModal } from "../Modals/FeedbackModal";
 
 interface OverflowProperties {
   isOverTheCap: boolean;
@@ -44,13 +47,13 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   paramWithContext:
-  | {
-    height: number | undefined;
-    firstActivationHeight: number | undefined;
-    currentVersion: GlobalParamsVersion | undefined;
-    isApprochingNextVersion: boolean | undefined;
-  }
-  | undefined;
+    | {
+        height: number | undefined;
+        firstActivationHeight: number | undefined;
+        currentVersion: GlobalParamsVersion | undefined;
+        isApprochingNextVersion: boolean | undefined;
+      }
+    | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -86,6 +89,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
+  const { coinName } = getNetworkConfig();
   const stakingParams = paramWithContext?.currentVersion;
   const firstActivationHeight = paramWithContext?.firstActivationHeight;
   const height = paramWithContext?.height;
@@ -235,7 +239,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated once Signet BTC block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current Signet BTC block height is ${height || "-"}.`,
+            `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${height || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
