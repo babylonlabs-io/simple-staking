@@ -11,14 +11,13 @@ import { Delegation } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
-import { getStakingTerm } from "@/utils/getStakingTerm";
+import { signStakingTx } from "@/utils/delegations/signStakingTx";
 import {
   ParamsWithContext,
   getCurrentGlobalParamsVersion,
 } from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
-import { signForm } from "@/utils/signForm";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
@@ -125,10 +124,10 @@ export const Staking: React.FC<StakingProps> = ({
         isHeightCap: true,
         overTheCapRange:
           nextBlockHeight >= stakingCapHeight + confirmationDepth - 1,
-        /* 
-          When btc height is approching the staking cap height, 
+        /*
+          When btc height is approching the staking cap height,
           there is higher chance of overflow due to tx not being included in the next few blocks on time
-          We also don't take the confirmation depth into account here as majority 
+          We also don't take the confirmation depth into account here as majority
           of the delegation will be overflow after the cap is reached, unless btc fork happens but it's unlikely
         */
         approchingCapRange:
@@ -167,65 +166,24 @@ export const Staking: React.FC<StakingProps> = ({
 
   const handleSign = async () => {
     try {
-      if (!btcWallet) {
-        throw new Error("Wallet not connected");
-      } else if (!address) {
-        throw new Error("Address is not set");
-      } else if (!btcWalletNetwork) {
-        throw new Error("Wallet network not connected");
-      } else if (!paramWithCtx || !paramWithCtx.currentVersion) {
+      if (!paramWithCtx || !paramWithCtx.currentVersion) {
         throw new Error("Global params not loaded");
-      } else if (!finalityProvider) {
-        throw new Error("Finality provider not selected");
       }
       const { currentVersion: globalParamsVersion } = paramWithCtx;
-      const stakingTerm = getStakingTerm(
+      // Sign the staking transaction
+      const { stakingTxHex, stakingTerm } = await signStakingTx(
         globalParamsVersion,
         stakingTimeBlocks,
+        btcWallet,
+        finalityProvider,
+        btcWalletNetwork,
+        stakingAmountSat,
+        address,
+        publicKeyNoCoord,
       );
-      let signedTxHex: string;
-      try {
-        signedTxHex = await signForm(
-          globalParamsVersion,
-          btcWallet,
-          finalityProvider,
-          stakingTerm,
-          btcWalletNetwork,
-          stakingAmountSat,
-          address,
-          publicKeyNoCoord,
-        );
-        if (
-          !feedbackModal.isOpen &&
-          feedbackModal.type !== "success" &&
-          !successFeedbackModalOpened
-        ) {
-          setFeedbackModal({ type: "success", isOpen: true });
-        }
-      } catch (error: Error | any) {
-        throw error;
-      }
-
-      let txID;
-      try {
-        txID = await btcWallet.pushTx(signedTxHex);
-      } catch (error: Error | any) {
-        throw error;
-      }
-
-      // Update the local state with the new delegation
-      setDelegationsLocalStorage((delegations) => [
-        toLocalStorageDelegation(
-          Transaction.fromHex(signedTxHex).getId(),
-          publicKeyNoCoord,
-          finalityProvider.btcPk,
-          stakingAmountSat,
-          signedTxHex,
-          stakingTerm,
-        ),
-        ...delegations,
-      ]);
-
+      // UI
+      handleFeedbackModal("success");
+      handleLocalStorageDelegations(stakingTxHex, stakingTerm);
       handleResetState();
     } catch (error: Error | any) {
       showError({
@@ -237,6 +195,24 @@ export const Staking: React.FC<StakingProps> = ({
         retryAction: handleSign,
       });
     }
+  };
+
+  // Save the delegation to local storage
+  const handleLocalStorageDelegations = (
+    signedTxHex: string,
+    stakingTerm: number,
+  ) => {
+    setDelegationsLocalStorage((delegations) => [
+      toLocalStorageDelegation(
+        Transaction.fromHex(signedTxHex).getId(),
+        publicKeyNoCoord,
+        finalityProvider!.btcPk,
+        stakingAmountSat,
+        signedTxHex,
+        stakingTerm,
+      ),
+      ...delegations,
+    ]);
   };
 
   // Select the finality provider from the list
@@ -261,15 +237,22 @@ export const Staking: React.FC<StakingProps> = ({
     setStakingTimeBlocks(inputTimeBlocks);
   };
 
+  // Show feedback modal only once for each type
+  const handleFeedbackModal = (type: "success" | "cancel") => {
+    if (!feedbackModal.isOpen && feedbackModal.type !== type) {
+      const isFeedbackModalOpened =
+        type === "success"
+          ? successFeedbackModalOpened
+          : cancelFeedbackModalOpened;
+      if (!isFeedbackModalOpened) {
+        setFeedbackModal({ type, isOpen: true });
+      }
+    }
+  };
+
   const handlePreviewModalClose = (isOpen: boolean) => {
     setPreviewModalOpen(isOpen);
-    if (
-      !feedbackModal.isOpen &&
-      feedbackModal.type !== "cancel" &&
-      !cancelFeedbackModalOpened
-    ) {
-      setFeedbackModal({ type: "cancel", isOpen: true });
-    }
+    handleFeedbackModal("cancel");
   };
 
   const showOverflowWarning = (overflow: OverflowProperties) => {

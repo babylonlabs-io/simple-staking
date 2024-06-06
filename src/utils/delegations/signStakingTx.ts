@@ -4,32 +4,46 @@ import { stakingTransaction } from "btc-staking-ts";
 import { signPsbtTransaction } from "@/app/common/utils/psbt";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
+import { isTaproot } from "@/utils/wallet";
+import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
-import { apiDataToStakingScripts } from "./apiDataToStakingScripts";
-import { isTaproot } from "./wallet";
-import { WalletProvider } from "./wallet/wallet_provider";
+import { getStakingTerm } from "../getStakingTerm";
 
-export const signForm = async (
-  params: GlobalParamsVersion,
-  btcWallet: WalletProvider,
-  finalityProvider: FinalityProvider,
-  stakingTerm: number,
-  btcWalletNetwork: networks.Network,
+// Sign a staking transaction
+// Returns:
+// - stakingTxHex: the signed staking transaction
+// - stakingTerm: the staking term
+export const signStakingTx = async (
+  globalParamsVersion: GlobalParamsVersion,
+  stakingTimeBlocks: number,
+  btcWallet: WalletProvider | undefined,
+  finalityProvider: FinalityProvider | undefined,
+  btcWalletNetwork: networks.Network | undefined,
   stakingAmountSat: number,
-  address: string,
+  address: string | undefined,
   publicKeyNoCoord: string,
-): Promise<string> => {
+): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
+  // Initial validation
+  if (!btcWallet) throw new Error("Wallet is not connected");
+  if (!address) throw new Error("Address is not set");
+  if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
+  if (!finalityProvider) throw new Error("Finality provider is not selected");
+
+  // Data extraction
+  const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
+
+  // Check the staking data
   if (
-    !finalityProvider ||
-    stakingAmountSat < params.minStakingAmountSat ||
-    stakingAmountSat > params.maxStakingAmountSat ||
-    stakingTerm < params.minStakingTimeBlocks ||
-    stakingTerm > params.maxStakingTimeBlocks
+    stakingAmountSat < globalParamsVersion.minStakingAmountSat ||
+    stakingAmountSat > globalParamsVersion.maxStakingAmountSat ||
+    stakingTerm < globalParamsVersion.minStakingTimeBlocks ||
+    stakingTerm > globalParamsVersion.maxStakingTimeBlocks
   ) {
-    // TODO Show Popup
     throw new Error("Invalid staking data");
   }
 
+  // Get the UTXOs
   let inputUTXOs = [];
   try {
     inputUTXOs = await btcWallet.getUtxos(address);
@@ -40,17 +54,20 @@ export const signForm = async (
     throw new Error("Not enough usable balance");
   }
 
+  // Create the staking scripts
   let scripts;
   try {
     scripts = apiDataToStakingScripts(
       finalityProvider.btcPk,
       stakingTerm,
-      params,
+      globalParamsVersion,
       publicKeyNoCoord,
     );
   } catch (error: Error | any) {
     throw new Error(error?.message || "Cannot build staking scripts");
   }
+
+  // Get the network fees
   let feeRate: number;
   try {
     const netWorkFee = await btcWallet.getNetworkFees();
@@ -58,6 +75,8 @@ export const signForm = async (
   } catch (error) {
     throw new Error("Cannot get network fees");
   }
+
+  // Create the staking transaction
   let unsignedStakingPsbt;
   try {
     const { psbt } = stakingTransaction(
@@ -72,7 +91,7 @@ export const signForm = async (
       // For example, if a Bitcoin height of X is provided,
       // the transaction will be included starting from height X+1.
       // https://learnmeabitcoin.com/technical/transaction/locktime/
-      params.activationHeight - 1,
+      globalParamsVersion.activationHeight - 1,
     );
     unsignedStakingPsbt = psbt;
   } catch (error: Error | any) {
@@ -80,6 +99,8 @@ export const signForm = async (
       error?.message || "Cannot build unsigned staking transaction",
     );
   }
+
+  // Sign the staking transaction
   let stakingTx: Transaction;
   try {
     stakingTx = await signPsbtTransaction(btcWallet)(
@@ -89,5 +110,11 @@ export const signForm = async (
     throw new Error(error?.message || "Staking transaction signing PSBT error");
   }
 
-  return stakingTx.toHex();
+  // Get the staking transaction hex
+  const stakingTxHex = stakingTx.toHex();
+
+  // Broadcast the staking transaction
+  await btcWallet.pushTx(stakingTxHex);
+
+  return { stakingTxHex, stakingTerm };
 };
