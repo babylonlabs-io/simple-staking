@@ -43,7 +43,6 @@ interface DelegationsProps {
   delegationsLocalStorage: DelegationInterface[];
   globalParamsVersion: GlobalParamsVersion;
   publicKeyNoCoord: string;
-  unbondingFeeSat: number;
   btcWalletNetwork: networks.Network;
   address: string;
   signPsbtTx: SignPsbtTransaction;
@@ -58,7 +57,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
   delegationsLocalStorage,
   globalParamsVersion,
   publicKeyNoCoord,
-  unbondingFeeSat,
   btcWalletNetwork,
   address,
   signPsbtTx,
@@ -131,7 +129,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
     const { psbt: unsignedUnbondingTx } = unbondingTransaction(
       scripts,
       Transaction.fromHex(delegation.stakingTx.txHex),
-      unbondingFeeSat,
+      globalParamsWhenStaking.unbondingFeeSat,
       btcWalletNetwork,
       delegation.stakingTx.outputIndex,
     );

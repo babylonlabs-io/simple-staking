@@ -397,9 +397,6 @@ const Home: React.FC<HomeProps> = () => {
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={paramWithContext.currentVersion}
                 publicKeyNoCoord={publicKeyNoCoord}
-                unbondingFeeSat={
-                  paramWithContext.currentVersion.unbondingFeeSat
-                }
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbtTx={signPsbtTransaction(btcWallet)}
