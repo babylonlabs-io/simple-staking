@@ -43,6 +43,7 @@
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@tanstack/react-query-devtools": "^5.28.14",
+    "@types/jest": "^29.5.12",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -53,11 +54,13 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-import": "^2.29.1",
     "husky": "^9.0.11",
+    "jest": "^29.7.0",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "3.4.3",
+    "ts-jest": "^29.1.4",
     "typescript": "^5"
   }
 }
