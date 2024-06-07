@@ -5,6 +5,7 @@ import { Tooltip } from "react-tooltip";
 
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { StakingStats } from "@/app/types/stakingStats";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -22,32 +23,57 @@ interface StatsProps {
   isLoading: boolean;
 }
 
+const buildStakingCapSection = (
+  coinName: string,
+  btcHeight?: number,
+  verionedParam?: GlobalParamsVersion,
+) => {
+  if (verionedParam) {
+    const { stakingCapHeight, stakingCapSat, activationHeight } = verionedParam;
+    if (verionedParam?.stakingCapSat) {
+      return {
+        title: "Staking TVL Cap",
+        value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
+      };
+    } else if (verionedParam?.stakingCapHeight) {
+      return {
+        title: "Staking window",
+        value: `height ${activationHeight} - ${stakingCapHeight} (current: ${btcHeight})`,
+      };
+    }
+  }
+  return {
+    title: "Staking TVL Cap",
+    value: "-",
+  };
+};
+
 export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
   const btcHeight = useBtcHeight();
   const globalParams = useGlobalParams();
-  let stakingCapSat = 0;
+  let param;
   if (btcHeight && globalParams) {
     const { currentVersion } = getCurrentGlobalParamsVersion(
       btcHeight + 1,
       globalParams,
     );
-    stakingCapSat = currentVersion?.stakingCapSat || 0;
+    param = currentVersion;
   }
+
+  const { coinName } = getNetworkConfig();
+
+  const cap = buildStakingCapSection(coinName, btcHeight, param);
 
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",
     maximumFractionDigits: 2,
   });
 
-  const { coinName } = getNetworkConfig();
-
   const sections = [
     [
       {
-        title: "Staking TVL Cap",
-        value: stakingCapSat
-          ? `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`
-          : "-",
+        title: cap.title,
+        value: cap.value,
         icon: stakingTvlCap,
       },
       {

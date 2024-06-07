@@ -28,6 +28,7 @@ import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 
 interface OverflowProperties {
+  isHeightCap: boolean;
   isOverTheCap: boolean;
   isApprochingCap: boolean;
 }
@@ -214,6 +215,34 @@ export const Staking: React.FC<StakingProps> = ({
     }
   };
 
+  const showOverflowWarning = (overflow: OverflowProperties) => {
+    if (overflow.isHeightCap) {
+      return (
+        <Message
+          title="Staking window closed"
+          messages={[
+            "Staking is temporarily disabled due to the staking window getting closed.",
+            "Please check your staking history to see if any of your stake is tagged overflow.",
+            "Overflow stake should be unbonded and withdrawn.",
+          ]}
+          icon={stakingCapReached}
+        />
+      );
+    } else {
+      return (
+        <Message
+          title="Staking cap reached"
+          messages={[
+            "Staking is temporarily disabled due to the staking cap getting reached.",
+            "Please check your staking history to see if any of your stake is tagged overflow.",
+            "Overflow stake should be unbonded and withdrawn.",
+          ]}
+          icon={stakingCapReached}
+        />
+      );
+    }
+  };
+
   const handleCloseFeedbackModal = () => {
     if (feedbackModal.type === "success") {
       setSuccessFeedbackModalOpened(true);
@@ -259,17 +288,7 @@ export const Staking: React.FC<StakingProps> = ({
     }
     // 5. Staking cap reached
     else if (overflow.isOverTheCap) {
-      return (
-        <Message
-          title="Staking cap reached"
-          messages={[
-            "Staking is temporarily disabled due to the staking cap getting reached.",
-            "Please check your staking history to see if any of your stake is tagged overflow.",
-            "Overflow stake should be unbonded and withdrawn.",
-          ]}
-          icon={stakingCapReached}
-        />
-      );
+      return showOverflowWarning(overflow);
     }
     // 6. Staking form
     else {

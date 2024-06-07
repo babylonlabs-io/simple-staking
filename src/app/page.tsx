@@ -327,20 +327,32 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
-  // overflow properties to indicate the current state of the staking cap with the tvl
-  // these constants are needed for easier prop passing
+  // Check if the staking cap is reached, or if it is approaching
+  // the cap can either be height-based or sat-based
   let overflow = {
+    isHeightCap: false,
     isOverTheCap: false,
     isApprochingCap: false,
   };
-  if (paramWithContext?.currentVersion && stakingStats) {
-    const { stakingCapSat } = paramWithContext.currentVersion;
-    const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
-    overflow = {
-      isOverTheCap: stakingCapSat <= activeTVLSat,
-      isApprochingCap:
-        stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
-    };
+  if (paramWithContext?.currentVersion) {
+    const { height } = paramWithContext;
+    const { stakingCapHeight, stakingCapSat, confirmationDepth } =
+      paramWithContext.currentVersion;
+    if (stakingCapHeight) {
+      overflow = {
+        isHeightCap: true,
+        isOverTheCap: stakingCapHeight <= height,
+        isApprochingCap: stakingCapHeight + confirmationDepth < height,
+      };
+    } else if (stakingCapSat && stakingStats) {
+      const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
+      overflow = {
+        isHeightCap: false,
+        isOverTheCap: stakingCapSat <= activeTVLSat,
+        isApprochingCap:
+          stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
+      };
+    }
   }
 
   return (

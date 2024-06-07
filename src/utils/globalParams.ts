@@ -42,3 +42,12 @@ export const getCurrentGlobalParamsVersion = (
     firstActivationHeight,
   };
 };
+
+export const getStakingCap = (verionedParam: GlobalParamsVersion) => {
+  if (verionedParam.stakingCapSat) {
+    return {
+      isHeightBased: false,
+      value: verionedParam.stakingCapSat,
+    };
+  }
+};
