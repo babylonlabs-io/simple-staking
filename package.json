@@ -44,6 +44,7 @@
   "devDependencies": {
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@tanstack/react-query-devtools": "^5.28.14",
+    "@testing-library/jest-dom": "^6.4.5",
     "@testing-library/react": "^16.0.0",
     "@types/jest": "^29.5.12",
     "@types/node": "^20",
