@@ -13,8 +13,9 @@ export const TestingInfo: React.FC<TestingInfoProps> = () => {
           </p>
         </div>
         <p className="text-center lg:text-left">
-          Please do your due diligence. Tokens are for testing only and do not
-          carry any monetary value.
+          The app may contain bugs. Use it after conducting your own research
+          and making an informed decision. Tokens are for testing only and do
+          not carry any monetary value.
         </p>
       </div>
     </div>
