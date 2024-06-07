@@ -85,7 +85,7 @@ export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
   ];
 
   return (
-    <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm 2xl:flex-row 2xl:justify-between">
+    <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm lg:flex-row lg:justify-between">
       {sections.map((section, index) => (
         <div
           key={index}
@@ -93,7 +93,7 @@ export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
         >
           {section.map((subSection, subIndex) => (
             <Fragment key={subSection.title}>
-              <div className="flex items-center gap-2 md:flex-1 md:flex-col 2xl:flex-initial 2xl:flex-row">
+              <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-center">
                 <div className="flex items-center gap-2">
                   <Image src={subSection.icon} alt={subSection.title} />
                   <div className="flex items-center gap-1">
