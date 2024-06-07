@@ -37,7 +37,7 @@ const buildStakingCapSection = (
       };
     } else if (verionedParam?.stakingCapHeight) {
       return {
-        title: "Staking window",
+        title: "Staking Window",
         value: `height ${activationHeight} - ${stakingCapHeight} (current: ${btcHeight})`,
       };
     }
