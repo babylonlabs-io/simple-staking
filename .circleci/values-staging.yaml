@@ -1,7 +1,7 @@
 namespace: phase-1-staging
 name: simple-staking
 deployment:
-  image: 490721144737.dkr.ecr.us-east-1.amazonaws.com/simple-staking
+  image: 490721144737.dkr.ecr.us-east-1.amazonaws.com/simple-staking-private
   version: REPLACEME
   replicas: 1
   ports:
