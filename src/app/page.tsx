@@ -37,7 +37,7 @@ import { useError } from "./context/Error/ErrorContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
-interface HomeProps { }
+interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -48,6 +48,7 @@ const Home: React.FC<HomeProps> = () => {
   const [address, setAddress] = useState("");
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
+
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -317,7 +318,7 @@ const Home: React.FC<HomeProps> = () => {
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
           <Stats />
-          {address && btcWalletBalanceSat && (
+          {address && (
             <Summary
               address={address}
               totalStakedSat={totalStakedSat}

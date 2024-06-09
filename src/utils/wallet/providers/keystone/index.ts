@@ -158,7 +158,7 @@ export class KeystoneWallet extends WalletProvider {
   };
 
   getNetwork = async (): Promise<Network> => {
-    return Network.SIGNET;
+    return this.networkEnv;
   };
 
   /**

@@ -105,7 +105,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
         </p>
         <p>
           There is also a build-in maximum staking period of{" "}
-          {blocksToWeeks(minStakingTimeBlocks, 5)}.
+          {minStakingTimeBlocks ? blocksToWeeks(minStakingTimeBlocks, 5) : "-"}.
         </p>
         <p>
           If the stake is not unbonded before the end of this period, it will
