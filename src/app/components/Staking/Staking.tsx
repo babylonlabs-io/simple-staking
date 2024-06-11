@@ -44,7 +44,6 @@ interface StakingProps {
   finalityProviders: FinalityProviderInterface[] | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
-  // overflow: OverflowProperties;
   onConnect: () => void;
   finalityProvidersFetchNext: () => void;
   finalityProvidersHasNext: boolean;
@@ -105,7 +104,7 @@ export const Staking: React.FC<StakingProps> = ({
     if (!btcHeight || !globalParams) {
       return;
     }
-    const paramCtx = getCurrentGlobalParamsVersion(btcHeight, globalParams);
+    const paramCtx = getCurrentGlobalParamsVersion(btcHeight + 1, globalParams);
     setParamWithCtx(paramCtx);
   }, [btcHeight, globalParams]);
 
@@ -114,15 +113,18 @@ export const Staking: React.FC<StakingProps> = ({
     if (!paramWithCtx || !paramWithCtx.currentVersion || !btcHeight) {
       return;
     }
+    const nextBlockHeight = btcHeight + 1;
     const { stakingCapHeight, stakingCapSat, confirmationDepth } =
       paramWithCtx.currentVersion;
     // Use height based cap than value based cap if it is set
     if (stakingCapHeight) {
       setOverflow({
         isHeightCap: true,
-        overTheCapRange: btcHeight >= stakingCapHeight + confirmationDepth - 1,
+        overTheCapRange:
+          nextBlockHeight >= stakingCapHeight + confirmationDepth - 1,
         approchingCapRange:
-          btcHeight >= stakingCapHeight - OVERFLOW_HEIGHT_WANRING_THRESHOLD,
+          nextBlockHeight >=
+          stakingCapHeight - OVERFLOW_HEIGHT_WANRING_THRESHOLD,
       });
     } else if (stakingCapSat && stakingStats && stakingStats.data) {
       const { activeTVLSat, unconfirmedTVLSat } = stakingStats.data;
@@ -141,7 +143,9 @@ export const Staking: React.FC<StakingProps> = ({
   const isUpgrading = paramWithCtx?.isApprochingNextVersion;
   const isBlockHeightUnderActivation =
     !stakingParams ||
-    (btcHeight && firstActivationHeight && btcHeight < firstActivationHeight);
+    (btcHeight &&
+      firstActivationHeight &&
+      btcHeight + 1 < firstActivationHeight);
   const { showError } = useError();
 
   const handleResetState = () => {
