@@ -1,15 +1,21 @@
 import Image from "next/image";
-import { Fragment } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import {
+  StakingStats,
+  useStakingStats,
+} from "@/app/context/api/StakingStatsProvider";
 import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { StakingStats } from "@/app/types/stakingStats";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import {
+  ParamsWithContext,
+  getCurrentGlobalParamsVersion,
+} from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import confirmedTvl from "./icons/confirmed-tvl.svg";
@@ -18,51 +24,100 @@ import pendingStake from "./icons/pending-stake.svg";
 import stakers from "./icons/stakers.svg";
 import stakingTvlCap from "./icons/staking-tvl-cap.svg";
 
-interface StatsProps {
-  stakingStats: StakingStats | undefined;
-  isLoading: boolean;
-}
+const buildNextCapText = (
+  coinName: string,
+  btcHeight: number,
+  nextVersion: GlobalParamsVersion,
+) => {
+  const { stakingCapHeight, stakingCapSat, activationHeight } = nextVersion;
+  if (stakingCapHeight) {
+    return {
+      title: "Staking Window",
+      value: `open in ${activationHeight - btcHeight - 1} blocks`,
+    };
+  } else if (stakingCapSat) {
+    return {
+      title: "Next Staking TVL Cap",
+      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
+    };
+  }
+};
 
 const buildStakingCapSection = (
   coinName: string,
-  btcHeight?: number,
-  verionedParam?: GlobalParamsVersion,
+  btcHeight: number,
+  paramsCtx: ParamsWithContext,
 ) => {
-  if (verionedParam) {
-    const { stakingCapHeight, stakingCapSat, activationHeight } = verionedParam;
-    if (verionedParam?.stakingCapSat) {
-      return {
-        title: "Staking TVL Cap",
-        value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
-      };
-    } else if (verionedParam?.stakingCapHeight) {
-      return {
-        title: "Staking Window",
-        value: `height ${activationHeight} - ${stakingCapHeight} (current: ${btcHeight})`,
-      };
-    }
+  const { currentVersion, nextVersion } = paramsCtx;
+  if (!currentVersion) {
+    return;
   }
-  return {
-    title: "Staking TVL Cap",
-    value: "-",
-  };
+  if (nextVersion) {
+    return buildNextCapText(coinName, btcHeight, nextVersion);
+  }
+  const { stakingCapHeight, stakingCapSat, confirmationDepth } = currentVersion;
+  if (stakingCapHeight) {
+    const numOfBlockLeft = stakingCapHeight + confirmationDepth - btcHeight - 1;
+    return {
+      title: "Staking Window",
+      value:
+        numOfBlockLeft > 0 ? `close in ${numOfBlockLeft} blocks` : "closed",
+    };
+  } else if (stakingCapSat) {
+    return {
+      title: "Staking TVL Cap",
+      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
+    };
+  }
 };
 
-export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
+export const Stats: React.FC = () => {
+  const [stakingStats, setStakingStats] = useState<StakingStats | undefined>({
+    activeTVLSat: 0,
+    totalTVLSat: 0,
+    activeDelegations: 0,
+    totalDelegations: 0,
+    totalStakers: 0,
+    unconfirmedTVLSat: 0,
+  });
+  const [stakingCapText, setStakingCapText] = useState<{
+    title: string;
+    value: string;
+  }>({
+    title: "Staking TVL Cap",
+    value: "-",
+  });
+  const [isLoading, setIsLoading] = useState(true);
+  const stakingStatsProvider = useStakingStats();
   const btcHeight = useBtcHeight();
   const globalParams = useGlobalParams();
-  let param;
-  if (btcHeight && globalParams) {
-    const { currentVersion } = getCurrentGlobalParamsVersion(
-      btcHeight + 1,
-      globalParams,
-    );
-    param = currentVersion;
-  }
 
   const { coinName } = getNetworkConfig();
 
-  const cap = buildStakingCapSection(coinName, btcHeight, param);
+  // Load the data from staking stats provider
+  useEffect(() => {
+    if (stakingStatsProvider) {
+      if (stakingStatsProvider.data) {
+        setStakingStats(stakingStatsProvider.data);
+      }
+      setIsLoading(stakingStatsProvider.isLoading);
+    }
+  }, [stakingStatsProvider]);
+
+  useEffect(() => {
+    if (!btcHeight || !globalParams) {
+      return;
+    }
+    const paramsWithCtx = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams,
+    );
+    if (!paramsWithCtx) {
+      return;
+    }
+    const cap = buildStakingCapSection(coinName, btcHeight, paramsWithCtx);
+    if (cap) setStakingCapText(cap);
+  }, [globalParams, btcHeight, stakingStats, coinName]);
 
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",
@@ -72,8 +127,8 @@ export const Stats: React.FC<StatsProps> = ({ stakingStats, isLoading }) => {
   const sections = [
     [
       {
-        title: cap.title,
-        value: cap.value,
+        title: stakingCapText.title,
+        value: stakingCapText.value,
         icon: stakingTvlCap,
       },
       {

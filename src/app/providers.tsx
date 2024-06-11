@@ -8,6 +8,7 @@ import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { GlobalParamsProvider } from "./context/api/GlobalParamsProvider";
+import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 
 function Providers({ children }: React.PropsWithChildren) {
@@ -19,9 +20,11 @@ function Providers({ children }: React.PropsWithChildren) {
         <ErrorProvider>
           <GlobalParamsProvider>
             <BtcHeightProvider>
-              <ReactQueryStreamedHydration>
-                {children}
-              </ReactQueryStreamedHydration>
+              <StakingStatsProvider>
+                <ReactQueryStreamedHydration>
+                  {children}
+                </ReactQueryStreamedHydration>
+              </StakingStatsProvider>
             </BtcHeightProvider>
           </GlobalParamsProvider>
         </ErrorProvider>

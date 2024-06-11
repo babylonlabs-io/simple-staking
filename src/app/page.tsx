@@ -22,8 +22,6 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { getStats } from "./api/getStats";
-import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -66,7 +64,7 @@ const Home: React.FC<HomeProps> = () => {
       return {
         // The staking parameters are retrieved based on the current height + 1
         // so this verification should take this into account.
-        height: height + 1,
+        height: height,
         ...getCurrentGlobalParamsVersion(height + 1, versions),
       };
     },
@@ -148,21 +146,6 @@ const Home: React.FC<HomeProps> = () => {
     },
   });
 
-  const {
-    data: stakingStats,
-    isLoading: stakingStatsIsLoading,
-    error: statsError,
-    isError: hasStatsError,
-    refetch: refetchStats,
-  } = useQuery({
-    queryKey: ["stats"],
-    queryFn: getStats,
-    refetchInterval: 60000, // 1 minute
-    retry: (failureCount, error) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
-
   useEffect(() => {
     const handleError = ({
       error,
@@ -195,12 +178,6 @@ const Home: React.FC<HomeProps> = () => {
       refetchFunction: refetchDelegationData,
     });
     handleError({
-      error: statsError,
-      hasError: hasStatsError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchStats,
-    });
-    handleError({
       error: globalParamsVersionError,
       hasError: hasGlobalParamsVersionError,
       errorState: ErrorState.SERVER_ERROR,
@@ -210,7 +187,6 @@ const Home: React.FC<HomeProps> = () => {
     hasFinalityProvidersError,
     hasGlobalParamsVersionError,
     hasDelegationsError,
-    hasStatsError,
     isRefetchFinalityProvidersError,
   ]);
 
@@ -327,34 +303,6 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
-  // Check if the staking cap is reached, or if it is approaching
-  // the cap can either be height-based or sat-based
-  let overflow = {
-    isHeightCap: false,
-    isOverTheCap: false,
-    isApprochingCap: false,
-  };
-  if (paramWithContext?.currentVersion) {
-    const { height } = paramWithContext;
-    const { stakingCapHeight, stakingCapSat, confirmationDepth } =
-      paramWithContext.currentVersion;
-    if (stakingCapHeight) {
-      overflow = {
-        isHeightCap: true,
-        isOverTheCap: stakingCapHeight <= height,
-        isApprochingCap: stakingCapHeight + confirmationDepth < height,
-      };
-    } else if (stakingCapSat && stakingStats) {
-      const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
-      overflow = {
-        isHeightCap: false,
-        isOverTheCap: stakingCapSat <= activeTVLSat,
-        isApprochingCap:
-          stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
-      };
-    }
-  }
-
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -368,10 +316,7 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          <Stats
-            stakingStats={stakingStats}
-            isLoading={stakingStatsIsLoading}
-          />
+          <Stats />
           {address && btcWalletBalanceSat && (
             <Summary
               address={address}
@@ -380,11 +325,10 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
+            btcHeight={paramWithContext?.height}
             finalityProviders={finalityProviders?.finalityProviders}
-            paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
-            overflow={overflow}
             finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
             finalityProvidersIsFetchingMore={
