@@ -278,7 +278,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking window closed"
           messages={[
-            "Staking is temporarily disabled due to the staking window getting closed.",
+            "Staking is temporarily disabled due to the staking window being closed.",
             "Please check your staking history to see if any of your stake is tagged overflow.",
             "Overflow stake should be unbonded and withdrawn.",
           ]}
@@ -307,6 +307,24 @@ export const Staking: React.FC<StakingProps> = ({
       setCancelFeedbackModalOpened(true);
     }
     setFeedbackModal({ type: null, isOpen: false });
+  };
+
+  const showApproachingCapWarning = () => {
+    if (!overflow.approchingCapRange) {
+      return;
+    }
+    if (overflow.isHeightCap) {
+      return (
+        <p className="text-center text-sm text-error">
+          Staking window is closing. Your stake may <b>overflow</b>!
+        </p>
+      );
+    }
+    return (
+      <p className="text-center text-sm text-error">
+        Staking cap is filling up. Your stake may <b>overflow</b>!
+      </p>
+    );
   };
 
   const renderStakingForm = () => {
@@ -394,11 +412,7 @@ export const Staking: React.FC<StakingProps> = ({
                 reset={resetFormInputs}
               />
             </div>
-            {overflow.approchingCapRange && (
-              <p className="text-center text-sm text-error">
-                Staking cap is approaching. Your stake may <b>overflow</b>!
-              </p>
-            )}
+            {showApproachingCapWarning()}
             <button
               className="btn-primary btn mt-2 w-full"
               disabled={!signReady}

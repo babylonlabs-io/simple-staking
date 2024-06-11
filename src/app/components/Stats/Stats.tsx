@@ -48,11 +48,11 @@ const buildStakingCapSection = (
   btcHeight: number,
   paramsCtx: ParamsWithContext,
 ) => {
-  const { currentVersion, nextVersion } = paramsCtx;
+  const { currentVersion, nextVersion, isApprochingNextVersion } = paramsCtx;
   if (!currentVersion) {
     return;
   }
-  if (nextVersion) {
+  if (isApprochingNextVersion && nextVersion) {
     return buildNextCapText(coinName, btcHeight, nextVersion);
   }
   const { stakingCapHeight, stakingCapSat, confirmationDepth } = currentVersion;

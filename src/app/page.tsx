@@ -37,7 +37,7 @@ import { useError } from "./context/Error/ErrorContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
-interface HomeProps {}
+interface HomeProps { }
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -64,8 +64,8 @@ const Home: React.FC<HomeProps> = () => {
       return {
         // The staking parameters are retrieved based on the current height + 1
         // so this verification should take this into account.
-        height: height,
-        ...getCurrentGlobalParamsVersion(height + 1, versions),
+        currentHeight: height,
+        nextBlockParams: getCurrentGlobalParamsVersion(height + 1, versions),
       };
     },
     refetchInterval: 60000, // 1 minute
@@ -325,7 +325,7 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            btcHeight={paramWithContext?.height}
+            btcHeight={paramWithContext?.currentHeight}
             finalityProviders={finalityProviders?.finalityProviders}
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
@@ -344,14 +344,16 @@ const Home: React.FC<HomeProps> = () => {
           />
           {btcWallet &&
             delegations &&
-            paramWithContext?.currentVersion &&
+            paramWithContext?.nextBlockParams.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
                 delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
-                globalParamsVersion={paramWithContext.currentVersion}
+                globalParamsVersion={
+                  paramWithContext.nextBlockParams.currentVersion
+                }
                 publicKeyNoCoord={publicKeyNoCoord}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
