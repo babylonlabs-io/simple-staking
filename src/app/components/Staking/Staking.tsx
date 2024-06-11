@@ -2,7 +2,7 @@ import { Transaction, networks } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { OVERFLOW_HEIGHT_WANRING_THRESHOLD } from "@/app/common/constants";
+import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
@@ -101,10 +101,13 @@ export const Staking: React.FC<StakingProps> = ({
   // load global params and calculate the current staking params
   const globalParams = useGlobalParams();
   useMemo(() => {
-    if (!btcHeight || !globalParams) {
+    if (!btcHeight || !globalParams.data) {
       return;
     }
-    const paramCtx = getCurrentGlobalParamsVersion(btcHeight + 1, globalParams);
+    const paramCtx = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams.data,
+    );
     setParamWithCtx(paramCtx);
   }, [btcHeight, globalParams]);
 
@@ -122,17 +125,23 @@ export const Staking: React.FC<StakingProps> = ({
         isHeightCap: true,
         overTheCapRange:
           nextBlockHeight >= stakingCapHeight + confirmationDepth - 1,
+        /* 
+          When btc height is approching the staking cap height, 
+          there is higher chance of overflow due to tx not being included in the next few blocks on time
+          We also don't take the confirmation depth into account here as majority 
+          of the delegation will be overflow after the cap is reached, unless btc fork happens but it's unlikely
+        */
         approchingCapRange:
           nextBlockHeight >=
-          stakingCapHeight - OVERFLOW_HEIGHT_WANRING_THRESHOLD,
+          stakingCapHeight - OVERFLOW_HEIGHT_WARNING_THRESHOLD,
       });
-    } else if (stakingCapSat && stakingStats && stakingStats.data) {
+    } else if (stakingCapSat && stakingStats.data) {
       const { activeTVLSat, unconfirmedTVLSat } = stakingStats.data;
       setOverflow({
         isHeightCap: false,
         overTheCapRange: stakingCapSat <= activeTVLSat,
         approchingCapRange:
-          stakingCapSat * OVERFLOW_HEIGHT_WANRING_THRESHOLD < unconfirmedTVLSat,
+          stakingCapSat * OVERFLOW_HEIGHT_WARNING_THRESHOLD < unconfirmedTVLSat,
       });
     }
   }, [paramWithCtx, btcHeight, stakingStats]);

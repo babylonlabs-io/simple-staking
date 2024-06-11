@@ -24,9 +24,13 @@ interface StakingStatsContextType {
   isLoading: boolean;
 }
 
-const StakingStatsContext = createContext<StakingStatsContextType | undefined>(
-  undefined,
-);
+const defaultContextValue: StakingStatsContextType = {
+  data: undefined,
+  isLoading: true,
+};
+
+const StakingStatsContext =
+  createContext<StakingStatsContextType>(defaultContextValue);
 
 export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
   children,

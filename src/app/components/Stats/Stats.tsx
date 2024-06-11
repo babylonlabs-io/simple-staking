@@ -33,7 +33,7 @@ const buildNextCapText = (
   if (stakingCapHeight) {
     return {
       title: "Staking Window",
-      value: `open in ${activationHeight - btcHeight - 1} blocks`,
+      value: `opens in ${activationHeight - btcHeight - 1} blocks`,
     };
   } else if (stakingCapSat) {
     return {
@@ -61,7 +61,7 @@ const buildStakingCapSection = (
     return {
       title: "Staking Window",
       value:
-        numOfBlockLeft > 0 ? `close in ${numOfBlockLeft} blocks` : "closed",
+        numOfBlockLeft > 0 ? `closes in ${numOfBlockLeft} blocks` : "closed",
     };
   } else if (stakingCapSat) {
     return {
@@ -96,21 +96,19 @@ export const Stats: React.FC = () => {
 
   // Load the data from staking stats provider
   useEffect(() => {
-    if (stakingStatsProvider) {
-      if (stakingStatsProvider.data) {
-        setStakingStats(stakingStatsProvider.data);
-      }
-      setIsLoading(stakingStatsProvider.isLoading);
+    if (stakingStatsProvider.data) {
+      setStakingStats(stakingStatsProvider.data);
     }
-  }, [stakingStatsProvider]);
+    setIsLoading(stakingStatsProvider.isLoading || globalParams.isLoading);
+  }, [stakingStatsProvider, globalParams]);
 
   useEffect(() => {
-    if (!btcHeight || !globalParams) {
+    if (!btcHeight || !globalParams.data) {
       return;
     }
     const paramsWithCtx = getCurrentGlobalParamsVersion(
       btcHeight + 1,
-      globalParams,
+      globalParams.data,
     );
     if (!paramsWithCtx) {
       return;
