@@ -8,21 +8,30 @@ interface GlobalParamsProviderProps {
   children: ReactNode;
 }
 
-const GlobalParamsContext = createContext<GlobalParamsVersion[] | undefined>(
-  undefined,
-);
+interface GlobalParamsContextType {
+  data: GlobalParamsVersion[] | undefined;
+  isLoading: boolean;
+}
+
+const defaultContextValue: GlobalParamsContextType = {
+  data: undefined,
+  isLoading: true,
+};
+
+const GlobalParamsContext =
+  createContext<GlobalParamsContextType>(defaultContextValue);
 
 export const GlobalParamsProvider: React.FC<GlobalParamsProviderProps> = ({
   children,
 }) => {
-  const { data } = useQuery({
+  const { data, isLoading } = useQuery({
     queryKey: ["API_GLOBAL_PARAMS"],
     queryFn: async () => getGlobalParams(),
     refetchInterval: 60000, // 1 minute
   });
 
   return (
-    <GlobalParamsContext.Provider value={data}>
+    <GlobalParamsContext.Provider value={{ data, isLoading }}>
       {children}
     </GlobalParamsContext.Provider>
   );

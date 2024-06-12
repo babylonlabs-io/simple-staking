@@ -1,15 +1,21 @@
 import { Transaction, networks } from "bitcoinjs-lib";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { getStakingTerm } from "@/utils/getStakingTerm";
+import {
+  ParamsWithContext,
+  getCurrentGlobalParamsVersion,
+} from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 import { signForm } from "@/utils/signForm";
@@ -28,14 +34,16 @@ import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
 
 interface OverflowProperties {
-  isOverTheCap: boolean;
-  isApprochingCap: boolean;
+  isHeightCap: boolean;
+  overTheCapRange: boolean;
+  approchingCapRange: boolean;
 }
+
 interface StakingProps {
+  btcHeight: number | undefined;
   finalityProviders: FinalityProviderInterface[] | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
-  overflow: OverflowProperties;
   onConnect: () => void;
   finalityProvidersFetchNext: () => void;
   finalityProvidersHasNext: boolean;
@@ -46,26 +54,17 @@ interface StakingProps {
   address: string | undefined;
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
-  paramWithContext:
-    | {
-        height: number | undefined;
-        firstActivationHeight: number | undefined;
-        currentVersion: GlobalParamsVersion | undefined;
-        isApprochingNextVersion: boolean | undefined;
-      }
-    | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
+  btcHeight,
   finalityProviders,
   isWalletConnected,
-  overflow,
   onConnect,
   finalityProvidersFetchNext,
   finalityProvidersHasNext,
   finalityProvidersIsFetchingMore,
   isLoading,
-  paramWithContext,
   btcWallet,
   btcWalletNetwork,
   address,
@@ -88,15 +87,74 @@ export const Staking: React.FC<StakingProps> = ({
     useLocalStorage<boolean>("bbn-staking-successFeedbackModalOpened", false);
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
+  const [paramWithCtx, setParamWithCtx] = useState<
+    ParamsWithContext | undefined
+  >();
+  const [overflow, setOverflow] = useState<OverflowProperties>({
+    isHeightCap: false,
+    overTheCapRange: false,
+    approchingCapRange: false,
+  });
+
+  const stakingStats = useStakingStats();
+
+  // load global params and calculate the current staking params
+  const globalParams = useGlobalParams();
+  useMemo(() => {
+    if (!btcHeight || !globalParams.data) {
+      return;
+    }
+    const paramCtx = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams.data,
+    );
+    setParamWithCtx(paramCtx);
+  }, [btcHeight, globalParams]);
+
+  // Calculate the overflow properties
+  useMemo(() => {
+    if (!paramWithCtx || !paramWithCtx.currentVersion || !btcHeight) {
+      return;
+    }
+    const nextBlockHeight = btcHeight + 1;
+    const { stakingCapHeight, stakingCapSat, confirmationDepth } =
+      paramWithCtx.currentVersion;
+    // Use height based cap than value based cap if it is set
+    if (stakingCapHeight) {
+      setOverflow({
+        isHeightCap: true,
+        overTheCapRange:
+          nextBlockHeight >= stakingCapHeight + confirmationDepth - 1,
+        /* 
+          When btc height is approching the staking cap height, 
+          there is higher chance of overflow due to tx not being included in the next few blocks on time
+          We also don't take the confirmation depth into account here as majority 
+          of the delegation will be overflow after the cap is reached, unless btc fork happens but it's unlikely
+        */
+        approchingCapRange:
+          nextBlockHeight >=
+          stakingCapHeight - OVERFLOW_HEIGHT_WARNING_THRESHOLD,
+      });
+    } else if (stakingCapSat && stakingStats.data) {
+      const { activeTVLSat, unconfirmedTVLSat } = stakingStats.data;
+      setOverflow({
+        isHeightCap: false,
+        overTheCapRange: stakingCapSat <= activeTVLSat,
+        approchingCapRange:
+          stakingCapSat * OVERFLOW_HEIGHT_WARNING_THRESHOLD < unconfirmedTVLSat,
+      });
+    }
+  }, [paramWithCtx, btcHeight, stakingStats]);
 
   const { coinName } = getNetworkConfig();
-  const stakingParams = paramWithContext?.currentVersion;
-  const firstActivationHeight = paramWithContext?.firstActivationHeight;
-  const height = paramWithContext?.height;
-  const isUpgrading = paramWithContext?.isApprochingNextVersion;
+  const stakingParams = paramWithCtx?.currentVersion;
+  const firstActivationHeight = paramWithCtx?.firstActivationHeight;
+  const isUpgrading = paramWithCtx?.isApprochingNextVersion;
   const isBlockHeightUnderActivation =
     !stakingParams ||
-    (height && firstActivationHeight && height < firstActivationHeight);
+    (btcHeight &&
+      firstActivationHeight &&
+      btcHeight + 1 < firstActivationHeight);
   const { showError } = useError();
 
   const handleResetState = () => {
@@ -115,12 +173,12 @@ export const Staking: React.FC<StakingProps> = ({
         throw new Error("Address is not set");
       } else if (!btcWalletNetwork) {
         throw new Error("Wallet network not connected");
-      } else if (!paramWithContext || !paramWithContext.currentVersion) {
+      } else if (!paramWithCtx || !paramWithCtx.currentVersion) {
         throw new Error("Global params not loaded");
       } else if (!finalityProvider) {
         throw new Error("Finality provider not selected");
       }
-      const { currentVersion: globalParamsVersion } = paramWithContext;
+      const { currentVersion: globalParamsVersion } = paramWithCtx;
       const stakingTerm = getStakingTerm(
         globalParamsVersion,
         stakingTimeBlocks,
@@ -214,6 +272,34 @@ export const Staking: React.FC<StakingProps> = ({
     }
   };
 
+  const showOverflowWarning = (overflow: OverflowProperties) => {
+    if (overflow.isHeightCap) {
+      return (
+        <Message
+          title="Staking window closed"
+          messages={[
+            "Staking is temporarily disabled due to the staking window being closed.",
+            "Please check your staking history to see if any of your stake is tagged overflow.",
+            "Overflow stake should be unbonded and withdrawn.",
+          ]}
+          icon={stakingCapReached}
+        />
+      );
+    } else {
+      return (
+        <Message
+          title="Staking cap reached"
+          messages={[
+            "Staking is temporarily disabled due to the staking cap getting reached.",
+            "Please check your staking history to see if any of your stake is tagged overflow.",
+            "Overflow stake should be unbonded and withdrawn.",
+          ]}
+          icon={stakingCapReached}
+        />
+      );
+    }
+  };
+
   const handleCloseFeedbackModal = () => {
     if (feedbackModal.type === "success") {
       setSuccessFeedbackModalOpened(true);
@@ -221,6 +307,24 @@ export const Staking: React.FC<StakingProps> = ({
       setCancelFeedbackModalOpened(true);
     }
     setFeedbackModal({ type: null, isOpen: false });
+  };
+
+  const showApproachingCapWarning = () => {
+    if (!overflow.approchingCapRange) {
+      return;
+    }
+    if (overflow.isHeightCap) {
+      return (
+        <p className="text-center text-sm text-error">
+          Staking window is closing. Your stake may <b>overflow</b>!
+        </p>
+      );
+    }
+    return (
+      <p className="text-center text-sm text-error">
+        Staking cap is filling up. Your stake may <b>overflow</b>!
+      </p>
+    );
   };
 
   const renderStakingForm = () => {
@@ -239,7 +343,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${height || "-"}.`,
+            `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${btcHeight || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
@@ -258,18 +362,8 @@ export const Staking: React.FC<StakingProps> = ({
       );
     }
     // 5. Staking cap reached
-    else if (overflow.isOverTheCap) {
-      return (
-        <Message
-          title="Staking cap reached"
-          messages={[
-            "Staking is temporarily disabled due to the staking cap getting reached.",
-            "Please check your staking history to see if any of your stake is tagged overflow.",
-            "Overflow stake should be unbonded and withdrawn.",
-          ]}
-          icon={stakingCapReached}
-        />
-      );
+    else if (overflow.overTheCapRange) {
+      return showOverflowWarning(overflow);
     }
     // 6. Staking form
     else {
@@ -318,11 +412,7 @@ export const Staking: React.FC<StakingProps> = ({
                 reset={resetFormInputs}
               />
             </div>
-            {overflow.isApprochingCap && (
-              <p className="text-center text-sm text-error">
-                Staking cap is filling up. Your stake may <b>overflow</b>!
-              </p>
-            )}
+            {showApproachingCapWarning()}
             <button
               className="btn-primary btn mt-2 w-full"
               disabled={!signReady}

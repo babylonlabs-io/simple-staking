@@ -22,8 +22,6 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { getStats } from "./api/getStats";
-import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -39,7 +37,7 @@ import { useError } from "./context/Error/ErrorContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
-interface HomeProps {}
+interface HomeProps { }
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
@@ -66,8 +64,8 @@ const Home: React.FC<HomeProps> = () => {
       return {
         // The staking parameters are retrieved based on the current height + 1
         // so this verification should take this into account.
-        height: height + 1,
-        ...getCurrentGlobalParamsVersion(height + 1, versions),
+        currentHeight: height,
+        nextBlockParams: getCurrentGlobalParamsVersion(height + 1, versions),
       };
     },
     refetchInterval: 60000, // 1 minute
@@ -148,21 +146,6 @@ const Home: React.FC<HomeProps> = () => {
     },
   });
 
-  const {
-    data: stakingStats,
-    isLoading: stakingStatsIsLoading,
-    error: statsError,
-    isError: hasStatsError,
-    refetch: refetchStats,
-  } = useQuery({
-    queryKey: ["stats"],
-    queryFn: getStats,
-    refetchInterval: 60000, // 1 minute
-    retry: (failureCount, error) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
-
   useEffect(() => {
     const handleError = ({
       error,
@@ -195,12 +178,6 @@ const Home: React.FC<HomeProps> = () => {
       refetchFunction: refetchDelegationData,
     });
     handleError({
-      error: statsError,
-      hasError: hasStatsError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchStats,
-    });
-    handleError({
       error: globalParamsVersionError,
       hasError: hasGlobalParamsVersionError,
       errorState: ErrorState.SERVER_ERROR,
@@ -210,7 +187,6 @@ const Home: React.FC<HomeProps> = () => {
     hasFinalityProvidersError,
     hasGlobalParamsVersionError,
     hasDelegationsError,
-    hasStatsError,
     isRefetchFinalityProvidersError,
   ]);
 
@@ -327,22 +303,6 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
-  // overflow properties to indicate the current state of the staking cap with the tvl
-  // these constants are needed for easier prop passing
-  let overflow = {
-    isOverTheCap: false,
-    isApprochingCap: false,
-  };
-  if (paramWithContext?.currentVersion && stakingStats) {
-    const { stakingCapSat } = paramWithContext.currentVersion;
-    const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
-    overflow = {
-      isOverTheCap: stakingCapSat <= activeTVLSat,
-      isApprochingCap:
-        stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
-    };
-  }
-
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -356,10 +316,7 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          <Stats
-            stakingStats={stakingStats}
-            isLoading={stakingStatsIsLoading}
-          />
+          <Stats />
           {address && btcWalletBalanceSat && (
             <Summary
               address={address}
@@ -368,11 +325,10 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
+            btcHeight={paramWithContext?.currentHeight}
             finalityProviders={finalityProviders?.finalityProviders}
-            paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
-            overflow={overflow}
             finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
             finalityProvidersIsFetchingMore={
@@ -388,14 +344,16 @@ const Home: React.FC<HomeProps> = () => {
           />
           {btcWallet &&
             delegations &&
-            paramWithContext?.currentVersion &&
+            paramWithContext?.nextBlockParams.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
                 delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
-                globalParamsVersion={paramWithContext.currentVersion}
+                globalParamsVersion={
+                  paramWithContext.nextBlockParams.currentVersion
+                }
                 publicKeyNoCoord={publicKeyNoCoord}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
