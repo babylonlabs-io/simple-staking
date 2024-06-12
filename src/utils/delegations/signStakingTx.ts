@@ -6,30 +6,26 @@ import { FinalityProvider } from "@/app/types/finalityProviders";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { isTaproot } from "@/utils/wallet";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { UTXO, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getStakingTerm } from "../getStakingTerm";
 
-// Sign a staking transaction
 // Returns:
-// - stakingTxHex: the signed staking transaction
+// - unsignedStakingPsbt: the unsigned staking transaction
 // - stakingTerm: the staking term
-export const signStakingTx = async (
+// - stakingFee: the staking fee
+export const createStakingTx = async (
+  btcWallet: WalletProvider,
+  address: string,
+  btcWalletNetwork: networks.Network,
+  finalityProvider: FinalityProvider,
   globalParamsVersion: GlobalParamsVersion,
   stakingTimeBlocks: number,
-  btcWallet: WalletProvider | undefined,
-  finalityProvider: FinalityProvider | undefined,
-  btcWalletNetwork: networks.Network | undefined,
   stakingAmountSat: number,
-  address: string | undefined,
   publicKeyNoCoord: string,
-): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
-  // Initial validation
-  if (!btcWallet) throw new Error("Wallet is not connected");
-  if (!address) throw new Error("Address is not set");
-  if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
-  if (!finalityProvider) throw new Error("Finality provider is not selected");
-
+  predefinedFeeRate?: number,
+  predefinedUTXOs?: UTXO[],
+) => {
   // Data extraction
   const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
 
@@ -43,10 +39,15 @@ export const signStakingTx = async (
     throw new Error("Invalid staking data");
   }
 
-  // Get the UTXOs
   let inputUTXOs = [];
   try {
-    inputUTXOs = await btcWallet.getUtxos(address);
+    // If predefined UTXOs are provided (fees calculations), use them
+    if (predefinedUTXOs) {
+      inputUTXOs = predefinedUTXOs;
+    } else {
+      // If not, get the UTXOs from the wallet
+      inputUTXOs = await btcWallet.getUtxos(address);
+    }
   } catch (error: Error | any) {
     throw new Error(error?.message || "UTXOs error");
   }
@@ -70,16 +71,23 @@ export const signStakingTx = async (
   // Get the network fees
   let feeRate: number;
   try {
-    const netWorkFee = await btcWallet.getNetworkFees();
-    feeRate = netWorkFee.fastestFee;
+    // If predefined fee rate is provided, use it
+    if (predefinedFeeRate) {
+      feeRate = predefinedFeeRate;
+    } else {
+      // If not, get the network fastest fee
+      const netWorkFee = await btcWallet.getNetworkFees();
+      feeRate = netWorkFee.fastestFee;
+    }
   } catch (error) {
     throw new Error("Cannot get network fees");
   }
 
   // Create the staking transaction
   let unsignedStakingPsbt;
+  let stakingFeeSat;
   try {
-    const { psbt } = stakingTransaction(
+    const { psbt, fee } = stakingTransaction(
       scripts,
       stakingAmountSat,
       address,
@@ -94,11 +102,49 @@ export const signStakingTx = async (
       globalParamsVersion.activationHeight - 1,
     );
     unsignedStakingPsbt = psbt;
+    stakingFeeSat = fee;
   } catch (error: Error | any) {
     throw new Error(
       error?.message || "Cannot build unsigned staking transaction",
     );
   }
+
+  return { unsignedStakingPsbt, stakingTerm, stakingFeeSat };
+};
+
+// Sign a staking transaction
+// Returns:
+// - stakingTxHex: the signed staking transaction
+// - stakingTerm: the staking term
+export const signStakingTx = async (
+  globalParamsVersion: GlobalParamsVersion,
+  stakingTimeBlocks: number,
+  btcWallet: WalletProvider | undefined,
+  finalityProvider: FinalityProvider | undefined,
+  btcWalletNetwork: networks.Network | undefined,
+  stakingAmountSat: number,
+  address: string | undefined,
+  publicKeyNoCoord: string,
+  customFeeRate?: number,
+): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
+  // Initial validation
+  if (!btcWallet) throw new Error("Wallet is not connected");
+  if (!address) throw new Error("Address is not set");
+  if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
+  if (!finalityProvider) throw new Error("Finality provider is not selected");
+
+  // Create the staking transaction
+  let { unsignedStakingPsbt, stakingTerm } = await createStakingTx(
+    btcWallet,
+    address,
+    btcWalletNetwork,
+    finalityProvider,
+    globalParamsVersion,
+    stakingTimeBlocks,
+    stakingAmountSat,
+    publicKeyNoCoord,
+    customFeeRate,
+  );
 
   // Sign the staking transaction
   let stakingTx: Transaction;

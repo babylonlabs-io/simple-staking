@@ -25,6 +25,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { StakingAmount } from "./Form/StakingAmount";
+import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
@@ -76,6 +77,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
+  const [customFeeRate, setCustomFeeRate] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
@@ -160,6 +162,7 @@ export const Staking: React.FC<StakingProps> = ({
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
     setStakingTimeBlocks(0);
+    setCustomFeeRate(0);
     setPreviewModalOpen(false);
     setResetFormInputs(!resetFormInputs);
   };
@@ -180,6 +183,7 @@ export const Staking: React.FC<StakingProps> = ({
         stakingAmountSat,
         address,
         publicKeyNoCoord,
+        customFeeRate,
       );
       // UI
       handleFeedbackModal("success");
@@ -394,6 +398,26 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingAmountSatChange={handleStakingAmountSatChange}
                 reset={resetFormInputs}
               />
+              {btcWallet &&
+                address &&
+                btcWalletNetwork &&
+                finalityProvider &&
+                paramWithCtx?.currentVersion &&
+                signReady && (
+                  <StakingFee
+                    btcWallet={btcWallet}
+                    address={address}
+                    btcWalletNetwork={btcWalletNetwork}
+                    finalityProvider={finalityProvider}
+                    globalParamsVersion={paramWithCtx.currentVersion}
+                    stakingTimeBlocks={stakingTimeBlocksWithFixed}
+                    stakingAmountSat={stakingAmountSat}
+                    publicKeyNoCoord={publicKeyNoCoord}
+                    customFeeRate={customFeeRate}
+                    onCustomFeeRateChange={setCustomFeeRate}
+                    reset={resetFormInputs}
+                  />
+                )}
             </div>
             {showApproachingCapWarning()}
             <button

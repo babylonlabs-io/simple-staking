@@ -122,9 +122,11 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         onBlur={handleBlur}
         placeholder={coinName}
       />
-      <div className="mb-2 mt-4 min-h-[20px]">
-        <p className="text-center text-sm text-error">{error}</p>
-      </div>
+      {error && (
+        <div className="my-2 min-h-[20px]">
+          <p className="text-center text-sm text-error">{error}</p>
+        </div>
+      )}
     </label>
   );
 };
