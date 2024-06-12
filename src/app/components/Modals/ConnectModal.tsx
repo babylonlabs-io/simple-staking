@@ -157,11 +157,27 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           <h3 className="text-center font-semibold">Choose wallet</h3>
           <div className="grid max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
             {walletList.map(
-              ({ provider, name, linkToDocs, icon, isQRWallet }) => {
+              ({
+                provider,
+                name,
+                linkToDocs,
+                icon,
+                isQRWallet,
+                supportedNetworks,
+              }) => {
                 if (name === BROWSER_INJECTED_WALLET_NAME) {
                   return buildInjectableWallet(isInjectable, name);
                 }
                 const walletAvailable = isQRWallet || !!window[provider as any];
+
+                // If the wallet is integrated but does not support the current network, do not display it
+                if (
+                  !supportedNetworks ||
+                  !supportedNetworks.includes(getNetworkConfig().network)
+                ) {
+                  return null;
+                }
+
                 return (
                   <a
                     key={name}

@@ -7,34 +7,39 @@ import {
   getTipHeight,
   pushTx,
 } from "../../mempool_api";
-import {
-  Fees,
-  Network,
-  UTXO,
-  WalletInfo,
-  WalletProvider,
-} from "../wallet_provider";
+import { Fees, Network, UTXO, WalletProvider } from "../wallet_provider";
 
 // window object for Bitget Wallet extension
 export const bitgetWalletProvider = "bitkeep";
 
+// Internal network names
+const INTERNAL_NETWORK_NAMES = {
+  [Network.MAINNET]: "livenet",
+  [Network.TESTNET]: "testnet",
+  [Network.SIGNET]: "signet",
+};
+
 export class BitgetWallet extends WalletProvider {
-  private bitgetWalletInfo: WalletInfo | undefined;
-  private provider = window?.[bitgetWalletProvider]?.unisat;
+  private bitcoinNetworkProvider: any;
+
   constructor() {
     super();
-  }
 
-  connectWallet = async (): Promise<any> => {
     // check whether there is an Bitget Wallet extension
-    if (!this.provider) {
+    if (!window[bitgetWalletProvider]?.unisat) {
       throw new Error("Bitget Wallet extension not found");
     }
 
-    try {
-      await this.provider?.requestAccounts(); // Connect to Bitget Wallet extension
+    this.bitcoinNetworkProvider = window[bitgetWalletProvider].unisat;
+  }
 
-      await this.provider?.switchNetwork("signet");
+  connectWallet = async (): Promise<any> => {
+    try {
+      await this.bitcoinNetworkProvider.switchNetwork(
+        INTERNAL_NETWORK_NAMES[this.networkEnv],
+      );
+
+      await this.bitcoinNetworkProvider.requestAccounts(); // Connect to Bitget Wallet extension
     } catch (error) {
       if ((error as Error)?.message?.includes("rejected")) {
         throw new Error("Connection to Bitget Wallet was rejected");
@@ -49,10 +54,6 @@ export class BitgetWallet extends WalletProvider {
     if (!address || !publicKeyHex) {
       throw new Error("Could not connect to Bitget Wallet");
     }
-    this.bitgetWalletInfo = {
-      publicKeyHex,
-      address,
-    };
     return this;
   };
 
@@ -61,7 +62,7 @@ export class BitgetWallet extends WalletProvider {
   };
 
   getAddress = async (): Promise<string> => {
-    let accounts = (await this.provider?.getAccounts()) || [];
+    let accounts = (await this.bitcoinNetworkProvider.getAccounts()) || [];
     if (!accounts?.[0]) {
       throw new Error("Bitget Wallet not connected");
     }
@@ -69,7 +70,7 @@ export class BitgetWallet extends WalletProvider {
   };
 
   getPublicKeyHex = async (): Promise<string> => {
-    let publicKey = await this.provider?.getPublicKey();
+    let publicKey = await this.bitcoinNetworkProvider.getPublicKey();
     if (!publicKey) {
       throw new Error("Bitget Wallet not connected");
     }
@@ -80,7 +81,7 @@ export class BitgetWallet extends WalletProvider {
     const data = {
       method: "signPsbt",
       params: {
-        from: this.provider?.selectedAddress,
+        from: this.bitcoinNetworkProvider.selectedAddress,
         __internalFunc: "__signPsbt_babylon",
         psbtHex,
         options: {
@@ -89,7 +90,10 @@ export class BitgetWallet extends WalletProvider {
       },
     };
 
-    let signedPsbt = await this.provider?.request("dappsSign", data);
+    let signedPsbt = await this.bitcoinNetworkProvider.request(
+      "dappsSign",
+      data,
+    );
     let psbt = Psbt.fromHex(signedPsbt);
 
     const allFinalized = psbt.data.inputs.every(
@@ -114,7 +118,7 @@ export class BitgetWallet extends WalletProvider {
     const data = {
       method: "signPsbt",
       params: {
-        from: this.provider?.selectedAddress,
+        from: this.bitcoinNetworkProvider.selectedAddress,
         __internalFunc: "__signPsbts_babylon",
         psbtHex: "_",
         psbtHexs: psbtsHexes,
@@ -123,7 +127,10 @@ export class BitgetWallet extends WalletProvider {
     };
 
     try {
-      let signedPsbts = await this.provider?.request("dappsSign", data);
+      let signedPsbts = await this.bitcoinNetworkProvider.request(
+        "dappsSign",
+        data,
+      );
       signedPsbts = signedPsbts.split(",");
       return signedPsbts.map((tx: string) => {
         let psbt = Psbt.fromHex(tx);
@@ -143,18 +150,29 @@ export class BitgetWallet extends WalletProvider {
   };
 
   signMessageBIP322 = async (message: string): Promise<string> => {
-    return await this.provider?.signMessage(message, "bip322-simple");
+    return await this.bitcoinNetworkProvider.signMessage(
+      message,
+      "bip322-simple",
+    );
   };
 
   getNetwork = async (): Promise<Network> => {
-    return await this.provider?.getNetwork();
+    const internalNetwork = await this.bitcoinNetworkProvider.getNetwork();
+
+    for (const [key, value] of Object.entries(INTERNAL_NETWORK_NAMES)) {
+      if (value === internalNetwork) {
+        return key as Network;
+      }
+    }
+
+    throw new Error("Unsupported network");
   };
 
   on = (eventName: string, callBack: () => void) => {
     if (eventName === "accountChanged") {
-      return this.provider?.on("accountsChanged", callBack);
+      return this.bitcoinNetworkProvider.on("accountsChanged", callBack);
     }
-    return this.provider?.on(eventName, callBack);
+    return this.bitcoinNetworkProvider.on(eventName, callBack);
   };
 
   // Mempool calls

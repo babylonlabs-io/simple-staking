@@ -16,32 +16,51 @@ import {
 
 export const tomoProvider = "tomo_btc";
 
+// Internal network names
+const INTERNAL_NETWORK_NAMES = {
+  [Network.MAINNET]: "mainnet",
+  [Network.TESTNET]: "testnet",
+  [Network.SIGNET]: "signet",
+};
+
 export class TomoWallet extends WalletProvider {
   private tomoWalletInfo: WalletInfo | undefined;
+  private bitcoinNetworkProvider: any;
 
   constructor() {
     super();
-  }
 
-  connectWallet = async (): Promise<this> => {
-    const workingVersion = "1.2.0";
+    // check whether there is Tomo extension
     if (!window[tomoProvider]) {
       throw new Error("Tomo Wallet extension not found");
     }
 
-    if (window[tomoProvider].getVersion) {
-      const version = await window[tomoProvider].getVersion();
+    this.bitcoinNetworkProvider = window[tomoProvider];
+  }
+
+  connectWallet = async (): Promise<this> => {
+    const workingVersion = "1.2.0";
+    if (!this.bitcoinNetworkProvider) {
+      throw new Error("Tomo Wallet extension not found");
+    }
+
+    if (this.bitcoinNetworkProvider.getVersion) {
+      const version = await this.bitcoinNetworkProvider.getVersion();
       if (version < workingVersion) {
         throw new Error("Please update Tomo Wallet to the latest version");
       }
     }
 
+    await this.bitcoinNetworkProvider.switchNetwork(
+      INTERNAL_NETWORK_NAMES[this.networkEnv],
+    );
+
     let addresses = null;
     let pubKey = null;
     try {
       // this will not throw an error even if user has no BTC Signet enabled
-      addresses = await window[tomoProvider].connectWallet();
-      pubKey = await window[tomoProvider].getPublicKey();
+      addresses = await this.bitcoinNetworkProvider.connectWallet();
+      pubKey = await this.bitcoinNetworkProvider.getPublicKey();
       if (!addresses || addresses.length === 0 || !pubKey) {
         throw new Error("BTC is not enabled in Tomo Wallet");
       }
@@ -71,7 +90,7 @@ export class TomoWallet extends WalletProvider {
     if (!this.tomoWalletInfo) {
       throw new Error("Tomo Wallet not connected");
     }
-    return this.tomoWalletInfo?.publicKeyHex;
+    return this.tomoWalletInfo.publicKeyHex;
   };
 
   signPsbt = async (psbtHex: string): Promise<string> => {
@@ -79,7 +98,7 @@ export class TomoWallet extends WalletProvider {
       throw new Error("Tomo Wallet not connected");
     }
     // sign the PSBT
-    return await window[tomoProvider].signPsbt(psbtHex);
+    return await this.bitcoinNetworkProvider.signPsbt(psbtHex);
   };
 
   signPsbts = async (psbtsHexes: string[]): Promise<string[]> => {
@@ -88,22 +107,29 @@ export class TomoWallet extends WalletProvider {
     }
 
     // sign the PSBTs
-    return await window[tomoProvider]?.signPsbts(psbtsHexes);
+    return await this.bitcoinNetworkProvider.signPsbts(psbtsHexes);
   };
 
   signMessageBIP322 = async (message: string): Promise<string> => {
     if (!this.tomoWalletInfo) {
       throw new Error("Tomo Wallet not connected");
     }
-    return await window[tomoProvider]?.signMessage(message, "bip322-simple");
+    return await this.bitcoinNetworkProvider.signMessage(
+      message,
+      "bip322-simple",
+    );
   };
 
   getNetwork = async (): Promise<Network> => {
-    let network = await window[tomoProvider]?.getNetwork();
-    if (network === Network.MAINNET) {
-      throw new Error("On mainnet now, please switch to signet in wallet");
+    const internalNetwork = await this.bitcoinNetworkProvider.getNetwork();
+
+    for (const [key, value] of Object.entries(INTERNAL_NETWORK_NAMES)) {
+      if (value === internalNetwork) {
+        return key as Network;
+      }
     }
-    return network;
+
+    throw new Error("Unsupported network");
   };
 
   on = (eventName: string, callBack: () => void) => {
@@ -112,7 +138,7 @@ export class TomoWallet extends WalletProvider {
     }
     // subscribe to account change event
     if (eventName === "accountChanged") {
-      return window[tomoProvider].on(eventName, callBack);
+      return this.bitcoinNetworkProvider.on(eventName, callBack);
     }
   };
 

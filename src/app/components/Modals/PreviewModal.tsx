@@ -56,7 +56,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToWeeks(stakingTimeBlocks, 5)}</p>
+            <p>
+              {stakingTimeBlocks ? blocksToWeeks(stakingTimeBlocks, 5) : "-"}
+            </p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
