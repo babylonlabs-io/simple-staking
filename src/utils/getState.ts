@@ -43,7 +43,7 @@ export const getStateTooltip = (state: string, confirmationDepth?: number) => {
     case DelegationState.WITHDRAWN:
       return "Stake has been withdrawn";
     case DelegationState.PENDING:
-      return `Stake is pending ${confirmationDepth || 10} Bitcoin confirmations`;
+      return `Stake that is pending ${confirmationDepth || 10} Bitcoin confirmations will only be visible from this device`;
     case DelegationState.OVERFLOW:
       return "Stake is over the staking cap";
     case DelegationState.EXPIRED:
