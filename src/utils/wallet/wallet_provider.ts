@@ -1,5 +1,3 @@
-import { getNetworkConfig } from "@/config/network.config";
-
 export type Fees = {
   // fee for inclusion in the next block
   fastestFee: number;
@@ -47,7 +45,8 @@ export abstract class WalletProvider {
   protected networkEnv: Network;
 
   constructor() {
-    this.networkEnv = getNetworkConfig().network;
+    this.networkEnv = Network.SIGNET;
+    // this.networkEnv = getNetworkConfig().network;
   }
 
   /**
