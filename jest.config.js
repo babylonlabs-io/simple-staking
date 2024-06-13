@@ -12,6 +12,5 @@ module.exports = {
   collectCoverage: false,
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
   coverageDirectory: 'coverage',
-  testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.test.tsx'],
-  setupFilesAfterEnv: ['./jest.setup.js'],
+  testMatch: ['**/tests/**/*.test.ts', '**/tests/**/*.test.tsx']
 };
