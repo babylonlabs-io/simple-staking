@@ -9,17 +9,20 @@ staking website.
 
 To set up a development environment, first specify the required environment
 variables in the `.env.local` file in the root directory:
+
 ```
 cp .env.example .env.local
 ```
 
 where,
+
 - `NEXT_PUBLIC_MEMPOOL_API` specifies the mempool.space host to use for Bitcoin
   node queries
 - `NEXT_PUBLIC_API_URL` specifies the back-end API to use for the staking
   system queries
 
 Then, to start a development server:
+
 ```bash
 npm run dev
 ```

@@ -1,27 +1,13 @@
 {
-  "extends": [
-    "next/core-web-vitals",
-    "prettier"
-  ],
-  "plugins": [
-    "@tanstack/query",
-    "import"
-  ],
+  "extends": ["next/core-web-vitals", "prettier"],
+  "plugins": ["@tanstack/query", "import"],
   "rules": {
     "import/order": [
       "error",
       {
         "groups": [
-          [
-            "builtin",
-            "external"
-          ],
-          [
-            "internal",
-            "parent",
-            "sibling",
-            "index"
-          ]
+          ["builtin", "external"],
+          ["internal", "parent", "sibling", "index"]
         ],
         "pathGroups": [
           {
@@ -35,10 +21,7 @@
             "position": "after"
           }
         ],
-        "pathGroupsExcludedImportTypes": [
-          "builtin",
-          "external"
-        ],
+        "pathGroupsExcludedImportTypes": ["builtin", "external"],
         "newlines-between": "always"
       }
     ]
