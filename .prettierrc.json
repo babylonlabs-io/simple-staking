@@ -6,5 +6,19 @@
   "plugins": [
     "prettier-plugin-tailwindcss",
     "prettier-plugin-organize-imports"
+  ],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "options": {
+        "parser": "typescript"
+      }
+    },
+    {
+      "files": ["*.js", "*.jsx"],
+      "options": {
+        "parser": "babel"
+      }
+    }
   ]
 }

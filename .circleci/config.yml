@@ -14,11 +14,15 @@ jobs:
     steps:
       - checkout
       - node/install:
-          node-version: '21.7'
+          node-version: "21.7"
       - run:
           name: Install dependencies
           command: |
             npm install
+      - run:
+          name: Run tests
+          command: |
+            npm run test
       - run:
           name: Build project
           command: |
