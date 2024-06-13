@@ -16,6 +16,9 @@
     "sort-imports": "eslint --fix .",
     "test": "jest"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "dependencies": {
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@keystonehq/animated-qr": "^0.8.6",
