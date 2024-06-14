@@ -160,13 +160,13 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             }}
           />
           <div className="w-full flex justify-between text-xs opacity-50 px-0">
-            <span>{feeRates?.economyFee}</span>
-            <span>{MAX}</span>
+            <span>{feeRates?.economyFee} sat/vB</span>
+            <span>{MAX} sat/vB</span>
           </div>
         </div>
-        {showWarning && (
+        {showWarning ? (
           <p className="text-center text-sm text-error">Fees are low</p>
-        )}
+        ) : null}
       </div>
     );
   };
