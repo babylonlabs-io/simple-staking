@@ -175,10 +175,13 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             className="btn btn-xs btn-ghost h-8"
             onClick={() => {
               setCustomFeeButtonSelected(undefined);
-              customFeeRate >= feeRates!.minimumFee &&
+              if (!customFeeRate) {
+                onCustomFeeRateChange(feeRates!.fastestFee);
+              } else if (customFeeRate >= feeRates!.minimumFee) {
                 onCustomFeeRateChange(customFeeRate - 1);
+              }
             }}
-            disabled={customFeeRate <= feeRates!.minimumFee}
+            disabled={!customFeeRate || customFeeRate <= feeRates!.minimumFee}
           >
             -
           </button>
@@ -198,10 +201,17 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             className="btn btn-xs btn-ghost h-8"
             onClick={() => {
               setCustomFeeButtonSelected(undefined);
-              customFeeRate < feeRates!.fastestFee * ULTRA_HIGH_MULTIPLIER &&
+              if (!customFeeRate) {
+                onCustomFeeRateChange(feeRates!.fastestFee);
+              } else if (
+                customFeeRate <
+                feeRates!.fastestFee * ULTRA_HIGH_MULTIPLIER
+              ) {
                 onCustomFeeRateChange(customFeeRate + 1);
+              }
             }}
             disabled={
+              !customFeeRate ||
               customFeeRate >= feeRates!.fastestFee * ULTRA_HIGH_MULTIPLIER
             }
           >
