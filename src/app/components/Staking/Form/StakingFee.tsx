@@ -154,19 +154,19 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             min={feeRates?.economyFee}
             max={MAX}
             value={customFeeRate || feeRates?.fastestFee}
-            className="range range-primary range-xs my-2 opacity-60"
+            className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
             onChange={(e) => {
               onCustomFeeRateChange(parseInt(e.target.value));
             }}
           />
-          <div className="w-full flex justify-between text-xs opacity-50 px-0">
-            <span>{feeRates?.economyFee} sat/vB</span>
-            <span>{MAX} sat/vB</span>
+          <div className="w-full flex justify-between text-xs px-0 items-center">
+            <span className="opacity-50">{feeRates?.economyFee} sat/vB</span>
+            {showWarning ? (
+              <p className="text-center text-error">Fees are low</p>
+            ) : null}
+            <span className="opacity-50">{MAX} sat/vB</span>
           </div>
         </div>
-        {showWarning ? (
-          <p className="text-center text-sm text-error">Fees are low</p>
-        ) : null}
       </div>
     );
   };
