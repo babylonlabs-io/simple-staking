@@ -125,6 +125,10 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     // 300 -> 1024, 16 -> 32, 24 -> 64
     const MAX = nextPowerOfTwo(feeRates?.fastestFee! * 2);
 
+    // If fee is below the fastest fee, show a warning
+    const showWarning =
+      customFeeRate && feeRates && customFeeRate < feeRates?.fastestFee;
+
     return (
       <div className="flex flex-col gap-2">
         <label className="form-control flex-1">
@@ -160,6 +164,9 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             <span>{MAX}</span>
           </div>
         </div>
+        {showWarning && (
+          <p className="text-center text-sm text-error">Fees are low</p>
+        )}
       </div>
     );
   };
