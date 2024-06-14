@@ -7,6 +7,7 @@ import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
+import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { LoadingSmall } from "../../Loading/Loading";
@@ -119,13 +120,18 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   };
 
   const customModeRender = () => {
+    // Slider min should be the economy fee
+    // Slider max should be 2x the fastest fee of power of 2
+    // 300 -> 1024, 16 -> 32, 24 -> 64
+    const MAX = nextPowerOfTwo(feeRates?.fastestFee! * 2);
+
     return (
       <div className="flex flex-col gap-2">
         <label className="form-control flex-1">
           <div className={`label`}>
             <span className="label-text-alt text-base text-md">Fee</span>
             <span className="label-text-alt opacity-50">
-              Fee rate: {customFeeRate} sat/vB
+              Fee rate: {customFeeRate || feeRates?.fastestFee} sat/vB
             </span>
           </div>
           <label className="input input-bordered flex items-center gap-2 no-focus">
@@ -141,8 +147,8 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <div>
           <input
             type="range"
-            min={30}
-            max={60}
+            min={feeRates?.economyFee}
+            max={MAX}
             value={customFeeRate || feeRates?.fastestFee}
             className="range range-primary range-xs my-2 opacity-60"
             onChange={(e) => {
@@ -150,8 +156,8 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             }}
           />
           <div className="w-full flex justify-between text-xs opacity-50 px-0">
-            <span>{30}</span>
-            <span>{60}</span>
+            <span>{feeRates?.economyFee}</span>
+            <span>{MAX}</span>
           </div>
         </div>
       </div>
