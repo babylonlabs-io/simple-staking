@@ -40,13 +40,10 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   reset,
 }) => {
   const [customMode, setCustomMode] = useState(false);
-  const [customFeeButtonSelected, setCustomFeeButtonSelected] =
-    useState<number>();
 
   // Use effect to reset the state when reset prop changes
   useEffect(() => {
     setCustomMode(false);
-    setCustomFeeButtonSelected(undefined);
   }, [reset]);
 
   // Fetch fee rates, sat/vB
@@ -122,40 +119,11 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   };
 
   const customModeRender = () => {
-    const generateButtonClasses = (index: number) => {
-      return `btn btn-xs btn-outline h-8 flex-1 ${
-        customFeeButtonSelected === index ? "btn-primary" : ""
-      }`;
-    };
-
-    const ULTRA_HIGH_MULTIPLIER = 2;
-    const ULTRA_HIGH_FEE_RATE = feeRates!.fastestFee * ULTRA_HIGH_MULTIPLIER;
-
-    const buttons = [
-      {
-        label: "low",
-        fee: feeRates!.hourFee,
-      },
-      {
-        label: "medium",
-        fee: feeRates!.halfHourFee,
-      },
-      {
-        label: "high",
-        fee: feeRates!.fastestFee,
-      },
-      {
-        label: "ultra high",
-        fee: ULTRA_HIGH_FEE_RATE,
-      },
-    ];
-
     return (
       <div className="flex flex-col gap-2">
         <label className="form-control flex-1">
-          <div
-            className={`label justify-end ${customFeeRate ? "flex" : "invisible"}`}
-          >
+          <div className={`label`}>
+            <span className="label-text-alt text-base text-md">Fee</span>
             <span className="label-text-alt opacity-50">
               Fee rate: {customFeeRate} sat/vB
             </span>
@@ -170,53 +138,21 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             <p>{coinName}</p>
           </label>
         </label>
-        <div className="flex gap-2">
-          <button
-            className="btn btn-xs btn-ghost h-8"
-            onClick={() => {
-              setCustomFeeButtonSelected(undefined);
-              if (!customFeeRate) {
-                onCustomFeeRateChange(feeRates!.fastestFee);
-              } else if (customFeeRate >= feeRates!.minimumFee) {
-                onCustomFeeRateChange(customFeeRate - 1);
-              }
+        <div>
+          <input
+            type="range"
+            min={30}
+            max={60}
+            value={customFeeRate || feeRates?.fastestFee}
+            className="range range-primary range-xs my-2 opacity-60"
+            onChange={(e) => {
+              onCustomFeeRateChange(parseInt(e.target.value));
             }}
-            disabled={!customFeeRate || customFeeRate <= feeRates!.minimumFee}
-          >
-            -
-          </button>
-          {buttons.map((button, index) => (
-            <button
-              key={button.label}
-              className={generateButtonClasses(index)}
-              onClick={() => {
-                setCustomFeeButtonSelected(index);
-                onCustomFeeRateChange(button.fee);
-              }}
-            >
-              {button.label}
-            </button>
-          ))}
-          <button
-            className="btn btn-xs btn-ghost h-8"
-            onClick={() => {
-              setCustomFeeButtonSelected(undefined);
-              if (!customFeeRate) {
-                onCustomFeeRateChange(feeRates!.fastestFee);
-              } else if (
-                customFeeRate <
-                feeRates!.fastestFee * ULTRA_HIGH_MULTIPLIER
-              ) {
-                onCustomFeeRateChange(customFeeRate + 1);
-              }
-            }}
-            disabled={
-              !customFeeRate ||
-              customFeeRate >= feeRates!.fastestFee * ULTRA_HIGH_MULTIPLIER
-            }
-          >
-            +
-          </button>
+          />
+          <div className="w-full flex justify-between text-xs opacity-50 px-0">
+            <span>{30}</span>
+            <span>{60}</span>
+          </div>
         </div>
       </div>
     );
