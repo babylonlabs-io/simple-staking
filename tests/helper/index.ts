@@ -3,7 +3,6 @@ import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
 import { UTXO } from "@/utils/wallet/wallet_provider";
-console.log(ecc);
 const ECPair = ECPairFactory(ecc);
 
 export class DataGenerator {

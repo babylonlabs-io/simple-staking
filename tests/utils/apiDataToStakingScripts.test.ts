@@ -1,3 +1,6 @@
+/**
+ * @jest-environment node
+ */
 import * as bitcoin from "bitcoinjs-lib";
 
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
