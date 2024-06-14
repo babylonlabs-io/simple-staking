@@ -96,16 +96,16 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
       <div className="flex flex-col justify-center gap-1 items-center">
         <div className="min-h-8 flex justify-center flex-col items-center">
           {feeRates ? (
-            <p>Recommended fee size: {feeRates.fastestFee} sats/vB</p>
+            <p>Recommended fee rate: {feeRates.fastestFee} sats/vB</p>
           ) : (
-            <LoadingSmall text="Loading recommended fee size..." />
+            <LoadingSmall text="Loading recommended fee rate..." />
           )}
           {stakingFeeSat ? (
             <p>
-              Total fee amount: {satoshiToBtc(stakingFeeSat)} {coinName}
+              Transaction fee amount: {satoshiToBtc(stakingFeeSat)} {coinName}
             </p>
           ) : (
-            <LoadingSmall text="Loading total fee amount..." />
+            <LoadingSmall text="Loading transaction fee amount..." />
           )}
         </div>
         <button
