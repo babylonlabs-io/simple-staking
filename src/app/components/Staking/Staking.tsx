@@ -143,6 +143,7 @@ export const Staking: React.FC<StakingProps> = ({
     },
   });
 
+  // TODO extract as a function and pass as a prop
   // Fetch staking fee, sat
   const { data: stakingFeeSat } = useQuery({
     queryKey: [
