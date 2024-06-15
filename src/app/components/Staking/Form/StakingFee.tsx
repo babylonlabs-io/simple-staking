@@ -114,7 +114,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   };
 
   // fetched fee rates and staking fee sat
-  const customModeReady = customMode;
+  const customModeReady = customMode && feeRates && stakingFeeSat;
 
   return (
     <div className="my-2 text-sm">
