@@ -14,17 +14,16 @@ import { getStakingTerm } from "../getStakingTerm";
 // - unsignedStakingPsbt: the unsigned staking transaction
 // - stakingTerm: the staking term
 // - stakingFee: the staking fee
-export const createStakingTx = async (
-  btcWallet: WalletProvider,
-  address: string,
-  btcWalletNetwork: networks.Network,
-  finalityProvider: FinalityProvider,
+export const createStakingTx = (
   globalParamsVersion: GlobalParamsVersion,
-  stakingTimeBlocks: number,
   stakingAmountSat: number,
+  stakingTimeBlocks: number,
+  finalityProvider: FinalityProvider,
+  btcWalletNetwork: networks.Network,
+  address: string,
   publicKeyNoCoord: string,
-  predefinedFeeRate?: number,
-  predefinedUTXOs?: UTXO[],
+  feeRate: number,
+  inputUTXOs: UTXO[],
 ) => {
   // Data extraction
   const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
@@ -39,18 +38,6 @@ export const createStakingTx = async (
     throw new Error("Invalid staking data");
   }
 
-  let inputUTXOs = [];
-  try {
-    // If predefined UTXOs are provided (fees calculations), use them
-    if (predefinedUTXOs) {
-      inputUTXOs = predefinedUTXOs;
-    } else {
-      // If not, get the UTXOs from the wallet
-      inputUTXOs = await btcWallet.getUtxos(address);
-    }
-  } catch (error: Error | any) {
-    throw new Error(error?.message || "UTXOs error");
-  }
   if (inputUTXOs.length == 0) {
     throw new Error("Not enough usable balance");
   }
@@ -66,21 +53,6 @@ export const createStakingTx = async (
     );
   } catch (error: Error | any) {
     throw new Error(error?.message || "Cannot build staking scripts");
-  }
-
-  // Get the network fees
-  let feeRate: number;
-  try {
-    // If predefined fee rate is provided, use it
-    if (predefinedFeeRate) {
-      feeRate = predefinedFeeRate;
-    } else {
-      // If not, get the network fastest fee
-      const netWorkFee = await btcWallet.getNetworkFees();
-      feeRate = netWorkFee.fastestFee;
-    }
-  } catch (error) {
-    throw new Error("Cannot get network fees");
   }
 
   // Create the staking transaction
@@ -117,15 +89,16 @@ export const createStakingTx = async (
 // - stakingTxHex: the signed staking transaction
 // - stakingTerm: the staking term
 export const signStakingTx = async (
-  globalParamsVersion: GlobalParamsVersion,
-  stakingTimeBlocks: number,
   btcWallet: WalletProvider | undefined,
+  globalParamsVersion: GlobalParamsVersion,
+  stakingAmountSat: number,
+  stakingTimeBlocks: number,
   finalityProvider: FinalityProvider | undefined,
   btcWalletNetwork: networks.Network | undefined,
-  stakingAmountSat: number,
   address: string | undefined,
   publicKeyNoCoord: string,
-  customFeeRate?: number,
+  feeRate: number,
+  inputUTXOs: UTXO[],
 ): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
   // Initial validation
   if (!btcWallet) throw new Error("Wallet is not connected");
@@ -134,16 +107,16 @@ export const signStakingTx = async (
   if (!finalityProvider) throw new Error("Finality provider is not selected");
 
   // Create the staking transaction
-  let { unsignedStakingPsbt, stakingTerm } = await createStakingTx(
-    btcWallet,
-    address,
-    btcWalletNetwork,
-    finalityProvider,
+  let { unsignedStakingPsbt, stakingTerm } = createStakingTx(
     globalParamsVersion,
-    stakingTimeBlocks,
     stakingAmountSat,
+    stakingTimeBlocks,
+    finalityProvider,
+    btcWalletNetwork,
+    address,
     publicKeyNoCoord,
-    customFeeRate,
+    feeRate,
+    inputUTXOs,
   );
 
   // Sign the staking transaction

@@ -1,26 +1,15 @@
-import { useQuery } from "@tanstack/react-query";
-import { networks } from "bitcoinjs-lib";
 import { useEffect, useState } from "react";
 
-import { FinalityProvider } from "@/app/types/finalityProviders";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { Fees } from "@/utils/wallet/wallet_provider";
 
 import { LoadingSmall } from "../../Loading/Loading";
 
 interface StakingFeeProps {
-  btcWallet: WalletProvider;
-  address: string;
-  btcWalletNetwork: networks.Network;
-  finalityProvider: FinalityProvider;
-  globalParamsVersion: GlobalParamsVersion;
-  stakingTimeBlocks: number;
-  stakingAmountSat: number;
-  publicKeyNoCoord: string;
+  feeRates?: Fees;
+  stakingFeeSat?: number;
   customFeeRate: number;
   onCustomFeeRateChange: (fee: number) => void;
   reset: boolean;
@@ -28,14 +17,8 @@ interface StakingFeeProps {
 
 // Staking fee sat might be expensive to calculate as it sums UTXOs
 export const StakingFee: React.FC<StakingFeeProps> = ({
-  btcWallet,
-  address,
-  btcWalletNetwork,
-  finalityProvider,
-  globalParamsVersion,
-  stakingTimeBlocks,
-  stakingAmountSat,
-  publicKeyNoCoord,
+  feeRates,
+  stakingFeeSat,
   customFeeRate,
   onCustomFeeRateChange,
   reset,
@@ -46,48 +29,6 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   useEffect(() => {
     setCustomMode(false);
   }, [reset]);
-
-  // Fetch fee rates, sat/vB
-  const { data: feeRates } = useQuery({
-    queryKey: ["fee rates"],
-    queryFn: btcWallet.getNetworkFees,
-    refetchInterval: 60000, // 1 minute
-  });
-
-  // Fetch all UTXOs
-  const { data: UTXOs } = useQuery({
-    queryKey: ["UTXOs", address],
-    // Has a second optional parameter, the amount of satoshis to spend
-    // Can be used for optimization
-    queryFn: () => btcWallet.getUtxos(address),
-    refetchInterval: 60000 * 5, // 5 minutes
-  });
-
-  // Fetch staking fee, sat
-  const { data: stakingFeeSat } = useQuery({
-    queryKey: ["staking fee sat", address, customFeeRate],
-    queryFn: () =>
-      // This function is always run in sync mode as no fetch is needed
-      // So there are gitter in the UI
-      createStakingTx(
-        btcWallet,
-        address,
-        btcWalletNetwork,
-        finalityProvider,
-        globalParamsVersion,
-        stakingTimeBlocks,
-        stakingAmountSat,
-        publicKeyNoCoord,
-        // Same as above, if feeRates is not fetched, the query won't be triggered
-        customFeeRate || feeRates?.fastestFee!,
-        // Without UTXOs, the fetch query won't be triggered
-        UTXOs!,
-      ),
-    // Only enabled if there are UTXOs and fee rates
-    enabled: !!(UTXOs && UTXOs?.length > 0 && feeRates?.fastestFee),
-    select: (data) => data.stakingFeeSat,
-    refetchInterval: 60000 * 5, // 5 minutes
-  });
 
   const { coinName } = getNetworkConfig();
 

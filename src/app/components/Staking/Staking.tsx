@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
@@ -11,7 +12,10 @@ import { Delegation } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
-import { signStakingTx } from "@/utils/delegations/signStakingTx";
+import {
+  createStakingTx,
+  signStakingTx,
+} from "@/utils/delegations/signStakingTx";
 import {
   ParamsWithContext,
   getCurrentGlobalParamsVersion,
@@ -97,6 +101,83 @@ export const Staking: React.FC<StakingProps> = ({
     approchingCapRange: false,
   });
 
+  // Fetch fee rates, sat/vB
+  const { data: feeRates } = useQuery({
+    queryKey: ["fee rates"],
+    queryFn: async () => {
+      if (btcWallet?.getNetworkFees) {
+        return await btcWallet.getNetworkFees();
+      }
+    },
+    enabled: !!btcWallet?.getNetworkFees,
+    refetchInterval: 60000, // 1 minute
+  });
+
+  // Fetch all UTXOs
+  const { data: UTXOs } = useQuery({
+    queryKey: ["UTXOs", address],
+    // Has a second optional parameter, the amount of satoshis to spend
+    // Can be used for optimization
+    queryFn: async () => {
+      if (btcWallet?.getUtxos && address) {
+        return await btcWallet.getUtxos(address);
+      }
+    },
+    enabled: !!(btcWallet?.getUtxos && address),
+    refetchInterval: 60000 * 5, // 5 minutes
+  });
+
+  // Fetch staking fee, sat
+  const { data: stakingFeeSat } = useQuery({
+    queryKey: [
+      "staking fee sat",
+      address,
+      customFeeRate || feeRates?.fastestFee,
+      UTXOs?.length,
+      // changing state variables to trigger the query
+      finalityProvider?.btcPk,
+      stakingAmountSat,
+      stakingTimeBlocks,
+    ],
+    queryFn: () => {
+      if (
+        address &&
+        btcWalletNetwork &&
+        finalityProvider &&
+        paramWithCtx?.currentVersion &&
+        stakingAmountSat &&
+        publicKeyNoCoord &&
+        UTXOs &&
+        feeRates?.fastestFee
+      ) {
+        const { stakingFeeSat } = createStakingTx(
+          paramWithCtx?.currentVersion,
+          stakingAmountSat,
+          stakingTimeBlocks,
+          finalityProvider,
+          btcWalletNetwork,
+          address,
+          publicKeyNoCoord,
+          customFeeRate || feeRates?.fastestFee,
+          UTXOs,
+        );
+        return stakingFeeSat;
+      }
+    },
+    // Only enabled if there are UTXOs and fee rates
+    enabled: !!(
+      btcWallet &&
+      paramWithCtx?.currentVersion &&
+      finalityProvider?.btcPk &&
+      stakingAmountSat &&
+      // rely on 2 other queries
+      UTXOs &&
+      UTXOs?.length > 0 &&
+      feeRates?.fastestFee
+    ),
+    refetchInterval: 60000 * 5, // 5 minutes
+  });
+
   const stakingStats = useStakingStats();
 
   // load global params and calculate the current staking params
@@ -169,21 +250,25 @@ export const Staking: React.FC<StakingProps> = ({
 
   const handleSign = async () => {
     try {
-      if (!paramWithCtx || !paramWithCtx.currentVersion) {
+      if (!paramWithCtx || !paramWithCtx.currentVersion)
         throw new Error("Global params not loaded");
-      }
+      if (!feeRates?.fastestFee) throw new Error("Fee rates not loaded");
+      if (!UTXOs || UTXOs.length === 0)
+        throw new Error("Not enough usable balance");
+
       const { currentVersion: globalParamsVersion } = paramWithCtx;
       // Sign the staking transaction
       const { stakingTxHex, stakingTerm } = await signStakingTx(
-        globalParamsVersion,
-        stakingTimeBlocks,
         btcWallet,
+        globalParamsVersion,
+        stakingAmountSat,
+        stakingTimeBlocks,
         finalityProvider,
         btcWalletNetwork,
-        stakingAmountSat,
         address,
         publicKeyNoCoord,
-        customFeeRate,
+        customFeeRate || feeRates?.fastestFee,
+        UTXOs,
       );
       // UI
       handleFeedbackModal("success");
@@ -398,26 +483,15 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingAmountSatChange={handleStakingAmountSatChange}
                 reset={resetFormInputs}
               />
-              {btcWallet &&
-                address &&
-                btcWalletNetwork &&
-                finalityProvider &&
-                paramWithCtx?.currentVersion &&
-                signReady && (
-                  <StakingFee
-                    btcWallet={btcWallet}
-                    address={address}
-                    btcWalletNetwork={btcWalletNetwork}
-                    finalityProvider={finalityProvider}
-                    globalParamsVersion={paramWithCtx.currentVersion}
-                    stakingTimeBlocks={stakingTimeBlocksWithFixed}
-                    stakingAmountSat={stakingAmountSat}
-                    publicKeyNoCoord={publicKeyNoCoord}
-                    customFeeRate={customFeeRate}
-                    onCustomFeeRateChange={setCustomFeeRate}
-                    reset={resetFormInputs}
-                  />
-                )}
+              {signReady && (
+                <StakingFee
+                  feeRates={feeRates}
+                  stakingFeeSat={stakingFeeSat}
+                  customFeeRate={customFeeRate}
+                  onCustomFeeRateChange={setCustomFeeRate}
+                  reset={resetFormInputs}
+                />
+              )}
             </div>
             {showApproachingCapWarning()}
             <button
