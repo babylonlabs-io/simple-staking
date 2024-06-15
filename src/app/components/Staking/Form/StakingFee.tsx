@@ -8,11 +8,12 @@ import { Fees } from "@/utils/wallet/wallet_provider";
 import { LoadingSmall } from "../../Loading/Loading";
 
 interface StakingFeeProps {
-  feeRates?: Fees;
-  stakingFeeSat?: number;
   customFeeRate: number;
   onCustomFeeRateChange: (fee: number) => void;
   reset: boolean;
+  // optional as component shows loading state
+  feeRates?: Fees;
+  stakingFeeSat?: number;
 }
 
 // Staking fee sat might be expensive to calculate as it sums UTXOs
