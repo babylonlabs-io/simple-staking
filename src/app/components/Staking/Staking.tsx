@@ -143,47 +143,6 @@ export const Staking: React.FC<StakingProps> = ({
     },
   });
 
-  // Memoize the staking fee calculation
-  const stakingFeeSat = useMemo(() => {
-    if (
-      btcWalletNetwork &&
-      address &&
-      publicKeyNoCoord &&
-      stakingAmountSat &&
-      finalityProvider &&
-      paramWithCtx?.currentVersion &&
-      feeRates?.fastestFee &&
-      UTXOs
-    ) {
-      const feeRate = customFeeRate || feeRates.fastestFee;
-      const { stakingFeeSat } = createStakingTx(
-        paramWithCtx.currentVersion,
-        stakingAmountSat,
-        stakingTimeBlocks,
-        finalityProvider,
-        btcWalletNetwork,
-        address,
-        publicKeyNoCoord,
-        feeRate,
-        UTXOs,
-      );
-      return stakingFeeSat;
-    } else {
-      return 0;
-    }
-  }, [
-    btcWalletNetwork,
-    address,
-    publicKeyNoCoord,
-    stakingAmountSat,
-    stakingTimeBlocks,
-    finalityProvider,
-    paramWithCtx,
-    feeRates,
-    customFeeRate,
-    UTXOs,
-  ]);
-
   const stakingStats = useStakingStats();
 
   // load global params and calculate the current staking params
@@ -351,6 +310,63 @@ export const Staking: React.FC<StakingProps> = ({
       ...delegations,
     ]);
   };
+
+  // Memoize the staking fee calculation
+  const stakingFeeSat = useMemo(() => {
+    if (
+      btcWalletNetwork &&
+      address &&
+      publicKeyNoCoord &&
+      stakingAmountSat &&
+      finalityProvider &&
+      paramWithCtx?.currentVersion &&
+      feeRates?.fastestFee &&
+      UTXOs
+    ) {
+      const feeRate = customFeeRate || feeRates.fastestFee;
+      try {
+        // Calculate the staking fee
+        const { stakingFeeSat } = createStakingTx(
+          paramWithCtx.currentVersion,
+          stakingAmountSat,
+          stakingTimeBlocks,
+          finalityProvider,
+          btcWalletNetwork,
+          address,
+          publicKeyNoCoord,
+          feeRate,
+          UTXOs,
+        );
+        return stakingFeeSat;
+      } catch (error: Error | any) {
+        // fees + staking amount can be more than the balance
+        showError({
+          error: {
+            message: error.message,
+            errorState: ErrorState.STAKING,
+            errorTime: new Date(),
+          },
+          retryAction: () => setCustomFeeRate(0),
+        });
+        setCustomFeeRate(0);
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+  }, [
+    btcWalletNetwork,
+    address,
+    publicKeyNoCoord,
+    stakingAmountSat,
+    stakingTimeBlocks,
+    finalityProvider,
+    paramWithCtx,
+    feeRates,
+    customFeeRate,
+    UTXOs,
+    showError,
+  ]);
 
   // Select the finality provider from the list
   const handleChooseFinalityProvider = (btcPkHex: string) => {
