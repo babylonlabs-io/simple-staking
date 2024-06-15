@@ -143,57 +143,36 @@ export const Staking: React.FC<StakingProps> = ({
     },
   });
 
-  // TODO extract as a function and pass as a prop
-  // Fetch staking fee, sat
-  const { data: stakingFeeSat } = useQuery({
-    queryKey: [
-      "staking fee sat",
-      address,
-      customFeeRate || feeRates?.fastestFee,
-      UTXOs?.length,
-      // changing state variables to trigger the query
-      finalityProvider?.btcPk,
-      stakingAmountSat,
-      stakingTimeBlocks,
-    ],
-    queryFn: () => {
-      if (
-        address &&
-        btcWalletNetwork &&
-        finalityProvider &&
-        paramWithCtx?.currentVersion &&
-        stakingAmountSat &&
-        publicKeyNoCoord &&
-        UTXOs &&
-        feeRates?.fastestFee
-      ) {
-        const { stakingFeeSat } = createStakingTx(
-          paramWithCtx?.currentVersion,
-          stakingAmountSat,
-          stakingTimeBlocks,
-          finalityProvider,
-          btcWalletNetwork,
-          address,
-          publicKeyNoCoord,
-          customFeeRate || feeRates?.fastestFee,
-          UTXOs,
-        );
-        return stakingFeeSat;
-      }
-    },
-    // Only enabled if there are UTXOs and fee rates
-    enabled: !!(
-      btcWallet &&
-      paramWithCtx?.currentVersion &&
-      finalityProvider?.btcPk &&
+  const getStakingFeeSat = (): number => {
+    if (
+      // Wallet data
+      btcWalletNetwork &&
+      address &&
+      publicKeyNoCoord &&
+      // Form data, stakingTimeBlocks can be 0
       stakingAmountSat &&
-      // rely on 2 other queries
-      UTXOs &&
-      UTXOs?.length > 0 &&
-      feeRates?.fastestFee
-    ),
-    refetchInterval: 60000 * 5, // 5 minutes
-  });
+      finalityProvider &&
+      // API data
+      paramWithCtx?.currentVersion &&
+      feeRates?.fastestFee &&
+      UTXOs
+    ) {
+      const { stakingFeeSat } = createStakingTx(
+        paramWithCtx?.currentVersion,
+        stakingAmountSat,
+        stakingTimeBlocks,
+        finalityProvider,
+        btcWalletNetwork,
+        address,
+        publicKeyNoCoord,
+        customFeeRate || feeRates?.fastestFee,
+        UTXOs,
+      );
+      return stakingFeeSat;
+    } else {
+      return 0;
+    }
+  };
 
   const stakingStats = useStakingStats();
 
@@ -545,7 +524,7 @@ export const Staking: React.FC<StakingProps> = ({
               {signReady && (
                 <StakingFee
                   feeRates={feeRates}
-                  stakingFeeSat={stakingFeeSat}
+                  getStakingFeeSat={getStakingFeeSat}
                   customFeeRate={customFeeRate}
                   onCustomFeeRateChange={setCustomFeeRate}
                   reset={resetFormInputs}
