@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
@@ -9,7 +9,7 @@ import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { Delegation } from "@/app/types/delegations";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
 import {
@@ -102,7 +102,12 @@ export const Staking: React.FC<StakingProps> = ({
   });
 
   // Fetch fee rates, sat/vB
-  const { data: feeRates } = useQuery({
+  const {
+    data: feeRates,
+    error: feeRatesError,
+    isError: hasFeeRatesError,
+    refetch: refetchFeeRates,
+  } = useQuery({
     queryKey: ["fee rates"],
     queryFn: async () => {
       if (btcWallet?.getNetworkFees) {
@@ -111,10 +116,18 @@ export const Staking: React.FC<StakingProps> = ({
     },
     enabled: !!btcWallet?.getNetworkFees,
     refetchInterval: 60000, // 1 minute
+    retry: (failureCount) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   // Fetch all UTXOs
-  const { data: UTXOs } = useQuery({
+  const {
+    data: UTXOs,
+    error: UTXOsError,
+    isError: hasUTXOsError,
+    refetch: refetchUTXOs,
+  } = useQuery({
     queryKey: ["UTXOs", address],
     // Has a second optional parameter, the amount of satoshis to spend
     // Can be used for optimization
@@ -125,6 +138,9 @@ export const Staking: React.FC<StakingProps> = ({
     },
     enabled: !!(btcWallet?.getUtxos && address),
     refetchInterval: 60000 * 5, // 5 minutes
+    retry: (failureCount) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   // Fetch staking fee, sat
@@ -237,7 +253,49 @@ export const Staking: React.FC<StakingProps> = ({
     (btcHeight &&
       firstActivationHeight &&
       btcHeight + 1 < firstActivationHeight);
-  const { showError } = useError();
+
+  const { isErrorOpen, showError } = useError();
+
+  useEffect(() => {
+    const handleError = ({
+      error,
+      hasError,
+      errorState,
+      refetchFunction,
+    }: ErrorHandlerParam) => {
+      if (hasError && error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState,
+            errorTime: new Date(),
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    };
+
+    handleError({
+      error: feeRatesError,
+      hasError: hasFeeRatesError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchFeeRates,
+    });
+    handleError({
+      error: UTXOsError,
+      hasError: hasUTXOsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchUTXOs,
+    });
+  }, [
+    UTXOsError,
+    feeRatesError,
+    hasFeeRatesError,
+    hasUTXOsError,
+    refetchFeeRates,
+    refetchUTXOs,
+    showError,
+  ]);
 
   const handleResetState = () => {
     setFinalityProvider(undefined);
