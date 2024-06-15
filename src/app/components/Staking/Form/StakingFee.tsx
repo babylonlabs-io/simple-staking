@@ -8,7 +8,7 @@ import { Fees } from "@/utils/wallet/wallet_provider";
 import { LoadingSmall } from "../../Loading/Loading";
 
 interface StakingFeeProps {
-  getStakingFeeSat: () => number;
+  stakingFeeSat: number;
   customFeeRate: number;
   onCustomFeeRateChange: (fee: number) => void;
   reset: boolean;
@@ -18,7 +18,7 @@ interface StakingFeeProps {
 
 // Staking fee sat might be expensive to calculate as it sums UTXOs
 export const StakingFee: React.FC<StakingFeeProps> = ({
-  getStakingFeeSat,
+  stakingFeeSat,
   customFeeRate,
   onCustomFeeRateChange,
   reset,
@@ -42,10 +42,9 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           ) : (
             <LoadingSmall text="Loading recommended fee rate..." />
           )}
-          {getStakingFeeSat() ? (
+          {stakingFeeSat ? (
             <p>
-              Transaction fee amount: {satoshiToBtc(getStakingFeeSat())}{" "}
-              {coinName}
+              Transaction fee amount: {satoshiToBtc(stakingFeeSat)} {coinName}
             </p>
           ) : (
             <LoadingSmall text="Loading transaction fee amount..." />
@@ -54,7 +53,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <button
           className="btn btn-sm btn-link no-underline"
           onClick={() => setCustomMode(true)}
-          disabled={!feeRates || !getStakingFeeSat()}
+          disabled={!feeRates || !stakingFeeSat}
         >
           Use Custom
         </button>
@@ -85,7 +84,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             <input
               type="text"
               className="no-focus grow"
-              value={getStakingFeeSat() ? satoshiToBtc(getStakingFeeSat()) : ""}
+              value={stakingFeeSat ? satoshiToBtc(stakingFeeSat) : ""}
               readOnly
             />
             <p>{coinName}</p>

@@ -143,36 +143,46 @@ export const Staking: React.FC<StakingProps> = ({
     },
   });
 
-  const getStakingFeeSat = (): number => {
+  // Memoize the staking fee calculation
+  const stakingFeeSat = useMemo(() => {
     if (
-      // Wallet data
       btcWalletNetwork &&
       address &&
       publicKeyNoCoord &&
-      // Form data, stakingTimeBlocks can be 0
       stakingAmountSat &&
       finalityProvider &&
-      // API data
       paramWithCtx?.currentVersion &&
       feeRates?.fastestFee &&
       UTXOs
     ) {
+      const feeRate = customFeeRate || feeRates.fastestFee;
       const { stakingFeeSat } = createStakingTx(
-        paramWithCtx?.currentVersion,
+        paramWithCtx.currentVersion,
         stakingAmountSat,
         stakingTimeBlocks,
         finalityProvider,
         btcWalletNetwork,
         address,
         publicKeyNoCoord,
-        customFeeRate || feeRates?.fastestFee,
+        feeRate,
         UTXOs,
       );
       return stakingFeeSat;
     } else {
       return 0;
     }
-  };
+  }, [
+    btcWalletNetwork,
+    address,
+    publicKeyNoCoord,
+    stakingAmountSat,
+    stakingTimeBlocks,
+    finalityProvider,
+    paramWithCtx,
+    feeRates,
+    customFeeRate,
+    UTXOs,
+  ]);
 
   const stakingStats = useStakingStats();
 
@@ -524,7 +534,7 @@ export const Staking: React.FC<StakingProps> = ({
               {signReady && (
                 <StakingFee
                   feeRates={feeRates}
-                  getStakingFeeSat={getStakingFeeSat}
+                  stakingFeeSat={stakingFeeSat}
                   customFeeRate={customFeeRate}
                   onCustomFeeRateChange={setCustomFeeRate}
                   reset={resetFormInputs}
