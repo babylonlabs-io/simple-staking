@@ -556,6 +556,8 @@ export const Staking: React.FC<StakingProps> = ({
               finalityProvider={finalityProvider?.description.moniker}
               stakingAmountSat={stakingAmountSat}
               stakingTimeBlocks={stakingTimeBlocksWithFixed}
+              stakingFeeSat={stakingFeeSat}
+              feeRate={customFeeRate || feeRates?.fastestFee}
             />
           </div>
         </>
