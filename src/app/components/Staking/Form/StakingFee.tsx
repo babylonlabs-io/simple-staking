@@ -64,7 +64,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     // Slider min should be the economy fee
     // Slider max should be 2x the fastest fee of power of 2
     // 300 -> 1024, 16 -> 32, 24 -> 64
-    const MAX = nextPowerOfTwo(feeRates?.fastestFee! * 2);
+    const maxFeeRate = nextPowerOfTwo(feeRates?.fastestFee! * 2);
 
     // If fee is below the fastest fee, show a warning
     const showWarning =
@@ -93,7 +93,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           <input
             type="range"
             min={feeRates?.economyFee}
-            max={MAX}
+            max={maxFeeRate}
             value={customFeeRate || feeRates?.fastestFee}
             className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
             onChange={(e) => {
@@ -105,7 +105,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             {showWarning ? (
               <p className="text-center text-error">Fees are low</p>
             ) : null}
-            <span className="opacity-50">{MAX} sat/vB</span>
+            <span className="opacity-50">{maxFeeRate} sat/vB</span>
           </div>
         </div>
       </div>
