@@ -38,13 +38,19 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
       <div className="flex flex-col justify-center gap-1 items-center">
         <div className="min-h-8 flex justify-center flex-col items-center">
           {feeRates ? (
-            <p>Recommended fee rate: {feeRates.fastestFee} sats/vB</p>
+            <p>
+              Recommended fee rate:{" "}
+              <strong>{feeRates.fastestFee} sats/vB</strong>
+            </p>
           ) : (
             <LoadingSmall text="Loading recommended fee rate..." />
           )}
           {stakingFeeSat ? (
             <p>
-              Transaction fee amount: {satoshiToBtc(stakingFeeSat)} {coinName}
+              Transaction fee amount:{" "}
+              <strong>
+                {satoshiToBtc(stakingFeeSat)} {coinName}
+              </strong>
             </p>
           ) : (
             <LoadingSmall text="Loading transaction fee amount..." />
@@ -73,23 +79,18 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
     return (
       <div className="flex flex-col gap-2">
-        <label className="form-control flex-1">
-          <div className={`label`}>
-            <span className="label-text-alt text-base text-md">Fee</span>
-            <span className="label-text-alt opacity-50">
-              Fee rate: {customFeeRate || feeRates?.fastestFee} sat/vB
-            </span>
-          </div>
-          <label className="input input-bordered flex items-center gap-2 no-focus">
-            <input
-              type="text"
-              className="no-focus grow"
-              value={stakingFeeSat ? satoshiToBtc(stakingFeeSat) : ""}
-              readOnly
-            />
-            <p>{coinName}</p>
-          </label>
-        </label>
+        <div className="flex flex-col items-center">
+          <p>
+            Custom fee rate:{" "}
+            <strong>{customFeeRate || feeRates?.fastestFee} sat/vB</strong>
+          </p>
+          <p>
+            Transaction fee amount:{" "}
+            <strong>
+              {satoshiToBtc(stakingFeeSat)} {coinName}
+            </strong>
+          </p>
+        </div>
         <div>
           <input
             type="range"
