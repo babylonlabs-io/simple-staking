@@ -132,8 +132,6 @@ export const Staking: React.FC<StakingProps> = ({
     refetch: refetchAvailableUTXOs,
   } = useQuery({
     queryKey: ["available UTXOs", address],
-    // Has a second optional parameter, the amount of satoshis to spend
-    // Can be used for optimization
     queryFn: async () => {
       if (btcWallet?.getUtxos && address) {
         return await btcWallet.getUtxos(address);
