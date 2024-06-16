@@ -40,7 +40,9 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           {mempoolFeeRates ? (
             <p>
               Recommended fee rate:{" "}
-              <strong>{mempoolFeeRates.fastestFee} sats/vB</strong>
+              <strong>
+                {getFeeRateFromMempool(mempoolFeeRates).defaultFeeRate} sats/vB
+              </strong>
             </p>
           ) : (
             <LoadingSmall text="Loading recommended fee rate..." />
