@@ -100,7 +100,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
-      0,
+      0, // unbonding always has a single output
     );
   }
 
