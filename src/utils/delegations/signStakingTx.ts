@@ -42,6 +42,10 @@ export const createStakingTx = (
     throw new Error("Not enough usable balance");
   }
 
+  if (feeRate <= 0) {
+    throw new Error("Invalid fee rate");
+  }
+
   // Create the staking scripts
   let scripts;
   try {
