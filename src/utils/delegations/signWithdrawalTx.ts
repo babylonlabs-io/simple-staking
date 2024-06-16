@@ -86,6 +86,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
+      delegation.stakingTx.outputIndex,
     );
   } else {
     // Withdraw funds from a staking transaction in which the timelock naturally expired
@@ -99,6 +100,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
+      0,
     );
   }
 
