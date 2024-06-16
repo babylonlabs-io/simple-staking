@@ -81,7 +81,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
   const selectedModeRender = () => {
     // If fee is below the fastest fee, show a warning
-    const showWarning =
+    const showLowFeesWarning =
       selectedFeeRate && mempoolFeeRates && selectedFeeRate < defaultFeeRate;
 
     return (
@@ -104,12 +104,12 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             min={minFeeRate}
             max={maxFeeRate}
             value={selectedFeeRate || defaultFeeRate}
-            className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
+            className={`range range-xs my-2 opacity-60 ${showLowFeesWarning ? "range-error" : "range-primary"}`}
             onChange={handleSliderChange}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
             <span className="opacity-50">{minFeeRate} sat/vB</span>
-            {showWarning ? (
+            {showLowFeesWarning ? (
               <p className="text-center text-error">
                 Fees are low, inclusion is not guaranteed
               </p>
