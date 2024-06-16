@@ -332,10 +332,15 @@ export const Staking: React.FC<StakingProps> = ({
       finalityProvider &&
       paramWithCtx?.currentVersion &&
       mempoolFeeRates?.fastestFee &&
+      mempoolFeeRates?.hourFee &&
       availableUTXOs
     ) {
-      const memoizedFeeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
       try {
+        // check that selected Fee rate (if present) is bigger than mempoolFeeRates.hourFee
+        if (selectedFeeRate && selectedFeeRate < mempoolFeeRates.hourFee) {
+          throw new Error("Selected fee rate is lower than the hour fee");
+        }
+        const memoizedFeeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
           paramWithCtx.currentVersion,
