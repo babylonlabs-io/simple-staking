@@ -256,8 +256,10 @@ export const Staking: React.FC<StakingProps> = ({
     setResetFormInputs(!resetFormInputs);
   };
 
+  const { minFeeRate, defaultFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
+
   // Either use the custom fee rate or the fastest fee rate
-  const feeRate = selectedFeeRate || mempoolFeeRates?.fastestFee;
+  const feeRate = selectedFeeRate || defaultFeeRate;
 
   const handleSign = async () => {
     try {
@@ -334,9 +336,6 @@ export const Staking: React.FC<StakingProps> = ({
       availableUTXOs
     ) {
       try {
-        const { minFeeRate, defaultFeeRate } =
-          getFeeRateFromMempool(mempoolFeeRates);
-
         // check that selected Fee rate (if present) is bigger than the min fee
         if (selectedFeeRate && selectedFeeRate < minFeeRate) {
           throw new Error("Selected fee rate is lower than the hour fee");
@@ -383,6 +382,8 @@ export const Staking: React.FC<StakingProps> = ({
     selectedFeeRate,
     availableUTXOs,
     showError,
+    defaultFeeRate,
+    minFeeRate,
   ]);
 
   // Select the finality provider from the list

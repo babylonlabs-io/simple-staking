@@ -33,12 +33,13 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
   const { coinName } = getNetworkConfig();
 
+  const { minFeeRate, defaultFeeRate, maxFeeRate } =
+    getFeeRateFromMempool(mempoolFeeRates);
+
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(e.target.value);
 
     if (mempoolFeeRates && value >= 0) {
-      const { minFeeRate, maxFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
-
       if (value >= minFeeRate && value <= maxFeeRate) {
         onSelectedFeeRateChange(parseInt(e.target.value));
       }
@@ -51,10 +52,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <div className="min-h-8 flex justify-center flex-col items-center">
           {mempoolFeeRates ? (
             <p>
-              Recommended fee rate:{" "}
-              <strong>
-                {getFeeRateFromMempool(mempoolFeeRates).defaultFeeRate} sats/vB
-              </strong>
+              Recommended fee rate: <strong>{defaultFeeRate} sats/vB</strong>
             </p>
           ) : (
             <LoadingSmall text="Loading recommended fee rate..." />
@@ -82,11 +80,6 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   };
 
   const customModeRender = () => {
-    if (!mempoolFeeRates) return null;
-
-    const { minFeeRate, defaultFeeRate, maxFeeRate } =
-      getFeeRateFromMempool(mempoolFeeRates);
-
     // If fee is below the fastest fee, show a warning
     const showWarning =
       selectedFeeRate && mempoolFeeRates && selectedFeeRate < defaultFeeRate;
