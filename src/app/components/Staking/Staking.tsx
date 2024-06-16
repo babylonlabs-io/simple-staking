@@ -273,7 +273,7 @@ export const Staking: React.FC<StakingProps> = ({
         throw new Error("Global params not loaded");
       if (!feeRate) throw new Error("Fee rates not loaded");
       if (!availableUTXOs || availableUTXOs.length === 0)
-        throw new Error("Not enough usable balance");
+        throw new Error("No available balance");
 
       const { currentVersion: globalParamsVersion } = paramWithCtx;
       // Sign the staking transaction
