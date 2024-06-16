@@ -94,7 +94,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <div>
           <input
             type="range"
-            min={feeRates?.economyFee}
+            min={feeRates?.hourFee}
             max={maxFeeRate}
             value={customFeeRate || feeRates?.fastestFee}
             className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
@@ -103,7 +103,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             }}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
-            <span className="opacity-50">{feeRates?.economyFee} sat/vB</span>
+            <span className="opacity-50">{feeRates?.hourFee} sat/vB</span>
             {showWarning ? (
               <p className="text-center text-error">Fees are low</p>
             ) : null}
