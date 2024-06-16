@@ -33,6 +33,18 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
   const { coinName } = getNetworkConfig();
 
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value);
+
+    if (mempoolFeeRates && value >= 0) {
+      const { minFeeRate, maxFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
+
+      if (value >= minFeeRate && value <= maxFeeRate) {
+        onSelectedFeeRateChange(parseInt(e.target.value));
+      }
+    }
+  };
+
   const defaultModeRender = () => {
     return (
       <div className="flex flex-col justify-center gap-1 items-center">
@@ -100,9 +112,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             max={maxFeeRate}
             value={selectedFeeRate || defaultFeeRate}
             className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
-            onChange={(e) => {
-              onSelectedFeeRateChange(parseInt(e.target.value));
-            }}
+            onChange={handleSliderChange}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
             <span className="opacity-50">{minFeeRate} sat/vB</span>
