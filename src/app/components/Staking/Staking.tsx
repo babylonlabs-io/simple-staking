@@ -81,6 +81,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
+  // Custom fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
@@ -101,6 +102,7 @@ export const Staking: React.FC<StakingProps> = ({
     approchingCapRange: false,
   });
 
+  // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
   const {
     data: mempoolFeeRates,
