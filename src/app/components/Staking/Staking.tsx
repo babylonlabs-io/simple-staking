@@ -334,7 +334,7 @@ export const Staking: React.FC<StakingProps> = ({
       mempoolFeeRates?.fastestFee &&
       availableUTXOs
     ) {
-      const feeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
+      const memoizedFeeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
       try {
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
@@ -345,7 +345,7 @@ export const Staking: React.FC<StakingProps> = ({
           btcWalletNetwork,
           address,
           publicKeyNoCoord,
-          feeRate,
+          memoizedFeeRate,
           availableUTXOs,
         );
         return stakingFeeSat;
