@@ -88,7 +88,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
       <div className="flex flex-col gap-2">
         <div className="flex flex-col items-center">
           <p>
-            Custom fee rate:{" "}
+            Selected fee rate:{" "}
             <strong>{selectedFeeRate || defaultFeeRate} sat/vB</strong>
           </p>
           <p>
