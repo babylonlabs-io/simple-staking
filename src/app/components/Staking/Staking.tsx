@@ -260,6 +260,12 @@ export const Staking: React.FC<StakingProps> = ({
 
   const handleSign = async () => {
     try {
+      // Initial validation
+      if (!btcWallet) throw new Error("Wallet is not connected");
+      if (!address) throw new Error("Address is not set");
+      if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
+      if (!finalityProvider)
+        throw new Error("Finality provider is not selected");
       if (!paramWithCtx || !paramWithCtx.currentVersion)
         throw new Error("Global params not loaded");
       if (!feeRate) throw new Error("Fee rates not loaded");

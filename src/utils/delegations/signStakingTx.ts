@@ -89,23 +89,17 @@ export const createStakingTx = (
 // - stakingTxHex: the signed staking transaction
 // - stakingTerm: the staking term
 export const signStakingTx = async (
-  btcWallet: WalletProvider | undefined,
+  btcWallet: WalletProvider,
   globalParamsVersion: GlobalParamsVersion,
   stakingAmountSat: number,
   stakingTimeBlocks: number,
-  finalityProvider: FinalityProvider | undefined,
-  btcWalletNetwork: networks.Network | undefined,
-  address: string | undefined,
+  finalityProvider: FinalityProvider,
+  btcWalletNetwork: networks.Network,
+  address: string,
   publicKeyNoCoord: string,
   feeRate: number,
   inputUTXOs: UTXO[],
 ): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
-  // Initial validation
-  if (!btcWallet) throw new Error("Wallet is not connected");
-  if (!address) throw new Error("Address is not set");
-  if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
-  if (!finalityProvider) throw new Error("Finality provider is not selected");
-
   // Create the staking transaction
   let { unsignedStakingPsbt, stakingTerm } = createStakingTx(
     globalParamsVersion,
