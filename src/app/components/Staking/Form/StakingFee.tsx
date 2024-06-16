@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
+import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { Fees } from "@/utils/wallet/wallet_provider";
 
 import { LoadingSmall } from "../../Loading/Loading";
@@ -68,25 +68,21 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   };
 
   const customModeRender = () => {
-    // Slider min should be the economy fee
-    // Slider max should be 2x the fastest fee of power of 2
-    // 300 -> 1024, 16 -> 32, 24 -> 64
-    const maxFeeRate = nextPowerOfTwo(mempoolFeeRates?.fastestFee! * 2);
+    if (!mempoolFeeRates) return null;
+
+    const { minFeeRate, defaultFeeRate, maxFeeRate } =
+      getFeeRateFromMempool(mempoolFeeRates);
 
     // If fee is below the fastest fee, show a warning
     const showWarning =
-      selectedFeeRate &&
-      mempoolFeeRates &&
-      selectedFeeRate < mempoolFeeRates?.fastestFee;
+      selectedFeeRate && mempoolFeeRates && selectedFeeRate < defaultFeeRate;
 
     return (
       <div className="flex flex-col gap-2">
         <div className="flex flex-col items-center">
           <p>
             Custom fee rate:{" "}
-            <strong>
-              {selectedFeeRate || mempoolFeeRates?.fastestFee} sat/vB
-            </strong>
+            <strong>{selectedFeeRate || defaultFeeRate} sat/vB</strong>
           </p>
           <p>
             Transaction fee amount:{" "}
@@ -98,18 +94,16 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <div>
           <input
             type="range"
-            min={mempoolFeeRates?.hourFee}
+            min={minFeeRate}
             max={maxFeeRate}
-            value={selectedFeeRate || mempoolFeeRates?.fastestFee}
+            value={selectedFeeRate || defaultFeeRate}
             className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
             onChange={(e) => {
               onSelectedFeeRateChange(parseInt(e.target.value));
             }}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
-            <span className="opacity-50">
-              {mempoolFeeRates?.hourFee} sat/vB
-            </span>
+            <span className="opacity-50">{minFeeRate} sat/vB</span>
             {showWarning ? (
               <p className="text-center text-error">Fees are low</p>
             ) : null}

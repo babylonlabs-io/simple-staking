@@ -16,6 +16,7 @@ import {
   createStakingTx,
   signStakingTx,
 } from "@/utils/delegations/signStakingTx";
+import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import {
   ParamsWithContext,
   getCurrentGlobalParamsVersion,
@@ -331,16 +332,18 @@ export const Staking: React.FC<StakingProps> = ({
       stakingAmountSat &&
       finalityProvider &&
       paramWithCtx?.currentVersion &&
-      mempoolFeeRates?.fastestFee &&
-      mempoolFeeRates?.hourFee &&
+      mempoolFeeRates &&
       availableUTXOs
     ) {
       try {
-        // check that selected Fee rate (if present) is bigger than mempoolFeeRates.hourFee
-        if (selectedFeeRate && selectedFeeRate < mempoolFeeRates.hourFee) {
+        const { minFeeRate, defaultFeeRate } =
+          getFeeRateFromMempool(mempoolFeeRates);
+
+        // check that selected Fee rate (if present) is bigger than the min fee
+        if (selectedFeeRate && selectedFeeRate < minFeeRate) {
           throw new Error("Selected fee rate is lower than the hour fee");
         }
-        const memoizedFeeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
+        const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
           paramWithCtx.currentVersion,
