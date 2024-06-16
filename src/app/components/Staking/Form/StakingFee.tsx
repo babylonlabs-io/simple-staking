@@ -79,7 +79,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     );
   };
 
-  const customModeRender = () => {
+  const selectedModeRender = () => {
     // If fee is below the fastest fee, show a warning
     const showWarning =
       selectedFeeRate && mempoolFeeRates && selectedFeeRate < defaultFeeRate;
@@ -126,7 +126,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
   return (
     <div className="my-2 text-sm">
-      {customModeReady ? customModeRender() : defaultModeRender()}
+      {customModeReady ? selectedModeRender() : defaultModeRender()}
     </div>
   );
 };

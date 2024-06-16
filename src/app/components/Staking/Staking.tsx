@@ -82,7 +82,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
-  // Custom fee rate, comes from the user input
+  // Selected fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
@@ -258,7 +258,7 @@ export const Staking: React.FC<StakingProps> = ({
 
   const { minFeeRate, defaultFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
 
-  // Either use the custom fee rate or the fastest fee rate
+  // Either use the selected fee rate or the fastest fee rate
   const feeRate = selectedFeeRate || defaultFeeRate;
 
   const handleSign = async () => {
