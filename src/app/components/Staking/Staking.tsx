@@ -548,6 +548,9 @@ export const Staking: React.FC<StakingProps> = ({
         !!finalityProvider,
       );
 
+      const previewReady =
+        signReady && feeRate && availableUTXOs && stakingAmountSat;
+
       return (
         <>
           <p>Set up staking terms</p>
@@ -579,12 +582,12 @@ export const Staking: React.FC<StakingProps> = ({
             {showApproachingCapWarning()}
             <button
               className="btn-primary btn mt-2 w-full"
-              disabled={!signReady}
+              disabled={!previewReady}
               onClick={() => setPreviewModalOpen(true)}
             >
               Preview
             </button>
-            {feeRate && (
+            {previewReady && (
               <PreviewModal
                 open={previewModalOpen}
                 onClose={handlePreviewModalClose}
