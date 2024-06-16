@@ -255,11 +255,14 @@ export const Staking: React.FC<StakingProps> = ({
     setResetFormInputs(!resetFormInputs);
   };
 
+  // Either use the custom fee rate or the fastest fee rate
+  const feeRate = customFeeRate || feeRates?.fastestFee;
+
   const handleSign = async () => {
     try {
       if (!paramWithCtx || !paramWithCtx.currentVersion)
         throw new Error("Global params not loaded");
-      if (!feeRates?.fastestFee) throw new Error("Fee rates not loaded");
+      if (!feeRate) throw new Error("Fee rates not loaded");
       if (!UTXOs || UTXOs.length === 0)
         throw new Error("Not enough usable balance");
 
@@ -274,7 +277,7 @@ export const Staking: React.FC<StakingProps> = ({
         btcWalletNetwork,
         address,
         publicKeyNoCoord,
-        customFeeRate || feeRates?.fastestFee,
+        feeRate,
         UTXOs,
       );
       // UI
@@ -565,16 +568,18 @@ export const Staking: React.FC<StakingProps> = ({
             >
               Preview
             </button>
-            <PreviewModal
-              open={previewModalOpen}
-              onClose={handlePreviewModalClose}
-              onSign={handleSign}
-              finalityProvider={finalityProvider?.description.moniker}
-              stakingAmountSat={stakingAmountSat}
-              stakingTimeBlocks={stakingTimeBlocksWithFixed}
-              stakingFeeSat={stakingFeeSat}
-              feeRate={customFeeRate || feeRates?.fastestFee}
-            />
+            {feeRate && (
+              <PreviewModal
+                open={previewModalOpen}
+                onClose={handlePreviewModalClose}
+                onSign={handleSign}
+                finalityProvider={finalityProvider?.description.moniker}
+                stakingAmountSat={stakingAmountSat}
+                stakingTimeBlocks={stakingTimeBlocksWithFixed}
+                stakingFeeSat={stakingFeeSat}
+                feeRate={feeRate}
+              />
+            )}
           </div>
         </>
       );

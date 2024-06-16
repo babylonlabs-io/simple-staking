@@ -15,7 +15,7 @@ interface PreviewModalProps {
   stakingAmountSat: number;
   stakingTimeBlocks: number;
   stakingFeeSat: number;
-  feeRate?: number;
+  feeRate: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
