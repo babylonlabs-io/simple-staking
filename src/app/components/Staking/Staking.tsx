@@ -81,7 +81,7 @@ export const Staking: React.FC<StakingProps> = ({
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
-  const [customFeeRate, setCustomFeeRate] = useState(0);
+  const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
@@ -250,13 +250,13 @@ export const Staking: React.FC<StakingProps> = ({
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
     setStakingTimeBlocks(0);
-    setCustomFeeRate(0);
+    setSelectedFeeRate(0);
     setPreviewModalOpen(false);
     setResetFormInputs(!resetFormInputs);
   };
 
   // Either use the custom fee rate or the fastest fee rate
-  const feeRate = customFeeRate || mempoolFeeRates?.fastestFee;
+  const feeRate = selectedFeeRate || mempoolFeeRates?.fastestFee;
 
   const handleSign = async () => {
     try {
@@ -332,7 +332,7 @@ export const Staking: React.FC<StakingProps> = ({
       mempoolFeeRates?.fastestFee &&
       UTXOs
     ) {
-      const feeRate = customFeeRate || mempoolFeeRates.fastestFee;
+      const feeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
       try {
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
@@ -355,9 +355,9 @@ export const Staking: React.FC<StakingProps> = ({
             errorState: ErrorState.STAKING,
             errorTime: new Date(),
           },
-          retryAction: () => setCustomFeeRate(0),
+          retryAction: () => setSelectedFeeRate(0),
         });
-        setCustomFeeRate(0);
+        setSelectedFeeRate(0);
         return 0;
       }
     } else {
@@ -372,7 +372,7 @@ export const Staking: React.FC<StakingProps> = ({
     finalityProvider,
     paramWithCtx,
     mempoolFeeRates,
-    customFeeRate,
+    selectedFeeRate,
     UTXOs,
     showError,
   ]);
@@ -560,8 +560,8 @@ export const Staking: React.FC<StakingProps> = ({
                 <StakingFee
                   mempoolFeeRates={mempoolFeeRates}
                   stakingFeeSat={stakingFeeSat}
-                  customFeeRate={customFeeRate}
-                  onCustomFeeRateChange={setCustomFeeRate}
+                  selectedFeeRate={selectedFeeRate}
+                  onSelectedFeeRateChange={setSelectedFeeRate}
                   reset={resetFormInputs}
                 />
               )}

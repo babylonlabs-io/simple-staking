@@ -9,8 +9,8 @@ import { LoadingSmall } from "../../Loading/Loading";
 
 interface StakingFeeProps {
   stakingFeeSat: number;
-  customFeeRate: number;
-  onCustomFeeRateChange: (fee: number) => void;
+  selectedFeeRate: number;
+  onSelectedFeeRateChange: (fee: number) => void;
   reset: boolean;
   // optional as component shows loading state
   mempoolFeeRates?: Fees;
@@ -19,8 +19,8 @@ interface StakingFeeProps {
 // Staking fee sat might be expensive to calculate as it sums UTXOs
 export const StakingFee: React.FC<StakingFeeProps> = ({
   stakingFeeSat,
-  customFeeRate,
-  onCustomFeeRateChange,
+  selectedFeeRate,
+  onSelectedFeeRateChange,
   reset,
   mempoolFeeRates,
 }) => {
@@ -75,9 +75,9 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
     // If fee is below the fastest fee, show a warning
     const showWarning =
-      customFeeRate &&
+      selectedFeeRate &&
       mempoolFeeRates &&
-      customFeeRate < mempoolFeeRates?.fastestFee;
+      selectedFeeRate < mempoolFeeRates?.fastestFee;
 
     return (
       <div className="flex flex-col gap-2">
@@ -85,7 +85,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           <p>
             Custom fee rate:{" "}
             <strong>
-              {customFeeRate || mempoolFeeRates?.fastestFee} sat/vB
+              {selectedFeeRate || mempoolFeeRates?.fastestFee} sat/vB
             </strong>
           </p>
           <p>
@@ -100,10 +100,10 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             type="range"
             min={mempoolFeeRates?.hourFee}
             max={maxFeeRate}
-            value={customFeeRate || mempoolFeeRates?.fastestFee}
+            value={selectedFeeRate || mempoolFeeRates?.fastestFee}
             className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
             onChange={(e) => {
-              onCustomFeeRateChange(parseInt(e.target.value));
+              onSelectedFeeRateChange(parseInt(e.target.value));
             }}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
