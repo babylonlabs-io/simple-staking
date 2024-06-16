@@ -73,6 +73,10 @@ export const signWithdrawalTx = async (
     publicKeyNoCoord,
   );
 
+  // delegation.stakingTx.outputIndex can be any number
+  // but when unbonding finished, the outputIndex is 0 always
+  const outputIndex = 0;
+
   // Create the withdrawal transaction
   let withdrawPsbtTxResult: PsbtTransactionResult;
   if (delegation?.unbondingTx) {
@@ -86,7 +90,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
-      delegation.stakingTx.outputIndex,
+      outputIndex,
     );
   } else {
     // Withdraw funds from a staking transaction in which the timelock naturally expired
@@ -100,7 +104,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
-      delegation.stakingTx.outputIndex,
+      outputIndex,
     );
   }
 
