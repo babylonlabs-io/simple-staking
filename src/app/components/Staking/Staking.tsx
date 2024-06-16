@@ -103,10 +103,10 @@ export const Staking: React.FC<StakingProps> = ({
 
   // Fetch fee rates, sat/vB
   const {
-    data: feeRates,
-    error: feeRatesError,
-    isError: hasFeeRatesError,
-    refetch: refetchFeeRates,
+    data: mempoolFeeRates,
+    error: mempoolFeeRatesError,
+    isError: hasMempoolFeeRatesError,
+    refetch: refetchMempoolFeeRates,
   } = useQuery({
     queryKey: ["fee rates"],
     queryFn: async () => {
@@ -225,10 +225,10 @@ export const Staking: React.FC<StakingProps> = ({
     };
 
     handleError({
-      error: feeRatesError,
-      hasError: hasFeeRatesError,
+      error: mempoolFeeRatesError,
+      hasError: hasMempoolFeeRatesError,
       errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchFeeRates,
+      refetchFunction: refetchMempoolFeeRates,
     });
     handleError({
       error: UTXOsError,
@@ -238,10 +238,10 @@ export const Staking: React.FC<StakingProps> = ({
     });
   }, [
     UTXOsError,
-    feeRatesError,
-    hasFeeRatesError,
+    mempoolFeeRatesError,
+    hasMempoolFeeRatesError,
     hasUTXOsError,
-    refetchFeeRates,
+    refetchMempoolFeeRates,
     refetchUTXOs,
     showError,
   ]);
@@ -256,7 +256,7 @@ export const Staking: React.FC<StakingProps> = ({
   };
 
   // Either use the custom fee rate or the fastest fee rate
-  const feeRate = customFeeRate || feeRates?.fastestFee;
+  const feeRate = customFeeRate || mempoolFeeRates?.fastestFee;
 
   const handleSign = async () => {
     try {
@@ -329,10 +329,10 @@ export const Staking: React.FC<StakingProps> = ({
       stakingAmountSat &&
       finalityProvider &&
       paramWithCtx?.currentVersion &&
-      feeRates?.fastestFee &&
+      mempoolFeeRates?.fastestFee &&
       UTXOs
     ) {
-      const feeRate = customFeeRate || feeRates.fastestFee;
+      const feeRate = customFeeRate || mempoolFeeRates.fastestFee;
       try {
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
@@ -371,7 +371,7 @@ export const Staking: React.FC<StakingProps> = ({
     stakingTimeBlocks,
     finalityProvider,
     paramWithCtx,
-    feeRates,
+    mempoolFeeRates,
     customFeeRate,
     UTXOs,
     showError,
@@ -558,7 +558,7 @@ export const Staking: React.FC<StakingProps> = ({
               />
               {signReady && (
                 <StakingFee
-                  feeRates={feeRates}
+                  mempoolFeeRates={mempoolFeeRates}
                   stakingFeeSat={stakingFeeSat}
                   customFeeRate={customFeeRate}
                   onCustomFeeRateChange={setCustomFeeRate}

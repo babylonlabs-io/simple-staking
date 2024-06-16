@@ -13,7 +13,7 @@ interface StakingFeeProps {
   onCustomFeeRateChange: (fee: number) => void;
   reset: boolean;
   // optional as component shows loading state
-  feeRates?: Fees;
+  mempoolFeeRates?: Fees;
 }
 
 // Staking fee sat might be expensive to calculate as it sums UTXOs
@@ -22,7 +22,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   customFeeRate,
   onCustomFeeRateChange,
   reset,
-  feeRates,
+  mempoolFeeRates,
 }) => {
   const [customMode, setCustomMode] = useState(false);
 
@@ -37,10 +37,10 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     return (
       <div className="flex flex-col justify-center gap-1 items-center">
         <div className="min-h-8 flex justify-center flex-col items-center">
-          {feeRates ? (
+          {mempoolFeeRates ? (
             <p>
               Recommended fee rate:{" "}
-              <strong>{feeRates.fastestFee} sats/vB</strong>
+              <strong>{mempoolFeeRates.fastestFee} sats/vB</strong>
             </p>
           ) : (
             <LoadingSmall text="Loading recommended fee rate..." />
@@ -59,7 +59,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <button
           className="btn btn-sm btn-link no-underline"
           onClick={() => setCustomMode(true)}
-          disabled={!feeRates || !stakingFeeSat}
+          disabled={!mempoolFeeRates || !stakingFeeSat}
         >
           Use Custom
         </button>
@@ -71,18 +71,22 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     // Slider min should be the economy fee
     // Slider max should be 2x the fastest fee of power of 2
     // 300 -> 1024, 16 -> 32, 24 -> 64
-    const maxFeeRate = nextPowerOfTwo(feeRates?.fastestFee! * 2);
+    const maxFeeRate = nextPowerOfTwo(mempoolFeeRates?.fastestFee! * 2);
 
     // If fee is below the fastest fee, show a warning
     const showWarning =
-      customFeeRate && feeRates && customFeeRate < feeRates?.fastestFee;
+      customFeeRate &&
+      mempoolFeeRates &&
+      customFeeRate < mempoolFeeRates?.fastestFee;
 
     return (
       <div className="flex flex-col gap-2">
         <div className="flex flex-col items-center">
           <p>
             Custom fee rate:{" "}
-            <strong>{customFeeRate || feeRates?.fastestFee} sat/vB</strong>
+            <strong>
+              {customFeeRate || mempoolFeeRates?.fastestFee} sat/vB
+            </strong>
           </p>
           <p>
             Transaction fee amount:{" "}
@@ -94,16 +98,18 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
         <div>
           <input
             type="range"
-            min={feeRates?.hourFee}
+            min={mempoolFeeRates?.hourFee}
             max={maxFeeRate}
-            value={customFeeRate || feeRates?.fastestFee}
+            value={customFeeRate || mempoolFeeRates?.fastestFee}
             className={`range range-xs my-2 opacity-60 ${showWarning ? "range-error" : "range-primary"}`}
             onChange={(e) => {
               onCustomFeeRateChange(parseInt(e.target.value));
             }}
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
-            <span className="opacity-50">{feeRates?.hourFee} sat/vB</span>
+            <span className="opacity-50">
+              {mempoolFeeRates?.hourFee} sat/vB
+            </span>
             {showWarning ? (
               <p className="text-center text-error">Fees are low</p>
             ) : null}
@@ -115,7 +121,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   };
 
   // fetched fee rates and staking fee sat
-  const customModeReady = customMode && feeRates && stakingFeeSat;
+  const customModeReady = customMode && mempoolFeeRates && stakingFeeSat;
 
   return (
     <div className="my-2 text-sm">
