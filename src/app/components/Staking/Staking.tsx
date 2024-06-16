@@ -110,7 +110,7 @@ export const Staking: React.FC<StakingProps> = ({
     isError: hasMempoolFeeRatesError,
     refetch: refetchMempoolFeeRates,
   } = useQuery({
-    queryKey: ["fee rates"],
+    queryKey: ["mempool fee rates"],
     queryFn: async () => {
       if (btcWallet?.getNetworkFees) {
         return await btcWallet.getNetworkFees();
@@ -125,12 +125,12 @@ export const Staking: React.FC<StakingProps> = ({
 
   // Fetch all UTXOs
   const {
-    data: UTXOs,
-    error: UTXOsError,
-    isError: hasUTXOsError,
-    refetch: refetchUTXOs,
+    data: availableUTXOs,
+    error: availableUTXOsError,
+    isError: hasAvailableUTXOsError,
+    refetch: refetchAvailableUTXOs,
   } = useQuery({
-    queryKey: ["UTXOs", address],
+    queryKey: ["available UTXOs", address],
     // Has a second optional parameter, the amount of satoshis to spend
     // Can be used for optimization
     queryFn: async () => {
@@ -233,18 +233,18 @@ export const Staking: React.FC<StakingProps> = ({
       refetchFunction: refetchMempoolFeeRates,
     });
     handleError({
-      error: UTXOsError,
-      hasError: hasUTXOsError,
+      error: availableUTXOsError,
+      hasError: hasAvailableUTXOsError,
       errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchUTXOs,
+      refetchFunction: refetchAvailableUTXOs,
     });
   }, [
-    UTXOsError,
+    availableUTXOsError,
     mempoolFeeRatesError,
     hasMempoolFeeRatesError,
-    hasUTXOsError,
+    hasAvailableUTXOsError,
     refetchMempoolFeeRates,
-    refetchUTXOs,
+    refetchAvailableUTXOs,
     showError,
   ]);
 
@@ -271,7 +271,7 @@ export const Staking: React.FC<StakingProps> = ({
       if (!paramWithCtx || !paramWithCtx.currentVersion)
         throw new Error("Global params not loaded");
       if (!feeRate) throw new Error("Fee rates not loaded");
-      if (!UTXOs || UTXOs.length === 0)
+      if (!availableUTXOs || availableUTXOs.length === 0)
         throw new Error("Not enough usable balance");
 
       const { currentVersion: globalParamsVersion } = paramWithCtx;
@@ -286,7 +286,7 @@ export const Staking: React.FC<StakingProps> = ({
         address,
         publicKeyNoCoord,
         feeRate,
-        UTXOs,
+        availableUTXOs,
       );
       // UI
       handleFeedbackModal("success");
@@ -332,7 +332,7 @@ export const Staking: React.FC<StakingProps> = ({
       finalityProvider &&
       paramWithCtx?.currentVersion &&
       mempoolFeeRates?.fastestFee &&
-      UTXOs
+      availableUTXOs
     ) {
       const feeRate = selectedFeeRate || mempoolFeeRates.fastestFee;
       try {
@@ -346,7 +346,7 @@ export const Staking: React.FC<StakingProps> = ({
           address,
           publicKeyNoCoord,
           feeRate,
-          UTXOs,
+          availableUTXOs,
         );
         return stakingFeeSat;
       } catch (error: Error | any) {
@@ -375,7 +375,7 @@ export const Staking: React.FC<StakingProps> = ({
     paramWithCtx,
     mempoolFeeRates,
     selectedFeeRate,
-    UTXOs,
+    availableUTXOs,
     showError,
   ]);
 
