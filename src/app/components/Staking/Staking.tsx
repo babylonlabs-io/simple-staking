@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
-import { Dispatch, SetStateAction, useMemo, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
@@ -8,10 +9,14 @@ import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { Delegation } from "@/app/types/delegations";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
-import { signStakingTx } from "@/utils/delegations/signStakingTx";
+import {
+  createStakingTx,
+  signStakingTx,
+} from "@/utils/delegations/signStakingTx";
+import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import {
   ParamsWithContext,
   getCurrentGlobalParamsVersion,
@@ -25,6 +30,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { StakingAmount } from "./Form/StakingAmount";
+import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
@@ -76,6 +82,8 @@ export const Staking: React.FC<StakingProps> = ({
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
+  // Selected fee rate, comes from the user input
+  const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
@@ -93,6 +101,47 @@ export const Staking: React.FC<StakingProps> = ({
     isHeightCap: false,
     overTheCapRange: false,
     approchingCapRange: false,
+  });
+
+  // Mempool fee rates, comes from the network
+  // Fetch fee rates, sat/vB
+  const {
+    data: mempoolFeeRates,
+    error: mempoolFeeRatesError,
+    isError: hasMempoolFeeRatesError,
+    refetch: refetchMempoolFeeRates,
+  } = useQuery({
+    queryKey: ["mempool fee rates"],
+    queryFn: async () => {
+      if (btcWallet?.getNetworkFees) {
+        return await btcWallet.getNetworkFees();
+      }
+    },
+    enabled: !!btcWallet?.getNetworkFees,
+    refetchInterval: 60000, // 1 minute
+    retry: (failureCount) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
+  });
+
+  // Fetch all UTXOs
+  const {
+    data: availableUTXOs,
+    error: availableUTXOsError,
+    isError: hasAvailableUTXOsError,
+    refetch: refetchAvailableUTXOs,
+  } = useQuery({
+    queryKey: ["available UTXOs", address],
+    queryFn: async () => {
+      if (btcWallet?.getUtxos && address) {
+        return await btcWallet.getUtxos(address);
+      }
+    },
+    enabled: !!(btcWallet?.getUtxos && address),
+    refetchInterval: 60000 * 5, // 5 minutes
+    retry: (failureCount) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
   });
 
   const stakingStats = useStakingStats();
@@ -154,32 +203,91 @@ export const Staking: React.FC<StakingProps> = ({
     (btcHeight &&
       firstActivationHeight &&
       btcHeight + 1 < firstActivationHeight);
-  const { showError } = useError();
+
+  const { isErrorOpen, showError } = useError();
+
+  useEffect(() => {
+    const handleError = ({
+      error,
+      hasError,
+      errorState,
+      refetchFunction,
+    }: ErrorHandlerParam) => {
+      if (hasError && error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState,
+            errorTime: new Date(),
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    };
+
+    handleError({
+      error: mempoolFeeRatesError,
+      hasError: hasMempoolFeeRatesError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchMempoolFeeRates,
+    });
+    handleError({
+      error: availableUTXOsError,
+      hasError: hasAvailableUTXOsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchAvailableUTXOs,
+    });
+  }, [
+    availableUTXOsError,
+    mempoolFeeRatesError,
+    hasMempoolFeeRatesError,
+    hasAvailableUTXOsError,
+    refetchMempoolFeeRates,
+    refetchAvailableUTXOs,
+    showError,
+  ]);
 
   const handleResetState = () => {
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
     setStakingTimeBlocks(0);
+    setSelectedFeeRate(0);
     setPreviewModalOpen(false);
     setResetFormInputs(!resetFormInputs);
   };
 
+  const { minFeeRate, defaultFeeRate } = getFeeRateFromMempool(mempoolFeeRates);
+
+  // Either use the selected fee rate or the fastest fee rate
+  const feeRate = selectedFeeRate || defaultFeeRate;
+
   const handleSign = async () => {
     try {
-      if (!paramWithCtx || !paramWithCtx.currentVersion) {
+      // Initial validation
+      if (!btcWallet) throw new Error("Wallet is not connected");
+      if (!address) throw new Error("Address is not set");
+      if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
+      if (!finalityProvider)
+        throw new Error("Finality provider is not selected");
+      if (!paramWithCtx || !paramWithCtx.currentVersion)
         throw new Error("Global params not loaded");
-      }
+      if (!feeRate) throw new Error("Fee rates not loaded");
+      if (!availableUTXOs || availableUTXOs.length === 0)
+        throw new Error("No available balance");
+
       const { currentVersion: globalParamsVersion } = paramWithCtx;
       // Sign the staking transaction
       const { stakingTxHex, stakingTerm } = await signStakingTx(
-        globalParamsVersion,
-        stakingTimeBlocks,
         btcWallet,
+        globalParamsVersion,
+        stakingAmountSat,
+        stakingTimeBlocks,
         finalityProvider,
         btcWalletNetwork,
-        stakingAmountSat,
         address,
         publicKeyNoCoord,
+        feeRate,
+        availableUTXOs,
       );
       // UI
       handleFeedbackModal("success");
@@ -214,6 +322,69 @@ export const Staking: React.FC<StakingProps> = ({
       ...delegations,
     ]);
   };
+
+  // Memoize the staking fee calculation
+  const stakingFeeSat = useMemo(() => {
+    if (
+      btcWalletNetwork &&
+      address &&
+      publicKeyNoCoord &&
+      stakingAmountSat &&
+      finalityProvider &&
+      paramWithCtx?.currentVersion &&
+      mempoolFeeRates &&
+      availableUTXOs
+    ) {
+      try {
+        // check that selected Fee rate (if present) is bigger than the min fee
+        if (selectedFeeRate && selectedFeeRate < minFeeRate) {
+          throw new Error("Selected fee rate is lower than the hour fee");
+        }
+        const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
+        // Calculate the staking fee
+        const { stakingFeeSat } = createStakingTx(
+          paramWithCtx.currentVersion,
+          stakingAmountSat,
+          stakingTimeBlocks,
+          finalityProvider,
+          btcWalletNetwork,
+          address,
+          publicKeyNoCoord,
+          memoizedFeeRate,
+          availableUTXOs,
+        );
+        return stakingFeeSat;
+      } catch (error: Error | any) {
+        // fees + staking amount can be more than the balance
+        showError({
+          error: {
+            message: error.message,
+            errorState: ErrorState.STAKING,
+            errorTime: new Date(),
+          },
+          retryAction: () => setSelectedFeeRate(0),
+        });
+        setSelectedFeeRate(0);
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+  }, [
+    btcWalletNetwork,
+    address,
+    publicKeyNoCoord,
+    stakingAmountSat,
+    stakingTimeBlocks,
+    finalityProvider,
+    paramWithCtx,
+    mempoolFeeRates,
+    selectedFeeRate,
+    availableUTXOs,
+    showError,
+    defaultFeeRate,
+    minFeeRate,
+  ]);
 
   // Select the finality provider from the list
   const handleChooseFinalityProvider = (btcPkHex: string) => {
@@ -376,6 +547,9 @@ export const Staking: React.FC<StakingProps> = ({
         !!finalityProvider,
       );
 
+      const previewReady =
+        signReady && feeRate && availableUTXOs && stakingAmountSat;
+
       return (
         <>
           <p>Set up staking terms</p>
@@ -394,23 +568,36 @@ export const Staking: React.FC<StakingProps> = ({
                 onStakingAmountSatChange={handleStakingAmountSatChange}
                 reset={resetFormInputs}
               />
+              {signReady && (
+                <StakingFee
+                  mempoolFeeRates={mempoolFeeRates}
+                  stakingFeeSat={stakingFeeSat}
+                  selectedFeeRate={selectedFeeRate}
+                  onSelectedFeeRateChange={setSelectedFeeRate}
+                  reset={resetFormInputs}
+                />
+              )}
             </div>
             {showApproachingCapWarning()}
             <button
               className="btn-primary btn mt-2 w-full"
-              disabled={!signReady}
+              disabled={!previewReady}
               onClick={() => setPreviewModalOpen(true)}
             >
               Preview
             </button>
-            <PreviewModal
-              open={previewModalOpen}
-              onClose={handlePreviewModalClose}
-              onSign={handleSign}
-              finalityProvider={finalityProvider?.description.moniker}
-              stakingAmountSat={stakingAmountSat}
-              stakingTimeBlocks={stakingTimeBlocksWithFixed}
-            />
+            {previewReady && (
+              <PreviewModal
+                open={previewModalOpen}
+                onClose={handlePreviewModalClose}
+                onSign={handleSign}
+                finalityProvider={finalityProvider?.description.moniker}
+                stakingAmountSat={stakingAmountSat}
+                stakingTimeBlocks={stakingTimeBlocksWithFixed}
+                stakingFeeSat={stakingFeeSat}
+                feeRate={feeRate}
+              />
+            )}
           </div>
         </>
       );

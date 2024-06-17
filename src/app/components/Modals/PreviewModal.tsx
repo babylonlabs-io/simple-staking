@@ -14,6 +14,8 @@ interface PreviewModalProps {
   finalityProvider: string | undefined;
   stakingAmountSat: number;
   stakingTimeBlocks: number;
+  stakingFeeSat: number;
+  feeRate: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -23,6 +25,8 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   stakingAmountSat,
   stakingTimeBlocks,
   onSign,
+  stakingFeeSat,
+  feeRate,
 }) => {
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
@@ -51,6 +55,18 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           <div className={`${cardStyles} flex-1`}>
             <p className="text-xs dark:text-neutral-content">Amount</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4 md:flex-row">
+          <div className={`${cardStyles} flex-1`}>
+            <p className="text-xs dark:text-neutral-content">Fee rate</p>
+            <p>{feeRate} sat/vB</p>
+          </div>
+          <div className={`${cardStyles} flex-1`}>
+            <p className="text-xs dark:text-neutral-content">
+              Transaction fee amount
+            </p>
+            <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">

@@ -6,30 +6,25 @@ import { FinalityProvider } from "@/app/types/finalityProviders";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { isTaproot } from "@/utils/wallet";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { UTXO, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getStakingTerm } from "../getStakingTerm";
 
-// Sign a staking transaction
 // Returns:
-// - stakingTxHex: the signed staking transaction
+// - unsignedStakingPsbt: the unsigned staking transaction
 // - stakingTerm: the staking term
-export const signStakingTx = async (
+// - stakingFee: the staking fee
+export const createStakingTx = (
   globalParamsVersion: GlobalParamsVersion,
-  stakingTimeBlocks: number,
-  btcWallet: WalletProvider | undefined,
-  finalityProvider: FinalityProvider | undefined,
-  btcWalletNetwork: networks.Network | undefined,
   stakingAmountSat: number,
-  address: string | undefined,
+  stakingTimeBlocks: number,
+  finalityProvider: FinalityProvider,
+  btcWalletNetwork: networks.Network,
+  address: string,
   publicKeyNoCoord: string,
-): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
-  // Initial validation
-  if (!btcWallet) throw new Error("Wallet is not connected");
-  if (!address) throw new Error("Address is not set");
-  if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
-  if (!finalityProvider) throw new Error("Finality provider is not selected");
-
+  feeRate: number,
+  inputUTXOs: UTXO[],
+) => {
   // Data extraction
   const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
 
@@ -43,15 +38,12 @@ export const signStakingTx = async (
     throw new Error("Invalid staking data");
   }
 
-  // Get the UTXOs
-  let inputUTXOs = [];
-  try {
-    inputUTXOs = await btcWallet.getUtxos(address);
-  } catch (error: Error | any) {
-    throw new Error(error?.message || "UTXOs error");
-  }
   if (inputUTXOs.length == 0) {
     throw new Error("Not enough usable balance");
+  }
+
+  if (feeRate <= 0) {
+    throw new Error("Invalid fee rate");
   }
 
   // Create the staking scripts
@@ -67,19 +59,11 @@ export const signStakingTx = async (
     throw new Error(error?.message || "Cannot build staking scripts");
   }
 
-  // Get the network fees
-  let feeRate: number;
-  try {
-    const netWorkFee = await btcWallet.getNetworkFees();
-    feeRate = netWorkFee.fastestFee;
-  } catch (error) {
-    throw new Error("Cannot get network fees");
-  }
-
   // Create the staking transaction
   let unsignedStakingPsbt;
+  let stakingFeeSat;
   try {
-    const { psbt } = stakingTransaction(
+    const { psbt, fee } = stakingTransaction(
       scripts,
       stakingAmountSat,
       address,
@@ -94,11 +78,44 @@ export const signStakingTx = async (
       globalParamsVersion.activationHeight - 1,
     );
     unsignedStakingPsbt = psbt;
+    stakingFeeSat = fee;
   } catch (error: Error | any) {
     throw new Error(
       error?.message || "Cannot build unsigned staking transaction",
     );
   }
+
+  return { unsignedStakingPsbt, stakingTerm, stakingFeeSat };
+};
+
+// Sign a staking transaction
+// Returns:
+// - stakingTxHex: the signed staking transaction
+// - stakingTerm: the staking term
+export const signStakingTx = async (
+  btcWallet: WalletProvider,
+  globalParamsVersion: GlobalParamsVersion,
+  stakingAmountSat: number,
+  stakingTimeBlocks: number,
+  finalityProvider: FinalityProvider,
+  btcWalletNetwork: networks.Network,
+  address: string,
+  publicKeyNoCoord: string,
+  feeRate: number,
+  inputUTXOs: UTXO[],
+): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
+  // Create the staking transaction
+  let { unsignedStakingPsbt, stakingTerm } = createStakingTx(
+    globalParamsVersion,
+    stakingAmountSat,
+    stakingTimeBlocks,
+    finalityProvider,
+    btcWalletNetwork,
+    address,
+    publicKeyNoCoord,
+    feeRate,
+    inputUTXOs,
+  );
 
   // Sign the staking transaction
   let stakingTx: Transaction;
