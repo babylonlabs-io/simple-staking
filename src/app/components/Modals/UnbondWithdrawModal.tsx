@@ -1,5 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 
+import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
+
 import { GeneralModal } from "./GeneralModal";
 
 export const MODE_UNBOND = "unbond";
@@ -7,6 +9,7 @@ export const MODE_WITHDRAW = "withdraw";
 export type MODE = typeof MODE_UNBOND | typeof MODE_WITHDRAW;
 
 interface PreviewModalProps {
+  unbondingTimeBlocks: number;
   open: boolean;
   onClose: (value: boolean) => void;
   onProceed: () => void;
@@ -14,6 +17,7 @@ interface PreviewModalProps {
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
+  unbondingTimeBlocks,
   open,
   onClose,
   onProceed,
@@ -23,7 +27,11 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const unbondContent = (
     <>
       You are about to unbond your stake before its expiration. The expected
-      unbonding time will be about <strong>7 days</strong>.<br />
+      unbonding time will be about
+      <strong>
+        {unbondingTimeBlocks ? blocksToDisplayTime(unbondingTimeBlocks) : "-"}
+      </strong>
+      .<br />
       After unbonded, you will need to use this dashboard to withdraw your stake
       for it to appear in your wallet. OK to proceed?
     </>

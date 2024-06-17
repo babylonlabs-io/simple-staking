@@ -1,5 +1,7 @@
 import { DelegationState } from "@/app/types/delegations";
 
+import { blocksToDisplayTime } from "./blocksToDisplayTime";
+
 // Convert state to human readable format
 export const getState = (state: string) => {
   switch (state) {
@@ -30,20 +32,23 @@ export const getState = (state: string) => {
 };
 
 // Create state tooltips for the additional information
-export const getStateTooltip = (state: string, confirmationDepth?: number) => {
+export const getStateTooltip = (
+  state: string,
+  params?: { confirmationDepth: number; unbondingTime: number },
+) => {
   switch (state) {
     case DelegationState.ACTIVE:
       return "Stake is active";
     case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding requested";
     case DelegationState.UNBONDING:
-      return "Unbonding process of 7 days has started";
+      return `Unbonding process of ${params ? blocksToDisplayTime(params.unbondingTime) : "-"} has started`;
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:
       return "Stake has been withdrawn";
     case DelegationState.PENDING:
-      return `Stake that is pending ${confirmationDepth || 10} Bitcoin confirmations will only be visible from this device`;
+      return `Stake that is pending ${params?.confirmationDepth || 10} Bitcoin confirmations will only be visible from this device`;
     case DelegationState.OVERFLOW:
       return "Stake is over the staking cap";
     case DelegationState.EXPIRED:

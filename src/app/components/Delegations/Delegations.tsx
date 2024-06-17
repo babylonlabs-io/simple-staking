@@ -284,6 +284,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
       {modalMode && txID && (
         <UnbondWithdrawModal
+          unbondingTimeBlocks={globalParamsVersion.unbondingTime}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           onProceed={() => {
