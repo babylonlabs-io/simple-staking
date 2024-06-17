@@ -51,7 +51,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       </div>
       <div
         id="finality-providers"
-        className="no-scrollbar max-h-[21rem] overflow-y-auto"
+        className="no-scrollbar max-h-[31rem] overflow-y-auto"
       >
         <InfiniteScroll
           className="flex flex-col gap-4"
