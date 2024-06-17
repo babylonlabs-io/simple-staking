@@ -29,6 +29,7 @@ import {
   getTipHeight,
   pushTx,
 } from "../../../mempool_api";
+import { WalletError, WalletErrorType } from "../../errors";
 import { Fees, Network, UTXO, WalletProvider } from "../../wallet_provider";
 
 import BIP322 from "./bip322";
@@ -87,9 +88,14 @@ export class KeystoneWallet extends WalletProvider {
           "The scanned QR code is not the sync code from the Keystone hardware wallet. Please verify the code and try again.",
       },
     );
-
-    if (decodedResult.status !== ReadStatus.success)
+    if (decodedResult.status === ReadStatus.canceled) {
+      throw new WalletError(
+        WalletErrorType.ConnectionCancelled,
+        "Connection cancelled",
+      );
+    } else if (decodedResult.status !== ReadStatus.success) {
       throw new Error("Error reading QR code, Please try again.");
+    }
 
     // parse the QR Code and get extended public key and other required information
     const accountData = this.dataSdk.parseAccount(decodedResult.result);

@@ -9,6 +9,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 import {
   getPublicKeyNoCoord,
   isSupportedAddressType,
@@ -243,6 +244,13 @@ const Home: React.FC<HomeProps> = () => {
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
+      if (
+        error instanceof WalletError &&
+        error.getType() === WalletErrorType.ConnectionCancelled
+      ) {
+        // User cancelled the connection, hence do nothing
+        return;
+      }
       showError({
         error: {
           message: error.message,
