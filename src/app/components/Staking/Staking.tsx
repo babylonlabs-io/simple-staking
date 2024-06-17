@@ -537,15 +537,16 @@ export const Staking: React.FC<StakingProps> = ({
         : stakingTimeBlocks;
 
       // Check if the staking transaction is ready to be signed
-      const signReady = isStakingSignReady(
-        minStakingAmountSat,
-        maxStakingAmountSat,
-        minStakingTimeBlocks,
-        maxStakingTimeBlocks,
-        stakingAmountSat,
-        stakingTimeBlocksWithFixed,
-        !!finalityProvider,
-      );
+      const { isReady: signReady, reason: signNotReadyReason } =
+        isStakingSignReady(
+          minStakingAmountSat,
+          maxStakingAmountSat,
+          minStakingTimeBlocks,
+          maxStakingTimeBlocks,
+          stakingAmountSat,
+          stakingTimeBlocksWithFixed,
+          !!finalityProvider,
+        );
 
       const previewReady =
         signReady && feeRate && availableUTXOs && stakingAmountSat;
@@ -579,57 +580,86 @@ export const Staking: React.FC<StakingProps> = ({
               )}
             </div>
             {showApproachingCapWarning()}
-            <button
-              className="btn-primary btn mt-2 w-full"
-              disabled={!previewReady}
-              onClick={() => setPreviewModalOpen(true)}
+<<<<<<< HEAD
+      <button
+        className="btn-primary btn mt-2 w-full"
+        disabled={!previewReady}
+        onClick={() => setPreviewModalOpen(true)}
+      >
+        Preview
+      </button>
+      {
+        previewReady && (
+          <PreviewModal
+            open={previewModalOpen}
+            onClose={handlePreviewModalClose}
+            onSign={handleSign}
+            finalityProvider={finalityProvider?.description.moniker}
+            stakingAmountSat={stakingAmountSat}
+            stakingTimeBlocks={stakingTimeBlocksWithFixed}
+            stakingFeeSat={stakingFeeSat}
+            feeRate={feeRate}
+          />
+        )
+      }
+=======
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id="tooltip-staking-preview"
+              data-tooltip-content={signNotReadyReason}
+              data-tooltip-place="top"
             >
-              Preview
-            </button>
-            {previewReady && (
-              <PreviewModal
-                open={previewModalOpen}
-                onClose={handlePreviewModalClose}
-                onSign={handleSign}
-                finalityProvider={finalityProvider?.description.moniker}
-                stakingAmountSat={stakingAmountSat}
-                stakingTimeBlocks={stakingTimeBlocksWithFixed}
-                stakingFeeSat={stakingFeeSat}
-                feeRate={feeRate}
-              />
-            )}
-          </div>
+              <button
+                className="btn-primary btn mt-2 w-full"
+                disabled={!signReady}
+                onClick={() => setPreviewModalOpen(true)}
+              >
+                Preview
+              </button>
+              <Tooltip id="tooltip-staking-preview" />
+            </span>
+
+            <PreviewModal
+              open={previewModalOpen}
+              onClose={handlePreviewModalClose}
+              onSign={handleSign}
+              finalityProvider={finalityProvider?.description.moniker}
+              stakingAmountSat={stakingAmountSat}
+              stakingTimeBlocks={stakingTimeBlocksWithFixed}
+            />
+>>>>>>> 08497a0 (fix: add tooltip msg to preview button to hint on what's not ready)
+          </div >
         </>
       );
     }
   };
 
-  return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
-      <h3 className="mb-4 font-bold">Staking</h3>
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
-          <FinalityProviders
-            finalityProviders={finalityProviders}
-            selectedFinalityProvider={finalityProvider}
-            onFinalityProviderChange={handleChooseFinalityProvider}
-            queryMeta={{
-              next: finalityProvidersFetchNext,
-              hasMore: finalityProvidersHasNext,
-              isFetchingMore: finalityProvidersIsFetchingMore,
-            }}
-          />
-        </div>
-        <div className="divider m-0 lg:divider-horizontal lg:m-0" />
-        <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
-          {renderStakingForm()}
-        </div>
+return (
+  <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+    <h3 className="mb-4 font-bold">Staking</h3>
+    <div className="flex flex-col gap-4 lg:flex-row">
+      <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
+        <FinalityProviders
+          finalityProviders={finalityProviders}
+          selectedFinalityProvider={finalityProvider}
+          onFinalityProviderChange={handleChooseFinalityProvider}
+          queryMeta={{
+            next: finalityProvidersFetchNext,
+            hasMore: finalityProvidersHasNext,
+            isFetchingMore: finalityProvidersIsFetchingMore,
+          }}
+        />
       </div>
-      <FeedbackModal
-        open={feedbackModal.isOpen}
-        onClose={handleCloseFeedbackModal}
-        type={feedbackModal.type}
-      />
+      <div className="divider m-0 lg:divider-horizontal lg:m-0" />
+      <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
+        {renderStakingForm()}
+      </div>
     </div>
-  );
+    <FeedbackModal
+      open={feedbackModal.isOpen}
+      onClose={handleCloseFeedbackModal}
+      type={feedbackModal.type}
+    />
+  </div>
+);
 };
