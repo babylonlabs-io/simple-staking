@@ -155,6 +155,18 @@ const config: Config = {
 
   // The test environment that will be used for testing
   testEnvironment: "jsdom",
+  projects: [
+    {
+      displayName: "node",
+      testEnvironment: "node",
+      testMatch: ["<rootDir>/tests/**/*.test.ts"],
+    },
+    {
+      displayName: "jsdom",
+      testEnvironment: "jsdom",
+      testMatch: ["<rootDir>/tests/**/*.test.tsx"],
+    },
+  ],
 
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},

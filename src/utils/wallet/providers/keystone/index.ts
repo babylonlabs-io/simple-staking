@@ -19,6 +19,8 @@ import { tapleafHash } from "bitcoinjs-lib/src/payments/bip341";
 import { toXOnly } from "bitcoinjs-lib/src/psbt/bip371";
 import { pubkeyInScript } from "bitcoinjs-lib/src/psbt/psbtutils";
 
+import { getNetworkConfig } from "@/config/network.config";
+
 import { toNetwork } from "../..";
 import {
   getAddressBalance,
@@ -44,6 +46,7 @@ export class KeystoneWallet extends WalletProvider {
   private keystoneWaleltInfo: KeystoneWalletInfo | undefined;
   private viewSdk: typeof sdk;
   private dataSdk: KeystoneSDK;
+  private networkEnv: Network | undefined;
 
   constructor() {
     super();
@@ -52,6 +55,7 @@ export class KeystoneWallet extends WalletProvider {
     this.dataSdk = new KeystoneSDK({
       origin: "babylon staking app",
     });
+    this.networkEnv = getNetworkConfig().network;
   }
 
   /**
@@ -158,6 +162,9 @@ export class KeystoneWallet extends WalletProvider {
   };
 
   getNetwork = async (): Promise<Network> => {
+    if (!this.networkEnv) {
+      throw new Error("Network not set");
+    }
     return this.networkEnv;
   };
 

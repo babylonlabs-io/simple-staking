@@ -1,3 +1,4 @@
+import { getNetworkConfig } from "@/config/network.config";
 import {
   getAddressBalance,
   getFundingUTXOs,
@@ -26,6 +27,7 @@ const INTERNAL_NETWORK_NAMES = {
 export class TomoWallet extends WalletProvider {
   private tomoWalletInfo: WalletInfo | undefined;
   private bitcoinNetworkProvider: any;
+  private networkEnv: Network | undefined;
 
   constructor() {
     super();
@@ -34,6 +36,7 @@ export class TomoWallet extends WalletProvider {
     if (!window[tomoProvider]) {
       throw new Error("Tomo Wallet extension not found");
     }
+    this.networkEnv = getNetworkConfig().network;
 
     this.bitcoinNetworkProvider = window[tomoProvider];
   }
@@ -43,7 +46,9 @@ export class TomoWallet extends WalletProvider {
     if (!this.bitcoinNetworkProvider) {
       throw new Error("Tomo Wallet extension not found");
     }
-
+    if (!this.networkEnv) {
+      throw new Error("Network not found");
+    }
     if (this.bitcoinNetworkProvider.getVersion) {
       const version = await this.bitcoinNetworkProvider.getVersion();
       if (version < workingVersion) {

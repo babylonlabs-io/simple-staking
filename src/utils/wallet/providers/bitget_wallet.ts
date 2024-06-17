@@ -1,5 +1,7 @@
 import { Psbt } from "bitcoinjs-lib";
 
+import { getNetworkConfig } from "@/config/network.config";
+
 import {
   getAddressBalance,
   getFundingUTXOs,
@@ -21,6 +23,7 @@ const INTERNAL_NETWORK_NAMES = {
 
 export class BitgetWallet extends WalletProvider {
   private bitcoinNetworkProvider: any;
+  private networkEnv: Network | undefined;
 
   constructor() {
     super();
@@ -29,11 +32,16 @@ export class BitgetWallet extends WalletProvider {
     if (!window[bitgetWalletProvider]?.unisat) {
       throw new Error("Bitget Wallet extension not found");
     }
+    this.networkEnv = getNetworkConfig().network;
 
     this.bitcoinNetworkProvider = window[bitgetWalletProvider].unisat;
   }
 
   connectWallet = async (): Promise<any> => {
+    if (!this.networkEnv) {
+      throw new Error("Network not found");
+    }
+
     try {
       await this.bitcoinNetworkProvider.switchNetwork(
         INTERNAL_NETWORK_NAMES[this.networkEnv],

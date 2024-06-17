@@ -1,4 +1,8 @@
-import { network, validateAddress } from "@/config/network.config";
+import {
+  getNetworkConfig,
+  network,
+  validateAddress,
+} from "@/config/network.config";
 
 import {
   getAddressBalance,
@@ -22,6 +26,7 @@ export class OKXWallet extends WalletProvider {
   private okxWalletInfo: WalletInfo | undefined;
   private okxWallet: any;
   private bitcoinNetworkProvider: any;
+  private networkEnv: Network | undefined;
 
   constructor() {
     super();
@@ -32,9 +37,10 @@ export class OKXWallet extends WalletProvider {
     }
 
     this.okxWallet = window[okxProvider];
+    const networkEnv = getNetworkConfig().network;
 
     // OKX uses different providers for different networks
-    switch (this.networkEnv) {
+    switch (networkEnv) {
       case Network.MAINNET:
         this.bitcoinNetworkProvider = this.okxWallet.bitcoin;
         break;
@@ -136,6 +142,9 @@ export class OKXWallet extends WalletProvider {
   getNetwork = async (): Promise<Network> => {
     // OKX does not provide a way to get the network for Signet and Testnet
     // So we pass the check on connection and return the environment network
+    if (!this.networkEnv) {
+      throw new Error("Network not set");
+    }
     return this.networkEnv;
   };
 

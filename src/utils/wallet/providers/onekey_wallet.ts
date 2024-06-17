@@ -1,3 +1,5 @@
+import { getNetworkConfig } from "@/config/network.config";
+
 import {
   getAddressBalance,
   getFundingUTXOs,
@@ -25,6 +27,7 @@ export class OneKeyWallet extends WalletProvider {
   private oneKeyWalletInfo: WalletInfo | undefined;
   private oneKeyWallet: any;
   private bitcoinNetworkProvider: any;
+  private networkEnv: Network | undefined;
 
   constructor() {
     super();
@@ -38,6 +41,8 @@ export class OneKeyWallet extends WalletProvider {
 
     // OneKey provider stays the same for all networks
     this.bitcoinNetworkProvider = this.oneKeyWallet.btcwallet;
+
+    this.networkEnv = getNetworkConfig().network;
   }
 
   async connectWallet(): Promise<this> {

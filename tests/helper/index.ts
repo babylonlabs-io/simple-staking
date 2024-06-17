@@ -130,44 +130,6 @@ export class DataGenerator {
     return this.network;
   };
 
-  //   generateMockStakingScripts = (): StakingScripts => {
-  //     const finalityProviderPk = this.generateRandomKeyPairs(true).publicKey;
-  //     const stakingTxTimelock = this.generateRandomStakingTerm();
-  //     const publicKeyNoCoord = this.generateRandomKeyPairs(true).publicKey;
-  //     const globalParams = this.generateRandomGlobalParams();
-
-  //     // Convert covenant PKs to buffers
-  //     const covenantPKsBuffer = globalParams.covenantPks.map((pk) =>
-  //       Buffer.from(pk, "hex"),
-  //     );
-
-  //     // Create staking script data
-  //     let stakingScriptData;
-  //     try {
-  //       stakingScriptData = new StakingScriptData(
-  //         Buffer.from(publicKeyNoCoord, "hex"),
-  //         [Buffer.from(finalityProviderPk, "hex")],
-  //         covenantPKsBuffer,
-  //         globalParams.covenantQuorum,
-  //         stakingTxTimelock,
-  //         globalParams.unbondingTime,
-  //         Buffer.from(globalParams.tag, "hex"),
-  //       );
-  //     } catch (error: Error | any) {
-  //       throw new Error(error?.message || "Cannot build staking script data");
-  //     }
-
-  //     // Build scripts
-  //     let scripts;
-  //     try {
-  //       scripts = stakingScriptData.buildScripts();
-  //     } catch (error: Error | any) {
-  //       throw new Error(error?.message || "Error while recreating scripts");
-  //     }
-
-  //     return scripts;
-  //   };
-
   generateRandomUTXOs = (
     dataGenerator: DataGenerator,
     numUTXOs: number,
