@@ -77,7 +77,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         </div>
         <div className="flex items-center justify-end gap-1 lg:justify-start">
           <p className="hidden sm:flex lg:hidden">Comission:</p>
-          {maxDecimals(Number(comission) * 100, 2)}%
+          {moniker ? `${maxDecimals(Number(comission) * 100, 2)}%` : "-"}
           <span
             className="inline-flex cursor-pointer text-xs sm:hidden"
             data-tooltip-id={`tooltip-delegation-${pkHex}`}
