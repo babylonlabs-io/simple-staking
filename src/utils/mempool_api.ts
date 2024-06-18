@@ -43,6 +43,11 @@ function validateAddressUrl(address: string): URL {
   return new URL(mempoolAPI + "v1/validate-address/" + address);
 }
 
+// URL for the transaction info endpoint
+function txInfoUrl(txId: string): URL {
+  return new URL(mempoolAPI + "tx/" + txId);
+}
+
 /**
  * Pushes a transaction to the Bitcoin network.
  * @param txHex - The hex string corresponding to the full transaction.
@@ -183,4 +188,18 @@ export async function getFundingUTXOs(
       scriptPubKey: scriptPubKey,
     };
   });
+}
+
+/**
+ * Retrieve information about a transaction.
+ * @param txId - The transaction ID in string format.
+ * @returns A promise that resolves into the transaction information.
+ */
+export async function getTxInfo(txId: string): Promise<any> {
+  const response = await fetch(txInfoUrl(txId));
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(err);
+  }
+  return await response.json();
 }

@@ -1,13 +1,14 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
 import { getNetworkConfig } from "@/config/network.config";
-import { blocksToWeeks } from "@/utils/blocksToWeeks";
+import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 
 interface StakingTimeProps {
   minStakingTimeBlocks: number;
   maxStakingTimeBlocks: number;
+  unbondingTimeBlocks: number;
   onStakingTimeBlocksChange: (inputTimeBlocks: number) => void;
   reset: boolean;
 }
@@ -15,6 +16,7 @@ interface StakingTimeProps {
 export const StakingTime: React.FC<StakingTimeProps> = ({
   minStakingTimeBlocks,
   maxStakingTimeBlocks,
+  unbondingTimeBlocks,
   onStakingTimeBlocksChange,
   reset,
 }) => {
@@ -101,11 +103,16 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
       <div className="card mb-2 bg-base-200 p-4">
         <p>
           You can unbond and withdraw your stake anytime with an unbonding time
-          of 7 days.
+          of{" "}
+          {unbondingTimeBlocks ? blocksToDisplayTime(unbondingTimeBlocks) : "-"}
+          .
         </p>
         <p>
           There is also a build-in maximum staking period of{" "}
-          {blocksToWeeks(minStakingTimeBlocks, 5)}.
+          {minStakingTimeBlocks
+            ? blocksToDisplayTime(minStakingTimeBlocks)
+            : "-"}
+          .
         </p>
         <p>
           If the stake is not unbonded before the end of this period, it will

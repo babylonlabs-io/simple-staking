@@ -1,7 +1,10 @@
+import { getNetworkConfig } from "@/config/network.config";
+
 import {
   getAddressBalance,
   getFundingUTXOs,
   getNetworkFees,
+  pushTx,
 } from "../../mempool_api";
 import {
   Fees,
@@ -13,11 +16,66 @@ import {
 
 export const oneKeyProvider = "$onekey";
 
+// Internal network names
+const INTERNAL_NETWORK_NAMES = {
+  [Network.MAINNET]: "livenet",
+  [Network.TESTNET]: "testnet",
+  [Network.SIGNET]: "signet",
+};
+
 export class OneKeyWallet extends WalletProvider {
   private oneKeyWalletInfo: WalletInfo | undefined;
+  private oneKeyWallet: any;
+  private bitcoinNetworkProvider: any;
+  private networkEnv: Network | undefined;
+
+  constructor() {
+    super();
+
+    // check whether there is an OneKey extension
+    if (!window[oneKeyProvider]?.btcwallet) {
+      throw new Error("OneKey Wallet extension not found");
+    }
+
+    this.oneKeyWallet = window[oneKeyProvider];
+
+    // OneKey provider stays the same for all networks
+    this.bitcoinNetworkProvider = this.oneKeyWallet.btcwallet;
+
+    this.networkEnv = getNetworkConfig().network;
+  }
 
   async connectWallet(): Promise<this> {
-    const self = await window[oneKeyProvider].btcwallet.connectWallet();
+    const self = await this.bitcoinNetworkProvider.connectWallet();
+    const walletNetwork = await this.getNetwork();
+
+    if (this.networkEnv !== walletNetwork) {
+      throw new Error(
+        `Wallet is not switched to Bitcoin ${this.networkEnv} network`,
+      );
+    }
+
+    // TODO `window.$onekey.btcwallet.switchNetwork` does not support "signet" network at the moment
+    // Uncomment once it is supported
+    // switch (this.networkEnv) {
+    //   case Network.MAINNET:
+    //     await this.bitcoinNetworkProvider.switchNetwork(
+    //       INTERNAL_NETWORK_NAMES.mainnet,
+    //     );
+    //     break;
+    //   case Network.TESTNET:
+    //     await this.bitcoinNetworkProvider.switchNetwork(
+    //       INTERNAL_NETWORK_NAMES.testnet,
+    //     );
+    //     break;
+    //   case Network.SIGNET:
+    //     await this.bitcoinNetworkProvider.switchNetwork(
+    //       INTERNAL_NETWORK_NAMES.signet,
+    //     );
+    //     break;
+    //   default:
+    //     throw new Error("Unsupported network");
+    // }
     const address = await this.getAddress();
     const publicKeyHex = await this.getPublicKeyHex();
     this.oneKeyWalletInfo = {
@@ -28,41 +86,57 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async getWalletProviderName(): Promise<string> {
-    return window[oneKeyProvider].btcwallet.getWalletProviderName();
+    return this.bitcoinNetworkProvider.getWalletProviderName();
   }
 
   async getAddress(): Promise<string> {
     if (!this.oneKeyWalletInfo) {
-      return window[oneKeyProvider].btcwallet.getAddress();
+      return this.bitcoinNetworkProvider.getAddress();
     }
     return this.oneKeyWalletInfo.address;
   }
 
   async getPublicKeyHex(): Promise<string> {
     if (!this.oneKeyWalletInfo) {
-      return window[oneKeyProvider].btcwallet.getPublicKeyHex();
+      return this.bitcoinNetworkProvider.getPublicKeyHex();
     }
     return this.oneKeyWalletInfo.publicKeyHex;
   }
 
   async signPsbt(psbtHex: string): Promise<string> {
-    return window[oneKeyProvider].btcwallet.signPsbt(psbtHex);
+    return this.bitcoinNetworkProvider.signPsbt(psbtHex);
   }
 
   async signPsbts(psbtsHexes: string[]): Promise<string[]> {
-    return window[oneKeyProvider].btcwallet.signPsbts(psbtsHexes);
+    return this.bitcoinNetworkProvider.signPsbts(psbtsHexes);
   }
 
   async getNetwork(): Promise<Network> {
-    return window[oneKeyProvider].btcwallet.getNetwork();
+    const internalNetwork = await this.bitcoinNetworkProvider.getNetwork();
+
+    for (const [key, value] of Object.entries(INTERNAL_NETWORK_NAMES)) {
+      if (value === "testnet") {
+        return Network.SIGNET;
+      }
+      // TODO remove as soon as OneKey implements
+      // in case of testnet return signet
+      else if (value === internalNetwork) {
+        return key as Network;
+      }
+    }
+
+    throw new Error("Unsupported network");
   }
 
   async signMessageBIP322(message: string): Promise<string> {
-    return window[oneKeyProvider].btcwallet.signMessageBIP322(message);
+    return this.bitcoinNetworkProvider.signMessageBIP322(message);
   }
 
   on(eventName: string, callBack: () => void): void {
-    window[oneKeyProvider].btcwallet.on(eventName, callBack);
+    if (eventName === "accountChanged") {
+      return this.bitcoinNetworkProvider.on("accountsChanged", callBack);
+    }
+    this.bitcoinNetworkProvider.on(eventName, callBack);
   }
 
   async getBalance(): Promise<number> {
@@ -76,7 +150,7 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async pushTx(txHex: string): Promise<string> {
-    return window[oneKeyProvider].btcwallet.pushTx(txHex);
+    return await pushTx(txHex);
   }
 
   async getUtxos(address: string, amount?: number): Promise<UTXO[]> {
@@ -85,6 +159,6 @@ export class OneKeyWallet extends WalletProvider {
   }
 
   async getBTCTipHeight(): Promise<number> {
-    return window[oneKeyProvider].btcwallet.getBTCTipHeight();
+    return this.bitcoinNetworkProvider.getBTCTipHeight();
   }
 }

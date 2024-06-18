@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
+import { useTerms } from "@/app/context/Terms/TermsContext";
 import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -37,6 +38,8 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   // This constant is used to identify the browser wallet
   // And whether or not it should be injected
   const BROWSER = "btcwallet";
+
+  const { openTerms } = useTerms();
 
   useEffect(() => {
     const fetchWalletProviderDetails = async () => {
@@ -141,14 +144,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             />
             <span className="label-text">
               I certify that I have read and accept the updated{" "}
-              <a
-                href="/babylonchain_terms_of_use.doc"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="sublink text-primary hover:underline"
+              <button
+                onClick={openTerms}
+                className="transition-colors hover:text-primary cursor-pointer btn btn-link no-underline text-base-content px-0 h-auto min-h-0"
               >
                 Terms of Use
-              </a>
+              </button>
               .
             </span>
           </label>
@@ -157,11 +158,27 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           <h3 className="text-center font-semibold">Choose wallet</h3>
           <div className="grid max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
             {walletList.map(
-              ({ provider, name, linkToDocs, icon, isQRWallet }) => {
+              ({
+                provider,
+                name,
+                linkToDocs,
+                icon,
+                isQRWallet,
+                supportedNetworks,
+              }) => {
                 if (name === BROWSER_INJECTED_WALLET_NAME) {
                   return buildInjectableWallet(isInjectable, name);
                 }
                 const walletAvailable = isQRWallet || !!window[provider as any];
+
+                // If the wallet is integrated but does not support the current network, do not display it
+                if (
+                  !supportedNetworks ||
+                  !supportedNetworks.includes(getNetworkConfig().network)
+                ) {
+                  return null;
+                }
+
                 return (
                   <a
                     key={name}

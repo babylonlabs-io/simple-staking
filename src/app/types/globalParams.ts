@@ -2,6 +2,7 @@ export interface GlobalParamsVersion {
   version: number;
   activationHeight: number;
   stakingCapSat: number;
+  stakingCapHeight: number;
   tag: string;
   covenantPks: string[];
   covenantQuorum: number;

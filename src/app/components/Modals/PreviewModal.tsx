@@ -1,7 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 
 import { getNetworkConfig } from "@/config/network.config";
-import { blocksToWeeks } from "@/utils/blocksToWeeks";
+import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 
@@ -14,6 +14,9 @@ interface PreviewModalProps {
   finalityProvider: string | undefined;
   stakingAmountSat: number;
   stakingTimeBlocks: number;
+  stakingFeeSat: number;
+  feeRate: number;
+  unbondingTimeBlocks: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -22,7 +25,10 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   finalityProvider,
   stakingAmountSat,
   stakingTimeBlocks,
+  unbondingTimeBlocks,
   onSign,
+  stakingFeeSat,
+  feeRate,
 }) => {
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
@@ -54,15 +60,35 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
+          <div className={`${cardStyles} flex-1`}>
+            <p className="text-xs dark:text-neutral-content">Fee rate</p>
+            <p>{feeRate} sat/vB</p>
+          </div>
+          <div className={`${cardStyles} flex-1`}>
+            <p className="text-xs dark:text-neutral-content">
+              Transaction fee amount
+            </p>
+            <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToWeeks(stakingTimeBlocks, 5)}</p>
+            <p>
+              {stakingTimeBlocks ? blocksToDisplayTime(stakingTimeBlocks) : "-"}
+            </p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
               On-demand unbonding
             </p>
-            <p>Enabled (7 days unbonding time)</p>
+            <p>
+              Enabled (
+              {unbondingTimeBlocks
+                ? blocksToDisplayTime(unbondingTimeBlocks)
+                : "-"}{" "}
+              unbonding time)
+            </p>
           </div>
         </div>
         <h4 className="text-center text-base">Attention!</h4>

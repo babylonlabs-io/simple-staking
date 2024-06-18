@@ -8,7 +8,9 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDelegationsLocalStorage";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 import {
   getPublicKeyNoCoord,
   isSupportedAddressType,
@@ -22,8 +24,6 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { getStats } from "./api/getStats";
-import { OVERFLOW_TVL_WARNING_THRESHOLD } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -31,11 +31,13 @@ import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
+import { TermsModal } from "./components/Modals/Terms/TermsModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
+import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
@@ -50,6 +52,8 @@ const Home: React.FC<HomeProps> = () => {
   const [address, setAddress] = useState("");
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
+  const { isTermsOpen, closeTerms } = useTerms();
+
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -66,8 +70,8 @@ const Home: React.FC<HomeProps> = () => {
       return {
         // The staking parameters are retrieved based on the current height + 1
         // so this verification should take this into account.
-        height: height + 1,
-        ...getCurrentGlobalParamsVersion(height + 1, versions),
+        currentHeight: height,
+        nextBlockParams: getCurrentGlobalParamsVersion(height + 1, versions),
       };
     },
     refetchInterval: 60000, // 1 minute
@@ -148,21 +152,6 @@ const Home: React.FC<HomeProps> = () => {
     },
   });
 
-  const {
-    data: stakingStats,
-    isLoading: stakingStatsIsLoading,
-    error: statsError,
-    isError: hasStatsError,
-    refetch: refetchStats,
-  } = useQuery({
-    queryKey: ["stats"],
-    queryFn: getStats,
-    refetchInterval: 60000, // 1 minute
-    retry: (failureCount, error) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
-
   useEffect(() => {
     const handleError = ({
       error,
@@ -195,12 +184,6 @@ const Home: React.FC<HomeProps> = () => {
       refetchFunction: refetchDelegationData,
     });
     handleError({
-      error: statsError,
-      hasError: hasStatsError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchStats,
-    });
-    handleError({
       error: globalParamsVersionError,
       hasError: hasGlobalParamsVersionError,
       errorState: ErrorState.SERVER_ERROR,
@@ -210,7 +193,6 @@ const Home: React.FC<HomeProps> = () => {
     hasFinalityProvidersError,
     hasGlobalParamsVersionError,
     hasDelegationsError,
-    hasStatsError,
     isRefetchFinalityProvidersError,
   ]);
 
@@ -266,6 +248,13 @@ const Home: React.FC<HomeProps> = () => {
       setAddress(address);
       setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
     } catch (error: Error | any) {
+      if (
+        error instanceof WalletError &&
+        error.getType() === WalletErrorType.ConnectionCancelled
+      ) {
+        // User cancelled the connection, hence do nothing
+        return;
+      }
       showError({
         error: {
           message: error.message,
@@ -292,22 +281,43 @@ const Home: React.FC<HomeProps> = () => {
     }
   }, [btcWallet]);
 
-  // Remove the delegations that are already present in the API
+  // Clean up the local storage delegations
   useEffect(() => {
-    if (!delegations) {
+    if (!delegations?.delegations) {
       return;
     }
-    setDelegationsLocalStorage((localDelegations) =>
-      localDelegations?.filter(
-        (localDelegation) =>
-          !delegations?.delegations.find(
-            (delegation) =>
-              delegation?.stakingTxHashHex ===
-              localDelegation?.stakingTxHashHex,
-          ),
-      ),
-    );
-  }, [delegations, setDelegationsLocalStorage]);
+
+    const updateDelegations = async () => {
+      // Filter the delegations that are still valid
+      const validDelegations = await filterDelegationsLocalStorage(
+        delegationsLocalStorage,
+        delegations.delegations,
+      );
+
+      // Extract the stakingTxHashHex from the validDelegations
+      const validDelegationsHashes = validDelegations
+        .map((delegation) => delegation.stakingTxHashHex)
+        .sort();
+      const delegationsLocalStorageHashes = delegationsLocalStorage
+        .map((delegation) => delegation.stakingTxHashHex)
+        .sort();
+
+      // Check if the validDelegations are different from the current delegationsLocalStorage
+      const areDelegationsDifferent =
+        validDelegationsHashes.length !==
+          delegationsLocalStorageHashes.length ||
+        validDelegationsHashes.some(
+          (hash, index) => hash !== delegationsLocalStorageHashes[index],
+        );
+
+      // Update the local storage delegations if they are different to avoid unnecessary updates
+      if (areDelegationsDifferent) {
+        setDelegationsLocalStorage(validDelegations);
+      }
+    };
+
+    updateDelegations();
+  }, [delegations, setDelegationsLocalStorage, delegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
   const finalityProvidersKV = finalityProviders?.finalityProviders.reduce(
@@ -327,22 +337,6 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
-  // overflow properties to indicate the current state of the staking cap with the tvl
-  // these constants are needed for easier prop passing
-  let overflow = {
-    isOverTheCap: false,
-    isApprochingCap: false,
-  };
-  if (paramWithContext?.currentVersion && stakingStats) {
-    const { stakingCapSat } = paramWithContext.currentVersion;
-    const { activeTVLSat, unconfirmedTVLSat } = stakingStats;
-    overflow = {
-      isOverTheCap: stakingCapSat <= activeTVLSat,
-      isApprochingCap:
-        stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
-    };
-  }
-
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -356,11 +350,8 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          <Stats
-            stakingStats={stakingStats}
-            isLoading={stakingStatsIsLoading}
-          />
-          {address && btcWalletBalanceSat && (
+          <Stats />
+          {address && (
             <Summary
               address={address}
               totalStakedSat={totalStakedSat}
@@ -368,11 +359,10 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
+            btcHeight={paramWithContext?.currentHeight}
             finalityProviders={finalityProviders?.finalityProviders}
-            paramWithContext={paramWithContext}
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
-            overflow={overflow}
             finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
             finalityProvidersHasNext={hasNextFinalityProvidersPage}
             finalityProvidersIsFetchingMore={
@@ -388,14 +378,16 @@ const Home: React.FC<HomeProps> = () => {
           />
           {btcWallet &&
             delegations &&
-            paramWithContext?.currentVersion &&
+            paramWithContext?.nextBlockParams.currentVersion &&
             btcWalletNetwork &&
             finalityProvidersKV && (
               <Delegations
                 finalityProvidersKV={finalityProvidersKV}
                 delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
-                globalParamsVersion={paramWithContext.currentVersion}
+                globalParamsVersion={
+                  paramWithContext.nextBlockParams.currentVersion
+                }
                 publicKeyNoCoord={publicKeyNoCoord}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
@@ -433,6 +425,7 @@ const Home: React.FC<HomeProps> = () => {
         onClose={hideError}
         onRetry={retryErrorAction}
       />
+      <TermsModal open={isTermsOpen} onClose={closeTerms} />
     </main>
   );
 };
