@@ -7,6 +7,7 @@ import {
 
 const BLOCKS_PER_HOUR = 6;
 const WEEKS_PRECISION = 5;
+const DAY_TO_WEEK_DISPLAY_THRESHOLD = 30;
 
 /**
  * Converts a number of blocks into days or weeks
@@ -35,8 +36,8 @@ export const blocksToDisplayTime = (blocks: number): string => {
   const endDate = add(startDate, { hours });
 
   const dayDifference = differenceInCalendarDays(endDate, startDate);
-  // If the difference is greater than or equal to 7 days, return the difference in weeks
-  if (dayDifference >= 7) {
+  // If the difference is greater than or equal to 30 days, return the difference in weeks
+  if (dayDifference >= DAY_TO_WEEK_DISPLAY_THRESHOLD) {
     // Calculate the difference in weeks
     const weeks = differenceInWeeks(endDate, startDate);
     const roundedWeeks = Math.round(weeks / WEEKS_PRECISION) * WEEKS_PRECISION;
