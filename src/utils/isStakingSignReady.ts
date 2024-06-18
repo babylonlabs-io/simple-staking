@@ -13,7 +13,7 @@ export const isStakingSignReady = (
   if (!fpSelected)
     return {
       isReady: false,
-      reason: "Please select a validator",
+      reason: "Please select a finality provider",
     };
 
   // Amount parameters are ready
@@ -32,12 +32,12 @@ export const isStakingSignReady = (
   if (!amountIsReady) {
     return {
       isReady: false,
-      reason: "Please enter a valid amount",
+      reason: "Please enter a valid stake amount",
     };
   } else if (!timeIsReady) {
     return {
       isReady: false,
-      reason: "Please enter a valid time",
+      reason: "Please enter a valid staking period",
     };
   }
   return {
