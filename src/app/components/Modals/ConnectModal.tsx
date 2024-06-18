@@ -144,12 +144,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             />
             <span className="label-text">
               I certify that I have read and accept the updated{" "}
-              <a
+              <button
                 onClick={openTerms}
-                className="sublink text-primary hover:underline"
+                className="transition-colors hover:text-primary cursor-pointer btn btn-link no-underline text-base-content px-0 h-auto min-h-0"
               >
                 Terms of Use
-              </a>
+              </button>
               .
             </span>
           </label>

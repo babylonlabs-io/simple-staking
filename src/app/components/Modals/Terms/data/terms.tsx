@@ -1,6 +1,6 @@
 export const Terms = () => {
   return (
-    <div className="rounded-2xl border border-neutral-content p-6 dark:border-neutral-content/20 overflow-y-scroll no-scrollbar max-h-[100vh]">
+    <div className="rounded-2xl border border-neutral-content p-6 dark:border-neutral-content/20 overflow-y-scroll no-scrollbar max-h-[100vh] terms-container">
       <p>Last updated [27 May 2024]</p>
       <br />
       <p>
@@ -40,7 +40,7 @@ export const Terms = () => {
         for fraudulent use of the Interface.
       </p>
       <br />
-      <h2 className="text-primary">Terms of use</h2>
+      <h3 className="text-primary">Terms of use</h3>
       <br />
       <p>
         These Terms of Use and any terms and conditions incorporated by
@@ -76,7 +76,7 @@ export const Terms = () => {
       <br />
       <h3 className="text-primary">Binding Provisions</h3>
       <br />
-      <h4 className="text-primary">
+      <h4 className="font-bold text-primary">
         1. Dispute Resolution; Arbitration Agreement
       </h4>
       <br />
@@ -100,7 +100,9 @@ export const Terms = () => {
         information you obtained from the Interface.
       </p>
       <br />
-      <h4 className="text-primary">2. Class Action and Jury Trial Waiver</h4>
+      <h4 className="font-bold text-primary">
+        2. Class Action and Jury Trial Waiver
+      </h4>
       <br />
       <p>
         You agree to bring all disputes or claims connected to the Interface or
@@ -110,14 +112,14 @@ export const Terms = () => {
         waive the right to demand a trial by jury.
       </p>
       <br />
-      <h4 className="text-primary">3. Governing Law</h4>
+      <h4 className="font-bold text-primary">3. Governing Law</h4>
       <br />
       <p>
         You agree that the laws of the Cayman Islands, without regard to the
         principles of conflict of laws, govern these Terms.
       </p>
       <br />
-      <h4 className="text-primary">4. About the Interface</h4>
+      <h4 className="font-bold text-primary">4. About the Interface</h4>
       <br />
       <p>
         The Interface aggregates and publishes publicly available third-party
@@ -133,14 +135,16 @@ export const Terms = () => {
         Users to self-authorize token transfers on relevant blockchains.
       </p>
       <br />
-      <h4 className="text-primary">5. About the Protocol</h4>
+      <h4 className="font-bold text-primary">5. About the Protocol</h4>
       <br />
       <p>
         The Protocols are software source codes freely licensed to the public
         under the license(s) identified in the applicable GitHub repository.
       </p>
       <br />
-      <h4 className="text-primary">6. Interface relationship to Protocol</h4>
+      <h4 className="font-bold text-primary">
+        6. Interface relationship to Protocol
+      </h4>
       <br />
       <p>
         Using the relevant blockchain systems, third-party supplied wallets,
@@ -215,53 +219,53 @@ export const Terms = () => {
         Interface.
       </p>
       <br />
-      <h4 className="text-primary">7. Eligibility</h4>
+      <h4 className="font-bold text-primary">7. Eligibility</h4>
       <br />
       <p>If you use the interface you represent and declare that you:</p>
       <ol>
         <li>
-          &nbsp;&nbsp;a. are of legal age in the jurisdiction in which you
-          reside to use the Interface and the Protocols, and you have legal
-          capacity to consent and agree to be bound by these Terms;
+          are of legal age in the jurisdiction in which you reside to use the
+          Interface and the Protocols, and you have legal capacity to consent
+          and agree to be bound by these Terms;
         </li>
         <li>
-          &nbsp;&nbsp;b. have all technical knowledge necessary or advisable to
-          understand and evaluate the risks of using the Interface and the
-          Protocols;
+          have all technical knowledge necessary or advisable to understand and
+          evaluate the risks of using the Interface and the Protocols;
         </li>
         <li>
-          &nbsp;&nbsp;c. comply with all applicable laws, rules and regulations
-          in your relevant jurisdiction and your use of the Interface is not
-          prohibited by and does not otherwise violate or facilitate the
-          violation of any applicable laws or regulations, or contribute to or
-          facilitate any illegal activity;
+          comply with all applicable laws, rules and regulations in your
+          relevant jurisdiction and your use of the Interface is not prohibited
+          by and does not otherwise violate or facilitate the violation of any
+          applicable laws or regulations, or contribute to or facilitate any
+          illegal activity;
         </li>
         <li>
-          &nbsp;&nbsp;d. are not a resident, citizen, national or agent of, or
-          an entity organized, incorporated or doing business in, Belarus,
-          Burundi, Crimea and Sevastopol, Cuba, Democratic Republic of Congo,
-          Iran, Iraq, Libya, North Korea, Somalia, Sudan, Syria, Venezuela,
-          Zimbabwe or any other country to which the United States, the United
-          Kingdom, the European Union or any of its member states or the United
-          Nations or any of its member states (collectively, the Major
-          Jurisdictions) embargoes goods or imposes similar sanctions (such
-          embargoed or sanctioned territories, collectively, the Restricted
-          Territories);
+          are not a resident, citizen, national or agent of, or an entity
+          organized, incorporated or doing business in, Belarus, Burundi, Crimea
+          and Sevastopol, Cuba, Democratic Republic of Congo, Iran, Iraq, Libya,
+          North Korea, Somalia, Sudan, Syria, Venezuela, Zimbabwe or any other
+          country to which the United States, the United Kingdom, the European
+          Union or any of its member states or the United Nations or any of its
+          member states (collectively, the{" "}
+          <span className="text-primary">Major Jurisdictions</span>) embargoes
+          goods or imposes similar sanctions (such embargoed or sanctioned
+          territories, collectively, the{" "}
+          <span className="text-primary">Restricted Territories</span>);
         </li>
         <li>
-          &nbsp;&nbsp;e. are not, and do not directly or indirectly own or
-          control, and have not received any assets from any blockchain address
-          that is listed on any sanctions list or equivalent maintained by any
-          of the Major Jurisdictions (such sanctions-listed persons,
-          collectively, Sanctions Lists Persons); and
+          are not, and do not directly or indirectly own or control, and have
+          not received any assets from any blockchain address that is listed on
+          any sanctions list or equivalent maintained by any of the Major
+          Jurisdictions (such sanctions-listed persons, collectively,{" "}
+          <span className="text-primary">Sanctions Lists Persons</span>); and
         </li>
         <li>
-          &nbsp;&nbsp;f. do not intend to transact in or with any Restricted
-          Territories or Sanctions List Persons;
+          do not intend to transact in or with any Restricted Territories or
+          Sanctions List Persons;
         </li>
       </ol>
       <br />
-      <h4 className="text-primary">8. Permitted Use</h4>
+      <h4 className="font-bold text-primary">8. Permitted Use</h4>
       <br />
       <p>
         The Permitted Use of the Interface is exclusively to aid technologically
@@ -274,100 +278,97 @@ export const Terms = () => {
         User&apos;s intentions).
       </p>
       <br />
-      <h4 className="text-primary">9. Prohibited Uses</h4>
+      <h4 className="font-bold text-primary">9. Prohibited Uses</h4>
       <br />
       <p>
         Each User must not, directly or indirectly, in connection with their use
         of the Interface:
       </p>
       <ol>
+        <li>use the Interface other than for the Permitted Use;</li>
         <li>
-          &nbsp;&nbsp;a. use the Interface other than for the Permitted Use;
+          use the Interface at any time when any representation of the User set
+          forth in the Terms is untrue or inaccurate;
         </li>
         <li>
-          &nbsp;&nbsp;b. use the Interface at any time when any representation
-          of the User set forth in the Terms is untrue or inaccurate;
+          rely on the Interface as a basis for or a source of advice concerning
+          any financial or legal decision making or transactions;
         </li>
         <li>
-          &nbsp;&nbsp;c. rely on the Interface as a basis for or a source of
-          advice concerning any financial or legal decision making or
-          transactions;
+          employ any device, scheme or artifice to defraud, or otherwise
+          materially mislead, any person;
         </li>
         <li>
-          &nbsp;&nbsp;d. employ any device, scheme or artifice to defraud, or
-          otherwise materially mislead, any person;
+          engage in any act, practice or course of business that operates or
+          would operate as a fraud or deceit upon any person;
         </li>
         <li>
-          &nbsp;&nbsp;e. engage in any act, practice or course of business that
-          operates or would operate as a fraud or deceit upon any person;
+          fail to comply with any applicable provision of these Terms or any
+          other terms or conditions, privacy policy, or other policy governing
+          the use of the Interface;
         </li>
         <li>
-          &nbsp;&nbsp;f. fail to comply with any applicable provision of these
-          Terms or any other terms or conditions, privacy policy, or other
-          policy governing the use of the Interface;
-        </li>
-        <li>
-          &nbsp;&nbsp;g. engage, attempt, or assist in any hack of or attack on
-          the Interface or any wallet application or device, including any{" "}
+          engage, attempt, or assist in any hack of or attack on the Interface
+          or any wallet application or device, including any{" "}
           <span className="text-primary">“sybil attack”</span>,{" "}
           <span className="text-primary">“DoS attack”</span>,{" "}
           <span className="text-primary">“griefing attack”</span>, virus
           deployment, or theft;
         </li>
         <li>
-          &nbsp;&nbsp;h. commit any violation of applicable laws, rules or
-          regulations in your relevant jurisdiction;
+          commit any violation of applicable laws, rules or regulations in your
+          relevant jurisdiction;
         </li>
         <li>
-          &nbsp;&nbsp;i. transact in securities, commodities futures, trading of
-          commodities on a leveraged, margined or financed basis, binary options
-          (including prediction-market transactions), real estate or real estate
-          leases, equipment leases, debt financings, equity financings or other
-          similar transactions, in each case, if such transactions do not comply
-          with all laws, rules and regulations applicable to the parties and
-          assets engaged therein;
+          transact in securities, commodities futures, trading of commodities on
+          a leveraged, margined or financed basis, binary options (including
+          prediction-market transactions), real estate or real estate leases,
+          equipment leases, debt financings, equity financings or other similar
+          transactions, in each case, if such transactions do not comply with
+          all laws, rules and regulations applicable to the parties and assets
+          engaged therein;
         </li>
         <li>
-          &nbsp;&nbsp;j. engage in token-based or other financings of a
-          business, enterprise, venture, DAO, software development project or
-          other initiative, including ICOs, DAICOs, IEOs, or other token-based
-          fundraising events;
+          engage in token-based or other financings of a business, enterprise,
+          venture, DAO, software development project or other initiative,
+          including ICOs, DAICOs, IEOs, or other token-based fundraising events;
         </li>
         <li>
-          &nbsp;&nbsp;k. engage in activity that violates any applicable law,
-          rule, or regulation concerning the integrity of trading markets,
-          including, but not limited to, the manipulative tactics commonly known
-          as spoofing and wash trading.
+          engage in activity that violates any applicable law, rule, or
+          regulation concerning the integrity of trading markets, including, but
+          not limited to, the manipulative tactics commonly known as spoofing
+          and wash trading.
         </li>
         <li>
-          &nbsp;&nbsp;l. engage in any act, practice, or course of business that
-          operates to circumvent any sanctions or export controls targeting the
-          User or the country or territory where the User is located.
+          engage in any act, practice, or course of business that operates to
+          circumvent any sanctions or export controls targeting the User or the
+          country or territory where the User is located.
         </li>
         <li>
-          &nbsp;&nbsp;m. engage in any activity that infringes on or violates
-          any copyright, trademark, service mark, patent, right of publicity,
-          right of privacy, or other proprietary or intellectual property rights
-          under any law.
+          engage in any activity that infringes on or violates any copyright,
+          trademark, service mark, patent, right of publicity, right of privacy,
+          or other proprietary or intellectual property rights under any law.
         </li>
         <li>
-          &nbsp;&nbsp;n. engage in any activity that disguises or interferes in
-          any way with the IP address of a computer used to access or use the
-          Interface or that otherwise prevents correctly identifying the IP
-          address of the computer used to access the Interface.
+          engage in any activity that disguises or interferes in any way with
+          the IP address of a computer used to access or use the Interface or
+          that otherwise prevents correctly identifying the IP address of the
+          computer used to access the Interface.
         </li>
         <li>
-          &nbsp;&nbsp;o. engage in any activity that transmits, exchanges, or is
-          otherwise supported by the direct or indirect proceeds of criminal or
-          fraudulent activity; and
+          engage in any activity that transmits, exchanges, or is otherwise
+          supported by the direct or indirect proceeds of criminal or fraudulent
+          activity; and
         </li>
         <li>
-          &nbsp;&nbsp;p. engage in any activity that contributes to or
-          facilitates any of the foregoing activities.
+          engage in any activity that contributes to or facilitates any of the
+          foregoing activities.
         </li>
       </ol>
       <br />
-      <h4 className="text-primary">10. Additional User Declarations</h4>
+      <h4 className="font-bold text-primary">
+        10. Additional User Declarations
+      </h4>
       <br />
       <p>
         Additionally, if you use the interface you consent to, represent, and
@@ -375,85 +376,85 @@ export const Terms = () => {
       </p>
       <ol>
         <li>
-          &nbsp;&nbsp;a.that the only duties and obligations connected with the
-          Interface owed to the User are set forth in these Terms;
+          that the only duties and obligations connected with the Interface owed
+          to the User are set forth in these Terms;
         </li>
         <li>
-          &nbsp;&nbsp;b. that these Terms constitute legal, valid, and binding
-          obligations enforceable against the Users;
+          that these Terms constitute legal, valid, and binding obligations
+          enforceable against the Users;
         </li>
         <li>
-          &nbsp;&nbsp;c. that the Interface shall be deemed to be based solely
-          in the Cayman Islands and that although the Interface may be available
-          in other jurisdictions, its availability does not give rise to general
-          or specific personal jurisdiction in any forum outside the Cayman
+          that the Interface shall be deemed to be based solely in the Cayman
+          Islands and that although the Interface may be available in other
+          jurisdictions, its availability does not give rise to general or
+          specific personal jurisdiction in any forum outside the Cayman
           Islands;
         </li>
         <li>
-          &nbsp;&nbsp;d. that the Interface is provided for informational
-          purposes only and it is not directly or indirectly in control of the
-          Protocol and related blockchain systems or capable of performing or
-          effecting any transactions on your behalf;
+          that the Interface is provided for informational purposes only and it
+          is not directly or indirectly in control of the Protocol and related
+          blockchain systems or capable of performing or effecting any
+          transactions on your behalf;
         </li>
         <li>
-          &nbsp;&nbsp;e. that the Interface is only being provided as an aid to
-          your own independent research and evaluation of the Protocol and you
-          should not take, or refrain from taking, any action based on any
-          information on the Interface and without limitation from third party
-          blog posts, articles, links news feeds, tutorials, tweets, and videos;
+          that the Interface is only being provided as an aid to your own
+          independent research and evaluation of the Protocol and you should not
+          take, or refrain from taking, any action based on any information on
+          the Interface and without limitation from third party blog posts,
+          articles, links news feeds, tutorials, tweets, and videos;
         </li>
         <li>
-          &nbsp;&nbsp;f. that the ability of the Interface to connect with
-          third-party wallet applications or devices is not an endorsement or
-          recommendation by or on behalf of the Interface maintainers, and you
-          assume all responsibility for selecting and evaluating, and incurring
-          the risks of any bugs, defects, malfunctions or interruptions of any
-          third-party wallet applications or devices you directly or indirectly
-          use in connection with the Interface;
+          that the ability of the Interface to connect with third-party wallet
+          applications or devices is not an endorsement or recommendation by or
+          on behalf of the Interface maintainers, and you assume all
+          responsibility for selecting and evaluating, and incurring the risks
+          of any bugs, defects, malfunctions or interruptions of any third-party
+          wallet applications or devices you directly or indirectly use in
+          connection with the Interface;
         </li>
         <li>
-          &nbsp;&nbsp;g. to not hold the Interface maintainers or any affiliates
-          liable for any damages that you may suffer in connection with your use
-          of the Interface or the Protocol;
+          to not hold the Interface maintainers or any affiliates liable for any
+          damages that you may suffer in connection with your use of the
+          Interface or the Protocol;
         </li>
         <li>
-          &nbsp;&nbsp;h. that the information available on the Interface is not
-          professional, legal, business, investment, or any other advice related
-          to any financial product;
+          that the information available on the Interface is not professional,
+          legal, business, investment, or any other advice related to any
+          financial product;
         </li>
         <li>
-          &nbsp;&nbsp;i. that the information is not an offer or recommendation
-          or solicitation to buy or sell any particular digital asset or to use
-          any particular investment strategy;
+          that the information is not an offer or recommendation or solicitation
+          to buy or sell any particular digital asset or to use any particular
+          investment strategy;
         </li>
         <li>
-          &nbsp;&nbsp;j. that before you make any financial, legal, or other
-          decision in connection with the interface, you should seek independent
+          that before you make any financial, legal, or other decision in
+          connection with the interface, you should seek independent
           professional advice from an individual who is licensed and qualified
           in the area for which such advice would be appropriate;
         </li>
         <li>
-          &nbsp;&nbsp;k. that the Terms are not intended to, and do not, create
-          or impose any fiduciary duties on any party;
+          that the Terms are not intended to, and do not, create or impose any
+          fiduciary duties on any party;
         </li>
         <li>
-          &nbsp;&nbsp;l. to the fullest extent permitted by law, you acknowledge
-          and agree that the Interface maintainers owe no fiduciary duties or
-          liabilities to you or any other party;
+          to the fullest extent permitted by law, you acknowledge and agree that
+          the Interface maintainers owe no fiduciary duties or liabilities to
+          you or any other party;
         </li>
         <li>
-          &nbsp;&nbsp;m. that to the extent, any such duties or liabilities may
-          exist at law or in equity, those duties and liabilities are hereby
-          irrevocably disclaimed, waived, and eliminated;
+          that to the extent, any such duties or liabilities may exist at law or
+          in equity, those duties and liabilities are hereby irrevocably
+          disclaimed, waived, and eliminated;
         </li>
         <li>
-          &nbsp;&nbsp;n. that you may suffer damages in connection with your use
-          of the Interface or the Protocol and the Interface and Interface
-          maintainers are not liable for such damages;
+          that you may suffer damages in connection with your use of the
+          Interface or the Protocol and the Interface and Interface maintainers
+          are not liable for such damages;
         </li>
       </ol>
       <br />
-      <h4 className="text-primary">11. Certain risks</h4>
+      <h4 className="font-bold text-primary">11. Certain risks</h4>
       <br />
       <p>
         Each User acknowledges, agrees, consents to, and assumes the risks of,
@@ -477,11 +478,11 @@ export const Terms = () => {
       <p>
         The Interface is a free web application maintained at the sole and
         absolute discretion of a community of contributors who may also be known
-        as Interface maintainers. Individually and collectively they assume no
-        duty, liability, obligation, or undertaking to continue to maintain, or
-        to make available the Interface. The Interface maintainers may terminate
-        or change the Interface with respect to any aspect of the Interface at
-        any time.
+        as <span className="text-primary">Interface maintainers</span>.
+        Individually and collectively they assume no duty, liability,
+        obligation, or undertaking to continue to maintain, or to make available
+        the Interface. The Interface maintainers may terminate or change the
+        Interface with respect to any aspect of the Interface at any time.
       </p>
       <br />
       <p>
@@ -604,7 +605,7 @@ export const Terms = () => {
         have no ability to reverse or refund any amounts paid in error.
       </p>
       <br />
-      <h4 className="text-primary">12. License to Use Interface</h4>
+      <h4 className="font-bold text-primary">12. License to Use Interface</h4>
       <br />
       <p>
         Each User, subject to their eligibility, acceptance, and adherence to
@@ -613,7 +614,7 @@ export const Terms = () => {
         Interface for the Permitted Uses in accordance with these Terms.
       </p>
       <br />
-      <h4 className="text-primary">13. Privacy Policy</h4>
+      <h4 className="font-bold text-primary">13. Privacy Policy</h4>
       <br />
       <p>
         The Interface may directly or indirectly collect and temporarily store
@@ -626,7 +627,7 @@ export const Terms = () => {
         Interface.
       </p>
       <br />
-      <h4 className="text-primary">14. Non-Reliance</h4>
+      <h4 className="font-bold text-primary">14. Non-Reliance</h4>
       <br />
       <p>
         The Users declare that they are knowledgeable, experienced, and
@@ -641,7 +642,7 @@ export const Terms = () => {
         forth in these Terms.
       </p>
       <br />
-      <h4 className="text-primary">
+      <h4 className="font-bold text-primary">
         15. Risks, Disclaimers, and Limitations of Liability
       </h4>
       <br />
@@ -688,10 +689,11 @@ export const Terms = () => {
       <h5 className="text-primary">15.3 Fork Handling</h5>
       <br />
       <p>
-        The Protocol, and all tokens may be subject to Forks. Forks occur when
-        some or all persons running the software clients for a particular
-        blockchain system adopt a new client or a new version of an existing
-        client that: (i) changes the protocol rules in backward-compatible or
+        The Protocol, and all tokens may be subject to{" "}
+        <span className="text-primary">Forks</span>. Forks occur when some or
+        all persons running the software clients for a particular blockchain
+        system adopt a new client or a new version of an existing client that:
+        (i) changes the protocol rules in backward-compatible or
         backward-incompatible manner that affects which transactions can be
         added into later blocks, how later blocks are added to the blockchain,
         or other matters relating to the future operation of the protocol; or
@@ -778,7 +780,7 @@ export const Terms = () => {
         person or entity.
       </p>
       <br />
-      <h4 className="text-primary">
+      <h4 className="font-bold text-primary">
         16. Entire Representation, Consent and Agreement
       </h4>
       <br />
