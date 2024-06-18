@@ -102,12 +102,11 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const renderStateTooltip = () => {
-    const confirmationDepth = globalParamsVersion?.confirmationDepth;
     // overflow should be shown only on active state
     if (isOverflow && isActive) {
-      return getStateTooltip(DelegationState.OVERFLOW, confirmationDepth);
+      return getStateTooltip(DelegationState.OVERFLOW, globalParamsVersion);
     } else {
-      return getStateTooltip(intermediateState || state, confirmationDepth);
+      return getStateTooltip(intermediateState || state, globalParamsVersion);
     }
   };
 

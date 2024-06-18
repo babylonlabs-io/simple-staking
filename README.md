@@ -20,6 +20,7 @@ where,
   node queries
 - `NEXT_PUBLIC_API_URL` specifies the back-end API to use for the staking
   system queries
+- `NEXT_PUBLIC_NETWORK` specifies the BTC network environment
 
 Then, to start a development server:
 
