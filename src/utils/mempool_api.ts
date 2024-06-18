@@ -199,6 +199,7 @@ export async function getTxInfo(txId: string): Promise<any> {
   const response = await fetch(txInfoUrl(txId));
   if (!response.ok) {
     const err = await response.text();
+    console.log("err: ", err);
     throw new Error(err);
   }
   return await response.json();

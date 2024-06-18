@@ -39,12 +39,10 @@ export const filterDelegationsLocalStorage = async (
       // otherwise (low fees as example), we keep it in the local storage
 
       // Check if the transaction is in the mempool
-      let isInMempool;
+      let isInMempool = true;
       try {
         const fetchedTx = await getTxInfo(localDelegation.stakingTxHashHex);
-        if (fetchedTx) {
-          isInMempool = true;
-        } else {
+        if (!fetchedTx) {
           throw new Error("Transaction not found in the mempool");
         }
       } catch (_error) {
