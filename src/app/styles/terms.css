@@ -12,6 +12,10 @@
   margin-bottom: 0.5rem;
 }
 
+.terms-container h5 {
+  font-weight: 500;
+}
+
 .terms-container ol {
   padding-left: 1.5rem;
   margin-top: 0.25rem;

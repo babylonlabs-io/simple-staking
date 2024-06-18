@@ -1,12 +1,12 @@
 export const Terms = () => {
   return (
     <div className="rounded-2xl border border-neutral-content p-6 dark:border-neutral-content/20 overflow-y-scroll no-scrollbar max-h-[100vh] terms-container">
-      <p>Last updated [27 May 2024]</p>
+      <p className="italic">Last updated [27 May 2024]</p>
       <br />
       <p>
         <a
           href="https://btcstaking.testnet.babylonchain.io/"
-          className="text-primary"
+          className="text-primary italic"
         >
           https://btcstaking.testnet.babylonchain.io/
         </a>{" "}
