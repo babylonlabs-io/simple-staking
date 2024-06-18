@@ -31,9 +31,10 @@ const buildNextCapText = (
 ) => {
   const { stakingCapHeight, stakingCapSat, activationHeight } = nextVersion;
   if (stakingCapHeight) {
+    const remainingBlocks = activationHeight - btcHeight - 1;
     return {
       title: "Staking Window",
-      value: `opens in ${activationHeight - btcHeight - 1} blocks`,
+      value: `opens in ${remainingBlocks} ${remainingBlocks == 1 ? "block" : "blocks"}`,
     };
   } else if (stakingCapSat) {
     return {
@@ -61,7 +62,9 @@ const buildStakingCapSection = (
     return {
       title: "Staking Window",
       value:
-        numOfBlockLeft > 0 ? `closes in ${numOfBlockLeft} blocks` : "closed",
+        numOfBlockLeft > 0
+          ? `closes in ${numOfBlockLeft} ${numOfBlockLeft == 1 ? "block" : "blocks"}`
+          : "closed",
     };
   } else if (stakingCapSat) {
     return {
