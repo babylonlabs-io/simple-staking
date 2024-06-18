@@ -200,7 +200,6 @@ export async function getTxInfo(txId: string): Promise<any> {
   if (!response.ok) {
     const err = await response.text();
     throw new Error(err);
-  } else {
-    return await response.json();
   }
+  return await response.json();
 }
