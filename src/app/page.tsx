@@ -282,10 +282,22 @@ const Home: React.FC<HomeProps> = () => {
         delegationsLocalStorage,
         delegations.delegations,
       );
+
+      // Extract the stakingTxHashHex from the validDelegations
+      const validDelegationsHashes = validDelegations
+        .map((delegation) => delegation.stakingTxHashHex)
+        .sort();
+      const delegationsLocalStorageHashes = delegationsLocalStorage
+        .map((delegation) => delegation.stakingTxHashHex)
+        .sort();
+
       // Check if the validDelegations are different from the current delegationsLocalStorage
       const areDelegationsDifferent =
-        JSON.stringify(validDelegations) !==
-        JSON.stringify(delegationsLocalStorage);
+        validDelegationsHashes.length !==
+          delegationsLocalStorageHashes.length ||
+        validDelegationsHashes.some(
+          (hash, index) => hash !== delegationsLocalStorageHashes[index],
+        );
 
       // Update the local storage delegations if they are different to avoid unnecessary updates
       if (areDelegationsDifferent) {
