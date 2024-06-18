@@ -1,0 +1,28 @@
+.terms-container h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.terms-container h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.terms-container h5 {
+  font-weight: 600;
+}
+
+.terms-container ol {
+  padding-left: 1.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.terms-container li {
+  list-style-type: lower-alpha;
+  margin-bottom: 0.75rem;
+}
