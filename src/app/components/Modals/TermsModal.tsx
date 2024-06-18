@@ -59,13 +59,6 @@ export const TermsModal: React.FC<TermsModalProps> = ({ open, onClose }) => {
           className="min-h-[25rem] rounded-xl"
         ></iframe>
       )}
-      <div className="mt-4">
-        <a href="/babylonchain_terms_of_use.doc" download>
-          <button className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-lg px-2 text-white w-full">
-            Download Terms of Use
-          </button>
-        </a>
-      </div>
     </GeneralModal>
   );
 };
