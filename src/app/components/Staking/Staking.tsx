@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
 import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
@@ -537,15 +538,16 @@ export const Staking: React.FC<StakingProps> = ({
         : stakingTimeBlocks;
 
       // Check if the staking transaction is ready to be signed
-      const signReady = isStakingSignReady(
-        minStakingAmountSat,
-        maxStakingAmountSat,
-        minStakingTimeBlocks,
-        maxStakingTimeBlocks,
-        stakingAmountSat,
-        stakingTimeBlocksWithFixed,
-        !!finalityProvider,
-      );
+      const { isReady: signReady, reason: signNotReadyReason } =
+        isStakingSignReady(
+          minStakingAmountSat,
+          maxStakingAmountSat,
+          minStakingTimeBlocks,
+          maxStakingTimeBlocks,
+          stakingAmountSat,
+          stakingTimeBlocksWithFixed,
+          !!finalityProvider,
+        );
 
       const previewReady =
         signReady && feeRate && availableUTXOs && stakingAmountSat;
@@ -579,13 +581,21 @@ export const Staking: React.FC<StakingProps> = ({
               )}
             </div>
             {showApproachingCapWarning()}
-            <button
-              className="btn-primary btn mt-2 w-full"
-              disabled={!previewReady}
-              onClick={() => setPreviewModalOpen(true)}
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id="tooltip-staking-preview"
+              data-tooltip-content={signNotReadyReason}
+              data-tooltip-place="top"
             >
-              Preview
-            </button>
+              <button
+                className="btn-primary btn mt-2 w-full"
+                disabled={!previewReady}
+                onClick={() => setPreviewModalOpen(true)}
+              >
+                Preview
+              </button>
+              <Tooltip id="tooltip-staking-preview" />
+            </span>
             {previewReady && (
               <PreviewModal
                 open={previewModalOpen}
