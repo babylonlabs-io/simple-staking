@@ -37,10 +37,10 @@ export class OKXWallet extends WalletProvider {
     }
 
     this.okxWallet = window[okxProvider];
-    const networkEnv = getNetworkConfig().network;
+    this.networkEnv = getNetworkConfig().network;
 
     // OKX uses different providers for different networks
-    switch (networkEnv) {
+    switch (this.networkEnv) {
       case Network.MAINNET:
         this.bitcoinNetworkProvider = this.okxWallet.bitcoin;
         break;
