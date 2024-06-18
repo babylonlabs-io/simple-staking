@@ -38,12 +38,23 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
       <div className="grid grid-cols-stakingFinalityProvidersMobile grid-rows-2 items-center gap-2 lg:grid-cols-stakingFinalityProvidersDesktop lg:grid-rows-1">
         <div>
           {moniker ? (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 justify-start lg:justify-center">
               <p>{moniker}</p>
               <Image src={blue} alt="verified" />
             </div>
           ) : (
-            "-"
+            <div className="flex items-center gap-1 justify-start lg:justify-center">
+              <span
+                className="cursor-pointer text-xs"
+                data-tooltip-id="tooltip-missing-fp"
+                data-tooltip-content="This finaility provider did not provide any information."
+                data-tooltip-place="top"
+              >
+                <AiOutlineInfoCircle className="text-red-500" />
+              </span>
+              <Tooltip id="tooltip-missing-fp" />
+              <span>-</span>
+            </div>
           )}
         </div>
         <div className="flex justify-end lg:justify-start">
