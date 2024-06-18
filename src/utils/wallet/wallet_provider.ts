@@ -1,5 +1,3 @@
-import { getNetworkConfig } from "@/config/network.config";
-
 export type Fees = {
   // fee for inclusion in the next block
   fastestFee: number;
@@ -44,12 +42,6 @@ export type WalletInfo = {
  */
 
 export abstract class WalletProvider {
-  protected networkEnv: Network;
-
-  constructor() {
-    this.networkEnv = getNetworkConfig().network;
-  }
-
   /**
    * Connects to the wallet and returns the instance of the wallet provider.
    * Currently only supports "native segwit" and "taproot" address types.

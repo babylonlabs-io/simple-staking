@@ -26,7 +26,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "node_modules/@testing-library/jest-dom"
+    "node_modules/@testing-library/jest-dom",
+    "tests"
   ],
   "exclude": ["node_modules"]
 }
