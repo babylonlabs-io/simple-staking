@@ -272,7 +272,7 @@ const Home: React.FC<HomeProps> = () => {
 
   // Clean up the local storage delegations
   useEffect(() => {
-    if (!delegations) {
+    if (!delegations?.delegations) {
       return;
     }
 
@@ -280,7 +280,7 @@ const Home: React.FC<HomeProps> = () => {
       // Filter the delegations that are still valid
       const validDelegations = await filterDelegationsLocalStorage(
         delegationsLocalStorage,
-        delegations,
+        delegations.delegations,
       );
       // Check if the validDelegations are different from the current delegationsLocalStorage
       const areDelegationsDifferent =

@@ -1,4 +1,3 @@
-import { PaginatedDelegations } from "@/app/api/getDelegations";
 import { Delegation } from "@/app/types/delegations";
 
 import { getTxInfo } from "../mempool_api";
@@ -10,14 +9,14 @@ const maxDelegationPendingDuration = 24 * 60 * 60 * 1000; // 24 hours in millise
 // Returns the delegations that are valid and should be kept in the local storage
 export const filterDelegationsLocalStorage = async (
   delegationsLocalStorage: Delegation[],
-  delegationsAPI: PaginatedDelegations,
+  delegationsFromAPI: Delegation[],
 ): Promise<Delegation[]> => {
   const validDelegations: Delegation[] = [];
 
   // `continue` will not add the delegation to the validDelegations array
   for (const localDelegation of delegationsLocalStorage) {
     // Check if the delegation is already present in the API
-    const delegationInAPI = delegationsAPI.delegations.find(
+    const delegationInAPI = delegationsFromAPI.find(
       (delegation) =>
         delegation?.stakingTxHashHex === localDelegation?.stakingTxHashHex,
     );
