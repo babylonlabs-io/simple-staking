@@ -29,11 +29,13 @@ import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
+import { TermsModal } from "./components/Modals/TermsModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
+import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
@@ -48,6 +50,7 @@ const Home: React.FC<HomeProps> = () => {
   const [address, setAddress] = useState("");
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
+  const { isTermsOpen, closeTerms } = useTerms();
 
   const {
     data: paramWithContext,
@@ -392,6 +395,7 @@ const Home: React.FC<HomeProps> = () => {
         onClose={hideError}
         onRetry={retryErrorAction}
       />
+      <TermsModal open={isTermsOpen} onClose={closeTerms} />
     </main>
   );
 };

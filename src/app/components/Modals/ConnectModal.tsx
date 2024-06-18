@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
+import { useTerms } from "@/app/context/Terms/TermsContext";
 import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -37,6 +38,8 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   // This constant is used to identify the browser wallet
   // And whether or not it should be injected
   const BROWSER = "btcwallet";
+
+  const { openTerms } = useTerms();
 
   useEffect(() => {
     const fetchWalletProviderDetails = async () => {
@@ -142,9 +145,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             <span className="label-text">
               I certify that I have read and accept the updated{" "}
               <a
-                href="/babylonchain_terms_of_use.doc"
-                target="_blank"
-                rel="noopener noreferrer"
+                onClick={openTerms}
                 className="sublink text-primary hover:underline"
               >
                 Terms of Use

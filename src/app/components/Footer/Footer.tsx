@@ -10,6 +10,8 @@ import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail } from "react-icons/md";
 
+import { useTerms } from "@/app/context/Terms/TermsContext";
+
 const iconLinks = [
   {
     name: "Website",
@@ -61,32 +63,28 @@ const iconLinks = [
 const textLinks = [
   {
     name: "Terms of Use",
-    url: "/babylonchain_terms_of_use.doc",
-    isExternal: false,
   },
 ];
 
 interface FooterProps {}
 
 export const Footer: React.FC<FooterProps> = () => {
+  const { openTerms } = useTerms();
+
   return (
     <div className="container mx-auto flex flex-col items-center">
       <div className="w-24">
         <div className="divider my-1" />
       </div>
       <div className="flex justify-center gap-8 p-2">
-        {textLinks.map(({ name, url, isExternal }) => (
-          <div key={name} className="flex items-center justify-center text-sm">
-            <a
-              href={url}
-              target={isExternal ? "_blank" : "_self"}
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-primary"
-            >
-              {name}
-            </a>
-          </div>
-        ))}
+        <div className="flex items-center justify-center text-sm">
+          <a
+            onClick={openTerms}
+            className="transition-colors hover:text-primary cursor-pointer"
+          >
+            Terms of Use
+          </a>
+        </div>
       </div>
       <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
         {iconLinks.map(({ name, url, Icon }) => (
