@@ -4,10 +4,15 @@ import { Fees } from "./wallet/wallet_provider";
 // Returns min, default and max fee rate from mempool
 export const getFeeRateFromMempool = (mempoolFeeRates?: Fees) => {
   if (mempoolFeeRates) {
+    // The maximum fee rate is at least 128 sat/vB
+    const MAX_FEE_RATE = 128;
     return {
       minFeeRate: mempoolFeeRates.hourFee,
       defaultFeeRate: mempoolFeeRates.fastestFee,
-      maxFeeRate: nextPowerOfTwo(mempoolFeeRates?.fastestFee! * 2),
+      maxFeeRate: Math.max(
+        MAX_FEE_RATE,
+        nextPowerOfTwo(mempoolFeeRates.fastestFee),
+      ),
     };
   } else {
     return {
