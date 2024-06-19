@@ -86,7 +86,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
-      delegation.stakingTx.outputIndex,
+      0,
     );
   } else {
     // Withdraw funds from a staking transaction in which the timelock naturally expired
@@ -100,7 +100,7 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       fees.fastestFee,
-      0, // unbonding always has a single output
+      delegation.stakingTx.outputIndex,
     );
   }
 
