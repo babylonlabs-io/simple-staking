@@ -27,19 +27,18 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const unbondContent = (
     <>
       You are about to unbond your stake before its expiration. The expected
-      unbonding time will be about
+      unbonding time will be about{" "}
       <strong>
         {unbondingTimeBlocks ? blocksToDisplayTime(unbondingTimeBlocks) : "-"}
       </strong>
       .<br />
       After unbonded, you will need to use this dashboard to withdraw your stake
-      for it to appear in your wallet. OK to proceed?
+      for it to appear in your wallet.
     </>
   );
 
   const withdrawTitle = "Withdraw";
-  const withdrawContent =
-    "You are about to withdraw your stake. OK to proceed?";
+  const withdrawContent = "You are about to withdraw your stake.";
 
   const title = mode === MODE_UNBOND ? unbondTitle : withdrawTitle;
   const content = mode === MODE_UNBOND ? unbondContent : withdrawContent;
