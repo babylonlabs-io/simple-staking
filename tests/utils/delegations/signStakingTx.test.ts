@@ -1,210 +1,101 @@
-import { createStakingTx } from "@/utils/delegations/signStakingTx";
+import { signStakingTx } from "@/utils/delegations/signStakingTx";
 import { toNetwork } from "@/utils/wallet";
 import { Network } from "@/utils/wallet/wallet_provider";
 
 import { DataGenerator } from "../../helper";
 
-describe("utils/isStakingSignReady", () => {
+// Mock the signPsbtTransaction function
+jest.mock("@/app/common/utils/psbt", () => ({
+  signPsbtTransaction: jest.fn(),
+}));
+
+describe("utils/delegations/signStakingTx", () => {
   const networks = [Network.MAINNET, Network.SIGNET];
   networks.forEach((n) => {
     const network = toNetwork(n);
     const dataGen = new DataGenerator(network);
     const randomFpKeys = dataGen.generateRandomKeyPair(true);
     const randomUserKeys = dataGen.generateRandomKeyPair(true);
-    const randomFeeRate = 1; // keep test simple by setting this to unit 1
+    const feeRate = 1; // keep test simple by setting this to unit 1
+    const randomParam = dataGen.generateRandomGlobalParams(true);
+    const randomStakingAmount = dataGen.getRandomIntegerBetween(
+      randomParam.minStakingAmountSat,
+      randomParam.maxStakingAmountSat,
+    );
+    const randomStakingTimeBlocks = dataGen.getRandomIntegerBetween(
+      randomParam.minStakingTimeBlocks,
+      randomParam.maxStakingTimeBlocks,
+    );
+    const randomInputUTXOs = dataGen.generateRandomUTXOs(
+      randomStakingAmount + Math.floor(Math.random() * 1000000),
+      Math.floor(Math.random() * 10) + 1,
+    );
+    const txHex = dataGen.generateRandomTxId();
 
-    [true, false].forEach((isFixed) => {
-      const randomParam = dataGen.generateRandomGlobalParams(isFixed);
-      const randomStakingAmount = dataGen.getRandomIntegerBetween(
-        randomParam.minStakingAmountSat,
-        randomParam.maxStakingAmountSat,
+    // mock the btcWallet
+    const btcWallet = {
+      signPsbt: jest.fn(),
+      getWalletProviderName: jest.fn(),
+      pushTx: jest.fn().mockResolvedValue(true),
+    };
+
+    it("should successfully sign a staking transaction", async () => {
+      // Import the mock function
+      const { signPsbtTransaction } = require("@/app/common/utils/psbt");
+      signPsbtTransaction.mockImplementationOnce(() => {
+        return async () => {
+          return {
+            toHex: () => txHex,
+          };
+        };
+      });
+
+      const result = await signStakingTx(
+        btcWallet as any,
+        randomParam,
+        randomStakingAmount,
+        randomStakingTimeBlocks,
+        randomFpKeys.publicKey,
+        network,
+        dataGen.getTaprootAddress(randomUserKeys.publicKey),
+        randomUserKeys.publicKey,
+        feeRate,
+        randomInputUTXOs,
       );
-      const randomStakingTimeBlocks = dataGen.getRandomIntegerBetween(
-        randomParam.minStakingTimeBlocks,
-        randomParam.maxStakingTimeBlocks,
-      );
-      const randomInputUTXOs = dataGen.generateRandomUTXOs(
-        randomStakingAmount + Math.floor(Math.random() * 1000000),
-        Math.floor(Math.random() * 10) + 1,
-      );
-      const testTermDescription = isFixed ? "fixed term" : "variable term";
-      describe(`${testTermDescription} - createStakingTx`, () => {
-        it("should successfully create a staking transaction", () => {
-          const { stakingFeeSat, stakingTerm, unsignedStakingPsbt } =
-            createStakingTx(
-              randomParam,
-              randomStakingAmount,
-              randomStakingTimeBlocks,
-              randomFpKeys.publicKey,
-              network,
-              dataGen.getTaprootAddress(randomUserKeys.publicKey),
-              randomUserKeys.publicKey,
-              randomFeeRate,
-              randomInputUTXOs,
-            );
 
-          expect(stakingTerm).toBe(randomStakingTimeBlocks);
-          const matchedStakingOutput = unsignedStakingPsbt.txOutputs.find(
-            (output) => {
-              return output.value === randomStakingAmount;
-            },
-          );
-          expect(matchedStakingOutput).toBeDefined();
-          expect(stakingFeeSat).toBeGreaterThan(0);
-        });
+      expect(result).toBeDefined();
+      expect(btcWallet.pushTx).toHaveBeenCalled();
+      // check the signed transaction hex
+      expect(result.stakingTxHex).toBe(txHex);
+      // check the staking term
+      expect(result.stakingTerm).toBe(randomStakingTimeBlocks);
+    });
 
-        it(`${testTermDescription} - should successfully create a staking transaction with change amount in output`, () => {
-          const utxo = dataGen.generateRandomUTXOs(
-            randomStakingAmount + Math.floor(Math.random() * 1000000),
-            1, // make it a single utxo so we always have change
-          );
-          const { stakingFeeSat, stakingTerm, unsignedStakingPsbt } =
-            createStakingTx(
-              randomParam,
-              randomStakingAmount,
-              randomStakingTimeBlocks,
-              randomFpKeys.publicKey,
-              network,
-              dataGen.getTaprootAddress(randomUserKeys.publicKey),
-              randomUserKeys.publicKey,
-              randomFeeRate,
-              utxo,
-            );
-
-          expect(stakingTerm).toBe(randomStakingTimeBlocks);
-          const matchedStakingOutput = unsignedStakingPsbt.txOutputs.find(
-            (output) => {
-              return output.value === randomStakingAmount;
-            },
-          );
-          expect(matchedStakingOutput).toBeDefined();
-          expect(stakingFeeSat).toBeGreaterThan(0);
-
-          const changeOutput = unsignedStakingPsbt.txOutputs.find((output) => {
-            return (
-              output.address ==
-              dataGen.getTaprootAddress(randomUserKeys.publicKey)
-            );
-          });
-          expect(changeOutput).toBeDefined();
-        });
+    it("should throw an error when signing a staking transaction", async () => {
+      // Import the mock function
+      const { signPsbtTransaction } = require("@/app/common/utils/psbt");
+      signPsbtTransaction.mockImplementationOnce(() => {
+        return async () => {
+          throw new Error("signing error");
+        };
       });
 
-      it(`${testTermDescription} - should throw an error if the staking amount is less than the minimum staking amount`, () => {
-        expect(() =>
-          createStakingTx(
-            randomParam,
-            randomParam.minStakingAmountSat - 1,
-            randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
-            network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
-            randomFeeRate,
-            randomInputUTXOs,
-          ),
-        ).toThrow("Invalid staking data");
-      });
-
-      it(`${testTermDescription} - should throw an error if the staking amount is greater than the maximum staking amount`, () => {
-        expect(() =>
-          createStakingTx(
-            randomParam,
-            randomParam.maxStakingAmountSat + 1,
-            randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
-            network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
-            randomFeeRate,
-            randomInputUTXOs,
-          ),
-        ).toThrow("Invalid staking data");
-      });
-
-      it(`${testTermDescription} - should throw an error if the fee rate is less than or equal to 0`, () => {
-        expect(() =>
-          createStakingTx(
-            randomParam,
-            randomStakingAmount,
-            randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
-            network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
-            0,
-            randomInputUTXOs,
-          ),
-        ).toThrow("Invalid fee rate");
-      });
-
-      it(`${testTermDescription} - should throw an error if there are no usable balance`, () => {
-        expect(() =>
-          createStakingTx(
-            randomParam,
-            randomStakingAmount,
-            randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
-            network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
-            randomFeeRate,
-            [],
-          ),
-        ).toThrow("Not enough usable balance");
-      });
-
-      // This test only test createStakingTx when apiDataToStakingScripts throw error.
-      // The different error cases are tested in the apiDataToStakingScripts.test.ts
-      it(`${testTermDescription} - should throw an error if the staking scripts cannot be built`, () => {
-        expect(() =>
-          createStakingTx(
-            randomParam,
-            randomStakingAmount,
-            randomStakingTimeBlocks,
-            dataGen.generateRandomKeyPair(false).publicKey, // invalid finality provider key
-            network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
-            randomFeeRate,
-            randomInputUTXOs,
-          ),
-        ).toThrow("Invalid script data provided");
-      });
-
-      // More test cases when we have variable staking terms
-      if (!isFixed) {
-        it(`${testTermDescription} - should throw an error if the staking term is less than the minimum staking time blocks`, () => {
-          expect(() =>
-            createStakingTx(
-              randomParam,
-              randomStakingAmount,
-              randomParam.minStakingTimeBlocks - 1,
-              randomFpKeys.publicKey,
-              network,
-              dataGen.getTaprootAddress(randomUserKeys.publicKey),
-              randomUserKeys.publicKey,
-              randomFeeRate,
-              randomInputUTXOs,
-            ),
-          ).toThrow("Invalid staking data");
-        });
-
-        it(`${testTermDescription} - should throw an error if the staking term is greater than the maximum staking time blocks`, () => {
-          expect(() =>
-            createStakingTx(
-              randomParam,
-              randomStakingAmount,
-              randomParam.maxStakingTimeBlocks + 1,
-              randomFpKeys.publicKey,
-              network,
-              dataGen.getTaprootAddress(randomUserKeys.publicKey),
-              randomUserKeys.publicKey,
-              randomFeeRate,
-              randomInputUTXOs,
-            ),
-          ).toThrow("Invalid staking data");
-        });
+      try {
+        await signStakingTx(
+          btcWallet as any,
+          randomParam,
+          randomStakingAmount,
+          randomStakingTimeBlocks,
+          randomFpKeys.publicKey,
+          network,
+          dataGen.getTaprootAddress(randomUserKeys.publicKey),
+          randomUserKeys.publicKey,
+          feeRate,
+          randomInputUTXOs,
+        );
+      } catch (error: any) {
+        expect(error).toBeDefined();
+        expect(error.message).toBe("signing error");
       }
     });
   });
