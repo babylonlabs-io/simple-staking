@@ -1,8 +1,13 @@
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
+import { StakingScriptData, StakingScripts } from "btc-staking-ts";
 import ECPairFactory from "ecpair";
 
+import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { UTXO } from "@/utils/wallet/wallet_provider";
+
+// Initialize the ECC library
+bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
 
 export class DataGenerator {
@@ -20,7 +25,7 @@ export class DataGenerator {
     return randomBuffer.toString("hex");
   };
 
-  generateRandomKeyPairs = (isNoCoordPk = false) => {
+  generateRandomKeyPair = (isNoCoordPk = true) => {
     const keyPair = ECPair.makeRandom({ network: this.network });
     const { privateKey, publicKey } = keyPair;
     if (!privateKey || !publicKey) {
@@ -42,18 +47,23 @@ export class DataGenerator {
     return Math.floor(Math.random() * 65535) + 1;
   };
 
+  generateRandomUnbondingTime = (stakingTerm: number) => {
+    return Math.floor(Math.random() * stakingTerm) + 1;
+  };
+
   generateRandomFeeRates = () => {
     return Math.floor(Math.random() * 1000) + 1;
   };
 
-  // Convenant quorums are a list of public keys that are used to sign a covenant
+  // Convenant committee are a list of public keys that are used to sign a covenant
   generateRandomCovenantCommittee = (size: number): Buffer[] => {
-    const quorum: Buffer[] = [];
+    const committe: Buffer[] = [];
     for (let i = 0; i < size; i++) {
-      const keyPair = this.generateRandomKeyPairs(true);
-      quorum.push(Buffer.from(keyPair.publicKey, "hex"));
+      // covenant committee PKs are with coordiantes
+      const keyPair = this.generateRandomKeyPair(false);
+      committe.push(Buffer.from(keyPair.publicKey, "hex"));
     }
-    return quorum;
+    return committe;
   };
 
   generateRandomTag = () => {
@@ -64,16 +74,20 @@ export class DataGenerator {
     return buffer;
   };
 
+  // Generate a single global param
   generateRandomGlobalParams = (isFixedTimelock = false) => {
-    // the commitee size is assunmed to be between 5 and 20
+    const stakingTerm = this.generateRandomStakingTerm();
     const committeeSize = Math.floor(Math.random() * 20) + 5;
     const covenantPks = this.generateRandomCovenantCommittee(committeeSize).map(
       (buffer) => buffer.toString("hex"),
     );
-    // the covenantQuorum should always be around 2/3 of the committee size
-    const covenantQuorum = Math.floor((committeeSize * 2) / 3);
-    let maxStakingTimeBlocks = Math.floor(Math.random() * 100);
+    const covenantQuorum = Math.floor(Math.random() * (committeeSize - 1)) + 1;
+    const unbondingTime = this.generateRandomUnbondingTime(stakingTerm);
+    const tag = this.generateRandomTag().toString("hex");
+
     let minStakingTimeBlocks = Math.floor(Math.random() * 100);
+    let maxStakingTimeBlocks =
+      minStakingTimeBlocks + Math.floor(Math.random() * 1000);
     if (isFixedTimelock) {
       maxStakingTimeBlocks = minStakingTimeBlocks;
     }
@@ -87,20 +101,24 @@ export class DataGenerator {
       activationHeight: Math.floor(Math.random() * 100),
       stakingCapSat: Math.floor(Math.random() * 100),
       stakingCapHeight: Math.floor(Math.random() * 100),
-      tag: this.generateRandomTag().toString("hex"),
       covenantPks,
       covenantQuorum,
-      unbondingTime: this.generateRandomStakingTerm(),
       unbondingFeeSat: Math.floor(Math.random() * 1000),
       maxStakingAmountSat,
       minStakingAmountSat,
       maxStakingTimeBlocks,
       minStakingTimeBlocks,
       confirmationDepth: Math.floor(Math.random() * 20),
+      unbondingTime,
+      tag,
     };
   };
 
   getTaprootAddress = (publicKey: string) => {
+    // Remove the prefix if it exists
+    if (publicKey.length == 66) {
+      publicKey = publicKey.slice(2);
+    }
     const internalPubkey = Buffer.from(publicKey, "hex");
     const { address } = bitcoin.payments.p2tr({
       internalPubkey,
@@ -130,15 +148,77 @@ export class DataGenerator {
     return this.network;
   };
 
+  generateMockStakingScripts = (
+    globalParams: GlobalParamsVersion,
+    publicKeyNoCoord: string,
+    finalityProviderPk: string,
+    stakingTxTimelock: number,
+  ): StakingScripts => {
+    // Convert covenant PKs to buffers
+    const covenantPKsBuffer = globalParams.covenantPks.map((pk: string) =>
+      Buffer.from(pk, "hex"),
+    );
+
+    // Create staking script data
+    let stakingScriptData;
+    try {
+      stakingScriptData = new StakingScriptData(
+        Buffer.from(publicKeyNoCoord, "hex"),
+        [Buffer.from(finalityProviderPk, "hex")],
+        covenantPKsBuffer,
+        globalParams.covenantQuorum,
+        stakingTxTimelock,
+        globalParams.unbondingTime,
+        Buffer.from(globalParams.tag, "hex"),
+      );
+    } catch (error: Error | any) {
+      throw new Error(error?.message || "Cannot build staking script data");
+    }
+
+    // Build scripts
+    let scripts;
+    try {
+      scripts = stakingScriptData.buildScripts();
+    } catch (error: Error | any) {
+      throw new Error(error?.message || "Error while recreating scripts");
+    }
+
+    return scripts;
+  };
+
   generateRandomUTXOs = (
-    dataGenerator: DataGenerator,
-    numUTXOs: number,
+    minAvailableBalance: number,
+    numberOfUTXOs: number,
   ): UTXO[] => {
-    return Array.from({ length: numUTXOs }, () => ({
-      txid: dataGenerator.generateRandomTxId(),
-      vout: Math.floor(Math.random() * 10),
-      scriptPubKey: this.generateRandomKeyPairs().publicKey,
-      value: Math.floor(Math.random() * 9000) + 1000,
-    }));
+    const utxos = [];
+    let sum = 0;
+    for (let i = 0; i < numberOfUTXOs; i++) {
+      utxos.push({
+        txid: this.generateRandomTxId(),
+        vout: Math.floor(Math.random() * 10),
+        scriptPubKey: this.generateRandomKeyPair().publicKey,
+        value: Math.floor(Math.random() * 9000) + minAvailableBalance,
+      });
+      sum += utxos[i].value;
+      if (sum >= minAvailableBalance) {
+        break;
+      }
+    }
+    return utxos;
+  };
+  /**
+   * Generates a random integer between min and max.
+   *
+   * @param {number} min - The minimum number.
+   * @param {number} max - The maximum number.
+   * @returns {number} - A random integer between min and max.
+   */
+  getRandomIntegerBetween = (min: number, max: number): number => {
+    if (min > max) {
+      throw new Error(
+        "The minimum number should be less than or equal to the maximum number.",
+      );
+    }
+    return Math.floor(Math.random() * (max - min + 1)) + min;
   };
 }
