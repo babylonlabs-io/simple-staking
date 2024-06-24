@@ -62,7 +62,7 @@ export const walletList: IntegratedWallet[] = [
     wallet: BitgetWallet,
     provider: bitgetWalletProvider,
     linkToDocs: "https://web3.bitget.com",
-    supportedNetworks: [Network.MAINNET, Network.SIGNET],
+    supportedNetworks: [Network.SIGNET],
   },
   {
     name: "Keystone",
