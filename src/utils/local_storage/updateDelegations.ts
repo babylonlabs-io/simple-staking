@@ -5,8 +5,7 @@ import { filterDelegationsLocalStorage } from "./filterDelegationsLocalStorage";
 export const updateDelegations = async (
   delegations: Delegation[],
   delegationsLocalStorage: Delegation[],
-  setDelegationsLocalStorage: (delegations: Delegation[]) => void,
-) => {
+): Promise<{ areDelegationsDifferent: boolean; delegations: Delegation[] }> => {
   // Filter the delegations that are still valid
   const validDelegations = await filterDelegationsLocalStorage(
     delegationsLocalStorage,
@@ -27,10 +26,12 @@ export const updateDelegations = async (
     validDelegationsHashes.some(
       (hash, index) => hash !== delegationsLocalStorageHashes[index],
     );
-  console.log("areDelegationsDifferent", areDelegationsDifferent);
 
-  // Update the local storage delegations if they are different to avoid unnecessary updates
-  if (areDelegationsDifferent) {
-    setDelegationsLocalStorage(validDelegations);
-  }
+  return {
+    areDelegationsDifferent,
+    // Return the new delegations if they are different or original if no update is needed
+    delegations: areDelegationsDifferent
+      ? validDelegations
+      : delegationsLocalStorage,
+  };
 };
