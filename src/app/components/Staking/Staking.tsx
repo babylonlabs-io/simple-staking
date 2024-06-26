@@ -402,7 +402,7 @@ export const Staking: React.FC<StakingProps> = ({
 
       if (found.btcPk === publicKeyNoCoord) {
         throw new Error(
-          "Can not select the same finality provider which has the same public key as the wallet",
+          "Cannot select a finality provider with the same public key as the wallet",
         );
       }
     } catch (error: any) {
