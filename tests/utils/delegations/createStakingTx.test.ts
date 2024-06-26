@@ -1,19 +1,19 @@
-import { createStakingTx } from "@/utils/delegations/signStakingTx";
-import { toNetwork } from "@/utils/wallet";
-import { Network } from "@/utils/wallet/wallet_provider";
+import { initBTCCurve } from "btc-staking-ts";
 
-import { DataGenerator } from "../../helper";
+import { createStakingTx } from "@/utils/delegations/signStakingTx";
+
+import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
 
 describe("utils/delegations/createStakingTx", () => {
-  const networks = [Network.MAINNET, Network.SIGNET];
-  networks.forEach((n) => {
-    const network = toNetwork(n);
-    const dataGen = new DataGenerator(network);
-    const randomFpKeys = dataGen.generateRandomKeyPair(true);
-    const randomUserKeys = dataGen.generateRandomKeyPair(true);
-    const feeRate = 1; // keep test simple by setting this to unit 1
-
+  initBTCCurve();
+  testingNetworks.forEach(({ network, dataGenerator: dataGen }) => {
     [true, false].forEach((isFixed) => {
+      const randomFpKeys = dataGen.generateRandomKeyPair();
+      const randomStakerKeys = dataGen.generateRandomKeyPair();
+      const feeRate = DEFAULT_TEST_FEE_RATE;
+      const { address: stakerTaprootAddress, scriptPubKey } =
+        dataGen.getAddressAndScriptPubKey(randomStakerKeys.publicKey).taproot;
+
       const randomParam = dataGen.generateRandomGlobalParams(isFixed);
       const randomStakingAmount = dataGen.getRandomIntegerBetween(
         randomParam.minStakingAmountSat,
@@ -24,8 +24,9 @@ describe("utils/delegations/createStakingTx", () => {
         randomParam.maxStakingTimeBlocks,
       );
       const randomInputUTXOs = dataGen.generateRandomUTXOs(
-        randomStakingAmount + Math.floor(Math.random() * 1000000),
+        randomStakingAmount + Math.floor(Math.random() * 100000000),
         Math.floor(Math.random() * 10) + 1,
+        scriptPubKey,
       );
       const testTermDescription = isFixed ? "fixed term" : "variable term";
 
@@ -35,10 +36,10 @@ describe("utils/delegations/createStakingTx", () => {
             randomParam,
             randomStakingAmount,
             randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
+            randomFpKeys.noCoordPublicKey,
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             feeRate,
             randomInputUTXOs,
           );
@@ -57,16 +58,17 @@ describe("utils/delegations/createStakingTx", () => {
         const utxo = dataGen.generateRandomUTXOs(
           randomStakingAmount + Math.floor(Math.random() * 1000000),
           1, // make it a single utxo so we always have change
+          scriptPubKey,
         );
         const { stakingFeeSat, stakingTerm, unsignedStakingPsbt } =
           createStakingTx(
             randomParam,
             randomStakingAmount,
             randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
+            randomFpKeys.noCoordPublicKey,
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             feeRate,
             utxo,
           );
@@ -81,10 +83,7 @@ describe("utils/delegations/createStakingTx", () => {
         expect(stakingFeeSat).toBeGreaterThan(0);
 
         const changeOutput = unsignedStakingPsbt.txOutputs.find((output) => {
-          return (
-            output.address ==
-            dataGen.getTaprootAddress(randomUserKeys.publicKey)
-          );
+          return output.address == stakerTaprootAddress;
         });
         expect(changeOutput).toBeDefined();
       });
@@ -95,10 +94,10 @@ describe("utils/delegations/createStakingTx", () => {
             randomParam,
             randomParam.minStakingAmountSat - 1,
             randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
+            randomFpKeys.noCoordPublicKey,
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             feeRate,
             randomInputUTXOs,
           ),
@@ -111,10 +110,10 @@ describe("utils/delegations/createStakingTx", () => {
             randomParam,
             randomParam.maxStakingAmountSat + 1,
             randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
+            randomFpKeys.noCoordPublicKey,
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             feeRate,
             randomInputUTXOs,
           ),
@@ -127,10 +126,10 @@ describe("utils/delegations/createStakingTx", () => {
             randomParam,
             randomStakingAmount,
             randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
+            randomFpKeys.noCoordPublicKey,
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             0,
             randomInputUTXOs,
           ),
@@ -143,10 +142,10 @@ describe("utils/delegations/createStakingTx", () => {
             randomParam,
             randomStakingAmount,
             randomStakingTimeBlocks,
-            randomFpKeys.publicKey,
+            randomFpKeys.noCoordPublicKey,
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             feeRate,
             [],
           ),
@@ -161,10 +160,10 @@ describe("utils/delegations/createStakingTx", () => {
             randomParam,
             randomStakingAmount,
             randomStakingTimeBlocks,
-            dataGen.generateRandomKeyPair(false).publicKey, // invalid finality provider key
+            dataGen.generateRandomKeyPair().publicKey, // invalid finality provider key
             network,
-            dataGen.getTaprootAddress(randomUserKeys.publicKey),
-            randomUserKeys.publicKey,
+            stakerTaprootAddress,
+            randomStakerKeys.noCoordPublicKey,
             feeRate,
             randomInputUTXOs,
           ),
@@ -179,10 +178,10 @@ describe("utils/delegations/createStakingTx", () => {
               randomParam,
               randomStakingAmount,
               randomParam.minStakingTimeBlocks - 1,
-              randomFpKeys.publicKey,
+              randomFpKeys.noCoordPublicKey,
               network,
-              dataGen.getTaprootAddress(randomUserKeys.publicKey),
-              randomUserKeys.publicKey,
+              stakerTaprootAddress,
+              randomStakerKeys.noCoordPublicKey,
               feeRate,
               randomInputUTXOs,
             ),
@@ -195,10 +194,10 @@ describe("utils/delegations/createStakingTx", () => {
               randomParam,
               randomStakingAmount,
               randomParam.maxStakingTimeBlocks + 1,
-              randomFpKeys.publicKey,
+              randomFpKeys.noCoordPublicKey,
               network,
-              dataGen.getTaprootAddress(randomUserKeys.publicKey),
-              randomUserKeys.publicKey,
+              stakerTaprootAddress,
+              randomStakerKeys.noCoordPublicKey,
               feeRate,
               randomInputUTXOs,
             ),

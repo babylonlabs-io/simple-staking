@@ -1,8 +1,8 @@
-import { signStakingTx } from "@/utils/delegations/signStakingTx";
-import { toNetwork } from "@/utils/wallet";
-import { Network } from "@/utils/wallet/wallet_provider";
+import { initBTCCurve } from "btc-staking-ts";
 
-import { DataGenerator } from "../../helper";
+import { signStakingTx } from "@/utils/delegations/signStakingTx";
+
+import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
 
 // Mock the signPsbtTransaction function
 jest.mock("@/app/common/utils/psbt", () => ({
@@ -10,13 +10,11 @@ jest.mock("@/app/common/utils/psbt", () => ({
 }));
 
 describe("utils/delegations/signStakingTx", () => {
-  const networks = [Network.MAINNET, Network.SIGNET];
-  networks.forEach((n) => {
-    const network = toNetwork(n);
-    const dataGen = new DataGenerator(network);
-    const randomFpKeys = dataGen.generateRandomKeyPair(true);
-    const randomUserKeys = dataGen.generateRandomKeyPair(true);
-    const feeRate = 1; // keep test simple by setting this to unit 1
+  initBTCCurve();
+  testingNetworks.forEach(({ network, dataGenerator: dataGen }) => {
+    const randomFpKeys = dataGen.generateRandomKeyPair();
+    const randomUserKeys = dataGen.generateRandomKeyPair();
+    const feeRate = DEFAULT_TEST_FEE_RATE;
     const randomParam = dataGen.generateRandomGlobalParams(true);
     const randomStakingAmount = dataGen.getRandomIntegerBetween(
       randomParam.minStakingAmountSat,
@@ -26,9 +24,15 @@ describe("utils/delegations/signStakingTx", () => {
       randomParam.minStakingTimeBlocks,
       randomParam.maxStakingTimeBlocks,
     );
+    const { address: randomTaprootAddress, scriptPubKey } =
+      dataGen.getAddressAndScriptPubKey(
+        dataGen.generateRandomKeyPair().publicKey,
+      ).taproot;
+
     const randomInputUTXOs = dataGen.generateRandomUTXOs(
-      randomStakingAmount + Math.floor(Math.random() * 1000000),
+      randomStakingAmount + Math.floor(Math.random() * 100000000),
       Math.floor(Math.random() * 10) + 1,
+      scriptPubKey,
     );
     const txHex = dataGen.generateRandomTxId();
 
@@ -55,10 +59,10 @@ describe("utils/delegations/signStakingTx", () => {
         randomParam,
         randomStakingAmount,
         randomStakingTimeBlocks,
-        randomFpKeys.publicKey,
+        randomFpKeys.noCoordPublicKey,
         network,
-        dataGen.getTaprootAddress(randomUserKeys.publicKey),
-        randomUserKeys.publicKey,
+        randomTaprootAddress,
+        randomUserKeys.noCoordPublicKey,
         feeRate,
         randomInputUTXOs,
       );
@@ -86,10 +90,10 @@ describe("utils/delegations/signStakingTx", () => {
           randomParam,
           randomStakingAmount,
           randomStakingTimeBlocks,
-          randomFpKeys.publicKey,
+          randomFpKeys.noCoordPublicKey,
           network,
-          dataGen.getTaprootAddress(randomUserKeys.publicKey),
-          randomUserKeys.publicKey,
+          randomTaprootAddress,
+          randomUserKeys.noCoordPublicKey,
           feeRate,
           randomInputUTXOs,
         );

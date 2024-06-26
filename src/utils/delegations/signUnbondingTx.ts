@@ -6,7 +6,6 @@ import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
@@ -26,13 +25,12 @@ const getStakerSignature = (unbondingTx: Transaction): string => {
 export const signUnbondingTx = async (
   id: string,
   delegationsAPI: DelegationInterface[],
-  globalParamsVersion: GlobalParamsVersion,
   publicKeyNoCoord: string,
   btcWalletNetwork: networks.Network,
   signPsbtTx: SignPsbtTransaction,
 ): Promise<{ unbondingTxHex: string; delegation: DelegationInterface }> => {
   // Check if the data is available
-  if (!delegationsAPI || !globalParamsVersion) {
+  if (!delegationsAPI) {
     throw new Error("No back-end API data available");
   }
 
