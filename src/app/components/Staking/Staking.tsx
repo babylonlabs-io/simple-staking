@@ -389,13 +389,32 @@ export const Staking: React.FC<StakingProps> = ({
 
   // Select the finality provider from the list
   const handleChooseFinalityProvider = (btcPkHex: string) => {
-    if (!finalityProviders) {
-      throw new Error("Finality providers not loaded");
-    }
+    let found: FinalityProviderInterface | undefined;
+    try {
+      if (!finalityProviders) {
+        throw new Error("Finality providers not loaded");
+      }
 
-    const found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
-    if (!found) {
-      throw new Error("Finality provider not found");
+      found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
+      if (!found) {
+        throw new Error("Finality provider not found");
+      }
+
+      if (found.btcPk === publicKeyNoCoord) {
+        throw new Error(
+          "Can not select the same finality provider which has the same public key as the wallet",
+        );
+      }
+    } catch (error: any) {
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.STAKING,
+          errorTime: new Date(),
+        },
+        retryAction: () => handleChooseFinalityProvider(btcPkHex),
+      });
+      return;
     }
 
     setFinalityProvider(found);
