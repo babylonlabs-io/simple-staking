@@ -29,9 +29,6 @@ export const calculateDelegationsDiff = async (
 
   return {
     areDelegationsDifferent,
-    // Return the new delegations if they are different or original if no update is needed
-    delegations: areDelegationsDifferent
-      ? validDelegationsLocalStorage
-      : delegationsLocalStorage,
+    delegations: validDelegationsLocalStorage,
   };
 };

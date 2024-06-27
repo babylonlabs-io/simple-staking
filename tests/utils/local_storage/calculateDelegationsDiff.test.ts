@@ -5,7 +5,7 @@ import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDeleg
 // Mock the filterDelegationsLocalStorage function
 jest.mock("@/utils/local_storage/filterDelegationsLocalStorage");
 
-describe("calculateDelegationsDiff", () => {
+describe("utils/local_storage/calculateDelegationsDiff", () => {
   const mockDelegationsHash1: Delegation[] = [
     { stakingTxHashHex: "hash1" } as Delegation,
   ];
