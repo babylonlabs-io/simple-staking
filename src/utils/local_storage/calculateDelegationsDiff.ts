@@ -2,7 +2,7 @@ import { Delegation } from "@/app/types/delegations";
 
 import { filterDelegationsLocalStorage } from "./filterDelegationsLocalStorage";
 
-export const updateDelegations = async (
+export const calculateDelegationsDiff = async (
   delegations: Delegation[],
   delegationsLocalStorage: Delegation[],
 ): Promise<{ areDelegationsDifferent: boolean; delegations: Delegation[] }> => {

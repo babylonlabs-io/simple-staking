@@ -8,8 +8,8 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
-import { updateDelegations } from "@/utils/local_storage/updateDelegations";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 import {
   getPublicKeyNoCoord,
@@ -289,7 +289,7 @@ const Home: React.FC<HomeProps> = () => {
 
     const update = async () => {
       const { areDelegationsDifferent, delegations: newDelegations } =
-        await updateDelegations(
+        await calculateDelegationsDiff(
           delegations.delegations,
           delegationsLocalStorage,
         );

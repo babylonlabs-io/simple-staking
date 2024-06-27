@@ -1,11 +1,11 @@
 import { Delegation } from "@/app/types/delegations";
+import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDelegationsLocalStorage";
-import { updateDelegations } from "@/utils/local_storage/updateDelegations";
 
 // Mock the filterDelegationsLocalStorage function
 jest.mock("@/utils/local_storage/filterDelegationsLocalStorage");
 
-describe("updateDelegations", () => {
+describe("calculateDelegationsDiff", () => {
   const mockDelegationsHash1: Delegation[] = [
     { stakingTxHashHex: "hash1" } as Delegation,
   ];
@@ -23,7 +23,7 @@ describe("updateDelegations", () => {
       mockDelegationsHash1,
     );
 
-    const result = await updateDelegations(
+    const result = await calculateDelegationsDiff(
       mockDelegationsHash1,
       mockDelegationsHash2,
     );
@@ -37,7 +37,7 @@ describe("updateDelegations", () => {
       mockDelegationsHash2,
     );
 
-    const result = await updateDelegations(
+    const result = await calculateDelegationsDiff(
       mockDelegationsHash2,
       mockDelegationsHash2,
     );
@@ -49,7 +49,7 @@ describe("updateDelegations", () => {
   it("should handle empty API delegations correctly", async () => {
     (filterDelegationsLocalStorage as jest.Mock).mockResolvedValue([]);
 
-    const result = await updateDelegations([], mockDelegationsHash2);
+    const result = await calculateDelegationsDiff([], mockDelegationsHash2);
 
     expect(result.areDelegationsDifferent).toBe(true);
     expect(result.delegations).toEqual([]);
@@ -60,7 +60,7 @@ describe("updateDelegations", () => {
       mockDelegationsHash1,
     );
 
-    const result = await updateDelegations(mockDelegationsHash1, []);
+    const result = await calculateDelegationsDiff(mockDelegationsHash1, []);
 
     expect(result.areDelegationsDifferent).toBe(true);
     expect(result.delegations).toEqual(mockDelegationsHash1);
@@ -69,7 +69,7 @@ describe("updateDelegations", () => {
   it("should handle both empty delegations and local storage correctly", async () => {
     (filterDelegationsLocalStorage as jest.Mock).mockResolvedValue([]);
 
-    const result = await updateDelegations([], []);
+    const result = await calculateDelegationsDiff([], []);
 
     expect(result.areDelegationsDifferent).toBe(false);
     expect(result.delegations).toEqual([]);
@@ -80,7 +80,7 @@ describe("updateDelegations", () => {
       mockDelegationsHash1,
     );
 
-    const result = await updateDelegations(
+    const result = await calculateDelegationsDiff(
       mockDelegationsHash1,
       mockDelegationsHash1,
     );
