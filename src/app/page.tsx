@@ -287,7 +287,7 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
 
-    const update = async () => {
+    const updateDelegationsLocalStorage = async () => {
       const { areDelegationsDifferent, delegations: newDelegations } =
         await calculateDelegationsDiff(
           delegations.delegations,
@@ -298,7 +298,7 @@ const Home: React.FC<HomeProps> = () => {
       }
     };
 
-    update();
+    updateDelegationsLocalStorage();
   }, [delegations, setDelegationsLocalStorage, delegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
