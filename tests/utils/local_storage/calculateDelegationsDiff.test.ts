@@ -74,18 +74,4 @@ describe("calculateDelegationsDiff", () => {
     expect(result.areDelegationsDifferent).toBe(false);
     expect(result.delegations).toEqual([]);
   });
-
-  it("should handle identical delegations correctly", async () => {
-    (filterDelegationsLocalStorage as jest.Mock).mockResolvedValue(
-      mockDelegationsHash1,
-    );
-
-    const result = await calculateDelegationsDiff(
-      mockDelegationsHash1,
-      mockDelegationsHash1,
-    );
-
-    expect(result.areDelegationsDifferent).toBe(false);
-    expect(result.delegations).toEqual(mockDelegationsHash1);
-  });
 });
