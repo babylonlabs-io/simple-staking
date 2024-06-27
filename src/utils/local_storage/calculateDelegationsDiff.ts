@@ -7,13 +7,13 @@ export const calculateDelegationsDiff = async (
   delegationsLocalStorage: Delegation[],
 ): Promise<{ areDelegationsDifferent: boolean; delegations: Delegation[] }> => {
   // Filter the delegations that are still valid
-  const validDelegations = await filterDelegationsLocalStorage(
+  const validDelegationsLocalStorage = await filterDelegationsLocalStorage(
     delegationsLocalStorage,
     delegations,
   );
 
-  // Extract the stakingTxHashHex from the validDelegations
-  const validDelegationsHashes = validDelegations
+  // Extract the stakingTxHashHex
+  const validDelegationsHashes = validDelegationsLocalStorage
     .map((delegation) => delegation.stakingTxHashHex)
     .sort();
   const delegationsLocalStorageHashes = delegationsLocalStorage
@@ -31,7 +31,7 @@ export const calculateDelegationsDiff = async (
     areDelegationsDifferent,
     // Return the new delegations if they are different or original if no update is needed
     delegations: areDelegationsDifferent
-      ? validDelegations
+      ? validDelegationsLocalStorage
       : delegationsLocalStorage,
   };
 };
