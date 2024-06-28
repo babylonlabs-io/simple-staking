@@ -35,6 +35,25 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 
   const { coinName } = getNetworkConfig();
 
+  let stakingTimeDisplay = "-";
+  let unbondingTimeDisplay = "-";
+
+  try {
+    if (stakingTimeBlocks) {
+      stakingTimeDisplay = blocksToDisplayTime(stakingTimeBlocks);
+    }
+  } catch (error) {
+    console.error("Error converting staking time blocks:", error);
+  }
+
+  try {
+    if (unbondingTimeBlocks) {
+      unbondingTimeDisplay = blocksToDisplayTime(unbondingTimeBlocks);
+    }
+  } catch (error) {
+    console.error("Error converting unbonding time blocks:", error);
+  }
+
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
@@ -74,21 +93,13 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>
-              {stakingTimeBlocks ? blocksToDisplayTime(stakingTimeBlocks) : "-"}
-            </p>
+            <p>{stakingTimeDisplay}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
               On-demand unbonding
             </p>
-            <p>
-              Enabled (
-              {unbondingTimeBlocks
-                ? blocksToDisplayTime(unbondingTimeBlocks)
-                : "-"}{" "}
-              unbonding time)
-            </p>
+            <p>Enabled ({unbondingTimeDisplay} unbonding time)</p>
           </div>
         </div>
         <h4 className="text-center text-base">Attention!</h4>
