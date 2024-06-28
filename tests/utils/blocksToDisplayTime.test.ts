@@ -24,4 +24,8 @@ describe("blocksToDisplayTime", () => {
   it("should convert 4320 blocks to 5 weeks", () => {
     expect(blocksToDisplayTime(4320)).toBe("5 weeks");
   });
+
+  it("should convert 63000 blocks to 65 weeks", () => {
+    expect(blocksToDisplayTime(63000)).toBe("65 weeks");
+  });
 });

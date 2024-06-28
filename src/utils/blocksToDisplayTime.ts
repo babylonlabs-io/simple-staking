@@ -39,7 +39,9 @@ export const blocksToDisplayTime = (blocks: number): string => {
   // If the difference is greater than or equal to 30 days, return the difference in weeks
   if (dayDifference >= DAY_TO_WEEK_DISPLAY_THRESHOLD) {
     // Calculate the difference in weeks
-    const weeks = differenceInWeeks(endDate, startDate);
+    const weeks = differenceInWeeks(endDate, startDate, {
+      roundingMethod: "ceil",
+    });
     const roundedWeeks = Math.round(weeks / WEEKS_PRECISION) * WEEKS_PRECISION;
     return `${roundedWeeks} weeks`;
   }
