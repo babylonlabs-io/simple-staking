@@ -8,7 +8,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDelegationsLocalStorage";
+import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 import {
@@ -287,36 +287,18 @@ const Home: React.FC<HomeProps> = () => {
       return;
     }
 
-    const updateDelegations = async () => {
-      // Filter the delegations that are still valid
-      const validDelegations = await filterDelegationsLocalStorage(
-        delegationsLocalStorage,
-        delegations.delegations,
-      );
-
-      // Extract the stakingTxHashHex from the validDelegations
-      const validDelegationsHashes = validDelegations
-        .map((delegation) => delegation.stakingTxHashHex)
-        .sort();
-      const delegationsLocalStorageHashes = delegationsLocalStorage
-        .map((delegation) => delegation.stakingTxHashHex)
-        .sort();
-
-      // Check if the validDelegations are different from the current delegationsLocalStorage
-      const areDelegationsDifferent =
-        validDelegationsHashes.length !==
-          delegationsLocalStorageHashes.length ||
-        validDelegationsHashes.some(
-          (hash, index) => hash !== delegationsLocalStorageHashes[index],
+    const updateDelegationsLocalStorage = async () => {
+      const { areDelegationsDifferent, delegations: newDelegations } =
+        await calculateDelegationsDiff(
+          delegations.delegations,
+          delegationsLocalStorage,
         );
-
-      // Update the local storage delegations if they are different to avoid unnecessary updates
       if (areDelegationsDifferent) {
-        setDelegationsLocalStorage(validDelegations);
+        setDelegationsLocalStorage(newDelegations);
       }
     };
 
-    updateDelegations();
+    updateDelegationsLocalStorage();
   }, [delegations, setDelegationsLocalStorage, delegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
