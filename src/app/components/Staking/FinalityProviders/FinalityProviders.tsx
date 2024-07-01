@@ -71,9 +71,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
               comission={fp.commission}
               selected={selectedFinalityProvider?.btcPk === fp.btcPk}
               onClick={() => {
-                if (fp.description?.moniker) {
-                  onFinalityProviderChange(fp.btcPk);
-                }
+                onFinalityProviderChange(fp.btcPk);
               }}
             />
           ))}
