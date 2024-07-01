@@ -1,8 +1,8 @@
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 
 describe("blocksToDisplayTime", () => {
-  it("should throw error if block is 0", () => {
-    expect(() => blocksToDisplayTime(0)).toThrow("No blocks provided");
+  it("should return '-' if block is 0", () => {
+    expect(blocksToDisplayTime(0)).toBe("-");
   });
 
   it("should convert 1 block to 1 day", () => {
