@@ -30,7 +30,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
 
   const { coinName } = getNetworkConfig();
 
-  const finalityProviderHasData = moniker && pkHex && stakeSat && comission;
+  const finalityProviderHasData = moniker && pkHex;
 
   const handleClick = () => {
     if (finalityProviderHasData) {
