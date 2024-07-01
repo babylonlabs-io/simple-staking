@@ -24,8 +24,8 @@ const DAY_TO_WEEK_DISPLAY_THRESHOLD = 30;
  * blocksToDisplayTime(200); // "2 days"
  */
 export const blocksToDisplayTime = (blocks: number): string => {
-  // If no blocks are provided, throw an error
-  if (!blocks) throw new Error("No blocks provided");
+  // If no blocks are provided, return default value
+  if (!blocks) return "-";
 
   // Calculate the equivalent time in hours
   const hours = blocks / BLOCKS_PER_HOUR;
