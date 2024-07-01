@@ -104,9 +104,11 @@ export class DataGenerator {
       maxStakingTimeBlocks = minStakingTimeBlocks;
     }
 
-    const minStakingAmountSat = Math.floor(Math.random() * 100);
-    const maxStakingAmountSat =
-      minStakingAmountSat + Math.floor(Math.random() * 1000);
+    const minStakingAmountSat = this.getRandomIntegerBetween(10000, 100000);
+    const maxStakingAmountSat = this.getRandomIntegerBetween(
+      minStakingAmountSat,
+      100000000,
+    );
 
     const defaultParams = {
       version: 0,
