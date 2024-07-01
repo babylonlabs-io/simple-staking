@@ -12,7 +12,7 @@ interface FinalityProviderProps {
   moniker: string;
   pkHex: string;
   stakeSat: number;
-  comission: string;
+  commission: string;
   onClick: () => void;
   selected: boolean;
 }
@@ -21,7 +21,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   moniker,
   pkHex,
   stakeSat,
-  comission,
+  commission,
   onClick,
   selected,
 }) => {
@@ -30,7 +30,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
 
   const { coinName } = getNetworkConfig();
 
-  const finalityProviderHasData = moniker && pkHex && comission;
+  const finalityProviderHasData = moniker && pkHex && commission;
 
   const handleClick = () => {
     if (finalityProviderHasData) {
@@ -88,9 +88,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           <Tooltip id={`tooltip-delegation-${pkHex}`} />
         </div>
         <div className="flex items-center justify-end gap-1 lg:justify-start">
-          <p className="hidden sm:flex lg:hidden">Comission:</p>
+          <p className="hidden sm:flex lg:hidden">Commission:</p>
           {finalityProviderHasData
-            ? `${maxDecimals(Number(comission) * 100, 2)}%`
+            ? `${maxDecimals(Number(commission) * 100, 2)}%`
             : "-"}
           <span
             className="inline-flex cursor-pointer text-xs sm:hidden"
