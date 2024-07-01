@@ -70,7 +70,11 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
               stakeSat={fp.activeTVLSat}
               comission={fp.commission}
               selected={selectedFinalityProvider?.btcPk === fp.btcPk}
-              onClick={() => onFinalityProviderChange(fp.btcPk)}
+              onClick={() => {
+                if (fp.description.moniker) {
+                  onFinalityProviderChange(fp.btcPk);
+                }
+              }}
             />
           ))}
         </InfiniteScroll>
