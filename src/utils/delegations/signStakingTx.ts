@@ -2,7 +2,6 @@ import { Transaction, networks } from "bitcoinjs-lib";
 import { stakingTransaction } from "btc-staking-ts";
 
 import { signPsbtTransaction } from "@/app/common/utils/psbt";
-import { FinalityProvider } from "@/app/types/finalityProviders";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { isTaproot } from "@/utils/wallet";
@@ -18,14 +17,15 @@ export const createStakingTx = (
   globalParamsVersion: GlobalParamsVersion,
   stakingAmountSat: number,
   stakingTimeBlocks: number,
-  finalityProvider: FinalityProvider,
+  finalityProviderPublicKey: string,
   btcWalletNetwork: networks.Network,
   address: string,
   publicKeyNoCoord: string,
   feeRate: number,
   inputUTXOs: UTXO[],
 ) => {
-  // Data extraction
+  // Get the staking term, it will ignore the `stakingTimeBlocks` and use the value from params
+  // if the min and max staking time blocks are the same
   const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
 
   // Check the staking data
@@ -50,7 +50,7 @@ export const createStakingTx = (
   let scripts;
   try {
     scripts = apiDataToStakingScripts(
-      finalityProvider.btcPk,
+      finalityProviderPublicKey,
       stakingTerm,
       globalParamsVersion,
       publicKeyNoCoord,
@@ -97,7 +97,7 @@ export const signStakingTx = async (
   globalParamsVersion: GlobalParamsVersion,
   stakingAmountSat: number,
   stakingTimeBlocks: number,
-  finalityProvider: FinalityProvider,
+  finalityProviderPublicKey: string,
   btcWalletNetwork: networks.Network,
   address: string,
   publicKeyNoCoord: string,
@@ -109,7 +109,7 @@ export const signStakingTx = async (
     globalParamsVersion,
     stakingAmountSat,
     stakingTimeBlocks,
-    finalityProvider,
+    finalityProviderPublicKey,
     btcWalletNetwork,
     address,
     publicKeyNoCoord,
