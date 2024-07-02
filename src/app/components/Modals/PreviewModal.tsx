@@ -55,7 +55,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <p>{finalityProvider || "-"}</p>
           </div>
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">Amount</p>
+            <p className="text-xs dark:text-neutral-content">Stake Amount</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
           </div>
         </div>
@@ -65,9 +65,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <p>{feeRate} sat/vB</p>
           </div>
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">
-              Transaction fee amount
-            </p>
+            <p className="text-xs dark:text-neutral-content">Transaction fee</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
           </div>
         </div>
