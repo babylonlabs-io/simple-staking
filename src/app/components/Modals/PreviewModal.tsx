@@ -72,20 +72,15 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>
-              {stakingTimeBlocks ? blocksToDisplayTime(stakingTimeBlocks) : "-"}
-            </p>
+            <p>{blocksToDisplayTime(stakingTimeBlocks)}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
               On-demand unbonding
             </p>
             <p>
-              Enabled (
-              {unbondingTimeBlocks
-                ? blocksToDisplayTime(unbondingTimeBlocks)
-                : "-"}{" "}
-              unbonding time)
+              Enabled ({blocksToDisplayTime(unbondingTimeBlocks)} unbonding
+              time)
             </p>
           </div>
         </div>
