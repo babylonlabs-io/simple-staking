@@ -8,6 +8,9 @@ import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
 jest.mock("@/app/common/utils/psbt", () => ({
   signPsbtTransaction: jest.fn(),
 }));
+jest.mock("@/utils/delegations/fee", () => ({
+  txFeeSafetyCheck: jest.fn().mockReturnValue(undefined),
+}));
 
 describe("utils/delegations/signStakingTx", () => {
   initBTCCurve();
