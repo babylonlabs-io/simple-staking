@@ -38,7 +38,7 @@ describe("signPsbtTransaction", () => {
 
   it("should return a signed transaction for non-compatible wallets", async () => {
     const { unsignedPsbtHex, signedPsbtHex } =
-      dataGenerator.generateRandomPsbtHex();
+      dataGenerator.generateRandomPsbtHex(true);
 
     (btcWallet.getWalletProviderName as jest.Mock).mockResolvedValue("OneKey");
 

@@ -289,7 +289,7 @@ export class DataGenerator {
       .extractTransaction();
   };
 
-  generateRandomPsbtHex = () => {
+  generateRandomPsbtHex = (backwardCompatible = false) => {
     const { keyPair } = this.generateRandomKeyPair();
     const { publicKey } = keyPair;
     const p2wpkh = bitcoin.payments.p2wpkh({
@@ -327,7 +327,12 @@ export class DataGenerator {
 
     psbt.finalizeAllInputs();
 
-    const signedPsbtHex = psbt.toHex();
+    let signedPsbtHex;
+    if (backwardCompatible) {
+      signedPsbtHex = psbt.extractTransaction().toHex();
+    } else {
+      signedPsbtHex = psbt.toHex();
+    }
 
     return { unsignedPsbtHex, signedPsbtHex };
   };
