@@ -289,6 +289,49 @@ export class DataGenerator {
       .extractTransaction();
   };
 
+  generateRandomPsbtHex = () => {
+    const { keyPair } = this.generateRandomKeyPair();
+    const { publicKey } = keyPair;
+    const p2wpkh = bitcoin.payments.p2wpkh({
+      pubkey: publicKey,
+      network: this.network,
+    });
+
+    const inputValue = BigInt(Math.floor(Math.random() * 90000) + 10000);
+    const fee = BigInt(Math.floor(Math.random() * 1000) + 100);
+    const outputValue = inputValue - fee;
+
+    const psbt = new bitcoin.Psbt({
+      network: this.network,
+      maximumFeeRate: 1000,
+    })
+      .addInput({
+        hash: this.generateRandomTxId(),
+        index: 0,
+        witnessUtxo: {
+          script: p2wpkh.output!,
+          value: Number(inputValue),
+        },
+      })
+      .addOutput({
+        address: bitcoin.address.toBase58Check(
+          Buffer.alloc(20, 1),
+          this.network.pubKeyHash,
+        ),
+        value: Number(outputValue),
+      });
+
+    const unsignedPsbtHex = psbt.toHex();
+
+    psbt.signInput(0, keyPair);
+
+    psbt.finalizeAllInputs();
+
+    const signedPsbtHex = psbt.toHex();
+
+    return { unsignedPsbtHex, signedPsbtHex };
+  };
+
   private getTaprootAddress = (publicKey: string) => {
     // Remove the prefix if it exists
     if (publicKey.length == COMPRESSED_PUBLIC_KEY_HEX_LENGTH) {
