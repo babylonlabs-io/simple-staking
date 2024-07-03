@@ -12,6 +12,11 @@ import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
+import { getFeeRateFromMempool } from "../getFeeRateFromMempool";
+import { Fees } from "../wallet/wallet_provider";
+
+import { txFeeSafetyCheck } from "./fee";
+
 // Sign a withdrawal transaction
 // Returns:
 // - withdrawalTx: the signed withdrawal transaction
@@ -24,7 +29,7 @@ export const signWithdrawalTx = async (
   btcWalletNetwork: networks.Network,
   signPsbtTx: SignPsbtTransaction,
   address: string,
-  getNetworkFees: () => Promise<{ fastestFee: number }>,
+  getNetworkFees: () => Promise<Fees>,
   pushTx: (txHex: string) => Promise<string>,
 ): Promise<{
   withdrawalTxHex: string;
@@ -73,6 +78,8 @@ export const signWithdrawalTx = async (
     publicKeyNoCoord,
   );
 
+  const feeRate = getFeeRateFromMempool(fees);
+
   // Create the withdrawal transaction
   let withdrawPsbtTxResult: PsbtTransactionResult;
   if (delegation?.unbondingTx) {
@@ -85,7 +92,7 @@ export const signWithdrawalTx = async (
       Transaction.fromHex(delegation.unbondingTx.txHex),
       address,
       btcWalletNetwork,
-      fees.fastestFee,
+      feeRate.defaultFeeRate,
       0,
     );
   } else {
@@ -99,7 +106,7 @@ export const signWithdrawalTx = async (
       Transaction.fromHex(delegation.stakingTx.txHex),
       address,
       btcWalletNetwork,
-      fees.fastestFee,
+      feeRate.defaultFeeRate,
       delegation.stakingTx.outputIndex,
     );
   }
@@ -115,6 +122,12 @@ export const signWithdrawalTx = async (
 
   // Get the withdrawal transaction hex
   const withdrawalTxHex = withdrawalTx.toHex();
+  // Perform a safety check on the estimated transaction fee
+  txFeeSafetyCheck(
+    withdrawalTx,
+    feeRate.defaultFeeRate,
+    withdrawPsbtTxResult.fee,
+  );
 
   // Broadcast withdrawal transaction
   await pushTx(withdrawalTxHex);

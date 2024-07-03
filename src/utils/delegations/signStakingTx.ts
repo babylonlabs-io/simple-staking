@@ -9,6 +9,8 @@ import { UTXO, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getStakingTerm } from "../getStakingTerm";
 
+import { txFeeSafetyCheck } from "./fee";
+
 // Returns:
 // - unsignedStakingPsbt: the unsigned staking transaction
 // - stakingTerm: the staking term
@@ -105,7 +107,7 @@ export const signStakingTx = async (
   inputUTXOs: UTXO[],
 ): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
   // Create the staking transaction
-  let { unsignedStakingPsbt, stakingTerm } = createStakingTx(
+  let { unsignedStakingPsbt, stakingTerm, stakingFeeSat } = createStakingTx(
     globalParamsVersion,
     stakingAmountSat,
     stakingTimeBlocks,
@@ -129,6 +131,8 @@ export const signStakingTx = async (
 
   // Get the staking transaction hex
   const stakingTxHex = stakingTx.toHex();
+
+  txFeeSafetyCheck(stakingTx, feeRate, stakingFeeSat);
 
   // Broadcast the staking transaction
   await btcWallet.pushTx(stakingTxHex);
