@@ -9,5 +9,6 @@ declare global {
     tomo_btc: any;
     $onekey: any;
     bitkeep: any;
+    bitcoin: any;
   }
 }
