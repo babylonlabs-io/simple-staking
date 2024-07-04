@@ -19,7 +19,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   return (
     <nav>
-      <div className="bg-base-300 shadow-sm">
+      <div className="backdrop-blur	top-0 z-10 fixed shadow-sm w-full">
         <div className="container mx-auto flex w-full items-center justify-between gap-4 p-6">
           <Logo />
           <div className="flex flex-1">

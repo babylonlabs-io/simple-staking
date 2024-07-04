@@ -41,7 +41,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = () => {
   return (
     <button
       onClick={() => (lightSelected ? setTheme("dark") : setTheme("light"))}
-      className="flex gap-1 rounded-full bg-base-100 p-2 outline-none"
+      className="flex gap-1 rounded-full bg-base-100 p-2 outline-none hidden"
     >
       <div className={`${iconStyles(lightSelected)}`}>
         <FiSun size={16} />
