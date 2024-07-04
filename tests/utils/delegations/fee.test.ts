@@ -16,9 +16,7 @@ describe("txFeeSafetyCheck", () => {
       globalParams,
       randomParam.activationHeight + 1,
     );
-
     const tx = signedPsbt.extractTransaction();
-
     describe(`on ${networkName} - `, () => {
       test("should not throw an error if the estimated fee is within the acceptable range", () => {
         let estimatedFee = (tx.virtualSize() * feeRate) / 2 + 1;
