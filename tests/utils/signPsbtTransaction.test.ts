@@ -29,25 +29,25 @@ describe("signPsbtTransaction", () => {
         )
       ].activationHeight + 1;
 
-    const { unsignedStakingPsbtHex, signedStakingPsbtHex } =
-      dataGenerator.generateRandomPsbtHex(
-        randomGlobalParamsVersions,
-        randomStakingTxHeight,
-        stakerKeys,
-        false,
-      );
+    const { unsignedPsbt } = dataGenerator.createRandomStakingPsbt(
+      randomGlobalParamsVersions,
+      randomStakingTxHeight,
+      stakerKeys,
+    );
+
+    const unsignedPsbtHex = unsignedPsbt.toHex();
 
     (btcWallet.getWalletProviderName as jest.Mock).mockResolvedValue(
       dataGenerator.generateRandomString(10),
     );
 
-    (btcWallet.signPsbt as jest.Mock).mockResolvedValue(signedStakingPsbtHex);
+    (btcWallet.signPsbt as jest.Mock).mockResolvedValue(unsignedPsbtHex);
 
     const signTransaction = signPsbtTransaction(btcWallet);
 
-    const result = await signTransaction(unsignedStakingPsbtHex);
+    const result = await signTransaction(unsignedPsbtHex);
 
-    expect(btcWallet.signPsbt).toHaveBeenCalledWith(unsignedStakingPsbtHex);
+    expect(btcWallet.signPsbt).toHaveBeenCalledWith(unsignedPsbtHex);
 
     expect(btcWallet.getWalletProviderName).toHaveBeenCalled();
 
@@ -68,23 +68,24 @@ describe("signPsbtTransaction", () => {
         )
       ].activationHeight + 1;
 
-    const { unsignedStakingPsbtHex, signedStakingPsbtHex } =
-      dataGenerator.generateRandomPsbtHex(
-        randomGlobalParamsVersions,
-        randomStakingTxHeight,
-        stakerKeys,
-        true,
-      );
+    const { signedPsbt, unsignedPsbt } = dataGenerator.createRandomStakingPsbt(
+      randomGlobalParamsVersions,
+      randomStakingTxHeight,
+      stakerKeys,
+    );
+
+    const signedPsbtHex = signedPsbt.extractTransaction().toHex();
+    const unsignedPsbtHex = unsignedPsbt.extractTransaction().toHex();
 
     (btcWallet.getWalletProviderName as jest.Mock).mockResolvedValue("OneKey");
 
-    (btcWallet.signPsbt as jest.Mock).mockResolvedValue(signedStakingPsbtHex);
+    (btcWallet.signPsbt as jest.Mock).mockResolvedValue(signedPsbtHex);
 
     const signTransaction = signPsbtTransaction(btcWallet);
 
-    const result = await signTransaction(unsignedStakingPsbtHex);
+    const result = await signTransaction(unsignedPsbtHex);
 
-    expect(btcWallet.signPsbt).toHaveBeenCalledWith(unsignedStakingPsbtHex);
+    expect(btcWallet.signPsbt).toHaveBeenCalledWith(unsignedPsbtHex);
 
     expect(btcWallet.getWalletProviderName).toHaveBeenCalled();
 

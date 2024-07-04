@@ -253,7 +253,7 @@ export class DataGenerator {
     };
   };
 
-  buildPsbt = (
+  createRandomStakingPsbt = (
     globalParams: GlobalParamsVersion[],
     txHeight: number,
     stakerKeysPairs?: KeyPairs,
@@ -295,59 +295,16 @@ export class DataGenerator {
       ),
     );
 
-    return { unsignedStakingPsbt };
-  };
+    const unsignedPsbt = unsignedStakingPsbt;
 
-  createRandomStakingTx = (
-    globalParams: GlobalParamsVersion[],
-    txHeight: number,
-    stakerKeysPairs?: KeyPairs,
-  ) => {
-    const stakerKeys = stakerKeysPairs
-      ? stakerKeysPairs
-      : this.generateRandomKeyPair();
-
-    const { unsignedStakingPsbt } = this.buildPsbt(
-      globalParams,
-      txHeight,
-      stakerKeysPairs,
-    );
-    return unsignedStakingPsbt
+    const signedPsbt = unsignedStakingPsbt
       .signAllInputs(stakerKeys.keyPair)
-      .finalizeAllInputs()
-      .extractTransaction();
-  };
+      .finalizeAllInputs();
 
-  generateRandomPsbtHex = (
-    globalParams: GlobalParamsVersion[],
-    txHeight: number,
-    stakerKeysPairs?: KeyPairs,
-    backwardCompatible?: boolean,
-  ) => {
-    const stakerKeys = stakerKeysPairs
-      ? stakerKeysPairs
-      : this.generateRandomKeyPair();
-
-    const { unsignedStakingPsbt } = this.buildPsbt(
-      globalParams,
-      txHeight,
-      stakerKeysPairs,
-    );
-
-    const unsignedStakingPsbtHex = unsignedStakingPsbt.toHex();
-
-    unsignedStakingPsbt.signInput(0, stakerKeys.keyPair);
-
-    unsignedStakingPsbt.finalizeAllInputs();
-
-    let signedStakingPsbtHex;
-    if (backwardCompatible) {
-      signedStakingPsbtHex = unsignedStakingPsbt.extractTransaction().toHex();
-    } else {
-      signedStakingPsbtHex = unsignedStakingPsbt.toHex();
-    }
-
-    return { unsignedStakingPsbtHex, signedStakingPsbtHex };
+    return {
+      unsignedPsbt,
+      signedPsbt,
+    };
   };
 
   private getTaprootAddress = (publicKey: string) => {
