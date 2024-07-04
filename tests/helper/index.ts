@@ -28,6 +28,17 @@ export class DataGenerator {
     this.network = network;
   }
 
+  generateRandomString = (length: number): string => {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
   generateRandomTxId = () => {
     const randomBuffer = Buffer.alloc(32);
     for (let i = 0; i < 32; i++) {
@@ -242,7 +253,7 @@ export class DataGenerator {
     };
   };
 
-  createRandomStakingTx = (
+  buildPsbt = (
     globalParams: GlobalParamsVersion[],
     txHeight: number,
     stakerKeysPairs?: KeyPairs,
@@ -283,58 +294,60 @@ export class DataGenerator {
         scriptPubKey,
       ),
     );
+
+    return { unsignedStakingPsbt };
+  };
+
+  createRandomStakingTx = (
+    globalParams: GlobalParamsVersion[],
+    txHeight: number,
+    stakerKeysPairs?: KeyPairs,
+  ) => {
+    const stakerKeys = stakerKeysPairs
+      ? stakerKeysPairs
+      : this.generateRandomKeyPair();
+
+    const { unsignedStakingPsbt } = this.buildPsbt(
+      globalParams,
+      txHeight,
+      stakerKeysPairs,
+    );
     return unsignedStakingPsbt
       .signAllInputs(stakerKeys.keyPair)
       .finalizeAllInputs()
       .extractTransaction();
   };
 
-  generateRandomPsbtHex = (backwardCompatible = false) => {
-    const { keyPair } = this.generateRandomKeyPair();
-    const { publicKey } = keyPair;
-    const p2wpkh = bitcoin.payments.p2wpkh({
-      pubkey: publicKey,
-      network: this.network,
-    });
+  generateRandomPsbtHex = (
+    globalParams: GlobalParamsVersion[],
+    txHeight: number,
+    stakerKeysPairs?: KeyPairs,
+    backwardCompatible?: boolean,
+  ) => {
+    const stakerKeys = stakerKeysPairs
+      ? stakerKeysPairs
+      : this.generateRandomKeyPair();
 
-    const inputValue = BigInt(Math.floor(Math.random() * 90000) + 10000);
-    const fee = BigInt(Math.floor(Math.random() * 1000) + 100);
-    const outputValue = inputValue - fee;
+    const { unsignedStakingPsbt } = this.buildPsbt(
+      globalParams,
+      txHeight,
+      stakerKeysPairs,
+    );
 
-    const psbt = new bitcoin.Psbt({
-      network: this.network,
-      maximumFeeRate: 1000,
-    })
-      .addInput({
-        hash: this.generateRandomTxId(),
-        index: 0,
-        witnessUtxo: {
-          script: p2wpkh.output!,
-          value: Number(inputValue),
-        },
-      })
-      .addOutput({
-        address: bitcoin.address.toBase58Check(
-          Buffer.alloc(20, 1),
-          this.network.pubKeyHash,
-        ),
-        value: Number(outputValue),
-      });
+    const unsignedStakingPsbtHex = unsignedStakingPsbt.toHex();
 
-    const unsignedPsbtHex = psbt.toHex();
+    unsignedStakingPsbt.signInput(0, stakerKeys.keyPair);
 
-    psbt.signInput(0, keyPair);
+    unsignedStakingPsbt.finalizeAllInputs();
 
-    psbt.finalizeAllInputs();
-
-    let signedPsbtHex;
+    let signedStakingPsbtHex;
     if (backwardCompatible) {
-      signedPsbtHex = psbt.extractTransaction().toHex();
+      signedStakingPsbtHex = unsignedStakingPsbt.extractTransaction().toHex();
     } else {
-      signedPsbtHex = psbt.toHex();
+      signedStakingPsbtHex = unsignedStakingPsbt.toHex();
     }
 
-    return { unsignedPsbtHex, signedPsbtHex };
+    return { unsignedStakingPsbtHex, signedStakingPsbtHex };
   };
 
   private getTaprootAddress = (publicKey: string) => {
