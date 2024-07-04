@@ -2,11 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("styles/terms.css");
-
 :root {
   --primary: #ff7c2a;
-  --secondary: "#0DB7BF";
+  --secondary: #0db7bf;
+  --es-text: #ffffff;
+  --es-bg: #111111;
+  --es-accent: #f5be37;
+  --es-text-secondary: "#b2b2b2";
+  --es-secondary-2: "#212121";
+  --es-border: "#5B5B5B";
+  --es-form-bg: linear-gradient(
+    186.33deg,
+    rgba(64, 64, 64, 0.4) 4.99%,
+    rgba(64, 64, 64, 0.2) 94.95%
+  );
 }
 
 /* disable number input arrows */
@@ -57,7 +66,7 @@ input[type="number"] {
 }
 
 .fp-selected {
-  border: 1px solid var(--primary) !important;
+  border: 1px solid var(--es-accent) !important;
   filter: brightness(0.98);
 }
 
@@ -68,7 +77,7 @@ input[type="number"] {
 /* tabs selection */
 .tab.tab-active:not(.tab-disabled):not([disabled]),
 .tab:is(input:checked) {
-  border-color: #ff7c2a;
+  border-color: var(--es-accent);
 }
 
 .divider:after,
@@ -77,28 +86,8 @@ input[type="number"] {
   width: 1px !important;
 }
 
-[data-theme="dark"] .main-app-mainnet {
-  background: rgb(43, 43, 43) url("./assets/bg-pattern.svg") left top/auto
-    repeat;
-}
-
-[data-theme="light"] .main-app-mainnet {
-  background: rgb(236, 236, 236) url("./assets/bg-pattern.svg") left top/auto
-    repeat;
-}
-
-[data-theme="dark"] .main-app-testnet {
-  background: rgb(43, 43, 43) url("./assets/testnet-bg-pattern.svg") left
-    top/auto repeat;
-}
-
-[data-theme="light"] .main-app-testnet {
-  background: rgb(236, 236, 236) url("./assets/testnet-bg-pattern.svg") left
-    top/auto repeat;
-}
-
 [data-theme="dark"] .react-responsive-modal-modal {
-  background-color: #1e1e1e;
+  background-color: var(--es-bg);
   color: #fff;
 }
 
@@ -109,4 +98,69 @@ input[type="number"] {
 
 body.modal-open {
   overflow: hidden;
+}
+
+.primary-button {
+  background: var(--es-accent);
+  color: var(--es-bg);
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 500;
+  padding: 8px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wallet-link:hover .wallet-detected-link {
+  color: var(--es-accent);
+}
+
+.form-bg {
+  background: var(--es-form-bg);
+}
+
+.checkbox-primary {
+  border-color: var(--es-accent) !important;
+  border-radius: 0 !important;
+  width: 16px;
+  height: 16px;
+}
+
+.checkbox-primary:checked {
+  --chkbg: var(--es-accent) !important;
+}
+
+.tooltip-es {
+  color: var(--es-text-secondary);
+  background-color: var(--es-bg);
+  z-index: 1;
+  border-radius: 0;
+  border: 1px solid var(--es-border);
+}
+
+.es-button {
+  @apply h-20 w-full border border-es-accent bg-es-accent text-center text-3xl font-medium text-es-black disabled:opacity-70 md:transition-colors md:hover:bg-es-black md:hover:text-es-accent;
+}
+.es-button-secondary {
+  @apply h-20 w-full border border-es-border text-center text-3xl font-medium text-es-text-secondary disabled:opacity-70 md:transition-colors md:hover:bg-es-black md:hover:text-es-accent;
+}
+
+.stake-modal {
+  background: linear-gradient(
+    186.33deg,
+    rgba(64, 64, 64, 0.4) 4.99%,
+    rgba(64, 64, 64, 0.2) 94.95%
+  ) !important;
+  background-color: var(--es-bg) !important;
+  padding: 0 !important;
+  min-height: 480px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.unbond-modal {
+  min-height: unset !important;
 }
