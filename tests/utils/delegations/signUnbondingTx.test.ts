@@ -30,11 +30,14 @@ describe("signUnbondingTx", () => {
         randomGlobalParamsVersions.length - 1,
       )
     ].activationHeight + 1;
-  const randomStakingTx = dataGenerator.createRandomStakingTx(
+  const { signedPsbt } = dataGenerator.createRandomStakingPsbt(
     randomGlobalParamsVersions,
     randomStakingTxHeight,
     stakerKeys,
   );
+
+  const signedPsbtTx = signedPsbt.extractTransaction();
+
   const mockedDelegationApi = [
     {
       stakingTxHashHex: randomTxId,
@@ -42,8 +45,8 @@ describe("signUnbondingTx", () => {
         dataGenerator.generateRandomKeyPair().noCoordPublicKey,
       stakingTx: {
         startHeight: randomStakingTxHeight,
-        timelock: randomStakingTx.locktime,
-        txHex: randomStakingTx.toHex(),
+        timelock: signedPsbtTx.locktime,
+        txHex: signedPsbtTx.toHex(),
         outputIndex: 0,
       },
     },
