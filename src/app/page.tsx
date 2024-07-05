@@ -18,10 +18,10 @@ import {
 } from "@/utils/wallet/index";
 import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
-import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
+import { PaginatedDelegations, getDelegations } from "./api/getDelegations";
 import {
-  getFinalityProviders,
   PaginatedFinalityProviders,
+  getFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { signPsbtTransaction } from "./common/utils/psbt";
@@ -32,8 +32,9 @@ import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { TermsModal } from "./components/Modals/Terms/TermsModal";
-import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
+import { StakingModal } from "./components/Staking/StakingModal";
+import { provider } from "./components/Staking/provider.data.js";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
@@ -215,6 +216,12 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
+  const [stakingModalOpen, setStakingModalOpen] = useState(false);
+
+  const handleStakingModal = () => {
+    setStakingModalOpen(true);
+  };
+
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
     setBTCWalletBalanceSat(0);
@@ -321,9 +328,8 @@ const Home: React.FC<HomeProps> = () => {
 
   return (
     <main
-      className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
+      className={`relative h-full min-h-svh w-full pt-20 bg-es-bg ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
     >
-      <NetworkBadge />
       <Header
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
@@ -332,7 +338,11 @@ const Home: React.FC<HomeProps> = () => {
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
-          <Stats />
+          <Stats
+            onConnect={handleConnectModal}
+            onStaking={handleStakingModal}
+            address={address}
+          />
           {address && (
             <Summary
               address={address}
@@ -398,6 +408,21 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <StakingModal
+        open={stakingModalOpen}
+        onClose={setStakingModalOpen}
+        btcHeight={paramWithContext?.currentHeight}
+        finalityProvider={provider}
+        isWalletConnected={!!btcWallet}
+        onConnect={handleConnectModal}
+        isLoading={isLoadingCurrentParams}
+        btcWallet={btcWallet}
+        btcWalletBalanceSat={btcWalletBalanceSat}
+        btcWalletNetwork={btcWalletNetwork}
+        address={address}
+        publicKeyNoCoord={publicKeyNoCoord}
+        setDelegationsLocalStorage={setDelegationsLocalStorage}
       />
       <ErrorModal
         open={isErrorOpen}

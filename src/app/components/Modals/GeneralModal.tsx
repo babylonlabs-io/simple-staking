@@ -6,6 +6,11 @@ interface GeneralModalProps {
   onClose: (value: boolean) => void;
   small?: boolean;
   children: ReactNode;
+  position?: "center" | "right";
+  classNames?: {
+    modalContainer?: string;
+    modal?: string;
+  };
 }
 
 export const GeneralModal: React.FC<GeneralModalProps> = ({
@@ -13,6 +18,8 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   onClose,
   children,
   small,
+  position = "center",
+  classNames = {},
 }) => {
   const modalRef = useRef(null);
 
@@ -36,14 +43,22 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
     }
   };
 
+  const getPositionClasses = () => {
+    if (position === "right") {
+      return "absolute top-1/2 right-0 transform -translate-y-1/2";
+    } else {
+      return "flex items-end justify-center md:items-center";
+    }
+  };
+
   return (
     <Modal
       ref={modalRef}
       open={open}
       onClose={() => onClose(false)}
       classNames={{
-        modalContainer: "flex items-end justify-center md:items-center",
-        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[85svh] min-w-[20rem] md:min-w-[30rem] ${getSize()}`,
+        modalContainer: `${getPositionClasses()} ${classNames.modalContainer || ""}`,
+        modal: `m-0 w-full max-w-none  bg-es-bg shadow-lg md:w-auto  max-h-[85svh] min-w-[20rem] md:min-w-[30rem] ${getSize()} ${classNames.modal || ""}`,
       }}
       showCloseIcon={false}
       blockScroll={false}

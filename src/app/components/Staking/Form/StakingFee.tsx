@@ -69,7 +69,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           )}
         </div>
         <button
-          className="btn btn-sm btn-link no-underline"
+          className="btn btn-sm btn-link no-underline text-es-accent"
           onClick={() => setCustomMode(true)}
           disabled={!mempoolFeeRates || !stakingFeeSat}
         >
@@ -125,7 +125,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   const customModeReady = customMode && mempoolFeeRates && stakingFeeSat;
 
   return (
-    <div className="my-2 text-sm">
+    <div className="my-2 text-sm w-full">
       {customModeReady ? selectedModeRender() : defaultModeRender()}
     </div>
   );

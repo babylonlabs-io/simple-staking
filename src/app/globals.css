@@ -164,3 +164,11 @@ body.modal-open {
 .unbond-modal {
   min-height: unset !important;
 }
+
+.range-primary {
+  --range-shdw: var(--es-accent);
+}
+
+.range-primarys::-webkit-slider-thumb {
+  background: var(--es-accent) !important;
+}
