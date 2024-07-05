@@ -1,3 +1,4 @@
+import { Decimal } from "decimal.js-light";
 /**
  * Limits the number of decimal places of a given number to a specified maximum.
  *
@@ -14,14 +15,6 @@
  * maxDecimals(3.141, 3);           // returns 3.141
  * maxDecimals(3.149, 3);           // returns 3.149
  */
-
 export const maxDecimals = (value: number, maxDecimals: number): number => {
-  // Convert the number to a string with a fixed number of decimal places
-  const fixedString = value.toFixed(maxDecimals);
-
-  // Convert the fixed string back to a number using the unary plus operator
-  const result = +fixedString;
-
-  // Return the result
-  return result;
+  return new Decimal(value).toDecimalPlaces(maxDecimals).toNumber();
 };
