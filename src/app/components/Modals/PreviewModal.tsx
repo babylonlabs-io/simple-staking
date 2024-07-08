@@ -30,15 +30,14 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   stakingFeeSat,
   feeRate,
 }) => {
-  const cardStyles =
-    "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
+  const cardStyles = "bg-black px-4 py-3 flex flex-col";
 
   const { coinName } = getNetworkConfig();
 
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">Preview</h3>
+        <h3 className="font-semibold text-xl uppercase">Preview</h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
           onClick={() => onClose(false)}
@@ -49,61 +48,69 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
       <div className="flex flex-col gap-4 text-sm">
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">
+            <p className="uppercase text-md text-es-text-secondary">
               Finality Provider
             </p>
-            <p>{finalityProvider || "-"}</p>
+            <p className="text-base text-white font-medium">
+              {finalityProvider || "-"}
+            </p>
           </div>
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">Stake Amount</p>
-            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
+            <p className="uppercase text-md text-es-text-secondary">Amount</p>
+            <p className="text-base text-white font-medium">{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">Fee rate</p>
-            <p>{feeRate} sat/vB</p>
+            <p className="uppercase text-md text-es-text-secondary">Fee rate</p>
+            <p className="text-base text-white font-medium">{feeRate} sat/vB</p>
           </div>
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">Transaction fee</p>
-            <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
+            <p className="uppercase text-md text-es-text-secondary">
+              Transaction fee
+            </p>
+            <p className="text-base text-white font-medium">{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
-            <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToDisplayTime(stakingTimeBlocks)}</p>
+            <p className="uppercase text-md text-es-text-secondary">Term</p>
+            <p className="text-base text-white font-medium">
+              {blocksToDisplayTime(stakingTimeBlocks)}
+            </p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
-            <p className="text-xs dark:text-neutral-content">
+            <p className="uppercase text-md text-es-text-secondary">
               On-demand unbonding
             </p>
-            <p>
+            <p className="text-base text-white font-medium">
               Enabled ({blocksToDisplayTime(unbondingTimeBlocks)} unbonding
               time)
             </p>
           </div>
         </div>
-        <h4 className="text-center text-base">Attention!</h4>
-        <p className="dark:text-neutral-content">
+        <h4 className="font-semibold text-xl uppercase text-center">
+          Attention!
+        </h4>
+        <p className="text-medium text-sm text-es-text-hint">
           1. Your stake may &quot;overflow&quot; the staking TVL cap and need to
           be unbonded and withdrawn, which will cost you extra transaction fees.
           So please stake wisely.
         </p>
-        <p className="dark:text-neutral-content">
+        <p className="text-medium text-sm text-es-text-hint">
           2. No third party possesses your staked {coinName}. You are the only
           one who can unbond and withdraw your stake.
         </p>
         <div className="flex gap-4">
           <button
-            className="btn btn-outline flex-1"
+            className="es-button-secondary"
             onClick={() => {
               onClose(false);
             }}
           >
             Cancel
           </button>
-          <button className="btn-primary btn flex-1" onClick={onSign}>
+          <button className="es-button" onClick={onSign}>
             Stake
           </button>
         </div>

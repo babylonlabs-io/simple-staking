@@ -32,11 +32,9 @@ import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { TermsModal } from "./components/Modals/Terms/TermsModal";
-import { Staking } from "./components/Staking/Staking";
 import { StakingModal } from "./components/Staking/StakingModal";
 import { provider } from "./components/Staking/provider.data.js";
 import { Stats } from "./components/Stats/Stats";
-import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
@@ -343,14 +341,14 @@ const Home: React.FC<HomeProps> = () => {
             onStaking={handleStakingModal}
             address={address}
           />
-          {address && (
+          {/* {address && (
             <Summary
               address={address}
               totalStakedSat={totalStakedSat}
               balanceSat={btcWalletBalanceSat}
             />
-          )}
-          <Staking
+          )} */}
+          {/* <Staking
             btcHeight={paramWithContext?.currentHeight}
             finalityProviders={finalityProviders?.finalityProviders}
             isWalletConnected={!!btcWallet}
@@ -367,7 +365,7 @@ const Home: React.FC<HomeProps> = () => {
             address={address}
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
-          />
+          /> */}
           {btcWallet &&
             delegations &&
             paramWithContext?.nextBlockParams.currentVersion &&
@@ -381,6 +379,7 @@ const Home: React.FC<HomeProps> = () => {
                   paramWithContext.nextBlockParams.currentVersion
                 }
                 publicKeyNoCoord={publicKeyNoCoord}
+                btcWallet={btcWallet}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbtTx={signPsbtTransaction(btcWallet)}

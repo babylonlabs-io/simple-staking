@@ -1,13 +1,14 @@
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
+import arrowRight from "@/app/assets/arrow-right.svg";
 import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { durationTillNow } from "@/utils/formatTime";
+import { timestampFormatted } from "@/utils/formatTime";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
@@ -59,13 +60,19 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+            className="uppercase text-base inline-flex items-center gap-2 md:hover:opacity-70 md:transition-opacity"
             onClick={() => onUnbond(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_UNBONDING
             }
           >
             Unbond
+            <Image
+              src={arrowRight}
+              className=""
+              style={{ width: "16px" }}
+              alt="arrow-right"
+            />
           </button>
         </div>
       );
@@ -73,13 +80,19 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+            className="uppercase text-base inline-flex items-center gap-2 md:hover:opacity-70 md:transition-opacity"
             onClick={() => onWithdraw(stakingTxHash)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
             }
           >
             Withdraw
+            <Image
+              src={arrowRight}
+              className=""
+              style={{ width: "16px" }}
+              alt="arrow-right"
+            />
           </button>
         </div>
       );
@@ -114,34 +127,42 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   return (
     <div
-      className={`card relative border bg-base-300 p-4 text-sm dark:bg-base-200 ${isOverflow ? "border-primary" : "dark:border-0"}`}
+      className={`relative border border-t-0 px-6 text-base ${isOverflow ? "border-es-border" : "border-es-border"}`}
     >
-      {isOverflow && (
-        <div className="absolute -top-1 right-1/2 flex translate-x-1/2 items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs text-white lg:right-2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0">
-          <IoIosWarning size={16} />
-          <p>overflow</p>
-        </div>
-      )}
-      <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
-        <p>
-          {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}
+      <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center md:gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
+        <p className="text-center py-1.5 border-r border-r-es-border">
+          {timestampFormatted(startTimestamp)}
         </p>
-        <p>{durationTillNow(startTimestamp, currentTime)}</p>
-        <div className="hidden justify-center lg:flex">
+        <p className="text-center py-1.5 border-r border-r-es-border">
+          {maxDecimals(satoshiToBtc(stakingValueSat), 8)}
+        </p>
+        <div className="hidden justify-center lg:flex py-1.5 border-r border-r-es-border">
           <a
             href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="text-es-text-hint text-base flex items-center gap-3 hover:underline"
           >
             {trim(stakingTxHash)}
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M6.22222 2.66667V4.44444H1.77778V14.2222H11.5556V9.77778H13.3333V15.1111C13.3333 15.3469 13.2397 15.573 13.073 15.7397C12.9063 15.9064 12.6802 16 12.4444 16H0.888889C0.653141 16 0.427048 15.9064 0.260349 15.7397C0.0936505 15.573 0 15.3469 0 15.1111V3.55556C0 3.31981 0.0936505 3.09372 0.260349 2.92702C0.427048 2.76032 0.653141 2.66667 0.888889 2.66667H6.22222ZM16 0V7.11111H14.2222V3.03378L7.29511 9.96178L6.03822 8.70489L12.9644 1.77778H8.88889V0H16Z"
+                fill="#B2B2B2"
+              />
+            </svg>
           </a>
         </div>
         {/*
         we need to center the text without the tooltip
         add its size 12px and gap 4px, 16/2 = 8px
         */}
-        <div className="relative flex justify-end lg:left-[8px] lg:justify-center">
+        <div className="relative flex justify-end lg:left-[8px] lg:justify-center border-r py-1.5 border-r-es-border">
           <div className="flex items-center gap-1">
             <p>{renderState()}</p>
             <span
@@ -150,12 +171,20 @@ export const Delegation: React.FC<DelegationProps> = ({
               data-tooltip-content={renderStateTooltip()}
               data-tooltip-place="top"
             >
-              <AiOutlineInfoCircle />
+              <AiOutlineInfoCircle className="hover:fill-es-accent" />
             </span>
-            <Tooltip id={`tooltip-${stakingTxHash}`} />
+            <Tooltip
+              id={`tooltip-${stakingTxHash}`}
+              place="top"
+              className="tooltip-es"
+            />
           </div>
         </div>
-        {generateActionButton()}
+        <div className="relative flex justify-end lg:left-[8px] lg:justify-center">
+          <div className="flex items-center gap-1">
+            <div>{generateActionButton()}</div>
+          </div>
+        </div>
       </div>
     </div>
   );

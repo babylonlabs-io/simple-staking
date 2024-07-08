@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { IoMdClose } from "react-icons/io";
 
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
@@ -42,37 +43,51 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const title = mode === MODE_UNBOND ? unbondTitle : withdrawTitle;
   const content = mode === MODE_UNBOND ? unbondContent : withdrawContent;
 
+  const unbondButtonText = "UNBOND";
+  const withdrawButtonText = "Withdraw";
+
+  const [selectedFeeRate, setSelectedFeeRate] = useState(0);
+  const [resetFormInputs, setResetFormInputs] = useState(false);
+
+  const handleSelectedFeeRate = (fee: number) => {
+    setSelectedFeeRate(fee);
+  };
+
   return (
-    <GeneralModal open={open} onClose={onClose} small>
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">{title}</h3>
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose(false)}
-        >
-          <IoMdClose size={24} />
-        </button>
-      </div>
-      <div className="flex flex-col gap-4">
-        <p className="text-center dark:text-neutral-content">{content}</p>
-        <div className="flex gap-4">
-          <button
-            className="btn btn-outline flex-1"
-            onClick={() => {
-              onClose(false);
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            className="btn-primary btn flex-1"
-            onClick={() => {
-              onClose(false);
-              onProceed();
-            }}
-          >
-            Proceed
-          </button>
+    <GeneralModal
+      open={open}
+      onClose={onClose}
+      small
+      classNames={{ modal: "stake-modal unbond-modal" }}
+    >
+      <div className="md:max-w-[480px]">
+        <div className="flex flex-col flex-grow mt-8 md:max-w-[480px]">
+          <h3 className="text-center font-semibold text-xl uppercase">
+            {mode === MODE_UNBOND ? unbondTitle : withdrawTitle}
+          </h3>
+          <div className="absolute right-4 top-4">
+            <button
+              className="btn btn-circle btn-ghost btn-sm"
+              onClick={() => onClose(false)}
+            >
+              <IoMdClose size={24} />
+            </button>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <p className="px-9 pt-4 text-es-accent font-medium">{content}</p>
+
+          <div className="flex gap-4">
+            <button
+              className="es-button"
+              onClick={() => {
+                onClose(false);
+                onProceed();
+              }}
+            >
+              {mode === MODE_UNBOND ? unbondButtonText : withdrawButtonText}
+            </button>
+          </div>
         </div>
       </div>
     </GeneralModal>
