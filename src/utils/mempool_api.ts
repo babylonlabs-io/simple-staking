@@ -1,5 +1,6 @@
 import { getNetworkConfig } from "@/config/network.config";
 
+import { isTaproot } from "./wallet";
 import { Fees, UTXO } from "./wallet/wallet_provider";
 
 const { mempoolApiUrl } = getNetworkConfig();
@@ -154,13 +155,29 @@ export async function getFundingUTXOs(
     .filter((utxo: any) => utxo.status.confirmed)
     .sort((a: any, b: any) => b.value - a.value);
 
+  const response = await fetch(validateAddressUrl(address));
+  const addressInfo = await response.json();
+  const { isvalid, scriptPubKey } = addressInfo;
+  if (!isvalid) {
+    throw new Error("Invalid address");
+  }
+
+  // We need to cut BRC-20, ARC-20, Runes, and other tokens from the list of UTXOs
+  const ORDINALS_THRESHOLD = 1500;
+  let confirmedUTXOsWithoutOrdinals = [...confirmedUTXOs];
+  if (isTaproot(addressInfo.address)) {
+    confirmedUTXOsWithoutOrdinals = confirmedUTXOsWithoutOrdinals.filter(
+      (utxo: any) => utxo.value > ORDINALS_THRESHOLD,
+    );
+  }
+
   // If amount is provided, reduce the list of UTXOs into a list that
   // contains just enough UTXOs to satisfy the `amount` requirement.
-  let sliced = confirmedUTXOs;
+  let sliced = confirmedUTXOsWithoutOrdinals;
   if (amount) {
     var sum = 0;
-    for (var i = 0; i < confirmedUTXOs.length; ++i) {
-      sum += confirmedUTXOs[i].value;
+    for (var i = 0; i < confirmedUTXOsWithoutOrdinals.length; ++i) {
+      sum += confirmedUTXOsWithoutOrdinals[i].value;
       if (sum > amount) {
         break;
       }
@@ -168,14 +185,7 @@ export async function getFundingUTXOs(
     if (sum < amount) {
       return [];
     }
-    sliced = confirmedUTXOs.slice(0, i + 1);
-  }
-
-  const response = await fetch(validateAddressUrl(address));
-  const addressInfo = await response.json();
-  const { isvalid, scriptPubKey } = addressInfo;
-  if (!isvalid) {
-    throw new Error("Invalid address");
+    sliced = confirmedUTXOsWithoutOrdinals.slice(0, i + 1);
   }
 
   // Iterate through the final list of UTXOs to construct the result list.
