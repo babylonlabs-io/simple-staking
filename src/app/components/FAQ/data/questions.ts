@@ -59,4 +59,20 @@ export const questions = (coinName: string) => [
     content: `<p>Hands-on stakers can operate the <a href="https://github.com/babylonchain/btc-staker/blob/dev/docs/create-phase1-staking.md" target="_blank" rel="noopener noreferrer" class="text-primary"><u>btc-staker CLI program</u></a> that allows for the creation of ${coinName} staking transactions from the CLI.</p>
     `,
   },
+  {
+    title: "Will I pay any fees for staking?",
+    content: `<p>Yes, there are three transaction fees associated with staking, all charged by the Bitcoin network:</p><br />
+    <ol>
+      <li>
+        1. <b>Staking Transaction Fee (Fs)</b>: This fee is for the staking transaction. To stake amount S, you need at least S + Fs in your wallet. It is calculated in real-time based on current network conditions.
+      </li><br />
+      <li>
+        2. <b>Unbonding Transaction Fee (Fu)</b>: If you unbond your stake before it expires, this fee is deducted from your stake S, resulting in a withdrawable amount of S - Fu. Fu is a calculated static value to ensure inclusion in busy network conditions.
+      </li><br />
+      <li>
+        3. <b>Withdraw Transaction Fee (Fw)</b>: This fee is for the withdrawal transaction that transfers the stake back to your wallet. It is deducted from your withdrawable stake, which is either S (if you wait until expiration) or S - Fu (if unbonded early). This fee ensures fast inclusion based on current network conditions.
+      </li>
+    </ol><br />
+    <p>In summary, to stake S, you need S + Fs, and upon completion, you get S - Fw or S - Fu - Fw back, depending on whether you wait for expiration or unbond early.</p>`,
+  },
 ];
