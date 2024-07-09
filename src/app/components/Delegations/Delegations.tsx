@@ -130,7 +130,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
       const { delegation } = await signWithdrawalTx(
         id,
         delegationsAPI,
-        globalParamsVersion,
         publicKeyNoCoord,
         btcWalletNetwork,
         signPsbtTx,
@@ -303,6 +302,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       {modalMode && txID && (
         <UnbondWithdrawModal
           unbondingTimeBlocks={globalParamsVersion.unbondingTime}
+          unbondingFeeSat={globalParamsVersion.unbondingFeeSat}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           onProceed={() => {

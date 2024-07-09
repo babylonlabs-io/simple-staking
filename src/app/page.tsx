@@ -3,7 +3,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
 import { initBTCCurve } from "btc-staking-ts";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
@@ -193,6 +193,13 @@ const Home: React.FC<HomeProps> = () => {
     hasGlobalParamsVersionError,
     hasDelegationsError,
     isRefetchFinalityProvidersError,
+    finalityProvidersError,
+    refetchFinalityProvidersData,
+    delegationsError,
+    refetchDelegationData,
+    globalParamsVersionError,
+    refetchGlobalParamsVersion,
+    showError,
   ]);
 
   // Initializing btc curve is a required one-time operation
@@ -228,48 +235,51 @@ const Home: React.FC<HomeProps> = () => {
     setAddress("");
   };
 
-  const handleConnectBTC = async (walletProvider: WalletProvider) => {
-    // close the modal
-    setConnectModalOpen(false);
+  const handleConnectBTC = useCallback(
+    async (walletProvider: WalletProvider) => {
+      // close the modal
+      setConnectModalOpen(false);
 
-    try {
-      await walletProvider.connectWallet();
-      const address = await walletProvider.getAddress();
-      // check if the wallet address type is supported in babylon
-      const supported = isSupportedAddressType(address);
-      if (!supported) {
-        throw new Error(
-          "Invalid address type. Please use a Native SegWit or Taproot",
+      try {
+        await walletProvider.connectWallet();
+        const address = await walletProvider.getAddress();
+        // check if the wallet address type is supported in babylon
+        const supported = isSupportedAddressType(address);
+        if (!supported) {
+          throw new Error(
+            "Invalid address type. Please use a Native SegWit or Taproot",
+          );
+        }
+
+        const balanceSat = await walletProvider.getBalance();
+        const publicKeyNoCoord = getPublicKeyNoCoord(
+          await walletProvider.getPublicKeyHex(),
         );
+        setBTCWallet(walletProvider);
+        setBTCWalletBalanceSat(balanceSat);
+        setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
+        setAddress(address);
+        setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+      } catch (error: Error | any) {
+        if (
+          error instanceof WalletError &&
+          error.getType() === WalletErrorType.ConnectionCancelled
+        ) {
+          // User cancelled the connection, hence do nothing
+          return;
+        }
+        showError({
+          error: {
+            message: error.message,
+            errorState: ErrorState.WALLET,
+            errorTime: new Date(),
+          },
+          retryAction: () => handleConnectBTC(walletProvider),
+        });
       }
-
-      const balanceSat = await walletProvider.getBalance();
-      const publicKeyNoCoord = getPublicKeyNoCoord(
-        await walletProvider.getPublicKeyHex(),
-      );
-      setBTCWallet(walletProvider);
-      setBTCWalletBalanceSat(balanceSat);
-      setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
-      setAddress(address);
-      setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
-    } catch (error: Error | any) {
-      if (
-        error instanceof WalletError &&
-        error.getType() === WalletErrorType.ConnectionCancelled
-      ) {
-        // User cancelled the connection, hence do nothing
-        return;
-      }
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.WALLET,
-          errorTime: new Date(),
-        },
-        retryAction: () => handleConnectBTC(walletProvider),
-      });
-    }
-  };
+    },
+    [showError],
+  );
 
   // Subscribe to account changes
   useEffect(() => {
@@ -284,7 +294,7 @@ const Home: React.FC<HomeProps> = () => {
         once = true;
       };
     }
-  }, [btcWallet]);
+  }, [btcWallet, handleConnectBTC]);
 
   // Clean up the local storage delegations
   useEffect(() => {
