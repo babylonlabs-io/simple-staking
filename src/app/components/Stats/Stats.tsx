@@ -145,6 +145,11 @@ export const Stats: React.FC = () => {
           ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 8)} ${coinName}`
           : 0,
         icon: pendingStake,
+        tooltip:
+          stakingStats &&
+          stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat < 0
+            ? "Pending TVL can be negative when there are unbonding requests"
+            : undefined,
       },
     ],
     [

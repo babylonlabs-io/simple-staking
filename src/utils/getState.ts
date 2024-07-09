@@ -42,7 +42,7 @@ export const getStateTooltip = (
     case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding requested";
     case DelegationState.UNBONDING:
-      return `Unbonding process of ${params ? blocksToDisplayTime(params.unbondingTime) : "-"} has started`;
+      return `Unbonding process of ${blocksToDisplayTime(params?.unbondingTime)} has started`;
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:

@@ -103,16 +103,11 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
       <div className="card mb-2 bg-base-200 p-4">
         <p>
           You can unbond and withdraw your stake anytime with an unbonding time
-          of{" "}
-          {unbondingTimeBlocks ? blocksToDisplayTime(unbondingTimeBlocks) : "-"}
-          .
+          of {blocksToDisplayTime(unbondingTimeBlocks)}.
         </p>
         <p>
           There is also a build-in maximum staking period of{" "}
-          {minStakingTimeBlocks
-            ? blocksToDisplayTime(minStakingTimeBlocks)
-            : "-"}
-          .
+          {blocksToDisplayTime(minStakingTimeBlocks)}.
         </p>
         <p>
           If the stake is not unbonded before the end of this period, it will

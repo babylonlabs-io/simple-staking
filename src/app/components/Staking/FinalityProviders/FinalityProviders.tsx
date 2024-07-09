@@ -65,12 +65,14 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           {finalityProviders?.map((fp) => (
             <FinalityProvider
               key={fp.btcPk}
-              moniker={fp.description.moniker}
+              moniker={fp.description?.moniker}
               pkHex={fp.btcPk}
               stakeSat={fp.activeTVLSat}
-              comission={fp.commission}
+              commission={fp.commission}
               selected={selectedFinalityProvider?.btcPk === fp.btcPk}
-              onClick={() => onFinalityProviderChange(fp.btcPk)}
+              onClick={() => {
+                onFinalityProviderChange(fp.btcPk);
+              }}
             />
           ))}
         </InfiniteScroll>

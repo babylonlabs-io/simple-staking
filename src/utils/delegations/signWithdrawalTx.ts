@@ -8,9 +8,13 @@ import {
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+
+import { getFeeRateFromMempool } from "../getFeeRateFromMempool";
+import { Fees } from "../wallet/wallet_provider";
+
+import { txFeeSafetyCheck } from "./fee";
 
 // Sign a withdrawal transaction
 // Returns:
@@ -19,19 +23,18 @@ import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 export const signWithdrawalTx = async (
   id: string,
   delegationsAPI: DelegationInterface[],
-  globalParamsVersion: GlobalParamsVersion,
   publicKeyNoCoord: string,
   btcWalletNetwork: networks.Network,
   signPsbtTx: SignPsbtTransaction,
   address: string,
-  getNetworkFees: () => Promise<{ fastestFee: number }>,
+  getNetworkFees: () => Promise<Fees>,
   pushTx: (txHex: string) => Promise<string>,
 ): Promise<{
   withdrawalTxHex: string;
   delegation: DelegationInterface;
 }> => {
   // Check if the data is available
-  if (!delegationsAPI || !globalParamsVersion) {
+  if (!delegationsAPI) {
     throw new Error("No back-end API data available");
   }
 
@@ -73,6 +76,8 @@ export const signWithdrawalTx = async (
     publicKeyNoCoord,
   );
 
+  const feeRate = getFeeRateFromMempool(fees);
+
   // Create the withdrawal transaction
   let withdrawPsbtTxResult: PsbtTransactionResult;
   if (delegation?.unbondingTx) {
@@ -85,7 +90,7 @@ export const signWithdrawalTx = async (
       Transaction.fromHex(delegation.unbondingTx.txHex),
       address,
       btcWalletNetwork,
-      fees.fastestFee,
+      feeRate.defaultFeeRate,
     );
   } else {
     // Withdraw funds from a staking transaction in which the timelock naturally expired
@@ -98,7 +103,7 @@ export const signWithdrawalTx = async (
       Transaction.fromHex(delegation.stakingTx.txHex),
       address,
       btcWalletNetwork,
-      fees.fastestFee,
+      feeRate.defaultFeeRate,
       delegation.stakingTx.outputIndex,
     );
   }
@@ -114,6 +119,12 @@ export const signWithdrawalTx = async (
 
   // Get the withdrawal transaction hex
   const withdrawalTxHex = withdrawalTx.toHex();
+  // Perform a safety check on the estimated transaction fee
+  txFeeSafetyCheck(
+    withdrawalTx,
+    feeRate.defaultFeeRate,
+    withdrawPsbtTxResult.fee,
+  );
 
   // Broadcast withdrawal transaction
   await pushTx(withdrawalTxHex);

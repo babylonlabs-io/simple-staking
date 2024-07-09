@@ -55,7 +55,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <p>{finalityProvider || "-"}</p>
           </div>
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">Amount</p>
+            <p className="text-xs dark:text-neutral-content">Stake Amount</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
           </div>
         </div>
@@ -65,29 +65,22 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <p>{feeRate} sat/vB</p>
           </div>
           <div className={`${cardStyles} flex-1`}>
-            <p className="text-xs dark:text-neutral-content">
-              Transaction fee amount
-            </p>
+            <p className="text-xs dark:text-neutral-content">Transaction fee</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
           <div className={`${cardStyles} basis-1/5`}>
             <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>
-              {stakingTimeBlocks ? blocksToDisplayTime(stakingTimeBlocks) : "-"}
-            </p>
+            <p>{blocksToDisplayTime(stakingTimeBlocks)}</p>
           </div>
           <div className={`${cardStyles} basis-4/5`}>
             <p className="text-xs dark:text-neutral-content">
               On-demand unbonding
             </p>
             <p>
-              Enabled (
-              {unbondingTimeBlocks
-                ? blocksToDisplayTime(unbondingTimeBlocks)
-                : "-"}{" "}
-              unbonding time)
+              Enabled ({blocksToDisplayTime(unbondingTimeBlocks)} unbonding
+              time)
             </p>
           </div>
         </div>

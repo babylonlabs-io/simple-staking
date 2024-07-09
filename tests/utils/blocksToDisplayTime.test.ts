@@ -1,8 +1,8 @@
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 
 describe("blocksToDisplayTime", () => {
-  it("should throw error if block is 0", () => {
-    expect(() => blocksToDisplayTime(0)).toThrow("No blocks provided");
+  it("should return '-' if block is 0", () => {
+    expect(blocksToDisplayTime(0)).toBe("-");
   });
 
   it("should convert 1 block to 1 day", () => {
@@ -23,5 +23,9 @@ describe("blocksToDisplayTime", () => {
 
   it("should convert 4320 blocks to 5 weeks", () => {
     expect(blocksToDisplayTime(4320)).toBe("5 weeks");
+  });
+
+  it("should convert 63000 blocks to 65 weeks", () => {
+    expect(blocksToDisplayTime(63000)).toBe("65 weeks");
   });
 });
