@@ -5,6 +5,9 @@ import { Fees, UTXO } from "./wallet/wallet_provider";
 
 const { mempoolApiUrl } = getNetworkConfig();
 
+// Amount of satoshis below which we consider a UTXO to be an ordinal
+const ORDINALS_THRESHOLD = 1500;
+
 /*
     URL Construction methods
 */
@@ -163,7 +166,6 @@ export async function getFundingUTXOs(
   }
 
   // We need to cut BRC-20, ARC-20, Runes, and other tokens from the list of UTXOs
-  const ORDINALS_THRESHOLD = 1500;
   let confirmedUTXOsWithoutOrdinals = [...confirmedUTXOs];
   if (isTaproot(addressInfo.address)) {
     confirmedUTXOsWithoutOrdinals = confirmedUTXOsWithoutOrdinals.filter(
