@@ -81,7 +81,11 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const formattedErrorTime = format(errorTime, "dd MMMM yyyy 'at' HH:mm:ss");
 
   return (
-    <GeneralModal open={open} onClose={onClose}>
+    <GeneralModal
+      open={open}
+      onClose={onClose}
+      classNames={{ modal: "bg-es-bg" }}
+    >
       <div className="mb- flex items-center justify-end">
         <button
           className="btn btn-circle btn-ghost btn-sm"
@@ -91,26 +95,22 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         </button>
       </div>
       <div className="flex flex-col justify-center gap-4">
-        <h3 className="text-center font-bold text-error">{getErrorTitle()}</h3>
+        <h3 className="text-xl uppercase text-center font-semibold text-error">
+          {getErrorTitle()}
+        </h3>
         <div className="flex flex-col gap-3">
-          <p className="text-center">{getErrorMessage()}</p>
+          <p className="text-medium text-sm text-es-text-hint">
+            {getErrorMessage()}
+          </p>
           <p className="text-center text-xs opacity-50">{formattedErrorTime}</p>
         </div>
         <div className="mt-4 flex justify-around gap-4">
-          <button
-            className="btn btn-outline flex-1 rounded-lg px-2"
-            onClick={() => onClose()}
-          >
+          <button className="es-button-secondary" onClick={() => onClose()}>
             Cancel
           </button>
-          {onRetry && (
-            <button
-              className="btn-primary btn flex-1 rounded-lg px-2 text-white"
-              onClick={handleRetry}
-            >
-              Try Again
-            </button>
-          )}
+          <button className="es-button" onClick={handleRetry}>
+            Try Again
+          </button>
         </div>
       </div>
     </GeneralModal>

@@ -19,10 +19,15 @@ export const apiWrapper = async (
       throw new Error("Invalid method");
   }
 
+  const isTestnet = new URLSearchParams(window.location.search).has("testnet");
+  const baseURL = isTestnet
+    ? process.env.NEXT_PUBLIC_API_URL_TESTNET
+    : process.env.NEXT_PUBLIC_API_URL;
+  const fullURL = `${baseURL}${url}`;
+
   try {
-    // destructure params in case of post request
     response = await handler(
-      `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      fullURL,
       method === "POST"
         ? { ...params }
         : {
