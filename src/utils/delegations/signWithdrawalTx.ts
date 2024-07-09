@@ -8,7 +8,6 @@ import {
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
@@ -24,7 +23,6 @@ import { txFeeSafetyCheck } from "./fee";
 export const signWithdrawalTx = async (
   id: string,
   delegationsAPI: DelegationInterface[],
-  globalParamsVersion: GlobalParamsVersion,
   publicKeyNoCoord: string,
   btcWalletNetwork: networks.Network,
   signPsbtTx: SignPsbtTransaction,
@@ -36,7 +34,7 @@ export const signWithdrawalTx = async (
   delegation: DelegationInterface;
 }> => {
   // Check if the data is available
-  if (!delegationsAPI || !globalParamsVersion) {
+  if (!delegationsAPI) {
     throw new Error("No back-end API data available");
   }
 
