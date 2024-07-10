@@ -4,7 +4,10 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
-import { OVERFLOW_HEIGHT_WARNING_THRESHOLD } from "@/app/common/constants";
+import {
+  OVERFLOW_HEIGHT_WARNING_THRESHOLD,
+  OVERFLOW_TVL_WARNING_THRESHOLD,
+} from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
@@ -190,7 +193,7 @@ export const Staking: React.FC<StakingProps> = ({
         isHeightCap: false,
         overTheCapRange: stakingCapSat <= activeTVLSat,
         approchingCapRange:
-          stakingCapSat * OVERFLOW_HEIGHT_WARNING_THRESHOLD < unconfirmedTVLSat,
+          stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
       });
     }
   }, [paramWithCtx, btcHeight, stakingStats]);
