@@ -76,8 +76,8 @@ export class OneKeyWallet extends WalletProvider {
     //   default:
     //     throw new Error("Unsupported network");
     // }
-    const address = await this.getAddress();
-    const publicKeyHex = await this.getPublicKeyHex();
+    const address = await this.bitcoinNetworkProvider.getAddress();
+    const publicKeyHex = await this.bitcoinNetworkProvider.getPublicKeyHex();
     this.oneKeyWalletInfo = {
       address,
       publicKeyHex,

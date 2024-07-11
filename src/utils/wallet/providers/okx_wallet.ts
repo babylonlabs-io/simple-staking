@@ -154,7 +154,7 @@ export class OKXWallet extends WalletProvider {
     }
     // subscribe to account change event
     if (eventName === "accountChanged") {
-      return this.okxWallet.on(eventName, callBack);
+      return this.bitcoinNetworkProvider.on(eventName, callBack);
     }
   };
 
