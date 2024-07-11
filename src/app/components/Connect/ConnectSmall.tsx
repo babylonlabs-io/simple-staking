@@ -35,7 +35,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   const { coinName, networkName } = getNetworkConfig();
 
   return address ? (
-    <div className="relative mr-[-10px] flex text-sm" ref={ref}>
+    <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>
       <button
         className="flex cursor-pointer outline-none items-stretch"
         onClick={() => setShowMenu(!showMenu)}
