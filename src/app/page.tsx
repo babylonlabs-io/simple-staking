@@ -266,6 +266,7 @@ const Home: React.FC<HomeProps> = () => {
         let errorMessage;
         switch (error.message) {
           case "Incorrect address prefix for Testnet / Signet. Expected address to start with 'tb1'.":
+          case "Incorrect address prefix for Mainnet. Expected address to start with 'bc1'.":
             errorMessage =
               "Unsupported address type detected. Please use a Native SegWit or Taproot address.";
             break;
