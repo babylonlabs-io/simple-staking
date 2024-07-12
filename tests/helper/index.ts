@@ -28,6 +28,17 @@ export class DataGenerator {
     this.network = network;
   }
 
+  generateRandomString = (length: number): string => {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
   generateRandomTxId = () => {
     const randomBuffer = Buffer.alloc(32);
     for (let i = 0; i < 32; i++) {
@@ -121,7 +132,7 @@ export class DataGenerator {
     const prev = previousPram ? previousPram : defaultParams;
 
     return {
-      version: prev.version ? prev.version + 1 : 0,
+      version: prev.version + 1,
       activationHeight:
         prev.activationHeight + this.getRandomIntegerBetween(0, 10000),
       stakingCapSat:
@@ -135,7 +146,7 @@ export class DataGenerator {
       minStakingAmountSat,
       maxStakingTimeBlocks,
       minStakingTimeBlocks,
-      confirmationDepth: Math.floor(Math.random() * 20),
+      confirmationDepth: this.getRandomIntegerBetween(1, 20),
       unbondingTime,
       tag,
     };
@@ -152,6 +163,7 @@ export class DataGenerator {
       versions.push(
         this.generateRandomGlobalParams(isFixedTimelock, lastVersion),
       );
+      lastVersion = versions[i];
     }
     return versions;
   };
@@ -242,7 +254,7 @@ export class DataGenerator {
     };
   };
 
-  createRandomStakingTx = (
+  createRandomStakingPsbt = (
     globalParams: GlobalParamsVersion[],
     txHeight: number,
     stakerKeysPairs?: KeyPairs,
@@ -283,10 +295,17 @@ export class DataGenerator {
         scriptPubKey,
       ),
     );
-    return unsignedStakingPsbt
+
+    const unsignedPsbt = unsignedStakingPsbt;
+
+    const signedPsbt = unsignedStakingPsbt
       .signAllInputs(stakerKeys.keyPair)
-      .finalizeAllInputs()
-      .extractTransaction();
+      .finalizeAllInputs();
+
+    return {
+      unsignedPsbt,
+      signedPsbt,
+    };
   };
 
   private getTaprootAddress = (publicKey: string) => {
