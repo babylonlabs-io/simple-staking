@@ -569,6 +569,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
               onStakingAmountSatChange={handleStakingAmountSatChange}
               onError={handleError}
               reset={resetFormInputs}
+              stakingFeeSat={stakingFeeSat}
             />
             <div className="flex justify-between w-full mt-3 mb-14">
               <p className="uppercase text-xs">

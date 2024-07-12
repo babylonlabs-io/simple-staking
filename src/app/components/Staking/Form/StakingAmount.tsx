@@ -15,6 +15,7 @@ interface StakingAmountProps {
   onStakingAmountSatChange: (inputAmountSat: number) => void;
   onError?: (error: string) => void;
   reset: boolean;
+  stakingFeeSat: number;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
@@ -24,6 +25,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   onStakingAmountSatChange,
   onError = () => {},
   reset,
+  stakingFeeSat,
 }) => {
   const initialStakingValue = () => {
     onStakingAmountSatChange(minStakingAmountSat);
@@ -117,12 +119,20 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   const handleMaxClick = () => {
     setError("");
     onError("");
+
+    const walletBalanceAfterFeeSat = btcWalletBalanceSat - stakingFeeSat;
+    const maxValueAfterFee =
+      walletBalanceAfterFeeSat > maxStakingAmountSat
+        ? maxStakingAmountSat
+        : walletBalanceAfterFeeSat;
+
     const maxValue = maxDecimals(
-      satoshiToBtc(btcWalletBalanceSat),
+      satoshiToBtc(maxValueAfterFee < 0 ? 0 : maxValueAfterFee),
       8,
     ).toString();
+
     setValue(maxValue);
-    onStakingAmountSatChange(btcWalletBalanceSat);
+    onStakingAmountSatChange(maxValueAfterFee < 0 ? 0 : maxValueAfterFee);
   };
 
   const handleMinClick = () => {

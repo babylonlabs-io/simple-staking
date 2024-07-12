@@ -334,6 +334,18 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  let totalPendingSat = 0;
+
+  if (delegationsLocalStorage) {
+    totalPendingSat = delegationsLocalStorage
+      // using only pending delegations
+      .filter((delegation) => delegation?.state === DelegationState.PENDING)
+      .reduce(
+        (accumulator: number, item) => accumulator + item?.stakingValueSat,
+        0,
+      );
+  }
+
   return (
     <main
       className={`relative h-full min-h-svh w-full pt-20 bg-es-bg ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -350,6 +362,8 @@ const Home: React.FC<HomeProps> = () => {
             onConnect={handleConnectModal}
             onStaking={handleStakingModal}
             address={address}
+            totalStakedSat={totalStakedSat}
+            totalPendingSat={totalPendingSat}
           />
           {/* {address && (
             <Summary
@@ -389,7 +403,6 @@ const Home: React.FC<HomeProps> = () => {
                   paramWithContext.nextBlockParams.currentVersion
                 }
                 publicKeyNoCoord={publicKeyNoCoord}
-                btcWallet={btcWallet}
                 btcWalletNetwork={btcWalletNetwork}
                 address={address}
                 signPsbtTx={signPsbtTransaction(btcWallet)}
