@@ -56,13 +56,6 @@ export class OKXWallet extends WalletProvider {
   }
 
   connectWallet = async (): Promise<this> => {
-    const workingVersion = "2.83.26";
-
-    const version = await window[okxProvider].getVersion();
-    if (version < workingVersion) {
-      throw new Error("Please update OKX Wallet to the latest version");
-    }
-
     try {
       await this.okxWallet.enable(); // Connect to OKX Wallet extension
     } catch (error) {
@@ -154,7 +147,7 @@ export class OKXWallet extends WalletProvider {
     }
     // subscribe to account change event
     if (eventName === "accountChanged") {
-      return this.okxWallet.on(eventName, callBack);
+      return this.bitcoinNetworkProvider.on(eventName, callBack);
     }
   };
 
