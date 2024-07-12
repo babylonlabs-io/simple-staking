@@ -10,7 +10,7 @@ interface NetworkBadgeProps {}
 
 export const NetworkBadge: React.FC<NetworkBadgeProps> = () => {
   return (
-    <div className="absolute left-2 top-[6rem]">
+    <div className="absolute left-2 top-[10rem] md:top-[6rem]">
       {[Network.SIGNET, Network.TESTNET].includes(network) && (
         <>
           <Image src={testnetIcon} alt="Testnet" className="w-[10rem]" />
