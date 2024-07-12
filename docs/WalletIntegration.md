@@ -217,17 +217,6 @@ export class OKXWallet extends WalletProvider {
   }
 
   connectWallet = async (): Promise<this> => {
-    const workingVersion = "2.83.26";
-    // check whether there is an OKX Wallet extension
-    if (!window.okxwallet) {
-      throw new Error("OKX Wallet extension not found");
-    }
-
-    const version = await window.okxwallet.getVersion();
-    if (version < workingVersion) {
-      throw new Error("Please update OKX Wallet to the latest version");
-    }
-
     const okxwallet = window.okxwallet;
     try {
       await okxwallet.enable(); // Connect to OKX Wallet extension
