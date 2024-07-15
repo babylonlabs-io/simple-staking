@@ -345,7 +345,7 @@ const Home: React.FC<HomeProps> = () => {
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
     >
-      <NetworkBadge />
+      <NetworkBadge isWalletConnected={!!btcWallet} />
       <Header
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
