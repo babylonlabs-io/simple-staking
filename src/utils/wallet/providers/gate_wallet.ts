@@ -1,4 +1,4 @@
-import { network, validateAddress } from "@/config/network.config";
+import { getNetworkConfig, network, validateAddress } from "@/config/network.config";
 
 import {
   getAddressBalance,
@@ -22,6 +22,7 @@ export class GateWallet extends WalletProvider {
   private gateWalletInfo: WalletInfo | undefined;
   private gateWallet: any;
   private bitcoinNetwork: any;
+  private networkEnv: Network | undefined;
 
   constructor() {
     super();
@@ -33,12 +34,24 @@ export class GateWallet extends WalletProvider {
 
     this.gateWallet = window[gateProvider];
     this.bitcoinNetwork = this.gateWallet?.bitcoin;
+
+    this.networkEnv = getNetworkConfig().network;
   }
 
   connectWallet = async (): Promise<this> => {
     let result;
     try {
-      result = await this.bitcoinNetwork.requestAccounts("SIGNET_TEST"); // Connect to Gate Wallet extension
+        switch (this.networkEnv) {  // Gatewallet not support testnet yet
+            case Network.MAINNET:
+                result = await this.bitcoinNetwork.requestAccounts(); // Connect to Gate Wallet extension
+                break;
+            case Network.SIGNET:
+                result = await this.bitcoinNetwork.requestAccounts("SIGNET_TEST");
+                break;
+            default:
+                throw new Error("Unsupported network");
+        }
+      
     } catch (error) {
       if ((error as Error)?.message?.includes("rejected")) {
         throw new Error("Connection to Gate Wallet was rejected");
@@ -119,7 +132,10 @@ export class GateWallet extends WalletProvider {
   };
 
   getNetwork = async (): Promise<Network> => {
-    return Network.SIGNET;
+    if (!this.networkEnv) {
+        throw new Error("Network not set");
+      }
+      return this.networkEnv;
   };
 
   on = (eventName: string, callBack: () => void) => {
