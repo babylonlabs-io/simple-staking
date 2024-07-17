@@ -22,6 +22,7 @@ COPY docker-entrypoint.sh .
 RUN NEXT_PUBLIC_MEMPOOL_API=APP_NEXT_PUBLIC_MEMPOOL_API \
     NEXT_PUBLIC_API_URL=APP_NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_NETWORK=APP_NEXT_PUBLIC_NETWORK \
+    NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES \
     yarn build
 
 # Step 2. Production image, copy all the files and run next
