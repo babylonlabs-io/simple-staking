@@ -1,8 +1,11 @@
 import { RiErrorWarningLine } from "react-icons/ri";
 
+import { shouldDisplayTestingMsg } from "@/config";
+
 interface TestingInfoProps {}
 
 export const TestingInfo: React.FC<TestingInfoProps> = () => {
+  if (!shouldDisplayTestingMsg()) return null;
   return (
     <div className="flex w-full justify-center">
       <div className="card flex w-full flex-col items-center gap-1 bg-base-200 p-3 text-sm lg:w-auto lg:flex-row lg:text-xs">
