@@ -33,13 +33,13 @@ export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
 
   return (
     address && (
-      <div className="relative flex text-sm w-full" ref={ref}>
+      <div className="relative flex text-sm" ref={ref}>
         <button
           className="flex cursor-pointer outline-none items-stretch w-full justify-between"
           onClick={() => setShowMenu(!showMenu)}
         >
           <div className="flex items-center rounded-lg border border-base-200/75 p-2 pr-4 w-full">
-            <div className="flex items-center gap-1 w-full justify-around">
+            <div className="flex items-center gap-1 w-full justify-center">
               <FaBitcoin className="text-primary" />
               <p>
                 <strong>
