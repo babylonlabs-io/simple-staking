@@ -550,6 +550,7 @@ export const Staking: React.FC<StakingProps> = ({
         minStakingTimeBlocks,
         maxStakingTimeBlocks,
         unbondingTime,
+        confirmationDepth,
       } = stakingParams;
 
       // Staking time is fixed
@@ -629,6 +630,7 @@ export const Staking: React.FC<StakingProps> = ({
                 stakingAmountSat={stakingAmountSat}
                 stakingTimeBlocks={stakingTimeBlocksWithFixed}
                 stakingFeeSat={stakingFeeSat}
+                confirmationDepth={confirmationDepth}
                 feeRate={feeRate}
                 unbondingTimeBlocks={unbondingTime}
               />
