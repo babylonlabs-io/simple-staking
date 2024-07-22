@@ -77,27 +77,6 @@ export async function pushTx(txHex: string): Promise<string> {
 }
 
 /**
- * Returns the balance of an address.
- * @param address - The Bitcoin address in string format.
- * @returns A promise that resolves to the amount of satoshis that the address
- *          holds.
- */
-// TODO balance should come from reduced UTXOs
-export async function getAddressBalance(address: string): Promise<number> {
-  const response = await fetch(addressInfoUrl(address));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
-  } else {
-    const addressInfo = await response.json();
-    return (
-      addressInfo.chain_stats.funded_txo_sum -
-      addressInfo.chain_stats.spent_txo_sum
-    );
-  }
-}
-
-/**
  * Retrieve the recommended Bitcoin network fees.
  * @returns A promise that resolves into a `Fees` object.
  */

@@ -23,7 +23,6 @@ import { getNetworkConfig } from "@/config/network.config";
 
 import { toNetwork } from "../..";
 import {
-  getAddressBalance,
   getFundingUTXOs,
   getNetworkFees,
   getTipHeight,
@@ -264,11 +263,6 @@ export class KeystoneWallet extends WalletProvider {
   };
 
   // Mempool calls
-
-  getBalance = async (): Promise<number> => {
-    return await getAddressBalance(await this.getAddress());
-  };
-
   getNetworkFees = async (): Promise<Fees> => {
     return await getNetworkFees();
   };

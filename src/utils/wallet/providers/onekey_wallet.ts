@@ -1,11 +1,6 @@
 import { getNetworkConfig } from "@/config/network.config";
 
-import {
-  getAddressBalance,
-  getFundingUTXOs,
-  getNetworkFees,
-  pushTx,
-} from "../../mempool_api";
+import { getFundingUTXOs, getNetworkFees, pushTx } from "../../mempool_api";
 import {
   Fees,
   Network,
@@ -139,10 +134,7 @@ export class OneKeyWallet extends WalletProvider {
     this.bitcoinNetworkProvider.on(eventName, callBack);
   }
 
-  async getBalance(): Promise<number> {
-    // mempool call
-    return getAddressBalance(await this.getAddress());
-  }
+  // Mempool calls
 
   async getNetworkFees(): Promise<Fees> {
     // mempool call

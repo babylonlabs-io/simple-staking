@@ -197,7 +197,6 @@ provided out of the box from the wallet exposed methods.
 ```ts
 import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
 import {
-  getAddressBalance,
   getTipHeight,
   getFundingUTXOs,
   getNetworkFees,
@@ -307,11 +306,6 @@ export class OKXWallet extends WalletProvider {
   };
 
   // Mempool calls
-
-  getBalance = async (): Promise<number> => {
-    return await getAddressBalance(await this.getAddress());
-  };
-
   getNetworkFees = async (): Promise<Fees> => {
     return await getNetworkFees();
   };
@@ -394,26 +388,6 @@ export async function pushTx(txHex: string): Promise<string> {
     }
   } else {
     return await response.text();
-  }
-}
-
-/**
- * Returns the balance of an address.
- * @param address - The Bitcoin address in string format.
- * @returns A promise that resolves to the amount of satoshis that the address
- *          holds.
- */
-export async function getAddressBalance(address: string): Promise<number> {
-  const response = await fetch(addressInfoUrl(address));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
-  } else {
-    const addressInfo = await response.json();
-    return (
-      addressInfo.chain_stats.funded_txo_sum -
-      addressInfo.chain_stats.spent_txo_sum
-    );
   }
 }
 

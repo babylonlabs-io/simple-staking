@@ -5,7 +5,6 @@ import {
 } from "@/config/network.config";
 
 import {
-  getAddressBalance,
   getFundingUTXOs,
   getNetworkFees,
   getTipHeight,
@@ -152,11 +151,6 @@ export class OKXWallet extends WalletProvider {
   };
 
   // Mempool calls
-
-  getBalance = async (): Promise<number> => {
-    return await getAddressBalance(await this.getAddress());
-  };
-
   getNetworkFees = async (): Promise<Fees> => {
     return await getNetworkFees();
   };
