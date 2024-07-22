@@ -3,9 +3,9 @@ FROM node:22-alpine3.19 AS builder
 
 WORKDIR /app
 
-COPY package.json yarn.lock* ./
-# Omit --production flag for TypeScript devDependencies
-RUN yarn --frozen-lockfile
+COPY package.json package-lock.json ./
+# Install dependencies with npm
+RUN npm ci
 
 COPY src ./src
 COPY public ./public
@@ -22,7 +22,8 @@ COPY docker-entrypoint.sh .
 RUN NEXT_PUBLIC_MEMPOOL_API=APP_NEXT_PUBLIC_MEMPOOL_API \
     NEXT_PUBLIC_API_URL=APP_NEXT_PUBLIC_API_URL \
     NEXT_PUBLIC_NETWORK=APP_NEXT_PUBLIC_NETWORK \
-    yarn build
+    NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=APP_NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES \
+    npm run build
 
 # Step 2. Production image, copy all the files and run next
 FROM node:22-alpine3.19 AS runner

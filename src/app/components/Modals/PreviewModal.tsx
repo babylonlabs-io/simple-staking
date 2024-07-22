@@ -17,6 +17,7 @@ interface PreviewModalProps {
   stakingFeeSat: number;
   feeRate: number;
   unbondingTimeBlocks: number;
+  confirmationDepth: number;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -29,6 +30,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   onSign,
   stakingFeeSat,
   feeRate,
+  confirmationDepth,
 }) => {
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
@@ -93,6 +95,12 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         <p className="dark:text-neutral-content">
           2. No third party possesses your staked {coinName}. You are the only
           one who can unbond and withdraw your stake.
+        </p>
+        <p className="dark:text-neutral-content">
+          3. Your stake will initially have the status of &quot;Pending&quot;
+          until it receives {confirmationDepth} Bitcoin confirmations.
+          &quot;Pending&quot; stake is only accessible through the device it was
+          created.
         </p>
         <div className="flex gap-4">
           <button
