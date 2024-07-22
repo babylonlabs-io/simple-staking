@@ -1,5 +1,4 @@
 import { getFundingUTXOs } from "@/utils/mempool_api";
-import { UTXO } from "@/utils/wallet/wallet_provider";
 
 // Mocking fetch globally
 global.fetch = jest.fn() as jest.Mock;
@@ -9,29 +8,6 @@ jest.mock("@/config/network.config", () => ({
   getNetworkConfig: jest.fn(() => ({
     mempoolApiUrl: "https://babylon.mempool.space",
   })),
-}));
-
-// Transaction with BRC20
-const txIDWithBrc20 = "txWithBRC20";
-
-jest.mock("@/app/api/postFilterOrdinals", () => ({
-  postFilterOrdinals: async (utxos: UTXO[]): Promise<UTXO[]> => {
-    // Simulated API response
-    const apiResponse = [
-      {
-        txid: txIDWithBrc20,
-        isBrc20: true,
-      },
-    ];
-
-    // Filter out UTXOs based on the simulated API response
-    const filteredUtxos = utxos.filter((utxo) => {
-      const responseItem = apiResponse.find((item) => item.txid === utxo.txid);
-      return responseItem ? !responseItem.isBrc20 : true;
-    });
-
-    return filteredUtxos;
-  },
 }));
 
 describe("getFundingUTXOs", () => {
@@ -51,18 +27,6 @@ describe("getFundingUTXOs", () => {
         block_time: 1720789592,
       },
       value: 10000,
-    },
-    {
-      txid: txIDWithBrc20,
-      vout: 1,
-      status: {
-        confirmed: true,
-        block_height: 851842,
-        block_hash:
-          "000000000000000000010995e987a0e4e10420d84895ed555bad221a9686ca66",
-        block_time: 1720789492,
-      },
-      value: 150000,
     },
     {
       txid: "unconfirmed utxo",
@@ -100,7 +64,7 @@ describe("getFundingUTXOs", () => {
     scriptPubKey: "",
   };
 
-  it("should return UTXOs that satisfy the amount requirement, excluding BRC-20 ordinals", async () => {
+  it("should return UTXOs that satisfy the amount requirement", async () => {
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
         if (
@@ -135,7 +99,7 @@ describe("getFundingUTXOs", () => {
     ]);
   });
 
-  it("should return all confirmed UTXOs if no amount is provided, excluding BRC-20 ordinals", async () => {
+  it("should return all confirmed UTXOs if no amount is provided", async () => {
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
         if (
