@@ -45,9 +45,7 @@ export const Summary: React.FC<SummaryProps> = ({
             <FaBitcoin className="text-primary" size={16} />
             {typeof btcWalletBalanceSat === "number" ? (
               <p className="whitespace-nowrap font-semibold">
-                <strong>
-                  {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)} {coinName}
-                </strong>
+                {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)} {coinName}
               </p>
             ) : (
               <LoadingSmall text="Loading..." />
