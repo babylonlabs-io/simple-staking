@@ -59,7 +59,7 @@ interface StakingProps {
   finalityProvidersHasNext: boolean;
   finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
-  btcWalletBalanceSat: number;
+  btcWalletBalanceSat?: number;
   btcWalletNetwork: networks.Network | undefined;
   address: string | undefined;
   publicKeyNoCoord: string;
