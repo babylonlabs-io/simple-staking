@@ -139,7 +139,9 @@ export const Staking: React.FC<StakingProps> = ({
     queryKey: ["available UTXOs", address],
     queryFn: async () => {
       if (btcWallet?.getUtxos && address) {
+        // all confirmed UTXOs from the wallet
         const mempoolUTXOs = await btcWallet.getUtxos(address);
+        // filter out the ordinals
         const filteredUTXOs = await postFilterOrdinals(mempoolUTXOs, address);
         return filteredUTXOs;
       }
