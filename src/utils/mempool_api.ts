@@ -1,4 +1,3 @@
-import { postFilterOrdinals } from "@/app/api/postFilterOrdinals";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { Fees, UTXO } from "./wallet/wallet_provider";
@@ -156,25 +155,13 @@ export async function getFundingUTXOs(
     .filter((utxo: any) => utxo.status.confirmed)
     .sort((a: any, b: any) => b.value - a.value);
 
-  let confirmedUTXOsWithoutOrdinals = null;
-  try {
-    // Filter out ordinals
-    confirmedUTXOsWithoutOrdinals = await postFilterOrdinals(
-      confirmedUTXOs,
-      address,
-    );
-  } catch (error: Error | any) {
-    // If the API call fails, we will use the original list of UTXOs
-    confirmedUTXOsWithoutOrdinals = confirmedUTXOs;
-  }
-
   // If amount is provided, reduce the list of UTXOs into a list that
   // contains just enough UTXOs to satisfy the `amount` requirement.
-  let sliced = confirmedUTXOsWithoutOrdinals;
+  let sliced = confirmedUTXOs;
   if (amount) {
     var sum = 0;
-    for (var i = 0; i < confirmedUTXOsWithoutOrdinals.length; ++i) {
-      sum += confirmedUTXOsWithoutOrdinals[i].value;
+    for (var i = 0; i < confirmedUTXOs.length; ++i) {
+      sum += confirmedUTXOs[i].value;
       if (sum > amount) {
         break;
       }
@@ -182,7 +169,7 @@ export async function getFundingUTXOs(
     if (sum < amount) {
       return [];
     }
-    sliced = confirmedUTXOsWithoutOrdinals.slice(0, i + 1);
+    sliced = confirmedUTXOs.slice(0, i + 1);
   }
 
   const response = await fetch(validateAddressUrl(address));
