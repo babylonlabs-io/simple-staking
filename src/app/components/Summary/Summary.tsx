@@ -6,16 +6,18 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
 import { Network } from "@/utils/wallet/wallet_provider";
 
+import { LoadingSmall } from "../Loading/Loading";
+
 interface SummaryProps {
   address: string;
   totalStakedSat: number;
-  balanceSat: number;
+  btcWalletBalanceSat?: number;
 }
 
 export const Summary: React.FC<SummaryProps> = ({
   address,
   totalStakedSat,
-  balanceSat,
+  btcWalletBalanceSat,
 }) => {
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
@@ -41,10 +43,15 @@ export const Summary: React.FC<SummaryProps> = ({
           <p className="dark:text-neutral-content">Balance</p>
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
-            <p className="whitespace-nowrap font-semibold">
-              {balanceSat ? maxDecimals(satoshiToBtc(balanceSat), 8) : 0}{" "}
-              {coinName}
-            </p>
+            {typeof btcWalletBalanceSat === "number" ? (
+              <p className="whitespace-nowrap font-semibold">
+                <strong>
+                  {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)} {coinName}
+                </strong>
+              </p>
+            ) : (
+              <LoadingSmall text="Loading..." />
+            )}
           </div>
           <p className="hidden xl:flex xl:text-sm 2xl:ml-2">{trim(address)}</p>
         </div>
