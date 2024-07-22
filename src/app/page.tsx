@@ -25,6 +25,7 @@ import {
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { postFilterOrdinals } from "./api/postFilterOrdinals";
+import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -159,7 +160,7 @@ const Home: React.FC<HomeProps> = () => {
     isError: hasAvailableUTXOsError,
     refetch: refetchAvailableUTXOs,
   } = useQuery({
-    queryKey: ["available UTXOs", address],
+    queryKey: [UTXO_KEY, address],
     queryFn: async () => {
       if (btcWallet?.getUtxos && address) {
         // all confirmed UTXOs from the wallet
