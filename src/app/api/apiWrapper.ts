@@ -5,6 +5,7 @@ export const apiWrapper = async (
   url: string,
   generalErrorMessage: string,
   params?: any,
+  timeout?: number,
 ) => {
   let response;
   let handler;
@@ -28,6 +29,9 @@ export const apiWrapper = async (
         : {
             params,
           },
+      {
+        timeout: timeout || 0, // 0 is no timeout
+      },
     );
   } catch (error) {
     if (axios.isAxiosError(error)) {
