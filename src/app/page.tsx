@@ -416,6 +416,7 @@ const Home: React.FC<HomeProps> = () => {
             address={address}
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
+            availableUTXOs={availableUTXOs}
           />
           {btcWallet &&
             delegations &&
