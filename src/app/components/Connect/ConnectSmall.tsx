@@ -35,12 +35,12 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   const { coinName, networkName } = getNetworkConfig();
 
   return address ? (
-    <div className="relative mr-[-10px] flex text-sm" ref={ref}>
+    <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>
       <button
-        className="flex cursor-pointer outline-none"
+        className="flex cursor-pointer outline-none items-stretch"
         onClick={() => setShowMenu(!showMenu)}
       >
-        <div className="rounded-lg border border-base-200/75 p-2 pr-4">
+        <div className="flex items-center rounded-lg border border-base-200/75 p-2 pr-4">
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" />
             <p>
@@ -50,7 +50,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             </p>
           </div>
         </div>
-        <div className="relative right-[10px] rounded-lg border border-primary bg-[#fdf2ec] p-2 dark:border-white dark:bg-base-200">
+        <div className="relative right-[10px] flex items-center rounded-lg border border-primary bg-[#fdf2ec] p-2 dark:border-white dark:bg-base-200">
           {trim(address)}
         </div>
       </button>

@@ -6,11 +6,17 @@ import { Network } from "@/utils/wallet/wallet_provider";
 import testnetIcon from "./testnet-icon.png";
 
 // This component can also be used rendering based on the network type
-interface NetworkBadgeProps {}
+interface NetworkBadgeProps {
+  isWalletConnected: boolean;
+}
 
-export const NetworkBadge: React.FC<NetworkBadgeProps> = () => {
+export const NetworkBadge: React.FC<NetworkBadgeProps> = ({
+  isWalletConnected,
+}) => {
   return (
-    <div className="absolute left-2 top-[6rem]">
+    <div
+      className={`absolute left-2 ${isWalletConnected ? "top-40 md:top-24 lg:top-32" : "top-24 md:top-24 lg:top-32"}`}
+    >
       {[Network.SIGNET, Network.TESTNET].includes(network) && (
         <>
           <Image src={testnetIcon} alt="Testnet" className="w-[10rem]" />
