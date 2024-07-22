@@ -4,7 +4,6 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
-import { postFilterOrdinals } from "@/app/api/postFilterOrdinals";
 import {
   OVERFLOW_HEIGHT_WARNING_THRESHOLD,
   OVERFLOW_TVL_WARNING_THRESHOLD,
@@ -28,7 +27,7 @@ import {
 } from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { UTXO, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
 import { PreviewModal } from "../Modals/PreviewModal";
@@ -64,6 +63,7 @@ interface StakingProps {
   address: string | undefined;
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
+  availableUTXOs?: UTXO[] | undefined;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -81,6 +81,7 @@ export const Staking: React.FC<StakingProps> = ({
   publicKeyNoCoord,
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
+  availableUTXOs,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -124,30 +125,6 @@ export const Staking: React.FC<StakingProps> = ({
     },
     enabled: !!btcWallet?.getNetworkFees,
     refetchInterval: 60000, // 1 minute
-    retry: (failureCount) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
-
-  // Fetch all UTXOs
-  const {
-    data: availableUTXOs,
-    error: availableUTXOsError,
-    isError: hasAvailableUTXOsError,
-    refetch: refetchAvailableUTXOs,
-  } = useQuery({
-    queryKey: ["available UTXOs", address],
-    queryFn: async () => {
-      if (btcWallet?.getUtxos && address) {
-        // all confirmed UTXOs from the wallet
-        const mempoolUTXOs = await btcWallet.getUtxos(address);
-        // filter out the ordinals
-        const filteredUTXOs = await postFilterOrdinals(mempoolUTXOs, address);
-        return filteredUTXOs;
-      }
-    },
-    enabled: !!(btcWallet?.getUtxos && address),
-    refetchInterval: 60000 * 5, // 5 minutes
     retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
     },
@@ -240,19 +217,10 @@ export const Staking: React.FC<StakingProps> = ({
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchMempoolFeeRates,
     });
-    handleError({
-      error: availableUTXOsError,
-      hasError: hasAvailableUTXOsError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchAvailableUTXOs,
-    });
   }, [
-    availableUTXOsError,
     mempoolFeeRatesError,
     hasMempoolFeeRatesError,
-    hasAvailableUTXOsError,
     refetchMempoolFeeRates,
-    refetchAvailableUTXOs,
     showError,
   ]);
 
