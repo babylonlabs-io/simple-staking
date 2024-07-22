@@ -4,6 +4,7 @@ import { apiWrapper } from "./apiWrapper";
 
 interface UtxoInfo {
   txid: string;
+  vout: number;
   inscription: boolean;
 }
 
@@ -23,15 +24,18 @@ export const postFilterOrdinals = async (
       })),
     },
   );
-  // turn the data into map with key of the txid
+  // turn the data into map with key of the `txid:vout`
   const utxoInfoMap = data.data.reduce(
-    (acc: Record<string, boolean>, utxo: UtxoInfo) => {
-      acc[utxo.txid] = utxo.inscription;
+    (acc: Record<string, boolean>, u: UtxoInfo) => {
+      acc[getUTXOIdentifier(u)] = u.inscription;
       return acc;
     },
     {},
   );
 
   // filter out the ordinals
-  return utxos.filter((utxo) => !utxoInfoMap[utxo.txid]);
+  return utxos.filter((utxo) => !utxoInfoMap[getUTXOIdentifier(utxo)]);
 };
+
+const getUTXOIdentifier = (utxo: { txid: string; vout: number }) =>
+  `${utxo.txid}:${utxo.vout}`;
