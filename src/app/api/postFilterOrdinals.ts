@@ -24,6 +24,7 @@ export const postFilterOrdinals = async (
       })),
     },
   );
+
   // turn the data into map with key of the `txid:vout`
   const utxoInfoMap = data.data.reduce(
     (acc: Record<string, boolean>, u: UtxoInfo) => {
@@ -37,5 +38,6 @@ export const postFilterOrdinals = async (
   return utxos.filter((utxo) => !utxoInfoMap[getUTXOIdentifier(utxo)]);
 };
 
+// helper function to get the identifier of a UTXO
 const getUTXOIdentifier = (utxo: { txid: string; vout: number }) =>
   `${utxo.txid}:${utxo.vout}`;
