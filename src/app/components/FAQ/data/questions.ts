@@ -75,4 +75,9 @@ export const questions = (coinName: string) => [
     </ol><br />
     <p>In summary, to stake S, you need S + Fs, and upon completion, you get S - Fw or S - Fu - Fw back, depending on whether you wait for expiration or unbond early.</p>`,
   },
+  {
+    title:
+      "Is it ok to use a wallet holding fungible tokens built on Bitcoin (e.g. BRC-20/ARC-20/Runes)?",
+    content: `<p>No, this should be avoided. The fungible tokens built on Bitcoin ecosystem is still in its infancy and in an experimental phase. Software built for the detection of such tokens to avoid their misspending comes without a warranty and guarantees, making it risky to connect wallets owning such tokens to dApps.</p>`,
+  },
 ];
