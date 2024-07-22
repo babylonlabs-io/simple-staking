@@ -4,6 +4,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
+import { postFilterOrdinals } from "@/app/api/postFilterOrdinals";
 import {
   OVERFLOW_HEIGHT_WARNING_THRESHOLD,
   OVERFLOW_TVL_WARNING_THRESHOLD,
@@ -138,7 +139,9 @@ export const Staking: React.FC<StakingProps> = ({
     queryKey: ["available UTXOs", address],
     queryFn: async () => {
       if (btcWallet?.getUtxos && address) {
-        return await btcWallet.getUtxos(address);
+        const mempoolUTXOs = await btcWallet.getUtxos(address);
+        const filteredUTXOs = await postFilterOrdinals(mempoolUTXOs, address);
+        return filteredUTXOs;
       }
     },
     enabled: !!(btcWallet?.getUtxos && address),
