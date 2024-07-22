@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Transaction, networks } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
@@ -7,6 +7,7 @@ import { useLocalStorage } from "usehooks-ts";
 import {
   OVERFLOW_HEIGHT_WARNING_THRESHOLD,
   OVERFLOW_TVL_WARNING_THRESHOLD,
+  UTXO_KEY,
 } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
@@ -238,6 +239,8 @@ export const Staking: React.FC<StakingProps> = ({
   // Either use the selected fee rate or the fastest fee rate
   const feeRate = selectedFeeRate || defaultFeeRate;
 
+  const queryClient = useQueryClient();
+
   const handleSign = async () => {
     try {
       // Initial validation
@@ -266,6 +269,8 @@ export const Staking: React.FC<StakingProps> = ({
         feeRate,
         availableUTXOs,
       );
+      // Invalidate UTXOs
+      queryClient.invalidateQueries({ queryKey: [UTXO_KEY, address] });
       // UI
       handleFeedbackModal("success");
       handleLocalStorageDelegations(stakingTxHex, stakingTerm);
