@@ -159,7 +159,10 @@ export async function getFundingUTXOs(
   let confirmedUTXOsWithoutOrdinals = null;
   try {
     // Filter out ordinals
-    confirmedUTXOsWithoutOrdinals = await postFilterOrdinals(confirmedUTXOs);
+    confirmedUTXOsWithoutOrdinals = await postFilterOrdinals(
+      confirmedUTXOs,
+      address,
+    );
   } catch (error: Error | any) {
     // If the API call fails, we will use the original list of UTXOs
     confirmedUTXOsWithoutOrdinals = confirmedUTXOs;
