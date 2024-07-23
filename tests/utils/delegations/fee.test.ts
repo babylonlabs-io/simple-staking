@@ -12,10 +12,11 @@ describe("txFeeSafetyCheck", () => {
       globalParams[
         dataGenerator.getRandomIntegerBetween(0, globalParams.length - 1)
       ];
-    const tx = dataGenerator.createRandomStakingTx(
+    const { signedPsbt } = dataGenerator.createRandomStakingPsbt(
       globalParams,
       randomParam.activationHeight + 1,
     );
+    const tx = signedPsbt.extractTransaction();
     describe(`on ${networkName} - `, () => {
       test("should not throw an error if the estimated fee is within the acceptable range", () => {
         let estimatedFee = (tx.virtualSize() * feeRate) / 2 + 1;

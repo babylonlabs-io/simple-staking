@@ -1,6 +1,9 @@
 import { shouldDisplayTestingMsg } from "@/config";
 
 describe("shouldDisplayTestingMsg", () => {
+  beforeEach(() => {
+    delete process.env.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES;
+  });
   afterEach(() => {
     delete process.env.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES;
   });
