@@ -1,4 +1,4 @@
-name: Call Sync Branch
+name: Sync PR Dev to Main
 
 on:
   schedule:
