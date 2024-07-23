@@ -1,0 +1,14 @@
+name: Call Sync Branch
+
+on:
+  schedule:
+  - cron: "50 3 * * *" 
+
+jobs:
+  call_sync_branch:
+    uses: babylonchain/.github/.github/workflows/reusable_sync_branch.yml@hiep/add-sync-branch
+    with:
+      base_branch: 'dev'
+      target_branch: 'main'
+      reviewers: 'hiepmai-babylonchain,jrwbabylonchain'
+    secrets: inherit
