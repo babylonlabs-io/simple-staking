@@ -41,7 +41,7 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <ConnectedSmall
             address={address}
-            balanceSat={balanceSat}
+            btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
           />
         </div>
