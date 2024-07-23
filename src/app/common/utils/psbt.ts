@@ -14,11 +14,16 @@ export const signPsbtTransaction = (wallet: WalletProvider) => {
     const signedHex = await wallet.signPsbt(psbtHex);
     const providerName = await wallet.getWalletProviderName();
     if (SIGN_PSBT_NOT_COMPATIBLE_WALLETS.includes(providerName)) {
-      // The old implementation of signPsbt returns the signed transaction in hex
-      return Transaction.fromHex(signedHex);
+      try {
+        // Try to parse the signedHex as PSBT to see if it follows the new implementation
+        return Psbt.fromHex(signedHex).extractTransaction();
+      } catch {
+        // If parsing fails, it's the old version implementation
+        return Transaction.fromHex(signedHex);
+      }
     }
-    // The new implementation of signPsbt returns the signed PSBT in hex
-    // We need to extract the transaction from the PSBT
+
+    // For compatible wallets, directly extract the transaction from the signed PSBT
     return Psbt.fromHex(signedHex).extractTransaction();
   };
 };
