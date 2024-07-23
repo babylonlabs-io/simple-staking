@@ -9,13 +9,13 @@ interface UtxoInfo {
   inscription: boolean;
 }
 
+const TIMEOUT_DURATION = 2000; // 2 seconds
+const BATCH_SIZE = 30;
+
 export const postFilterOrdinals = async (
   utxos: UTXO[],
   address: string,
 ): Promise<UTXO[]> => {
-  const TIMEOUT_DURATION = 2000; // 2 seconds
-  const BATCH_SIZE = 30;
-
   try {
     const utxoChunks = chunkArray(utxos, BATCH_SIZE);
     const responses = await Promise.all(
