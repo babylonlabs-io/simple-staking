@@ -19,7 +19,8 @@ export const getCurrentGlobalParamsVersion = (
     throw new Error("No global params versions found");
   }
   // Step 1: Sort the versions in descending order based on activationHeight
-  const sorted = versionedParams.sort(
+  // Note, we have cloned the array to avoid mutating the original array
+  const sorted = [...versionedParams].sort(
     (a, b) => b.activationHeight - a.activationHeight,
   );
 
