@@ -9,16 +9,17 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
 
 import { Hash } from "../Hash/Hash";
+import { LoadingSmall } from "../Loading/Loading";
 
 interface ConnectedSmallProps {
   address: string;
-  balanceSat: number;
+  btcWalletBalanceSat?: number;
   onDisconnect: () => void;
 }
 
 export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
   address,
-  balanceSat,
+  btcWalletBalanceSat,
   onDisconnect,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
@@ -42,9 +43,16 @@ export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
             <div className="flex items-center gap-1 w-full justify-center">
               <FaBitcoin className="text-primary" />
               <p>
-                <strong>
-                  {maxDecimals(satoshiToBtc(balanceSat), 8) || 0} {coinName}
-                </strong>
+                {typeof btcWalletBalanceSat === "number" ? (
+                  <p>
+                    <strong>
+                      {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)}{" "}
+                      {coinName}
+                    </strong>
+                  </p>
+                ) : (
+                  <LoadingSmall text="Loading..." />
+                )}
               </p>
             </div>
           </div>
