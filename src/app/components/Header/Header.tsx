@@ -1,3 +1,5 @@
+import { HealthCheckResult } from "@/app/types/healthCheck";
+
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
@@ -10,6 +12,7 @@ interface HeaderProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
+  healthCheck?: HealthCheckResult;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
+  healthCheck,
 }) => {
   return (
     <nav>
@@ -33,6 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
+            healthCheck={healthCheck}
           />
           <ThemeToggle />
         </div>
