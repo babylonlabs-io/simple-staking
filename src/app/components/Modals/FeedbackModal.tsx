@@ -1,5 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 
+import { getNetworkConfig } from "@/config/network.config";
+
 import { GeneralModal } from "./GeneralModal";
 
 interface FeedbackModalProps {
@@ -8,78 +10,117 @@ interface FeedbackModalProps {
   type: "success" | "cancel" | null;
 }
 
-const SuccessContent = () => {
+interface ContentProps {
+  networkName: string;
+}
+
+const SuccessContent: React.FC<ContentProps> = ({ networkName }) => {
   return (
     <div className="text-text-black dark:text-white">
       <div className="mt-6 flex flex-col gap-4">
-        <p>Congratulations on successfully staking your BTC!</p>
         <p>
-          Note that for your Bitcoin Stake to become Active it needs to be
-          included in a Bitcoin block with sufficient confirmations. This might
-          take up to two hours, so stay tuned!
+          You have successfully completed your Bitcoin staking journey on our{" "}
+          {networkName}. Your contribution helps secure the decentralized
+          economy.
         </p>
-        <p>
-          Your participation is crucial to our testnet’s success. We invite you
-          to share your experience and feedback in our dedicated thread on the
-          Babylon Forum. Your insights are valuable to us and will help us
-          understand your experience with Bitcoin staking on our Testnet.
-        </p>
-        <p>
-          Visit the{" "}
-          <a
-            href="https://forum.babylonlabs.io/c/testnet/41"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary"
-          >
-            Testnet Feedback Megathread
-          </a>{" "}
-          to post your thoughts.
-        </p>
-        <p>
-          Thank you for being a part of this groundbreaking journey with us!
-        </p>
+        <ul className="list-disc pl-4">
+          <li>
+            <strong>Feedback:</strong> Share your experience on our{" "}
+            <a
+              href="https://forum.babylonlabs.io/c/feedback/44"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Feedback Forum
+            </a>{" "}
+            or{" "}
+            <a
+              href="https://discord.com/invite/babylonglobal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Discord
+            </a>{" "}
+            (<code>#feedback</code> channel).
+          </li>
+          <li>
+            <strong>Report Bugs:</strong> Help us improve by reporting any
+            issues on our{" "}
+            <a
+              href="https://forum.babylonlabs.io/c/support/45"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Support Forum
+            </a>{" "}
+            or{" "}
+            <a
+              href="https://discord.com/invite/babylonglobal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Discord
+            </a>{" "}
+            (<code>#support</code> channel).
+          </li>
+        </ul>
+        <p>Thank you for being a part of the Babylon community!</p>
       </div>
     </div>
   );
 };
 
-const CancelContent = () => {
+const CancelContent: React.FC<ContentProps> = ({ networkName }) => {
   return (
     <div className="text-text-black dark:text-white">
       <div className="mt-6 flex flex-col gap-4">
         <p>
-          We noticed you’re leaving the Bitcoin staking process on our Testnet.
-          Your input is important to us, and we’d appreciate it if you can let
-          us know why.
+          It looks like you didn’t complete your staking journey. We&apos;d love
+          to help you get back on track or hear about any issues you faced.
         </p>
+        <ul className="list-disc pl-4">
+          <li>
+            <strong>Need Assistance?</strong> Reach out on our{" "}
+            <a
+              href="https://discord.com/invite/babylonglobal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Discord
+            </a>{" "}
+            (<code>#support</code> channel).
+          </li>
+          <li>
+            <strong>Feedback:</strong> Let us know your thoughts on our{" "}
+            <a
+              href="https://forum.babylonlabs.io/c/feedback/44"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Feedback Forum
+            </a>{" "}
+            or{" "}
+            <a
+              href="https://discord.com/invite/babylonglobal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary"
+            >
+              Discord
+            </a>{" "}
+            (<code>#feedback</code> channel).
+          </li>
+        </ul>
         <p>
-          If you need any help with Bitcoin staking, please{" "}
-          <a
-            href="https://forum.babylonlabs.io/c/testnet/41"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary"
-          >
-            Open a New Topic
-          </a>{" "}
-          on our forum and we’d be happy to assist.
-        </p>
-        <p>
-          You can also add your feedback to the{" "}
-          <a
-            href="https://forum.babylonlabs.io/t/feedback-megathread/183"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-primary"
-          >
-            Testnet Feedback Megathread
-          </a>{" "}
-          to help us make the process better.
-        </p>
-        <p>
-          Thank you for being a part of our Bitcoin Staking Protocol Testnet
-          event!
+          Your feedback is crucial for us to improve and provide a seamless
+          experience. Thank you for being a part of our Bitcoin Staking Protocol{" "}
+          {networkName}!
         </p>
       </div>
     </div>
@@ -91,13 +132,13 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
   onClose,
   type,
 }) => {
+  const { networkName } = getNetworkConfig();
+
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">
-          {type === "success"
-            ? "Share your Staking Experience!"
-            : "We Value Your Feedback"}
+          {type === "success" ? "Congratulations!" : "We Value Your Feedback"}
         </h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
@@ -106,8 +147,8 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
           <IoMdClose size={24} />
         </button>
       </div>
-      {type === "success" && <SuccessContent />}
-      {type === "cancel" && <CancelContent />}
+      {type === "success" && <SuccessContent networkName={networkName} />}
+      {type === "cancel" && <CancelContent networkName={networkName} />}
     </GeneralModal>
   );
 };
