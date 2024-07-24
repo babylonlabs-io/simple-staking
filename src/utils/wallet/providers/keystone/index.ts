@@ -30,7 +30,13 @@ import {
   pushTx,
 } from "../../../mempool_api";
 import { WalletError, WalletErrorType } from "../../errors";
-import { Fees, Network, UTXO, WalletProvider } from "../../wallet_provider";
+import {
+  Fees,
+  Inscription,
+  Network,
+  UTXO,
+  WalletProvider,
+} from "../../wallet_provider";
 
 import BIP322 from "./bip322";
 
@@ -285,6 +291,10 @@ export class KeystoneWallet extends WalletProvider {
   getBTCTipHeight = async (): Promise<number> => {
     return await getTipHeight();
   };
+
+  getInscriptions(): Promise<Inscription[]> {
+    throw new Error("Method not implemented.");
+  }
 }
 
 /**

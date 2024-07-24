@@ -12,7 +12,9 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
+  DEFAULT_INSCRIPTION_LIMIT,
   Fees,
+  Inscription,
   Network,
   UTXO,
   WalletInfo,
@@ -152,7 +154,6 @@ export class OKXWallet extends WalletProvider {
   };
 
   // Mempool calls
-
   getBalance = async (): Promise<number> => {
     return await getAddressBalance(await this.getAddress());
   };
@@ -172,5 +173,26 @@ export class OKXWallet extends WalletProvider {
 
   getBTCTipHeight = async (): Promise<number> => {
     return await getTipHeight();
+  };
+
+  // Inscriptions are only available on OKX Wallet BTC mainnet (i.e okxWallet.bitcoin)
+  getInscriptions = async (): Promise<Inscription[]> => {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
+    const inscriptions: Inscription[] = [];
+    let cursor = 0;
+    while (true) {
+      const { list } = await this.bitcoinNetworkProvider.getInscriptions(
+        cursor,
+        DEFAULT_INSCRIPTION_LIMIT,
+      );
+      inscriptions.push(...list);
+      if (list.length < DEFAULT_INSCRIPTION_LIMIT) {
+        break;
+      }
+      cursor += DEFAULT_INSCRIPTION_LIMIT;
+    }
+    return inscriptions;
   };
 }

@@ -23,6 +23,11 @@ export interface UTXO {
   scriptPubKey: string;
 }
 
+export interface Inscription {
+  // output of the inscription in the format of `txid:vout`
+  output: string;
+}
+
 // supported networks
 export enum Network {
   MAINNET = "mainnet",
@@ -35,6 +40,9 @@ export type WalletInfo = {
   publicKeyHex: string;
   address: string;
 };
+
+// Default number of inscriptions to fetch in a single method call
+export const DEFAULT_INSCRIPTION_LIMIT = 100;
 
 /**
  * Abstract class representing a wallet provider.
@@ -140,4 +148,10 @@ export abstract class WalletProvider {
    * @returns A promise that resolves to the block height.
    */
   abstract getBTCTipHeight(): Promise<number>;
+
+  /**
+   * Retrieves the inscriptions for the connected wallet.
+   * @returns A promise that resolves to an array of inscriptions.
+   */
+  abstract getInscriptions(): Promise<Inscription[]>;
 }
