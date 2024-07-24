@@ -8,14 +8,14 @@ import { Logo } from "./Logo";
 interface HeaderProps {
   onConnect: () => void;
   address: string;
-  balanceSat: number;
+  btcWalletBalanceSat?: number;
   onDisconnect: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onConnect,
   address,
-  balanceSat,
+  btcWalletBalanceSat,
   onDisconnect,
 }) => {
   return (
@@ -31,17 +31,17 @@ export const Header: React.FC<HeaderProps> = ({
           <ConnectSmall
             onConnect={onConnect}
             address={address}
-            balanceSat={balanceSat}
+            btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
           />
           <ThemeToggle />
         </div>
         <div
-          className={`container mx-auto flex w-full items-center gap-4 ${address ? "justify-end p-6 pt-0" : ""} md:hidden md:p-0`}
+          className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
         >
           <ConnectedSmall
             address={address}
-            balanceSat={balanceSat}
+            btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
           />
         </div>

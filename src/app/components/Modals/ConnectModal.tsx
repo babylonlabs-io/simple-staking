@@ -26,7 +26,8 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   onConnect,
   connectDisabled,
 }) => {
-  const [accepted, setAccepted] = useState(false);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [noInscription, setNoInscription] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
@@ -139,8 +140,8 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             <input
               type="checkbox"
               className="checkbox-primary checkbox"
-              onChange={(e) => setAccepted(e.target.checked)}
-              checked={accepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+              checked={termsAccepted}
             />
             <span className="label-text">
               I certify that I have read and accept the updated{" "}
@@ -151,6 +152,20 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                 Terms of Use
               </button>
               .
+            </span>
+          </label>
+        </div>
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-2 rounded-xl bg-base-100 p-4">
+            <input
+              type="checkbox"
+              className="checkbox-primary checkbox"
+              onChange={(e) => setNoInscription(e.target.checked)}
+              checked={noInscription}
+            />
+            <span className="label-text">
+              I certify that there are no Bitcoin inscriptions tokens in my
+              wallet.
             </span>
           </label>
         </div>
@@ -216,7 +231,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
         <button
           className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-lg px-2 text-white"
           onClick={handleConnect}
-          disabled={connectDisabled || !accepted || !selectedWallet}
+          disabled={
+            connectDisabled ||
+            !termsAccepted ||
+            !selectedWallet ||
+            !noInscription
+          }
         >
           <PiWalletBold size={20} />
           Connect to {networkName} network

@@ -24,6 +24,8 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
+import { postFilterOrdinals } from "./api/postFilterOrdinals";
+import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -45,7 +47,6 @@ interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
-  const [btcWalletBalanceSat, setBTCWalletBalanceSat] = useState(0);
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
@@ -147,7 +148,31 @@ const Home: React.FC<HomeProps> = () => {
 
       return flattenedData;
     },
-    retry: (failureCount, error) => {
+    retry: (failureCount, _error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
+  });
+
+  // Fetch all UTXOs
+  const {
+    data: availableUTXOs,
+    error: availableUTXOsError,
+    isError: hasAvailableUTXOsError,
+    refetch: refetchAvailableUTXOs,
+  } = useQuery({
+    queryKey: [UTXO_KEY, address],
+    queryFn: async () => {
+      if (btcWallet?.getUtxos && address) {
+        // all confirmed UTXOs from the wallet
+        const mempoolUTXOs = await btcWallet.getUtxos(address);
+        // filter out the ordinals
+        const filteredUTXOs = await postFilterOrdinals(mempoolUTXOs, address);
+        return filteredUTXOs;
+      }
+    },
+    enabled: !!(btcWallet?.getUtxos && address),
+    refetchInterval: 60000 * 5, // 5 minutes
+    retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
     },
   });
@@ -189,6 +214,12 @@ const Home: React.FC<HomeProps> = () => {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchGlobalParamsVersion,
     });
+    handleError({
+      error: availableUTXOsError,
+      hasError: hasAvailableUTXOsError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchAvailableUTXOs,
+    });
   }, [
     hasFinalityProvidersError,
     hasGlobalParamsVersionError,
@@ -201,6 +232,9 @@ const Home: React.FC<HomeProps> = () => {
     globalParamsVersionError,
     refetchGlobalParamsVersion,
     showError,
+    availableUTXOsError,
+    hasAvailableUTXOsError,
+    refetchAvailableUTXOs,
   ]);
 
   // Initializing btc curve is a required one-time operation
@@ -224,7 +258,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const handleDisconnectBTC = () => {
     setBTCWallet(undefined);
-    setBTCWalletBalanceSat(0);
+
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
@@ -246,12 +280,10 @@ const Home: React.FC<HomeProps> = () => {
           );
         }
 
-        const balanceSat = await walletProvider.getBalance();
         const publicKeyNoCoord = getPublicKeyNoCoord(
           await walletProvider.getPublicKeyHex(),
         );
         setBTCWallet(walletProvider);
-        setBTCWalletBalanceSat(balanceSat);
         setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
@@ -341,6 +373,12 @@ const Home: React.FC<HomeProps> = () => {
       );
   }
 
+  // Balance is reduced confirmed UTXOs with ordinals
+  const btcWalletBalanceSat = availableUTXOs?.reduce(
+    (accumulator, item) => accumulator + item.value,
+    0,
+  );
+
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -350,7 +388,7 @@ const Home: React.FC<HomeProps> = () => {
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
         address={address}
-        balanceSat={btcWalletBalanceSat}
+        btcWalletBalanceSat={btcWalletBalanceSat}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
@@ -359,7 +397,7 @@ const Home: React.FC<HomeProps> = () => {
             <Summary
               address={address}
               totalStakedSat={totalStakedSat}
-              balanceSat={btcWalletBalanceSat}
+              btcWalletBalanceSat={btcWalletBalanceSat}
             />
           )}
           <Staking
@@ -379,6 +417,7 @@ const Home: React.FC<HomeProps> = () => {
             address={address}
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
+            availableUTXOs={availableUTXOs}
           />
           {btcWallet &&
             delegations &&
