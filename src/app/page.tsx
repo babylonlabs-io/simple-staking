@@ -24,6 +24,7 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
+import { getHealthCheck } from "./api/getHealthCheck";
 import { postFilterOrdinals } from "./api/postFilterOrdinals";
 import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
@@ -54,6 +55,18 @@ const Home: React.FC<HomeProps> = () => {
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
   const { isTermsOpen, closeTerms } = useTerms();
+
+  const {
+    data: healthCheck,
+    error: healthCheckError,
+    isError: hasHealthCheckError,
+    refetch: refetchHealthCheck,
+  } = useQuery({
+    queryKey: ["health check"],
+    queryFn: getHealthCheck,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+  });
 
   const {
     data: paramWithContext,
@@ -220,6 +233,12 @@ const Home: React.FC<HomeProps> = () => {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchAvailableUTXOs,
     });
+    handleError({
+      error: healthCheckError,
+      hasError: hasHealthCheckError,
+      errorState: ErrorState.SERVER_ERROR,
+      refetchFunction: refetchHealthCheck,
+    });
   }, [
     hasFinalityProvidersError,
     hasGlobalParamsVersionError,
@@ -235,6 +254,9 @@ const Home: React.FC<HomeProps> = () => {
     availableUTXOsError,
     hasAvailableUTXOsError,
     refetchAvailableUTXOs,
+    healthCheckError,
+    hasHealthCheckError,
+    refetchHealthCheck,
   ]);
 
   // Initializing btc curve is a required one-time operation
@@ -389,6 +411,7 @@ const Home: React.FC<HomeProps> = () => {
         onDisconnect={handleDisconnectBTC}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
+        healthCheck={healthCheck}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
@@ -418,6 +441,7 @@ const Home: React.FC<HomeProps> = () => {
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
+            healthCheck={healthCheck}
           />
           {btcWallet &&
             delegations &&

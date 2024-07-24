@@ -35,6 +35,11 @@ export const apiWrapper = async (
     );
   } catch (error) {
     if (axios.isAxiosError(error)) {
+      // 451 is a custom status code for geo-blocking
+      if (error.response?.status === 451 || error.request.status === 451) {
+        // Rethrow the original error so the caller can handle it
+        throw error;
+      }
       const message = error?.response?.data?.message;
       throw new Error(message || generalErrorMessage);
     } else {

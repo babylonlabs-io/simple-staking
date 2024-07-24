@@ -1,9 +1,12 @@
 import { useRef, useState } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
+import { Tooltip } from "react-tooltip";
 import { useOnClickOutside } from "usehooks-ts";
 
+import { HealthCheckResult } from "@/app/types/healthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -17,6 +20,7 @@ interface ConnectSmallProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
+  healthCheck?: HealthCheckResult;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
@@ -24,6 +28,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
+  healthCheck,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
@@ -34,6 +39,26 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   useOnClickOutside(ref, handleClickOutside);
 
   const { coinName, networkName } = getNetworkConfig();
+
+  const renderHealthCheckTooltip = () => {
+    if (!healthCheck) return null;
+
+    return (
+      <>
+        <span
+          className="cursor-pointer text-xs"
+          data-tooltip-id={`tooltip-connect-${healthCheck.status}`}
+          data-tooltip-content={healthCheck.message}
+          data-tooltip-place="bottom"
+        >
+          <AiOutlineInfoCircle />
+        </span>
+        <Tooltip id={`tooltip-connect-${healthCheck.status}`} />
+      </>
+    );
+  };
+
+  const healthCheckNormal = healthCheck?.status === "normal";
 
   return address ? (
     <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>
@@ -92,13 +117,16 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       )}
     </div>
   ) : (
-    <button
-      className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-full px-2 text-white md:rounded-lg"
-      onClick={onConnect}
-      disabled={!!address}
-    >
-      <PiWalletBold size={20} className="flex md:hidden" />
-      <span className="hidden md:flex">Connect to {networkName} network</span>
-    </button>
+    <div className="flex items-center gap-1">
+      <button
+        className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-full px-2 text-white md:rounded-lg"
+        onClick={onConnect}
+        disabled={!!address || !healthCheckNormal}
+      >
+        <PiWalletBold size={20} className="flex md:hidden" />
+        <span className="hidden md:flex">Connect to {networkName} network</span>
+      </button>
+      {!healthCheckNormal && renderHealthCheckTooltip()}
+    </div>
   );
 };
