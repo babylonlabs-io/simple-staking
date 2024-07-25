@@ -1,4 +1,4 @@
-name: Sync PR Dev to Main
+name: Create Sync PR from Main to Dev
 
 on:
   schedule:
