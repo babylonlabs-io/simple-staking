@@ -56,8 +56,16 @@ export interface UTXO {
   scriptPubKey: string;
 }
 
+export interface Inscription {
+  // output of the inscription in the format of `txid:vout`
+  output: string;
+}
+
 // supported networks
 export type Network = "mainnet" | "testnet" | "regtest" | "signet";
+
+// Default number of inscriptions to fetch in a single method call
+export const DEFAULT_INSCRIPTION_LIMIT = 100;
 
 /**
  * Abstract class representing a wallet provider.
@@ -162,6 +170,12 @@ export abstract class WalletProvider {
    * @returns A promise that resolves to the block height.
    */
   abstract getBTCTipHeight(): Promise<number>;
+
+  /**
+   * Retrieves the inscriptions for the connected wallet.
+   * @returns A promise that resolves to an array of inscriptions.
+   */
+  abstract getInscriptions(): Promise<Inscription[]>;
 }
 ```
 
@@ -307,7 +321,6 @@ export class OKXWallet extends WalletProvider {
   };
 
   // Mempool calls
-
   getBalance = async (): Promise<number> => {
     return await getAddressBalance(await this.getAddress());
   };
@@ -327,6 +340,27 @@ export class OKXWallet extends WalletProvider {
 
   getBTCTipHeight = async (): Promise<number> => {
     return await getTipHeight();
+  };
+
+  // Inscriptions(Ordinal/Runes/BRC-20 etc)
+  getInscriptions = async (): Promise<Inscription[]> => {
+    if (!this.okxWalletInfo) {
+      throw new Error("OKX Wallet not connected");
+    }
+    const inscriptions: Inscription[] = [];
+    let cursor = 0;
+    while (true) {
+      const { list } = await this.bitcoinNetworkProvider.getInscriptions(
+        cursor,
+        DEFAULT_INSCRIPTION_LIMIT,
+      );
+      inscriptions.push(...list);
+      if (list.length < DEFAULT_INSCRIPTION_LIMIT) {
+        break;
+      }
+      cursor += DEFAULT_INSCRIPTION_LIMIT;
+    }
+    return inscriptions;
   };
 }
 ```
@@ -401,7 +435,7 @@ export async function pushTx(txHex: string): Promise<string> {
  * Returns the balance of an address.
  * @param address - The Bitcoin address in string format.
  * @returns A promise that resolves to the amount of satoshis that the address
- *          holds.
+ * holds.
  */
 export async function getAddressBalance(address: string): Promise<number> {
   const response = await fetch(addressInfoUrl(address));

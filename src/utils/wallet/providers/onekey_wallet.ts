@@ -7,7 +7,9 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
+  DEFAULT_INSCRIPTION_LIMIT,
   Fees,
+  Inscription,
   Network,
   UTXO,
   WalletInfo,
@@ -161,4 +163,22 @@ export class OneKeyWallet extends WalletProvider {
   async getBTCTipHeight(): Promise<number> {
     return this.bitcoinNetworkProvider.getBTCTipHeight();
   }
+
+  // Inscriptions are only available on oneKey Wallet BTC mainnet
+  getInscriptions = async (): Promise<Inscription[]> => {
+    const inscriptions: Inscription[] = [];
+    let cursor = 0;
+    while (true) {
+      const { list } = await this.bitcoinNetworkProvider.getInscriptions(
+        cursor,
+        DEFAULT_INSCRIPTION_LIMIT,
+      );
+      inscriptions.push(...list);
+      if (list.length < DEFAULT_INSCRIPTION_LIMIT) {
+        break;
+      }
+      cursor += DEFAULT_INSCRIPTION_LIMIT;
+    }
+    return inscriptions;
+  };
 }

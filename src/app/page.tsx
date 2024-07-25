@@ -10,6 +10,7 @@ import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { filterOrdinals } from "@/utils/utxo";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 import {
   getPublicKeyNoCoord,
@@ -24,7 +25,6 @@ import {
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { postFilterOrdinals } from "./api/postFilterOrdinals";
 import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
@@ -166,7 +166,11 @@ const Home: React.FC<HomeProps> = () => {
         // all confirmed UTXOs from the wallet
         const mempoolUTXOs = await btcWallet.getUtxos(address);
         // filter out the ordinals
-        const filteredUTXOs = await postFilterOrdinals(mempoolUTXOs, address);
+        const filteredUTXOs = await filterOrdinals(
+          mempoolUTXOs,
+          address,
+          btcWallet.getInscriptions,
+        );
         return filteredUTXOs;
       }
     },

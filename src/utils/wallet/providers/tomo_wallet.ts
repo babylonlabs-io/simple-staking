@@ -9,6 +9,7 @@ import {
 
 import {
   Fees,
+  Inscription,
   Network,
   UTXO,
   WalletInfo,
@@ -169,4 +170,8 @@ export class TomoWallet extends WalletProvider {
   getBTCTipHeight = async (): Promise<number> => {
     return await getTipHeight();
   };
+
+  getInscriptions(): Promise<Inscription[]> {
+    throw new Error("Method not implemented.");
+  }
 }
