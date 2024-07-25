@@ -2,13 +2,13 @@ name: Sync PR Dev to Main
 
 on:
   schedule:
-  - cron: "50 3 * * *" 
+  - cron: "0 0 * * *" 
 
 jobs:
   call_sync_branch:
     uses: babylonchain/.github/.github/workflows/reusable_sync_branch.yml@hiep/add-sync-branch
     with:
-      base_branch: 'dev'
-      target_branch: 'main'
-      reviewers: 'hiepmai-babylonchain,jrwbabylonchain'
+      base_branch: 'main'
+      target_branch: 'dev'
+      reviewers: 'jrwbabylonchain'
     secrets: inherit
