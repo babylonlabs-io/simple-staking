@@ -72,6 +72,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
             <FinalityProvider
               key={fp.btcPk}
               moniker={fp.description?.moniker}
+              website={fp.description?.website}
               pkHex={fp.btcPk}
               stakeSat={fp.activeTVLSat}
               commission={fp.commission}
