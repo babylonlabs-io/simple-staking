@@ -1,0 +1,14 @@
+name: Create Sync PR from Main to Dev
+
+on:
+  schedule:
+  - cron: "0 0 * * *" 
+
+jobs:
+  call_sync_branch:
+    uses: babylonchain/.github/.github/workflows/reusable_sync_branch.yml@v0.2.0
+    with:
+      base_branch: 'main'
+      target_branch: 'dev'
+      reviewers: 'jrwbabylonchain,gbarkhatov,jeremy-babylonchain'
+    secrets: inherit
