@@ -6,7 +6,12 @@ import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 import { useOnClickOutside } from "usehooks-ts";
 
-import { HealthCheckResult } from "@/app/types/healthCheck";
+import {
+  API_ERROR_MESSAGE,
+  GEO_BLOCK_MESSAGE,
+  HealthCheckResult,
+  HealthCheckStatus,
+} from "@/app/types/healthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -20,7 +25,7 @@ interface ConnectSmallProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
-  healthCheck?: HealthCheckResult;
+  apiAvailable?: HealthCheckResult;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
@@ -28,7 +33,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
-  healthCheck,
+  apiAvailable,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
@@ -40,25 +45,30 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
 
   const { coinName, networkName } = getNetworkConfig();
 
-  const renderHealthCheckTooltip = () => {
-    if (!healthCheck) return null;
+  const renderApiAvailableTooltip = () => {
+    if (!apiAvailable) return null;
+
+    const message =
+      apiAvailable.status === HealthCheckStatus.GeoBlocked
+        ? GEO_BLOCK_MESSAGE
+        : API_ERROR_MESSAGE;
 
     return (
       <>
         <span
           className="cursor-pointer text-xs"
-          data-tooltip-id={`tooltip-connect-${healthCheck.status}`}
-          data-tooltip-content={healthCheck.message}
+          data-tooltip-id={`tooltip-connect-${apiAvailable.status}`}
+          data-tooltip-content={message}
           data-tooltip-place="bottom"
         >
           <AiOutlineInfoCircle />
         </span>
-        <Tooltip id={`tooltip-connect-${healthCheck.status}`} />
+        <Tooltip id={`tooltip-connect-${apiAvailable.status}`} />
       </>
     );
   };
 
-  const healthCheckNormal = healthCheck?.status === "normal";
+  const isApiNormal = apiAvailable?.status === HealthCheckStatus.Normal;
 
   return address ? (
     <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>
@@ -121,12 +131,12 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       <button
         className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-full px-2 text-white md:rounded-lg"
         onClick={onConnect}
-        disabled={!!address || !healthCheckNormal}
+        disabled={!!address || !isApiNormal}
       >
         <PiWalletBold size={20} className="flex md:hidden" />
         <span className="hidden md:flex">Connect to {networkName} network</span>
       </button>
-      {!healthCheckNormal && renderHealthCheckTooltip()}
+      {!isApiNormal && renderApiAvailableTooltip()}
     </div>
   );
 };

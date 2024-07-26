@@ -57,12 +57,12 @@ const Home: React.FC<HomeProps> = () => {
   const { isTermsOpen, closeTerms } = useTerms();
 
   const {
-    data: healthCheck,
-    error: healthCheckError,
-    isError: hasHealthCheckError,
-    refetch: refetchHealthCheck,
+    data: apiAvailable,
+    error: apiAvailableError,
+    isError: hasApiAvailableError,
+    refetch: refetchApiAvailable,
   } = useQuery({
-    queryKey: ["health check"],
+    queryKey: ["api available"],
     queryFn: getHealthCheck,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
@@ -238,10 +238,10 @@ const Home: React.FC<HomeProps> = () => {
       refetchFunction: refetchAvailableUTXOs,
     });
     handleError({
-      error: healthCheckError,
-      hasError: hasHealthCheckError,
+      error: apiAvailableError,
+      hasError: hasApiAvailableError,
       errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchHealthCheck,
+      refetchFunction: refetchApiAvailable,
     });
   }, [
     hasFinalityProvidersError,
@@ -258,9 +258,9 @@ const Home: React.FC<HomeProps> = () => {
     availableUTXOsError,
     hasAvailableUTXOsError,
     refetchAvailableUTXOs,
-    healthCheckError,
-    hasHealthCheckError,
-    refetchHealthCheck,
+    apiAvailableError,
+    hasApiAvailableError,
+    refetchApiAvailable,
   ]);
 
   // Initializing btc curve is a required one-time operation
@@ -415,7 +415,7 @@ const Home: React.FC<HomeProps> = () => {
         onDisconnect={handleDisconnectBTC}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
-        healthCheck={healthCheck}
+        apiAvailable={apiAvailable}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
@@ -445,7 +445,7 @@ const Home: React.FC<HomeProps> = () => {
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
-            healthCheck={healthCheck}
+            apiAvailable={apiAvailable}
           />
           {btcWallet &&
             delegations &&

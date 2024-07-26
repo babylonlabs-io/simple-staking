@@ -16,7 +16,12 @@ import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
-import { HealthCheckResult } from "@/app/types/healthCheck";
+import {
+  API_ERROR_MESSAGE,
+  GEO_BLOCK_MESSAGE,
+  HealthCheckResult,
+  HealthCheckStatus,
+} from "@/app/types/healthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import {
   createStakingTx,
@@ -40,8 +45,8 @@ import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
+import apiNotAvailable from "./Form/States/api-not-available.svg";
 import geoRestricted from "./Form/States/geo-restricted.svg";
-import healthCheckFailed from "./Form/States/health-check-failed.svg";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
@@ -68,7 +73,7 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   availableUTXOs?: UTXO[] | undefined;
-  healthCheck?: HealthCheckResult;
+  apiAvailable?: HealthCheckResult;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -87,7 +92,7 @@ export const Staking: React.FC<StakingProps> = ({
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
   availableUTXOs,
-  healthCheck,
+  apiAvailable,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -490,25 +495,21 @@ export const Staking: React.FC<StakingProps> = ({
   const renderStakingForm = () => {
     // States of the staking form:
     // Health check failed
-    if (!healthCheck || healthCheck.status === "error") {
+    if (!apiAvailable || apiAvailable.status === HealthCheckStatus.Error) {
       return (
         <Message
           title="Staking is not available"
-          messages={[
-            "The Bitcoin Staking functionality is not available at the moment.",
-          ]}
-          icon={healthCheckFailed}
+          messages={[API_ERROR_MESSAGE]}
+          icon={apiNotAvailable}
         />
       );
     }
     // Geo blocked
-    else if (healthCheck.status === "geoBlocked") {
+    else if (apiAvailable.status === HealthCheckStatus.GeoBlocked) {
       return (
         <Message
           title="Staking is not available"
-          messages={[
-            "The Bitcoin Staking functionality is not available in your region.",
-          ]}
+          messages={[GEO_BLOCK_MESSAGE]}
           icon={geoRestricted}
         />
       );

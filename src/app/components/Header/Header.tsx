@@ -12,7 +12,7 @@ interface HeaderProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
-  healthCheck?: HealthCheckResult;
+  apiAvailable?: HealthCheckResult;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
-  healthCheck,
+  apiAvailable,
 }) => {
   return (
     <nav>
@@ -37,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
-            healthCheck={healthCheck}
+            apiAvailable={apiAvailable}
           />
           <ThemeToggle />
         </div>

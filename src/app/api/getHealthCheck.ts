@@ -1,8 +1,11 @@
-import { isAxiosError } from "axios";
+import axios, { isAxiosError } from "axios";
 
-import { HealthCheckResult } from "../types/healthCheck";
-
-import { apiWrapper } from "./apiWrapper";
+import {
+  API_ERROR_MESSAGE,
+  GEO_BLOCK_MESSAGE,
+  HealthCheckResult,
+  HealthCheckStatus,
+} from "../types/healthCheck";
 
 interface HealthCheckResponse {
   data: string;
@@ -10,18 +13,19 @@ interface HealthCheckResponse {
 
 export const getHealthCheck = async (): Promise<HealthCheckResult> => {
   try {
-    const response = await apiWrapper(
-      "GET",
-      "/healthcheck",
-      "Error checking health",
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/healthcheck`,
     );
     const healthCheckAPIResponse: HealthCheckResponse = response.data;
     // If the response has a data field, it's a normal response
     if (healthCheckAPIResponse.data) {
-      return { status: "normal", message: healthCheckAPIResponse.data };
+      return {
+        status: HealthCheckStatus.Normal,
+        message: healthCheckAPIResponse.data,
+      };
     } else {
       // Something went wrong
-      throw new Error("Health check failed");
+      throw new Error(API_ERROR_MESSAGE);
     }
   } catch (error: Error | any) {
     // Geo-blocking is a custom status code
@@ -30,14 +34,16 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
       (error.response?.status === 451 || error.request.status === 451)
     ) {
       return {
-        status: "geoBlocked",
-        message:
-          "The Bitcoin Staking functionality is not available in your region",
+        status: HealthCheckStatus.GeoBlocked,
+        message: error.request?.response?.message || GEO_BLOCK_MESSAGE,
       };
     } else {
       return {
-        status: "error",
-        message: "Please try again later",
+        status: HealthCheckStatus.Error,
+        message:
+          error.request?.response?.message ||
+          error?.message ||
+          API_ERROR_MESSAGE,
       };
     }
   }
