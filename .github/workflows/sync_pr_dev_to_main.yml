@@ -10,5 +10,5 @@ jobs:
     with:
       base_branch: 'main'
       target_branch: 'dev'
-      reviewers: 'jrwbabylonchain'
+      reviewers: 'jrwbabylonchain,gbarkhatov,jeremy-babylonchain'
     secrets: inherit
