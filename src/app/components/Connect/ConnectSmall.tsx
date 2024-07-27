@@ -45,7 +45,9 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
 
   const { coinName, networkName } = getNetworkConfig();
 
-  const renderApiAvailableTooltip = () => {
+  // Renders the Tooltip describing the reason
+  // why the user might not be able to connect the wallet
+  const renderApiNotAvailableTooltip = () => {
     if (!apiAvailable) return null;
 
     const message =
@@ -136,7 +138,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
         <PiWalletBold size={20} className="flex md:hidden" />
         <span className="hidden md:flex">Connect to {networkName} network</span>
       </button>
-      {!isApiNormal && renderApiAvailableTooltip()}
+      {!isApiNormal && renderApiNotAvailableTooltip()}
     </div>
   );
 };
