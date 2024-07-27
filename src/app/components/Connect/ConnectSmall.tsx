@@ -133,6 +133,8 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
       <button
         className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-full px-2 text-white md:rounded-lg"
         onClick={onConnect}
+        // Disable the button if the user is already connected
+        // or if the API: is not available, geo-blocked, or has an error
         disabled={!!address || !isApiNormal}
       >
         <PiWalletBold size={20} className="flex md:hidden" />
