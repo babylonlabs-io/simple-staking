@@ -1,9 +1,11 @@
 import bitgetWalletIcon from "./icons/bitget-wallet.svg";
+import gateIcon from "./icons/gate.svg";
 import keystoneIcon from "./icons/keystone.svg";
 import okxIcon from "./icons/okx.svg";
 import oneKeyIcon from "./icons/onekey.svg";
 import tomoIcon from "./icons/tomo.svg";
 import { BitgetWallet, bitgetWalletProvider } from "./providers/bitget_wallet";
+import { GateWallet, gateProvider } from "./providers/gate_wallet";
 import { KeystoneWallet } from "./providers/keystone";
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";
 import { OneKeyWallet, oneKeyProvider } from "./providers/onekey_wallet";
@@ -31,6 +33,13 @@ export const walletList: IntegratedWallet[] = [
     provider: okxProvider,
     linkToDocs: "https://www.okx.com/web3",
     supportedNetworks: [Network.MAINNET, Network.SIGNET],
+  },
+  {
+    name: "Gate Wallet",
+    icon: gateIcon,
+    wallet: GateWallet,
+    provider: gateProvider,
+    linkToDocs: "https://www.gate.io/web3",
   },
   {
     name: BROWSER_INJECTED_WALLET_NAME,
