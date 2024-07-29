@@ -32,7 +32,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   }
 
   const network = getNetworkConfig().network;
-  const createFinalityProviderLink = `https://github.com/babylonchain/networks/tree/main/${
+  const createFinalityProviderLink = `https://github.com/babylonlabs-io/networks/tree/main/${
     network == Network.MAINNET ? "bbn-1" : "bbn-test-4"
   }/finality-providers`;
   return (

@@ -60,7 +60,7 @@ export const questions = (coinName: string): Question[] => {
     },
     {
       title: "Are there any other ways to stake?",
-      content: `<p>Hands-on stakers can operate the <a href="https://github.com/babylonchain/btc-staker/blob/dev/docs/create-phase1-staking.md" target="_blank" rel="noopener noreferrer" class="text-primary"><u>btc-staker CLI program</u></a> that allows for the creation of ${coinName} staking transactions from the CLI.</p>
+      content: `<p>Hands-on stakers can operate the <a href="https://github.com/babylonlabs-io/btc-staker/blob/dev/docs/create-phase1-staking.md" target="_blank" rel="noopener noreferrer" class="text-primary"><u>btc-staker CLI program</u></a> that allows for the creation of ${coinName} staking transactions from the CLI.</p>
       `,
     },
     {

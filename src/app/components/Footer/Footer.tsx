@@ -25,7 +25,7 @@ const iconLinks = [
   },
   {
     name: "GitHub",
-    url: "https://github.com/babylonchain",
+    url: "https://github.com/babylonlabs-io",
     Icon: BsGithub,
   },
   {
