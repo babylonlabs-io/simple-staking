@@ -11,7 +11,7 @@ import {
   GEO_BLOCK_MESSAGE,
   HealthCheckResult,
   HealthCheckStatus,
-} from "@/app/types/healthCheck";
+} from "@/app/types/services/healthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
