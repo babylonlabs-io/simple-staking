@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { FiGlobe } from "react-icons/fi";
 import { Tooltip } from "react-tooltip";
 
 import blue from "@/app/assets/blue-check.svg";
@@ -15,6 +16,7 @@ interface FinalityProviderProps {
   commission: string;
   onClick: () => void;
   selected: boolean;
+  website?: string;
 }
 
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
@@ -24,6 +26,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   commission,
   onClick,
   selected,
+  website,
 }) => {
   const generalStyles =
     "card relative cursor-pointer border bg-base-300 p-4 text-sm transition-shadow hover:shadow-md dark:border-transparent dark:bg-base-200";
@@ -53,6 +56,16 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             <div className="flex items-center gap-1 justify-start">
               <Image src={blue} alt="verified" />
               <p>{moniker}</p>
+              {website && (
+                <a
+                  href={website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary btn btn-outline btn-xs ml-2 p-0 h-6 w-6"
+                >
+                  <FiGlobe />
+                </a>
+              )}
             </div>
           ) : (
             <div className="flex items-center gap-1 justify-start">
