@@ -6,12 +6,7 @@ import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 import { useOnClickOutside } from "usehooks-ts";
 
-import {
-  API_ERROR_MESSAGE,
-  GEO_BLOCK_MESSAGE,
-  HealthCheckResult,
-  HealthCheckStatus,
-} from "@/app/types/services/healthCheck";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -25,7 +20,6 @@ interface ConnectSmallProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
-  apiAvailable?: HealthCheckResult;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
@@ -33,7 +27,6 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
-  apiAvailable,
 }) => {
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
@@ -44,33 +37,27 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   useOnClickOutside(ref, handleClickOutside);
 
   const { coinName, networkName } = getNetworkConfig();
+  const { isApiNormal, isBlocked, apiMessage } = useHealthCheck();
 
   // Renders the Tooltip describing the reason
   // why the user might not be able to connect the wallet
   const renderApiNotAvailableTooltip = () => {
-    if (!apiAvailable) return null;
-
-    const message =
-      apiAvailable.status === HealthCheckStatus.GeoBlocked
-        ? GEO_BLOCK_MESSAGE
-        : API_ERROR_MESSAGE;
+    if (!isBlocked && isApiNormal) return null;
 
     return (
       <>
         <span
           className="cursor-pointer text-xs"
-          data-tooltip-id={`tooltip-connect-${apiAvailable.status}`}
-          data-tooltip-content={message}
+          data-tooltip-id="tooltip-connect"
+          data-tooltip-content={apiMessage}
           data-tooltip-place="bottom"
         >
           <AiOutlineInfoCircle />
         </span>
-        <Tooltip id={`tooltip-connect-${apiAvailable.status}`} />
+        <Tooltip id="tooltip-connect" />
       </>
     );
   };
-
-  const isApiNormal = apiAvailable?.status === HealthCheckStatus.Normal;
 
   return address ? (
     <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>

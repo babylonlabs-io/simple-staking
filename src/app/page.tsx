@@ -40,7 +40,6 @@ import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
-import { getHealthCheck } from "./services/healthCheckService";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
 
@@ -55,18 +54,6 @@ const Home: React.FC<HomeProps> = () => {
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
   const { isTermsOpen, closeTerms } = useTerms();
-
-  const {
-    data: apiAvailable,
-    error: apiAvailableError,
-    isError: hasApiAvailableError,
-    refetch: refetchApiAvailable,
-  } = useQuery({
-    queryKey: ["api available"],
-    queryFn: getHealthCheck,
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-  });
 
   const {
     data: paramWithContext,
@@ -237,12 +224,6 @@ const Home: React.FC<HomeProps> = () => {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchAvailableUTXOs,
     });
-    handleError({
-      error: apiAvailableError,
-      hasError: hasApiAvailableError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchApiAvailable,
-    });
   }, [
     hasFinalityProvidersError,
     hasGlobalParamsVersionError,
@@ -258,9 +239,6 @@ const Home: React.FC<HomeProps> = () => {
     availableUTXOsError,
     hasAvailableUTXOsError,
     refetchAvailableUTXOs,
-    apiAvailableError,
-    hasApiAvailableError,
-    refetchApiAvailable,
   ]);
 
   // Initializing btc curve is a required one-time operation
@@ -415,7 +393,6 @@ const Home: React.FC<HomeProps> = () => {
         onDisconnect={handleDisconnectBTC}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
-        apiAvailable={apiAvailable}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
@@ -445,7 +422,6 @@ const Home: React.FC<HomeProps> = () => {
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
-            apiAvailable={apiAvailable}
           />
           {btcWallet &&
             delegations &&

@@ -13,15 +13,10 @@ import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
-import {
-  API_ERROR_MESSAGE,
-  GEO_BLOCK_MESSAGE,
-  HealthCheckResult,
-  HealthCheckStatus,
-} from "@/app/types/services/healthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import {
   createStakingTx,
@@ -73,7 +68,6 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   availableUTXOs?: UTXO[] | undefined;
-  apiAvailable?: HealthCheckResult;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -92,7 +86,6 @@ export const Staking: React.FC<StakingProps> = ({
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
   availableUTXOs,
-  apiAvailable,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -202,6 +195,7 @@ export const Staking: React.FC<StakingProps> = ({
       btcHeight + 1 < firstActivationHeight);
 
   const { isErrorOpen, showError } = useError();
+  const { isApiNormal, isBlocked, apiMessage } = useHealthCheck();
 
   useEffect(() => {
     const handleError = ({
@@ -495,22 +489,12 @@ export const Staking: React.FC<StakingProps> = ({
   const renderStakingForm = () => {
     // States of the staking form:
     // Health check failed
-    if (!apiAvailable || apiAvailable.status === HealthCheckStatus.Error) {
+    if (!isApiNormal || isBlocked) {
       return (
         <Message
           title="Staking is not available"
-          messages={[API_ERROR_MESSAGE]}
-          icon={apiNotAvailable}
-        />
-      );
-    }
-    // Geo blocked
-    else if (apiAvailable.status === HealthCheckStatus.GeoBlocked) {
-      return (
-        <Message
-          title="Staking is not available"
-          messages={[GEO_BLOCK_MESSAGE]}
-          icon={geoRestricted}
+          messages={[apiMessage || ""]}
+          icon={isBlocked ? geoRestricted : apiNotAvailable}
         />
       );
     }
@@ -528,7 +512,9 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${btcHeight || "-"}.`,
+            `Staking will be activated once ${coinName} block height passes ${
+              firstActivationHeight ? firstActivationHeight - 1 : "-"
+            }. The current ${coinName} block height is ${btcHeight || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
