@@ -12,9 +12,8 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
-  DEFAULT_INSCRIPTION_LIMIT,
   Fees,
-  Inscription,
+  InscriptionIdentifier,
   Network,
   UTXO,
   WalletInfo,
@@ -176,23 +175,46 @@ export class OKXWallet extends WalletProvider {
   };
 
   // Inscriptions are only available on OKX Wallet BTC mainnet (i.e okxWallet.bitcoin)
-  getInscriptions = async (): Promise<Inscription[]> => {
+  getInscriptions = async (): Promise<InscriptionIdentifier[]> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
-    const inscriptions: Inscription[] = [];
+    // max num of iterations to prevent infinite loop
+    const MAX_ITERATIONS = 100;
+    // Fetch inscriptions in batches of 100
+    const limit = 100;
+    const inscriptionIdentifiers: InscriptionIdentifier[] = [];
     let cursor = 0;
-    while (true) {
-      const { list } = await this.bitcoinNetworkProvider.getInscriptions(
-        cursor,
-        DEFAULT_INSCRIPTION_LIMIT,
-      );
-      inscriptions.push(...list);
-      if (list.length < DEFAULT_INSCRIPTION_LIMIT) {
-        break;
+    let iterations = 0;
+    try {
+      while (iterations < MAX_ITERATIONS) {
+        const { list } = await this.bitcoinNetworkProvider.getInscriptions(
+          cursor,
+          limit,
+        );
+        const identifiers = list.map((i: { output: string }) => {
+          const [txid, vout] = i.output.split(":");
+          return {
+            txid,
+            vout,
+          };
+        });
+        inscriptionIdentifiers.push(...identifiers);
+        if (list.length < limit) {
+          break;
+        }
+        cursor += limit;
+        iterations++;
+        if (iterations >= MAX_ITERATIONS) {
+          throw new Error(
+            "Exceeded maximum iterations when fetching inscriptions",
+          );
+        }
       }
-      cursor += DEFAULT_INSCRIPTION_LIMIT;
+    } catch (error) {
+      throw new Error("Failed to get inscriptions from OKX Wallet");
     }
-    return inscriptions;
+
+    return inscriptionIdentifiers;
   };
 }
