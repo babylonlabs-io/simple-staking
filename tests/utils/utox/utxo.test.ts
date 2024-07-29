@@ -1,6 +1,6 @@
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { filterOrdinals } from "@/utils/utxo";
-import { Inscription, UTXO } from "@/utils/wallet/wallet_provider";
+import { InscriptionIdentifier, UTXO } from "@/utils/wallet/wallet_provider";
 
 // Mock the dependencies
 jest.mock("@/app/api/postFilterOrdinals");
@@ -23,7 +23,12 @@ describe("filterOrdinals", () => {
   });
 
   it("should filter out UTXOs that contain ordinals from the wallet", async () => {
-    const mockInscriptions: Inscription[] = [{ output: "txid1:0" }];
+    const mockInscriptions: InscriptionIdentifier[] = [
+      {
+        txid: "txid1",
+        vout: 0,
+      },
+    ];
     const getInscriptionsFromWalletCb = jest
       .fn()
       .mockResolvedValue(mockInscriptions);

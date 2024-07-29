@@ -1,6 +1,6 @@
 import { postVerifyUtxoOrdinals, UtxoInfo } from "@/app/api/postFilterOrdinals";
 
-import { Inscription, UTXO } from "../wallet/wallet_provider";
+import { InscriptionIdentifier, UTXO } from "../wallet/wallet_provider";
 
 /**
  * Filters out UTXOs that contain ordinals.
@@ -17,7 +17,7 @@ import { Inscription, UTXO } from "../wallet/wallet_provider";
 export const filterOrdinals = async (
   utxos: UTXO[],
   address: string,
-  getInscriptionsFromWalletCb: () => Promise<Inscription[]>,
+  getInscriptionsFromWalletCb: () => Promise<InscriptionIdentifier[]>,
 ): Promise<UTXO[]> => {
   if (!utxos.length) {
     return [];
@@ -29,7 +29,9 @@ export const filterOrdinals = async (
     // filter out the utxos that contains ordinals
     return utxos.filter(
       (utxo) =>
-        !inscriptions.find((i) => i.output === `${utxo.txid}:${utxo.vout}`),
+        !inscriptions.find((i) => {
+          return i.txid === utxo.txid && i.vout === utxo.vout;
+        }),
     );
   } catch (error) {
     return filterFromApi(utxos, address);

@@ -32,7 +32,7 @@ import {
 import { WalletError, WalletErrorType } from "../../errors";
 import {
   Fees,
-  Inscription,
+  InscriptionIdentifier,
   Network,
   UTXO,
   WalletProvider,
@@ -292,7 +292,7 @@ export class KeystoneWallet extends WalletProvider {
     return await getTipHeight();
   };
 
-  getInscriptions(): Promise<Inscription[]> {
+  getInscriptions(): Promise<InscriptionIdentifier[]> {
     throw new Error("Method not implemented.");
   }
 }
