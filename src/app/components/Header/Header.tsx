@@ -1,3 +1,5 @@
+import { HealthCheckResult } from "@/app/types/healthCheck";
+
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
@@ -10,6 +12,7 @@ interface HeaderProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
+  apiAvailable?: HealthCheckResult;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -17,35 +20,35 @@ export const Header: React.FC<HeaderProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
+  apiAvailable,
 }) => {
   return (
     <nav>
       <div className="bg-base-300 shadow-sm">
-        <div className="container mx-auto flex-col">
-          <div className="w-full flex items-center justify-between gap-4 p-6 pb-4 md:pb-6">
-            <Logo />
-            <div className="flex flex-1">
-              <div className="hidden flex-1 xl:flex">
-                <TestingInfo />
-              </div>
+        <div className="container mx-auto flex w-full items-center justify-between gap-4 p-6 pb-4 md:pb-6">
+          <Logo />
+          <div className="flex flex-1">
+            <div className="hidden flex-1 xl:flex">
+              <TestingInfo />
             </div>
-            <ConnectSmall
-              onConnect={onConnect}
-              address={address}
-              btcWalletBalanceSat={btcWalletBalanceSat}
-              onDisconnect={onDisconnect}
-            />
-            <ThemeToggle />
           </div>
-          <div
-            className={`container mx-auto flex w-full items-center gap-4 md:hidden md:p-0 ${address ? "justify-end p-6 pt-0" : ""}`}
-          >
-            <ConnectedSmall
-              address={address}
-              btcWalletBalanceSat={btcWalletBalanceSat}
-              onDisconnect={onDisconnect}
-            />
-          </div>
+          <ConnectSmall
+            onConnect={onConnect}
+            address={address}
+            btcWalletBalanceSat={btcWalletBalanceSat}
+            onDisconnect={onDisconnect}
+            apiAvailable={apiAvailable}
+          />
+          <ThemeToggle />
+        </div>
+        <div
+          className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
+        >
+          <ConnectedSmall
+            address={address}
+            btcWalletBalanceSat={btcWalletBalanceSat}
+            onDisconnect={onDisconnect}
+          />
         </div>
       </div>
       <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
