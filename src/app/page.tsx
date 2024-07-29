@@ -21,6 +21,7 @@ import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import {
+  getAllFinalityProviders,
   getFinalityProviders,
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
@@ -113,6 +114,21 @@ const Home: React.FC<HomeProps> = () => {
       return flattenedData;
     },
     retry: (failureCount, error) => {
+      return !isErrorOpen && failureCount <= 3;
+    },
+  });
+
+  const {
+    data: allFinalityProviders,
+    isLoading: isLoadingFinalityProviders,
+    error: allFinalityProvidersError,
+    isError: hasAllFinalityProvidersError,
+    refetch: refetchFinalityProviders,
+  } = useQuery({
+    queryKey: ["all-finality-providers"],
+    queryFn: getAllFinalityProviders,
+    staleTime: 60000 * 5,
+    retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
     },
   });

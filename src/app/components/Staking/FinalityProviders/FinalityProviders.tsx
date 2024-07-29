@@ -1,3 +1,5 @@
+import { debounce } from "lodash";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import {
@@ -8,6 +10,8 @@ import { QueryMeta } from "@/app/types/api";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
 import { Network } from "@/utils/wallet/wallet_provider";
+
+import { FinalityProviderSearch } from "../../FinalityProviders/FinalityProviderSearch";
 
 import { FinalityProvider } from "./FinalityProvider";
 
@@ -26,6 +30,37 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   onFinalityProviderChange,
   queryMeta,
 }) => {
+  const [filteredProviders, setFilteredProviders] = useState(finalityProviders);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((searchTerm: string) => {
+        const filtered = finalityProviders?.filter(
+          (fp) =>
+            fp.description?.moniker
+              ?.toLowerCase()
+              .includes(searchTerm.toLowerCase()) ||
+            fp.btcPk.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+        setFilteredProviders(filtered);
+      }, 300),
+    [finalityProviders],
+  );
+
+  useEffect(() => {
+    setFilteredProviders(finalityProviders);
+  }, [finalityProviders]);
+
+  useEffect(() => {
+    debouncedSearch(searchTerm);
+    return () => debouncedSearch.cancel();
+  }, [searchTerm, debouncedSearch]);
+
+  const handleSearch = useCallback((newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+  }, []);
+
   // If there are no finality providers, show loading
   if (!finalityProviders || finalityProviders.length === 0) {
     return <LoadingView />;
@@ -49,6 +84,10 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         </a>
         .
       </p>
+      <div className="flex justify-between">
+        <FinalityProviderSearch onSearch={handleSearch} />
+        {/* FinalityProviderSort */}
+      </div>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
         <p>Finality Provider</p>
         <p>BTC PK</p>
@@ -61,14 +100,14 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       >
         <InfiniteScroll
           className="flex flex-col gap-4"
-          dataLength={finalityProviders?.length || 0}
+          dataLength={filteredProviders?.length || 0}
           next={queryMeta.next}
           hasMore={queryMeta.hasMore}
           loader={queryMeta.isFetchingMore ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
           {" "}
-          {finalityProviders?.map((fp) => (
+          {filteredProviders?.map((fp) => (
             <FinalityProvider
               key={fp.btcPk}
               moniker={fp.description?.moniker}
