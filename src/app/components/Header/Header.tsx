@@ -38,7 +38,7 @@ export const Header: React.FC<HeaderProps> = ({
             <ThemeToggle />
           </div>
           <div
-            className={`${address && "justify-end p-6 pt-0"} container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
+            className={`container mx-auto flex w-full items-center gap-4 md:hidden md:p-0 ${address ? "justify-end p-6 pt-0" : ""}`}
           >
             <ConnectedSmall
               address={address}
