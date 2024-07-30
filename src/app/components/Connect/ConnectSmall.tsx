@@ -37,12 +37,12 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   useOnClickOutside(ref, handleClickOutside);
 
   const { coinName, networkName } = getNetworkConfig();
-  const { isApiNormal, isBlocked, apiMessage } = useHealthCheck();
+  const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   // Renders the Tooltip describing the reason
   // why the user might not be able to connect the wallet
   const renderApiNotAvailableTooltip = () => {
-    if (!isBlocked && isApiNormal) return null;
+    if (!isGeoBlocked && isApiNormal) return null;
 
     return (
       <>

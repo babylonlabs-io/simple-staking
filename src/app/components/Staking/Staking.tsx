@@ -195,7 +195,7 @@ export const Staking: React.FC<StakingProps> = ({
       btcHeight + 1 < firstActivationHeight);
 
   const { isErrorOpen, showError } = useError();
-  const { isApiNormal, isBlocked, apiMessage } = useHealthCheck();
+  const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   useEffect(() => {
     const handleError = ({
@@ -489,12 +489,12 @@ export const Staking: React.FC<StakingProps> = ({
   const renderStakingForm = () => {
     // States of the staking form:
     // Health check failed
-    if (!isApiNormal || isBlocked) {
+    if (!isApiNormal || isGeoBlocked) {
       return (
         <Message
           title="Staking is not available"
           messages={[apiMessage || ""]}
-          icon={isBlocked ? geoRestricted : apiNotAvailable}
+          icon={isGeoBlocked ? geoRestricted : apiNotAvailable}
         />
       );
     }
