@@ -62,11 +62,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
                     href={website}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary inline-flex p-0 ml-1"
+                    className="text-primary inline-flex ml-1 relative top-[1px]"
                   >
-                    <span>
-                      <FiExternalLink />
-                    </span>
+                    <FiExternalLink />
                   </a>
                 )}
               </p>
