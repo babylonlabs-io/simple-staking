@@ -83,8 +83,8 @@ export const Terms = () => {
       <p>
         If you have any dispute or claim arising out of or relating in any way
         to the Interface or these Terms, you must send an email to{" "}
-        <a href="mailto:contracts@babylonchain.io" className="text-primary">
-          contracts@babylonchain.io
+        <a href="mailto:contact@babylonlabs.io" className="text-primary">
+          contact@babylonlabs.io
         </a>{" "}
         to resolve the matter via an informal, good faith negotiation process.
         If that dispute or claim is not resolved within 60 days of sending such
