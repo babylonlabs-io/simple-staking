@@ -1,7 +1,9 @@
 name: Create Sync PR from Main to Dev
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - hiep/test-sync-workflow
 
 jobs:
   call_sync_branch:
