@@ -18,7 +18,7 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
     } else {
       throw new Error(API_ERROR_MESSAGE);
     }
-  } catch (error: Error | any) {
+  } catch (error: any) {
     if (isAxiosError451(error)) {
       return {
         status: HealthCheckStatus.GeoBlocked,
