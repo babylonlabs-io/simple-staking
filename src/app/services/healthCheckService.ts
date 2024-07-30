@@ -33,6 +33,6 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
   }
 };
 
-export const isGeoBlocked = (result: HealthCheckResult): boolean => {
+export const isGeoBlockedResult = (result: HealthCheckResult): boolean => {
   return result.status === HealthCheckStatus.GeoBlocked;
 };

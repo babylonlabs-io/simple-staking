@@ -3,7 +3,7 @@ import { useEffect } from "react";
 
 import {
   getHealthCheck,
-  isGeoBlocked,
+  isGeoBlockedResult,
 } from "@/app/services/healthCheckService";
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
 
@@ -34,7 +34,7 @@ export const useHealthCheck = () => {
   }, [isError, error, showError, refetch]);
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
-  const isBlocked = data ? isGeoBlocked(data) : false;
+  const isBlocked = data ? isGeoBlockedResult(data) : false;
   const apiMessage = data?.message;
 
   return {
