@@ -19,7 +19,7 @@ export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
   };
 
   return (
-    <div className="w-full mb-4">
+    <div className="w-full">
       <div className="relative">
         <div className="absolute inset-y-0 left-0 flex items-center justify-center w-10">
           <FiSearch className="text-sm md:text-lg" />
