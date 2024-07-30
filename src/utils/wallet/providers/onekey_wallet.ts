@@ -165,6 +165,9 @@ export class OneKeyWallet extends WalletProvider {
 
   // Inscriptions are only available on oneKey Wallet BTC mainnet
   getInscriptions = async (): Promise<InscriptionIdentifier[]> => {
+    if (this.networkEnv !== Network.MAINNET) {
+      throw new Error("Inscriptions are only available on OneKey mainnet");
+    }
     // max num of iterations to prevent infinite loop
     const MAX_ITERATIONS = 100;
     // Fetch inscriptions in batches of 100

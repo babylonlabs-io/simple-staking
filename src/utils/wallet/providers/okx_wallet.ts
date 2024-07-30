@@ -179,6 +179,11 @@ export class OKXWallet extends WalletProvider {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
+    if (this.networkEnv !== Network.MAINNET) {
+      throw new Error(
+        "Inscriptions are only available on OKX Wallet BTC mainnet",
+      );
+    }
     // max num of iterations to prevent infinite loop
     const MAX_ITERATIONS = 100;
     // Fetch inscriptions in batches of 100
