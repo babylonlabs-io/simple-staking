@@ -17,10 +17,14 @@ import { InscriptionIdentifier, UTXO } from "../wallet/wallet_provider";
 export const filterOrdinals = async (
   utxos: UTXO[],
   address: string,
-  getInscriptionsFromWalletCb: () => Promise<InscriptionIdentifier[]>,
+  getInscriptionsFromWalletCb?: () => Promise<InscriptionIdentifier[]>,
 ): Promise<UTXO[]> => {
   if (!utxos.length) {
     return [];
+  }
+  // fallback to Babylon API if the wallet does not support getting inscriptions
+  if (!getInscriptionsFromWalletCb) {
+    return filterFromApi(utxos, address);
   }
   // try to get the ordinals from the wallet first, if the wallet supports it
   // otherwise fallback to the Babylon API
