@@ -13,6 +13,7 @@ import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
@@ -39,6 +40,8 @@ import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
+import apiNotAvailable from "./Form/States/api-not-available.svg";
+import geoRestricted from "./Form/States/geo-restricted.svg";
 import stakingCapReached from "./Form/States/staking-cap-reached.svg";
 import stakingNotStarted from "./Form/States/staking-not-started.svg";
 import stakingUpgrading from "./Form/States/staking-upgrading.svg";
@@ -192,6 +195,7 @@ export const Staking: React.FC<StakingProps> = ({
       btcHeight + 1 < firstActivationHeight);
 
   const { isErrorOpen, showError } = useError();
+  const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   useEffect(() => {
     const handleError = ({
@@ -484,27 +488,39 @@ export const Staking: React.FC<StakingProps> = ({
 
   const renderStakingForm = () => {
     // States of the staking form:
-    // 1. Wallet is not connected
-    if (!isWalletConnected) {
+    // Health check failed
+    if (!isApiNormal || isGeoBlocked) {
+      return (
+        <Message
+          title="Staking is not available"
+          messages={[apiMessage || ""]}
+          icon={isGeoBlocked ? geoRestricted : apiNotAvailable}
+        />
+      );
+    }
+    // Wallet is not connected
+    else if (!isWalletConnected) {
       return <WalletNotConnected onConnect={onConnect} />;
     }
-    // 2. Wallet is connected but we are still loading the staking params
+    // Wallet is connected but we are still loading the staking params
     else if (isLoading) {
       return <LoadingView />;
     }
-    // 3. Staking has not started yet
+    // Staking has not started yet
     else if (isBlockHeightUnderActivation) {
       return (
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated once ${coinName} block height passes ${firstActivationHeight ? firstActivationHeight - 1 : "-"}. The current ${coinName} block height is ${btcHeight || "-"}.`,
+            `Staking will be activated once ${coinName} block height passes ${
+              firstActivationHeight ? firstActivationHeight - 1 : "-"
+            }. The current ${coinName} block height is ${btcHeight || "-"}.`,
           ]}
           icon={stakingNotStarted}
         />
       );
     }
-    // 4. Staking params upgrading
+    // Staking params upgrading
     else if (isUpgrading) {
       return (
         <Message
@@ -516,11 +532,11 @@ export const Staking: React.FC<StakingProps> = ({
         />
       );
     }
-    // 5. Staking cap reached
+    // Staking cap reached
     else if (overflow.overTheCapRange) {
       return showOverflowWarning(overflow);
     }
-    // 6. Staking form
+    // Staking form
     else {
       const {
         minStakingAmountSat,
