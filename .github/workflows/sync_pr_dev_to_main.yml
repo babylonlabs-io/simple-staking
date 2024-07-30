@@ -1,8 +1,7 @@
 name: Create Sync PR from Main to Dev
 
 on:
-  schedule:
-  - cron: "0 0 * * *" 
+  workflow_dispatch:
 
 jobs:
   call_sync_branch:
@@ -10,5 +9,5 @@ jobs:
     with:
       base_branch: 'main'
       target_branch: 'dev'
-      reviewers: 'jrwbabylonchain,gbarkhatov,jeremy-babylonchain'
+      reviewers: 'jrwbabylonlab,gbarkhatov,jeremy-babylonlabs'
     secrets: inherit
