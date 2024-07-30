@@ -4,11 +4,14 @@ on:
   schedule:
   - cron: "0 0 * * *" 
 
+permissions:
+  pull-requests: write
+      
 jobs:
   call_sync_branch:
-    uses: babylonchain/.github/.github/workflows/reusable_sync_branch.yml@v0.2.0
+    uses: babylonlabs-io/.github/.github/workflows/reusable_sync_branch.yml@v0.2.0
     with:
       base_branch: 'main'
       target_branch: 'dev'
-      reviewers: 'jrwbabylonchain,gbarkhatov,jeremy-babylonchain'
+      reviewers: 'jrwbabylonlab,gbarkhatov,jeremy-babylonlabs'
     secrets: inherit
