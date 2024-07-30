@@ -1,9 +1,8 @@
 name: Create Sync PR from Main to Dev
 
 on:
-  push:
-    branches:
-      - hiep/test-sync-workflow
+  schedule:
+  - cron: "0 0 * * *" 
 
 permissions:
   pull-requests: write
