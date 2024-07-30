@@ -82,6 +82,7 @@ export async function pushTx(txHex: string): Promise<string> {
  * @returns A promise that resolves to the amount of satoshis that the address
  *          holds.
  */
+// TODO balance should come from reduced UTXOs
 export async function getAddressBalance(address: string): Promise<number> {
   const response = await fetch(addressInfoUrl(address));
   if (!response.ok) {
@@ -185,7 +186,7 @@ export async function getFundingUTXOs(
       txid: s.txid,
       vout: s.vout,
       value: s.value,
-      scriptPubKey: scriptPubKey,
+      scriptPubKey,
     };
   });
 }

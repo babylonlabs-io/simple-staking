@@ -9,7 +9,13 @@ import {
   getTipHeight,
   pushTx,
 } from "../../mempool_api";
-import { Fees, Network, UTXO, WalletProvider } from "../wallet_provider";
+import {
+  Fees,
+  Inscription,
+  Network,
+  UTXO,
+  WalletProvider,
+} from "../wallet_provider";
 
 // window object for Bitget Wallet extension
 export const bitgetWalletProvider = "bitkeep";
@@ -203,4 +209,8 @@ export class BitgetWallet extends WalletProvider {
   getBTCTipHeight = async (): Promise<number> => {
     return await getTipHeight();
   };
+
+  getInscriptions(): Promise<Inscription[]> {
+    throw new Error("Method not implemented.");
+  }
 }

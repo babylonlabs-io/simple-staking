@@ -9,7 +9,7 @@ import { validateDecimalPoints } from "./validation/validation";
 interface StakingAmountProps {
   minStakingAmountSat: number;
   maxStakingAmountSat: number;
-  btcWalletBalanceSat: number;
+  btcWalletBalanceSat?: number;
   onStakingAmountSatChange: (inputAmountSat: number) => void;
   reset: boolean;
 }
@@ -52,6 +52,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   };
 
   const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
+    if (!btcWalletBalanceSat) return;
     setTouched(true);
 
     if (value === "") {
