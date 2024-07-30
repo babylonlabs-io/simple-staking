@@ -1,4 +1,4 @@
-import bitgetWalletIcon from "./icons/bitget-wallet.svg";
+import bitgetWalletIcon from "./icons/bitget.svg";
 import keystoneIcon from "./icons/keystone.svg";
 import okxIcon from "./icons/okx.svg";
 import oneKeyIcon from "./icons/onekey.svg";
