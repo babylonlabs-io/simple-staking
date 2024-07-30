@@ -1,4 +1,5 @@
-import { fetchHealthCheck, isAxiosError451 } from "../api/healthCheckClient";
+import { isAxiosError451 } from "../api/error";
+import { fetchHealthCheck } from "../api/healthCheckClient";
 import {
   API_ERROR_MESSAGE,
   GEO_BLOCK_MESSAGE,
