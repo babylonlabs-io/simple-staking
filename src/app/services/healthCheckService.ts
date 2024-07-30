@@ -22,15 +22,12 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
     if (isAxiosError451(error)) {
       return {
         status: HealthCheckStatus.GeoBlocked,
-        message: error.request?.response?.message || GEO_BLOCK_MESSAGE,
+        message: error.response?.message || GEO_BLOCK_MESSAGE,
       };
     } else {
       return {
         status: HealthCheckStatus.Error,
-        message:
-          error.request?.response?.message ||
-          error?.message ||
-          API_ERROR_MESSAGE,
+        message: error.response?.message || error?.message || API_ERROR_MESSAGE,
       };
     }
   }
