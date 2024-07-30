@@ -50,7 +50,7 @@ const iconLinks = [
   },
   {
     name: "Email",
-    url: "mailto:contact@babylonchain.io",
+    url: "mailto:contact@babylonlabs.io",
     Icon: MdAlternateEmail,
   },
   {
