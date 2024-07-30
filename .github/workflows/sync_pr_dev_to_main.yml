@@ -5,6 +5,10 @@ on:
     branches:
       - hiep/test-sync-workflow
 
+permissions:
+  contents: write
+  pull-requests: write
+      
 jobs:
   call_sync_branch:
     uses: babylonlabs-io/.github/.github/workflows/reusable_sync_branch.yml@v0.2.0
