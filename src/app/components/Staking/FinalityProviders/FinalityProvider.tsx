@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { FiGlobe } from "react-icons/fi";
+import { FiExternalLink } from "react-icons/fi";
 import { Tooltip } from "react-tooltip";
 
 import blue from "@/app/assets/blue-check.svg";
@@ -55,17 +55,19 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           {finalityProviderHasData ? (
             <div className="flex items-center gap-1 justify-start">
               <Image src={blue} alt="verified" />
-              <p>{moniker}</p>
-              {website && (
-                <a
-                  href={website}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-primary btn btn-outline btn-xs ml-2 p-0 h-6 w-6"
-                >
-                  <FiGlobe />
-                </a>
-              )}
+              <p>
+                {moniker}
+                {website && (
+                  <a
+                    href={website}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary inline-flex ml-1 relative top-[1px]"
+                  >
+                    <FiExternalLink />
+                  </a>
+                )}
+              </p>
             </div>
           ) : (
             <div className="flex items-center gap-1 justify-start">
