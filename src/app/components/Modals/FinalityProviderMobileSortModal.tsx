@@ -3,10 +3,7 @@ import { BsSortDown, BsSortUp } from "react-icons/bs";
 import { FaCheck } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 
-import {
-  SortDirection,
-  SortField,
-} from "../Staking/FinalityProviders/FinalityProviders";
+import { SortDirection, SortField } from "@/app/types/finalityProviders";
 
 import { GeneralModal } from "./GeneralModal";
 
