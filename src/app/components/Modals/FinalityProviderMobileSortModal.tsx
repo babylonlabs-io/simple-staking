@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { BsSortDown, BsSortUp } from "react-icons/bs";
 import { FaCheck } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -14,6 +14,10 @@ interface FinalityProviderMobileSortModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
   handleMobileSort: (order: SortDirection, criteria: SortField) => void;
+  activeOrder: number;
+  setActiveOrder: Dispatch<SetStateAction<number>>;
+  selectedCriterion: SortField;
+  setSelectedCriterion: Dispatch<SetStateAction<SortField>>;
 }
 
 interface Criteria {
@@ -23,28 +27,27 @@ interface Criteria {
 
 export const FinalityProviderMobileSortModal: React.FC<
   FinalityProviderMobileSortModalProps
-> = ({ open, onClose, handleMobileSort }) => {
-  const [activeOrder, setActiveOrder] = useState(0);
-  const [selectedCriterion, setSelectedCriterion] =
-    useState<SortField>("stakeSat");
+> = ({
+  open,
+  onClose,
+  handleMobileSort,
+  activeOrder,
+  setActiveOrder,
+  selectedCriterion,
+  setSelectedCriterion,
+}) => {
+  const [isMounted, setIsMounted] = useState(false);
+
   const orders = [
     { label: "Ascending", icon: <BsSortUp /> },
     { label: "Descending", icon: <BsSortDown /> },
   ];
   const criteria: Criteria[] = [
-    { id: "stakeSat", label: "Stake Sat" },
+    { id: "moniker", label: "Finality Provider" },
     { id: "btcPk", label: "BTC PK" },
-    { id: "moniker", label: "Moniker" },
+    { id: "stakeSat", label: "Total Delegation" },
     { id: "commission", label: "Commission" },
   ];
-  const bgRef = useRef(null);
-
-  useEffect(() => {
-    if (bgRef.current) {
-      (bgRef.current as HTMLDivElement).style.transform =
-        `translateX(${activeOrder * 100}%)`;
-    }
-  }, [activeOrder]);
 
   return (
     <GeneralModal open={open} onClose={onClose}>
@@ -61,18 +64,25 @@ export const FinalityProviderMobileSortModal: React.FC<
       <div className="relative flex w-full border border-gray-400 rounded-full p-2 mb-4">
         <div className="absolute left-0 top-0 w-full h-full p-1">
           <div
-            ref={bgRef}
-            className="w-1/2 h-full bg-gray-400 rounded-full transition-transform duration-300 ease-in-out"
+            className={`
+    w-1/2 h-full bg-gray-400 rounded-full
+    transition-transform duration-300 ease-in-out
+    ${activeOrder === 0 ? "translate-x-0" : "translate-x-full"}
+  `}
           />
         </div>
         {orders.map((order, index) => (
           <button
             key={index}
-            className={`flex-1 flex items-center justify-center px-4 py-2 rounded-full relative z-10 ${activeOrder === index ? "text-black" : "text-gray-400"} transition duration-300 ease-in-out`}
+            className={`flex-1 flex items-center justify-center px-4 py-2 rounded-full relative z-10 ${
+              activeOrder === index ? "text-black" : "text-gray-400"
+            } transition duration-300 ease-in-out`}
             onClick={() => setActiveOrder(index)}
           >
             <span
-              className={`${activeOrder === index ? "text-black" : "text-gray-400"} transition duration-150 ease-in-out`}
+              className={`${
+                activeOrder === index ? "text-black" : "text-gray-400"
+              } transition duration-150 ease-in-out`}
             >
               {order.icon}
             </span>{" "}

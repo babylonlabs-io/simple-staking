@@ -1,3 +1,4 @@
+import { useDebounce } from "@uidotdev/usehooks";
 import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
@@ -9,10 +10,11 @@ export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
   onSearch,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
-    onSearch(searchTerm);
-  }, [searchTerm, onSearch]);
+    onSearch(debouncedSearchTerm);
+  }, [debouncedSearchTerm, onSearch]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
