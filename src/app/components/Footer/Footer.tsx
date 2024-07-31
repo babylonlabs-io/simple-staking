@@ -25,7 +25,7 @@ const iconLinks = [
   },
   {
     name: "GitHub",
-    url: "https://github.com/babylonchain",
+    url: "https://github.com/babylonlabs-io",
     Icon: BsGithub,
   },
   {
@@ -50,7 +50,7 @@ const iconLinks = [
   },
   {
     name: "Email",
-    url: "mailto:contact@babylonchain.io",
+    url: "mailto:contact@babylonlabs.io",
     Icon: MdAlternateEmail,
   },
   {
