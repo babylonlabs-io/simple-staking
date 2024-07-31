@@ -81,18 +81,3 @@ export const getFinalityProviders = async (
 
   return { finalityProviders, pagination };
 };
-
-export const getAllFinalityProviders = async (): Promise<
-  FinalityProvider[]
-> => {
-  let allProviders: FinalityProvider[] = [];
-  let nextKey = "";
-
-  do {
-    const result = await getFinalityProviders(nextKey);
-    allProviders = [...allProviders, ...result.finalityProviders];
-    nextKey = result.pagination.next_key;
-  } while (nextKey);
-
-  return allProviders;
-};

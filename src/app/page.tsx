@@ -3,7 +3,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
 import { initBTCCurve } from "btc-staking-ts";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
@@ -21,7 +21,6 @@ import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import {
-  getAllFinalityProviders,
   getFinalityProviders,
   PaginatedFinalityProviders,
 } from "./api/getFinalityProviders";
@@ -43,6 +42,7 @@ import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
+import { FinalityProvider as FinalityProviderInterface } from "./types/finalityProviders";
 
 interface HomeProps {}
 
@@ -55,6 +55,10 @@ const Home: React.FC<HomeProps> = () => {
   const { error, isErrorOpen, showError, hideError, retryErrorAction } =
     useError();
   const { isTermsOpen, closeTerms } = useTerms();
+
+  const [allFinalityProviders, setAllFinalityProviders] = useState<
+    FinalityProviderInterface[]
+  >([]);
 
   const {
     data: paramWithContext,
@@ -93,6 +97,7 @@ const Home: React.FC<HomeProps> = () => {
     isError: hasFinalityProvidersError,
     refetch: refetchFinalityProvidersData,
     isRefetchError: isRefetchFinalityProvidersError,
+    isFetched: isFetchedFinalityProvider,
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
     queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
@@ -118,20 +123,25 @@ const Home: React.FC<HomeProps> = () => {
     },
   });
 
-  const {
-    data: allFinalityProviders,
-    isLoading: isLoadingFinalityProviders,
-    error: allFinalityProvidersError,
-    isError: hasAllFinalityProvidersError,
-    refetch: refetchFinalityProviders,
-  } = useQuery({
-    queryKey: ["all-finality-providers"],
-    queryFn: getAllFinalityProviders,
-    staleTime: 60000 * 5,
-    retry: (failureCount) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
+  const getAllFinalityProviders = useCallback(async () => {
+    let allProviders: FinalityProviderInterface[] = [];
+    let nextKey: string | null = "";
+
+    do {
+      const result = await getFinalityProviders(nextKey);
+      allProviders.push(...result.finalityProviders);
+      nextKey =
+        result.pagination.next_key !== "" ? result.pagination.next_key : null;
+    } while (nextKey);
+
+    setAllFinalityProviders(allProviders);
+  }, []);
+
+  useEffect(() => {
+    if (isFetchedFinalityProvider && finalityProviders) {
+      getAllFinalityProviders();
+    }
+  }, [isFetchedFinalityProvider, finalityProviders, getAllFinalityProviders]);
 
   const {
     data: delegations,
@@ -376,10 +386,16 @@ const Home: React.FC<HomeProps> = () => {
   }, [delegations, setDelegationsLocalStorage, delegationsLocalStorage]);
 
   // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = finalityProviders?.finalityProviders.reduce(
-    (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
-    {},
-  );
+  const finalityProvidersKV = useMemo(() => {
+    const providers =
+      allFinalityProviders.length > 0
+        ? allFinalityProviders
+        : finalityProviders?.finalityProviders || [];
+    return providers.reduce(
+      (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
+      {},
+    );
+  }, [allFinalityProviders, finalityProviders]);
 
   let totalStakedSat = 0;
 
@@ -421,7 +437,11 @@ const Home: React.FC<HomeProps> = () => {
           )}
           <Staking
             btcHeight={paramWithContext?.currentHeight}
-            finalityProviders={finalityProviders?.finalityProviders}
+            finalityProviders={
+              allFinalityProviders.length > 0
+                ? allFinalityProviders
+                : finalityProviders?.finalityProviders
+            }
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
             finalityProvidersFetchNext={fetchNextFinalityProvidersPage}

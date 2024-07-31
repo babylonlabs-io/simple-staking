@@ -11,31 +11,18 @@ import {
 import { useFinalityProvidersData } from "@/app/hooks/finalityProviders/useFinalityProvidersData";
 import { useFinalityProvidersSort } from "@/app/hooks/finalityProviders/useFinalityProvidersSort";
 import { useMobileSortModal } from "@/app/hooks/finalityProviders/useMobileSortModal";
-import { QueryMeta } from "@/app/types/api";
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import {
+  FinalityProvidersProps,
+  FinalityProvidersSortButtonProps,
+  SortField,
+} from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
 import { Network } from "@/utils/wallet/wallet_provider";
 
-import { FinalityProviderSearch } from "../../FinalityProviders/FinalityProviderSearch";
 import { FinalityProviderMobileSortModal } from "../../Modals/FinalityProviderMobileSortModal";
 
 import { FinalityProvider } from "./FinalityProvider";
-
-interface FinalityProvidersProps {
-  finalityProviders: FinalityProviderInterface[] | undefined;
-  selectedFinalityProvider: FinalityProviderInterface | undefined;
-  onFinalityProviderChange: (btcPkHex: string) => void;
-  queryMeta: QueryMeta;
-}
-
-export type SortField = "moniker" | "btcPk" | "stakeSat" | "commission";
-export type SortDirection = "asc" | "desc";
-
-interface SortButtonProps {
-  field: SortField;
-  label: string;
-  onSort: (field: SortField) => void;
-}
+import { FinalityProviderSearch } from "./FinalityProviderSearch";
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   finalityProviders,
@@ -46,13 +33,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   const { width } = useWindowSize();
   const isMobile = typeof width === "number" ? width < 1000 : false;
 
-  const {
-    filteredProviders,
-    handleSearch,
-    sortedProviders,
-    setSortField,
-    setSortDirection,
-  } = useFinalityProvidersData(finalityProviders);
+  const { handleSearch, sortedProviders, setSortField, setSortDirection } =
+    useFinalityProvidersData(finalityProviders);
 
   const { visualSortField, visualSortDirection, handleSort, handleMobileSort } =
     useFinalityProvidersSort(setSortField, setSortDirection);
@@ -88,7 +70,11 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     );
   };
 
-  const SortButton: React.FC<SortButtonProps> = ({ field, label, onSort }) => {
+  const SortButton: React.FC<FinalityProvidersSortButtonProps> = ({
+    field,
+    label,
+    onSort,
+  }) => {
     return (
       <button onClick={() => onSort(field)} className="flex items-center">
         {label} <SortIndicator field={field} />

@@ -1,10 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useEffect, useState } from "react";
 
-import {
-  SortDirection,
-  SortField,
-} from "@/app/components/Staking/FinalityProviders/FinalityProviders";
+import { SortDirection, SortField } from "@/app/types/finalityProviders";
 
 export const useFinalityProvidersSort = (
   setSortField: (field: SortField) => void,

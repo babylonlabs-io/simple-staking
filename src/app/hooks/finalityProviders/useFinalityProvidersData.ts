@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
+  FinalityProvider as FinalityProviderInterface,
   SortDirection,
   SortField,
-} from "@/app/components/Staking/FinalityProviders/FinalityProviders";
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+} from "@/app/types/finalityProviders";
 
 export const useFinalityProvidersData = (
   initialProviders: FinalityProviderInterface[] | undefined,

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { SortField } from "@/app/components/Staking/FinalityProviders/FinalityProviders";
+import { SortField } from "@/app/types/finalityProviders";
 
 export const useMobileSortModal = () => {
   const [isSortModalOpen, setIsSortModalOpen] = useState(false);
