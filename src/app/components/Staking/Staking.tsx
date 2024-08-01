@@ -16,7 +16,10 @@ import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import {
+  FinalityProvider,
+  FinalityProvider as FinalityProviderInterface,
+} from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
 import {
   createStakingTx,
@@ -54,13 +57,9 @@ interface OverflowProperties {
 
 interface StakingProps {
   btcHeight: number | undefined;
-  finalityProviders: FinalityProviderInterface[] | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
   onConnect: () => void;
-  finalityProvidersFetchNext: () => void;
-  finalityProvidersHasNext: boolean;
-  finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
   btcWalletBalanceSat?: number;
   btcWalletNetwork: networks.Network | undefined;
@@ -68,16 +67,15 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   availableUTXOs?: UTXO[] | undefined;
+  setFinalityProvidersCallback: (
+    kv: Record<string, string> | undefined,
+  ) => void;
 }
 
 export const Staking: React.FC<StakingProps> = ({
   btcHeight,
-  finalityProviders,
   isWalletConnected,
   onConnect,
-  finalityProvidersFetchNext,
-  finalityProvidersHasNext,
-  finalityProvidersIsFetchingMore,
   isLoading,
   btcWallet,
   btcWalletNetwork,
@@ -86,12 +84,15 @@ export const Staking: React.FC<StakingProps> = ({
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
   availableUTXOs,
+  setFinalityProvidersCallback,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
+  const [finalityProviders, setFinalityProviders] =
+    useState<FinalityProvider[]>();
   // Selected fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -112,6 +113,16 @@ export const Staking: React.FC<StakingProps> = ({
     overTheCapRange: false,
     approchingCapRange: false,
   });
+
+  // Finality providers key-value map { pk: moniker }
+  useEffect(() => {
+    const finalityProvidersKV: Record<string, string> | undefined =
+      finalityProviders?.reduce(
+        (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
+        {},
+      );
+    setFinalityProvidersCallback(finalityProvidersKV);
+  }, [finalityProviders, setFinalityProvidersCallback]);
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -658,13 +669,9 @@ export const Staking: React.FC<StakingProps> = ({
         <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
           <FinalityProviders
             finalityProviders={finalityProviders}
+            setFinalityProviders={setFinalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
-            queryMeta={{
-              next: finalityProvidersFetchNext,
-              hasMore: finalityProvidersHasNext,
-              isFetchingMore: finalityProvidersIsFetchingMore,
-            }}
           />
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />

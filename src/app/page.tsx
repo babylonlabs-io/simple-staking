@@ -3,7 +3,7 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
 import { initBTCCurve } from "btc-staking-ts";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
@@ -20,10 +20,6 @@ import {
 import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
-import {
-  getFinalityProviders,
-  PaginatedFinalityProviders,
-} from "./api/getFinalityProviders";
 import { getGlobalParams } from "./api/getGlobalParams";
 import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
@@ -41,8 +37,7 @@ import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
-import { ErrorHandlerParam, ErrorState } from "./types/errors";
-import { FinalityProvider as FinalityProviderInterface } from "./types/finalityProviders";
+import { ErrorState } from "./types/errors";
 
 interface HomeProps {}
 
@@ -50,15 +45,31 @@ const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
+  const [finalityProvidersKV, setFinalityProvidersKV] = useState<
+    Record<string, string>
+  >({});
 
   const [address, setAddress] = useState("");
-  const { error, isErrorOpen, showError, hideError, retryErrorAction } =
-    useError();
+  const {
+    error,
+    isErrorOpen,
+    showError,
+    hideError,
+    retryErrorAction,
+    handleError,
+  } = useError();
   const { isTermsOpen, closeTerms } = useTerms();
-
-  const [allFinalityProviders, setAllFinalityProviders] = useState<
-    FinalityProviderInterface[]
-  >([]);
+  const setFinalityProvidersCallback = useCallback(
+    (kv: Record<string, string> | undefined) => {
+      if (!kv) {
+        return;
+      }
+      setFinalityProvidersKV((prev) => {
+        return { ...prev, ...kv };
+      });
+    },
+    [],
+  );
 
   const {
     data: paramWithContext,
@@ -87,61 +98,6 @@ const Home: React.FC<HomeProps> = () => {
       return !isErrorOpen && failureCount <= 3;
     },
   });
-
-  const {
-    data: finalityProviders,
-    fetchNextPage: fetchNextFinalityProvidersPage,
-    hasNextPage: hasNextFinalityProvidersPage,
-    isFetchingNextPage: isFetchingNextFinalityProvidersPage,
-    error: finalityProvidersError,
-    isError: hasFinalityProvidersError,
-    refetch: refetchFinalityProvidersData,
-    isRefetchError: isRefetchFinalityProvidersError,
-    isFetched: isFetchedFinalityProvider,
-  } = useInfiniteQuery({
-    queryKey: ["finality providers"],
-    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
-    getNextPageParam: (lastPage) =>
-      lastPage?.pagination?.next_key !== ""
-        ? lastPage?.pagination?.next_key
-        : null,
-    initialPageParam: "",
-    refetchInterval: 60000, // 1 minute
-    select: (data) => {
-      const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
-        (acc, page) => {
-          acc.finalityProviders.push(...page.finalityProviders);
-          acc.pagination = page.pagination;
-          return acc;
-        },
-        { finalityProviders: [], pagination: { next_key: "" } },
-      );
-      return flattenedData;
-    },
-    retry: (failureCount, error) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
-
-  const getAllFinalityProviders = useCallback(async () => {
-    let allProviders: FinalityProviderInterface[] = [];
-    let nextKey: string | null = "";
-
-    do {
-      const result = await getFinalityProviders(nextKey);
-      allProviders.push(...result.finalityProviders);
-      nextKey =
-        result.pagination.next_key !== "" ? result.pagination.next_key : null;
-    } while (nextKey);
-
-    setAllFinalityProviders(allProviders);
-  }, []);
-
-  useEffect(() => {
-    if (isFetchedFinalityProvider && finalityProviders) {
-      getAllFinalityProviders();
-    }
-  }, [isFetchedFinalityProvider, finalityProviders, getAllFinalityProviders]);
 
   const {
     data: delegations,
@@ -208,30 +164,6 @@ const Home: React.FC<HomeProps> = () => {
   });
 
   useEffect(() => {
-    const handleError = ({
-      error,
-      hasError,
-      errorState,
-      refetchFunction,
-    }: ErrorHandlerParam) => {
-      if (hasError && error) {
-        showError({
-          error: {
-            message: error.message,
-            errorState: errorState,
-            errorTime: new Date(),
-          },
-          retryAction: refetchFunction,
-        });
-      }
-    };
-
-    handleError({
-      error: finalityProvidersError,
-      hasError: hasFinalityProvidersError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchFinalityProvidersData,
-    });
     handleError({
       error: delegationsError,
       hasError: hasDelegationsError,
@@ -251,12 +183,8 @@ const Home: React.FC<HomeProps> = () => {
       refetchFunction: refetchAvailableUTXOs,
     });
   }, [
-    hasFinalityProvidersError,
     hasGlobalParamsVersionError,
     hasDelegationsError,
-    isRefetchFinalityProvidersError,
-    finalityProvidersError,
-    refetchFinalityProvidersData,
     delegationsError,
     refetchDelegationData,
     globalParamsVersionError,
@@ -265,6 +193,7 @@ const Home: React.FC<HomeProps> = () => {
     availableUTXOsError,
     hasAvailableUTXOsError,
     refetchAvailableUTXOs,
+    handleError,
   ]);
 
   // Initializing btc curve is a required one-time operation
@@ -385,18 +314,6 @@ const Home: React.FC<HomeProps> = () => {
     updateDelegationsLocalStorage();
   }, [delegations, setDelegationsLocalStorage, delegationsLocalStorage]);
 
-  // Finality providers key-value map { pk: moniker }
-  const finalityProvidersKV = useMemo(() => {
-    const providers =
-      allFinalityProviders.length > 0
-        ? allFinalityProviders
-        : finalityProviders?.finalityProviders || [];
-    return providers.reduce(
-      (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
-      {},
-    );
-  }, [allFinalityProviders, finalityProviders]);
-
   let totalStakedSat = 0;
 
   if (delegations) {
@@ -437,18 +354,8 @@ const Home: React.FC<HomeProps> = () => {
           )}
           <Staking
             btcHeight={paramWithContext?.currentHeight}
-            finalityProviders={
-              allFinalityProviders.length > 0
-                ? allFinalityProviders
-                : finalityProviders?.finalityProviders
-            }
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
-            finalityProvidersFetchNext={fetchNextFinalityProvidersPage}
-            finalityProvidersHasNext={hasNextFinalityProvidersPage}
-            finalityProvidersIsFetchingMore={
-              isFetchingNextFinalityProvidersPage
-            }
             isLoading={isLoadingCurrentParams}
             btcWallet={btcWallet}
             btcWalletBalanceSat={btcWalletBalanceSat}
@@ -457,6 +364,7 @@ const Home: React.FC<HomeProps> = () => {
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
+            setFinalityProvidersCallback={setFinalityProvidersCallback}
           />
           {btcWallet &&
             delegations &&

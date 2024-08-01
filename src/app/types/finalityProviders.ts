@@ -1,4 +1,4 @@
-import { QueryMeta } from "./api";
+import { Dispatch, SetStateAction } from "react";
 
 export interface FinalityProvider {
   description: Description;
@@ -20,9 +20,11 @@ export interface Description {
 
 export interface FinalityProvidersProps {
   finalityProviders: FinalityProvider[] | undefined;
+  setFinalityProviders: Dispatch<
+    SetStateAction<FinalityProvider[] | undefined>
+  >;
   selectedFinalityProvider: FinalityProvider | undefined;
   onFinalityProviderChange: (btcPkHex: string) => void;
-  queryMeta: QueryMeta;
 }
 
 export type SortField = "moniker" | "btcPk" | "stakeSat" | "commission";
