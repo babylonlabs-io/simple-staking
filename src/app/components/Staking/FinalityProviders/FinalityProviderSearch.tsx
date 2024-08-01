@@ -28,7 +28,7 @@ export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
         </div>
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Search by Name or Public Key"
           value={searchTerm}
           onChange={handleSearch}
           className="w-full pl-10 pr-4 py-2 text-sm bg-transparent border-b border-gray-300 focus:outline-none focus:border-primary"
