@@ -45,9 +45,6 @@ const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
-  const [finalityProvidersKV, setFinalityProvidersKV] = useState<
-    Record<string, string>
-  >({});
 
   const [address, setAddress] = useState("");
   const {
@@ -59,17 +56,6 @@ const Home: React.FC<HomeProps> = () => {
     handleError,
   } = useError();
   const { isTermsOpen, closeTerms } = useTerms();
-  const setFinalityProvidersCallback = useCallback(
-    (kv: Record<string, string> | undefined) => {
-      if (!kv) {
-        return;
-      }
-      setFinalityProvidersKV((prev) => {
-        return { ...prev, ...kv };
-      });
-    },
-    [],
-  );
 
   const {
     data: paramWithContext,
@@ -364,15 +350,12 @@ const Home: React.FC<HomeProps> = () => {
             publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
-            setFinalityProvidersCallback={setFinalityProvidersCallback}
           />
           {btcWallet &&
             delegations &&
             paramWithContext?.nextBlockParams.currentVersion &&
-            btcWalletNetwork &&
-            finalityProvidersKV && (
+            btcWalletNetwork && (
               <Delegations
-                finalityProvidersKV={finalityProvidersKV}
                 delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
                 globalParamsVersion={

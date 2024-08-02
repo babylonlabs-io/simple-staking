@@ -67,9 +67,6 @@ interface StakingProps {
   publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   availableUTXOs?: UTXO[] | undefined;
-  setFinalityProvidersCallback: (
-    kv: Record<string, string> | undefined,
-  ) => void;
 }
 
 export const Staking: React.FC<StakingProps> = ({
@@ -84,7 +81,6 @@ export const Staking: React.FC<StakingProps> = ({
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
   availableUTXOs,
-  setFinalityProvidersCallback,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -113,16 +109,6 @@ export const Staking: React.FC<StakingProps> = ({
     overTheCapRange: false,
     approchingCapRange: false,
   });
-
-  // Finality providers key-value map { pk: moniker }
-  useEffect(() => {
-    const finalityProvidersKV: Record<string, string> | undefined =
-      finalityProviders?.reduce(
-        (acc, fp) => ({ ...acc, [fp?.btcPk]: fp?.description?.moniker }),
-        {},
-      );
-    setFinalityProvidersCallback(finalityProvidersKV);
-  }, [finalityProviders, setFinalityProvidersCallback]);
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
