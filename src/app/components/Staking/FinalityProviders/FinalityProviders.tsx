@@ -24,7 +24,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   selectedFinalityProvider,
   onFinalityProviderChange,
   finalityProviders,
-  setFinalityProviders,
+  finalityProvidersCallback,
 }) => {
   const { isErrorOpen, showError, handleError } = useError();
   const {
@@ -62,8 +62,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   });
 
   useEffect(() => {
-    setFinalityProviders(fps?.finalityProviders);
-  }, [finalityProviders, fps, setFinalityProviders]);
+    finalityProvidersCallback(fps?.finalityProviders);
+  }, [finalityProviders, fps, finalityProvidersCallback]);
 
   useEffect(() => {
     if (

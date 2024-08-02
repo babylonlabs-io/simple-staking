@@ -20,7 +20,7 @@ export interface Description {
 
 export interface FinalityProvidersProps {
   finalityProviders: FinalityProvider[] | undefined;
-  setFinalityProviders: Dispatch<
+  finalityProvidersCallback: Dispatch<
     SetStateAction<FinalityProvider[] | undefined>
   >;
   selectedFinalityProvider: FinalityProvider | undefined;

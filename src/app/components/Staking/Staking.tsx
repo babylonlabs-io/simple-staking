@@ -669,7 +669,7 @@ export const Staking: React.FC<StakingProps> = ({
         <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
           <FinalityProviders
             finalityProviders={finalityProviders}
-            setFinalityProviders={setFinalityProviders}
+            finalityProvidersCallback={setFinalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
           />
