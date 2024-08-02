@@ -7,9 +7,9 @@ jest.mock("@/app/api/postFilterOrdinals");
 
 describe("filterOrdinals", () => {
   const mockUtxos: UTXO[] = [
-    { txid: "txid1", vout: 0, value: 1000, scriptPubKey: "scriptPubKey1" },
-    { txid: "txid2", vout: 1, value: 2000, scriptPubKey: "scriptPubKey2" },
-    { txid: "txid3", vout: 2, value: 3000, scriptPubKey: "scriptPub" },
+    { txid: "txid1", vout: 0, value: 100000, scriptPubKey: "scriptPubKey1" },
+    { txid: "txid2", vout: 1, value: 200000, scriptPubKey: "scriptPubKey2" },
+    { txid: "txid3", vout: 2, value: 300000, scriptPubKey: "scriptPub" },
   ];
   const address = "testAddress";
 
@@ -20,6 +20,24 @@ describe("filterOrdinals", () => {
   it("should return an empty array when no UTXOs are provided", async () => {
     const result = await filterOrdinals([], address, jest.fn());
     expect(result).toEqual([]);
+  });
+
+  it("should filter out UTXOs have less than 10k sats", async () => {
+    const getInscriptionsFromWalletCb = jest.fn().mockResolvedValue([]);
+
+    const mockedUTXOsWithLowValue = [
+      { txid: "txid1", vout: 0, value: 10000, scriptPubKey: "scriptPubKey1" },
+      { txid: "txid2", vout: 1, value: 9999, scriptPubKey: "scriptPubKey2" },
+      { txid: "txid3", vout: 2, value: 10001, scriptPubKey: "scriptPub" },
+    ];
+
+    const result = await filterOrdinals(
+      mockedUTXOsWithLowValue,
+      address,
+      getInscriptionsFromWalletCb,
+    );
+
+    expect(result).toEqual([mockedUTXOsWithLowValue[2]]);
   });
 
   it("should filter out UTXOs that contain ordinals from the wallet", async () => {
