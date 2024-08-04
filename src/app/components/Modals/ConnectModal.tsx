@@ -178,13 +178,15 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                 name,
                 linkToDocs,
                 icon,
+                isUsbWallet,
                 isQRWallet,
                 supportedNetworks,
               }) => {
                 if (name === BROWSER_INJECTED_WALLET_NAME) {
                   return buildInjectableWallet(isInjectable, name);
                 }
-                const walletAvailable = isQRWallet || !!window[provider as any];
+                const walletAvailable =
+                  isQRWallet || isUsbWallet || !!window[provider as any];
 
                 // If the wallet is integrated but does not support the current network, do not display it
                 if (

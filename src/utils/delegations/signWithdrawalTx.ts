@@ -112,6 +112,9 @@ export const signWithdrawalTx = async (
   let withdrawalTx: Transaction;
   try {
     const { psbt } = withdrawPsbtTxResult;
+
+    console.log("withdrawPsbtTxResult", psbt.toHex());
+
     withdrawalTx = await signPsbtTx(psbt.toHex());
   } catch (error) {
     throw new Error("Failed to sign PSBT for the withdrawal transaction");
@@ -119,6 +122,11 @@ export const signWithdrawalTx = async (
 
   // Get the withdrawal transaction hex
   const withdrawalTxHex = withdrawalTx.toHex();
+
+  console.log("withdrawalTxHex", withdrawalTxHex);
+
+  throw new Error("Not implemented");
+
   // Perform a safety check on the estimated transaction fee
   txFeeSafetyCheck(
     withdrawalTx,

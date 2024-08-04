@@ -383,10 +383,18 @@ const Home: React.FC<HomeProps> = () => {
     0,
   );
 
+  // const handleConnectLedger = async () => {
+  //   const transport = await TransportWebUSB.create();
+  //   console.log(transport);
+  //   const app = new AppClient(transport);
+  //   console.log(app);
+  // };
+
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
     >
+      {/* <button onClick={handleConnectLedger}>connect ledger</button> */}
       <NetworkBadge isWalletConnected={!!btcWallet} />
       <Header
         onConnect={handleConnectModal}

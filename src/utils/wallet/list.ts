@@ -1,10 +1,12 @@
 import bitgetWalletIcon from "./icons/bitget.svg";
 import keystoneIcon from "./icons/keystone.svg";
+import ledgerIcon from "./icons/ledger.svg";
 import okxIcon from "./icons/okx.svg";
 import oneKeyIcon from "./icons/onekey.svg";
 import tomoIcon from "./icons/tomo.svg";
 import { BitgetWallet, bitgetWalletProvider } from "./providers/bitget_wallet";
 import { KeystoneWallet } from "./providers/keystone";
+import { LedgerWallet } from "./providers/ledger";
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";
 import { OneKeyWallet, oneKeyProvider } from "./providers/onekey_wallet";
 import { TomoWallet, tomoProvider } from "./providers/tomo_wallet";
@@ -17,6 +19,7 @@ interface IntegratedWallet {
   linkToDocs: string;
   provider?: string;
   isQRWallet?: boolean;
+  isUsbWallet?: boolean;
   supportedNetworks?: Network[];
 }
 
@@ -39,6 +42,14 @@ export const walletList: IntegratedWallet[] = [
     provider: "",
     linkToDocs: "",
     supportedNetworks: [Network.MAINNET, Network.SIGNET],
+  },
+  {
+    name: "Ledger",
+    icon: ledgerIcon,
+    wallet: LedgerWallet,
+    linkToDocs: "https://www.ledger.com/",
+    isUsbWallet: true,
+    supportedNetworks: [Network.MAINNET],
   },
   {
     name: "Tomo",
