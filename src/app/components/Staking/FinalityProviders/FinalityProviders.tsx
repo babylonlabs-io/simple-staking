@@ -23,8 +23,7 @@ import { FinalityProviderSearch } from "./FinalityProviderSearch";
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   selectedFinalityProvider,
   onFinalityProviderChange,
-  finalityProviders,
-  finalityProvidersCallback,
+  onFinalityProvidersLoad,
 }) => {
   const { isErrorOpen, showError, handleError } = useError();
   const {
@@ -62,8 +61,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   });
 
   useEffect(() => {
-    finalityProvidersCallback(fps?.finalityProviders);
-  }, [finalityProviders, fps, finalityProvidersCallback]);
+    onFinalityProvidersLoad(fps?.finalityProviders);
+  }, [fps, onFinalityProvidersLoad]);
 
   useEffect(() => {
     if (
@@ -95,10 +94,11 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     handleError,
   ]);
 
-  const { handleSearch, filteredProviders } =
-    useFinalityProvidersData(finalityProviders);
+  const { handleSearch, filteredProviders } = useFinalityProvidersData(
+    fps?.finalityProviders,
+  );
 
-  if (!finalityProviders || finalityProviders.length === 0) {
+  if (!fps?.finalityProviders || fps?.finalityProviders.length === 0) {
     return <LoadingView />;
   }
 

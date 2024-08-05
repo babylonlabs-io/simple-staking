@@ -19,19 +19,9 @@ export interface Description {
 }
 
 export interface FinalityProvidersProps {
-  finalityProviders: FinalityProvider[] | undefined;
-  finalityProvidersCallback: Dispatch<
+  onFinalityProvidersLoad: Dispatch<
     SetStateAction<FinalityProvider[] | undefined>
   >;
   selectedFinalityProvider: FinalityProvider | undefined;
   onFinalityProviderChange: (btcPkHex: string) => void;
-}
-
-export type SortField = "moniker" | "btcPk" | "stakeSat" | "commission";
-export type SortDirection = "asc" | "desc";
-
-export interface FinalityProvidersSortButtonProps {
-  field: SortField;
-  label: string;
-  onSort: (field: SortField) => void;
 }
