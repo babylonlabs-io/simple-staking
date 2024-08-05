@@ -15,15 +15,20 @@ COPY tailwind.config.ts .
 COPY postcss.config.js .
 COPY docker-entrypoint.sh .
 
-# We replace NEXT_PUBLIC_* variables here with placeholders
-# as next.js automatically replaces those during building
-# Later the docker-entrypoint.sh script finds such variables and replaces them
-# with the docker environment variables we have set
-RUN NEXT_PUBLIC_MEMPOOL_API=APP_NEXT_PUBLIC_MEMPOOL_API \
-    NEXT_PUBLIC_API_URL=APP_NEXT_PUBLIC_API_URL \
-    NEXT_PUBLIC_NETWORK=APP_NEXT_PUBLIC_NETWORK \
-    NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=APP_NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES \
-    npm run build
+
+ARG NEXT_PUBLIC_MEMPOOL_API
+ENV NEXT_PUBLIC_MEMPOOL_API=${NEXT_PUBLIC_MEMPOOL_API}
+
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+
+ARG NEXT_PUBLIC_NETWORK
+ENV NEXT_PUBLIC_NETWORK=${NEXT_PUBLIC_NETWORK}
+
+ARG NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES
+ENV NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=${NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES}
+
+RUN npm run build
 
 # Step 2. Production image, copy all the files and run next
 FROM node:22-alpine3.19 AS runner

@@ -1,0 +1,35 @@
+name: docker_publish
+
+on:
+  push:
+    branches:
+      - 'hiep/add-github-actions'
+    # - 'main'
+    # - 'dev'
+    # tags:
+    # - '*'
+
+jobs:
+  test:
+    uses: babylonlabs-io/.github/.github/workflows/reusable_node_lint_test.yml@hiep/add-nodejs-workflows
+     
+  docker_pipeline:
+    needs: ["test"]
+    uses: babylonlabs-io/.github/.github/workflows/reusable_docker_pipeline.yml@hiep/add-nodejs-workflows
+    secrets: inherit
+    strategy:
+      matrix:
+        environment: [devnet, staging]
+    with:
+      publish: true
+      environment: ${{ matrix.environment }}
+      buildArgs: |
+        NEXT_PUBLIC_MEMPOOL_API=${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
+        NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+        NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}
+        NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
+      repoName: "simple-staking-${{ matrix.environment }}"
+
+
+
+
