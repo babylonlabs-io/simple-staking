@@ -27,7 +27,7 @@ export const questions = (coinName: string): Question[] => {
       content: `<p>Yes, it leaves your wallet. Your wallet will not show it as your available balance because it is locked. However, it is not sent to any third party. It is locked in a self-custodial contract you control. This means that any subsequent movement of the ${coinName} will need your approval, and you are the only one who can unbond the stake and withdraw.</p>`,
     },
     {
-      title: `Is my ${coinName} Safe? Could I get slashed?`,
+      title: `Is my ${coinName} safe? Could I get slashed?`,
       content: `<p>You are not required to sign any PoS slashing-related authorizations. Thus, in theory, the ${coinName} in your self-custodial contract cannot be slashed due to the absence of your authorization.</p><br />
 
       <p>However, there are still risks associated with your ${coinName}:</p><br />
@@ -40,7 +40,7 @@ export const questions = (coinName: string): Question[] => {
         <br />
         <li>
           2. System reliability<br />
-          The Bitcoin staking system may be slow, unavailable, or compromised, which may cause the staking service to be unavailable or compromised, potentially leading to ${coinName} not being unbindable or not withdrawable.
+          The Bitcoin staking system may be slow, unavailable, or compromised, which may cause the staking service to be unavailable or compromised, potentially leading to ${coinName} not being unbondable or not withdrawable.
         </li>
       </ol>
       `,

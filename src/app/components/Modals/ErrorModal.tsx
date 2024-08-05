@@ -66,7 +66,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       case ErrorState.SERVER_ERROR:
         return `Error fetching data due to: ${errorMessage}`;
       case ErrorState.UNBONDING:
-        return `Your request to unbound failed due to: ${errorMessage}`;
+        return `Your request to unbond failed due to: ${errorMessage}`;
       case ErrorState.WITHDRAW:
         return `Failed to withdraw due to: ${errorMessage}`;
       case ErrorState.STAKING:
