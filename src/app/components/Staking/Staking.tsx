@@ -296,17 +296,33 @@ export const Staking: React.FC<StakingProps> = ({
     signedTxHex: string,
     stakingTerm: number,
   ) => {
-    setDelegationsLocalStorage((delegations) => [
-      toLocalStorageDelegation(
-        Transaction.fromHex(signedTxHex).getId(),
-        publicKeyNoCoord,
-        finalityProvider!.btcPk,
-        stakingAmountSat,
-        signedTxHex,
-        stakingTerm,
-      ),
-      ...delegations,
-    ]);
+    // Get the transaction ID
+    const newTxId = Transaction.fromHex(signedTxHex).getId();
+
+    setDelegationsLocalStorage((delegations) => {
+      // Check if the delegation with the same transaction ID already exists
+      const exists = delegations.some(
+        (delegation) => delegation.stakingTxHashHex === newTxId,
+      );
+
+      // If it doesn't exist, add the new delegation
+      if (!exists) {
+        return [
+          toLocalStorageDelegation(
+            newTxId,
+            publicKeyNoCoord,
+            finalityProvider!.btcPk,
+            stakingAmountSat,
+            signedTxHex,
+            stakingTerm,
+          ),
+          ...delegations,
+        ];
+      }
+
+      // If it exists, return the existing delegations unchanged
+      return delegations;
+    });
   };
 
   // Memoize the staking fee calculation
