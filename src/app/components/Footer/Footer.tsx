@@ -15,12 +15,12 @@ import { useTerms } from "@/app/context/Terms/TermsContext";
 const iconLinks = [
   {
     name: "Website",
-    url: "https://babylonchain.io",
+    url: "https://babylonlabs.io",
     Icon: GoHome,
   },
   {
     name: "X",
-    url: "https://twitter.com/babylon_chain",
+    url: "https://x.com/babylonlabs_io",
     Icon: FaXTwitter,
   },
   {
@@ -35,7 +35,7 @@ const iconLinks = [
   },
   {
     name: "LinkedIn",
-    url: "https://www.linkedin.com/company/babylon-chain/",
+    url: "https://www.linkedin.com/company/babylon-labs-official",
     Icon: BsLinkedin,
   },
   {
@@ -45,7 +45,7 @@ const iconLinks = [
   },
   {
     name: "Docs",
-    url: "https://docs.babylonchain.io/",
+    url: "https://docs.babylonlabs.io/",
     Icon: IoMdBook,
   },
   {

@@ -12,8 +12,8 @@ export const Terms = () => {
         </a>{" "}
         is a website-hosted user interface (the{" "}
         <i className="text-primary">“Interface”</i>).{" "}
-        <a href="https://babylonchain.io" className="text-primary">
-          BabylonChain.io
+        <a href="https://babylonlabs.io" className="text-primary">
+          BabylonLabs.io
         </a>{" "}
         is our website (<i className="text-primary">“Website”</i>).
       </p>
