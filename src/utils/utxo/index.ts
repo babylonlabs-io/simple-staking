@@ -2,6 +2,8 @@ import { postVerifyUtxoOrdinals, UtxoInfo } from "@/app/api/postFilterOrdinals";
 
 import { InscriptionIdentifier, UTXO } from "../wallet/wallet_provider";
 
+const LOW_VALUE_UTXO_THRESHOLD = 10000;
+
 /**
  * Filters out UTXOs that contain ordinals.
  * This method first attempts to get inscriptions from the wallet.
@@ -22,6 +24,9 @@ export const filterOrdinals = async (
   if (!utxos.length) {
     return [];
   }
+  // Filter UTXOs that has value less than 10k sats
+  utxos = filterLowValueUtxos(utxos);
+
   // fallback to Babylon API if the wallet does not support getting inscriptions
   if (!getInscriptionsFromWalletCb) {
     return filterFromApi(utxos, address);
@@ -70,3 +75,14 @@ const filterFromApi = async (
 // helper function to get the identifier of a UTXO
 const getUTXOIdentifier = (utxo: { txid: string; vout: number }) =>
   `${utxo.txid}:${utxo.vout}`;
+
+/*
+  Filter out UTXOs that have value less than 10k sats
+  Reasons as below:
+  1. Most of the original UTXOs are less than 10k sats
+  2. 10k sats or less has less economic value which will add more cost to the 
+  transaction due to fees
+*/
+const filterLowValueUtxos = (utxos: UTXO[]): UTXO[] => {
+  return utxos.filter((utxo) => utxo.value > LOW_VALUE_UTXO_THRESHOLD);
+};
