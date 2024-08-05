@@ -3,6 +3,8 @@ import { Inter } from "next/font/google";
 import "react-responsive-modal/styles.css";
 import "react-tooltip/dist/react-tooltip.css";
 
+import { getNetworkConfig } from "@/config/network.config";
+
 import "./globals.css";
 import Providers from "./providers";
 
@@ -29,14 +31,14 @@ export default function RootLayout({
       <meta property="og:image:height" content="1170" />
       <meta
         property="og:image"
-        content="https://btcstaking.babylonchain.io/og.png"
+        content={`${getNetworkConfig().appUrl}/og.png`}
       />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content="BTC Staking Dashboard" />
       <meta name="twitter:description" content="BTC Staking Dashboard" />
       <meta
         name="twitter:image"
-        content="https://btcstaking.babylonchain.io/og.png"
+        content={`${getNetworkConfig().appUrl}/og.png`}
       />
       <meta name="twitter:image:type" content="image/png" />
       <meta name="twitter:image:width" content="2048" />
