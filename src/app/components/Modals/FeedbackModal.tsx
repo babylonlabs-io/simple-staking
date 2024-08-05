@@ -119,8 +119,8 @@ const CancelContent: React.FC<ContentProps> = ({ networkName }) => {
         </ul>
         <p>
           Your feedback is crucial for us to improve and provide a seamless
-          experience. Thank you for being a part of our Bitcoin Staking Protocol{" "}
-          {networkName}!
+          experience. Thank you for being a part of our Bitcoin Staking
+          Protocol!
         </p>
       </div>
     </div>
