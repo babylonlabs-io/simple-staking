@@ -273,15 +273,16 @@ const Home: React.FC<HomeProps> = () => {
       // close the modal
       setConnectModalOpen(false);
 
+      const supportedNetworkMessage =
+        "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
+
       try {
         await walletProvider.connectWallet();
         const address = await walletProvider.getAddress();
         // check if the wallet address type is supported in babylon
         const supported = isSupportedAddressType(address);
         if (!supported) {
-          throw new Error(
-            "Invalid address type. Please use a Native SegWit or Taproot",
-          );
+          throw new Error(supportedNetworkMessage);
         }
 
         const publicKeyNoCoord = getPublicKeyNoCoord(
@@ -304,8 +305,7 @@ const Home: React.FC<HomeProps> = () => {
           case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
             error.message,
           ):
-            errorMessage =
-              "Unsupported address type detected. Please use a Native SegWit or Taproot address.";
+            errorMessage = supportedNetworkMessage;
             break;
           default:
             errorMessage = error.message;
