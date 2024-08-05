@@ -1,14 +1,14 @@
+import { getNetworkConfig } from "@/config/network.config";
+
 export const Terms = () => {
+  const appUrl = getNetworkConfig().appUrl;
   return (
     <div className="rounded-2xl border border-neutral-content p-6 dark:border-neutral-content/20 overflow-y-scroll no-scrollbar max-h-[100vh] terms-container">
       <p className="italic">Last updated [27 May 2024]</p>
       <br />
       <p>
-        <a
-          href="https://btcstaking.testnet.babylonchain.io/"
-          className="text-primary italic"
-        >
-          https://btcstaking.testnet.babylonchain.io/
+        <a href={appUrl} className="text-primary italic">
+          {appUrl}
         </a>{" "}
         is a website-hosted user interface (the{" "}
         <i className="text-primary">“Interface”</i>).{" "}
