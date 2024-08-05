@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        environment: [devnet, staging]
+        environment: [devnet, staging, mainnet]
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
@@ -54,7 +54,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        environment: [devnet, staging]
+        environment: [devnet, staging, mainnet]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace
@@ -87,7 +87,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        environment: [devnet, staging]
+        environment: [devnet, staging, mainnet]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace
