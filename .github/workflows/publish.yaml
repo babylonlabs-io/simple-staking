@@ -85,6 +85,9 @@ jobs:
 
   ecr_publish:
     runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        environment: [devnet, staging]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace
