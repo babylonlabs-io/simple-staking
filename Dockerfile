@@ -13,8 +13,6 @@ COPY next.config.mjs .
 COPY tsconfig.json .
 COPY tailwind.config.ts .
 COPY postcss.config.js .
-COPY docker-entrypoint.sh .
-
 
 ARG NEXT_PUBLIC_MEMPOOL_API
 ENV NEXT_PUBLIC_MEMPOOL_API=${NEXT_PUBLIC_MEMPOOL_API}
