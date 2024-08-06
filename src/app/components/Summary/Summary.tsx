@@ -1,9 +1,16 @@
+import { useMemo, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import {
+  getCurrentGlobalParamsVersion,
+  ParamsWithContext,
+} from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Network } from "@/utils/wallet/wallet_provider";
 
@@ -12,16 +19,31 @@ import { LoadingSmall } from "../Loading/Loading";
 interface SummaryProps {
   totalStakedSat: number;
   btcWalletBalanceSat?: number;
-  confirmationDepth?: number;
 }
 
 export const Summary: React.FC<SummaryProps> = ({
   totalStakedSat,
   btcWalletBalanceSat,
-  confirmationDepth,
 }) => {
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
+  const [paramWithCtx, setParamWithCtx] = useState<
+    ParamsWithContext | undefined
+  >();
+
+  const btcHeight = useBtcHeight();
+  const globalParams = useGlobalParams();
+
+  useMemo(() => {
+    if (!btcHeight || !globalParams.data) {
+      return;
+    }
+    const paramCtx = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams.data,
+    );
+    setParamWithCtx(paramCtx);
+  }, [btcHeight, globalParams]);
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm xl:flex-row xl:items-center xl:justify-between xl:gap-4">
@@ -33,7 +55,7 @@ export const Summary: React.FC<SummaryProps> = ({
             <span
               className="cursor-pointer text-xs"
               data-tooltip-id="tooltip-total-staked"
-              data-tooltip-content={`Total staked is updated after ${confirmationDepth || 10} confirmations`}
+              data-tooltip-content={`Total staked is updated after ${paramWithCtx?.currentVersion?.confirmationDepth || 10} confirmations`}
               data-tooltip-place="bottom"
             >
               <AiOutlineInfoCircle />
