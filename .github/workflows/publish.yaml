@@ -12,6 +12,9 @@ on:
 jobs:
   lint_test:
     uses: babylonlabs-io/.github/.github/workflows/reusable_node_lint_test.yml@hiep/add-nodejs-workflows
+    with:
+      run-build: true
+      run-unit-tests: true
   
   docker_build:
     needs: [lint_test]

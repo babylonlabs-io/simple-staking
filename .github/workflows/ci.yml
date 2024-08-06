@@ -6,5 +6,8 @@ on:
     - '**'
 
 jobs:
-  test:
+  lint_test:
     uses: babylonlabs-io/.github/.github/workflows/reusable_node_lint_test.yml@hiep/add-nodejs-workflows
+    with:
+      run-build: true
+      run-unit-tests: true
