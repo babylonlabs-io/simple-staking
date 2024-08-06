@@ -197,7 +197,10 @@ export const Stats: React.FC = () => {
                         >
                           <AiOutlineInfoCircle />
                         </span>
-                        <Tooltip id={`tooltip-${subSection.title}`} />
+                        <Tooltip
+                          id={`tooltip-${subSection.title}`}
+                          className="max-w-xs whitespace-normal break-words"
+                        />
                       </>
                     )}
                   </div>
