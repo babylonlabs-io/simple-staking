@@ -399,7 +399,6 @@ const Home: React.FC<HomeProps> = () => {
           <Stats />
           {address && (
             <Summary
-              address={address}
               totalStakedSat={totalStakedSat}
               btcWalletBalanceSat={btcWalletBalanceSat}
             />
