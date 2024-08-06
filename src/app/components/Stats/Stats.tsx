@@ -199,7 +199,7 @@ export const Stats: React.FC = () => {
                         </span>
                         <Tooltip
                           id={`tooltip-${subSection.title}`}
-                          className="max-w-xs whitespace-normal break-words"
+                          className="tooltip-wrap"
                         />
                       </>
                     )}

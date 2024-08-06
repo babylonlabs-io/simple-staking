@@ -82,8 +82,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           )}
         </InfiniteScroll>
       </div>
-      <Tooltip id="tooltip-delegations" />
-      <Tooltip id="tooltip-stake" />
+      <Tooltip id="tooltip-delegations" className="tooltip-wrap" />
+      <Tooltip id="tooltip-stake" className="tooltip-wrap" />
     </div>
   );
 };

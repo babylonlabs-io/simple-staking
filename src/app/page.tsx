@@ -401,6 +401,10 @@ const Home: React.FC<HomeProps> = () => {
             <Summary
               totalStakedSat={totalStakedSat}
               btcWalletBalanceSat={btcWalletBalanceSat}
+              confirmationDepth={
+                paramWithContext?.nextBlockParams.currentVersion
+                  ?.confirmationDepth
+              }
             />
           )}
           <Staking
