@@ -91,6 +91,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
         walletInstance = new walletProvider();
       }
 
+      // Clean up the state
+      setTermsAccepted(false);
+      setNoInscription(false);
+      setSelectedWallet("");
+
+      // Connect to the wallet and close the modal
       onConnect(walletInstance);
     }
   };
