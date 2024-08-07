@@ -110,3 +110,9 @@ input[type="number"] {
 body.modal-open {
   overflow: hidden;
 }
+
+.tooltip-wrap {
+  max-width: 20rem;
+  white-space: normal;
+  word-wrap: break-word;
+}

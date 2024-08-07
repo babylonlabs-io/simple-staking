@@ -1,7 +1,16 @@
+import { useMemo, useState } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 
+import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import {
+  getCurrentGlobalParamsVersion,
+  ParamsWithContext,
+} from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Network } from "@/utils/wallet/wallet_provider";
 
@@ -18,13 +27,41 @@ export const Summary: React.FC<SummaryProps> = ({
 }) => {
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
+  const [paramWithCtx, setParamWithCtx] = useState<
+    ParamsWithContext | undefined
+  >();
+
+  const btcHeight = useBtcHeight();
+  const globalParams = useGlobalParams();
+
+  useMemo(() => {
+    if (!btcHeight || !globalParams.data) {
+      return;
+    }
+    const paramCtx = getCurrentGlobalParamsVersion(
+      btcHeight + 1,
+      globalParams.data,
+    );
+    setParamWithCtx(paramCtx);
+  }, [btcHeight, globalParams]);
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm xl:flex-row xl:items-center xl:justify-between xl:gap-4">
       <h3 className="mb-4 font-bold xl:mb-0">Your staking summary</h3>
       <div className="flex flex-1 justify-between gap-2">
         <div className="flex flex-col gap-1 text-sm xl:flex-1 xl:flex-row xl:items-center xl:justify-center xl:gap-2 xl:text-base">
-          <p className="dark:text-neutral-content">Total staked</p>
+          <div className="flex gap-1 items-center">
+            <p className="dark:text-neutral-content">Total staked</p>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id="tooltip-total-staked"
+              data-tooltip-content={`Total staked is updated after ${paramWithCtx?.currentVersion?.confirmationDepth || 10} confirmations`}
+              data-tooltip-place="bottom"
+            >
+              <AiOutlineInfoCircle />
+            </span>
+            <Tooltip id="tooltip-total-staked" className="tooltip-wrap" />
+          </div>
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             <p className="whitespace-nowrap font-semibold">
