@@ -5,3 +5,10 @@ export const shouldDisplayTestingMsg = (): boolean => {
     process.env.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES?.toString() !== "false"
   );
 };
+
+// getNetworkAppUrl function is used to get the network app url based on the environment
+export const getNetworkAppUrl = (): string => {
+  return shouldDisplayTestingMsg()
+    ? "https://btcstaking.testnet.babylonchain.io"
+    : "https://btcstaking.babylonchain.io";
+};
