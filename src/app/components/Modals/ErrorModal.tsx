@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { IoMdClose } from "react-icons/io";
 
 import { useError } from "@/app/context/Error/ErrorContext";
@@ -78,8 +77,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     }
   };
 
-  const formattedErrorTime = format(errorTime, "dd MMMM yyyy 'at' HH:mm:ss");
-
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb- flex items-center justify-end">
@@ -94,7 +91,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         <h3 className="text-center font-bold text-error">{getErrorTitle()}</h3>
         <div className="flex flex-col gap-3">
           <p className="text-center">{getErrorMessage()}</p>
-          <p className="text-center text-xs opacity-50">{formattedErrorTime}</p>
         </div>
         <div className="mt-4 flex justify-around gap-4">
           <button
