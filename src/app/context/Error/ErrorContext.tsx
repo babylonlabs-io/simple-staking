@@ -6,7 +6,11 @@ import React, {
   useState,
 } from "react";
 
-import { ErrorType, ShowErrorParams } from "@/app/types/errors";
+import {
+  ErrorHandlerParam,
+  ErrorType,
+  ShowErrorParams,
+} from "@/app/types/errors";
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 
@@ -20,6 +24,12 @@ interface ErrorContextType {
   retryErrorAction?: () => void;
   showError: (showErrorParams: ShowErrorParams) => void;
   hideError: () => void;
+  handleError: ({
+    error,
+    hasError,
+    errorState,
+    refetchFunction,
+  }: ErrorHandlerParam) => void;
 }
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
@@ -51,12 +61,29 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     }, 300);
   }, []);
 
+  const handleError = useCallback(
+    ({ error, hasError, errorState, refetchFunction }: ErrorHandlerParam) => {
+      if (hasError && error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState: errorState,
+            errorTime: new Date(),
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    },
+    [showError],
+  );
+
   const value: ErrorContextType = {
     isErrorOpen: isErrorOpen,
     error,
     showError,
     hideError,
     retryErrorAction,
+    handleError,
   };
 
   return (
