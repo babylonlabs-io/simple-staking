@@ -8,7 +8,7 @@ import {
 import { FaXTwitter } from "react-icons/fa6";
 import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
-import { MdAlternateEmail } from "react-icons/md";
+import { MdAlternateEmail, MdForum } from "react-icons/md";
 
 import { useTerms } from "@/app/context/Terms/TermsContext";
 
@@ -47,6 +47,11 @@ const iconLinks = [
     name: "Docs",
     url: "https://docs.babylonlabs.io/",
     Icon: IoMdBook,
+  },
+  {
+    name: "Forum",
+    url: "https://forum.babylonlabs.io/",
+    Icon: MdForum,
   },
   {
     name: "Email",

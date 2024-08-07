@@ -11,7 +11,7 @@ interface FeedbackModalProps {
 }
 
 interface ContentProps {
-  networkName: string;
+  networkName?: string;
 }
 
 const SuccessContent: React.FC<ContentProps> = ({ networkName }) => {
@@ -74,7 +74,7 @@ const SuccessContent: React.FC<ContentProps> = ({ networkName }) => {
   );
 };
 
-const CancelContent: React.FC<ContentProps> = ({ networkName }) => {
+const CancelContent: React.FC<ContentProps> = () => {
   return (
     <div className="text-text-black dark:text-white">
       <div className="mt-6 flex flex-col gap-4">
@@ -119,8 +119,8 @@ const CancelContent: React.FC<ContentProps> = ({ networkName }) => {
         </ul>
         <p>
           Your feedback is crucial for us to improve and provide a seamless
-          experience. Thank you for being a part of our Bitcoin Staking Protocol{" "}
-          {networkName}!
+          experience. Thank you for being a part of our Bitcoin Staking
+          Protocol!
         </p>
       </div>
     </div>
@@ -148,7 +148,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         </button>
       </div>
       {type === "success" && <SuccessContent networkName={networkName} />}
-      {type === "cancel" && <CancelContent networkName={networkName} />}
+      {type === "cancel" && <CancelContent />}
     </GeneralModal>
   );
 };

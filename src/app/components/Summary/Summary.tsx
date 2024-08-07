@@ -3,19 +3,16 @@ import { FaBitcoin } from "react-icons/fa";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import { trim } from "@/utils/trim";
 import { Network } from "@/utils/wallet/wallet_provider";
 
 import { LoadingSmall } from "../Loading/Loading";
 
 interface SummaryProps {
-  address: string;
   totalStakedSat: number;
   btcWalletBalanceSat?: number;
 }
 
 export const Summary: React.FC<SummaryProps> = ({
-  address,
   totalStakedSat,
   btcWalletBalanceSat,
 }) => {
@@ -51,25 +48,17 @@ export const Summary: React.FC<SummaryProps> = ({
               <LoadingSmall text="Loading..." />
             )}
           </div>
-          <p className="hidden xl:flex xl:text-sm 2xl:ml-2">{trim(address)}</p>
+          {!onMainnet && (
+            <a
+              href="https://discord.com/invite/babylonglobal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-light text-primary hover:underline text-right lg:text-left"
+            >
+              Get Test Tokens
+            </a>
+          )}
         </div>
-      </div>
-      <div
-        className={`divider m-0 xl:divider-horizontal xl:m-0 ${onMainnet && "xl:hidden"}`}
-      />
-      <div className="flex justify-between gap-2 text-sm">
-        <p className="xl:hidden">{trim(address)}</p>
-        {/* Not visible on Mainnet */}
-        {!onMainnet && (
-          <a
-            href="https://discord.com/invite/babylonglobal"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-light text-primary hover:underline"
-          >
-            Get Test Tokens
-          </a>
-        )}
       </div>
     </div>
   );

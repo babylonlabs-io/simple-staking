@@ -1,4 +1,3 @@
-import { format } from "date-fns";
 import { IoMdClose } from "react-icons/io";
 
 import { useError } from "@/app/context/Error/ErrorContext";
@@ -66,7 +65,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       case ErrorState.SERVER_ERROR:
         return `Error fetching data due to: ${errorMessage}`;
       case ErrorState.UNBONDING:
-        return `Your request to unbound failed due to: ${errorMessage}`;
+        return `Your request to unbond failed due to: ${errorMessage}`;
       case ErrorState.WITHDRAW:
         return `Failed to withdraw due to: ${errorMessage}`;
       case ErrorState.STAKING:
@@ -77,8 +76,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return errorMessage;
     }
   };
-
-  const formattedErrorTime = format(errorTime, "dd MMMM yyyy 'at' HH:mm:ss");
 
   return (
     <GeneralModal open={open} onClose={onClose}>
@@ -94,7 +91,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         <h3 className="text-center font-bold text-error">{getErrorTitle()}</h3>
         <div className="flex flex-col gap-3">
           <p className="text-center">{getErrorMessage()}</p>
-          <p className="text-center text-xs opacity-50">{formattedErrorTime}</p>
         </div>
         <div className="mt-4 flex justify-around gap-4">
           <button

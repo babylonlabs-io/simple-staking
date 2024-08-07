@@ -77,18 +77,33 @@ export const Delegations: React.FC<DelegationsProps> = ({
     delegation: DelegationInterface,
     newState: string,
   ) => {
-    setIntermediateDelegationsLocalStorage((delegations) => [
-      toLocalStorageIntermediateDelegation(
-        delegation.stakingTxHashHex,
-        publicKeyNoCoord,
-        delegation.finalityProviderPkHex,
-        delegation.stakingValueSat,
-        delegation.stakingTx.txHex,
-        delegation.stakingTx.timelock,
-        newState,
-      ),
-      ...delegations,
-    ]);
+    const newTxId = delegation.stakingTxHashHex;
+
+    setIntermediateDelegationsLocalStorage((delegations) => {
+      // Check if an intermediate delegation with the same transaction ID already exists
+      const exists = delegations.some(
+        (existingDelegation) => existingDelegation.stakingTxHashHex === newTxId,
+      );
+
+      // If it doesn't exist, add the new intermediate delegation
+      if (!exists) {
+        return [
+          toLocalStorageIntermediateDelegation(
+            newTxId,
+            publicKeyNoCoord,
+            delegation.finalityProviderPkHex,
+            delegation.stakingValueSat,
+            delegation.stakingTx.txHex,
+            delegation.stakingTx.timelock,
+            newState,
+          ),
+          ...delegations,
+        ];
+      }
+
+      // If it exists, return the existing delegations unchanged
+      return delegations;
+    });
   };
 
   // Handles unbonding requests for Active delegations that want to be withdrawn early
