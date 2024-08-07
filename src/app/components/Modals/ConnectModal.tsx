@@ -224,10 +224,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                           >
                             <AiOutlineInfoCircle />
                           </span>
-                          <Tooltip
-                            id={name}
-                            className="max-w-xs whitespace-normal break-words"
-                          />
+                          <Tooltip id={name} className="tooltip-wrap" />
                         </div>
                       )}
                     </div>
