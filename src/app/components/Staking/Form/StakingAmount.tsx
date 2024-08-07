@@ -84,7 +84,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       },
       {
         valid: satoshis <= btcWalletBalanceSat,
-        message: `${errorLabel} exceeds your balance (${satoshiToBtc(btcWalletBalanceSat)})!`,
+        message: `${errorLabel} exceeds your balance (${satoshiToBtc(btcWalletBalanceSat)} ${coinName})!`,
       },
       {
         valid: validateDecimalPoints(value),
