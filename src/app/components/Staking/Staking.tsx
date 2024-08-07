@@ -629,7 +629,7 @@ export const Staking: React.FC<StakingProps> = ({
               >
                 Preview
               </button>
-              <Tooltip id="tooltip-staking-preview" />
+              <Tooltip id="tooltip-staking-preview" className="tooltip-wrap" />
             </span>
             {previewReady && (
               <PreviewModal

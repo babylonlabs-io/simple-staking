@@ -54,7 +54,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
         >
           <AiOutlineInfoCircle />
         </span>
-        <Tooltip id="tooltip-connect" />
+        <Tooltip id="tooltip-connect" className="tooltip-wrap" />
       </>
     );
   };

@@ -79,7 +79,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
               >
                 <AiOutlineInfoCircle size={16} />
               </span>
-              <Tooltip id="tooltip-missing-fp" />
+              <Tooltip id="tooltip-missing-fp" className="tooltip-wrap" />
               <span>No data provided</span>
             </div>
           )}
@@ -100,7 +100,10 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           >
             <AiOutlineInfoCircle />
           </span>
-          <Tooltip id={`tooltip-delegation-${pkHex}`} />
+          <Tooltip
+            id={`tooltip-delegation-${pkHex}`}
+            className="tooltip-wrap"
+          />
         </div>
         <div className="flex items-center justify-end gap-1 lg:justify-start">
           <p className="hidden sm:flex lg:hidden">Commission:</p>
@@ -115,7 +118,10 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           >
             <AiOutlineInfoCircle />
           </span>
-          <Tooltip id={`tooltip-delegation-${pkHex}`} />
+          <Tooltip
+            id={`tooltip-delegation-${pkHex}`}
+            className="tooltip-wrap"
+          />
         </div>
       </div>
     </div>

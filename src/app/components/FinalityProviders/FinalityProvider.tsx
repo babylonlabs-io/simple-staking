@@ -95,7 +95,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           0
         )}
       </div>
-      <Tooltip id="tooltip-missing" />
+      <Tooltip id="tooltip-missing" className="tooltip-wrap" />
     </div>
   );
 };
