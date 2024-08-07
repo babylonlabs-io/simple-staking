@@ -61,7 +61,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   });
 
   useEffect(() => {
-    onFinalityProvidersLoad(fps?.finalityProviders);
+    fps?.finalityProviders && onFinalityProvidersLoad(fps.finalityProviders);
   }, [fps, onFinalityProvidersLoad]);
 
   useEffect(() => {
@@ -98,7 +98,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     fps?.finalityProviders,
   );
 
-  if (!fps?.finalityProviders || fps?.finalityProviders.length === 0) {
+  if (!fps?.finalityProviders?.length) {
     return <LoadingView />;
   }
 
