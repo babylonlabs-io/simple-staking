@@ -5,7 +5,10 @@ export interface Question {
   content: string;
 }
 
-export const questions = (coinName: string): Question[] => {
+export const questions = (
+  coinName: string,
+  confirmationDepth?: number,
+): Question[] => {
   const questionList = [
     {
       title: "What is Babylon?",
@@ -47,7 +50,7 @@ export const questions = (coinName: string): Question[] => {
     },
     {
       title: "How long will it take for my stake to become active?",
-      content: `<p>A stake’s status demonstrates the current stage of the staking process. All stake starts in a Pending state which denotes that the ${coinName} Staking transaction does not yet have sufficient ${coinName} block confirmations. As soon as it receives 10 ${coinName} block confirmations, the status transitions to <i>Overflow</i> or <i>Active</i>. </p><br />
+      content: `<p>A stake’s status demonstrates the current stage of the staking process. All stake starts in a Pending state which denotes that the ${coinName} Staking transaction does not yet have sufficient ${coinName} block confirmations. As soon as it receives ${confirmationDepth || 10} ${coinName} block confirmations, the status transitions to <i>Overflow</i> or <i>Active</i>. </p><br />
       
       <p>In an amount-based cap, A stake is <i>Overflow</i> if the system has already accumulated the maximum amount of ${coinName} it can accept.</p><br />
       <p>In a time-based cap, where there is a starting block height and ending block height, a stake is <i>overflow</i> if it is included in a ${coinName} block that is newer than the ending block.</p><br /> 

@@ -2,7 +2,8 @@ import { postVerifyUtxoOrdinals, UtxoInfo } from "@/app/api/postFilterOrdinals";
 
 import { InscriptionIdentifier, UTXO } from "../wallet/wallet_provider";
 
-const LOW_VALUE_UTXO_THRESHOLD = 10000;
+export const LOW_VALUE_UTXO_THRESHOLD = 10000;
+export const WALLET_FETCH_INSRIPTIONS_TIMEOUT = 3000; // 3 seconds
 
 /**
  * Filters out UTXOs that contain ordinals.
@@ -34,7 +35,20 @@ export const filterOrdinals = async (
   // try to get the ordinals from the wallet first, if the wallet supports it
   // otherwise fallback to the Babylon API
   try {
-    const inscriptions = await getInscriptionsFromWalletCb();
+    const inscriptions = await Promise.race([
+      getInscriptionsFromWalletCb(),
+      new Promise<InscriptionIdentifier[]>((_, reject) =>
+        setTimeout(
+          () =>
+            reject(
+              new Error(
+                "Request timed out when fetching inscriptions from wallet",
+              ),
+            ),
+          WALLET_FETCH_INSRIPTIONS_TIMEOUT,
+        ),
+      ),
+    ]);
     // filter out the utxos that contains ordinals
     return utxos.filter(
       (utxo) =>

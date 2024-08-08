@@ -151,7 +151,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             >
               <AiOutlineInfoCircle />
             </span>
-            <Tooltip id={`tooltip-${stakingTxHash}`} />
+            <Tooltip id={`tooltip-${stakingTxHash}`} className="tooltip-wrap" />
           </div>
         </div>
         {generateActionButton()}
