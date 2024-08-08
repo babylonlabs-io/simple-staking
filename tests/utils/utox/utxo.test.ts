@@ -1,5 +1,5 @@
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
-import { filterOrdinals } from "@/utils/utxo";
+import { filterOrdinals, WALLET_FETCH_INSRIPTIONS_TIMEOUT } from "@/utils/utxo";
 import { InscriptionIdentifier, UTXO } from "@/utils/wallet/wallet_provider";
 
 // Mock the dependencies
@@ -108,5 +108,30 @@ describe("filterOrdinals", () => {
     );
 
     expect(result).toEqual(mockUtxos);
+  });
+
+  it("should filter UTXOs using the API fallback when wallet callback times out", async () => {
+    const mockApiResponse = [
+      { txid: "txid1", vout: 0, inscription: true },
+      { txid: "txid2", vout: 1, inscription: false },
+      { txid: "txid3", vout: 2, inscription: false },
+    ];
+    const getInscriptionsFromWalletCb = jest.fn().mockImplementation(() => {
+      return new Promise((resolve) =>
+        setTimeout(resolve, WALLET_FETCH_INSRIPTIONS_TIMEOUT + 1000),
+      );
+    });
+
+    (postVerifyUtxoOrdinals as jest.Mock).mockResolvedValue(mockApiResponse);
+
+    const result = await filterOrdinals(
+      mockUtxos,
+      address,
+      getInscriptionsFromWalletCb,
+    );
+
+    expect(getInscriptionsFromWalletCb).toHaveBeenCalledTimes(1);
+    expect(postVerifyUtxoOrdinals).toHaveBeenCalledWith(mockUtxos, address);
+    expect(result).toEqual([mockUtxos[1], mockUtxos[2]]);
   });
 });
