@@ -22,4 +22,5 @@ export interface ErrorHandlerParam {
 export interface ShowErrorParams {
   error: ErrorType;
   retryAction?: () => void;
+  noCancel?: boolean;
 }

@@ -286,7 +286,13 @@ export const Staking: React.FC<StakingProps> = ({
           errorState: ErrorState.STAKING,
           errorTime: new Date(),
         },
-        retryAction: handleSign,
+        noCancel: true,
+        retryAction: () => {
+          // in case of error, we need to reset the state
+          handleResetState();
+          // and refetch the UTXOs
+          queryClient.invalidateQueries({ queryKey: [UTXO_KEY, address] });
+        },
       });
     }
   };
