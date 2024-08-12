@@ -20,10 +20,12 @@ interface ErrorContextType {
   retryErrorAction?: () => void;
   showError: (showErrorParams: ShowErrorParams) => void;
   hideError: () => void;
+  noCancel?: boolean;
 }
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [isErrorOpen, setIsErrorOpen] = useState(false);
+  const [isNoCancel, setIsNoCancel] = useState(false);
   const [error, setError] = useState<ErrorType>({
     message: "",
     errorTime: new Date(),
@@ -33,11 +35,15 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     (() => void) | undefined
   >();
 
-  const showError = useCallback(({ error, retryAction }: ShowErrorParams) => {
-    setError(error);
-    setIsErrorOpen(true);
-    setRetryErrorAction(() => retryAction);
-  }, []);
+  const showError = useCallback(
+    ({ error, retryAction, noCancel }: ShowErrorParams) => {
+      setError(error);
+      setIsErrorOpen(true);
+      setIsNoCancel(noCancel ?? false);
+      setRetryErrorAction(() => retryAction);
+    },
+    [],
+  );
 
   const hideError = useCallback(() => {
     setIsErrorOpen(false);
@@ -48,6 +54,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         errorState: undefined,
       });
       setRetryErrorAction(undefined);
+      setIsNoCancel(false);
     }, 300);
   }, []);
 
@@ -57,6 +64,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     showError,
     hideError,
     retryErrorAction,
+    noCancel: isNoCancel,
   };
 
   return (

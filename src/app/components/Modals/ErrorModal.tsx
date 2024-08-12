@@ -22,7 +22,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   errorMessage,
   errorState,
   noCancel,
-  errorTime,
+  // errorTime, // This prop is not used in the component
 }) => {
   const { error, retryErrorAction } = useError();
 
@@ -95,7 +95,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
           <p className="text-center">{getErrorMessage()}</p>
         </div>
         <div className="mt-4 flex justify-around gap-4">
-          {noCancel && (
+          {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
             <button
               className="btn btn-outline flex-1 rounded-lg px-2"
               onClick={() => onClose()}

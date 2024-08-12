@@ -51,8 +51,14 @@ const Home: React.FC<HomeProps> = () => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
 
   const [address, setAddress] = useState("");
-  const { error, isErrorOpen, showError, hideError, retryErrorAction } =
-    useError();
+  const {
+    error,
+    isErrorOpen,
+    showError,
+    hideError,
+    retryErrorAction,
+    noCancel,
+  } = useError();
   const { isTermsOpen, closeTerms } = useTerms();
 
   const {
@@ -470,6 +476,7 @@ const Home: React.FC<HomeProps> = () => {
         errorTime={error.errorTime}
         onClose={hideError}
         onRetry={retryErrorAction}
+        noCancel={noCancel}
       />
       <TermsModal open={isTermsOpen} onClose={closeTerms} />
     </main>
