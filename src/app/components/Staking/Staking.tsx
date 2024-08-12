@@ -590,6 +590,7 @@ export const Staking: React.FC<StakingProps> = ({
           stakingAmountSat,
           stakingTimeBlocksWithFixed,
           !!finalityProvider,
+          stakingFeeSat,
         );
 
       const previewReady =
