@@ -288,8 +288,11 @@ export const Staking: React.FC<StakingProps> = ({
         },
         noCancel: true,
         retryAction: () => {
-          // in case of error, we need to reset the state
-          handleResetState();
+          // in case of error, we need to partly reset the state
+          setStakingAmountSat(0);
+          setSelectedFeeRate(0);
+          setPreviewModalOpen(false);
+          setResetFormInputs(!resetFormInputs);
           // and refetch the UTXOs
           queryClient.invalidateQueries({ queryKey: [UTXO_KEY, address] });
         },
