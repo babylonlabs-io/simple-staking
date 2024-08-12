@@ -112,6 +112,8 @@ export const Staking: React.FC<StakingProps> = ({
     overTheCapRange: false,
     approchingCapRange: false,
   });
+  const [stakingFeeSat, setStakingFeeSat] = useState<number>(0);
+  const [isSufficientBalance, setIsSufficientBalance] = useState(false);
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -242,6 +244,10 @@ export const Staking: React.FC<StakingProps> = ({
 
   // Either use the selected fee rate or the fastest fee rate
   const feeRate = selectedFeeRate || defaultFeeRate;
+  // check that selected Fee rate (if present) is bigger than the min fee
+  if (feeRate && feeRate < minFeeRate) {
+    throw new Error("Selected fee rate is lower than the hour fee");
+  }
 
   const queryClient = useQueryClient();
 
@@ -325,8 +331,7 @@ export const Staking: React.FC<StakingProps> = ({
     });
   };
 
-  // Memoize the staking fee calculation
-  const stakingFeeSat = useMemo(() => {
+  useEffect(() => {
     if (
       btcWalletNetwork &&
       address &&
@@ -334,15 +339,10 @@ export const Staking: React.FC<StakingProps> = ({
       stakingAmountSat &&
       finalityProvider &&
       paramWithCtx?.currentVersion &&
-      mempoolFeeRates &&
+      feeRate &&
       availableUTXOs
     ) {
       try {
-        // check that selected Fee rate (if present) is bigger than the min fee
-        if (selectedFeeRate && selectedFeeRate < minFeeRate) {
-          throw new Error("Selected fee rate is lower than the hour fee");
-        }
-        const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
           paramWithCtx.currentVersion,
@@ -352,25 +352,25 @@ export const Staking: React.FC<StakingProps> = ({
           btcWalletNetwork,
           address,
           publicKeyNoCoord,
-          memoizedFeeRate,
+          feeRate,
           availableUTXOs,
         );
-        return stakingFeeSat;
+        setIsSufficientBalance(true);
+        setStakingFeeSat(stakingFeeSat);
       } catch (error: Error | any) {
-        // fees + staking amount can be more than the balance
-        showError({
-          error: {
-            message: error.message,
-            errorState: ErrorState.STAKING,
-            errorTime: new Date(),
-          },
-          retryAction: () => setSelectedFeeRate(0),
-        });
-        setSelectedFeeRate(0);
-        return 0;
+        // This indicates the user has insufficient funds to cover staking amount + fees
+        if (error?.message.includes("Insufficient funds")) {
+          setIsSufficientBalance(false);
+        } else {
+          showError({
+            error: {
+              message: error.message,
+              errorState: ErrorState.STAKING,
+              errorTime: new Date(),
+            },
+          });
+        }
       }
-    } else {
-      return 0;
     }
   }, [
     btcWalletNetwork,
@@ -380,12 +380,9 @@ export const Staking: React.FC<StakingProps> = ({
     stakingTimeBlocks,
     finalityProvider,
     paramWithCtx,
-    mempoolFeeRates,
-    selectedFeeRate,
     availableUTXOs,
     showError,
-    defaultFeeRate,
-    minFeeRate,
+    feeRate,
   ]);
 
   // Select the finality provider from the list
@@ -581,6 +578,7 @@ export const Staking: React.FC<StakingProps> = ({
           stakingAmountSat,
           stakingTimeBlocksWithFixed,
           !!finalityProvider,
+          isSufficientBalance,
         );
 
       const previewReady =
@@ -604,16 +602,15 @@ export const Staking: React.FC<StakingProps> = ({
                 btcWalletBalanceSat={btcWalletBalanceSat}
                 onStakingAmountSatChange={handleStakingAmountSatChange}
                 reset={resetFormInputs}
+                isSufficientBalance={isSufficientBalance}
               />
-              {signReady && (
-                <StakingFee
-                  mempoolFeeRates={mempoolFeeRates}
-                  stakingFeeSat={stakingFeeSat}
-                  selectedFeeRate={selectedFeeRate}
-                  onSelectedFeeRateChange={setSelectedFeeRate}
-                  reset={resetFormInputs}
-                />
-              )}
+              <StakingFee
+                mempoolFeeRates={mempoolFeeRates}
+                stakingFeeSat={stakingFeeSat}
+                selectedFeeRate={selectedFeeRate}
+                onSelectedFeeRateChange={setSelectedFeeRate}
+                reset={resetFormInputs}
+              />
             </div>
             {showApproachingCapWarning()}
             <span

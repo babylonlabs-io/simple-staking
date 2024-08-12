@@ -9,6 +9,7 @@ export const isStakingSignReady = (
   amount: number,
   time: number,
   fpSelected: boolean,
+  sufficientBalance: boolean,
 ): { isReady: boolean; reason: string } => {
   if (!fpSelected)
     return {
@@ -38,6 +39,11 @@ export const isStakingSignReady = (
     return {
       isReady: false,
       reason: "Please enter a valid staking period",
+    };
+  } else if (!sufficientBalance) {
+    return {
+      isReady: false,
+      reason: "Not enough balance to cover the staking value and its fees",
     };
   }
   return {

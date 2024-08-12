@@ -12,6 +12,7 @@ interface StakingAmountProps {
   btcWalletBalanceSat?: number;
   onStakingAmountSatChange: (inputAmountSat: number) => void;
   reset: boolean;
+  isSufficientBalance: boolean;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
@@ -20,11 +21,13 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   btcWalletBalanceSat,
   onStakingAmountSatChange,
   reset,
+  isSufficientBalance,
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
   // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
+  const [blurred, setBlurred] = useState(false);
 
   const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
@@ -51,16 +54,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     }
   };
 
-  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
-    if (!btcWalletBalanceSat) return;
-    setTouched(true);
-
-    if (value === "") {
-      onStakingAmountSatChange(0);
-      setError(generalErrorMessage);
-      return;
-    }
-
+  useEffect(() => {
+    if (!btcWalletBalanceSat || value === "") return;
     const numValue = parseFloat(value);
     const satoshis = btcToSatoshi(numValue);
 
@@ -71,7 +66,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         message: `${errorLabel} must be a valid number.`,
       },
       {
-        valid: numValue !== 0,
+        valid: numValue > 0,
         message: `${errorLabel} must be greater than 0.`,
       },
       {
@@ -91,18 +86,46 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
         message: `${errorLabel} must have no more than 8 decimal points.`,
       },
     ];
-
     // Find the first failing validation
     const firstInvalid = validations.find((validation) => !validation.valid);
-
     if (firstInvalid) {
       onStakingAmountSatChange(0);
       setError(firstInvalid.message);
+      return;
     } else {
       setError("");
       onStakingAmountSatChange(satoshis);
       setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
+    // The fee + amount check can only be placed after onStakingAmountSatChange is called
+    // This is due to isSufficientBalance being dependent on the value of
+    // stakingAmountSat in parent component
+    if (!isSufficientBalance && validateDecimalPoints(value)) {
+      return setError(
+        "Not enough balance to cover the staking value and its fees",
+      );
+    }
+  }, [
+    isSufficientBalance,
+    blurred,
+    value,
+    btcWalletBalanceSat,
+    minStakingAmountSat,
+    maxStakingAmountSat,
+    onStakingAmountSatChange,
+    coinName,
+  ]);
+
+  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
+    if (!btcWalletBalanceSat) return;
+    setTouched(true);
+
+    if (value === "") {
+      onStakingAmountSatChange(0);
+      setError(generalErrorMessage);
+      return;
+    }
+    setBlurred(!blurred);
   };
 
   const minStakeAmount = maxDecimals(satoshiToBtc(minStakingAmountSat), 8);

@@ -2,7 +2,7 @@ import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
 describe("utils/isStakingSignReady", () => {
   it("should return false with reason if fpSelected is false", () => {
-    const result = isStakingSignReady(1, 2, 3, 4, 5, 6, false);
+    const result = isStakingSignReady(1, 2, 3, 4, 5, 6, false, true);
     expect(result.isReady).toBe(false);
     expect(result.reason).toBe("Please select a finality provider");
   });
@@ -43,6 +43,7 @@ describe("utils/isStakingSignReady", () => {
         4,
         input.amount,
         6,
+        true,
         true,
       );
       expect(result.isReady).toBe(false);
@@ -87,14 +88,23 @@ describe("utils/isStakingSignReady", () => {
         5,
         input.time,
         true,
+        true,
       );
       expect(result.isReady).toBe(false);
       expect(result.reason).toBe("Please enter a valid staking period");
     });
   });
 
+  it("should return false with reason if sufficientBalance is false", () => {
+    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true, false);
+    expect(result.isReady).toBe(false);
+    expect(result.reason).toBe(
+      "Not enough balance to cover the staking value and its fees",
+    );
+  });
+
   it("should return true with empty reason if amount and time are ready", () => {
-    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true);
+    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true, true);
     expect(result.isReady).toBe(true);
     expect(result.reason).toBe("");
   });

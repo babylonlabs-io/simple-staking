@@ -10,7 +10,7 @@ import { LoadingSmall } from "../../Loading/Loading";
 interface StakingFeeProps {
   stakingFeeSat: number;
   selectedFeeRate: number;
-  onSelectedFeeRateChange: (fee: number) => void;
+  onSelectedFeeRateChange: (feeRate: number) => void;
   reset: boolean;
   // optional as component shows loading state
   mempoolFeeRates?: Fees;
@@ -46,6 +46,11 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     }
   };
 
+  // If staking fee has not been calculated, return null
+  if (!stakingFeeSat) {
+    return null;
+  }
+
   const defaultModeRender = () => {
     return (
       <div className="flex flex-col justify-center gap-1 items-center">
@@ -57,16 +62,12 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           ) : (
             <LoadingSmall text="Loading recommended fee rate..." />
           )}
-          {stakingFeeSat ? (
-            <p>
-              Transaction fee amount:{" "}
-              <strong>
-                {satoshiToBtc(stakingFeeSat)} {coinName}
-              </strong>
-            </p>
-          ) : (
-            <LoadingSmall text="Loading transaction fee amount..." />
-          )}
+          <p>
+            Transaction fee amount:{" "}
+            <strong>
+              {satoshiToBtc(stakingFeeSat)} {coinName}
+            </strong>
+          </p>
         </div>
         <button
           className="btn btn-sm btn-link no-underline"
