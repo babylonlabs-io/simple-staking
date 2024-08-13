@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { FaBitcoin } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
@@ -121,12 +122,17 @@ export const Delegation: React.FC<DelegationProps> = ({
           <p>overflow</p>
         </div>
       )}
-      <div className="grid grid-flow-col grid-cols-2 grid-rows-2 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
-        <p>
-          {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}
+      <div className="grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row lg:grid-cols-5 lg:grid-rows-1">
+        <div className="flex gap-1 items-center order-1">
+          <FaBitcoin className="text-primary" />
+          <p>
+            {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}
+          </p>
+        </div>
+        <p className="order-3 lg:order-2">
+          {durationTillNow(startTimestamp, currentTime)}
         </p>
-        <p>{durationTillNow(startTimestamp, currentTime)}</p>
-        <div className="hidden justify-center lg:flex">
+        <div className="justify-center lg:flex order-2 lg:order-3">
           <a
             href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
             target="_blank"
@@ -136,11 +142,13 @@ export const Delegation: React.FC<DelegationProps> = ({
             {trim(stakingTxHash)}
           </a>
         </div>
+        {/* Future data placeholder */}
+        <div className="order-5 lg:hidden" />
         {/*
         we need to center the text without the tooltip
         add its size 12px and gap 4px, 16/2 = 8px
         */}
-        <div className="relative flex justify-end lg:left-[8px] lg:justify-center">
+        <div className="relative flex justify-end lg:left-[8px] lg:justify-center order-4">
           <div className="flex items-center gap-1">
             <p>{renderState()}</p>
             <span
@@ -154,7 +162,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             <Tooltip id={`tooltip-${stakingTxHash}`} className="tooltip-wrap" />
           </div>
         </div>
-        {generateActionButton()}
+        <div className="order-6">{generateActionButton()}</div>
       </div>
     </div>
   );

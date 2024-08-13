@@ -12,6 +12,7 @@ interface ErrorModalProps {
   errorMessage: string;
   errorState?: ErrorState;
   errorTime: Date;
+  noCancel?: boolean;
 }
 
 export const ErrorModal: React.FC<ErrorModalProps> = ({
@@ -20,7 +21,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   onRetry,
   errorMessage,
   errorState,
-  errorTime,
+  noCancel,
+  // errorTime, // This prop is not used in the component
 }) => {
   const { error, retryErrorAction } = useError();
 
@@ -93,12 +95,14 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
           <p className="text-center">{getErrorMessage()}</p>
         </div>
         <div className="mt-4 flex justify-around gap-4">
-          <button
-            className="btn btn-outline flex-1 rounded-lg px-2"
-            onClick={() => onClose()}
-          >
-            Cancel
-          </button>
+          {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
+            <button
+              className="btn btn-outline flex-1 rounded-lg px-2"
+              onClick={() => onClose()}
+            >
+              Cancel
+            </button>
+          )}
           {onRetry && (
             <button
               className="btn-primary btn flex-1 rounded-lg px-2 text-white"

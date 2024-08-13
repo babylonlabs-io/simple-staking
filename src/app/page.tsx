@@ -53,6 +53,7 @@ const Home: React.FC<HomeProps> = () => {
     showError,
     hideError,
     retryErrorAction,
+    noCancel,
     handleError,
   } = useError();
   const { isTermsOpen, closeTerms } = useTerms();
@@ -397,6 +398,7 @@ const Home: React.FC<HomeProps> = () => {
         errorTime={error.errorTime}
         onClose={hideError}
         onRetry={retryErrorAction}
+        noCancel={noCancel}
       />
       <TermsModal open={isTermsOpen} onClose={closeTerms} />
     </main>
