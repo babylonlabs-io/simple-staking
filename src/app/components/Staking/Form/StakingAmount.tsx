@@ -23,6 +23,8 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
+  const [blured, setBlured] = useState(false);
+
   // Track if the input field has been interacted with
   const [touched, setTouched] = useState(false);
 
@@ -51,17 +53,10 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     }
   };
 
-  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
-    if (!btcWalletBalanceSat) return;
-    setTouched(true);
-
-    if (value === "") {
-      onStakingAmountSatChange(0);
-      setError(generalErrorMessage);
-      return;
-    }
-
+  useEffect(() => {
+    if (btcWalletBalanceSat === undefined) return;
     const numValue = parseFloat(value);
+    if (!numValue) return;
     const satoshis = btcToSatoshi(numValue);
 
     // Run all validations
@@ -103,6 +98,24 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       onStakingAmountSatChange(satoshis);
       setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
+  }, [
+    btcWalletBalanceSat,
+    minStakingAmountSat,
+    maxStakingAmountSat,
+    value,
+    onStakingAmountSatChange,
+    coinName,
+    blured,
+  ]);
+
+  const handleBlur = (_e: FocusEvent<HTMLInputElement>) => {
+    if (value === "") {
+      onStakingAmountSatChange(0);
+      setError(generalErrorMessage);
+      return;
+    }
+    setTouched(true);
+    setBlured(!blured);
   };
 
   const minStakeAmount = maxDecimals(satoshiToBtc(minStakingAmountSat), 8);

@@ -366,10 +366,15 @@ export const Staking: React.FC<StakingProps> = ({
         );
         return stakingFeeSat;
       } catch (error: Error | any) {
+        let errorMsg = error?.message;
+        if (error?.message.includes("Insufficient funds")) {
+          errorMsg =
+            "Not enough balance to cover staking amount and fees, please lower the staking amount";
+        }
         // fees + staking amount can be more than the balance
         showError({
           error: {
-            message: error.message,
+            message: errorMsg,
             errorState: ErrorState.STAKING,
             errorTime: new Date(),
           },
