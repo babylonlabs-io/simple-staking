@@ -14,7 +14,6 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
 
 interface DelegationProps {
-  finalityProviderMoniker: string;
   stakingTx: StakingTx;
   stakingValueSat: number;
   stakingTxHash: string;
