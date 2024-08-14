@@ -366,10 +366,19 @@ export const Staking: React.FC<StakingProps> = ({
         );
         return stakingFeeSat;
       } catch (error: Error | any) {
+        let errorMsg = error?.message;
+        // Turn the error message into a user-friendly message
+        // The btc-staking-ts lib will be improved to return propert error types
+        // in the future. For now, we need to handle the errors manually by
+        // matching the error message.
+        if (errorMsg.includes("Insufficient funds")) {
+          errorMsg =
+            "Not enough balance to cover staking amount and fees, please lower the staking amount";
+        }
         // fees + staking amount can be more than the balance
         showError({
           error: {
-            message: error.message,
+            message: errorMsg,
             errorState: ErrorState.STAKING,
             errorTime: new Date(),
           },
