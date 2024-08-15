@@ -6,8 +6,6 @@ import {
 } from "@/app/components/Loading/Loading";
 import { QueryMeta } from "@/app/types/api";
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
-import { getNetworkConfig } from "@/config/network.config";
-import { Network } from "@/utils/wallet/wallet_provider";
 
 import { FinalityProvider } from "./FinalityProvider";
 
@@ -31,24 +29,9 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     return <LoadingView />;
   }
 
-  const network = getNetworkConfig().network;
-  const createFinalityProviderLink = `https://github.com/babylonlabs-io/networks/tree/main/${
-    network == Network.MAINNET ? "bbn-1" : "bbn-test-4"
-  }/finality-providers`;
   return (
     <>
-      <p>
-        Select a finality provider or{" "}
-        <a
-          href={createFinalityProviderLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="sublink text-primary hover:underline"
-        >
-          create your own
-        </a>
-        .
-      </p>
+      <p>Select a finality provider.</p>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
         <p>Finality Provider</p>
         <p>BTC PK</p>
