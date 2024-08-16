@@ -1,4 +1,6 @@
+import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -37,7 +39,7 @@ export const Summary: React.FC<SummaryProps> = ({
         </div>
         <div className="divider divider-horizontal xl:m-0" />
         <div className="flex flex-col gap-1 text-sm xl:flex-1 xl:flex-row xl:items-center xl:justify-center xl:gap-2 xl:text-base">
-          <p className="dark:text-neutral-content">Balance</p>
+          <p className="dark:text-neutral-content">Stakable Balance</p>
           <div className="flex items-center gap-1">
             <FaBitcoin className="text-primary" size={16} />
             {typeof btcWalletBalanceSat === "number" ? (
@@ -47,6 +49,21 @@ export const Summary: React.FC<SummaryProps> = ({
             ) : (
               <LoadingSmall text="Loading..." />
             )}
+          </div>
+          <div>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id={"tooltip-stakeable-balance"}
+              data-tooltip-content={`Stakable balance only includes confirmed Bitcoin balance. 
+              It does not include balance stemming from pending transactions.`}
+              data-tooltip-place="top"
+            >
+              <AiOutlineInfoCircle />
+            </span>
+            <Tooltip
+              id={"tooltip-stakeable-balance"}
+              className="tooltip-wrap"
+            />
           </div>
           {!onMainnet && (
             <a
