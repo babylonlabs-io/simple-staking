@@ -94,7 +94,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     } else {
       setError("");
       onStakingAmountSatChange(satoshis);
-      setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
+      // setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
   }, [
     btcWalletBalanceSat,
