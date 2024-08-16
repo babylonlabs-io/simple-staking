@@ -102,7 +102,9 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   };
 
   const buildInjectableWallet = (shouldDisplay: boolean, name: string) => {
-    if (!shouldDisplay) {
+    // NOTE: The 'OneKey (Browser)' special case here is a temporary solution
+    // while waiting for the OneKey wallet to release their fixes
+    if (!shouldDisplay || injectedWalletProviderName === "OneKey (Browser)") {
       return null;
     }
 
