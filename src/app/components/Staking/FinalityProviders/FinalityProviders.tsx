@@ -31,7 +31,9 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
 
   return (
     <>
-      <p>Step-1: Select a finaltiy provider</p>
+      <p>
+        <strong>Step-1:</strong> Select a finaltiy provider
+      </p>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
         <p>Finality Provider</p>
         <p>BTC PK</p>

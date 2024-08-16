@@ -607,7 +607,9 @@ export const Staking: React.FC<StakingProps> = ({
 
       return (
         <>
-          <p>Step-2: Set up staking terms</p>
+          <p>
+            <strong>Step-2:</strong> Set up staking terms
+          </p>
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
               <StakingTime
