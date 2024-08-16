@@ -95,9 +95,12 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         <h4 className="text-center text-base">Attention!</h4>
         <p className="dark:text-neutral-content">
           1. Your stake may &quot;overflow&quot; the staking TVL cap and need to
-          be unbonded and withdrawn, which will cost you a transaction fee of{" "}
-          <strong>{`${maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} ${coinName}`}</strong>{" "}
-          that will go to the BTC miners. So please stake wisely.
+          be unbonded and withdrawn, which will cost you {coinName} transaction
+          fees. So please stake wisely. Unbonding will cost you a static
+          transaction fee of{" "}
+          <strong>{`${maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} ${coinName}`}</strong>
+          , while the withdrawal fee depends on network conditions. All fees go
+          to the {coinName} miners.
         </p>
         <p className="dark:text-neutral-content">
           2. No third party possesses your staked {coinName}. You are the only
