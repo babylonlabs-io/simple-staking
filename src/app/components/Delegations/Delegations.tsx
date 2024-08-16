@@ -29,7 +29,6 @@ import {
 import { Delegation } from "./Delegation";
 
 interface DelegationsProps {
-  finalityProvidersKV: Record<string, string>;
   delegationsAPI: DelegationInterface[];
   delegationsLocalStorage: DelegationInterface[];
   globalParamsVersion: GlobalParamsVersion;
@@ -43,7 +42,6 @@ interface DelegationsProps {
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
-  finalityProvidersKV,
   delegationsAPI,
   delegationsLocalStorage,
   globalParamsVersion,
@@ -264,9 +262,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
                   state,
                   isOverflow,
                 } = delegation;
-                // Get the moniker of the finality provider
-                const finalityProviderMoniker =
-                  finalityProvidersKV[finalityProviderPkHex];
                 const intermediateDelegation =
                   intermediateDelegationsLocalStorage.find(
                     (item) => item.stakingTxHashHex === stakingTxHashHex,
@@ -275,7 +270,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
                 return (
                   <Delegation
                     key={stakingTxHashHex + stakingTx.startHeight}
-                    finalityProviderMoniker={finalityProviderMoniker}
                     stakingTx={stakingTx}
                     stakingValueSat={stakingValueSat}
                     stakingTxHash={stakingTxHashHex}
