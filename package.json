@@ -1,6 +1,6 @@
 {
   "name": "simple-staking",
-  "version": "0.2.32",
+  "version": "0.2.33",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -28,8 +28,8 @@
     "@scure/bip32": "^1.4.0",
     "@tanstack/react-query": "^5.28.14",
     "@tanstack/react-query-next-experimental": "^5.28.14",
+    "axios": "^1.7.4",
     "@uidotdev/usehooks": "^2.4.1",
-    "axios": "^1.6.8",
     "bitcoinjs-lib": "^6.1.5",
     "btc-staking-ts": "^0.2.10",
     "date-fns": "^3.6.0",

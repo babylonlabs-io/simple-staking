@@ -14,8 +14,6 @@ import { useError } from "@/app/context/Error/ErrorContext";
 import { useFinalityProvidersData } from "@/app/hooks/finalityProviders/useFinalityProvidersData";
 import { ErrorState } from "@/app/types/errors";
 import { FinalityProvidersProps } from "@/app/types/finalityProviders";
-import { getNetworkConfig } from "@/config/network.config";
-import { Network } from "@/utils/wallet/wallet_provider";
 
 import { FinalityProvider } from "./FinalityProvider";
 import { FinalityProviderSearch } from "./FinalityProviderSearch";
@@ -102,25 +100,9 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     return <LoadingView />;
   }
 
-  const network = getNetworkConfig().network;
-  const createFinalityProviderLink = `https://github.com/babylonlabs-io/networks/tree/main/${
-    network == Network.MAINNET ? "bbn-1" : "bbn-test-4"
-  }/finality-providers`;
-
   return (
     <>
-      <p>
-        Select a finality provider or{" "}
-        <a
-          href={createFinalityProviderLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="sublink text-primary hover:underline"
-        >
-          create your own
-        </a>
-        .
-      </p>
+      <p>Select a finality provider.</p>
       <div className="flex gap-3">
         <FinalityProviderSearch onSearch={handleSearch} />
       </div>
