@@ -40,7 +40,7 @@ const iconLinks = [
   },
   {
     name: "Medium",
-    url: "https://medium.com/babylonchain-io",
+    url: "https://medium.com/babylonlabs-io",
     Icon: BsMedium,
   },
   {

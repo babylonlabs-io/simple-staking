@@ -576,6 +576,7 @@ export const Staking: React.FC<StakingProps> = ({
         maxStakingTimeBlocks,
         unbondingTime,
         confirmationDepth,
+        unbondingFeeSat,
       } = stakingParams;
 
       // Staking time is fixed
@@ -604,7 +605,9 @@ export const Staking: React.FC<StakingProps> = ({
 
       return (
         <>
-          <p>Set up staking terms</p>
+          <p>
+            <strong>Step-2:</strong> Set up staking terms
+          </p>
           <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
               <StakingTime
@@ -659,6 +662,7 @@ export const Staking: React.FC<StakingProps> = ({
                 confirmationDepth={confirmationDepth}
                 feeRate={feeRate}
                 unbondingTimeBlocks={unbondingTime}
+                unbondingFeeSat={unbondingFeeSat}
               />
             )}
           </div>

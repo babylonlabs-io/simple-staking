@@ -94,7 +94,6 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
     } else {
       setError("");
       onStakingAmountSatChange(satoshis);
-      setValue(maxDecimals(satoshiToBtc(satoshis), 8).toString());
     }
   }, [
     btcWalletBalanceSat,
@@ -126,7 +125,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       </div>
       <input
         type="string"
-        className={`no-focus input input-bordered w-full ${error && "input-error"}`}
+        className={`no-focus input input-bordered w-full ${error ? "input-error" : ""}`}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}

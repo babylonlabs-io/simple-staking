@@ -10,5 +10,5 @@ export const shouldDisplayTestingMsg = (): boolean => {
 export const getNetworkAppUrl = (): string => {
   return shouldDisplayTestingMsg()
     ? "https://btcstaking.testnet.babylonchain.io"
-    : "https://btcstaking.babylonchain.io";
+    : "https://btcstaking.babylonlabs.io";
 };
