@@ -12,6 +12,7 @@ import { durationTillNow } from "@/utils/formatTime";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
+import { Network } from "@/utils/wallet/wallet_provider";
 
 interface DelegationProps {
   finalityProviderMoniker: string;
@@ -111,7 +112,12 @@ export const Delegation: React.FC<DelegationProps> = ({
     }
   };
 
-  const { coinName, mempoolApiUrl } = getNetworkConfig();
+  const { coinName, network } = getNetworkConfig();
+
+  const mempoolUIUrl =
+    network === Network.MAINNET
+      ? "https://mempool.space"
+      : "https://mempool.space/signet";
 
   return (
     <div
@@ -135,7 +141,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         </p>
         <div className="justify-center lg:flex order-2 lg:order-3">
           <a
-            href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
+            href={`${mempoolUIUrl}/tx/${stakingTxHash}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
