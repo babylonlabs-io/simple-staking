@@ -5,11 +5,11 @@ export interface PsbtTransactionResult {
   fee: number;
 }
 
-import { getGlobalParams } from "@/app/api/getGlobalParams";
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
-import { Delegation as DelegationInterface } from "@/app/types/delegations";
-import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getGlobalParams } from "../../app/api/getGlobalParams";
+import { SignPsbtTransaction } from "../../app/common/utils/psbt";
+import { Delegation as DelegationInterface } from "../../app/types/delegations";
+import { apiDataToStakingScripts } from "../../utils/apiDataToStakingScripts";
+import { getCurrentGlobalParamsVersion } from "../../utils/globalParams";
 
 import { getFeeRateFromMempool } from "../getFeeRateFromMempool";
 import { Fees } from "../wallet/wallet_provider";
