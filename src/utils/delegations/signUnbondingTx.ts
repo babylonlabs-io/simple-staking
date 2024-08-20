@@ -1,7 +1,7 @@
 import { Transaction, networks } from "bitcoinjs-lib";
 
-import { getGlobalParams } from "@/app/api/getGlobalParams";
-import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
+import { getGlobalParams } from "../../app/api/getGlobalParams";
+import { getUnbondingEligibility } from "../../app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
