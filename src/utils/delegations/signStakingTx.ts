@@ -1,5 +1,5 @@
 import { Transaction, networks } from "bitcoinjs-lib";
-import { stakingTransaction } from "btc-staking-ts";
+// import { stakingTransaction } from "btc-staking-ts";
 
 import { signPsbtTransaction } from "@/app/common/utils/psbt";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
@@ -15,7 +15,7 @@ import { txFeeSafetyCheck } from "./fee";
 // - unsignedStakingPsbt: the unsigned staking transaction
 // - stakingTerm: the staking term
 // - stakingFee: the staking fee
-export const createStakingTx = (
+export const createStakingTx = async (
   globalParamsVersion: GlobalParamsVersion,
   stakingAmountSat: number,
   stakingTimeBlocks: number,
@@ -51,7 +51,7 @@ export const createStakingTx = (
   // Create the staking scripts
   let scripts;
   try {
-    scripts = apiDataToStakingScripts(
+    scripts = await apiDataToStakingScripts(
       finalityProviderPublicKey,
       stakingTerm,
       globalParamsVersion,
@@ -60,6 +60,8 @@ export const createStakingTx = (
   } catch (error: Error | any) {
     throw new Error(error?.message || "Cannot build staking scripts");
   }
+
+  const  { stakingTransaction } = await import ("btc-staking-ts");
 
   // Create the staking transaction
   let unsignedStakingPsbt;
@@ -107,7 +109,7 @@ export const signStakingTx = async (
   inputUTXOs: UTXO[],
 ): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
   // Create the staking transaction
-  let { unsignedStakingPsbt, stakingTerm, stakingFeeSat } = createStakingTx(
+  let { unsignedStakingPsbt, stakingTerm, stakingFeeSat } = await createStakingTx(
     globalParamsVersion,
     stakingAmountSat,
     stakingTimeBlocks,

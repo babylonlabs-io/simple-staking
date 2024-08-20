@@ -1,9 +1,9 @@
-import { Transaction, networks } from "bitcoinjs-lib";
-import {
-  PsbtTransactionResult,
-  withdrawEarlyUnbondedTransaction,
-  withdrawTimelockUnbondedTransaction,
-} from "btc-staking-ts";
+import { Psbt, Transaction, networks } from "bitcoinjs-lib";
+
+export interface PsbtTransactionResult {
+  psbt: Psbt;
+  fee: number;
+}
 
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
@@ -69,7 +69,7 @@ export const signWithdrawalTx = async (
     slashingScript,
     unbondingScript,
     unbondingTimelockScript,
-  } = apiDataToStakingScripts(
+  } = await apiDataToStakingScripts(
     delegation.finalityProviderPkHex,
     delegation.stakingTx.timelock,
     globalParamsWhenStaking,
@@ -77,6 +77,12 @@ export const signWithdrawalTx = async (
   );
 
   const feeRate = getFeeRateFromMempool(fees);
+
+  const  {
+        withdrawEarlyUnbondedTransaction,
+        withdrawTimelockUnbondedTransaction,
+  } = await import ("btc-staking-ts");
+
 
   // Create the withdrawal transaction
   let withdrawPsbtTxResult: PsbtTransactionResult;

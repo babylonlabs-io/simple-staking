@@ -1,8 +1,14 @@
+// @ts-ignore
 import bitgetWalletIcon from "./icons/bitget.svg";
+// @ts-ignore
 import keystoneIcon from "./icons/keystone.svg";
+// @ts-ignore
 import okxIcon from "./icons/okx.svg";
+// @ts-ignore
 import oneKeyIcon from "./icons/onekey.svg";
+// @ts-ignore
 import tomoIcon from "./icons/tomo.svg";
+
 import { BitgetWallet, bitgetWalletProvider } from "./providers/bitget_wallet";
 import { KeystoneWallet } from "./providers/keystone";
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";

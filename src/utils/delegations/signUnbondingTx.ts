@@ -1,5 +1,4 @@
 import { Transaction, networks } from "bitcoinjs-lib";
-import { unbondingTransaction } from "btc-staking-ts";
 
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
@@ -63,13 +62,15 @@ export const signUnbondingTx = async (
   }
 
   // Recreate the staking scripts
-  const scripts = apiDataToStakingScripts(
+  const scripts = await apiDataToStakingScripts(
     delegation.finalityProviderPkHex,
     delegation.stakingTx.timelock,
     globalParamsWhenStaking,
     publicKeyNoCoord,
   );
 
+
+  const { unbondingTransaction } = await import ("btc-staking-ts");
   // Create the unbonding transaction
   const { psbt: unsignedUnbondingTx } = unbondingTransaction(
     scripts,
