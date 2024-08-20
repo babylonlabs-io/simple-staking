@@ -1,4 +1,4 @@
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { GlobalParamsVersion } from "../app/types/globalParams";
 
 export interface ParamsWithContext {
   currentVersion: GlobalParamsVersion | undefined;

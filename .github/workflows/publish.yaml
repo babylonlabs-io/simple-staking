@@ -35,9 +35,9 @@ jobs:
           tags: simple-staking:${{ github.sha }}
           outputs: type=docker,dest=/tmp/simple-staking-${{ matrix.environment }}.tar
           build-args: |
-            NEXT_PUBLIC_MEMPOOL_API=${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}
+            NEXT_PUBLIC_STAKING_SDK_BABYLON_MEMPOOL_API=${{ vars.NEXT_PUBLIC_STAKING_SDK_BABYLON_MEMPOOL_API }}
+            NEXT_PUBLIC_STAKING_SDK_BABYLON_API_URL=${{ vars.NEXT_PUBLIC_STAKING_SDK_BABYLON_API_URL }}
+            NEXT_PUBLIC_STAKING_SDK_BABYLON_NETWORK=${{ vars.NEXT_PUBLIC_STAKING_SDK_BABYLON_NETWORK }}
             NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
 
       - name: Upload Docker image to workspace

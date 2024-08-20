@@ -1,6 +1,6 @@
 
-import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { getPublicKeyNoCoord } from "@/utils/wallet/index";
+import { GlobalParamsVersion } from "../app/types/globalParams";
+import { getPublicKeyNoCoord } from "../utils/wallet/index";
 
 // import { StakingScripts } from "btc-staking-ts";
 export interface StakingScripts {

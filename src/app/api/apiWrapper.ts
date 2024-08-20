@@ -23,7 +23,7 @@ export const apiWrapper = async (
   try {
     // destructure params in case of post request
     response = await handler(
-      `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      `${process.env.NEXT_PUBLIC_STAKING_SDK_BABYLON_API_URL}${url}`,
       method === "POST"
         ? { ...params }
         : {

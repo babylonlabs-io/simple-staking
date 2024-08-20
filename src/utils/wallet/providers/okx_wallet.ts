@@ -2,7 +2,7 @@ import {
   getNetworkConfig,
   network,
   validateAddress,
-} from "@/config/network.config";
+} from "../../../config/network.config";
 
 import {
   getAddressBalance,

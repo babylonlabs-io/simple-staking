@@ -16,11 +16,11 @@ cp .env.example .env.local
 
 where,
 
-- `NEXT_PUBLIC_MEMPOOL_API` specifies the mempool.space host to use for Bitcoin
+- `NEXT_PUBLIC_STAKING_SDK_BABYLON_MEMPOOL_API` specifies the mempool.space host to use for Bitcoin
   node queries
-- `NEXT_PUBLIC_API_URL` specifies the back-end API to use for the staking
+- `NEXT_PUBLIC_STAKING_SDK_BABYLON_API_URL` specifies the back-end API to use for the staking
   system queries
-- `NEXT_PUBLIC_NETWORK` specifies the BTC network environment
+- `NEXT_PUBLIC_STAKING_SDK_BABYLON_NETWORK` specifies the BTC network environment
 - `NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES` boolean value to indicate whether display 
 testing network related message. Default to true
 
