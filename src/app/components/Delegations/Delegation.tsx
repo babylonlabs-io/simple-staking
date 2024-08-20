@@ -6,6 +6,10 @@ import { Tooltip } from "react-tooltip";
 
 import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import {
+  PUBLIC_MEMPOOL_URL,
+  PUBLIC_MEMPOOL_URL_SIGNET,
+} from "@/config/mempool";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { durationTillNow } from "@/utils/formatTime";
@@ -116,8 +120,8 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   const mempoolUIUrl =
     network === Network.MAINNET
-      ? "https://mempool.space"
-      : "https://mempool.space/signet";
+      ? PUBLIC_MEMPOOL_URL
+      : PUBLIC_MEMPOOL_URL_SIGNET;
 
   return (
     <div
