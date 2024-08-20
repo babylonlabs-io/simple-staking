@@ -2,12 +2,12 @@ import { useTheme } from "next-themes";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-import darkLogo from "@/app/assets/logo-black.svg";
-import lightLogo from "@/app/assets/logo-white.svg";
+import darkIcon from "@/app/assets/icon-black.svg";
+import lightIcon from "@/app/assets/icon-white.svg";
 
-interface LogoProps {}
+interface IconProps {}
 
-export const Logo: React.FC<LogoProps> = () => {
+export const Icon: React.FC<IconProps> = () => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const lightSelected = resolvedTheme === "light";
@@ -17,15 +17,20 @@ export const Logo: React.FC<LogoProps> = () => {
     setMounted(true);
   }, []);
 
-  // uses skeleton of babylon logo with primary color
+  // uses placeholder of babylon logo with primary color
   // since before theme is resolved, we don't know which logo to show
   if (!mounted) {
-    return <div className="h-[40px] w-[159px]" />;
+    return <span className="h-[24px] w-[24px]" />;
   }
 
   return (
-    <div className="flex">
-      <Image src={lightSelected ? darkLogo : lightLogo} alt="Babylon" />
-    </div>
+    <span className="inline-block mx-2">
+      <Image
+        src={lightSelected ? darkIcon : lightIcon}
+        alt="Babylon"
+        width={24}
+        height={24}
+      />
+    </span>
   );
 };

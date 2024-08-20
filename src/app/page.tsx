@@ -33,12 +33,14 @@ import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
+import { PrivacyModal } from "./components/Modals/Privacy/PrivacyModal";
 import { TermsModal } from "./components/Modals/Terms/TermsModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
+import { usePrivacy } from "./context/Privacy/PrivacyContext";
 import { useTerms } from "./context/Terms/TermsContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
@@ -60,6 +62,7 @@ const Home: React.FC<HomeProps> = () => {
     noCancel,
   } = useError();
   const { isTermsOpen, closeTerms } = useTerms();
+  const { isPrivacyOpen, closePrivacy } = usePrivacy();
 
   const {
     data: paramWithContext,
@@ -479,6 +482,7 @@ const Home: React.FC<HomeProps> = () => {
         noCancel={noCancel}
       />
       <TermsModal open={isTermsOpen} onClose={closeTerms} />
+      <PrivacyModal open={isPrivacyOpen} onClose={closePrivacy} />
     </main>
   );
 };
