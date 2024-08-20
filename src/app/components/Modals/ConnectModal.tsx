@@ -189,9 +189,9 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             <span className="label-text md:max-w-[27rem]">
               I acknowledge that Keystone via QR code is the only hardware
               wallet supporting Bitcoin Staking. Using any other hardware
-              wallets through any means (such as connection to
-              software/extension/mobile wallet) can lead to permanent inability
-              to withdraw the stake.
+              wallets through any means (such as connection to software /
+              extension / mobile wallet) can lead to permanent inability to
+              withdraw the stake.
             </span>
           </label>
         </div>
