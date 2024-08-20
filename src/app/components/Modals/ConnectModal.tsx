@@ -186,17 +186,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
               onChange={(e) => setNoHWWallet(e.target.checked)}
               checked={noHWWallet}
             />
-            <span className="label-text">
-              I certify that I am not connecting an unsupported hardware wallet.
-            </span>
-            <span
-              className="cursor-pointer text-xs"
-              data-tooltip-id="hw-wallet"
-              data-tooltip-content="I acknowledge that Keystone via QR code is the only hardware wallet supporting Bitcoin Staking. Using any other hardware wallets through any means (such as connection to software/extension/mobile wallet) can lead to permanent inability to withdraw the stake."
-              data-tooltip-place="top"
-            >
-              <AiOutlineInfoCircle />
-              <Tooltip id="hw-wallet" className="tooltip-wrap" />
+            <span className="label-text md:max-w-[27rem]">
+              I acknowledge that Keystone via QR code is the only hardware
+              wallet supporting Bitcoin Staking. Using any other hardware
+              wallets through any means (such as connection to
+              software/extension/mobile wallet) can lead to permanent inability
+              to withdraw the stake.
             </span>
           </label>
         </div>
