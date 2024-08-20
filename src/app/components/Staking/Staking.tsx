@@ -546,7 +546,7 @@ export const Staking: React.FC<StakingProps> = ({
         <Message
           title="Staking has not yet started"
           messages={[
-            `Staking will be activated once ${coinName} block height passes ${
+            `Staking will be activated once ${coinName} block height reaches ${
               firstActivationHeight ? firstActivationHeight - 1 : "-"
             }. The current ${coinName} block height is ${btcHeight || "-"}.`,
           ]}
