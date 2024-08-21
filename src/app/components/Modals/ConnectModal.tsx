@@ -6,6 +6,7 @@ import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
+import { usePrivacy } from "@/app/context/Privacy/PrivacyContext";
 import { useTerms } from "@/app/context/Terms/TermsContext";
 import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
@@ -42,6 +43,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   const BROWSER = "btcwallet";
 
   const { openTerms } = useTerms();
+  const { openPrivacy } = usePrivacy();
 
   useEffect(() => {
     const fetchWalletProviderDetails = async () => {
@@ -156,9 +158,16 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
               I certify that I have read and accept the updated{" "}
               <button
                 onClick={openTerms}
-                className="transition-colors hover:text-primary cursor-pointer btn btn-link no-underline text-base-content px-0 h-auto min-h-0"
+                className="cursor-pointer btn btn-link px-0 h-auto min-h-0"
               >
                 Terms of Use
+              </button>
+              {" and "}
+              <button
+                onClick={openPrivacy}
+                className="cursor-pointer btn btn-link px-0 h-auto min-h-0"
+              >
+                Privacy Policy
               </button>
               .
             </span>

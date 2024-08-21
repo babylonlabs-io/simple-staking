@@ -1,0 +1,52 @@
+.terms-privacy-container h3 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+.terms-privacy-container h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.terms-privacy-container h5 {
+  font-weight: 600;
+}
+
+.terms-privacy-container ol,
+.terms-privacy-container ul {
+  padding-left: 1.5rem;
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.terms-privacy-container ol > li {
+  list-style-type: lower-alpha;
+}
+
+.terms-privacy-container ol.alpha-capital > li {
+  list-style-type: upper-alpha;
+}
+
+.terms-privacy-container ul > li {
+  list-style-type: disc;
+}
+
+.terms-privacy-container li {
+  margin-bottom: 0.75rem;
+}
+
+.terms-privacy-container strong {
+  color: var(--primary);
+}
+
+.terms-privacy-container a {
+  text-decoration: underline;
+  font-weight: bold;
+  color: var(--primary);
+}
