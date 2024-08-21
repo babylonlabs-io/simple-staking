@@ -283,14 +283,14 @@ export const Privacy = () => {
         <strong>Events, promotions and contests.</strong> We may use your
         personal information to:
         <ul className="list-disc list-inside">
-          <li>administer promotions and contests;</li>
+          <li>administer promotions and contests</li>
           <li>
             communicate with you about promotions or contests in which you
-            participate;
+            participate
           </li>
           <li>
             contact or market to you after collecting your personal information
-            at an event;
+            at an event
           </li>
         </ul>
       </p>
