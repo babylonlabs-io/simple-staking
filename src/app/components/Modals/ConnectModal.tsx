@@ -195,7 +195,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
               onChange={(e) => setNoHWWallet(e.target.checked)}
               checked={noHWWallet}
             />
-            <span className="label-text md:max-w-[27rem]">
+            <span className="label-text md:max-w-[34rem]">
               I acknowledge that Keystone via QR code is the only hardware
               wallet supporting Bitcoin Staking. Using any other hardware
               wallets through any means (such as connection to software /
