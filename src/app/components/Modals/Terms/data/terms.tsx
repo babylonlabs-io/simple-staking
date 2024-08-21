@@ -760,13 +760,15 @@ export const Terms = () => {
       <h3>16. DISPUTE RESOLUTION; ARBITRATION AGREEMENT</h3>
       <br />
       <p>
-        Please read the arbitration provisions in this Section 16 of the Terms
-        carefully (the <strong>&quot;Arbitration Agreement&quot;</strong>). It
-        requires you to arbitrate disputes with Babylon Labs, its affiliates,
-        successors, and assigns, and all of their respective officers,
-        directors, employees, agents, and representatives (collectively, the{" "}
-        <strong>&quot;Babylon Parties&quot;</strong>) and limits the manner in
-        which you can seek relief from the Babylon Parties.
+        <strong>
+          Please read the arbitration provisions in this Section 16 of the Terms
+          carefully (the &quot;Arbitration Agreement&quot). It requires you to
+          arbitrate disputes with Babylon Labs, its affiliates, successors, and
+          assigns, and all of their respective officers, directors, employees,
+          agents, and representatives (collectively, the &quot;Babylon
+          Parties&quot) and limits the manner in which you can seek relief from
+          the Babylon Parties.
+        </strong>
       </p>
       <br />
       <h4 className="font-bold text-primary">
