@@ -570,7 +570,7 @@ export const Privacy = () => {
         visit. We currently do not respond to &quot;Do Not Track&quot; signals.
         To find out more about &quot;Do Not Track&quot;, please visit{" "}
         <a
-          href="https://http://www.allaboutdnt.com"
+          href="https://www.allaboutdnt.com"
           target="_blank"
           rel="noopener noreferrer"
         >
