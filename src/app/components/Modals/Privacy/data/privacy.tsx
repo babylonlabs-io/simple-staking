@@ -213,169 +213,171 @@ export const Privacy = () => {
         We may use your personal information for the following purposes or as
         otherwise described at the time of collection:
       </p>
-      <ul className="list-disc list-inside">
-        <li>
-          <strong>Service delivery and operations.</strong> We may use your
-          personal information to:
-          <ul className="list-disc list-inside">
-            <li>provide, operate and improve the Service and our business;</li>
-            <li>
-              personalize the Service, including remembering the devices from
-              which you have previously logged in and remembering your
-              selections and preferences as you navigate the Service;
-            </li>
-            <li>establish and maintain your user profile on the Service;</li>
-            <li>
-              facilitate your invitations to friends who you want to invite to
-              join the Service;
-            </li>
-            <li>
-              facilitate social features of the Service, such as by providing
-              chat or messaging functionality;
-            </li>
-            <li>
-              enable security features of the Service, such as by sending you
-              security codes via email or SMS, and remembering devices from
-              which you have previously logged in;
-            </li>
-            <li>
-              communicate with you about the Service, including by sending
-              Service-related announcements, updates, security alerts, and
-              support and administrative messages;
-            </li>
-            <li>
-              communicate with you about events or contests in which you
-              participate;
-            </li>
-            <li>
-              understand your needs and interests, and personalize your
-              experience with the Service and our communications; and
-            </li>
-            <li>
-              provide support for the Service, and respond to your requests,
-              questions and feedback.
-            </li>
-          </ul>
-        </li>
-        <li>
-          <strong>Research and development.</strong> We may use your personal
-          information for research and development purposes, including to
-          analyze and improve the Service and our business and to develop new
-          products and services. As part of these activities, we may create
-          aggregated, de-identified and/or anonymized data from personal
-          information we collect. We make personal information into
-          de-identified or anonymized data by removing information that makes
-          the data personally identifiable to you. We may use this aggregated,
-          de-identified or otherwise anonymized data and share it with third
-          parties for our lawful business purposes, including to analyze and
-          improve the Service and promote our business.
-        </li>
-        <li>
-          <strong>Marketing.</strong> We and our service providers may send you
-          direct marketing communications and may personalize these messages
-          based on your needs and interests. You may opt-out of our marketing
-          communications as described in the Opt-out of marketing section below.
-        </li>
-        <li>
-          <strong>Events, promotions and contests.</strong> We may use your
-          personal information to:
-          <ul className="list-disc list-inside">
-            <li>administer promotions and contests;</li>
-            <li>
-              communicate with you about promotions or contests in which you
-              participate;
-            </li>
-            <li>
-              contact or market to you after collecting your personal
-              information at an event;
-            </li>
-          </ul>
-        </li>
-        <li>
-          <strong>Service improvement and analytics.</strong> We may use your
-          personal information to analyze your usage of the Service, improve the
-          Service, improve the rest of our business, help us understand user
-          activity on the Service, including which pages are most and least
-          visited and how visitors move around the Service, as well as user
-          interactions with our emails, and to develop new products and
-          services.
-        </li>
-        <li>
-          <strong>
-            To manage our recruiting and process job applications.
-          </strong>{" "}
-          We may use personal information, such as data submitted to us in a job
-          application, to facilitate our recruitment activities and process job
-          applications, such as by evaluating a candidate for a job, and
-          monitoring recruitment statistics.
-        </li>
-        <li>
-          <strong>Compliance and protection.</strong> We may use your personal
-          information to:
-          <ul className="list-disc list-inside">
-            <li>
-              comply with applicable laws, lawful requests, and legal process,
-              such as to respond to subpoenas, investigations or requests from
-              government authorities;
-            </li>
-            <li>
-              protect our, your or others’ rights, privacy, safety or property
-              (including by making and defending legal claims);
-            </li>
-            <li>
-              audit our internal processes for compliance with legal and
-              contractual requirements or our internal policies;
-            </li>
-            <li>
-              enforce the terms and conditions that govern the Service; and
-            </li>
-            <li>
-              prevent, identify, investigate and deter fraudulent, harmful,
-              unauthorized, unethical or illegal activity, including
-              cyberattacks and identity theft.
-            </li>
-          </ul>
-        </li>
-        <li>
-          <strong>With your consent.</strong> In some cases, we may specifically
-          ask for your consent to collect, use or share your personal
-          information, such as when required by law.
-        </li>
-        <li>
-          <strong>Cookies and similar technologies.</strong> In addition to the
-          other uses included in this section, we may use the Cookies and
-          similar technologies described above for the following purposes:
-          <ul className="list-disc list-inside">
-            <li>
-              <strong>Technical operation.</strong> To allow the technical
-              operation of the Service, such as by remembering your selections
-              and preferences as you navigate the site, and whether you are
-              logged in when you visit password protected areas of the Service.
-            </li>
-            <li>
-              <strong>Functionality.</strong> To enhance the performance and
-              functionality of our services.
-            </li>
-            <li>
-              <strong>Analytics.</strong> To help us understand user activity on
-              the Service, including which pages are most and least visited and
-              how visitors move around the Service, as well as user interactions
-              with our emails. For example, we use Google Analytics for this
-              purpose. You can learn more about Google Analytics and how to
-              prevent the use of Google Analytics relating to your use of our
-              sites{" "}
-              <a
-                href="https://tools.google.com/dlpage/gaoptout?hl=en"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                here
-              </a>
-              .
-            </li>
-          </ul>
-        </li>
-      </ul>
+      <br />
+      <p>
+        <strong>Service delivery and operations.</strong> We may use your
+        personal information to:
+        <ul className="list-disc list-inside">
+          <li>provide, operate and improve the Service and our business;</li>
+          <li>
+            personalize the Service, including remembering the devices from
+            which you have previously logged in and remembering your selections
+            and preferences as you navigate the Service;
+          </li>
+          <li>establish and maintain your user profile on the Service;</li>
+          <li>
+            facilitate your invitations to friends who you want to invite to
+            join the Service;
+          </li>
+          <li>
+            facilitate social features of the Service, such as by providing chat
+            or messaging functionality;
+          </li>
+          <li>
+            enable security features of the Service, such as by sending you
+            security codes via email or SMS, and remembering devices from which
+            you have previously logged in;
+          </li>
+          <li>
+            communicate with you about the Service, including by sending
+            Service-related announcements, updates, security alerts, and support
+            and administrative messages;
+          </li>
+          <li>
+            communicate with you about events or contests in which you
+            participate;
+          </li>
+          <li>
+            understand your needs and interests, and personalize your experience
+            with the Service and our communications; and
+          </li>
+          <li>
+            provide support for the Service, and respond to your requests,
+            questions and feedback.
+          </li>
+        </ul>
+      </p>
+      <br />
+      <p>
+        <strong>Research and development.</strong> We may use your personal
+        information for research and development purposes, including to analyze
+        and improve the Service and our business and to develop new products and
+        services. As part of these activities, we may create aggregated,
+        de-identified and/or anonymized data from personal information we
+        collect. We make personal information into de-identified or anonymized
+        data by removing information that makes the data personally identifiable
+        to you. We may use this aggregated, de-identified or otherwise
+        anonymized data and share it with third parties for our lawful business
+        purposes, including to analyze and improve the Service and promote our
+        business.
+      </p>
+      <br />
+      <p>
+        <strong>Marketing.</strong> We and our service providers may send you
+        direct marketing communications and may personalize these messages based
+        on your needs and interests. You may opt-out of our marketing
+        communications as described in the Opt-out of marketing section below.
+      </p>
+      <br />
+      <p>
+        <strong>Events, promotions and contests.</strong> We may use your
+        personal information to:
+        <ul className="list-disc list-inside">
+          <li>administer promotions and contests;</li>
+          <li>
+            communicate with you about promotions or contests in which you
+            participate;
+          </li>
+          <li>
+            contact or market to you after collecting your personal information
+            at an event;
+          </li>
+        </ul>
+      </p>
+      <br />
+      <p>
+        <strong>Service improvement and analytics.</strong> We may use your
+        personal information to analyze your usage of the Service, improve the
+        Service, improve the rest of our business, help us understand user
+        activity on the Service, including which pages are most and least
+        visited and how visitors move around the Service, as well as user
+        interactions with our emails, and to develop new products and services.
+      </p>
+      <br />
+      <p>
+        <strong>To manage our recruiting and process job applications.</strong>{" "}
+        We may use personal information, such as data submitted to us in a job
+        application, to facilitate our recruitment activities and process job
+        applications, such as by evaluating a candidate for a job, and
+        monitoring recruitment statistics.
+      </p>
+      <br />
+      <p>
+        <strong>Compliance and protection.</strong> We may use your personal
+        information to:
+        <ul className="list-disc list-inside">
+          <li>
+            comply with applicable laws, lawful requests, and legal process,
+            such as to respond to subpoenas, investigations or requests from
+            government authorities;
+          </li>
+          <li>
+            protect our, your or others’ rights, privacy, safety or property
+            (including by making and defending legal claims);
+          </li>
+          <li>
+            audit our internal processes for compliance with legal and
+            contractual requirements or our internal policies;
+          </li>
+          <li>enforce the terms and conditions that govern the Service; and</li>
+          <li>
+            prevent, identify, investigate and deter fraudulent, harmful,
+            unauthorized, unethical or illegal activity, including cyberattacks
+            and identity theft.
+          </li>
+        </ul>
+      </p>
+      <br />
+      <p>
+        <strong>With your consent.</strong> In some cases, we may specifically
+        ask for your consent to collect, use or share your personal information,
+        such as when required by law.
+      </p>
+      <br />
+      <p>
+        <strong>Cookies and similar technologies.</strong> In addition to the
+        other uses included in this section, we may use the Cookies and similar
+        technologies described above for the following purposes:
+        <ul className="list-disc list-inside">
+          <li>
+            <strong>Technical operation.</strong> To allow the technical
+            operation of the Service, such as by remembering your selections and
+            preferences as you navigate the site, and whether you are logged in
+            when you visit password protected areas of the Service.
+          </li>
+          <li>
+            <strong>Functionality.</strong> To enhance the performance and
+            functionality of our services.
+          </li>
+          <li>
+            <strong>Analytics.</strong> To help us understand user activity on
+            the Service, including which pages are most and least visited and
+            how visitors move around the Service, as well as user interactions
+            with our emails. For example, we use Google Analytics for this
+            purpose. You can learn more about Google Analytics and how to
+            prevent the use of Google Analytics relating to your use of our
+            sites{" "}
+            <a
+              href="https://tools.google.com/dlpage/gaoptout?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              here
+            </a>
+            .
+          </li>
+        </ul>
+      </p>
       <br />
       <h3>Legal Basis for processing personal information:</h3>
       <br />
