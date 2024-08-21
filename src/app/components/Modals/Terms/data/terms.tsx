@@ -11,18 +11,18 @@ export const Terms = () => {
       <p className="italic">Last updated 20 August 2024</p>
       <br />
       <p>
-        Please read these Terms of Use (<strong>“Terms”</strong>) carefully
-        before interacting with or otherwise using the website at{" "}
+        Please read these Terms of Use (<strong>&quot;Terms&quot;</strong>)
+        carefully before interacting with or otherwise using the website at{" "}
         <a href="https://babylonlabs.io" className="text-primary">
           babylonlabs.io
         </a>{" "}
         including any content, tools, applications, services, or features (the{" "}
-        <strong>“Website”</strong>) or the user interface at{" "}
+        <strong>&quot;Website&quot;</strong>) or the user interface at{" "}
         <a href={url} className="text-primary">
           {url}
         </a>{" "}
         including any content, tools, applications, services, or features (the{" "}
-        <strong>“Interface”</strong>) or the API described{" "}
+        <strong>&quot;Interface&quot;</strong>) or the API described{" "}
         <a
           href="https://staking-api.babylonlabs.io/swagger/index.html"
           className="text-primary"
@@ -30,17 +30,18 @@ export const Terms = () => {
           here
         </a>{" "}
         including any content, tools, applications, services, or features {""}
-        (the <strong>“API”</strong>, and together with the Website, the{" "}
-        <strong>“Services”</strong>).
+        (the <strong>&quot;API&quot;</strong>, and together with the Website,
+        the <strong>&quot;Services&quot;</strong>).
       </p>
       <br />
       <p>
         These Terms (and any other terms or policies referenced in these Terms)
         govern your use of the Services and apply to you and each individual,
         entity, group, or association (each and collectively,{" "}
-        <strong>“you”, “your”</strong>) who views, interacts with, links to, or
-        otherwise uses the Services. Any use of the Services serves as your
-        acceptance of these Terms. You agree to comply with all of these Terms.
+        <strong>&quot;you&quot;, &quot;your&quot;</strong>) who views, interacts
+        with, links to, or otherwise uses the Services. Any use of the Services
+        serves as your acceptance of these Terms. You agree to comply with all
+        of these Terms.
       </p>
       <br />
       <p>
@@ -61,7 +62,7 @@ export const Terms = () => {
           and declaratory relief) on an individual basis. Applicable law may
           permit you to opt out of these arbitration provisions within a brief
           amount of time after you accept these terms. In either case, the
-          provisions of Section 17, “governing law”, will apply.
+          provisions of Section 17, &quot;governing law&quot;, will apply.
         </strong>
       </p>
       <br />
@@ -78,8 +79,9 @@ export const Terms = () => {
       </p>
       <br />
       <p>
-        <strong>“Babylon Labs”</strong>, <strong>“we”</strong>,{" "}
-        <strong>“our”</strong>, or <strong>“us”</strong> means Babylon Labs Ltd.
+        <strong>&quot;Babylon Labs&quot;</strong>,{" "}
+        <strong>&quot;we&quot;</strong>, <strong>&quot;our&quot;</strong>, or{" "}
+        <strong>&quot;us&quot;</strong> means Babylon Labs Ltd.
       </p>
       <br />
       <h3>1. THE INTERFACE AND THE PROTOCOLS</h3>
@@ -102,12 +104,12 @@ export const Terms = () => {
         staking transaction handled by the Protocols. The Interface and API are
         provided by us as supported by a community of contributors
         (collectively,
-        <strong>“Provider”</strong>). You should research and understand the
-        Protocols before using them. You can review their software source codes
-        that are freely licensed to the public and available at GitHub. We do
-        not operate or control the Protocols, or their validators or finality
-        providers, although we may contribute to the code base used by those who
-        do.
+        <strong>&quot;Provider&quot;</strong>). You should research and
+        understand the Protocols before using them. You can review their
+        software source codes that are freely licensed to the public and
+        available at GitHub. We do not operate or control the Protocols, or
+        their validators or finality providers, although we may contribute to
+        the code base used by those who do.
       </p>
       <br />
       <p>
@@ -115,8 +117,8 @@ export const Terms = () => {
         own crypto wallet. You will need to use a third-party wallet provider.
         The Interface is a non-custodial application, and we do not ever have
         custody, possession, or control of your Bitcoin, cryptocurrency, or
-        blockchain tokens (<strong>“Digital Assets”</strong>). You are solely
-        responsible for your custody of your Digital Assets and the
+        blockchain tokens (<strong>&quot;Digital Assets&quot;</strong>). You are
+        solely responsible for your custody of your Digital Assets and the
         cryptographic private keys to the Digital Asset wallets you hold. You
         should never share your private keys, wallet credentials, or seed phrase
         with anyone. Compatibility of the Interface with wallet applications,
@@ -216,16 +218,17 @@ export const Terms = () => {
           incorporated or doing business in, any country to which the United
           States, the United Kingdom, the European Union or any of its member
           states or the United Nations (collectively, the{" "}
-          <strong>“Major Jurisdictions”</strong>) embargoes goods or imposes
-          sanctions (such embargoed or sanctioned territories, collectively, the{" "}
-          <strong>“Restricted Territories”</strong>);
+          <strong>&quot;Major Jurisdictions&quot;</strong>) embargoes goods or
+          imposes sanctions (such embargoed or sanctioned territories,
+          collectively, the <strong>&quot;Restricted Territories&quot;</strong>
+          );
         </li>
         <li>
           if you are, or if you directly or indirectly own or control, or have
           received any assets from any blockchain address or from any person
           that is listed on any sanctions list or equivalent maintained by any
           of the Major Jurisdictions (collectively,{" "}
-          <strong>“Sanctions Lists Persons”</strong>);
+          <strong>&quot;Sanctions Lists Persons&quot;</strong>);
         </li>
         <li>
           to transact in or with any Restricted Territories or Sanctions List
@@ -240,8 +243,8 @@ export const Terms = () => {
           if you are a U.S. Person as defined in 17 CFR § 230.902, or currently
           or ordinarily located or resident in (or incorporated or organized in)
           the United States of America, Canada, or Australia (collectively,{" "}
-          <strong>“Excluded Jurisdictions”</strong>), or to transact in or with
-          Excluded Jurisdictions;
+          <strong>&quot;Excluded Jurisdictions&quot;</strong>), or to transact
+          in or with Excluded Jurisdictions;
         </li>
         <li>
           by utilizing a virtual private network (e.g., a VPN), or by otherwise
@@ -310,16 +313,17 @@ export const Terms = () => {
       <p>
         Further, you are not eligible to use and may not use the Interface or
         API for, and our license under Section 6 to the Interface or API does
-        not extend to, any Competing Use. <strong>“Competing Use”</strong> means
-        any access or use in or for any product, software, protocol, network,
-        application, or service that is made available to any party and that (i)
-        substitutes for the use of the Babylon Protocol, (ii) offers the same or
-        substantially similar functionality as the Babylon Protocol or (iii) is
-        built on or uses a protocol with substantially similar functionality as
-        the Babylon Protocol or otherwise facilitates the staking of Bitcoin
-        other than by utilizing the Babylon Protocol.{" "}
-        <strong>“Babylon Protocol”</strong> means the Bitcoin staking protocol
-        as further described in the documentation{" "}
+        not extend to, any Competing Use.{" "}
+        <strong>&quot;Competing Use&quot;</strong> means any access or use in or
+        for any product, software, protocol, network, application, or service
+        that is made available to any party and that (i) substitutes for the use
+        of the Babylon Protocol, (ii) offers the same or substantially similar
+        functionality as the Babylon Protocol or (iii) is built on or uses a
+        protocol with substantially similar functionality as the Babylon
+        Protocol or otherwise facilitates the staking of Bitcoin other than by
+        utilizing the Babylon Protocol.{" "}
+        <strong>&quot;Babylon Protocol&quot;</strong> means the Bitcoin staking
+        protocol as further described in the documentation{" "}
         <a
           href="https://docs.babylonlabs.io/docs/introduction/babylon-overview"
           className="text-primary"
@@ -334,17 +338,18 @@ export const Terms = () => {
       <p>
         Unless otherwise noted, all text, graphics, user interfaces, visual
         interfaces, photographs, trademarks, logos, sounds, music, artwork and
-        computer code (collectively, <strong>“Content”</strong>), including but
-        not limited to the design, structure, selection, coordination,
-        expression, “look and feel” and arrangement of such Content, contained
-        in the Services is owned, controlled or licensed by or to us and is
-        protected by trade dress, copyright, patent and trademark laws, and
-        various other intellectual property rights. Except as expressly provided
-        in these Terms, no part of the Services and no Content may be copied,
-        reproduced, republished, uploaded, posted, publicly displayed, encoded,
-        translated, transmitted or distributed in any way to any other computer,
-        server, website or other medium for publication or distribution or for
-        any commercial enterprise, without our express prior written consent.
+        computer code (collectively, <strong>&quot;Content&quot;</strong>),
+        including but not limited to the design, structure, selection,
+        coordination, expression, &quot;look and feel&quot; and arrangement of
+        such Content, contained in the Services is owned, controlled or licensed
+        by or to us and is protected by trade dress, copyright, patent and
+        trademark laws, and various other intellectual property rights. Except
+        as expressly provided in these Terms, no part of the Services and no
+        Content may be copied, reproduced, republished, uploaded, posted,
+        publicly displayed, encoded, translated, transmitted or distributed in
+        any way to any other computer, server, website or other medium for
+        publication or distribution or for any commercial enterprise, without
+        our express prior written consent.
       </p>
       <br />
       <p>
@@ -376,8 +381,8 @@ export const Terms = () => {
         <li>
           You will not hold Provider or any of its or their affiliates,
           officers, directors, shareholders, members, representatives or agents
-          (collectively, <strong>“Provider Parties”</strong>) liable for any
-          damages that you may suffer in connection with your use of the
+          (collectively, <strong>&quot;Provider Parties&quot;</strong>) liable
+          for any damages that you may suffer in connection with your use of the
           Services or the Protocol.
         </li>
         <li>
@@ -468,18 +473,19 @@ export const Terms = () => {
       <h3>5. NO WARRANTY, NO REPRESENTATIONS</h3>
       <br />
       <p>
-        The Services are provided on an <i className="text-primary">“AS IS”</i>{" "}
-        and <i className="text-primary">“AS AVAILABLE”</i> basis. Your access
-        and use of the Services are at your own risk. There is no representation
-        or warranty that access to the Services will be continuous,
-        uninterrupted, timely, or secure; that the information contained in the
-        Services will be accurate, reliable, complete, or current, or that the
-        Services will be free from errors, defects, viruses, or other harmful
-        elements. No advice, information, or statement made in connection with
-        the Services should be treated as creating any warranty concerning the
-        Services. There is no endorsement, guarantee, or assumption of
-        responsibility for any advertisements, offers, or statements made by
-        third parties concerning the Services.
+        The Services are provided on an{" "}
+        <i className="text-primary">&quot;AS IS&quot;</i> and{" "}
+        <i className="text-primary">&quot;AS AVAILABLE&quot;</i> basis. Your
+        access and use of the Services are at your own risk. There is no
+        representation or warranty that access to the Services will be
+        continuous, uninterrupted, timely, or secure; that the information
+        contained in the Services will be accurate, reliable, complete, or
+        current, or that the Services will be free from errors, defects,
+        viruses, or other harmful elements. No advice, information, or statement
+        made in connection with the Services should be treated as creating any
+        warranty concerning the Services. There is no endorsement, guarantee, or
+        assumption of responsibility for any advertisements, offers, or
+        statements made by third parties concerning the Services.
       </p>
       <br />
       <p>
@@ -556,18 +562,18 @@ export const Terms = () => {
       <h4 className="font-bold text-primary">Fork Handling</h4>
       <br />
       <p>
-        The Protocol, and all tokens may be subject to <strong>“Forks”</strong>{" "}
-        that occur when some or all persons running the software clients for a
-        particular blockchain system adopt a new client or a new version of an
-        existing client that: (i) changes the protocol rules in
-        backward-compatible or backward-incompatible manner that affects which
-        transactions can be added into later blocks, how later blocks are added
-        to the blockchain, or other matters relating to the future operation of
-        the protocol; or (ii) reorganizes or changes past blocks to alter the
-        history of the blockchain. Some Forks may result in two or more
-        persistent alternative versions of the protocol or blockchain, either of
-        which may be viewed as or claimed to be the legitimate or genuine
-        continuation of the original.
+        The Protocol, and all tokens may be subject to{" "}
+        <strong>&quot;Forks&quot;</strong> that occur when some or all persons
+        running the software clients for a particular blockchain system adopt a
+        new client or a new version of an existing client that: (i) changes the
+        protocol rules in backward-compatible or backward-incompatible manner
+        that affects which transactions can be added into later blocks, how
+        later blocks are added to the blockchain, or other matters relating to
+        the future operation of the protocol; or (ii) reorganizes or changes
+        past blocks to alter the history of the blockchain. Some Forks may
+        result in two or more persistent alternative versions of the protocol or
+        blockchain, either of which may be viewed as or claimed to be the
+        legitimate or genuine continuation of the original.
       </p>
       <br />
       <p>
@@ -647,8 +653,8 @@ export const Terms = () => {
         connection with the Services; (b) your violation of these Terms or any
         other applicable policy or contract of Provider; or (c) your violation
         of any rights of any other person or entity; each, a{" "}
-        <strong>“Claim”</strong>. We may, in our sole discretion, require you to
-        defend one or more Provider Parties in any Claim.
+        <strong>&quot;Claim&quot;</strong>. We may, in our sole discretion,
+        require you to defend one or more Provider Parties in any Claim.
       </p>
       <br />
       <h3>12. POINTS AND INCENTIVES</h3>
@@ -656,16 +662,17 @@ export const Terms = () => {
       <p>
         You may be attributed by us or third parties certain reputation
         indicators, loyalty points, or other intangible rewards related to your
-        activities including staking (collectively, <strong>“Points”</strong>).
-        Points are not blockchain tokens. Points are not, and may never convert
-        to, accrue to, be used as basis to calculate, or become any other tokens
-        or other Digital Asset or distribution thereof. Points are virtual items
-        with no monetary value. Points do not constitute any currency or
-        property of any type and are not redeemable, refundable, or eligible for
-        any fiat or virtual currency or anything else of value. Points are not
-        transferable, and you may not attempt to sell, trade, or transfer any
-        Points, or obtain any manner of credit using any Points. Any attempt to
-        sell, trade, or transfer any Points will be null and void.
+        activities including staking (collectively,{" "}
+        <strong>&quot;Points&quot;</strong>). Points are not blockchain tokens.
+        Points are not, and may never convert to, accrue to, be used as basis to
+        calculate, or become any other tokens or other Digital Asset or
+        distribution thereof. Points are virtual items with no monetary value.
+        Points do not constitute any currency or property of any type and are
+        not redeemable, refundable, or eligible for any fiat or virtual currency
+        or anything else of value. Points are not transferable, and you may not
+        attempt to sell, trade, or transfer any Points, or obtain any manner of
+        credit using any Points. Any attempt to sell, trade, or transfer any
+        Points will be null and void.
       </p>
       <br />
       <p>
@@ -690,15 +697,15 @@ export const Terms = () => {
       <br />
       <p>
         Besides our Points program, we may run various promotions, incentives,
-        or giveaways (each, a <strong>“Promotion”</strong>) communicated through
-        official Babylon Labs communication mediums, including blog posts,
-        email, social media, and the Discord server. Applicable details,
-        including any qualification periods, entry procedures or requirements,
-        award or selection criteria (to be determined at our sole discretion),
-        and notification procedures will be referenced there. Promotions are
-        void where prohibited and open only to individuals who can lawfully
-        participate in such Promotions in that individual&apos;s particular
-        jurisdiction.
+        or giveaways (each, a <strong>&quot;Promotion&quot;</strong>)
+        communicated through official Babylon Labs communication mediums,
+        including blog posts, email, social media, and the Discord server.
+        Applicable details, including any qualification periods, entry
+        procedures or requirements, award or selection criteria (to be
+        determined at our sole discretion), and notification procedures will be
+        referenced there. Promotions are void where prohibited and open only to
+        individuals who can lawfully participate in such Promotions in that
+        individual&apos;s particular jurisdiction.
       </p>
       <br />
       <h3>14. COPYRIGHT POLICY</h3>
@@ -740,24 +747,24 @@ export const Terms = () => {
         suggestions you may provide regarding the Services either directly or
         indirectly (for example, through the use on a third-party social media
         site of a company-designated hashtag) (collectively,{" "}
-        <strong>“Feedback”</strong>) is non-confidential and non-proprietary,
-        that we may treat as public information, and may be shared with others
-        on other sites and platforms. You hereby grant us an unrestricted,
-        irrevocable, universe-wide, royalty-free right to use, communicate,
-        reproduce, publish, display, distribute and exploit such Feedback in any
-        manner, with the right to sublicense.
+        <strong>&quot;Feedback&quot;</strong>) is non-confidential and
+        non-proprietary, that we may treat as public information, and may be
+        shared with others on other sites and platforms. You hereby grant us an
+        unrestricted, irrevocable, universe-wide, royalty-free right to use,
+        communicate, reproduce, publish, display, distribute and exploit such
+        Feedback in any manner, with the right to sublicense.
       </p>
       <br />
       <h3>16. DISPUTE RESOLUTION; ARBITRATION AGREEMENT</h3>
       <br />
       <p>
         Please read the arbitration provisions in this Section 16 of the Terms
-        carefully (the <strong>“Arbitration Agreement”</strong>). It requires
-        you to arbitrate disputes with Babylon Labs, its affiliates, successors,
-        and assigns, and all of their respective officers, directors, employees,
-        agents, and representatives (collectively, the{" "}
-        <strong>“Babylon Parties”</strong>) and limits the manner in which you
-        can seek relief from the Babylon Parties.
+        carefully (the <strong>&quot;Arbitration Agreement&quot;</strong>). It
+        requires you to arbitrate disputes with Babylon Labs, its affiliates,
+        successors, and assigns, and all of their respective officers,
+        directors, employees, agents, and representatives (collectively, the{" "}
+        <strong>&quot;Babylon Parties&quot;</strong>) and limits the manner in
+        which you can seek relief from the Babylon Parties.
       </p>
       <br />
       <h4 className="font-bold text-primary">
@@ -767,17 +774,18 @@ export const Terms = () => {
       <p>
         There might be instances when a dispute arises between you and the
         Babylon Parties with respect to the Services or these Terms (
-        <strong>“Dispute”</strong>). If that occurs, we are committed to working
-        with you to reach a reasonable resolution in good faith. Most Disputes
-        can be resolved quickly and to your satisfaction by emailing user
-        support at{" "}
+        <strong>&quot;Dispute&quot;</strong>). If that occurs, we are committed
+        to working with you to reach a reasonable resolution in good faith. Most
+        Disputes can be resolved quickly and to your satisfaction by emailing
+        user support at{" "}
         <a href="mailto:contracts@babylonlabs.io" className="text-primary">
           contracts@babylonlabs.io
         </a>{" "}
-        (<strong>“Our Address”</strong>). However, if such efforts prove
-        unsuccessful, you may send a written Notice of Dispute by email to Our
-        Address (<strong>“Notice”</strong>). The Notice must describe the nature
-        and basis of the Dispute and set forth the specific relief sought.
+        (<strong>&quot;Our Address&quot;</strong>). However, if such efforts
+        prove unsuccessful, you may send a written Notice of Dispute by email to
+        Our Address (<strong>&quot;Notice&quot;</strong>). The Notice must
+        describe the nature and basis of the Dispute and set forth the specific
+        relief sought.
       </p>
       <br />
       <p>
@@ -844,10 +852,10 @@ export const Terms = () => {
           except as follows. The existence of the arbitration, any nonpublic
           information provided in the arbitration, and any submissions, orders
           or awards made in the arbitration (together, the{" "}
-          <strong>“Confidential Information”</strong>) will not be disclosed to
-          any non-party except the tribunal, the ICC, the parties, their
-          counsel, experts, witnesses, accountants and auditors, insurers and
-          reinsurers, and any other person necessary to the conduct of the
+          <strong>&quot;Confidential Information&quot;</strong>) will not be
+          disclosed to any non-party except the tribunal, the ICC, the parties,
+          their counsel, experts, witnesses, accountants and auditors, insurers
+          and reinsurers, and any other person necessary to the conduct of the
           arbitration, or as necessary to enforce or challenge and award in bona
           fide legal proceedings, or as required by law. This confidentiality
           provision will survive termination of these Terms and of any
@@ -923,26 +931,28 @@ export const Terms = () => {
         These Terms and any action related thereto will be governed by the laws
         of the Cayman Islands, without regard to the principles of conflict of
         laws. Except as expressly set forth in Section 16,{" "}
-        <strong>“Dispute Resolution; Arbitration Agreement”</strong> the
-        exclusive jurisdiction for all Disputes will be the courts located in
-        the Cayman Islands, and you waive any objection to jurisdiction and
+        <strong>&quot;Dispute Resolution; Arbitration Agreement&quot;</strong>{" "}
+        the exclusive jurisdiction for all Disputes will be the courts located
+        in the Cayman Islands, and you waive any objection to jurisdiction and
         venue in such courts.
       </p>
       <br />
       <h3>18. Miscellaneous</h3>
       <br />
       <p>
-        The word <strong className="text-primary">“or”</strong> as used in this
-        Agreement has an inclusive meaning, equivalent to{" "}
-        <strong className="text-primary">“and/or”</strong>. The terms ‘include’
-        and ‘including’ will be deemed to be immediately followed by the phrase{" "}
-        <strong className="text-primary">“without limitation”</strong>. The
-        headings appearing at the beginning of several sections contained in
-        this Agreement have been inserted for identification and reference
+        The word <strong className="text-primary">&quot;or&quot;</strong> as
+        used in this Agreement has an inclusive meaning, equivalent to{" "}
+        <strong className="text-primary">&quot;and/or&quot;</strong>. The terms
+        ‘include’ and ‘including’ will be deemed to be immediately followed by
+        the phrase{" "}
+        <strong className="text-primary">&quot;without limitation&quot;</strong>
+        . The headings appearing at the beginning of several sections contained
+        in this Agreement have been inserted for identification and reference
         purposes only and must not be used to construe or interpret this
-        Agreement. The word <strong className="text-primary">“will”</strong> as
-        used in this Agreement has its common meaning, as well as the meaning
-        ascribed to the word <strong className="text-primary">“shall”</strong>:
+        Agreement. The word{" "}
+        <strong className="text-primary">&quot;will&quot;</strong> as used in
+        this Agreement has its common meaning, as well as the meaning ascribed
+        to the word <strong className="text-primary">&quot;shall&quot;</strong>:
         expressing a current obligation or status, or obligation or status that
         will arise in the future. All provisions of these Terms are severable,
         and the unenforceability or invalidity of any of the provisions will not
@@ -974,10 +984,10 @@ export const Terms = () => {
         If you are entering into these Terms on behalf of a company or other
         legal entity, group, or association, you represent that you have the
         authority to bind such entity to these Terms, in which case the Terms{" "}
-        <strong>“you”</strong> or <strong>“your”</strong> refers to you and such
-        entity, group, or association. If you do not have such authority, or if
-        you do not agree with these Terms, you must not accept these Terms and
-        you may not use the Services.
+        <strong>&quot;you&quot;</strong> or <strong>&quot;your&quot;</strong>{" "}
+        refers to you and such entity, group, or association. If you do not have
+        such authority, or if you do not agree with these Terms, you must not
+        accept these Terms and you may not use the Services.
       </p>
       <br />
       <p>
