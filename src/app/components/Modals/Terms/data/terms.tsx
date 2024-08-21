@@ -599,34 +599,40 @@ export const Terms = () => {
       <h3>10. LIMITATION OF LIABILITY</h3>
       <br />
       <p>
-        Except to the extent otherwise required by applicable law, under no
-        circumstances will any of the Provider Parties be responsible or liable
-        under any theory of liability, whether based in tort, contract,
-        negligence, strict liability, warranty, or otherwise, for any damages of
-        any kind arising from or relating to these Terms or the Services,
-        including but not limited to direct, indirect, economic, exemplary,
-        special, punitive, incidental, or consequential losses or damages of any
-        kind, including without limitation, loss of profits. The foregoing
-        limitations apply even if any of the events or circumstances giving rise
-        to such damages were foreseeable and even if the Provider Parties were
-        advised of or should have known of the possibility of such losses or
-        damages and notwithstanding any failure of essential purpose of any
-        limited remedy.
+        <strong>
+          Except to the extent otherwise required by applicable law, under no
+          circumstances will any of the Provider Parties be responsible or
+          liable under any theory of liability, whether based in tort, contract,
+          negligence, strict liability, warranty, or otherwise, for any damages
+          of any kind arising from or relating to these Terms or the Services,
+          including but not limited to direct, indirect, economic, exemplary,
+          special, punitive, incidental, or consequential losses or damages of
+          any kind, including without limitation, loss of profits. The foregoing
+          limitations apply even if any of the events or circumstances giving
+          rise to such damages were foreseeable and even if the Provider Parties
+          were advised of or should have known of the possibility of such losses
+          or damages and notwithstanding any failure of essential purpose of any
+          limited remedy.
+        </strong>
       </p>
       <br />
       <p>
-        Except to the extent otherwise required by applicable law, if,
-        notwithstanding the other provisions of these Terms, any of the Provider
-        Parties is found to be liable to you for any damages or losses which
-        arise from or relate to these Terms or the Services, the total aggregate
-        liability of the Provider Parties for any and all such claims,
-        regardless of the form of action, is limited to one hundred US dollars
-        (US$100.00).
+        <strong>
+          Except to the extent otherwise required by applicable law, if,
+          notwithstanding the other provisions of these Terms, any of the
+          Provider Parties is found to be liable to you for any damages or
+          losses which arise from or relate to these Terms or the Services, the
+          total aggregate liability of the Provider Parties for any and all such
+          claims, regardless of the form of action, is limited to one hundred US
+          dollars (US$100.00).
+        </strong>
       </p>
       <br />
       <p>
-        THE FOREGOING LIMITATIONS WILL APPLY EVEN IF THE ABOVE STATED REMEDY
-        FAILS OF ITS ESSENTIAL PURPOSE.
+        <strong>
+          THE FOREGOING LIMITATIONS WILL APPLY EVEN IF THE ABOVE STATED REMEDY
+          FAILS OF ITS ESSENTIAL PURPOSE.
+        </strong>
       </p>
       <br />
       <p>
