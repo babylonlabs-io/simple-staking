@@ -540,8 +540,9 @@ export const Privacy = () => {
       <p>
         <strong>Opt-out of communications</strong>. You may opt-out of
         marketing-related emails by following the opt-out or unsubscribe
-        instructions at the bottom of the email, or by contacting us. Please
-        note that if you choose to opt-out of marketing-related emails, you may
+        instructions at the bottom of the email, or by{" "}
+        <a href="mailto:contact@babylonlabs.io">contacting us</a>. Please note
+        that if you choose to opt-out of marketing-related emails, you may
         continue to receive service-related and other non-marketing emails.
       </p>
       <br />
@@ -600,10 +601,11 @@ export const Privacy = () => {
         <strong>Remove or anonymize your content</strong>. You may request that
         the content that you posted to the Service be removed or anonymized such
         that your personal information will not be publicly identifiable on the
-        Service by contacting us. We may decline to process your request as
-        consistent with law. Please note that even if we process your request,
-        it does not ensure complete or comprehensive removal of the content or
-        information posted on the Service.
+        Service by <a href="mailto:contact@babylonlabs.io">contacting us</a>. We
+        may decline to process your request as consistent with law. Please note
+        that even if we process your request, it does not ensure complete or
+        comprehensive removal of the content or information posted on the
+        Service.
       </p>
       <br />
       <p>
