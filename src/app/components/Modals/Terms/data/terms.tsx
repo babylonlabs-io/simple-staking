@@ -1,10 +1,8 @@
 import { Icon } from "@/app/components/Logo/Icon";
-import { usePrivacy } from "@/app/context/Privacy/PrivacyContext";
 import { getNetworkAppUrl } from "@/config";
 
 export const Terms = () => {
   const url = getNetworkAppUrl();
-  const { openPrivacy } = usePrivacy();
 
   return (
     <div className="rounded-2xl border border-neutral-content p-6 dark:border-neutral-content/20 overflow-y-scroll no-scrollbar max-h-[100vh] terms-privacy-container">
@@ -517,15 +515,8 @@ export const Terms = () => {
       <h3>7. PRIVACY POLICY</h3>
       <br />
       <p>
-        Please refer to our{" "}
-        <span
-          className="text-primary underline cursor-pointer"
-          onClick={openPrivacy}
-        >
-          [Privacy Policy]
-        </span>{" "}
-        for information on how we collect, use and disclose information from
-        users of the Services.
+        Please refer to our <strong>Privacy Policy</strong> for information on
+        how we collect, use and disclose information from users of the Services.
       </p>
       <br />
       <h3>8. THIRD-PARTY OFFERINGS AND CONTENT</h3>
