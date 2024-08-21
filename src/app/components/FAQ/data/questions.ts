@@ -28,7 +28,7 @@ export const questions = (
     },
     {
       title: `Does my ${coinName} leave my wallet once staked?`,
-      content: `<p>Technically, your ${coinName} has not left your custody. However, your wallet will not show the ${coinName} you staked in your available balance once that ${coinName} is locked. Current wallet implementations do not yet know how to display staked ${coinName} that is still in your custody. When staking you do not send the ${coinName} to a third party. It is locked in a self-custodial Bitcoin Staking script that you control. This means that any subsequent movement of the BTC will need your approval. You are the only one who can unbond the stake and withdraw.</p>`,
+      content: `<p>Technically, your ${coinName} has not left your custody. However, your wallet will not show the ${coinName} you staked in your available balance once that ${coinName} is locked. Current wallet implementations do not yet know how to display staked ${coinName} that is still in your custody. When staking, you do not send the ${coinName} to a third party. It is locked in a self-custodial Bitcoin Staking script that you control. This means that any subsequent movement of the ${coinName} will need your approval. You are the only one who can unbond the stake and withdraw.</p>`,
     },
     {
       title: `Is my ${coinName} safe? Could I get slashed?`,
@@ -47,7 +47,7 @@ export const questions = (
           The Bitcoin Staking system may be slow, unavailable, or compromised, which may cause the staking service to be unavailable or compromised, potentially leading to ${coinName} not being unbondable or not withdrawable.
         </li>
       </ol>
-      <p>The Babylon Labs team has open-sourced the code which has been audited by <a href="https://docs.babylonlabs.io/assets/files/coinspect-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Coinspect</u></a>, <a href="https://docs.babylonlabs.io/assets/files/zellic-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Zellic</u></a>, and through a public security campaign facilitated by <a href="https://docs.babylonlabs.io/assets/files/cantina-phase1-competition.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Cantina</u></a>.</p>
+      <p>The Babylon Labs team has open-sourced the code which has been audited by <a href="https://docs.babylonlabs.io/assets/files/coinspect-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Coinspect</u></a>, <a href="https://docs.babylonlabs.io/assets/files/zellic-phase1-audit.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>Zellic</u></a>, and through a <a href="https://docs.babylonlabs.io/assets/files/cantina-phase1-competition.pdf" target="_blank" rel="noopener noreferrer" class="text-primary"><u>public security campaign facilitated by Cantina</u></a>.</p>
       `,
     },
     {
@@ -88,7 +88,7 @@ export const questions = (
     {
       title:
         "Is it ok to use a wallet holding fungible tokens built on Bitcoin (e.g. BRC-20/ARC-20/Runes)?",
-      content: `<p>No, this should be avoided. Please do not connect or use a Bitcoin wallet holding BRC-20, ARC-20, Runes, or other NFTs or Bitcoin-native assets (other than bitcoin). They are still in their infancy and in an experimental phase. Software built for the detection of such tokens to avoid their misspending may not work, and you may lose all such tokens.</p>`,
+      content: `<p>No, this should be avoided. Please do not connect or use a Bitcoin wallet holding BRC-20, ARC-20, Runes, or other NFTs or Bitcoin-native assets (other than ${coinName}). They are still in their infancy and in an experimental phase. Software built for the detection of such tokens to avoid their misspending may not work, and you may lose all such tokens.</p>`,
     },
     {
       title: "Are hardware wallets supported?",
