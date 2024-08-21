@@ -4,15 +4,16 @@ export const Privacy = () => {
       <p className="italic">Effective as of 20 August 2024</p>
       <br />
       <p>
-        Babylon Labs Ltd (<strong>“Labs”</strong>, <strong>“we”</strong>,{" "}
-        <strong>“us”</strong> or <strong>“our”</strong>) is committed to
-        protecting the privacy of our users, stakeholders, and business
-        partners. This Privacy Policy describes how we use, disclose, and
-        safeguard any personal information that we collect through our digital
-        or online properties or services (including as applicable, our website,
-        social media pages, marketing activities, live events and other
-        activities described in this Privacy Policy (each separately and
-        collectively, the <strong>“Service”</strong>).
+        Babylon Labs Ltd (<strong>&quot;Labs&quot;</strong>,{" "}
+        <strong>&quot;we&quot;</strong>, <strong>&quot;us&quot;</strong> or{" "}
+        <strong>&quot;our&quot;</strong>) is committed to protecting the privacy
+        of our users, stakeholders, and business partners. This Privacy Policy
+        describes how we use, disclose, and safeguard any personal information
+        that we collect through our digital or online properties or services
+        (including as applicable, our website, social media pages, marketing
+        activities, live events and other activities described in this Privacy
+        Policy (each separately and collectively, the{" "}
+        <strong>&quot;Service&quot;</strong>).
       </p>
       <br />
       <p>
@@ -182,15 +183,16 @@ export const Privacy = () => {
           store on user devices and that allow web servers to record users’ web
           browsing activities and remember their submissions, preferences, and
           login status as they navigate a site. Cookies used on our sites
-          include both “session cookies” that are deleted when a session ends,
-          “persistent cookies” that remain longer, “first party” cookies that we
-          place and “third party” cookies that our third-party business partners
-          and service providers place. Most browsers accept cookies
-          automatically, but you may be able to control the way in which your
-          devices permit the use of cookies. If you so choose, you may block or
-          delete our cookies from your browser; however, blocking or deleting
-          cookies may cause some of the Services, including certain features and
-          general functionality, to work incorrectly.
+          include both &quot;session cookies&quot; that are deleted when a
+          session ends, &quot;persistent cookies&quot; that remain longer,
+          &quot;first party&quot; cookies that we place and &quot;third
+          party&quot; cookies that our third-party business partners and service
+          providers place. Most browsers accept cookies automatically, but you
+          may be able to control the way in which your devices permit the use of
+          cookies. If you so choose, you may block or delete our cookies from
+          your browser; however, blocking or deleting cookies may cause some of
+          the Services, including certain features and general functionality, to
+          work incorrectly.
         </li>
         <li>
           <strong>Local storage technologies</strong>, like HTML5, that provide
@@ -561,9 +563,10 @@ export const Privacy = () => {
         </li>
         <li>
           <strong>Do Not Track</strong>. Some Internet browsers may be
-          configured to send “Do Not Track” signals to the online services that
-          you visit. We currently do not respond to “Do Not Track” signals. To
-          find out more about “Do Not Track,” please visit{" "}
+          configured to send &quot;Do Not Track&quot; signals to the online
+          services that you visit. We currently do not respond to &quot;Do Not
+          Track&quot; signals. To find out more about &quot;Do Not Track&quot;,
+          please visit{" "}
           <a
             href="https://http://www.allaboutdnt.com"
             target="_blank"
