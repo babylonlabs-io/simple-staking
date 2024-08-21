@@ -29,6 +29,10 @@
   list-style-type: lower-alpha;
 }
 
+.terms-privacy-container ol.alpha-capital > li {
+  list-style-type: upper-alpha;
+}
+
 .terms-privacy-container ul > li {
   list-style-type: disc;
 }

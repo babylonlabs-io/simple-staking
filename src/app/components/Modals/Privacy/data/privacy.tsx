@@ -33,7 +33,7 @@ export const Privacy = () => {
       <h3>Personal Information We Collect</h3>
       <br />
       <p>We may collect the following categories of personal information:</p>
-      <ol>
+      <ol className="alpha-capital">
         <li>
           <strong>Information you provide to us.</strong> Personal information
           you may provide to us through the Service or otherwise includes:
