@@ -28,6 +28,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
 }) => {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [noInscription, setNoInscription] = useState(false);
+  const [noHWWallet, setNoHWWallet] = useState(false);
   const [selectedWallet, setSelectedWallet] = useState<string>("");
   const [mounted, setMounted] = useState(false);
 
@@ -142,7 +143,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
           <IoMdClose size={24} />
         </button>
       </div>
-      <div className="flex flex-col justify-center gap-4">
+      <div className="flex flex-col justify-center gap-2">
         <div className="form-control">
           <label className="label cursor-pointer justify-start gap-2 rounded-xl bg-base-100 p-4">
             <input
@@ -177,9 +178,26 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             </span>
           </label>
         </div>
+        <div className="form-control">
+          <label className="label cursor-pointer justify-start gap-2 rounded-xl bg-base-100 p-4">
+            <input
+              type="checkbox"
+              className="checkbox-primary checkbox"
+              onChange={(e) => setNoHWWallet(e.target.checked)}
+              checked={noHWWallet}
+            />
+            <span className="label-text md:max-w-[27rem]">
+              I acknowledge that Keystone via QR code is the only hardware
+              wallet supporting Bitcoin Staking. Using any other hardware
+              wallets through any means (such as connection to software /
+              extension / mobile wallet) can lead to permanent inability to
+              withdraw the stake.
+            </span>
+          </label>
+        </div>
         <div className="my-4 flex flex-col gap-4">
           <h3 className="text-center font-semibold">Choose wallet</h3>
-          <div className="grid max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
+          <div className="grid max-h-[15rem] md:max-h-[20rem] grid-cols-1 gap-4 overflow-y-auto">
             {walletList.map(
               ({
                 provider,
@@ -243,7 +261,8 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             connectDisabled ||
             !termsAccepted ||
             !selectedWallet ||
-            !noInscription
+            !noInscription ||
+            !noHWWallet
           }
         >
           <PiWalletBold size={20} />
