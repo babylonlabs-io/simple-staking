@@ -9,6 +9,7 @@ import { UTXO, WalletProvider } from "../../utils/wallet/wallet_provider";
 import { getStakingTerm } from "../getStakingTerm";
 
 import { txFeeSafetyCheck } from "./fee";
+import { emitEventFunc, noopFunc } from './events'
 
 // Returns:
 // - unsignedStakingPsbt: the unsigned staking transaction
@@ -106,6 +107,8 @@ export const signStakingTx = async (
   publicKeyNoCoord: string,
   feeRate: number,
   inputUTXOs: UTXO[],
+  emitWaitForSignatureEvent: emitEventFunc = noopFunc,
+  emitBroadcastEvent: emitEventFunc = noopFunc,
 ): Promise<{ stakingTxHex: string; stakingTerm: number }> => {
   // Create the staking transaction
   let { unsignedStakingPsbt, stakingTerm, stakingFeeSat } = await createStakingTx(
@@ -119,6 +122,8 @@ export const signStakingTx = async (
     feeRate,
     inputUTXOs,
   );
+
+  emitWaitForSignatureEvent()
 
   // Sign the staking transaction
   let stakingTx: Transaction;
@@ -134,6 +139,8 @@ export const signStakingTx = async (
   const stakingTxHex = stakingTx.toHex();
 
   txFeeSafetyCheck(stakingTx, feeRate, stakingFeeSat);
+
+  emitBroadcastEvent()
 
   // Broadcast the staking transaction
   await btcWallet.pushTx(stakingTxHex);
