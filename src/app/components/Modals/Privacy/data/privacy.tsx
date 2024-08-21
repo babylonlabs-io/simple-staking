@@ -57,8 +57,8 @@ export const Privacy = () => {
             <li>
               <strong>Communications data</strong>, such as the data we collect
               based on our exchanges with you, including when you{" "}
-              <a href="mailto:contact@babylonchain.io">contact us</a> through
-              the Service, social media, or otherwise.
+              <a href="mailto:contact@babylonlabs.io">contact us</a> through the
+              Service, social media, or otherwise.
             </li>
             <li>
               <strong>Job applicant data</strong>, such as professional
@@ -601,7 +601,7 @@ export const Privacy = () => {
           <strong>Delete your content or close your account</strong>. You can
           choose to delete certain content through your account. If you wish to
           request to close your account, please{" "}
-          <a href="mailto:contact@babylonchain.io">contact us</a>.
+          <a href="mailto:contact@babylonlabs.io">contact us</a>.
         </li>
       </ul>
       <br />
@@ -650,10 +650,10 @@ export const Privacy = () => {
         The Service is not intended for use by anyone under 18 years of age. If
         you are a parent or guardian of a child from whom you believe we have
         collected personal information in a manner prohibited by law, please{" "}
-        <a href="mailto:contact@babylonchain.io">contact us</a>. If we learn
-        that we have collected personal information through the Service from a
-        child without the consent of the child’s parent or guardian as required
-        by law, we will comply with applicable legal requirements to delete the
+        <a href="mailto:contact@babylonlabs.io">contact us</a>. If we learn that
+        we have collected personal information through the Service from a child
+        without the consent of the child’s parent or guardian as required by
+        law, we will comply with applicable legal requirements to delete the
         information.
       </p>
       <br />
@@ -679,7 +679,7 @@ export const Privacy = () => {
         in your jurisdiction. If you have any questions or concerns about this
         Privacy Policy or our data protection practices, please contact us via
         email at{" "}
-        <a href="mailto:contact@babylonchain.io">contact@babylonchain.io</a> (
+        <a href="mailto:contact@babylonlabs.io">contact@babylonlabs.io</a> (
         <strong>&quot;Notice Address&quot;</strong>).
       </p>
       <br />
