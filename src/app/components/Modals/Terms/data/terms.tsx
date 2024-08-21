@@ -473,29 +473,34 @@ export const Terms = () => {
       <h3>5. NO WARRANTY, NO REPRESENTATIONS</h3>
       <br />
       <p>
-        The Services are provided on an{" "}
-        <i className="text-primary">&quot;AS IS&quot;</i> and{" "}
-        <i className="text-primary">&quot;AS AVAILABLE&quot;</i> basis. Your
-        access and use of the Services are at your own risk. There is no
-        representation or warranty that access to the Services will be
-        continuous, uninterrupted, timely, or secure; that the information
-        contained in the Services will be accurate, reliable, complete, or
-        current, or that the Services will be free from errors, defects,
-        viruses, or other harmful elements. No advice, information, or statement
-        made in connection with the Services should be treated as creating any
-        warranty concerning the Services. There is no endorsement, guarantee, or
-        assumption of responsibility for any advertisements, offers, or
-        statements made by third parties concerning the Services.
+        <strong>
+          The Services are provided on an{" "}
+          <i className="text-primary">&quot;AS IS&quot;</i> and{" "}
+          <i className="text-primary">&quot;AS AVAILABLE&quot;</i> basis. Your
+          access and use of the Services are at your own risk. There is no
+          representation or warranty that access to the Services will be
+          continuous, uninterrupted, timely, or secure; that the information
+          contained in the Services will be accurate, reliable, complete, or
+          current, or that the Services will be free from errors, defects,
+          viruses, or other harmful elements. No advice, information, or
+          statement made in connection with the Services should be treated as
+          creating any warranty concerning the Services. There is no
+          endorsement, guarantee, or assumption of responsibility for any
+          advertisements, offers, or statements made by third parties concerning
+          the Services.
+        </strong>
       </p>
       <br />
       <p>
-        Further, there is no representations or warranty from anyone as to the
-        quality, origin, or ownership of any Content found on or available
-        through the Services, and the Provider Parties will have no liability
-        for any errors, misrepresentations, or omissions in, of, or about, the
-        Content, nor for the availability of the Content, and they will not be
-        liable for any losses, injuries, or damages from the use, inability to
-        use, or the display of the Content.
+        <strong>
+          Further, there is no representations or warranty from anyone as to the
+          quality, origin, or ownership of any Content found on or available
+          through the Services, and the Provider Parties will have no liability
+          for any errors, misrepresentations, or omissions in, of, or about, the
+          Content, nor for the availability of the Content, and they will not be
+          liable for any losses, injuries, or damages from the use, inability to
+          use, or the display of the Content.
+        </strong>
       </p>
       <br />
       <h3>6. License</h3>
