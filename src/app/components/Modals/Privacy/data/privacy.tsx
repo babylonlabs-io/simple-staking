@@ -531,84 +531,87 @@ export const Privacy = () => {
       <br />
       <h3>Your Choices</h3>
       <br />
-      <ul className="list-disc list-inside">
-        <li>
-          <strong>Access or update your information</strong>. If you have
-          registered for an account with us through the Service, you may review
-          and update certain account information by logging into the account.
-        </li>
-        <li>
-          <strong>Opt-out of communications</strong>. You may opt-out of
-          marketing-related emails by following the opt-out or unsubscribe
-          instructions at the bottom of the email, or by contacting us. Please
-          note that if you choose to opt-out of marketing-related emails, you
-          may continue to receive service-related and other non-marketing
-          emails.
-        </li>
-        <li>
-          <strong>Cookies</strong>. Most browsers let you remove or reject
-          cookies. To do this, follow the instructions in your browser settings.
-          Many browsers accept cookies by default until you change your
-          settings. Please note that if you set your browser to disable cookies,
-          the Service may not work properly. For more information about cookies,
-          including how to see what cookies have been set on your browser and
-          how to manage and delete them, visit{" "}
-          <a
-            href="https://www.allaboutcookies.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            www.allaboutcookies.org
-          </a>
-          . You can also configure your device to prevent images from loading to
-          prevent web beacons from functioning.
-        </li>
-        <li>
-          <strong>Do Not Track</strong>. Some Internet browsers may be
-          configured to send &quot;Do Not Track&quot; signals to the online
-          services that you visit. We currently do not respond to &quot;Do Not
-          Track&quot; signals. To find out more about &quot;Do Not Track&quot;,
-          please visit{" "}
-          <a
-            href="https://http://www.allaboutdnt.com"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            https://www.allaboutdnt.com
-          </a>
-          .
-        </li>
-        <li>
-          <strong>Linked third-party platforms</strong>. If you choose to
-          connect to the Service through your social media account or other
-          third-party platform, you may be able to use your settings in your
-          account with that platform to limit the information we receive from
-          it. If you revoke our ability to access information from a third-party
-          platform, that choice will not apply to information that we have
-          already received from that third party.
-        </li>
-        <li>
-          <strong>Declining to provide information</strong>. We need to collect
-          personal information to provide certain services. If you do not
-          provide the information we identify as required or mandatory, we may
-          not be able to provide those services.
-        </li>
-        <li>
-          <strong>Remove or anonymize your content</strong>. You may request
-          that the content that you posted to the Service be removed or
-          anonymized such that your personal information will not be publicly
-          identifiable on the Service by contacting us. We may decline to
-          process your request as consistent with law. Please note that even if
-          we process your request, it does not ensure complete or comprehensive
-          removal of the content or information posted on the Service.
-        </li>
-        <li>
-          <strong>Delete your content or close your account</strong>. You can
-          choose to delete certain content through your account. If you wish to
-          request to close your account, please{" "}
-          <a href="mailto:contact@babylonlabs.io">contact us</a>.
-        </li>
-      </ul>
+      <p>
+        <strong>Access or update your information</strong>. If you have
+        registered for an account with us through the Service, you may review
+        and update certain account information by logging into the account.
+      </p>
+      <br />
+      <p>
+        <strong>Opt-out of communications</strong>. You may opt-out of
+        marketing-related emails by following the opt-out or unsubscribe
+        instructions at the bottom of the email, or by contacting us. Please
+        note that if you choose to opt-out of marketing-related emails, you may
+        continue to receive service-related and other non-marketing emails.
+      </p>
+      <br />
+      <p>
+        <strong>Cookies</strong>. Most browsers let you remove or reject
+        cookies. To do this, follow the instructions in your browser settings.
+        Many browsers accept cookies by default until you change your settings.
+        Please note that if you set your browser to disable cookies, the Service
+        may not work properly. For more information about cookies, including how
+        to see what cookies have been set on your browser and how to manage and
+        delete them, visit{" "}
+        <a
+          href="https://www.allaboutcookies.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          www.allaboutcookies.org
+        </a>
+        . You can also configure your device to prevent images from loading to
+        prevent web beacons from functioning.
+      </p>
+      <br />
+      <p>
+        <strong>Do Not Track</strong>. Some Internet browsers may be configured
+        to send &quot;Do Not Track&quot; signals to the online services that you
+        visit. We currently do not respond to &quot;Do Not Track&quot; signals.
+        To find out more about &quot;Do Not Track&quot;, please visit{" "}
+        <a
+          href="https://http://www.allaboutdnt.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          https://www.allaboutdnt.com
+        </a>
+        .
+      </p>
+      <br />
+      <p>
+        <strong>Linked third-party platforms</strong>. If you choose to connect
+        to the Service through your social media account or other third-party
+        platform, you may be able to use your settings in your account with that
+        platform to limit the information we receive from it. If you revoke our
+        ability to access information from a third-party platform, that choice
+        will not apply to information that we have already received from that
+        third party.
+      </p>
+      <br />
+      <p>
+        <strong>Declining to provide information</strong>. We need to collect
+        personal information to provide certain services. If you do not provide
+        the information we identify as required or mandatory, we may not be able
+        to provide those services.
+      </p>
+      <br />
+      <p>
+        <strong>Remove or anonymize your content</strong>. You may request that
+        the content that you posted to the Service be removed or anonymized such
+        that your personal information will not be publicly identifiable on the
+        Service by contacting us. We may decline to process your request as
+        consistent with law. Please note that even if we process your request,
+        it does not ensure complete or comprehensive removal of the content or
+        information posted on the Service.
+      </p>
+      <br />
+      <p>
+        <strong>Delete your content or close your account</strong>. You can
+        choose to delete certain content through your account. If you wish to
+        request to close your account, please{" "}
+        <a href="mailto:contact@babylonlabs.io">contact us</a>.
+      </p>
       <br />
       <h3>Other Sites and Services</h3>
       <br />
