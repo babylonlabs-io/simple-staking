@@ -17,7 +17,7 @@ export const FAQ: React.FC<FAQProps> = () => {
   const [paramWithCtx, setParamWithCtx] = useState<
     ParamsWithContext | undefined
   >();
-  const { coinName } = getNetworkConfig();
+  const { coinName, networkName } = getNetworkConfig();
   const btcHeight = useBtcHeight();
   const globalParams = useGlobalParams();
 
@@ -41,6 +41,7 @@ export const FAQ: React.FC<FAQProps> = () => {
       <div className="flex flex-col gap-4">
         {questions(
           coinName,
+          networkName,
           paramWithCtx?.currentVersion?.confirmationDepth,
         ).map((question) => (
           <Section

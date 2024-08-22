@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
+import { PrivacyProvider } from "./context/Privacy/PrivacyContext";
 import { TermsProvider } from "./context/Terms/TermsContext";
 import { GlobalParamsProvider } from "./context/api/GlobalParamsProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
@@ -19,17 +20,19 @@ function Providers({ children }: React.PropsWithChildren) {
     <ThemeProvider defaultTheme="dark" attribute="data-theme">
       <QueryClientProvider client={client}>
         <TermsProvider>
-          <ErrorProvider>
-            <GlobalParamsProvider>
-              <BtcHeightProvider>
-                <StakingStatsProvider>
-                  <ReactQueryStreamedHydration>
-                    {children}
-                  </ReactQueryStreamedHydration>
-                </StakingStatsProvider>
-              </BtcHeightProvider>
-            </GlobalParamsProvider>
-          </ErrorProvider>
+          <PrivacyProvider>
+            <ErrorProvider>
+              <GlobalParamsProvider>
+                <BtcHeightProvider>
+                  <StakingStatsProvider>
+                    <ReactQueryStreamedHydration>
+                      {children}
+                    </ReactQueryStreamedHydration>
+                  </StakingStatsProvider>
+                </BtcHeightProvider>
+              </GlobalParamsProvider>
+            </ErrorProvider>
+          </PrivacyProvider>
         </TermsProvider>
         <ReactQueryDevtools
           buttonPosition="bottom-left"

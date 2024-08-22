@@ -2,10 +2,9 @@ import { shouldDisplayTestingMsg } from "@/config";
 
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { ConnectedSmall } from "../Connect/ConnectedSmall";
+import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
-
-import { Logo } from "./Logo";
 
 interface HeaderProps {
   onConnect: () => void;

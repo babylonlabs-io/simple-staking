@@ -103,7 +103,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   return (
     <>
       <p>
-        <strong>Step-1:</strong> Select a finaltiy provider
+        <strong>Step-1:</strong> Select a finality provider
       </p>
       <div className="flex gap-3">
         <FinalityProviderSearch onSearch={handleSearch} />
