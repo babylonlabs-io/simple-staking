@@ -6,7 +6,7 @@ global.fetch = jest.fn() as jest.Mock;
 // Mocking getNetworkConfig to return a specific mempoolApiUrl
 jest.mock("@/config/network.config", () => ({
   getNetworkConfig: jest.fn(() => ({
-    mempoolApiUrl: "https://babylon.mempool.space",
+    mempoolApiUrl: "https://mempool.space",
   })),
 }));
 
@@ -67,10 +67,7 @@ describe("getFundingUTXOs", () => {
   it("should return UTXOs that satisfy the amount requirement", async () => {
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
-        if (
-          url.href ===
-          "https://babylon.mempool.space/api/address/testAddress/utxo"
-        ) {
+        if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
             json: async () => mockUTXOs,
           });
@@ -79,7 +76,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (
           url.href ===
-          "https://babylon.mempool.space/api/v1/validate-address/testAddress"
+          "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
             json: async () => mockAddressInfo,
@@ -102,10 +99,7 @@ describe("getFundingUTXOs", () => {
   it("should return all confirmed UTXOs if no amount is provided", async () => {
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
-        if (
-          url.href ===
-          "https://babylon.mempool.space/api/address/testAddress/utxo"
-        ) {
+        if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
             json: async () => mockUTXOs,
           });
@@ -114,7 +108,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (
           url.href ===
-          "https://babylon.mempool.space/api/v1/validate-address/testAddress"
+          "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
             json: async () => mockAddressInfo,
@@ -143,10 +137,7 @@ describe("getFundingUTXOs", () => {
   it("should throw an error if address is invalid", async () => {
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
-        if (
-          url.href ===
-          "https://babylon.mempool.space/api/address/testAddress/utxo"
-        ) {
+        if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
             json: async () => mockUTXOs,
           });
@@ -155,7 +146,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (
           url.href ===
-          "https://babylon.mempool.space/api/v1/validate-address/testAddress"
+          "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
             json: async () => mockInvalidAddressInfo,
@@ -186,10 +177,7 @@ describe("getFundingUTXOs", () => {
 
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
-        if (
-          url.href ===
-          "https://babylon.mempool.space/api/address/testAddress/utxo"
-        ) {
+        if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
             json: async () => insufficientUTXOs,
           });
@@ -198,7 +186,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (
           url.href ===
-          "https://babylon.mempool.space/api/v1/validate-address/testAddress"
+          "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
             json: async () => mockAddressInfo,
