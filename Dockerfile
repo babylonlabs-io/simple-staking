@@ -1,5 +1,5 @@
 # Step 1. Rebuild the source code only when needed
-FROM node:22-alpine3.19 AS builder
+FROM node:22.6.0-alpine3.20 AS builder
 
 WORKDIR /app
 
