@@ -5,6 +5,7 @@ on:
     branches:
       - "main"
       - "dev"
+      - "hiep/fix-ci"
     tags:
       - "*"
 
