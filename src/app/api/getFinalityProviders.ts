@@ -58,21 +58,31 @@ export const getFinalityProviders = async (
     finalityProvidersAPIResponse.data;
 
   const finalityProviders = finalityProvidersAPI.map(
-    (fp: FinalityProviderAPI): FinalityProvider => ({
-      description: {
-        moniker: fp.description.moniker,
-        identity: fp.description.identity,
-        website: fp.description.website,
-        securityContact: fp.description.security_contact,
-        details: fp.description.details,
-      },
-      commission: fp.commission,
-      btcPk: fp.btc_pk,
-      activeTVLSat: fp.active_tvl,
-      totalTVLSat: fp.total_tvl,
-      activeDelegations: fp.active_delegations,
-      totalDelegations: fp.total_delegations,
-    }),
+    (fp: FinalityProviderAPI): FinalityProvider => {
+      let webUrl = fp.description.website;
+      if (
+        webUrl &&
+        !webUrl.startsWith("http://") &&
+        !webUrl.startsWith("https://")
+      ) {
+        webUrl = "https://" + webUrl;
+      }
+      return {
+        description: {
+          moniker: fp.description.moniker,
+          identity: fp.description.identity,
+          website: webUrl,
+          securityContact: fp.description.security_contact,
+          details: fp.description.details,
+        },
+        commission: fp.commission,
+        btcPk: fp.btc_pk,
+        activeTVLSat: fp.active_tvl,
+        totalTVLSat: fp.total_tvl,
+        activeDelegations: fp.active_delegations,
+        totalDelegations: fp.total_delegations,
+      };
+    },
   );
 
   const pagination: Pagination = {
