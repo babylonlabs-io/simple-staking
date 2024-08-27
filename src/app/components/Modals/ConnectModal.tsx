@@ -97,6 +97,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
       // Clean up the state
       setTermsAccepted(false);
       setNoInscription(false);
+      setNoHWWallet(false);
       setSelectedWallet("");
 
       // Connect to the wallet and close the modal
