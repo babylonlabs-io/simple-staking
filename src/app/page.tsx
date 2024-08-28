@@ -9,6 +9,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
+import { COOKIES_KEY } from "@/utils/local_storage/cookiesKey";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { filterOrdinals } from "@/utils/utxo";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
@@ -37,6 +38,7 @@ import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
+import { Toast } from "./components/Toast/Toast";
 import { useError } from "./context/Error/ErrorContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorHandlerParam, ErrorState } from "./types/errors";
@@ -256,6 +258,11 @@ const Home: React.FC<HomeProps> = () => {
     Delegation[]
   >(delegationsLocalStorageKey, []);
 
+  const [cookiesAccepted, setCookiesAccepted] = useLocalStorage<boolean>(
+    COOKIES_KEY,
+    false,
+  );
+
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
   const handleConnectModal = () => {
@@ -455,6 +462,15 @@ const Home: React.FC<HomeProps> = () => {
             totalActiveTVLSat={stakingStats?.activeTVL}
             connected={!!btcWallet}
           /> */}
+          {!cookiesAccepted && (
+            <Toast
+              message="We use cookies to enhance your experience and analyze site traffic. Read our"
+              linkText="Privacy Policy"
+              linkUrl="https://babylonlabs.io/privacy-policy"
+              closeText="Accept"
+              onClose={() => setCookiesAccepted(true)}
+            />
+          )}
         </div>
       </div>
       <FAQ />
