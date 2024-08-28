@@ -10,8 +10,6 @@ import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail, MdForum } from "react-icons/md";
 
-import { useTerms } from "@/app/context/Terms/TermsContext";
-
 const iconLinks = [
   {
     name: "Website",
@@ -68,20 +66,20 @@ const iconLinks = [
 interface FooterProps {}
 
 export const Footer: React.FC<FooterProps> = () => {
-  const { openTerms } = useTerms();
-
   return (
     <div className="container mx-auto flex flex-col items-center">
       <div className="w-24">
         <div className="divider my-1" />
       </div>
       <div className="flex justify-center gap-8 p-2">
-        <button
-          onClick={openTerms}
-          className="transition-colors hover:text-primary cursor-pointer btn btn-link no-underline text-base-content"
+        <a
+          href="https://babylonlabs.io/terms-of-use"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors hover:text-primary"
         >
           Terms of Use
-        </button>
+        </a>
       </div>
       <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
         {iconLinks.map(({ name, url, Icon }) => (
