@@ -80,6 +80,14 @@ export const Footer: React.FC<FooterProps> = () => {
         >
           Terms of Use
         </a>
+        <a
+          href="https://babylonlabs.io/privacy-policy"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transition-colors hover:text-primary"
+        >
+          Privacy Policy
+        </a>
       </div>
       <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
         {iconLinks.map(({ name, url, Icon }) => (
