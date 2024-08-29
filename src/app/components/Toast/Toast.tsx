@@ -26,7 +26,7 @@ export const Toast: React.FC<ToastProps> = ({
 
   return (
     <div className="toast toast-end z-10">
-      <div className="alert max-w-[20rem] flex flex-col">
+      <div className="alert sm:max-w-[20rem] flex flex-col">
         <p className="text-wrap text-xs">
           {message}{" "}
           {linkText && linkUrl && (
