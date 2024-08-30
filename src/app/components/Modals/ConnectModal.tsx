@@ -6,8 +6,6 @@ import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
-import { usePrivacy } from "@/app/context/Privacy/PrivacyContext";
-import { useTerms } from "@/app/context/Terms/TermsContext";
 import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
 import { WalletProvider } from "@/utils/wallet/wallet_provider";
@@ -41,9 +39,6 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
   // This constant is used to identify the browser wallet
   // And whether or not it should be injected
   const BROWSER = "btcwallet";
-
-  const { openTerms } = useTerms();
-  const { openPrivacy } = usePrivacy();
 
   useEffect(() => {
     const fetchWalletProviderDetails = async () => {
@@ -157,19 +152,23 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
             />
             <span className="label-text">
               I certify that I have read and accept the updated{" "}
-              <button
-                onClick={openTerms}
-                className="cursor-pointer btn btn-link px-0 h-auto min-h-0"
+              <a
+                href="https://babylonlabs.io/terms-of-use"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link link-primary"
               >
                 Terms of Use
-              </button>
+              </a>
               {" and "}
-              <button
-                onClick={openPrivacy}
-                className="cursor-pointer btn btn-link px-0 h-auto min-h-0"
+              <a
+                href="https://babylonlabs.io/privacy-policy"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link link-primary"
               >
                 Privacy Policy
-              </button>
+              </a>
               .
             </span>
           </label>
