@@ -1,9 +1,14 @@
 import bitgetWalletIcon from "./icons/bitget.svg";
+import cactusIcon from "./icons/cactuslink.svg";
 import keystoneIcon from "./icons/keystone.svg";
 import okxIcon from "./icons/okx.svg";
 import oneKeyIcon from "./icons/onekey.svg";
 import tomoIcon from "./icons/tomo.svg";
 import { BitgetWallet, bitgetWalletProvider } from "./providers/bitget_wallet";
+import {
+  CactusLinkWallet,
+  cactusLinkProvider,
+} from "./providers/cactuslink_wallet";
 import { KeystoneWallet } from "./providers/keystone";
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";
 import { OneKeyWallet, oneKeyProvider } from "./providers/onekey_wallet";
@@ -62,6 +67,14 @@ export const walletList: IntegratedWallet[] = [
     wallet: BitgetWallet,
     provider: bitgetWalletProvider,
     linkToDocs: "https://web3.bitget.com",
+    supportedNetworks: [Network.MAINNET, Network.SIGNET],
+  },
+  {
+    name: "Cactus Link",
+    icon: cactusIcon,
+    wallet: CactusLinkWallet,
+    provider: cactusLinkProvider,
+    linkToDocs: "",
     supportedNetworks: [Network.MAINNET, Network.SIGNET],
   },
   {
