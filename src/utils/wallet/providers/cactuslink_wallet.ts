@@ -51,7 +51,7 @@ export class CactusLinkWallet extends WalletProvider {
     }
 
     try {
-      await this.bitcoinNetworkProvider.requestAccounts(); // Connect to Bitget Wallet extension
+      await this.bitcoinNetworkProvider.requestAccounts(); // Connect to Cactus Link Wallet extension
     } catch (error) {
       if ((error as Error)?.message?.includes("rejected")) {
         throw new Error("Connection to Cactus Link Wallet was rejected");
@@ -148,7 +148,6 @@ export class CactusLinkWallet extends WalletProvider {
   };
 
   // Mempool calls
-
   getBalance = async (): Promise<number> => {
     return await getAddressBalance(await this.getAddress());
   };

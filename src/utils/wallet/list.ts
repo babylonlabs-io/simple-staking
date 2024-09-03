@@ -74,8 +74,9 @@ export const walletList: IntegratedWallet[] = [
     icon: cactusIcon,
     wallet: CactusLinkWallet,
     provider: cactusLinkProvider,
-    linkToDocs: "",
-    supportedNetworks: [Network.MAINNET, Network.SIGNET],
+    linkToDocs:
+      "https://chromewebstore.google.com/detail/cactus-link/chiilpgkfmcopocdffapngjcbggdehmj?pli=1",
+    supportedNetworks: [Network.SIGNET],
   },
   {
     name: "Keystone",
