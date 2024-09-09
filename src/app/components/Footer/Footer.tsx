@@ -65,7 +65,7 @@ const iconLinks = [
 
 interface FooterProps {}
 
-export const Footer: React.FC<FooterProps> = () => {
+export const Footer: React.FC = () => {
   return (
     <div className="container mx-auto flex flex-col items-center">
       <div className="w-24">
@@ -79,14 +79,6 @@ export const Footer: React.FC<FooterProps> = () => {
           className="transition-colors hover:text-primary"
         >
           Terms of Use
-        </a>
-        <a
-          href="https://babylonlabs.io/privacy-policy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-primary"
-        >
-          Privacy Policy
         </a>
       </div>
       <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
