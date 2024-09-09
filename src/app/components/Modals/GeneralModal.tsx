@@ -6,6 +6,7 @@ interface GeneralModalProps {
   onClose: (value: boolean) => void;
   small?: boolean;
   children: ReactNode;
+  className?: string;
 }
 
 export const GeneralModal: React.FC<GeneralModalProps> = ({
@@ -13,6 +14,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   onClose,
   children,
   small,
+  className = "",
 }) => {
   const modalRef = useRef(null);
 
@@ -43,7 +45,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       onClose={() => onClose(false)}
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
-        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[85svh] min-w-[20rem] md:min-w-[30rem] ${getSize()}`,
+        modal: `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[100svh] min-w-[20rem] md:max-h-[85svh] md:min-w-[30rem] ${getSize()} ${className}`,
       }}
       showCloseIcon={false}
       blockScroll={false}
