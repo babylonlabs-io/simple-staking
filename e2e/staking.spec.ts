@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { setupWalletConnection } from "./helper/connect";
 
-test.describe("Staking", () => {
+test.describe("Create staking transaction", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await setupWalletConnection(page);
