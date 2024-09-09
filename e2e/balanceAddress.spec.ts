@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 import { setupWalletConnection } from "./helper/connect";
 
-test.describe("After connection", () => {
+test.describe("Balance and address checks after connection", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
     await setupWalletConnection(page);
