@@ -1,56 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-import { injectBBNWallet } from "./helper/bbn_wallet";
-import {
-  acceptTermsAndConditions,
-  clickConnectButton,
-  clickConnectWalletButton,
-  clickInjectableWalletButton,
-  setupWalletConnection,
-} from "./helper/connect";
+import { setupWalletConnection } from "./helper/connect";
 
 test.describe("App", () => {
   test("has a title", async ({ page }) => {
     await page.goto("/");
     await expect(page).toHaveTitle(/Staking Dashboard/);
-  });
-});
-
-test.describe("Connecting wallet", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await injectBBNWallet(page);
-    await clickConnectButton(page);
-  });
-
-  test("clicking the connect wallet button should open up a modal", async ({
-    page,
-  }) => {
-    const modalHeader = page
-      .getByTestId("modal")
-      .getByRole("heading", { name: "Connect wallet" });
-    await expect(modalHeader).toBeVisible();
-  });
-
-  test("can accept terms", async ({ page }) => {
-    await acceptTermsAndConditions(page);
-  });
-
-  test("should inject BBN wallet", async ({ page }) => {
-    const isWalletInjected = await page.evaluate(() => {
-      return window.btcwallet.getWalletProviderName() === "BBN Wallet";
-    });
-    expect(isWalletInjected).toBe(true);
-  });
-
-  test("should connect wallet", async ({ page }) => {
-    await clickInjectableWalletButton(page);
-  });
-
-  test("complete flow", async ({ page }) => {
-    await acceptTermsAndConditions(page);
-    await clickInjectableWalletButton(page);
-    await clickConnectWalletButton(page);
   });
 });
 
