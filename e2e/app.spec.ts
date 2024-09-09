@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
 import { injectBBNWallet } from "./helper/bbn_wallet";
 import {
@@ -6,6 +6,7 @@ import {
   clickConnectButton,
   clickConnectWalletButton,
   clickInjectableWalletButton,
+  setupWalletConnection,
 } from "./helper/connect";
 
 test.describe("App", () => {
@@ -56,7 +57,7 @@ test.describe("Connecting wallet", () => {
 test.describe("After connection", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await connectWallet(page);
+    await setupWalletConnection(page);
   });
 
   test("balance is correct", async ({ page }) => {
@@ -73,7 +74,7 @@ test.describe("After connection", () => {
 test.describe("Staking", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await connectWallet(page);
+    await setupWalletConnection(page);
   });
 
   test("prepare the staking", async ({ page }) => {
@@ -117,11 +118,3 @@ test.describe("Staking", () => {
     );
   });
 });
-
-const connectWallet = async (page: Page) => {
-  await injectBBNWallet(page);
-  await clickConnectButton(page);
-  await acceptTermsAndConditions(page);
-  await clickInjectableWalletButton(page);
-  await clickConnectWalletButton(page);
-};
