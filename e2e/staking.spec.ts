@@ -1,6 +1,10 @@
 import { expect, test } from "@playwright/test";
 
-import { STAKING_AMOUNT } from "./constants";
+import {
+  STAKING_AMOUNT_BTC,
+  STAKING_AMOUNT_SAT,
+  STAKING_TX_HASH,
+} from "./constants/staking";
 import { setupWalletConnection } from "./helper/connect";
 
 test.describe("Create staking transaction", () => {
@@ -17,7 +21,7 @@ test.describe("Create staking transaction", () => {
     expect(previewButton).toBeDisabled();
 
     // Preview available after filling the amount
-    await page.getByPlaceholder("BTC").fill(`${STAKING_AMOUNT}`);
+    await page.getByPlaceholder("BTC").fill(`${STAKING_AMOUNT_BTC}`);
     expect(previewButton).toBeEnabled();
 
     await previewButton.click();
@@ -44,9 +48,7 @@ test.describe("Create staking transaction", () => {
 
     // Check the staking delegation tx hash and staking value
     const [delegation] = parsed;
-    expect(delegation.stakingValueSat).toBe(50000);
-    expect(delegation.stakingTxHashHex).toBe(
-      "47af61d63bcc6c513561d9a1198d082052cc07a81f50c6f130653f0a6ecc0fc1",
-    );
+    expect(delegation.stakingValueSat).toBe(STAKING_AMOUNT_SAT);
+    expect(delegation.stakingTxHashHex).toBe(STAKING_TX_HASH);
   });
 });
