@@ -1,16 +1,15 @@
 import { Page } from "@playwright/test";
 
-// Sample BBN Wallet implementation for E2E testing purposes
-
-export const injectBBNWallet = async (page: Page) => {
-  // Inject the BBNWallet methods into window.btcwallet
+// Sample wallet implementation for E2E testing purposes
+export const injectBTCWallet = async (page: Page) => {
+  // Inject the wallet methods into window.btcwallet
   await page.evaluate(() => {
     // wallet
-    const bbnWallet = {
+    const btcWallet = {
       connectWallet: () => {
-        return bbnWallet;
+        return btcWallet;
       },
-      getWalletProviderName: () => "BBN Wallet",
+      getWalletProviderName: () => "BTC Wallet",
       getAddress: () =>
         "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
       getPublicKeyHex: () =>
@@ -43,6 +42,6 @@ export const injectBBNWallet = async (page: Page) => {
       },
     };
 
-    window.btcwallet = bbnWallet;
+    window.btcwallet = btcWallet;
   });
 };

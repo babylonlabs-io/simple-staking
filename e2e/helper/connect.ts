@@ -1,6 +1,6 @@
 import { Page, expect } from "@playwright/test";
 
-import { injectBBNWallet } from "./bbn_wallet";
+import { injectBTCWallet } from "./injectBTCWallet";
 
 export const clickConnectButton = async (page: Page) => {
   const connectButton = page.getByRole("button", {
@@ -46,7 +46,7 @@ export const clickConnectWalletButton = async (page: Page) => {
 };
 
 export const setupWalletConnection = async (page: Page) => {
-  await injectBBNWallet(page);
+  await injectBTCWallet(page);
   await clickConnectButton(page);
   await acceptTermsAndConditions(page);
   await clickInjectableWalletButton(page);
