@@ -1,6 +1,4 @@
 import { expect, test } from "@playwright/test";
-// from fixtures in case we are loading chrome extensions
-// import { expect, test } from "../playwright.fixtures";
 
 import { injectBBNWallet } from "./helper/bbn_wallet";
 import {
