@@ -1,5 +1,6 @@
 import { expect, test } from "@playwright/test";
 
+import { STAKING_AMOUNT } from "./constants";
 import { setupWalletConnection } from "./helper/connect";
 
 test.describe("Create staking transaction", () => {
@@ -16,7 +17,7 @@ test.describe("Create staking transaction", () => {
     expect(previewButton).toBeDisabled();
 
     // Preview available after filling the amount
-    await page.getByPlaceholder("BTC").fill("0.0005");
+    await page.getByPlaceholder("BTC").fill(`${STAKING_AMOUNT}`);
     expect(previewButton).toBeEnabled();
 
     await previewButton.click();
