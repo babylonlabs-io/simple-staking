@@ -5,6 +5,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
+import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { QueryMeta } from "@/app/types/api";
 import {
@@ -39,19 +40,56 @@ interface DelegationsProps {
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
   getNetworkFees: WalletProvider["getNetworkFees"];
+  isWalletConnected: boolean;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
   delegationsAPI,
   delegationsLocalStorage,
   globalParamsVersion,
-  publicKeyNoCoord,
-  btcWalletNetwork,
-  address,
   signPsbtTx,
   pushTx,
   queryMeta,
   getNetworkFees,
+  address,
+  btcWalletNetwork,
+  publicKeyNoCoord,
+  isWalletConnected,
+}) => {
+  return (
+    <DelegationsPointsProvider
+      publicKeyNoCoord={publicKeyNoCoord}
+      delegationsAPI={delegationsAPI}
+      isWalletConnected={isWalletConnected}
+    >
+      <DelegationsContent
+        delegationsAPI={delegationsAPI}
+        delegationsLocalStorage={delegationsLocalStorage}
+        globalParamsVersion={globalParamsVersion}
+        signPsbtTx={signPsbtTx}
+        pushTx={pushTx}
+        queryMeta={queryMeta}
+        getNetworkFees={getNetworkFees}
+        address={address}
+        btcWalletNetwork={btcWalletNetwork}
+        publicKeyNoCoord={publicKeyNoCoord}
+        isWalletConnected={isWalletConnected}
+      />
+    </DelegationsPointsProvider>
+  );
+};
+
+const DelegationsContent: React.FC<DelegationsProps> = ({
+  delegationsAPI,
+  delegationsLocalStorage,
+  globalParamsVersion,
+  signPsbtTx,
+  pushTx,
+  queryMeta,
+  getNetworkFees,
+  address,
+  btcWalletNetwork,
+  publicKeyNoCoord,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -113,7 +151,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         id,
         delegationsAPI,
         publicKeyNoCoord,
-        btcWalletNetwork,
+        btcWalletNetwork!,
         signPsbtTx,
       );
       // Update the local state with the new intermediate delegation
@@ -143,7 +181,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
         id,
         delegationsAPI,
         publicKeyNoCoord,
-        btcWalletNetwork,
+        btcWalletNetwork!,
         signPsbtTx,
         address,
         getNetworkFees,
@@ -233,11 +271,12 @@ export const Delegations: React.FC<DelegationsProps> = ({
         </div>
       ) : (
         <>
-          <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
+          <div className="hidden grid-cols-6 gap-2 px-4 lg:grid">
             <p>Amount</p>
             <p>Inception</p>
             <p className="text-center">Transaction hash</p>
             <p className="text-center">Status</p>
+            <p className="text-center">Points</p>
             <p>Action</p>
           </div>
           <div

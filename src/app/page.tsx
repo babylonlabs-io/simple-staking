@@ -333,6 +333,7 @@ const Home: React.FC<HomeProps> = () => {
             <Summary
               totalStakedSat={totalStakedSat}
               btcWalletBalanceSat={btcWalletBalanceSat}
+              publicKeyNoCoord={publicKeyNoCoord}
             />
           )}
           <Staking
@@ -369,6 +370,7 @@ const Home: React.FC<HomeProps> = () => {
                   isFetchingMore: isFetchingNextDelegationsPage,
                 }}
                 getNetworkFees={btcWallet.getNetworkFees}
+                isWalletConnected={!!btcWallet}
               />
             )}
           {/* At this point of time is not used */}
