@@ -5,6 +5,7 @@ import { FaWallet } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
+import { twJoin } from "tailwind-merge";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
@@ -110,7 +111,10 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
     return (
       <button
         key={name}
-        className={`flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === BROWSER ? "border-primary" : "border-base-100"}`}
+        className={twJoin(
+          "flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary",
+          selectedWallet === BROWSER ? "border-primary" : "border-base-100",
+        )}
         onClick={() => setSelectedWallet(BROWSER)}
       >
         <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-white p-2 text-black">
@@ -236,7 +240,13 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                     return (
                       <a
                         key={name}
-                        className={`relative flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary ${selectedWallet === name ? "border-primary" : "border-base-100"} ${!walletAvailable ? "opacity-50" : ""}`}
+                        className={twJoin(
+                          "relative flex cursor-pointer items-center gap-2 rounded-xl border-2 bg-base-100 p-2 transition-all hover:text-primary",
+                          selectedWallet === name
+                            ? "border-primary"
+                            : "border-base-100",
+                          !walletAvailable ? "opacity-50" : "",
+                        )}
                         onClick={() =>
                           walletAvailable && setSelectedWallet(name)
                         }
