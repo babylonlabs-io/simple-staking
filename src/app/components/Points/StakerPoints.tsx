@@ -2,8 +2,6 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
 import { getStakersPoints } from "@/app/api/getStakersPoints";
-import { satoshiToBtc } from "@/utils/btcConversions";
-import { maxDecimals } from "@/utils/maxDecimals";
 
 interface StakerPointsProps {
   publicKeyNoCoord: string;
@@ -32,7 +30,7 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
   return (
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap font-semibold">
-        {points !== undefined ? maxDecimals(satoshiToBtc(points), 8) : 0}
+        {points !== undefined ? points : 0}
       </p>
     </div>
   );
