@@ -151,7 +151,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
         id,
         delegationsAPI,
         publicKeyNoCoord,
-        btcWalletNetwork!,
+        btcWalletNetwork,
         signPsbtTx,
       );
       // Update the local state with the new intermediate delegation
@@ -181,7 +181,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
         id,
         delegationsAPI,
         publicKeyNoCoord,
-        btcWalletNetwork!,
+        btcWalletNetwork,
         signPsbtTx,
         address,
         getNetworkFees,

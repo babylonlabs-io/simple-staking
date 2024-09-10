@@ -94,6 +94,12 @@ export const questions = (
       title: "Are hardware wallets supported?",
       content: `<p>Keystone via QR code is the only hardware wallet supporting Bitcoin Staking. Using any other hardware wallet through any means (such as connection to a software/extension/mobile wallet) can lead to permanent inability to withdraw the stake.</p>`,
     },
+    {
+      title: "What are the points?",
+      content: `<p>You agree not to engage in any manipulative, fraudulent, dishonest, or abusive activities in connection with points or any distribution of digital assets by us or our affiliates. This includes, but is not limited to, creating multiple accounts to claim additional points or digital assets, using bots or scripts to automate claiming, or participating in any schemes that artificially inflate the number or perceived value of points or digital assets. We or our affiliates may terminate any or all of your points due to such activities, or for breaching any license granted by us, and may disclose privately and publicly why such action was taken.</p>
+      <br />
+      <p>You agree not to engage in any manipulative, fraudulent, dishonest, or abusive activities in connection with points or any distribution of digital assets by us or our affiliates. This includes, but is not limited to, creating multiple accounts to claim additional points or digital assets, using bots or scripts to automate claiming, or participating in any schemes that artificially inflate the number or perceived value of points or digital assets. We or our affiliates may terminate any or all of your points due to such activities, or for breaching any license granted by us, and may disclose privately and publicly why such action was taken.</p>`,
+    },
   ];
   if (shouldDisplayTestingMsg()) {
     questionList.push({

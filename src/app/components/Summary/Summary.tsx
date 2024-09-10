@@ -83,7 +83,7 @@ export const Summary: React.FC<SummaryProps> = ({
               <span
                 className="cursor-pointer text-xs"
                 data-tooltip-id={"tooltip-total-points"}
-                data-tooltip-content={`This point system is used to measure each staker's activities, tracked by the staker's public key.`}
+                data-tooltip-content={`The points measure your staking activities based on your BTC public key. They are not associated with any tokens or other digital assets, and have no monetary value. Please check FAQ for further info.`}
               >
                 <AiOutlineInfoCircle />
               </span>
@@ -113,7 +113,10 @@ export const Summary: React.FC<SummaryProps> = ({
             <div className="flex items-center gap-1">
               <FaBitcoin className="text-primary" size={16} />
               {typeof btcWalletBalanceSat === "number" ? (
-                <p className="whitespace-nowrap font-semibold" data-testid="balance">
+                <p
+                  className="whitespace-nowrap font-semibold"
+                  data-testid="balance"
+                >
                   {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)} {coinName}
                 </p>
               ) : (
