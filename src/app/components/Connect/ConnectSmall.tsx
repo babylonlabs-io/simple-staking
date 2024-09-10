@@ -79,7 +79,10 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
             )}
           </div>
         </div>
-        <div className="relative right-[10px] flex items-center rounded-lg border border-primary bg-[#fdf2ec] p-2 dark:border-white dark:bg-base-200">
+        <div
+          className="relative right-[10px] flex items-center rounded-lg border border-primary bg-[#fdf2ec] p-2 dark:border-white dark:bg-base-200"
+          data-testid="address"
+        >
           {trim(address)}
         </div>
       </button>
