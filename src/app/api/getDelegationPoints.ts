@@ -24,59 +24,59 @@ export interface PaginatedDelegationsPoints {
   pagination: Pagination;
 }
 
-export const getDelegationPoints = async (
+// Get delegation points by staker BTC public key
+export const getDelegationPointsByStakerBtcPk = async (
+  stakerBtcPk: string,
   paginationKey?: string,
-  stakerBtcPk?: string,
-  stakingTxHashHexes?: string[],
 ): Promise<PaginatedDelegationsPoints> => {
-  const params: Record<string, string | string[]> = {};
+  const params: Record<string, string> = {
+    staker_btc_pk: encode(stakerBtcPk),
+  };
 
-  if (stakerBtcPk && stakingTxHashHexes && stakingTxHashHexes.length > 0) {
-    throw new Error(
-      "Only one of stakerBtcPk or stakingTxHashHexes should be provided",
-    );
+  if (paginationKey && paginationKey !== "") {
+    params.pagination_key = encode(paginationKey);
   }
 
-  if (
-    !stakerBtcPk &&
-    (!stakingTxHashHexes || stakingTxHashHexes.length === 0)
-  ) {
-    throw new Error(
-      "Either stakerBtcPk or stakingTxHashHexes must be provided",
-    );
-  }
+  const response = await apiWrapper(
+    "GET",
+    "/v1/points/staker/delegations",
+    "Error getting delegation points by staker BTC public key",
+    params,
+  );
 
-  if (stakerBtcPk) {
-    params.staker_btc_pk = encode(stakerBtcPk);
-  }
+  return {
+    data: response.data.data,
+    pagination: response.data.pagination,
+  };
+};
 
+// Get delegation points by staking transaction hash hex
+export const getDelegationPointsByStakingTxHashHexes = async (
+  stakingTxHashHexes: string[],
+  paginationKey?: string,
+): Promise<PaginatedDelegationsPoints> => {
   let allDelegationPoints: DelegationPoints[] = [];
   let nextPaginationKey = paginationKey;
 
   do {
-    const currentParams = { ...params };
+    const currentParams: Record<string, string | string[]> = {
+      staking_tx_hash_hex: stakingTxHashHexes.splice(0, 10),
+    };
+
     if (nextPaginationKey && nextPaginationKey !== "") {
       currentParams.pagination_key = encode(nextPaginationKey);
     }
 
-    if (stakingTxHashHexes && stakingTxHashHexes.length > 0) {
-      currentParams.staking_tx_hash_hex = stakingTxHashHexes.slice(0, 10);
-      stakingTxHashHexes = stakingTxHashHexes.slice(10);
-    }
-
     const response = await apiWrapper(
       "GET",
-      "/v1/points/staker/delegations",
-      "Error getting delegation points",
+      "/v1/points/staking-tx/delegations",
+      "Error getting delegation points by staking transaction hashes",
       currentParams,
     );
 
     allDelegationPoints = allDelegationPoints.concat(response.data.data);
     nextPaginationKey = response.data.pagination.next_key;
-  } while (
-    nextPaginationKey ||
-    (stakingTxHashHexes && stakingTxHashHexes.length > 0)
-  );
+  } while (nextPaginationKey || stakingTxHashHexes.length > 0);
 
   return {
     data: allDelegationPoints,

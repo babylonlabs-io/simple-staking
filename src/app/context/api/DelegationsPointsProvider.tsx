@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 import {
-  getDelegationPoints,
+  getDelegationPointsByStakingTxHashHexes,
   PaginatedDelegationsPoints,
 } from "@/app/api/getDelegationPoints";
 import { Delegation } from "@/app/types/delegations";
@@ -50,10 +50,9 @@ export const DelegationsPointsProvider: React.FC<
     );
 
     do {
-      const result = await getDelegationPoints(
-        paginationKey,
-        undefined,
+      const result = await getDelegationPointsByStakingTxHashHexes(
         stakingTxHashHexes,
+        paginationKey,
       );
       allPoints = [...allPoints, ...result.data];
       paginationKey = result.pagination.next_key;

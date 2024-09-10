@@ -74,13 +74,13 @@ export const Staking: React.FC<StakingProps> = ({
   isWalletConnected,
   onConnect,
   isLoading,
+  btcWallet,
+  btcWalletNetwork,
+  address,
+  publicKeyNoCoord,
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
   availableUTXOs,
-  publicKeyNoCoord,
-  address,
-  btcWallet,
-  btcWalletNetwork,
 }) => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
