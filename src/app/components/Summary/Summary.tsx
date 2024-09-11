@@ -83,7 +83,7 @@ export const Summary: React.FC<SummaryProps> = ({
               <span
                 className="cursor-pointer text-xs"
                 data-tooltip-id={"tooltip-total-points"}
-                data-tooltip-content={`The points measure your staking activities based on your BTC public key. They are not associated with any tokens or other digital assets, and have no monetary value. Please check FAQ for further info.`}
+                data-tooltip-content={`The points measure your staking activities based on your BTC public key. Please check FAQ for further info.`}
               >
                 <AiOutlineInfoCircle />
               </span>

@@ -96,9 +96,7 @@ export const questions = (
     },
     {
       title: "What are the points?",
-      content: `<p>You agree not to engage in any manipulative, fraudulent, dishonest, or abusive activities in connection with points or any distribution of digital assets by us or our affiliates. This includes, but is not limited to, creating multiple accounts to claim additional points or digital assets, using bots or scripts to automate claiming, or participating in any schemes that artificially inflate the number or perceived value of points or digital assets. We or our affiliates may terminate any or all of your points due to such activities, or for breaching any license granted by us, and may disclose privately and publicly why such action was taken.</p>
-      <br />
-      <p>You agree not to engage in any manipulative, fraudulent, dishonest, or abusive activities in connection with points or any distribution of digital assets by us or our affiliates. This includes, but is not limited to, creating multiple accounts to claim additional points or digital assets, using bots or scripts to automate claiming, or participating in any schemes that artificially inflate the number or perceived value of points or digital assets. We or our affiliates may terminate any or all of your points due to such activities, or for breaching any license granted by us, and may disclose privately and publicly why such action was taken.</p>`,
+      content: `<p>We use points to track staking activity. Points are not blockchain tokens. Points do not, and may never, convert to, accrue to, be used as a basis to calculate, or become tokens, other digital assets, or distributions thereof. Points are virtual calculations with no monetary value. Points do not constitute any currency or property of any type and are not redeemable, refundable, or transferable.</p>`,
     },
   ];
   if (shouldDisplayTestingMsg()) {

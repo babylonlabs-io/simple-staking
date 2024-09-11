@@ -1,4 +1,5 @@
 import React from "react";
+import { useMediaQuery } from "usehooks-ts";
 
 import { useDelegationsPoints } from "@/app/context/api/DelegationsPointsProvider";
 
@@ -10,6 +11,7 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
   stakingTxHash,
 }) => {
   const { delegationPoints, isLoading } = useDelegationsPoints();
+  const isMobile = useMediaQuery("(max-width:1023px)");
 
   const points = delegationPoints.get(stakingTxHash);
 
@@ -23,8 +25,12 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
 
   return (
     <div className="flex items-center justify-end gap-1">
-      <p className="whitespace-nowrap font-semibold">
-        {points !== undefined ? points : 0}
+      <p className="whitespace-nowrap">
+        {isMobile
+          ? `Points: ${points !== undefined ? points : 0}`
+          : points !== undefined
+            ? points
+            : 0}
       </p>
     </div>
   );

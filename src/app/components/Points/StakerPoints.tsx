@@ -15,6 +15,7 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
     queryFn: () => getStakersPoints([publicKeyNoCoord]),
     enabled: !!publicKeyNoCoord,
     refetchInterval: 60000, // Refresh every minute
+    refetchOnWindowFocus: false,
   });
 
   if (isLoading) {

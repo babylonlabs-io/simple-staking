@@ -69,7 +69,7 @@ export const getDelegationPointsByStakingTxHashHexes = async (
 
     const response = await apiWrapper(
       "GET",
-      "/v1/points/staking-tx/delegations",
+      "/v1/points/delegations",
       "Error getting delegation points by staking transaction hashes",
       currentParams,
     );

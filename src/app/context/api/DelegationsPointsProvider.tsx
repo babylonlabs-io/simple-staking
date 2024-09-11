@@ -65,6 +65,8 @@ export const DelegationsPointsProvider: React.FC<
     queryKey: ["delegationPoints", publicKeyNoCoord, delegationsAPI],
     queryFn: fetchAllPoints,
     enabled: isWalletConnected && delegationsAPI.length > 0,
+    refetchInterval: 60000, // Refetch every 60 seconds
+    refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
