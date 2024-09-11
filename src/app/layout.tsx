@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "react-responsive-modal/styles.css";
-import "react-tooltip/dist/react-tooltip.css";
 
 import { getNetworkAppUrl } from "@/config";
 
