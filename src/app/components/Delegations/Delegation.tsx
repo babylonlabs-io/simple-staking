@@ -4,6 +4,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
@@ -43,6 +44,7 @@ export const Delegation: React.FC<DelegationProps> = ({
 }) => {
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
+  const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -162,9 +164,11 @@ export const Delegation: React.FC<DelegationProps> = ({
             <Tooltip id={`tooltip-${stakingTxHash}`} className="tooltip-wrap" />
           </div>
         </div>
-        <div className="relative flex justify-end lg:justify-center order-5">
-          <DelegationPoints stakingTxHash={stakingTxHash} />
-        </div>
+        {!isApiNormal && !isGeoBlocked && (
+          <div className="relative flex justify-end lg:justify-center order-5">
+            <DelegationPoints stakingTxHash={stakingTxHash} />
+          </div>
+        )}
         <div className="order-6">{generateActionButton()}</div>
       </div>
     </div>

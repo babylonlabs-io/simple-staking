@@ -5,6 +5,7 @@ import {
   getDelegationPointsByStakingTxHashHexes,
   PaginatedDelegationsPoints,
 } from "@/app/api/getDelegationPoints";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 
 interface PointsContextType {
@@ -40,6 +41,7 @@ export const DelegationsPointsProvider: React.FC<
   const [delegationPoints, setDelegationPoints] = useState<Map<string, number>>(
     new Map(),
   );
+  const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
   const fetchAllPoints = async () => {
     let allPoints: PaginatedDelegationsPoints["data"] = [];
@@ -64,7 +66,11 @@ export const DelegationsPointsProvider: React.FC<
   const { data, isLoading, error } = useQuery({
     queryKey: ["delegationPoints", publicKeyNoCoord, delegationsAPI],
     queryFn: fetchAllPoints,
-    enabled: isWalletConnected && delegationsAPI.length > 0,
+    enabled:
+      isWalletConnected &&
+      delegationsAPI.length > 0 &&
+      isApiNormal &&
+      !isGeoBlocked,
     refetchInterval: 60000, // Refetch every 60 seconds
     refetchOnWindowFocus: false,
   });

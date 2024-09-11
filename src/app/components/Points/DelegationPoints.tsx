@@ -11,7 +11,7 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
   stakingTxHash,
 }) => {
   const { delegationPoints, isLoading } = useDelegationsPoints();
-  const isMobile = useMediaQuery("(max-width:1023px)");
+  const isMobile = useMediaQuery("(max-width:1000px)");
 
   const points = delegationPoints.get(stakingTxHash);
 

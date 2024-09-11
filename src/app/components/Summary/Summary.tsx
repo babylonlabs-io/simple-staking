@@ -5,6 +5,7 @@ import { Tooltip } from "react-tooltip";
 
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import {
@@ -36,6 +37,7 @@ export const Summary: React.FC<SummaryProps> = ({
 
   const btcHeight = useBtcHeight();
   const globalParams = useGlobalParams();
+  const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
   useMemo(() => {
     if (!btcHeight || !globalParams.data) {
@@ -76,23 +78,30 @@ export const Summary: React.FC<SummaryProps> = ({
               </p>
             </div>
           </div>
-          <div className="divider xl:divider-horizontal xl:mx-4 my-0" />
-          <div className="flex flex-1 flex-col gap-2 text-sm xl:items-center">
-            <div className="flex items-center gap-1">
-              <p className="dark:text-neutral-content">Total points</p>
-              <span
-                className="cursor-pointer text-xs"
-                data-tooltip-id={"tooltip-total-points"}
-                data-tooltip-content={`The points measure your staking activities based on your BTC public key. Please check FAQ for further info.`}
-              >
-                <AiOutlineInfoCircle />
-              </span>
-              <Tooltip id={"tooltip-total-points"} className="tooltip-wrap" />
-            </div>
-            <div className="flex items-center gap-1">
-              <StakerPoints publicKeyNoCoord={publicKeyNoCoord} />
-            </div>
-          </div>
+          {isApiNormal && !isGeoBlocked && (
+            <>
+              <div className="divider xl:divider-horizontal xl:mx-4 my-0" />
+              <div className="flex flex-1 flex-col gap-2 text-sm xl:items-center">
+                <div className="flex items-center gap-1">
+                  <p className="dark:text-neutral-content">Total points</p>
+                  <span
+                    className="cursor-pointer text-xs"
+                    data-tooltip-id={"tooltip-total-points"}
+                    data-tooltip-content={`The points measure your staking activities based on your BTC public key. Please check FAQ for further info.`}
+                  >
+                    <AiOutlineInfoCircle />
+                  </span>
+                  <Tooltip
+                    id={"tooltip-total-points"}
+                    className="tooltip-wrap"
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  <StakerPoints publicKeyNoCoord={publicKeyNoCoord} />
+                </div>
+              </div>
+            </>
+          )}
           <div className="divider xl:divider-horizontal xl:mx-4 my-0" />
           <div className="flex flex-1 flex-col gap-1 text-sm xl:items-center">
             <div className="flex items-center gap-1">
