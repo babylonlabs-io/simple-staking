@@ -123,7 +123,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.UNBONDING,
-          errorTime: new Date(),
         },
         retryAction: () => handleModal(id, MODE_UNBOND),
       });
@@ -156,7 +155,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.WITHDRAW,
-          errorTime: new Date(),
         },
         retryAction: () => handleModal(id, MODE_WITHDRAW),
       });

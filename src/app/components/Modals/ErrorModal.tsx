@@ -11,7 +11,6 @@ interface ErrorModalProps {
   onRetry?: () => void;
   errorMessage: string;
   errorState?: ErrorState;
-  errorTime: Date;
   noCancel?: boolean;
 }
 
@@ -22,7 +21,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   errorMessage,
   errorState,
   noCancel,
-  // errorTime, // This prop is not used in the component
 }) => {
   const { error, retryErrorAction } = useError();
 
@@ -31,7 +29,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       error: {
         message: error.message,
         errorState: error.errorState,
-        errorTime: new Date(),
       },
       retryAction: retryErrorAction,
     };

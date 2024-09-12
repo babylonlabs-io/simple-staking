@@ -35,7 +35,6 @@ export const Stakers: React.FC<StakersProps> = () => {
         error: {
           message: error.message,
           errorState: ErrorState.SERVER_ERROR,
-          errorTime: new Date(),
         },
         retryAction: refetch,
       });

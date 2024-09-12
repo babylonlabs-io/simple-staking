@@ -38,7 +38,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [isNoCancel, setIsNoCancel] = useState(false);
   const [error, setError] = useState<ErrorType>({
     message: "",
-    errorTime: new Date(),
     errorState: undefined,
   });
   const [retryErrorAction, setRetryErrorAction] = useState<
@@ -60,7 +59,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     setTimeout(() => {
       setError({
         message: "",
-        errorTime: new Date(),
         errorState: undefined,
       });
       setRetryErrorAction(undefined);
@@ -75,7 +73,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           error: {
             message: error.message,
             errorState: errorState,
-            errorTime: new Date(),
           },
           retryAction: refetchFunction,
         });
