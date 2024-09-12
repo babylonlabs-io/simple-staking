@@ -102,8 +102,11 @@ describe("globalParams", () => {
     expect(result.isApprochingNextVersion).toBeFalsy();
   });
 
-  it("should return correct values for params version that are not first or last", () => {
-    for (let index = 1; index < globalParams.length - 2; index++) {
+  describe("should return correct values for params version that are not first or last", () => {
+    const globalParams = dataGenerator.generateGlobalPramsVersions(10);
+    const paramIndexes = globalParams.map((_, i) => i).slice(1, -1);
+
+    it.each(paramIndexes)("param #%i", (index) => {
       const param = globalParams[index];
       // before approaching
       const lastConfirmationDepth = globalParams[index - 1].confirmationDepth;
@@ -131,6 +134,6 @@ describe("globalParams", () => {
       expect(result.currentVersion).toEqual(param);
       expect(result.nextVersion).toEqual(globalParams[index + 1]);
       expect(result.isApprochingNextVersion).toBeFalsy();
-    }
+    });
   });
 });

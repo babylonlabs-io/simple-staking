@@ -35,9 +35,7 @@ describe("signUnbondingTx", () => {
     randomStakingTxHeight,
     stakerKeys,
   );
-
   const signedPsbtTx = signedPsbt.extractTransaction();
-
   const mockedDelegationApi = [
     {
       stakingTxHashHex: randomTxId,

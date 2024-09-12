@@ -1,10 +1,3 @@
-import { initBTCCurve } from "btc-staking-ts";
-
-import { signStakingTx } from "@/utils/delegations/signStakingTx";
-
-import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
-
-// Mock the signPsbtTransaction function
 jest.mock("@/app/common/utils/psbt", () => ({
   signPsbtTransaction: jest.fn(),
 }));
@@ -12,12 +5,16 @@ jest.mock("@/utils/delegations/fee", () => ({
   txFeeSafetyCheck: jest.fn().mockReturnValue(undefined),
 }));
 
-describe("utils/delegations/signStakingTx", () => {
-  initBTCCurve();
-  testingNetworks.forEach(({ network, dataGenerator: dataGen }) => {
+import { signPsbtTransaction } from "@/app/common/utils/psbt";
+import { signStakingTx } from "@/utils/delegations/signStakingTx";
+
+import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
+
+describe.each(testingNetworks)(
+  "txFeeSafetyCheck",
+  ({ network, dataGenerator: dataGen }) => {
     const randomFpKeys = dataGen.generateRandomKeyPair();
     const randomUserKeys = dataGen.generateRandomKeyPair();
-    const feeRate = DEFAULT_TEST_FEE_RATE;
     const randomParam = dataGen.generateRandomGlobalParams(true);
     const randomStakingAmount = dataGen.getRandomIntegerBetween(
       randomParam.minStakingAmountSat,
@@ -31,15 +28,12 @@ describe("utils/delegations/signStakingTx", () => {
       dataGen.getAddressAndScriptPubKey(
         dataGen.generateRandomKeyPair().publicKey,
       ).taproot;
-
     const randomInputUTXOs = dataGen.generateRandomUTXOs(
       randomStakingAmount + Math.floor(Math.random() * 100000000),
       Math.floor(Math.random() * 10) + 1,
       scriptPubKey,
     );
     const txHex = dataGen.generateRandomTxId();
-
-    // mock the btcWallet
     const btcWallet = {
       signPsbt: jest.fn(),
       getWalletProviderName: jest.fn(),
@@ -47,15 +41,9 @@ describe("utils/delegations/signStakingTx", () => {
     };
 
     it("should successfully sign a staking transaction", async () => {
-      // Import the mock function
-      const { signPsbtTransaction } = require("@/app/common/utils/psbt");
-      signPsbtTransaction.mockImplementationOnce(() => {
-        return async () => {
-          return {
-            toHex: () => txHex,
-          };
-        };
-      });
+      (signPsbtTransaction as any).mockImplementationOnce(() => async () => ({
+        toHex: () => txHex,
+      }));
 
       const result = await signStakingTx(
         btcWallet as any,
@@ -66,7 +54,7 @@ describe("utils/delegations/signStakingTx", () => {
         network,
         randomTaprootAddress,
         randomUserKeys.noCoordPublicKey,
-        feeRate,
+        DEFAULT_TEST_FEE_RATE,
         randomInputUTXOs,
       );
 
@@ -79,12 +67,8 @@ describe("utils/delegations/signStakingTx", () => {
     });
 
     it("should throw an error when signing a staking transaction", async () => {
-      // Import the mock function
-      const { signPsbtTransaction } = require("@/app/common/utils/psbt");
-      signPsbtTransaction.mockImplementationOnce(() => {
-        return async () => {
-          throw new Error("signing error");
-        };
+      (signPsbtTransaction as any).mockImplementationOnce(() => async () => {
+        throw new Error("signing error");
       });
 
       try {
@@ -97,7 +81,7 @@ describe("utils/delegations/signStakingTx", () => {
           network,
           randomTaprootAddress,
           randomUserKeys.noCoordPublicKey,
-          feeRate,
+          DEFAULT_TEST_FEE_RATE,
           randomInputUTXOs,
         );
       } catch (error: any) {
@@ -105,5 +89,5 @@ describe("utils/delegations/signStakingTx", () => {
         expect(error.message).toBe("signing error");
       }
     });
-  });
-});
+  },
+);
