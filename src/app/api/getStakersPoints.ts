@@ -19,6 +19,7 @@ export const getStakersPoints = async (
 
   const response = await apiWrapper(
     "GET",
+    process.env.NEXT_PUBLIC_POINTS_API_URL || "",
     "/v1/points/stakers",
     "Error getting staker points",
     params,

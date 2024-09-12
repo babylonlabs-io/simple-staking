@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const apiWrapper = async (
   method: "GET" | "POST",
-  url: string,
+  apiUrl: string,
+  endpoint: string,
   generalErrorMessage: string,
   params?: any,
   timeout?: number,
@@ -23,7 +24,7 @@ export const apiWrapper = async (
   try {
     // destructure params in case of post request
     response = await handler(
-      `${process.env.NEXT_PUBLIC_API_URL}${url}`,
+      `${apiUrl}${endpoint}`,
       method === "POST"
         ? { ...params }
         : {

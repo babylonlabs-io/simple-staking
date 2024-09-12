@@ -21,6 +21,7 @@ export const postVerifyUtxoOrdinals = async (
     utxoChunks.map((chunk) =>
       apiWrapper(
         "POST",
+        process.env.NEXT_PUBLIC_API_URL || "",
         "/v1/ordinals/verify-utxos",
         "Error verifying utxos ordinals",
         {

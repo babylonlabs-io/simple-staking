@@ -39,6 +39,7 @@ export const getDelegationPointsByStakerBtcPk = async (
 
   const response = await apiWrapper(
     "GET",
+    process.env.NEXT_PUBLIC_POINTS_API_URL || "",
     "/v1/points/staker/delegations",
     "Error getting delegation points by staker BTC public key",
     params,
@@ -69,6 +70,7 @@ export const getDelegationPointsByStakingTxHashHexes = async (
 
     const response = await apiWrapper(
       "GET",
+      process.env.NEXT_PUBLIC_POINTS_API_URL || "",
       "/v1/points/delegations",
       "Error getting delegation points by staking transaction hashes",
       currentParams,

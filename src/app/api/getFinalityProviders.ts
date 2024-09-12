@@ -47,6 +47,7 @@ export const getFinalityProviders = async (
 
   const response = await apiWrapper(
     "GET",
+    process.env.NEXT_PUBLIC_API_URL || "",
     "/v1/finality-providers",
     "Error getting finality providers",
     params,

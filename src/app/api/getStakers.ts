@@ -30,6 +30,7 @@ export const getStakers = async (): Promise<Stakers> => {
 
     const response = await apiWrapper(
       "GET",
+      process.env.NEXT_PUBLIC_API_URL || "",
       "/v1/stats/staker",
       "Error getting stakers",
       params,

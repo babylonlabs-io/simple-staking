@@ -26,6 +26,7 @@ interface GlobalParamsDataResponse {
 export const getGlobalParams = async (): Promise<GlobalParamsVersion[]> => {
   const { data } = (await apiWrapper(
     "GET",
+    process.env.NEXT_PUBLIC_API_URL || "",
     "/v1/global-params",
     "Error getting global params",
   )) as AxiosResponse<{ data: GlobalParamsDataResponse }>;
