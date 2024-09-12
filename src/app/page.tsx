@@ -253,7 +253,6 @@ const Home: React.FC<HomeProps> = () => {
           error: {
             message: errorMessage,
             errorState: ErrorState.WALLET,
-            errorTime: new Date(),
           },
           retryAction: () => handleConnectBTC(walletProvider),
         });
@@ -391,7 +390,6 @@ const Home: React.FC<HomeProps> = () => {
         open={isErrorOpen}
         errorMessage={error.message}
         errorState={error.errorState}
-        errorTime={error.errorTime}
         onClose={hideError}
         onRetry={retryErrorAction}
         noCancel={noCancel}

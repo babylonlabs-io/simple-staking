@@ -206,7 +206,6 @@ export const Staking: React.FC<StakingProps> = ({
           error: {
             message: error.message,
             errorState,
-            errorTime: new Date(),
           },
           retryAction: refetchFunction,
         });
@@ -281,7 +280,6 @@ export const Staking: React.FC<StakingProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.STAKING,
-          errorTime: new Date(),
         },
         noCancel: true,
         retryAction: () => {
@@ -377,7 +375,6 @@ export const Staking: React.FC<StakingProps> = ({
           error: {
             message: errorMsg,
             errorState: ErrorState.STAKING,
-            errorTime: new Date(),
           },
           retryAction: () => setSelectedFeeRate(0),
         });
@@ -426,7 +423,6 @@ export const Staking: React.FC<StakingProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.STAKING,
-          errorTime: new Date(),
         },
         retryAction: () => handleChooseFinalityProvider(btcPkHex),
       });
