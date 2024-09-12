@@ -2,7 +2,12 @@ import { encode } from "url-safe-base64";
 
 import { Pagination } from "../types/api";
 
-import { apiWrapper } from "./apiWrapper";
+import { pointsApiWrapper } from "./pointsApiWrapper";
+
+export interface StakerPoints {
+  staker_btc_pk: string;
+  points: number;
+}
 
 export interface DelegationPoints {
   staking_tx_hash_hex: string;
@@ -28,40 +33,32 @@ export interface DelegationsPoints {
   data: DelegationPoints[];
 }
 
-// Get delegation points by staker BTC public key
-export const getDelegationPointsByStakerBtcPk = async (
-  stakerBtcPk: string,
-  paginationKey?: string,
-): Promise<PaginatedDelegationsPoints> => {
-  const params: Record<string, string> = {
-    staker_btc_pk: encode(stakerBtcPk),
-  };
+export const getStakersPoints = async (
+  stakerBtcPk: string[],
+): Promise<StakerPoints[]> => {
+  const params: Record<string, string> = {};
 
-  if (paginationKey && paginationKey !== "") {
-    params.pagination_key = encode(paginationKey);
-  }
+  params.staker_btc_pk =
+    stakerBtcPk.length > 1
+      ? stakerBtcPk.map(encode).join(",")
+      : encode(stakerBtcPk[0]);
 
-  const response = await apiWrapper(
+  const response = await pointsApiWrapper(
     "GET",
-    process.env.NEXT_PUBLIC_POINTS_API_URL || "",
-    "/v1/points/staker/delegations",
-    "Error getting delegation points by staker BTC public key",
+    "/v1/points/stakers",
+    "Error getting staker points",
     params,
   );
 
-  return {
-    data: response.data.data,
-    pagination: response.data.pagination,
-  };
+  return response.data;
 };
 
 // Get delegation points by staking transaction hash hex
 export const getDelegationPointsByStakingTxHashHexes = async (
   stakingTxHashHexes: string[],
 ): Promise<DelegationsPoints> => {
-  const response = await apiWrapper(
+  const response = await pointsApiWrapper(
     "POST",
-    process.env.NEXT_PUBLIC_POINTS_API_URL || "",
     "/v1/points/delegations",
     "Error getting delegation points by staking transaction hashes",
     { staking_tx_hash_hex: stakingTxHashHexes },

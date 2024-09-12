@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const apiWrapper = async (
+export const pointsApiWrapper = async (
   method: "GET" | "POST",
   path: string,
   generalErrorMessage: string,
@@ -23,7 +23,7 @@ export const apiWrapper = async (
   try {
     // destructure params in case of post request
     response = await handler(
-      `${process.env.NEXT_PUBLIC_API_URL}${path}`,
+      `${process.env.NEXT_PUBLIC_POINTS_API_URL}${path}`,
       method === "POST"
         ? { ...params }
         : {

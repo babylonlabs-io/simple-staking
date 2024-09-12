@@ -59,7 +59,6 @@ export const getDelegations = async (
 
   const response = await apiWrapper(
     "GET",
-    process.env.NEXT_PUBLIC_API_URL || "",
     "/v1/staker/delegations",
     "Error getting delegations",
     params,

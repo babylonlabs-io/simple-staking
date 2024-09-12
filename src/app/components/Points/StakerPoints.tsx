@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 
-import { getStakersPoints } from "@/app/api/getStakersPoints";
+import { getStakersPoints } from "@/app/api/getPoints";
 
 interface StakerPointsProps {
   publicKeyNoCoord: string;

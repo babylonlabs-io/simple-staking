@@ -22,7 +22,6 @@ export const postUnbonding = async (
 
   const response = await apiWrapper(
     "POST",
-    process.env.NEXT_PUBLIC_API_URL || "",
     "/v1/unbonding",
     "Error submitting unbonding request",
     payload,

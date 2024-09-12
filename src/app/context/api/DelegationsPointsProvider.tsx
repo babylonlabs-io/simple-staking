@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import { getDelegationPointsByStakingTxHashHexes } from "@/app/api/getDelegationPoints";
+import { getDelegationPointsByStakingTxHashHexes } from "@/app/api/getPoints";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 

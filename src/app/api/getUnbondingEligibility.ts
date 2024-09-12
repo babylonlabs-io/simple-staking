@@ -13,7 +13,6 @@ export const getUnbondingEligibility = async (txID: string) => {
 
   const response = await apiWrapper(
     "GET",
-    process.env.NEXT_PUBLIC_API_URL || "",
     "/v1/unbonding/eligibility",
     "Error checking unbonding eligibility",
     params,
