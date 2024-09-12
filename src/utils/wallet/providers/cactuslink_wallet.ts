@@ -141,10 +141,10 @@ export class CactusLinkWallet extends WalletProvider {
     if (!this.cactuslinkWalletInfo) {
       throw new Error("Cactus Link Wallet not connected");
     }
-    // subscribe to account change event
     if (eventName === "accountChanged") {
-      return this.bitcoinNetworkProvider.on(eventName, callBack);
+      return this.bitcoinNetworkProvider.on("accountsChanged", callBack);
     }
+    return this.bitcoinNetworkProvider.on(eventName, callBack);
   };
 
   // Mempool calls
