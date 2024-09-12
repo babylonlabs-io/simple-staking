@@ -164,7 +164,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             <Tooltip id={`tooltip-${stakingTxHash}`} className="tooltip-wrap" />
           </div>
         </div>
-        {!isApiNormal && !isGeoBlocked && (
+        {isApiNormal && !isGeoBlocked && (
           <div className="relative flex justify-end lg:justify-center order-5">
             <DelegationPoints stakingTxHash={stakingTxHash} />
           </div>

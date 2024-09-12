@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
-import {
-  getDelegationPointsByStakingTxHashHexes,
-  PaginatedDelegationsPoints,
-} from "@/app/api/getDelegationPoints";
+import { getDelegationPointsByStakingTxHashHexes } from "@/app/api/getDelegationPoints";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 
@@ -44,23 +41,21 @@ export const DelegationsPointsProvider: React.FC<
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
   const fetchAllPoints = async () => {
-    let allPoints: PaginatedDelegationsPoints["data"] = [];
-    let paginationKey = "";
-
     const stakingTxHashHexes = delegationsAPI.map(
       (delegation) => delegation.stakingTxHashHex,
     );
 
-    do {
-      const result = await getDelegationPointsByStakingTxHashHexes(
-        stakingTxHashHexes,
-        paginationKey,
-      );
-      allPoints = [...allPoints, ...result.data];
-      paginationKey = result.pagination.next_key;
-    } while (paginationKey !== "");
+    const chunkSize = 100;
+    const chunks = [];
+    for (let i = 0; i < stakingTxHashHexes.length; i += chunkSize) {
+      chunks.push(stakingTxHashHexes.slice(i, i + chunkSize));
+    }
 
-    return allPoints;
+    const results = await Promise.all(
+      chunks.map((chunk) => getDelegationPointsByStakingTxHashHexes(chunk)),
+    );
+
+    return results.flatMap((result) => result.data);
   };
 
   const { data, isLoading, error } = useQuery({

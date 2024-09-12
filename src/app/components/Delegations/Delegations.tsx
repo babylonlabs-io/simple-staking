@@ -7,6 +7,7 @@ import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { QueryMeta } from "@/app/types/api";
 import {
   Delegation as DelegationInterface,
@@ -95,6 +96,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
+  const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -276,7 +278,9 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
             <p>Inception</p>
             <p className="text-center">Transaction hash</p>
             <p className="text-center">Status</p>
-            <p className="text-center">Points</p>
+            {isApiNormal && !isGeoBlocked && (
+              <p className="text-center">Points</p>
+            )}
             <p>Action</p>
           </div>
           <div

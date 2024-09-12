@@ -24,6 +24,10 @@ export interface PaginatedDelegationsPoints {
   pagination: Pagination;
 }
 
+export interface DelegationsPoints {
+  data: DelegationPoints[];
+}
+
 // Get delegation points by staker BTC public key
 export const getDelegationPointsByStakerBtcPk = async (
   stakerBtcPk: string,
@@ -54,34 +58,16 @@ export const getDelegationPointsByStakerBtcPk = async (
 // Get delegation points by staking transaction hash hex
 export const getDelegationPointsByStakingTxHashHexes = async (
   stakingTxHashHexes: string[],
-  paginationKey?: string,
-): Promise<PaginatedDelegationsPoints> => {
-  let allDelegationPoints: DelegationPoints[] = [];
-  let nextPaginationKey = paginationKey;
-
-  do {
-    const currentParams: Record<string, string | string[]> = {
-      staking_tx_hash_hex: stakingTxHashHexes.splice(0, 10),
-    };
-
-    if (nextPaginationKey && nextPaginationKey !== "") {
-      currentParams.pagination_key = encode(nextPaginationKey);
-    }
-
-    const response = await apiWrapper(
-      "GET",
-      process.env.NEXT_PUBLIC_POINTS_API_URL || "",
-      "/v1/points/delegations",
-      "Error getting delegation points by staking transaction hashes",
-      currentParams,
-    );
-
-    allDelegationPoints = allDelegationPoints.concat(response.data.data);
-    nextPaginationKey = response.data.pagination.next_key;
-  } while (nextPaginationKey || stakingTxHashHexes.length > 0);
+): Promise<DelegationsPoints> => {
+  const response = await apiWrapper(
+    "POST",
+    process.env.NEXT_PUBLIC_POINTS_API_URL || "",
+    "/v1/points/delegations",
+    "Error getting delegation points by staking transaction hashes",
+    { staking_tx_hash_hex: stakingTxHashHexes },
+  );
 
   return {
-    data: allDelegationPoints,
-    pagination: { next_key: nextPaginationKey || "" },
+    data: response.data,
   };
 };
