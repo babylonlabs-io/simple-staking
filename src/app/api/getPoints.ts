@@ -34,14 +34,14 @@ export interface DelegationsPoints {
 }
 
 export const getStakersPoints = async (
-  stakerBtcPk: string[],
+  stakerBtcPks: string[],
 ): Promise<StakerPoints[]> => {
   const params: Record<string, string> = {};
 
   params.staker_btc_pk =
-    stakerBtcPk.length > 1
-      ? stakerBtcPk.map(encode).join(",")
-      : encode(stakerBtcPk[0]);
+    stakerBtcPks.length > 1
+      ? stakerBtcPks.map(encode).join(",")
+      : encode(stakerBtcPks[0]);
 
   const response = await pointsApiWrapper(
     "GET",
