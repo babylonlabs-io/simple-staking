@@ -62,6 +62,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       publicKeyNoCoord={publicKeyNoCoord}
       delegationsAPI={delegationsAPI}
       isWalletConnected={isWalletConnected}
+      address={address}
     >
       <DelegationsContent
         delegationsAPI={delegationsAPI}

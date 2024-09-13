@@ -30,11 +30,18 @@ interface DelegationsPointsProviderProps {
   publicKeyNoCoord: string;
   delegationsAPI: Delegation[];
   isWalletConnected: boolean;
+  address: string;
 }
 
 export const DelegationsPointsProvider: React.FC<
   DelegationsPointsProviderProps
-> = ({ children, publicKeyNoCoord, delegationsAPI, isWalletConnected }) => {
+> = ({
+  children,
+  publicKeyNoCoord,
+  delegationsAPI,
+  isWalletConnected,
+  address,
+}) => {
   const [delegationPoints, setDelegationPoints] = useState<Map<string, number>>(
     new Map(),
   );
@@ -59,7 +66,7 @@ export const DelegationsPointsProvider: React.FC<
   };
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["delegationPoints", publicKeyNoCoord, delegationsAPI],
+    queryKey: ["delegationPoints", address, publicKeyNoCoord],
     queryFn: fetchAllPoints,
     enabled:
       isWalletConnected &&
