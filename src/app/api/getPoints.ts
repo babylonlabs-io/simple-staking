@@ -64,7 +64,5 @@ export const getDelegationPointsByStakingTxHashHexes = async (
     { staking_tx_hash_hex: stakingTxHashHexes },
   );
 
-  return {
-    data: response.data,
-  };
+  return response.data;
 };

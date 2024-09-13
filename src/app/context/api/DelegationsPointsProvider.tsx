@@ -33,6 +33,8 @@ interface DelegationsPointsProviderProps {
   address: string;
 }
 
+const MAX_DELEGATION_POINTS_BATCH_SIZE = 60;
+
 export const DelegationsPointsProvider: React.FC<
   DelegationsPointsProviderProps
 > = ({
@@ -48,14 +50,19 @@ export const DelegationsPointsProvider: React.FC<
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
   const fetchAllPoints = async () => {
-    const stakingTxHashHexes = delegationsAPI.map(
-      (delegation) => delegation.stakingTxHashHex,
-    );
+    const stakingTxHashHexes = delegationsAPI
+      .filter((delegation) => !delegation.isOverflow)
+      .map((delegation) => delegation.stakingTxHashHex);
 
-    const chunkSize = 100;
     const chunks = [];
-    for (let i = 0; i < stakingTxHashHexes.length; i += chunkSize) {
-      chunks.push(stakingTxHashHexes.slice(i, i + chunkSize));
+    for (
+      let i = 0;
+      i < stakingTxHashHexes.length;
+      i += MAX_DELEGATION_POINTS_BATCH_SIZE
+    ) {
+      chunks.push(
+        stakingTxHashHexes.slice(i, i + MAX_DELEGATION_POINTS_BATCH_SIZE),
+      );
     }
 
     const results = await Promise.all(
@@ -73,7 +80,7 @@ export const DelegationsPointsProvider: React.FC<
       delegationsAPI.length > 0 &&
       isApiNormal &&
       !isGeoBlocked,
-    refetchInterval: 60000, // Refetch every 60 seconds
+    refetchInterval: 300000, // Refetch every 5 minutes
     refetchOnWindowFocus: false,
   });
 
@@ -81,7 +88,12 @@ export const DelegationsPointsProvider: React.FC<
     if (data) {
       const newDelegationPoints = new Map<string, number>();
       data.forEach((point) => {
-        newDelegationPoints.set(point.staking_tx_hash_hex, point.staker.points);
+        if (point) {
+          newDelegationPoints.set(
+            point.staking_tx_hash_hex,
+            point.staker.points,
+          );
+        }
       });
       setDelegationPoints(newDelegationPoints);
     }
