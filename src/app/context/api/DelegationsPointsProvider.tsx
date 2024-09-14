@@ -11,6 +11,15 @@ interface PointsContextType {
   error: Error | null;
 }
 
+interface DelegationsPointsProviderProps {
+  children: React.ReactNode;
+  publicKeyNoCoord: string;
+  delegationsAPI: Delegation[];
+  isWalletConnected: boolean;
+  address: string;
+}
+
+const MAX_DELEGATION_POINTS_BATCH_SIZE = 60;
 const DelegationsPointsContext = createContext<PointsContextType | undefined>(
   undefined,
 );
@@ -24,16 +33,6 @@ export const useDelegationsPoints = () => {
   }
   return context;
 };
-
-interface DelegationsPointsProviderProps {
-  children: React.ReactNode;
-  publicKeyNoCoord: string;
-  delegationsAPI: Delegation[];
-  isWalletConnected: boolean;
-  address: string;
-}
-
-const MAX_DELEGATION_POINTS_BATCH_SIZE = 60;
 
 export const DelegationsPointsProvider: React.FC<
   DelegationsPointsProviderProps
@@ -82,6 +81,7 @@ export const DelegationsPointsProvider: React.FC<
       !isGeoBlocked,
     refetchInterval: 300000, // Refetch every 5 minutes
     refetchOnWindowFocus: false,
+    retry: 1,
   });
 
   useEffect(() => {
