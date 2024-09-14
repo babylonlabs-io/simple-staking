@@ -655,7 +655,7 @@ export const Staking: React.FC<StakingProps> = ({
             {previewReady && (
               <PreviewModal
                 open={previewModalOpen}
-                onClose={disableModalClose ? () => {} : handlePreviewModalClose}
+                onClose={handlePreviewModalClose}
                 onSign={handleSign}
                 finalityProvider={finalityProvider?.description.moniker}
                 stakingAmountSat={stakingAmountSat}
