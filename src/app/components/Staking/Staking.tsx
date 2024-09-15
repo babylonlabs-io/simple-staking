@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { networks, Transaction } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
@@ -27,8 +27,8 @@ import {
 } from "@/utils/delegations/signStakingTx";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import {
-  ParamsWithContext,
   getCurrentGlobalParamsVersion,
+  ParamsWithContext,
 } from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
