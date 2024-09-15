@@ -91,7 +91,8 @@ export const Staking: React.FC<StakingProps> = ({
     useState<FinalityProvider[]>();
   // Selected fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
-  const [disableModalClose, setDisableModalClose] = useState(false);
+  const [isAwaitingWalletResponse, setIsAwaitingWalletResponse] =
+    useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
@@ -227,7 +228,7 @@ export const Staking: React.FC<StakingProps> = ({
   ]);
 
   const handleResetState = () => {
-    setDisableModalClose(false);
+    setIsAwaitingWalletResponse(false);
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
     setStakingTimeBlocks(0);
@@ -246,7 +247,7 @@ export const Staking: React.FC<StakingProps> = ({
   const handleSign = async () => {
     try {
       // Prevent the modal from closing
-      setDisableModalClose(true);
+      setIsAwaitingWalletResponse(true);
       // Initial validation
       if (!btcWallet) throw new Error("Wallet is not connected");
       if (!address) throw new Error("Address is not set");
@@ -297,7 +298,7 @@ export const Staking: React.FC<StakingProps> = ({
         },
       });
     } finally {
-      setDisableModalClose(false);
+      setIsAwaitingWalletResponse(false);
     }
   };
 
@@ -665,7 +666,7 @@ export const Staking: React.FC<StakingProps> = ({
                 feeRate={feeRate}
                 unbondingTimeBlocks={unbondingTime}
                 unbondingFeeSat={unbondingFeeSat}
-                disableModalClose={disableModalClose}
+                isAwaitingWalletResponse={isAwaitingWalletResponse}
               />
             )}
           </div>

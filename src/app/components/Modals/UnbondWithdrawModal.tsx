@@ -20,7 +20,7 @@ interface PreviewModalProps {
   onClose: (value: boolean) => void;
   onProceed: () => void;
   mode: MODE;
-  disableModalClose: boolean;
+  isAwaitingWalletResponse: boolean;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -30,7 +30,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onClose,
   onProceed,
   mode,
-  disableModalClose,
+  isAwaitingWalletResponse,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
 
@@ -67,21 +67,21 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
       open={open}
       onClose={onClose}
       closeOnEsc={false}
-      disableModalClose={disableModalClose}
+      isAwaitingWalletResponse={isAwaitingWalletResponse}
       small
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => !disableModalClose && onClose(false)}
+          onClick={() => !isAwaitingWalletResponse && onClose(false)}
         >
           <IoMdClose size={24} />
         </button>
       </div>
       <div className="flex flex-col gap-4">
         <p className="text-left dark:text-neutral-content">{content}</p>
-        {disableModalClose ? (
+        {isAwaitingWalletResponse ? (
           <LoadingView text="Loading..." noBorder />
         ) : (
           <div className="flex gap-4">
