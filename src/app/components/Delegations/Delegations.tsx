@@ -98,6 +98,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
+  const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -149,6 +150,8 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   // It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
   const handleUnbond = async (id: string) => {
     try {
+      // Prevent the modal from closing
+      setAwaitingWalletResponse(true);
       // Sign the unbonding transaction
       const { delegation } = await signUnbondingTx(
         id,
@@ -171,6 +174,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -178,6 +182,8 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
     try {
+      // Prevent the modal from closing
+      setAwaitingWalletResponse(true);
       // Sign the withdrawal transaction
       const { delegation } = await signWithdrawalTx(
         id,
@@ -203,6 +209,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -343,6 +350,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
               : handleWithdraw(txID);
           }}
           mode={modalMode}
+          awaitingWalletResponse={awaitingWalletResponse}
         />
       )}
     </div>

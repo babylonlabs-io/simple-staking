@@ -8,6 +8,8 @@ interface GeneralModalProps {
   small?: boolean;
   children: ReactNode;
   className?: string;
+  closeOnOverlayClick?: boolean;
+  closeOnEsc?: boolean;
 }
 
 export const GeneralModal: React.FC<GeneralModalProps> = ({
@@ -16,6 +18,8 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   children,
   small,
   className = "",
+  closeOnOverlayClick,
+  closeOnEsc = true,
 }) => {
   const modalRef = useRef(null);
 
@@ -46,6 +50,8 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       }}
       showCloseIcon={false}
       blockScroll={false}
+      closeOnEsc={closeOnEsc}
+      closeOnOverlayClick={closeOnOverlayClick}
     >
       {children}
     </Modal>
