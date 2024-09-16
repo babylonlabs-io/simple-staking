@@ -52,12 +52,14 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">Preview</h3>
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => !isAwaitingWalletResponse && onClose(false)}
-        >
-          <IoMdClose size={24} />
-        </button>
+        {!isAwaitingWalletResponse && (
+          <button
+            className="btn btn-circle btn-ghost btn-sm"
+            onClick={() => onClose(false)}
+          >
+            <IoMdClose size={24} />
+          </button>
+        )}
       </div>
       <div className="flex flex-col gap-4 text-sm">
         <div className="flex flex-col gap-4 md:flex-row">
@@ -122,7 +124,10 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           created.
         </p>
         {isAwaitingWalletResponse ? (
-          <LoadingView text="Loading..." noBorder />
+          <LoadingView
+            text="Awaiting wallet signature and broadcast"
+            noBorder
+          />
         ) : (
           <div className="flex gap-4">
             <button

@@ -72,17 +72,22 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => !isAwaitingWalletResponse && onClose(false)}
-        >
-          <IoMdClose size={24} />
-        </button>
+        {!isAwaitingWalletResponse && (
+          <button
+            className="btn btn-circle btn-ghost btn-sm"
+            onClick={() => onClose(false)}
+          >
+            <IoMdClose size={24} />
+          </button>
+        )}
       </div>
       <div className="flex flex-col gap-4">
         <p className="text-left dark:text-neutral-content">{content}</p>
         {isAwaitingWalletResponse ? (
-          <LoadingView text="Loading..." noBorder />
+          <LoadingView
+            text="Awaiting wallet signature and broadcast"
+            noBorder
+          />
         ) : (
           <div className="flex gap-4">
             <button
