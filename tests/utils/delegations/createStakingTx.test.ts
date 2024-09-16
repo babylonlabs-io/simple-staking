@@ -1,4 +1,4 @@
-import { initBTCCurve } from "btc-staking-ts";
+import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
 

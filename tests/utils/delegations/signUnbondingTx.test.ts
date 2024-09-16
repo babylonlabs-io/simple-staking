@@ -1,5 +1,5 @@
+import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { Psbt, Transaction } from "bitcoinjs-lib";
-import { initBTCCurve } from "btc-staking-ts";
 
 import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 

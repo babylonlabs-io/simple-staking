@@ -1,4 +1,7 @@
-import { StakingScriptData, StakingScripts } from "btc-staking-ts";
+import {
+  StakingScriptData,
+  StakingScripts,
+} from "@babylonlabs-io/btc-staking-ts";
 
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getPublicKeyNoCoord } from "@/utils/wallet/index";

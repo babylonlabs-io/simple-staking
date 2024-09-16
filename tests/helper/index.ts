@@ -1,6 +1,9 @@
+import {
+  StakingScriptData,
+  StakingScripts,
+} from "@babylonlabs-io/btc-staking-ts";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
-import { StakingScriptData, StakingScripts } from "btc-staking-ts";
 import ECPairFactory from "ecpair";
 
 import { GlobalParamsVersion } from "@/app/types/globalParams";
