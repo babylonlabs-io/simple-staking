@@ -4,10 +4,12 @@ import { createStakingTx } from "@/utils/delegations/signStakingTx";
 
 import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
 
-describe("utils/delegations/createStakingTx", () => {
-  initBTCCurve();
-  testingNetworks.forEach(({ network, dataGenerator: dataGen }) => {
-    [true, false].forEach((isFixed) => {
+initBTCCurve();
+
+describe.each(testingNetworks)(
+  "utils/delegations/createStakingTx",
+  ({ network, dataGenerator: dataGen }) => {
+    describe.each([true, false])("isFixed %s", (isFixed) => {
       const randomFpKeys = dataGen.generateRandomKeyPair();
       const randomStakerKeys = dataGen.generateRandomKeyPair();
       const feeRate = DEFAULT_TEST_FEE_RATE;
@@ -205,5 +207,5 @@ describe("utils/delegations/createStakingTx", () => {
         });
       }
     });
-  });
-});
+  },
+);

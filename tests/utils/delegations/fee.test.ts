@@ -2,8 +2,9 @@ import { txFeeSafetyCheck } from "@/utils/delegations/fee";
 
 import { testingNetworks } from "../../helper";
 
-describe("txFeeSafetyCheck", () => {
-  testingNetworks.map(({ networkName, dataGenerator }) => {
+describe.each(testingNetworks)(
+  "txFeeSafetyCheck",
+  ({ networkName, dataGenerator }) => {
     const feeRate = dataGenerator.generateRandomFeeRates();
     const globalParams = dataGenerator.generateGlobalPramsVersions(
       dataGenerator.getRandomIntegerBetween(1, 10),
@@ -17,6 +18,7 @@ describe("txFeeSafetyCheck", () => {
       randomParam.activationHeight + 1,
     );
     const tx = signedPsbt.extractTransaction();
+
     describe(`on ${networkName} - `, () => {
       test("should not throw an error if the estimated fee is within the acceptable range", () => {
         let estimatedFee = (tx.virtualSize() * feeRate) / 2 + 1;
@@ -58,5 +60,5 @@ describe("txFeeSafetyCheck", () => {
         }).not.toThrow();
       });
     });
-  });
-});
+  },
+);
