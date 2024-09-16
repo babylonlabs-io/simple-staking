@@ -1,4 +1,5 @@
 import {
+  initBTCCurve,
   StakingScriptData,
   StakingScripts,
 } from "@babylonlabs-io/btc-staking-ts";
@@ -12,6 +13,7 @@ import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { UTXO } from "@/utils/wallet/wallet_provider";
 
 // Initialize the ECC library
+initBTCCurve();
 bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
 

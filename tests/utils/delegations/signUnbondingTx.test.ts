@@ -1,4 +1,3 @@
-import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { Psbt, Transaction } from "bitcoinjs-lib";
 
 import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
@@ -16,7 +15,6 @@ jest.mock("@/app/api/postUnbonding", () => ({
 }));
 
 describe("signUnbondingTx", () => {
-  initBTCCurve();
   const { network, dataGenerator } = testingNetworks[0];
   const randomTxId = dataGenerator.generateRandomTxId();
   const randomGlobalParamsVersions = dataGenerator.generateGlobalPramsVersions(
