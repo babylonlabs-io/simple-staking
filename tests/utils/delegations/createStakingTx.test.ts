@@ -1,10 +1,6 @@
-import { initBTCCurve } from "btc-staking-ts";
-
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
 
 import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
-
-initBTCCurve();
 
 describe.each(testingNetworks)(
   "utils/delegations/createStakingTx",

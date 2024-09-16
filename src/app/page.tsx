@@ -1,8 +1,8 @@
 "use client";
 
+import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
-import { initBTCCurve } from "btc-staking-ts";
 import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
