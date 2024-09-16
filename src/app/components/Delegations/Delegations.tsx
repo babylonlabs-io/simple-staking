@@ -98,8 +98,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
-  const [isAwaitingWalletResponse, setisAwaitingWalletResponse] =
-    useState(false);
+  const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -152,7 +151,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const handleUnbond = async (id: string) => {
     try {
       // Prevent the modal from closing
-      setisAwaitingWalletResponse(true);
+      setAwaitingWalletResponse(true);
       // Sign the unbonding transaction
       const { delegation } = await signUnbondingTx(
         id,
@@ -175,7 +174,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
-      setisAwaitingWalletResponse(false);
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -184,7 +183,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const handleWithdraw = async (id: string) => {
     try {
       // Prevent the modal from closing
-      setisAwaitingWalletResponse(true);
+      setAwaitingWalletResponse(true);
       // Sign the withdrawal transaction
       const { delegation } = await signWithdrawalTx(
         id,
@@ -210,7 +209,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
-      setisAwaitingWalletResponse(false);
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -351,7 +350,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
               : handleWithdraw(txID);
           }}
           mode={modalMode}
-          isAwaitingWalletResponse={isAwaitingWalletResponse}
+          awaitingWalletResponse={awaitingWalletResponse}
         />
       )}
     </div>

@@ -21,7 +21,7 @@ interface PreviewModalProps {
   unbondingTimeBlocks: number;
   confirmationDepth: number;
   unbondingFeeSat: number;
-  isAwaitingWalletResponse: boolean;
+  awaitingWalletResponse: boolean;
 }
 
 export const PreviewModal: React.FC<PreviewModalProps> = ({
@@ -36,7 +36,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   feeRate,
   confirmationDepth,
   unbondingFeeSat,
-  isAwaitingWalletResponse,
+  awaitingWalletResponse,
 }) => {
   const cardStyles =
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
@@ -47,12 +47,12 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
     <GeneralModal
       open={open}
       onClose={onClose}
-      closeOnOverlayClick={!isAwaitingWalletResponse}
+      closeOnOverlayClick={!awaitingWalletResponse}
       closeOnEsc={false}
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">Preview</h3>
-        {!isAwaitingWalletResponse && (
+        {!awaitingWalletResponse && (
           <button
             className="btn btn-circle btn-ghost btn-sm"
             onClick={() => onClose(false)}
@@ -123,7 +123,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
           &quot;Pending&quot; stake is only accessible through the device it was
           created.
         </p>
-        {isAwaitingWalletResponse ? (
+        {awaitingWalletResponse ? (
           <LoadingView
             text="Awaiting wallet signature and broadcast"
             noBorder

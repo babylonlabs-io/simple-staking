@@ -20,7 +20,7 @@ interface PreviewModalProps {
   onClose: (value: boolean) => void;
   onProceed: () => void;
   mode: MODE;
-  isAwaitingWalletResponse: boolean;
+  awaitingWalletResponse: boolean;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -30,7 +30,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onClose,
   onProceed,
   mode,
-  isAwaitingWalletResponse,
+  awaitingWalletResponse,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
 
@@ -67,12 +67,12 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
       open={open}
       onClose={onClose}
       closeOnEsc={false}
-      closeOnOverlayClick={!isAwaitingWalletResponse}
+      closeOnOverlayClick={!awaitingWalletResponse}
       small
     >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>
-        {!isAwaitingWalletResponse && (
+        {!awaitingWalletResponse && (
           <button
             className="btn btn-circle btn-ghost btn-sm"
             onClick={() => onClose(false)}
@@ -83,7 +83,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
       </div>
       <div className="flex flex-col gap-4">
         <p className="text-left dark:text-neutral-content">{content}</p>
-        {isAwaitingWalletResponse ? (
+        {awaitingWalletResponse ? (
           <LoadingView
             text="Awaiting wallet signature and broadcast"
             noBorder
