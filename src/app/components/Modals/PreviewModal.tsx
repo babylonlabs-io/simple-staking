@@ -47,7 +47,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
     <GeneralModal
       open={open}
       onClose={onClose}
-      isAwaitingWalletResponse={isAwaitingWalletResponse}
+      closeOnOverlayClick={!isAwaitingWalletResponse}
       closeOnEsc={false}
     >
       <div className="mb-4 flex items-center justify-between">

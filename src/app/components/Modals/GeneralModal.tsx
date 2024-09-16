@@ -8,7 +8,7 @@ interface GeneralModalProps {
   small?: boolean;
   children: ReactNode;
   className?: string;
-  isAwaitingWalletResponse?: boolean;
+  closeOnOverlayClick?: boolean;
   closeOnEsc?: boolean;
 }
 
@@ -18,7 +18,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
   children,
   small,
   className = "",
-  isAwaitingWalletResponse,
+  closeOnOverlayClick,
   closeOnEsc = true,
 }) => {
   const modalRef = useRef(null);
@@ -51,7 +51,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       showCloseIcon={false}
       blockScroll={false}
       closeOnEsc={closeOnEsc}
-      closeOnOverlayClick={!isAwaitingWalletResponse}
+      closeOnOverlayClick={closeOnOverlayClick}
     >
       {children}
     </Modal>

@@ -67,7 +67,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
       open={open}
       onClose={onClose}
       closeOnEsc={false}
-      isAwaitingWalletResponse={isAwaitingWalletResponse}
+      closeOnOverlayClick={!isAwaitingWalletResponse}
       small
     >
       <div className="mb-4 flex items-center justify-between">
