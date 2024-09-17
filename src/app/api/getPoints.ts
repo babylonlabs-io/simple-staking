@@ -4,12 +4,16 @@ import { Pagination } from "../types/api";
 
 import { pointsApiWrapper } from "./pointsApiWrapper";
 
-export interface StakerPoints {
+interface StakerPointsAPIResponse {
+  data: StakerPointsAPI[];
+}
+
+export interface StakerPointsAPI {
   staker_btc_pk: string;
   points: number;
 }
 
-export interface DelegationPoints {
+export interface DelegationPointsAPI {
   staking_tx_hash_hex: string;
   staker: {
     pk: string;
@@ -24,18 +28,14 @@ export interface DelegationPoints {
   expiry_height: number;
 }
 
-export interface PaginatedDelegationsPoints {
-  data: DelegationPoints[];
+interface PaginatedDelegationsPointsAPIResponse {
+  data: DelegationPointsAPI[];
   pagination: Pagination;
-}
-
-export interface DelegationsPoints {
-  data: DelegationPoints[];
 }
 
 export const getStakersPoints = async (
   stakerBtcPks: string[],
-): Promise<StakerPoints[]> => {
+): Promise<StakerPointsAPI[]> => {
   const params = new URLSearchParams();
 
   stakerBtcPks.forEach((pk) => {
@@ -49,13 +49,14 @@ export const getStakersPoints = async (
     params,
   );
 
-  return response.data;
+  const responseData: StakerPointsAPIResponse = response.data;
+  return responseData.data;
 };
 
 // Get delegation points by staking transaction hash hex
 export const getDelegationPointsByStakingTxHashHexes = async (
   stakingTxHashHexes: string[],
-): Promise<DelegationsPoints> => {
+): Promise<DelegationPointsAPI[]> => {
   const response = await pointsApiWrapper(
     "POST",
     "/v1/points/delegations",
@@ -63,5 +64,6 @@ export const getDelegationPointsByStakingTxHashHexes = async (
     { staking_tx_hash_hex: stakingTxHashHexes },
   );
 
-  return response.data;
+  const responseData: PaginatedDelegationsPointsAPIResponse = response.data;
+  return responseData.data;
 };
