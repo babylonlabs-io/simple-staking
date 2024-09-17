@@ -19,7 +19,7 @@ interface DelegationsPointsProviderProps {
   address: string;
 }
 
-const MAX_DELEGATION_POINTS_BATCH_SIZE = 60;
+const MAX_DELEGATION_POINTS_BATCH_SIZE = 200;
 const DelegationsPointsContext = createContext<PointsContextType | undefined>(
   undefined,
 );
@@ -68,7 +68,7 @@ export const DelegationsPointsProvider: React.FC<
       chunks.map((chunk) => getDelegationPointsByStakingTxHashHexes(chunk)),
     );
 
-    return results.flatMap((result) => result.data);
+    return results.flatMap((result) => result);
   };
 
   const { data, isLoading, error } = useQuery({
