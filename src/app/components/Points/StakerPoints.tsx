@@ -32,7 +32,7 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
   return (
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap font-semibold">
-        {points !== undefined ? points : 0}
+        {points !== undefined ? points.toFixed(3) : "n.a."}
       </p>
     </div>
   );
