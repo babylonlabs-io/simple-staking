@@ -25,7 +25,7 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap">
         <span className="lg:hidden">Points: </span>
-        {points !== undefined ? points : 0}
+        {points !== undefined ? points.toFixed(3) : "n.a."}
       </p>
     </div>
   );
