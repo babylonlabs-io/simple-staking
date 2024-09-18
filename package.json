@@ -1,6 +1,6 @@
 {
   "name": "simple-staking",
-  "version": "0.2.44",
+  "version": "0.2.45",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -33,7 +33,7 @@
     "btc-staking-ts": "^0.2.8",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.1.9",
-    "next": "14.1.3",
+    "next": "14.2.12",
     "next-themes": "^0.3.0",
     "react": "^18",
     "react-dom": "^18",
