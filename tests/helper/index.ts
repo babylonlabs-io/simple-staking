@@ -10,6 +10,7 @@ import ECPairFactory from "ecpair";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getPublicKeyNoCoord } from "@/utils/wallet";
 import { UTXO } from "@/utils/wallet/wallet_provider";
 
 // Initialize the ECC library
@@ -62,7 +63,7 @@ export class DataGenerator {
     return {
       keyPair,
       publicKey: pk,
-      noCoordPublicKey: pk.slice(2),
+      noCoordPublicKey: getPublicKeyNoCoord(pk).toString("hex"),
     };
   };
 
@@ -113,9 +114,9 @@ export class DataGenerator {
     const unbondingTime = this.generateRandomUnbondingTime(stakingTerm);
     const tag = this.generateRandomTag().toString("hex");
 
-    let minStakingTimeBlocks = Math.floor(Math.random() * 100);
+    let minStakingTimeBlocks = this.getRandomIntegerBetween(1, 100);
     let maxStakingTimeBlocks =
-      minStakingTimeBlocks + Math.floor(Math.random() * 1000);
+      minStakingTimeBlocks + this.getRandomIntegerBetween(1, 1000);
     if (isFixedTimelock) {
       maxStakingTimeBlocks = minStakingTimeBlocks;
     }

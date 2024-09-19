@@ -175,6 +175,7 @@ dist
 .svelte-kit
 
 ### VisualStudioCode ###
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -268,3 +269,4 @@ next-env.d.ts
 
 # E2E Chrome Extensions
 extensions
+

@@ -11,7 +11,7 @@ describe("globalParams", () => {
 
   beforeEach(() => {
     globalParams = dataGenerator.generateGlobalPramsVersions(
-      dataGenerator.getRandomIntegerBetween(1, 100),
+      dataGenerator.getRandomIntegerBetween(2, 100),
     );
     lastActivationHeight =
       globalParams[globalParams.length - 1].activationHeight;

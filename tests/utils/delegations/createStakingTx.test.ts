@@ -11,7 +11,6 @@ describe.each(testingNetworks)(
       const feeRate = DEFAULT_TEST_FEE_RATE;
       const { address: stakerTaprootAddress, scriptPubKey } =
         dataGen.getAddressAndScriptPubKey(randomStakerKeys.publicKey).taproot;
-
       const randomParam = dataGen.generateRandomGlobalParams(isFixed);
       const randomStakingAmount = dataGen.getRandomIntegerBetween(
         randomParam.minStakingAmountSat,
@@ -22,8 +21,8 @@ describe.each(testingNetworks)(
         randomParam.maxStakingTimeBlocks,
       );
       const randomInputUTXOs = dataGen.generateRandomUTXOs(
-        randomStakingAmount + Math.floor(Math.random() * 100000000),
-        Math.floor(Math.random() * 10) + 1,
+        randomStakingAmount + dataGen.getRandomIntegerBetween(0, 100000000),
+        dataGen.getRandomIntegerBetween(1, 10),
         scriptPubKey,
       );
       const testTermDescription = isFixed ? "fixed term" : "variable term";
