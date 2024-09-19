@@ -1,9 +1,9 @@
-import { Transaction, networks } from "bitcoinjs-lib";
 import {
   PsbtTransactionResult,
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
-} from "btc-staking-ts";
+} from "@babylonlabs-io/btc-staking-ts";
+import { Transaction, networks } from "bitcoinjs-lib";
 
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
@@ -91,7 +91,6 @@ export const signWithdrawalTx = async (
       address,
       btcWalletNetwork,
       feeRate.defaultFeeRate,
-      0,
     );
   } else {
     // Withdraw funds from a staking transaction in which the timelock naturally expired

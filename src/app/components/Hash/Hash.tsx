@@ -39,7 +39,7 @@ export const Hash: React.FC<HashProps> = ({
     <div
       className={`inline-flex min-h-[25px] cursor-pointer items-center ${
         !noFade && "opacity-50"
-      } hover:opacity-100`}
+      } hover:opacity-100 pointer-events-auto`}
       onClick={handleCopy}
     >
       <p

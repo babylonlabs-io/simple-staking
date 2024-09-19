@@ -1,5 +1,5 @@
+import { unbondingTransaction } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction, networks } from "bitcoinjs-lib";
-import { unbondingTransaction } from "btc-staking-ts";
 
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";

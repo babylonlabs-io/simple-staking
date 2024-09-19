@@ -5,6 +5,8 @@ import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 
+import { LoadingView } from "../Loading/Loading";
+
 import { GeneralModal } from "./GeneralModal";
 
 export const MODE_UNBOND = "unbond";
@@ -18,6 +20,7 @@ interface PreviewModalProps {
   onClose: (value: boolean) => void;
   onProceed: () => void;
   mode: MODE;
+  awaitingWalletResponse: boolean;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -27,6 +30,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onClose,
   onProceed,
   mode,
+  awaitingWalletResponse,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
 
@@ -59,37 +63,46 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const content = mode === MODE_UNBOND ? unbondContent : withdrawContent;
 
   return (
-    <GeneralModal open={open} onClose={onClose} small>
+    <GeneralModal
+      open={open}
+      onClose={onClose}
+      closeOnEsc={false}
+      closeOnOverlayClick={!awaitingWalletResponse}
+      small
+    >
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">{title}</h3>
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose(false)}
-        >
-          <IoMdClose size={24} />
-        </button>
+        {!awaitingWalletResponse && (
+          <button
+            className="btn btn-circle btn-ghost btn-sm"
+            onClick={() => onClose(false)}
+          >
+            <IoMdClose size={24} />
+          </button>
+        )}
       </div>
       <div className="flex flex-col gap-4">
         <p className="text-left dark:text-neutral-content">{content}</p>
-        <div className="flex gap-4">
-          <button
-            className="btn btn-outline flex-1"
-            onClick={() => {
-              onClose(false);
-            }}
-          >
-            Cancel
-          </button>
-          <button
-            className="btn-primary btn flex-1"
-            onClick={() => {
-              onClose(false);
-              onProceed();
-            }}
-          >
-            Proceed
-          </button>
-        </div>
+        {awaitingWalletResponse ? (
+          <LoadingView
+            text="Awaiting wallet signature and broadcast"
+            noBorder
+          />
+        ) : (
+          <div className="flex gap-4">
+            <button
+              className="btn btn-outline flex-1"
+              onClick={() => {
+                onClose(false);
+              }}
+            >
+              Cancel
+            </button>
+            <button className="btn-primary btn flex-1" onClick={onProceed}>
+              Proceed
+            </button>
+          </div>
+        )}
       </div>
     </GeneralModal>
   );

@@ -1,19 +1,16 @@
-import { initBTCCurve } from "btc-staking-ts";
-
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
 
 import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
 
-describe("utils/delegations/createStakingTx", () => {
-  initBTCCurve();
-  testingNetworks.forEach(({ network, dataGenerator: dataGen }) => {
-    [true, false].forEach((isFixed) => {
+describe.each(testingNetworks)(
+  "utils/delegations/createStakingTx",
+  ({ network, dataGenerator: dataGen }) => {
+    describe.each([true, false])("isFixed %s", (isFixed) => {
       const randomFpKeys = dataGen.generateRandomKeyPair();
       const randomStakerKeys = dataGen.generateRandomKeyPair();
       const feeRate = DEFAULT_TEST_FEE_RATE;
       const { address: stakerTaprootAddress, scriptPubKey } =
         dataGen.getAddressAndScriptPubKey(randomStakerKeys.publicKey).taproot;
-
       const randomParam = dataGen.generateRandomGlobalParams(isFixed);
       const randomStakingAmount = dataGen.getRandomIntegerBetween(
         randomParam.minStakingAmountSat,
@@ -24,8 +21,8 @@ describe("utils/delegations/createStakingTx", () => {
         randomParam.maxStakingTimeBlocks,
       );
       const randomInputUTXOs = dataGen.generateRandomUTXOs(
-        randomStakingAmount + Math.floor(Math.random() * 100000000),
-        Math.floor(Math.random() * 10) + 1,
+        randomStakingAmount + dataGen.getRandomIntegerBetween(0, 100000000),
+        dataGen.getRandomIntegerBetween(1, 10),
         scriptPubKey,
       );
       const testTermDescription = isFixed ? "fixed term" : "variable term";
@@ -205,5 +202,5 @@ describe("utils/delegations/createStakingTx", () => {
         });
       }
     });
-  });
-});
+  },
+);

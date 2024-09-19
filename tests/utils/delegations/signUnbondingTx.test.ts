@@ -1,10 +1,3 @@
-import { Psbt, Transaction } from "bitcoinjs-lib";
-import { initBTCCurve } from "btc-staking-ts";
-
-import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
-
-import { testingNetworks } from "../../helper";
-
 jest.mock("@/app/api/getUnbondingEligibility", () => ({
   getUnbondingEligibility: jest.fn(),
 }));
@@ -15,8 +8,16 @@ jest.mock("@/app/api/postUnbonding", () => ({
   postUnbonding: jest.fn(),
 }));
 
+import { Psbt, Transaction } from "bitcoinjs-lib";
+
+import { getGlobalParams } from "@/app/api/getGlobalParams";
+import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
+import { postUnbonding } from "@/app/api/postUnbonding";
+import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
+
+import { testingNetworks } from "../../helper";
+
 describe("signUnbondingTx", () => {
-  initBTCCurve();
   const { network, dataGenerator } = testingNetworks[0];
   const randomTxId = dataGenerator.generateRandomTxId();
   const randomGlobalParamsVersions = dataGenerator.generateGlobalPramsVersions(
@@ -30,11 +31,12 @@ describe("signUnbondingTx", () => {
         randomGlobalParamsVersions.length - 1,
       )
     ].activationHeight + 1;
-  const randomStakingTx = dataGenerator.createRandomStakingTx(
+  const { signedPsbt } = dataGenerator.createRandomStakingPsbt(
     randomGlobalParamsVersions,
     randomStakingTxHeight,
     stakerKeys,
   );
+  const signedPsbtTx = signedPsbt.extractTransaction();
   const mockedDelegationApi = [
     {
       stakingTxHashHex: randomTxId,
@@ -42,8 +44,9 @@ describe("signUnbondingTx", () => {
         dataGenerator.generateRandomKeyPair().noCoordPublicKey,
       stakingTx: {
         startHeight: randomStakingTxHeight,
-        timelock: randomStakingTx.locktime,
-        txHex: randomStakingTx.toHex(),
+        timelock: 150,
+        //timelock: signedPsbtTx.locktime,
+        txHex: signedPsbtTx.toHex(),
         outputIndex: 0,
       },
     },
@@ -90,10 +93,7 @@ describe("signUnbondingTx", () => {
   });
 
   it("should throw an error if the stakingTx is not eligible for unbonding", async () => {
-    const {
-      getUnbondingEligibility,
-    } = require("@/app/api/getUnbondingEligibility");
-    getUnbondingEligibility.mockImplementationOnce(async () => {
+    (getUnbondingEligibility as any).mockImplementationOnce(async () => {
       return false;
     });
 
@@ -109,15 +109,10 @@ describe("signUnbondingTx", () => {
   });
 
   it("should throw an error if global param is not loaded", async () => {
-    const {
-      getUnbondingEligibility,
-    } = require("@/app/api/getUnbondingEligibility");
-    getUnbondingEligibility.mockImplementationOnce(async () => {
+    (getUnbondingEligibility as any).mockImplementationOnce(async () => {
       return true;
     });
-
-    const { getGlobalParams } = require("@/app/api/getGlobalParams");
-    getGlobalParams.mockImplementationOnce(async () => {
+    (getGlobalParams as any).mockImplementationOnce(async () => {
       return [];
     });
 
@@ -133,15 +128,10 @@ describe("signUnbondingTx", () => {
   });
 
   it("should throw an error if the current version is not found", async () => {
-    const {
-      getUnbondingEligibility,
-    } = require("@/app/api/getUnbondingEligibility");
-    getUnbondingEligibility.mockImplementationOnce(async () => {
+    (getUnbondingEligibility as any).mockImplementationOnce(async () => {
       return true;
     });
-
-    const { getGlobalParams } = require("@/app/api/getGlobalParams");
-    getGlobalParams.mockImplementationOnce(async () => {
+    (getGlobalParams as any).mockImplementationOnce(async () => {
       return randomGlobalParamsVersions;
     });
 
@@ -167,18 +157,12 @@ describe("signUnbondingTx", () => {
   });
 
   it("should throw error if fail to signPsbtTx", async () => {
-    const {
-      getUnbondingEligibility,
-    } = require("@/app/api/getUnbondingEligibility");
-    getUnbondingEligibility.mockImplementationOnce(async () => {
+    (getUnbondingEligibility as any).mockImplementationOnce(async () => {
       return true;
     });
-
-    const { getGlobalParams } = require("@/app/api/getGlobalParams");
-    getGlobalParams.mockImplementationOnce(async () => {
+    (getGlobalParams as any).mockImplementationOnce(async () => {
       return randomGlobalParamsVersions;
     });
-
     mockedSignPsbtTx.mockRejectedValueOnce(new Error("oops!"));
 
     expect(
@@ -193,20 +177,13 @@ describe("signUnbondingTx", () => {
   });
 
   it("should return the signed unbonding transaction", async () => {
-    const {
-      getUnbondingEligibility,
-    } = require("@/app/api/getUnbondingEligibility");
-    getUnbondingEligibility.mockImplementationOnce(async () => {
+    (getUnbondingEligibility as any).mockImplementationOnce(async () => {
       return true;
     });
-
-    const { getGlobalParams } = require("@/app/api/getGlobalParams");
-    getGlobalParams.mockImplementationOnce(async () => {
+    (getGlobalParams as any).mockImplementationOnce(async () => {
       return randomGlobalParamsVersions;
     });
-
-    const { postUnbonding } = require("@/app/api/postUnbonding");
-    postUnbonding.mockImplementationOnce(async () => {
+    (postUnbonding as any).mockImplementationOnce(async () => {
       return;
     });
 

@@ -6,7 +6,11 @@ import React, {
   useState,
 } from "react";
 
-import { ErrorType, ShowErrorParams } from "@/app/types/errors";
+import {
+  ErrorHandlerParam,
+  ErrorType,
+  ShowErrorParams,
+} from "@/app/types/errors";
 
 const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
 
@@ -21,6 +25,12 @@ interface ErrorContextType {
   showError: (showErrorParams: ShowErrorParams) => void;
   hideError: () => void;
   noCancel?: boolean;
+  handleError: ({
+    error,
+    hasError,
+    errorState,
+    refetchFunction,
+  }: ErrorHandlerParam) => void;
 }
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
@@ -28,7 +38,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const [isNoCancel, setIsNoCancel] = useState(false);
   const [error, setError] = useState<ErrorType>({
     message: "",
-    errorTime: new Date(),
     errorState: undefined,
   });
   const [retryErrorAction, setRetryErrorAction] = useState<
@@ -50,13 +59,27 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     setTimeout(() => {
       setError({
         message: "",
-        errorTime: new Date(),
         errorState: undefined,
       });
       setRetryErrorAction(undefined);
       setIsNoCancel(false);
     }, 300);
   }, []);
+
+  const handleError = useCallback(
+    ({ error, hasError, errorState, refetchFunction }: ErrorHandlerParam) => {
+      if (hasError && error) {
+        showError({
+          error: {
+            message: error.message,
+            errorState: errorState,
+          },
+          retryAction: refetchFunction,
+        });
+      }
+    },
+    [showError],
+  );
 
   const value: ErrorContextType = {
     isErrorOpen: isErrorOpen,
@@ -65,6 +88,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     hideError,
     retryErrorAction,
     noCancel: isNoCancel,
+    handleError,
   };
 
   return (

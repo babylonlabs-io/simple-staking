@@ -1,5 +1,7 @@
 import { encode } from "url-safe-base64";
 
+import { isValidUrl } from "@/utils/url";
+
 import { Pagination } from "../types/api";
 import { FinalityProvider } from "../types/finalityProviders";
 
@@ -62,7 +64,9 @@ export const getFinalityProviders = async (
       description: {
         moniker: fp.description.moniker,
         identity: fp.description.identity,
-        website: fp.description.website,
+        website: isValidUrl(fp.description.website)
+          ? fp.description.website
+          : "",
         securityContact: fp.description.security_contact,
         details: fp.description.details,
       },
