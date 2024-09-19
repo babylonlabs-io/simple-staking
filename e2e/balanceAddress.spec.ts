@@ -1,20 +1,90 @@
-import { expect, test } from "@playwright/test";
+import { expect, Page, test } from "@playwright/test";
 
+import { satoshiToBtc } from "@/utils/btcConversions";
+import { maxDecimals } from "@/utils/maxDecimals";
+import { trim } from "@/utils/trim";
+
+import {
+  NATIVE_SEGWIT_MAINNET_ADDRESS,
+  NATIVE_SEGWIT_SIGNET_ADDRESS,
+  TAPROOT_MAINNET_ADDRESS,
+  TAPROOT_SIGNET_ADDRESS,
+} from "./constants/wallet";
 import { setupWalletConnection } from "./helper/connect";
+import { extractNumericBalance } from "./helper/utils";
+import { nativeSegwitMainnetBalance } from "./mock/mainnet/nativeSegwit/utxos";
+import { taprootMainnetBalance } from "./mock/mainnet/taproot/utxos";
+import { nativeSegwitSignetBalance } from "./mock/signet/nativeSegwit/utxos";
+import { taprootSignetBalance } from "./mock/signet/taproot/utxos";
+
+type Network = "mainnet" | "signet";
+type AddressType = "taproot" | "nativeSegwit";
+
+// Determine the network from environment variable or default to 'mainnet'
+const network: Network =
+  (process.env.NEXT_PUBLIC_NETWORK as Network) || "mainnet";
+
+// Define the address types to test
+const addressTypes: AddressType[] = ["taproot", "nativeSegwit"];
+
+// Mappings for expected addresses based on network and address type
+const expectedAddresses: Record<AddressType, Record<Network, string>> = {
+  taproot: {
+    mainnet: TAPROOT_MAINNET_ADDRESS,
+    signet: TAPROOT_SIGNET_ADDRESS,
+  },
+  nativeSegwit: {
+    mainnet: NATIVE_SEGWIT_MAINNET_ADDRESS,
+    signet: NATIVE_SEGWIT_SIGNET_ADDRESS,
+  },
+};
+
+// Mappings for expected balances based on network and address type
+const expectedBalances: Record<AddressType, Record<Network, number>> = {
+  taproot: {
+    mainnet: taprootMainnetBalance,
+    signet: taprootSignetBalance,
+  },
+  nativeSegwit: {
+    mainnet: nativeSegwitMainnetBalance,
+    signet: nativeSegwitSignetBalance,
+  },
+};
+
+// Reusable function for checking address
+async function checkAddress(page: Page, expectedAddress: string) {
+  const address = await page.getByTestId("address").textContent();
+  expect(address).toBe(trim(expectedAddress));
+}
+
+// Reusable function for checking balance
+async function checkBalance(page: Page, expectedBalance: number) {
+  const balanceText = await page.getByTestId("balance").textContent();
+  const balance = maxDecimals(extractNumericBalance(balanceText), 8);
+  expect(balance).toBe(satoshiToBtc(expectedBalance));
+}
 
 test.describe("Balance and address checks after connection", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto("/");
-    await setupWalletConnection(page);
-  });
+  // Iterate over each address type
+  for (const type of addressTypes) {
+    test.describe(`${type} address on ${network}`, () => {
+      // Setup wallet connection before each test
+      test.beforeEach(async ({ page }) => {
+        await setupWalletConnection(page, network, type);
+      });
 
-  test("balance is correct", async ({ page }) => {
-    const balance = await page.getByTestId("balance").textContent();
-    expect(balance).toBe("0.12345678 BTC");
-  });
+      test(`should verify the ${type} address and balance on ${network}`, async ({
+        page,
+      }) => {
+        const expectedAddress = expectedAddresses[type][network];
+        const expectedBalance = expectedBalances[type][network];
 
-  test("address is correct", async ({ page }) => {
-    const address = await page.getByTestId("address").textContent();
-    expect(address).toBe("bc1p...97sd");
-  });
+        // Perform address check
+        await checkAddress(page, expectedAddress);
+
+        // Perform balance check
+        await checkBalance(page, expectedBalance);
+      });
+    });
+  }
 });
