@@ -9,7 +9,6 @@ export enum ErrorState {
 export interface ErrorType {
   message: string;
   errorState?: ErrorState;
-  errorTime: Date;
 }
 
 export interface ErrorHandlerParam {

@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { networks, Transaction } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
@@ -16,7 +16,10 @@ import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
-import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import {
+  FinalityProvider,
+  FinalityProvider as FinalityProviderInterface,
+} from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
 import {
   createStakingTx,
@@ -24,8 +27,8 @@ import {
 } from "@/utils/delegations/signStakingTx";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import {
-  ParamsWithContext,
   getCurrentGlobalParamsVersion,
+  ParamsWithContext,
 } from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
@@ -54,13 +57,9 @@ interface OverflowProperties {
 
 interface StakingProps {
   btcHeight: number | undefined;
-  finalityProviders: FinalityProviderInterface[] | undefined;
   isWalletConnected: boolean;
   isLoading: boolean;
   onConnect: () => void;
-  finalityProvidersFetchNext: () => void;
-  finalityProvidersHasNext: boolean;
-  finalityProvidersIsFetchingMore: boolean;
   btcWallet: WalletProvider | undefined;
   btcWalletBalanceSat?: number;
   btcWalletNetwork: networks.Network | undefined;
@@ -72,12 +71,8 @@ interface StakingProps {
 
 export const Staking: React.FC<StakingProps> = ({
   btcHeight,
-  finalityProviders,
   isWalletConnected,
   onConnect,
-  finalityProvidersFetchNext,
-  finalityProvidersHasNext,
-  finalityProvidersIsFetchingMore,
   isLoading,
   btcWallet,
   btcWalletNetwork,
@@ -92,8 +87,11 @@ export const Staking: React.FC<StakingProps> = ({
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
+  const [finalityProviders, setFinalityProviders] =
+    useState<FinalityProvider[]>();
   // Selected fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
+  const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [resetFormInputs, setResetFormInputs] = useState(false);
   const [feedbackModal, setFeedbackModal] = useState<{
@@ -209,7 +207,6 @@ export const Staking: React.FC<StakingProps> = ({
           error: {
             message: error.message,
             errorState,
-            errorTime: new Date(),
           },
           retryAction: refetchFunction,
         });
@@ -230,6 +227,7 @@ export const Staking: React.FC<StakingProps> = ({
   ]);
 
   const handleResetState = () => {
+    setAwaitingWalletResponse(false);
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
     setStakingTimeBlocks(0);
@@ -247,6 +245,8 @@ export const Staking: React.FC<StakingProps> = ({
 
   const handleSign = async () => {
     try {
+      // Prevent the modal from closing
+      setAwaitingWalletResponse(true);
       // Initial validation
       if (!btcWallet) throw new Error("Wallet is not connected");
       if (!address) throw new Error("Address is not set");
@@ -284,7 +284,6 @@ export const Staking: React.FC<StakingProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.STAKING,
-          errorTime: new Date(),
         },
         noCancel: true,
         retryAction: () => {
@@ -297,6 +296,8 @@ export const Staking: React.FC<StakingProps> = ({
           queryClient.invalidateQueries({ queryKey: [UTXO_KEY, address] });
         },
       });
+    } finally {
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -380,7 +381,6 @@ export const Staking: React.FC<StakingProps> = ({
           error: {
             message: errorMsg,
             errorState: ErrorState.STAKING,
-            errorTime: new Date(),
           },
           retryAction: () => setSelectedFeeRate(0),
         });
@@ -429,7 +429,6 @@ export const Staking: React.FC<StakingProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.STAKING,
-          errorTime: new Date(),
         },
         retryAction: () => handleChooseFinalityProvider(btcPkHex),
       });
@@ -666,6 +665,7 @@ export const Staking: React.FC<StakingProps> = ({
                 feeRate={feeRate}
                 unbondingTimeBlocks={unbondingTime}
                 unbondingFeeSat={unbondingFeeSat}
+                awaitingWalletResponse={awaitingWalletResponse}
               />
             )}
           </div>
@@ -680,14 +680,9 @@ export const Staking: React.FC<StakingProps> = ({
       <div className="flex flex-col gap-4 lg:flex-row">
         <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
           <FinalityProviders
-            finalityProviders={finalityProviders}
+            onFinalityProvidersLoad={setFinalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
-            queryMeta={{
-              next: finalityProvidersFetchNext,
-              hasMore: finalityProvidersHasNext,
-              isFetchingMore: finalityProvidersIsFetchingMore,
-            }}
           />
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />

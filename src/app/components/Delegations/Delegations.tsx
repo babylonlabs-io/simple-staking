@@ -5,7 +5,9 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
+import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { QueryMeta } from "@/app/types/api";
 import {
   Delegation as DelegationInterface,
@@ -29,7 +31,6 @@ import {
 import { Delegation } from "./Delegation";
 
 interface DelegationsProps {
-  finalityProvidersKV: Record<string, string>;
   delegationsAPI: DelegationInterface[];
   delegationsLocalStorage: DelegationInterface[];
   globalParamsVersion: GlobalParamsVersion;
@@ -40,25 +41,64 @@ interface DelegationsProps {
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
   getNetworkFees: WalletProvider["getNetworkFees"];
+  isWalletConnected: boolean;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
-  finalityProvidersKV,
   delegationsAPI,
   delegationsLocalStorage,
   globalParamsVersion,
-  publicKeyNoCoord,
-  btcWalletNetwork,
-  address,
   signPsbtTx,
   pushTx,
   queryMeta,
   getNetworkFees,
+  address,
+  btcWalletNetwork,
+  publicKeyNoCoord,
+  isWalletConnected,
+}) => {
+  return (
+    <DelegationsPointsProvider
+      publicKeyNoCoord={publicKeyNoCoord}
+      delegationsAPI={delegationsAPI}
+      isWalletConnected={isWalletConnected}
+      address={address}
+    >
+      <DelegationsContent
+        delegationsAPI={delegationsAPI}
+        delegationsLocalStorage={delegationsLocalStorage}
+        globalParamsVersion={globalParamsVersion}
+        signPsbtTx={signPsbtTx}
+        pushTx={pushTx}
+        queryMeta={queryMeta}
+        getNetworkFees={getNetworkFees}
+        address={address}
+        btcWalletNetwork={btcWalletNetwork}
+        publicKeyNoCoord={publicKeyNoCoord}
+        isWalletConnected={isWalletConnected}
+      />
+    </DelegationsPointsProvider>
+  );
+};
+
+const DelegationsContent: React.FC<DelegationsProps> = ({
+  delegationsAPI,
+  delegationsLocalStorage,
+  globalParamsVersion,
+  signPsbtTx,
+  pushTx,
+  queryMeta,
+  getNetworkFees,
+  address,
+  btcWalletNetwork,
+  publicKeyNoCoord,
 }) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
+  const { isApiNormal, isGeoBlocked } = useHealthCheck();
+  const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
 
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
@@ -110,6 +150,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
   // It constructs an unbonding transaction, creates a signature for it, and submits both to the back-end API
   const handleUnbond = async (id: string) => {
     try {
+      // Prevent the modal from closing
+      setAwaitingWalletResponse(true);
       // Sign the unbonding transaction
       const { delegation } = await signUnbondingTx(
         id,
@@ -125,7 +167,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.UNBONDING,
-          errorTime: new Date(),
         },
         retryAction: () => handleModal(id, MODE_UNBOND),
       });
@@ -133,6 +174,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -140,6 +182,8 @@ export const Delegations: React.FC<DelegationsProps> = ({
   // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
     try {
+      // Prevent the modal from closing
+      setAwaitingWalletResponse(true);
       // Sign the withdrawal transaction
       const { delegation } = await signWithdrawalTx(
         id,
@@ -158,7 +202,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.WITHDRAW,
-          errorTime: new Date(),
         },
         retryAction: () => handleModal(id, MODE_WITHDRAW),
       });
@@ -166,6 +209,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
+      setAwaitingWalletResponse(false);
     }
   };
 
@@ -235,11 +279,14 @@ export const Delegations: React.FC<DelegationsProps> = ({
         </div>
       ) : (
         <>
-          <div className="hidden grid-cols-5 gap-2 px-4 lg:grid">
+          <div className="hidden grid-cols-6 gap-2 px-4 lg:grid">
             <p>Amount</p>
             <p>Inception</p>
             <p className="text-center">Transaction hash</p>
             <p className="text-center">Status</p>
+            {isApiNormal && !isGeoBlocked && (
+              <p className="text-center">Points</p>
+            )}
             <p>Action</p>
           </div>
           <div
@@ -264,9 +311,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
                   state,
                   isOverflow,
                 } = delegation;
-                // Get the moniker of the finality provider
-                const finalityProviderMoniker =
-                  finalityProvidersKV[finalityProviderPkHex];
                 const intermediateDelegation =
                   intermediateDelegationsLocalStorage.find(
                     (item) => item.stakingTxHashHex === stakingTxHashHex,
@@ -275,7 +319,6 @@ export const Delegations: React.FC<DelegationsProps> = ({
                 return (
                   <Delegation
                     key={stakingTxHashHex + stakingTx.startHeight}
-                    finalityProviderMoniker={finalityProviderMoniker}
                     stakingTx={stakingTx}
                     stakingValueSat={stakingValueSat}
                     stakingTxHash={stakingTxHashHex}
@@ -307,6 +350,7 @@ export const Delegations: React.FC<DelegationsProps> = ({
               : handleWithdraw(txID);
           }}
           mode={modalMode}
+          awaitingWalletResponse={awaitingWalletResponse}
         />
       )}
     </div>

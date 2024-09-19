@@ -1,3 +1,6 @@
+@import "react-responsive-modal/styles.css";
+@import "react-tooltip/dist/react-tooltip.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

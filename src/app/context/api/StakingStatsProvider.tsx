@@ -51,7 +51,6 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
         error: {
           message: error.message,
           errorState: ErrorState.SERVER_ERROR,
-          errorTime: new Date(),
         },
         retryAction: refetch,
       });

@@ -1,14 +1,20 @@
+import {
+  initBTCCurve,
+  StakingScriptData,
+  StakingScripts,
+} from "@babylonlabs-io/btc-staking-ts";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
-import { StakingScriptData, StakingScripts } from "btc-staking-ts";
 import ECPairFactory from "ecpair";
 
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getPublicKeyNoCoord } from "@/utils/wallet";
 import { UTXO } from "@/utils/wallet/wallet_provider";
 
 // Initialize the ECC library
+initBTCCurve();
 bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
 
@@ -28,6 +34,17 @@ export class DataGenerator {
     this.network = network;
   }
 
+  generateRandomString = (length: number): string => {
+    const characters =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let result = "";
+    const charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+  };
+
   generateRandomTxId = () => {
     const randomBuffer = Buffer.alloc(32);
     for (let i = 0; i < 32; i++) {
@@ -46,7 +63,7 @@ export class DataGenerator {
     return {
       keyPair,
       publicKey: pk,
-      noCoordPublicKey: pk.slice(2),
+      noCoordPublicKey: getPublicKeyNoCoord(pk).toString("hex"),
     };
   };
 
@@ -97,9 +114,9 @@ export class DataGenerator {
     const unbondingTime = this.generateRandomUnbondingTime(stakingTerm);
     const tag = this.generateRandomTag().toString("hex");
 
-    let minStakingTimeBlocks = Math.floor(Math.random() * 100);
+    let minStakingTimeBlocks = this.getRandomIntegerBetween(1, 100);
     let maxStakingTimeBlocks =
-      minStakingTimeBlocks + Math.floor(Math.random() * 1000);
+      minStakingTimeBlocks + this.getRandomIntegerBetween(1, 1000);
     if (isFixedTimelock) {
       maxStakingTimeBlocks = minStakingTimeBlocks;
     }
@@ -121,7 +138,7 @@ export class DataGenerator {
     const prev = previousPram ? previousPram : defaultParams;
 
     return {
-      version: prev.version ? prev.version + 1 : 0,
+      version: prev.version + 1,
       activationHeight:
         prev.activationHeight + this.getRandomIntegerBetween(0, 10000),
       stakingCapSat:
@@ -135,7 +152,7 @@ export class DataGenerator {
       minStakingAmountSat,
       maxStakingTimeBlocks,
       minStakingTimeBlocks,
-      confirmationDepth: Math.floor(Math.random() * 20),
+      confirmationDepth: this.getRandomIntegerBetween(1, 20),
       unbondingTime,
       tag,
     };
@@ -152,6 +169,7 @@ export class DataGenerator {
       versions.push(
         this.generateRandomGlobalParams(isFixedTimelock, lastVersion),
       );
+      lastVersion = versions[i];
     }
     return versions;
   };
@@ -242,7 +260,7 @@ export class DataGenerator {
     };
   };
 
-  createRandomStakingTx = (
+  createRandomStakingPsbt = (
     globalParams: GlobalParamsVersion[],
     txHeight: number,
     stakerKeysPairs?: KeyPairs,
@@ -283,10 +301,17 @@ export class DataGenerator {
         scriptPubKey,
       ),
     );
-    return unsignedStakingPsbt
+
+    const unsignedPsbt = unsignedStakingPsbt;
+
+    const signedPsbt = unsignedStakingPsbt
       .signAllInputs(stakerKeys.keyPair)
-      .finalizeAllInputs()
-      .extractTransaction();
+      .finalizeAllInputs();
+
+    return {
+      unsignedPsbt,
+      signedPsbt,
+    };
   };
 
   private getTaprootAddress = (publicKey: string) => {

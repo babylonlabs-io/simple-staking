@@ -175,6 +175,7 @@ dist
 .svelte-kit
 
 ### VisualStudioCode ###
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
@@ -259,3 +260,13 @@ yarn-error.log*
 next-env.d.ts
 
 .env
+
+# E2E Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+
+# E2E Chrome Extensions
+extensions
+
