@@ -110,6 +110,7 @@ export const signWithdrawalTx = async (
 
   // Sign the withdrawal transaction
   let withdrawalTx: Transaction;
+
   try {
     const { psbt } = withdrawPsbtTxResult;
     withdrawalTx = await signPsbtTx(psbt.toHex());
