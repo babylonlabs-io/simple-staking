@@ -1,4 +1,5 @@
 import React from "react";
+import { NumericFormat } from "react-number-format";
 
 import { useDelegationsPoints } from "@/app/context/api/DelegationsPointsProvider";
 
@@ -25,7 +26,16 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap">
         <span className="lg:hidden">Points: </span>
-        {points !== undefined ? points.toFixed(3) : "n.a."}
+        {points !== undefined ? (
+          <NumericFormat
+            value={points.toFixed(3)}
+            displayType="text"
+            thousandSeparator=","
+            decimalSeparator="."
+          />
+        ) : (
+          "n.a."
+        )}
       </p>
     </div>
   );
