@@ -5,14 +5,14 @@ export const interceptRequest = async (
   page: Page,
   urlPattern: string,
   status: number,
-  body: Record<string, any> = {},
+  body: any = {},
   contentType: string = "application/json",
 ): Promise<void> => {
   await page.route(urlPattern, async (route) => {
     await route.fulfill({
       status,
       contentType,
-      body: JSON.stringify(body),
+      body: typeof body === "string" ? body : JSON.stringify(body),
     });
   });
 };

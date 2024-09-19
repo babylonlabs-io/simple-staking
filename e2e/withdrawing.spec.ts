@@ -2,67 +2,129 @@ import { expect, test } from "@playwright/test";
 
 import { DelegationState } from "@/app/types/delegations";
 import { getState } from "@/utils/getState";
+import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { getPublicKeyNoCoord } from "@/utils/wallet";
 
 import { setupWalletConnection } from "./helper/connect";
 import { interceptRequest } from "./helper/interceptRequest";
-import { unbondedTX } from "./mock/tx/withdrawing";
+import { mockNetwork } from "./helper/mockNetwork";
+import { nativeSegwitMainnetUnbondedTX } from "./mock/mainnet/wallet/nativeSegwit/withdrawing";
+import { taprootMainnetUnbondedTX } from "./mock/mainnet/wallet/taproot/withdrawing";
+import { nativeSegwitSignetUnbondedTX } from "./mock/signet/wallet/nativeSegwit/withdrawing";
+import { taprootSignetUnbondedTX } from "./mock/signet/wallet/taproot/withdrawing";
+
+// Define the network and address types
+type Network = "mainnet" | "signet";
+type AddressType = "taproot" | "nativeSegwit";
+
+// Determine the network from the environment variable or default to 'mainnet'
+const network: Network =
+  (process.env.NEXT_PUBLIC_NETWORK as Network) || "mainnet";
+
+// Define the address types to test
+const addressTypes: AddressType[] = ["taproot", "nativeSegwit"];
+
+// Mapping for unbonded transactions based on network and address type
+const unbondedTXMap: Record<AddressType, Record<Network, any>> = {
+  nativeSegwit: {
+    mainnet: nativeSegwitMainnetUnbondedTX,
+    signet: nativeSegwitSignetUnbondedTX,
+  },
+  taproot: {
+    mainnet: taprootMainnetUnbondedTX,
+    signet: taprootSignetUnbondedTX,
+  },
+};
 
 test.describe("Create withdrawing transaction", () => {
-  test("prepare the withdrawing", async ({ page }) => {
-    // Intercept the GET request for delegations
-    await interceptRequest(page, "**/v1/staker/delegations**", 200, unbondedTX);
-    // Intercept the Mempool POST request for withdrawing
-    await interceptRequest(page, "**/api/tx", 200, {
-      tx: "536af306eac15c7d87d852c601f52a23c2242f53c8c5f803c11befce090c3616",
+  // Iterate over each address type
+  for (const type of addressTypes) {
+    test.describe(`${type} address on ${network}`, () => {
+      // Mock the network
+      test.beforeEach(async ({ page }) => {
+        await mockNetwork(page, network);
+      });
+
+      test(`prepare the withdrawing using ${type}`, async ({ page }) => {
+        // Intercept the GET request for delegations
+        await interceptRequest(
+          page,
+          "**/v1/staker/delegations**",
+          200,
+          unbondedTXMap[type][network],
+        );
+
+        // Setup wallet connection
+        await setupWalletConnection(page, network, type);
+
+        // Initiate withdrawal
+        await page.getByRole("button", { name: "Withdraw" }).click();
+        await page.getByRole("button", { name: "Proceed" }).click();
+
+        // Verify the intermediate withdrawal state
+        await expect(
+          page.getByText(getState(DelegationState.INTERMEDIATE_WITHDRAWAL)),
+        ).toBeVisible();
+
+        // Retrieve the public key from the wallet
+        const publicKeyHex = await page.evaluate(
+          async () => await window.btcwallet.getPublicKeyHex(),
+        );
+        const publicKeyNoCoord =
+          getPublicKeyNoCoord(publicKeyHex).toString("hex");
+
+        // Verify the local storage has the correct staking details
+        const item = await page.evaluate(
+          (key: string) => localStorage.getItem(key),
+          getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord),
+        );
+
+        expect(item).not.toBeNull();
+        const parsed = JSON.parse(item as string);
+        expect(parsed).toHaveLength(1);
+        expect(parsed[0].state).toBe(DelegationState.INTERMEDIATE_WITHDRAWAL);
+      });
+
+      test(`withdrawn for ${type} on ${network}`, async ({ page }) => {
+        // Modify the unbondedTX to reflect "withdrawn"
+        const updatedTX = {
+          ...unbondedTXMap[type][network],
+          data: unbondedTXMap[type][network].data.map((tx: any) => ({
+            ...tx,
+            state: DelegationState.WITHDRAWN,
+          })),
+        };
+
+        // Intercept the GET request for updated delegation
+        await interceptRequest(
+          page,
+          "**/v1/staker/delegations**",
+          200,
+          updatedTX,
+        );
+
+        // Setup wallet connection
+        await setupWalletConnection(page, network, type);
+
+        // Verify the withdrawn state is visible
+        await expect(page.getByText("Withdrawn")).toBeVisible();
+
+        // Retrieve the public key from the wallet
+        const publicKeyHex = await page.evaluate(
+          async () => await window.btcwallet.getPublicKeyHex(),
+        );
+        const publicKeyNoCoord =
+          getPublicKeyNoCoord(publicKeyHex).toString("hex");
+
+        // Verify the local storage has been cleared
+        const item = await page.evaluate(
+          (key: string) => localStorage.getItem(key),
+          getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord),
+        );
+        expect(item).toBe("[]");
+        const parsed = JSON.parse(item as string);
+        expect(parsed).toHaveLength(0);
+      });
     });
-    await page.goto("/");
-    await setupWalletConnection(page);
-
-    // withdraw -> proceed
-    await page.getByRole("button", { name: "Withdraw" }).click();
-    await page.getByRole("button", { name: "Proceed" }).click();
-
-    // expect the withdrawal state text instead of a button
-    await expect(
-      page.getByText(getState(DelegationState.INTERMEDIATE_WITHDRAWAL)),
-    ).toBeVisible();
-
-    // check for local storage
-    const item = await page.evaluate(() =>
-      localStorage.getItem(
-        "bbn-staking-intermediate-delegations-4c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-      ),
-    );
-    expect(item).not.toBeNull();
-    const parsed = JSON.parse(item as string);
-    expect(parsed).toHaveLength(1);
-    expect(parsed[0].state).toBe(DelegationState.INTERMEDIATE_WITHDRAWAL);
-  });
-
-  test("withdrawn", async ({ page }) => {
-    // Modify the activeTX to reflect "withdrawn"
-    const updatedTX = {
-      ...unbondedTX,
-      data: unbondedTX.data.map((tx) => ({
-        ...tx,
-        state: DelegationState.WITHDRAWN,
-      })),
-    };
-
-    // Intercept the GET request for updated delegation
-    await interceptRequest(page, "**/v1/staker/delegations**", 200, updatedTX);
-    await page.goto("/");
-    await setupWalletConnection(page);
-    await expect(page.getByText("Withdrawn")).toBeVisible();
-
-    // check for local storage
-    const item = await page.evaluate(() =>
-      localStorage.getItem(
-        "bbn-staking-intermediate-delegations-4c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-      ),
-    );
-    expect(item).toBe("[]");
-    const parsed = JSON.parse(item as string);
-    expect(parsed).toHaveLength(0);
-  });
+  }
 });

@@ -17,26 +17,28 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
-    "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:mainnet": "NEXT_PUBLIC_NETWORK=mainnet playwright test",
+    "test:e2e:signet": "NEXT_PUBLIC_NETWORK=signet playwright test",
+    "test:e2e:full": "npm run test:e2e:mainnet && npm run test:e2e:signet"
   },
   "engines": {
     "node": "22.3.0"
   },
   "dependencies": {
+    "@babylonlabs-io/btc-staking-ts": "0.3.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@keystonehq/animated-qr": "^0.8.6",
     "@keystonehq/keystone-sdk": "^0.4.1",
     "@keystonehq/sdk": "0.21.3",
-    "@scure/bip32": "^1.4.0",
+    "@scure/bip32": "1.4.0",
+    "@scure/bip39": "1.4.0",
     "@tanstack/react-query": "^5.28.14",
     "@tanstack/react-query-next-experimental": "^5.28.14",
     "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.7.4",
     "bitcoinjs-lib": "6.1.5",
-    "@babylonlabs-io/btc-staking-ts": "0.3.0",
     "date-fns": "^3.6.0",
     "decimal.js-light": "^2.5.1",
     "framer-motion": "^11.1.9",
@@ -59,6 +61,8 @@
     "@babel/preset-env": "^7.24.7",
     "@babel/preset-react": "^7.24.7",
     "@babel/preset-typescript": "^7.24.7",
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@playwright/test": "^1.46.0",
     "@tanstack/eslint-plugin-query": "^5.28.11",
     "@tanstack/react-query-devtools": "^5.28.14",
@@ -72,7 +76,9 @@
     "babel-jest": "^29.7.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "daisyui": "^4.11.1",
+    "dotenv": "^16.4.5",
     "ecpair": "^2.1.0",
+    "esbuild": "^0.24.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.1.3",
     "eslint-config-prettier": "^9.1.0",
@@ -89,6 +95,6 @@
     "text-encoding": "^0.7.0",
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5.6.2"
   }
 }
