@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
+import { NumericFormat } from "react-number-format";
 
 import { getStakersPoints } from "@/app/api/getPoints";
 
@@ -32,7 +33,16 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
   return (
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap font-semibold">
-        {points !== undefined ? points.toFixed(3) : "n.a."}
+        {points !== undefined ? (
+          <NumericFormat
+            value={points.toFixed(3)}
+            displayType="text"
+            thousandSeparator=","
+            decimalSeparator="."
+          />
+        ) : (
+          "n.a."
+        )}
       </p>
     </div>
   );
