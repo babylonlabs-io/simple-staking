@@ -7,6 +7,7 @@ import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface HeaderProps {
+  loading?: boolean;
   onConnect: () => void;
   address: string;
   btcWalletBalanceSat?: number;
@@ -14,6 +15,7 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({
+  loading,
   onConnect,
   address,
   btcWalletBalanceSat,
@@ -32,6 +34,7 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </div>
           <ConnectSmall
+            loading={loading}
             onConnect={onConnect}
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
@@ -43,6 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
           className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
         >
           <ConnectedSmall
+            loading={loading}
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}

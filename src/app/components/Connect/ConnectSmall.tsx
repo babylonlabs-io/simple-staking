@@ -16,6 +16,7 @@ import { Hash } from "../Hash/Hash";
 import { LoadingSmall } from "../Loading/Loading";
 
 interface ConnectSmallProps {
+  loading?: boolean;
   onConnect: () => void;
   address: string;
   btcWalletBalanceSat?: number;
@@ -23,6 +24,7 @@ interface ConnectSmallProps {
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
+  loading = false,
   onConnect,
   address,
   btcWalletBalanceSat,
@@ -65,20 +67,22 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
         className="flex cursor-pointer outline-none items-stretch"
         onClick={() => setShowMenu(!showMenu)}
       >
-        <div className="flex items-center rounded-lg border border-base-200/75 p-2 pr-4">
-          <div className="flex items-center gap-1">
-            <FaBitcoin className="text-primary" />
-            {typeof btcWalletBalanceSat === "number" ? (
-              <p>
-                <strong>
-                  {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)} {coinName}
-                </strong>
-              </p>
-            ) : (
-              <LoadingSmall text="Loading..." />
-            )}
+        {(typeof btcWalletBalanceSat === "number" || loading) && (
+          <div className="flex items-center rounded-lg border border-base-200/75 p-2 pr-4">
+            <div className="flex items-center gap-1">
+              <FaBitcoin className="text-primary" />
+              {typeof btcWalletBalanceSat === "number" && (
+                <p>
+                  <strong>
+                    {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)}{" "}
+                    {coinName}
+                  </strong>
+                </p>
+              )}
+              {loading && <LoadingSmall text="Loading..." />}
+            </div>
           </div>
-        </div>
+        )}
         <div
           className="relative right-[10px] flex items-center rounded-lg border border-primary bg-[#fdf2ec] p-2 dark:border-white dark:bg-base-200"
           data-testid="address"

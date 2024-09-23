@@ -57,6 +57,7 @@ interface OverflowProperties {
 
 interface StakingProps {
   btcHeight: number | undefined;
+  disabled?: boolean;
   isWalletConnected: boolean;
   isLoading: boolean;
   onConnect: () => void;
@@ -71,6 +72,7 @@ interface StakingProps {
 
 export const Staking: React.FC<StakingProps> = ({
   btcHeight,
+  disabled = false,
   isWalletConnected,
   onConnect,
   isLoading,
@@ -115,6 +117,7 @@ export const Staking: React.FC<StakingProps> = ({
   // Fetch fee rates, sat/vB
   const {
     data: mempoolFeeRates,
+    isLoading: areMempoolFeeRatesLoading,
     error: mempoolFeeRatesError,
     isError: hasMempoolFeeRatesError,
     refetch: refetchMempoolFeeRates,
@@ -136,7 +139,7 @@ export const Staking: React.FC<StakingProps> = ({
 
   // load global params and calculate the current staking params
   const globalParams = useGlobalParams();
-  useMemo(() => {
+  useEffect(() => {
     if (!btcHeight || !globalParams.data) {
       return;
     }
@@ -148,7 +151,7 @@ export const Staking: React.FC<StakingProps> = ({
   }, [btcHeight, globalParams]);
 
   // Calculate the overflow properties
-  useMemo(() => {
+  useEffect(() => {
     if (!paramWithCtx || !paramWithCtx.currentVersion || !btcHeight) {
       return;
     }
@@ -519,14 +522,16 @@ export const Staking: React.FC<StakingProps> = ({
     );
   };
 
+  const hasError = disabled || hasMempoolFeeRatesError;
+
   const renderStakingForm = () => {
     // States of the staking form:
     // Health check failed
-    if (!isApiNormal || isGeoBlocked) {
+    if (!isApiNormal || isGeoBlocked || hasError) {
       return (
         <Message
           title="Staking is not available"
-          messages={[apiMessage || ""]}
+          messages={!hasError ? [apiMessage || ""] : [""]}
           icon={isGeoBlocked ? geoRestricted : apiNotAvailable}
         />
       );
@@ -536,7 +541,7 @@ export const Staking: React.FC<StakingProps> = ({
       return <WalletNotConnected onConnect={onConnect} />;
     }
     // Wallet is connected but we are still loading the staking params
-    else if (isLoading) {
+    else if (isLoading || areMempoolFeeRatesLoading) {
       return <LoadingView />;
     }
     // Staking has not started yet

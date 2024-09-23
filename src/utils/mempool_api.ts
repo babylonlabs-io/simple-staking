@@ -4,6 +4,15 @@ import { Fees, UTXO } from "./wallet/wallet_provider";
 
 const { mempoolApiUrl } = getNetworkConfig();
 
+export class ServerError extends Error {
+  constructor(
+    message: string,
+    public code: number,
+  ) {
+    super(message);
+  }
+}
+
 /*
     URL Construction methods
 */
@@ -199,7 +208,7 @@ export async function getTxInfo(txId: string): Promise<any> {
   const response = await fetch(txInfoUrl(txId));
   if (!response.ok) {
     const err = await response.text();
-    throw new Error(err);
+    throw new ServerError(err, response.status);
   }
   return await response.json();
 }
