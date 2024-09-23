@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
@@ -20,12 +20,14 @@ import { LoadingSmall } from "../Loading/Loading";
 import { StakerPoints } from "../Points/StakerPoints";
 
 interface SummaryProps {
+  loading?: boolean;
   totalStakedSat: number;
   btcWalletBalanceSat?: number;
   publicKeyNoCoord: string;
 }
 
 export const Summary: React.FC<SummaryProps> = ({
+  loading = false,
   totalStakedSat,
   btcWalletBalanceSat,
   publicKeyNoCoord,
@@ -40,7 +42,7 @@ export const Summary: React.FC<SummaryProps> = ({
   const globalParams = useGlobalParams();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
 
-  useMemo(() => {
+  useEffect(() => {
     if (!btcHeight || !globalParams.data) {
       return;
     }
@@ -131,8 +133,10 @@ export const Summary: React.FC<SummaryProps> = ({
                     {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)}{" "}
                     {coinName}
                   </p>
-                ) : (
+                ) : loading ? (
                   <LoadingSmall text="Loading..." />
+                ) : (
+                  "n.a."
                 )}
               </div>
             </div>

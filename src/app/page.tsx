@@ -122,6 +122,7 @@ const Home: React.FC<HomeProps> = () => {
   const {
     data: availableUTXOs,
     error: availableUTXOsError,
+    isLoading: isLoadingAvailableUTXOs,
     isError: hasAvailableUTXOsError,
     refetch: refetchAvailableUTXOs,
   } = useQuery({
@@ -320,6 +321,7 @@ const Home: React.FC<HomeProps> = () => {
     >
       <NetworkBadge isWalletConnected={!!btcWallet} />
       <Header
+        loading={isLoadingAvailableUTXOs}
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
         address={address}
@@ -330,16 +332,18 @@ const Home: React.FC<HomeProps> = () => {
           <Stats />
           {address && (
             <Summary
+              loading={isLoadingAvailableUTXOs}
               totalStakedSat={totalStakedSat}
               btcWalletBalanceSat={btcWalletBalanceSat}
               publicKeyNoCoord={publicKeyNoCoord}
             />
           )}
           <Staking
+            disabled={hasGlobalParamsVersionError || hasAvailableUTXOsError}
             btcHeight={paramWithContext?.currentHeight}
             isWalletConnected={!!btcWallet}
             onConnect={handleConnectModal}
-            isLoading={isLoadingCurrentParams}
+            isLoading={isLoadingCurrentParams || isLoadingAvailableUTXOs}
             btcWallet={btcWallet}
             btcWalletBalanceSat={btcWalletBalanceSat}
             btcWalletNetwork={btcWalletNetwork}

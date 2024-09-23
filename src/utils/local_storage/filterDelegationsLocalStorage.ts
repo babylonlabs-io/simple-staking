@@ -1,6 +1,6 @@
 import { Delegation } from "@/app/types/delegations";
 
-import { getTxInfo } from "../mempool_api";
+import { getTxInfo, ServerError } from "../mempool_api";
 
 // Duration after which a delegation should be removed from the local storage
 // if not identified by the API or mempool.
@@ -44,10 +44,12 @@ export const filterDelegationsLocalStorage = async (
       try {
         const fetchedTx = await getTxInfo(localDelegation.stakingTxHashHex);
         if (!fetchedTx) {
-          throw new Error("Transaction not found in the mempool");
+          throw new ServerError("Transaction not found in the mempool", 404);
         }
-      } catch (_error) {
-        isInMempool = false;
+      } catch (err) {
+        if ((err as ServerError).code === 404) {
+          isInMempool = false;
+        }
       }
 
       if (!isInMempool) {
