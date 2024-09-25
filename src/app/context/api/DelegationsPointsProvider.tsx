@@ -79,7 +79,7 @@ export const DelegationsPointsProvider: React.FC<
       delegationsAPI.length > 0 &&
       isApiNormal &&
       !isGeoBlocked,
-    refetchInterval: 300000, // Refetch every 5 minutes
+    refetchInterval: 30000, // Refetch every 30 seconds
     refetchOnWindowFocus: false,
     retry: 1,
   });
