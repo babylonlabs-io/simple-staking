@@ -35,9 +35,10 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
   });
 
   it("should return valid delegations not present in the API and not exceeding the max duration", async () => {
-    (getTxInfo as jest.Mock).mockRejectedValue(
-      new Error("Transaction not found in the mempool"),
-    );
+    (getTxInfo as jest.Mock).mockRejectedValue({
+      message: "Transaction not found in the mempool",
+      code: 404,
+    });
 
     const result = await filterDelegationsLocalStorage(
       mockDelegationsLocalStorage,
@@ -49,9 +50,10 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
   });
 
   it("should remove delegations that exceed max duration and are not in the mempool", async () => {
-    (getTxInfo as jest.Mock).mockRejectedValue(
-      new Error("Transaction not found in the mempool"),
-    );
+    (getTxInfo as jest.Mock).mockRejectedValue({
+      message: "Transaction not found in the mempool",
+      code: 404,
+    });
 
     const result = await filterDelegationsLocalStorage(
       mockDelegationsLocalStorage,
@@ -72,9 +74,10 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
       if (txHash === "hash1" || txHash === "hash3" || txHash === "hash6") {
         return Promise.resolve({});
       } else {
-        return Promise.reject(
-          new Error("Transaction not found in the mempool"),
-        );
+        return Promise.reject({
+          message: "Transaction not found in the mempool",
+          code: 404,
+        });
       }
     });
 
@@ -132,9 +135,10 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
   });
 
   it("should handle no API data but local storage items are present", async () => {
-    (getTxInfo as jest.Mock).mockRejectedValue(
-      new Error("Transaction not found in the mempool"),
-    );
+    (getTxInfo as jest.Mock).mockRejectedValue({
+      message: "Transaction not found in the mempool",
+      code: 404,
+    });
 
     const result = await filterDelegationsLocalStorage(
       mockDelegationsLocalStorage,
