@@ -282,7 +282,9 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
         </div>
       ) : (
         <>
-          <div className="hidden grid-cols-6 gap-2 px-4 lg:grid">
+          <div
+            className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 px-4 lg:grid`}
+          >
             <p>Amount</p>
             <p>Inception</p>
             <p className="text-center">Transaction hash</p>
