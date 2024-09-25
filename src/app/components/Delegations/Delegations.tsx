@@ -15,6 +15,7 @@ import {
 } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { shouldDisplayPoints } from "@/config";
 import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
@@ -100,6 +101,8 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
 
+  const shouldShowPoints =
+    isApiNormal && !isGeoBlocked && shouldDisplayPoints();
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
     getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
@@ -284,9 +287,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
             <p>Inception</p>
             <p className="text-center">Transaction hash</p>
             <p className="text-center">Status</p>
-            {isApiNormal && !isGeoBlocked && (
-              <p className="text-center">Points</p>
-            )}
+            {shouldShowPoints && <p className="text-center">Points</p>}
             <p>Action</p>
           </div>
           <div
@@ -307,7 +308,6 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
                   stakingValueSat,
                   stakingTx,
                   stakingTxHashHex,
-                  finalityProviderPkHex,
                   state,
                   isOverflow,
                 } = delegation;

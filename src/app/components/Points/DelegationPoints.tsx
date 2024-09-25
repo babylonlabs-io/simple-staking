@@ -2,41 +2,53 @@ import React from "react";
 import { NumericFormat } from "react-number-format";
 
 import { useDelegationsPoints } from "@/app/context/api/DelegationsPointsProvider";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { shouldDisplayPoints } from "@/config";
 
 interface DelegationPointsProps {
   stakingTxHash: string;
+  className?: string;
 }
 
 export const DelegationPoints: React.FC<DelegationPointsProps> = ({
   stakingTxHash,
+  className,
 }) => {
+  const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { delegationPoints, isLoading } = useDelegationsPoints();
+  // Early return if the API is not normal or the user is geo-blocked
+  if (!isApiNormal || isGeoBlocked || !shouldDisplayPoints()) {
+    return null;
+  }
 
   const points = delegationPoints.get(stakingTxHash);
-
   if (isLoading) {
     return (
-      <div className="flex items-center justify-end gap-1">
-        <div className="h-5 w-12 animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+      <div className={className}>
+        <div className="flex items-center justify-end gap-1">
+          <div className="h-5 w-12 animate-pulse rounded bg-gray-300 dark:bg-gray-700"></div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex items-center justify-end gap-1">
-      <p className="whitespace-nowrap">
-        <span className="lg:hidden">Points: </span>
-        {points !== undefined ? (
-          <NumericFormat
-            value={points.toFixed(3)}
-            displayType="text"
-            thousandSeparator=","
-            decimalSeparator="."
-          />
-        ) : (
-          "n.a."
-        )}
-      </p>
+    <div className={className}>
+      <div className="flex items-center justify-end gap-1">
+        <p className="whitespace-nowrap">
+          <span className="lg:hidden">Points: </span>
+          {points !== undefined ? (
+            <NumericFormat
+              value={points.toFixed(3)}
+              displayType="text"
+              thousandSeparator=","
+              decimalSeparator="."
+            />
+          ) : (
+            "n.a."
+          )}
+        </p>
+      </div>
     </div>
   );
 };
