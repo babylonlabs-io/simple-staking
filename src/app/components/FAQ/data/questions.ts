@@ -1,4 +1,4 @@
-import { shouldDisplayTestingMsg } from "@/config";
+import { shouldDisplayPoints, shouldDisplayTestingMsg } from "@/config";
 
 export interface Question {
   title: string;
@@ -94,11 +94,13 @@ export const questions = (
       title: "Are hardware wallets supported?",
       content: `<p>Keystone via QR code is the only hardware wallet supporting Bitcoin Staking. Using any other hardware wallet through any means (such as connection to a software/extension/mobile wallet) can lead to permanent inability to withdraw the stake.</p>`,
     },
-    {
-      title: "What are the points?",
-      content: `<p>We use points to track staking activity. Points are not blockchain tokens. Points do not, and may never, convert to, accrue to, be used as a basis to calculate, or become tokens, other digital assets, or distributions thereof. Points are virtual calculations with no monetary value. Points do not constitute any currency or property of any type and are not redeemable, refundable, or transferable.</p>`,
-    },
   ];
+  if (shouldDisplayPoints()) {
+    questionList.push({
+      title: "What are the points for?",
+      content: `<p>We use points to track staking activity. Points are not blockchain tokens. Points do not, and may never, convert to, accrue to, be used as a basis to calculate, or become tokens, other digital assets, or distributions thereof. Points are virtual calculations with no monetary value. Points do not constitute any currency or property of any type and are not redeemable, refundable, or transferable.</p>`,
+    });
+  }
   if (shouldDisplayTestingMsg()) {
     questionList.push({
       title: "What is the goal of this testnet?",
