@@ -46,12 +46,10 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
       // Check if the browser wallet is injectable
       if (window[BROWSER]) {
         // Get the name and icon of the injected wallet
-        const name =
-          window[BROWSER].getWalletProviderName &&
-          (await window[BROWSER].getWalletProviderName());
-        const icon =
-          window[BROWSER].getWalletProviderIcon &&
-          (await window[BROWSER].getWalletProviderIcon());
+        const [name, icon] = await Promise.all([
+          window[BROWSER].getWalletProviderName?.(),
+          window[BROWSER].getWalletProviderIcon?.(),
+        ]);
         // Set the name and icon of the injected wallet if they exist
         name && setInjectedWalletProviderName(`${name} (Browser)`);
         icon && setInjectedWalletProviderIcon(icon);

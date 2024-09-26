@@ -1,4 +1,4 @@
-import { networks } from "bitcoinjs-lib";
+import type { networks } from "bitcoinjs-lib";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
@@ -7,6 +7,7 @@ import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
+import { useWallet } from "@/app/context/wallet/WalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { QueryMeta } from "@/app/types/api";
 import {
@@ -35,14 +36,10 @@ interface DelegationsProps {
   delegationsAPI: DelegationInterface[];
   delegationsLocalStorage: DelegationInterface[];
   globalParamsVersion: GlobalParamsVersion;
-  publicKeyNoCoord: string;
-  btcWalletNetwork: networks.Network;
-  address: string;
   signPsbtTx: SignPsbtTransaction;
   pushTx: WalletProvider["pushTx"];
   queryMeta: QueryMeta;
   getNetworkFees: WalletProvider["getNetworkFees"];
-  isWalletConnected: boolean;
 }
 
 export const Delegations: React.FC<DelegationsProps> = ({
@@ -53,36 +50,50 @@ export const Delegations: React.FC<DelegationsProps> = ({
   pushTx,
   queryMeta,
   getNetworkFees,
-  address,
-  btcWalletNetwork,
-  publicKeyNoCoord,
-  isWalletConnected,
 }) => {
+  const { address, publicKeyNoCoord, connected, network } = useWallet();
+
   return (
-    <DelegationsPointsProvider
-      publicKeyNoCoord={publicKeyNoCoord}
-      delegationsAPI={delegationsAPI}
-      isWalletConnected={isWalletConnected}
-      address={address}
-    >
-      <DelegationsContent
-        delegationsAPI={delegationsAPI}
-        delegationsLocalStorage={delegationsLocalStorage}
-        globalParamsVersion={globalParamsVersion}
-        signPsbtTx={signPsbtTx}
-        pushTx={pushTx}
-        queryMeta={queryMeta}
-        getNetworkFees={getNetworkFees}
-        address={address}
-        btcWalletNetwork={btcWalletNetwork}
+    network && (
+      <DelegationsPointsProvider
         publicKeyNoCoord={publicKeyNoCoord}
-        isWalletConnected={isWalletConnected}
-      />
-    </DelegationsPointsProvider>
+        delegationsAPI={delegationsAPI}
+        isWalletConnected={connected}
+        address={address}
+      >
+        <DelegationsContent
+          delegationsAPI={delegationsAPI}
+          delegationsLocalStorage={delegationsLocalStorage}
+          globalParamsVersion={globalParamsVersion}
+          signPsbtTx={signPsbtTx}
+          pushTx={pushTx}
+          queryMeta={queryMeta}
+          getNetworkFees={getNetworkFees}
+          address={address}
+          btcWalletNetwork={network}
+          publicKeyNoCoord={publicKeyNoCoord}
+          isWalletConnected={connected}
+        />
+      </DelegationsPointsProvider>
+    )
   );
 };
 
-const DelegationsContent: React.FC<DelegationsProps> = ({
+interface DelegationsContentProps {
+  delegationsAPI: DelegationInterface[];
+  delegationsLocalStorage: DelegationInterface[];
+  globalParamsVersion: GlobalParamsVersion;
+  publicKeyNoCoord: string;
+  btcWalletNetwork: networks.Network;
+  address: string;
+  signPsbtTx: SignPsbtTransaction;
+  pushTx: WalletProvider["pushTx"];
+  queryMeta: QueryMeta;
+  getNetworkFees: WalletProvider["getNetworkFees"];
+  isWalletConnected: boolean;
+}
+
+const DelegationsContent: React.FC<DelegationsContentProps> = ({
   delegationsAPI,
   delegationsLocalStorage,
   globalParamsVersion,
