@@ -6,6 +6,7 @@ import React, {
   useState,
 } from "react";
 
+import { ErrorModal } from "@/app/components/Modals/ErrorModal";
 import {
   ErrorHandlerParam,
   ErrorType,
@@ -92,7 +93,17 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   };
 
   return (
-    <ErrorContext.Provider value={value}>{children}</ErrorContext.Provider>
+    <ErrorContext.Provider value={value}>
+      {children}
+      <ErrorModal
+        open={isErrorOpen}
+        errorMessage={error.message}
+        errorState={error.errorState}
+        onClose={hideError}
+        onRetry={retryErrorAction}
+        noCancel={isNoCancel}
+      />
+    </ErrorContext.Provider>
   );
 };
 

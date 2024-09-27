@@ -1,15 +1,13 @@
 import Image from "next/image";
 
+import { useWallet } from "@/app/context/wallet/WalletProvider";
+
 import connectIcon from "./connect-icon.svg";
 import walletIcon from "./wallet-icon.svg";
 
-interface WalletNotConnectedProps {
-  onConnect: () => void;
-}
+export const WalletNotConnected = () => {
+  const { open } = useWallet();
 
-export const WalletNotConnected: React.FC<WalletNotConnectedProps> = ({
-  onConnect,
-}) => {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-1 flex-col items-center justify-center gap-2 py-12">
@@ -21,7 +19,7 @@ export const WalletNotConnected: React.FC<WalletNotConnectedProps> = ({
           Please connect wallet to start staking
         </p>
       </div>
-      <button className="btn-primary btn" onClick={onConnect}>
+      <button className="btn-primary btn" onClick={open}>
         <Image src={connectIcon} alt="Connect wallet" />
         Connect wallet
       </button>
