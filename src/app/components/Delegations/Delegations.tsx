@@ -15,6 +15,7 @@ import {
 } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { shouldDisplayPoints } from "@/config";
 import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
@@ -100,6 +101,8 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
 
+  const shouldShowPoints =
+    isApiNormal && !isGeoBlocked && shouldDisplayPoints();
   // Local storage state for intermediate delegations (withdrawing, unbonding)
   const intermediateDelegationsLocalStorageKey =
     getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
@@ -279,14 +282,14 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
         </div>
       ) : (
         <>
-          <div className="hidden grid-cols-6 gap-2 px-4 lg:grid">
+          <div
+            className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 px-4 lg:grid`}
+          >
             <p>Amount</p>
             <p>Inception</p>
             <p className="text-center">Transaction hash</p>
             <p className="text-center">Status</p>
-            {isApiNormal && !isGeoBlocked && (
-              <p className="text-center">Points</p>
-            )}
+            {shouldShowPoints && <p className="text-center">Points</p>}
             <p>Action</p>
           </div>
           <div
@@ -307,7 +310,6 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
                   stakingValueSat,
                   stakingTx,
                   stakingTxHashHex,
-                  finalityProviderPkHex,
                   state,
                   isOverflow,
                 } = delegation;

@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { getDelegationPointsByStakingTxHashHexes } from "@/app/api/getPoints";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
+import { shouldDisplayPoints } from "@/config";
 
 interface PointsContextType {
   delegationPoints: Map<string, number>;
@@ -78,7 +79,8 @@ export const DelegationsPointsProvider: React.FC<
       isWalletConnected &&
       delegationsAPI.length > 0 &&
       isApiNormal &&
-      !isGeoBlocked,
+      !isGeoBlocked &&
+      shouldDisplayPoints(),
     refetchInterval: 300000, // Refetch every 5 minutes
     refetchOnWindowFocus: false,
     retry: 1,

@@ -7,6 +7,7 @@ import { Tooltip } from "react-tooltip";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { durationTillNow } from "@/utils/formatTime";
@@ -45,6 +46,8 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
+  const shouldShowPoints =
+    isApiNormal && !isGeoBlocked && shouldDisplayPoints();
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -126,7 +129,9 @@ export const Delegation: React.FC<DelegationProps> = ({
           <p>overflow</p>
         </div>
       )}
-      <div className="grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row lg:grid-cols-6 lg:grid-rows-1">
+      <div
+        className={`grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row ${shouldShowPoints ? "lg:grid-cols-6" : "lg:grid-cols-5"} lg:grid-rows-1`}
+      >
         <div className="flex gap-1 items-center order-1">
           <FaBitcoin className="text-primary" />
           <p>
@@ -164,11 +169,10 @@ export const Delegation: React.FC<DelegationProps> = ({
             <Tooltip id={`tooltip-${stakingTxHash}`} className="tooltip-wrap" />
           </div>
         </div>
-        {isApiNormal && !isGeoBlocked && (
-          <div className="relative flex justify-end lg:justify-center order-5">
-            <DelegationPoints stakingTxHash={stakingTxHash} />
-          </div>
-        )}
+        <DelegationPoints
+          stakingTxHash={stakingTxHash}
+          className="relative flex justify-end lg:justify-center order-5"
+        />
         <div className="order-6">{generateActionButton()}</div>
       </div>
     </div>
