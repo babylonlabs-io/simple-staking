@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { networks, Transaction } from "bitcoinjs-lib";
+import { Transaction } from "bitcoinjs-lib";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
@@ -13,6 +13,7 @@ import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
+import { useWallet } from "@/app/context/wallet/WalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { Delegation } from "@/app/types/delegations";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
@@ -32,7 +33,7 @@ import {
 } from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
-import { UTXO, WalletProvider } from "@/utils/wallet/wallet_provider";
+import type { UTXO } from "@/utils/wallet/wallet_provider";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
 import { PreviewModal } from "../Modals/PreviewModal";
@@ -58,14 +59,8 @@ interface OverflowProperties {
 interface StakingProps {
   btcHeight: number | undefined;
   disabled?: boolean;
-  isWalletConnected: boolean;
   isLoading: boolean;
-  onConnect: () => void;
-  btcWallet: WalletProvider | undefined;
   btcWalletBalanceSat?: number;
-  btcWalletNetwork: networks.Network | undefined;
-  address: string | undefined;
-  publicKeyNoCoord: string;
   setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
   availableUTXOs?: UTXO[] | undefined;
 }
@@ -73,17 +68,19 @@ interface StakingProps {
 export const Staking: React.FC<StakingProps> = ({
   btcHeight,
   disabled = false,
-  isWalletConnected,
-  onConnect,
   isLoading,
-  btcWallet,
-  btcWalletNetwork,
-  address,
-  publicKeyNoCoord,
   setDelegationsLocalStorage,
   btcWalletBalanceSat,
   availableUTXOs,
 }) => {
+  const {
+    connected,
+    address,
+    publicKeyNoCoord,
+    walletProvider: btcWallet,
+    network: btcWalletNetwork,
+  } = useWallet();
+
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
@@ -537,8 +534,8 @@ export const Staking: React.FC<StakingProps> = ({
       );
     }
     // Wallet is not connected
-    else if (!isWalletConnected) {
-      return <WalletNotConnected onConnect={onConnect} />;
+    else if (!connected) {
+      return <WalletNotConnected />;
     }
     // Wallet is connected but we are still loading the staking params
     else if (isLoading || areMempoolFeeRatesLoading) {

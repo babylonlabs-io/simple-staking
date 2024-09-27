@@ -2,8 +2,7 @@
 
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { networks } from "bitcoinjs-lib";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
@@ -11,13 +10,7 @@ import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { filterOrdinals } from "@/utils/utxo";
-import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
-import {
-  getPublicKeyNoCoord,
-  isSupportedAddressType,
-  toNetwork,
-} from "@/utils/wallet/index";
-import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
+import { Network } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { getGlobalParams } from "./api/getGlobalParams";
@@ -27,33 +20,27 @@ import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
-import { ConnectModal } from "./components/Modals/ConnectModal";
-import { ErrorModal } from "./components/Modals/ErrorModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { useError } from "./context/Error/ErrorContext";
+import { useWallet } from "./context/wallet/WalletProvider";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorState } from "./types/errors";
 
 interface HomeProps {}
 
 const Home: React.FC<HomeProps> = () => {
-  const [btcWallet, setBTCWallet] = useState<WalletProvider>();
-  const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
-  const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
-
-  const [address, setAddress] = useState("");
   const {
-    error,
-    isErrorOpen,
-    showError,
-    hideError,
-    retryErrorAction,
-    noCancel,
-    handleError,
-  } = useError();
+    walletProvider: btcWallet,
+    network: btcWalletNetwork,
+    address,
+    publicKeyNoCoord,
+  } = useWallet();
+
+  const { isErrorOpen, showError, handleError } = useError();
+
   const {
     data: paramWithContext,
     isLoading: isLoadingCurrentParams,
@@ -193,90 +180,6 @@ const Home: React.FC<HomeProps> = () => {
     Delegation[]
   >(delegationsLocalStorageKey, []);
 
-  const [connectModalOpen, setConnectModalOpen] = useState(false);
-
-  const handleConnectModal = () => {
-    setConnectModalOpen(true);
-  };
-
-  const handleDisconnectBTC = () => {
-    setBTCWallet(undefined);
-
-    setBTCWalletNetwork(undefined);
-    setPublicKeyNoCoord("");
-    setAddress("");
-  };
-
-  const handleConnectBTC = useCallback(
-    async (walletProvider: WalletProvider) => {
-      // close the modal
-      setConnectModalOpen(false);
-
-      const supportedNetworkMessage =
-        "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
-
-      try {
-        await walletProvider.connectWallet();
-        const address = await walletProvider.getAddress();
-        // check if the wallet address type is supported in babylon
-        const supported = isSupportedAddressType(address);
-        if (!supported) {
-          throw new Error(supportedNetworkMessage);
-        }
-
-        const publicKeyNoCoord = getPublicKeyNoCoord(
-          await walletProvider.getPublicKeyHex(),
-        );
-        setBTCWallet(walletProvider);
-        setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
-        setAddress(address);
-        setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
-      } catch (error: Error | any) {
-        if (
-          error instanceof WalletError &&
-          error.getType() === WalletErrorType.ConnectionCancelled
-        ) {
-          // User cancelled the connection, hence do nothing
-          return;
-        }
-        let errorMessage;
-        switch (true) {
-          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
-            error.message,
-          ):
-            errorMessage = supportedNetworkMessage;
-            break;
-          default:
-            errorMessage = error.message;
-            break;
-        }
-        showError({
-          error: {
-            message: errorMessage,
-            errorState: ErrorState.WALLET,
-          },
-          retryAction: () => handleConnectBTC(walletProvider),
-        });
-      }
-    },
-    [showError],
-  );
-
-  // Subscribe to account changes
-  useEffect(() => {
-    if (btcWallet) {
-      let once = false;
-      btcWallet.on("accountChanged", () => {
-        if (!once) {
-          handleConnectBTC(btcWallet);
-        }
-      });
-      return () => {
-        once = true;
-      };
-    }
-  }, [btcWallet, handleConnectBTC]);
-
   // Clean up the local storage delegations
   useEffect(() => {
     if (!delegations?.delegations) {
@@ -322,9 +225,6 @@ const Home: React.FC<HomeProps> = () => {
       <NetworkBadge isWalletConnected={!!btcWallet} />
       <Header
         loading={isLoadingAvailableUTXOs}
-        onConnect={handleConnectModal}
-        onDisconnect={handleDisconnectBTC}
-        address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
       />
       <div className="container mx-auto flex justify-center p-6">
@@ -341,14 +241,8 @@ const Home: React.FC<HomeProps> = () => {
           <Staking
             disabled={hasGlobalParamsVersionError || hasAvailableUTXOsError}
             btcHeight={paramWithContext?.currentHeight}
-            isWalletConnected={!!btcWallet}
-            onConnect={handleConnectModal}
             isLoading={isLoadingCurrentParams || isLoadingAvailableUTXOs}
-            btcWallet={btcWallet}
             btcWalletBalanceSat={btcWalletBalanceSat}
-            btcWalletNetwork={btcWalletNetwork}
-            address={address}
-            publicKeyNoCoord={publicKeyNoCoord}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
           />
@@ -362,9 +256,6 @@ const Home: React.FC<HomeProps> = () => {
                 globalParamsVersion={
                   paramWithContext.nextBlockParams.currentVersion
                 }
-                publicKeyNoCoord={publicKeyNoCoord}
-                btcWalletNetwork={btcWalletNetwork}
-                address={address}
                 signPsbtTx={signPsbtTransaction(btcWallet)}
                 pushTx={btcWallet.pushTx}
                 queryMeta={{
@@ -373,7 +264,6 @@ const Home: React.FC<HomeProps> = () => {
                   isFetchingMore: isFetchingNextDelegationsPage,
                 }}
                 getNetworkFees={btcWallet.getNetworkFees}
-                isWalletConnected={!!btcWallet}
               />
             )}
           {/* At this point of time is not used */}
@@ -386,20 +276,6 @@ const Home: React.FC<HomeProps> = () => {
       </div>
       <FAQ />
       <Footer />
-      <ConnectModal
-        open={connectModalOpen}
-        onClose={setConnectModalOpen}
-        onConnect={handleConnectBTC}
-        connectDisabled={!!address}
-      />
-      <ErrorModal
-        open={isErrorOpen}
-        errorMessage={error.message}
-        errorState={error.errorState}
-        onClose={hideError}
-        onRetry={retryErrorAction}
-        noCancel={noCancel}
-      />
     </main>
   );
 };
