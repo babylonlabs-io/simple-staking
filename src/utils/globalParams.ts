@@ -1,8 +1,8 @@
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 
 export interface ParamsWithContext {
-  currentVersion: GlobalParamsVersion | undefined;
-  nextVersion: GlobalParamsVersion | undefined;
+  currentVersion?: GlobalParamsVersion;
+  nextVersion?: GlobalParamsVersion;
   isApprochingNextVersion: boolean;
   firstActivationHeight: number;
 }
