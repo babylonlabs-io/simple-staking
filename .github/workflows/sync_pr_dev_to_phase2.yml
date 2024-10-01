@@ -1,0 +1,17 @@
+name: Create Sync PR from Dev to Phase-2
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+
+permissions:
+  pull-requests: write
+
+jobs:
+  call_sync_branch:
+    uses: babylonlabs-io/.github/.github/workflows/reusable_sync_branch.yml@v0.2.0
+    with:
+      base_branch: "dev"
+      target_branch: "phase-2"
+      reviewers: "jrwbabylonlab,gbarkhatov,jeremy-babylonlabs"
+    secrets: inherit
