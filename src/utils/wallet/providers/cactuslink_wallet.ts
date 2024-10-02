@@ -18,7 +18,7 @@ import {
 
 // Internal network names
 const INTERNAL_NETWORK_NAMES = {
-  [Network.MAINNET]: "livenet",
+  [Network.MAINNET]: "mainnet",
   [Network.TESTNET]: "testnet",
   [Network.SIGNET]: "signet",
 };
