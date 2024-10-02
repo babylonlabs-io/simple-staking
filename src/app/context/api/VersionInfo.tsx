@@ -37,7 +37,13 @@ export function VersionInfoProvider({ children }: PropsWithChildren) {
   } = useBTCTipHeight();
 
   const context = useMemo(() => {
-    if (!versions || !height) return;
+    if (!versions || !height)
+      return {
+        isApprochingNextVersion: false,
+        firstActivationHeight: 0,
+        isError: isHeightError || isVersionError,
+        isLoading: isVersionLoading || isHeightLoading,
+      };
 
     return {
       currentHeight: height,
