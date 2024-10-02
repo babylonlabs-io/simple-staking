@@ -46,14 +46,6 @@ export const walletList: IntegratedWallet[] = [
     supportedNetworks: [Network.MAINNET, Network.SIGNET],
   },
   {
-    name: "Tomo",
-    icon: tomoIcon,
-    wallet: TomoWallet,
-    provider: tomoProvider,
-    linkToDocs: "https://tomo.inc/",
-    supportedNetworks: [Network.SIGNET],
-  },
-  {
     name: "OneKey",
     icon: oneKeyIcon,
     wallet: OneKeyWallet,
@@ -84,6 +76,14 @@ export const walletList: IntegratedWallet[] = [
     wallet: KeystoneWallet,
     linkToDocs: "https://www.keyst.one/btc-only",
     isQRWallet: true,
+    supportedNetworks: [Network.MAINNET, Network.SIGNET],
+  },
+  {
+    name: "Tomo",
+    icon: tomoIcon,
+    wallet: TomoWallet,
+    provider: tomoProvider,
+    linkToDocs: "https://tomo.inc/",
     supportedNetworks: [Network.MAINNET, Network.SIGNET],
   },
 ];
