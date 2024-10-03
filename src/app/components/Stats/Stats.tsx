@@ -56,9 +56,9 @@ const buildStakingCapSection = (
   if (isApprochingNextVersion && nextVersion) {
     return buildNextCapText(coinName, btcHeight, nextVersion);
   }
-  const { stakingCapHeight, stakingCapSat, confirmationDepth } = currentVersion;
+  const { stakingCapHeight, stakingCapSat } = currentVersion;
   if (stakingCapHeight) {
-    const numOfBlockLeft = stakingCapHeight + confirmationDepth - btcHeight - 1;
+    const numOfBlockLeft = stakingCapHeight - btcHeight;
     return {
       title: "Staking Window",
       value:
