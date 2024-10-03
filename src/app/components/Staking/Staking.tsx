@@ -153,14 +153,12 @@ export const Staking: React.FC<StakingProps> = ({
       return;
     }
     const nextBlockHeight = btcHeight + 1;
-    const { stakingCapHeight, stakingCapSat, confirmationDepth } =
-      paramWithCtx.currentVersion;
+    const { stakingCapHeight, stakingCapSat } = paramWithCtx.currentVersion;
     // Use height based cap than value based cap if it is set
     if (stakingCapHeight) {
       setOverflow({
         isHeightCap: true,
-        overTheCapRange:
-          nextBlockHeight >= stakingCapHeight + confirmationDepth,
+        overTheCapRange: nextBlockHeight >= stakingCapHeight,
         /*
           When btc height is approching the staking cap height,
           there is higher chance of overflow due to tx not being included in the next few blocks on time
