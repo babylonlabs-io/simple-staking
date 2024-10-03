@@ -35,7 +35,7 @@ export function useAPIQuery<
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: data.refetch,
     });
-  }, [handleError, data?.error, data?.isError, data.refetch]);
+  }, [handleError, data.error, data.isError, data.refetch]);
 
   return data;
 }

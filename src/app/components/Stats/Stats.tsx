@@ -91,7 +91,7 @@ export const Stats: React.FC = () => {
       setStakingStats(stakingStatsProvider.data);
     }
     setIsLoading(
-      stakingStatsProvider.isLoading || versionInfo?.isLoading || false,
+      stakingStatsProvider.isLoading || Boolean(versionInfo?.isLoading),
     );
   }, [stakingStatsProvider, versionInfo?.isLoading]);
 
