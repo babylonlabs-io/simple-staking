@@ -1,12 +1,12 @@
 import type { networks } from "bitcoinjs-lib";
 import {
-  type PropsWithChildren,
   createContext,
   useCallback,
   useContext,
   useEffect,
   useMemo,
   useState,
+  type PropsWithChildren,
 } from "react";
 
 import { ConnectModal } from "@/app/components/Modals/ConnectModal";

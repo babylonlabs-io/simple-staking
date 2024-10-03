@@ -28,8 +28,8 @@ import {
 } from "@/utils/delegations/signStakingTx";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import {
-  getCurrentGlobalParamsVersion,
   ParamsWithContext,
+  getCurrentGlobalParamsVersion,
 } from "@/utils/globalParams";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
