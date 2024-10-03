@@ -8,9 +8,9 @@ import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
-import { VersionInfoProvider } from "./context/api/VersionInfo";
 import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 import { WalletProvider } from "./context/wallet/WalletProvider";
+import { AppState } from "./state";
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(new QueryClient());
@@ -20,7 +20,7 @@ function Providers({ children }: React.PropsWithChildren) {
       <QueryClientProvider client={client}>
         <ErrorProvider>
           <WalletProvider>
-            <VersionInfoProvider>
+            <AppState>
               <BtcHeightProvider>
                 <StakingStatsProvider>
                   <ReactQueryStreamedHydration>
@@ -28,7 +28,7 @@ function Providers({ children }: React.PropsWithChildren) {
                   </ReactQueryStreamedHydration>
                 </StakingStatsProvider>
               </BtcHeightProvider>
-            </VersionInfoProvider>
+            </AppState>
           </WalletProvider>
         </ErrorProvider>
         <ReactQueryDevtools

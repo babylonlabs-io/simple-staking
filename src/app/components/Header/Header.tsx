@@ -1,4 +1,5 @@
 import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
 import { ConnectSmall } from "../Connect/ConnectSmall";
@@ -7,16 +8,9 @@ import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
-interface HeaderProps {
-  loading?: boolean;
-  btcWalletBalanceSat?: number;
-}
-
-export const Header: React.FC<HeaderProps> = ({
-  loading,
-  btcWalletBalanceSat,
-}) => {
+export const Header = () => {
   const { address, open, disconnect } = useWallet();
+  const { totalBalance, isLoading: loading } = useAppState();
 
   return (
     <nav>
@@ -34,7 +28,7 @@ export const Header: React.FC<HeaderProps> = ({
             loading={loading}
             onConnect={open}
             address={address}
-            btcWalletBalanceSat={btcWalletBalanceSat}
+            btcWalletBalanceSat={totalBalance}
             onDisconnect={disconnect}
           />
           <ThemeToggle />
@@ -45,7 +39,7 @@ export const Header: React.FC<HeaderProps> = ({
           <ConnectedSmall
             loading={loading}
             address={address}
-            btcWalletBalanceSat={btcWalletBalanceSat}
+            btcWalletBalanceSat={totalBalance}
             onDisconnect={disconnect}
           />
         </div>

@@ -1,4 +1,4 @@
-import { useVersionInfo } from "@/app/context/api/VersionInfo";
+import { useAppState } from "@/app/state";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { questions } from "./data/questions";
@@ -7,8 +7,8 @@ import { Section } from "./Section";
 interface FAQProps {}
 
 export const FAQ: React.FC<FAQProps> = () => {
+  const { currentVersion } = useAppState();
   const { coinName, networkName } = getNetworkConfig();
-  const versionInfo = useVersionInfo();
 
   return (
     <div className="container mx-auto flex flex-col gap-2 p-6">
@@ -17,7 +17,7 @@ export const FAQ: React.FC<FAQProps> = () => {
         {questions(
           coinName,
           networkName,
-          versionInfo?.currentVersion?.confirmationDepth,
+          currentVersion?.confirmationDepth,
         ).map((question) => (
           <Section
             key={question.title}

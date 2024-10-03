@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Transaction } from "bitcoinjs-lib";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -12,10 +12,10 @@ import {
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
-import { useVersionInfo } from "@/app/context/api/VersionInfo";
 import { useWallet } from "@/app/context/wallet/WalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
-import { Delegation } from "@/app/types/delegations";
+import { useAppState } from "@/app/state";
+import { useDelegationState } from "@/app/state/DelegationState";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import {
   FinalityProvider,
@@ -29,7 +29,6 @@ import {
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
-import type { UTXO } from "@/utils/wallet/wallet_provider";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
 import { PreviewModal } from "../Modals/PreviewModal";
@@ -52,23 +51,18 @@ interface OverflowProperties {
   approchingCapRange: boolean;
 }
 
-interface StakingProps {
-  btcHeight: number | undefined;
-  disabled?: boolean;
-  isLoading: boolean;
-  btcWalletBalanceSat?: number;
-  setDelegationsLocalStorage: Dispatch<SetStateAction<Delegation[]>>;
-  availableUTXOs?: UTXO[] | undefined;
-}
-
-export const Staking: React.FC<StakingProps> = ({
-  btcHeight,
-  disabled = false,
-  isLoading,
-  setDelegationsLocalStorage,
-  btcWalletBalanceSat,
-  availableUTXOs,
-}) => {
+export const Staking = () => {
+  const {
+    availableUTXOs,
+    currentHeight: btcHeight,
+    currentVersion,
+    totalBalance: btcWalletBalanceSat,
+    firstActivationHeight,
+    isApprochingNextVersion,
+    isError,
+    isLoading,
+  } = useAppState();
+  const { addDelegation } = useDelegationState();
   const {
     connected,
     address,
@@ -76,6 +70,8 @@ export const Staking: React.FC<StakingProps> = ({
     walletProvider: btcWallet,
     network: btcWalletNetwork,
   } = useWallet();
+
+  const disabled = isError;
 
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
@@ -103,8 +99,6 @@ export const Staking: React.FC<StakingProps> = ({
     approchingCapRange: false,
   });
 
-  const versionInfo = useVersionInfo();
-
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
   const {
@@ -131,11 +125,11 @@ export const Staking: React.FC<StakingProps> = ({
 
   // Calculate the overflow properties
   useEffect(() => {
-    if (!versionInfo?.currentVersion || !btcHeight) {
+    if (!currentVersion || !btcHeight) {
       return;
     }
     const nextBlockHeight = btcHeight + 1;
-    const { stakingCapHeight, stakingCapSat } = versionInfo.currentVersion;
+    const { stakingCapHeight, stakingCapSat } = currentVersion;
     // Use height based cap than value based cap if it is set
     if (stakingCapHeight) {
       setOverflow({
@@ -160,12 +154,11 @@ export const Staking: React.FC<StakingProps> = ({
           stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
       });
     }
-  }, [versionInfo, btcHeight, stakingStats]);
+  }, [currentVersion, btcHeight, stakingStats]);
 
   const { coinName } = getNetworkConfig();
-  const stakingParams = versionInfo?.currentVersion;
-  const firstActivationHeight = versionInfo?.firstActivationHeight;
-  const isUpgrading = versionInfo?.isApprochingNextVersion;
+  const stakingParams = currentVersion;
+  const isUpgrading = isApprochingNextVersion;
   const isBlockHeightUnderActivation =
     !stakingParams ||
     (btcHeight &&
@@ -233,17 +226,15 @@ export const Staking: React.FC<StakingProps> = ({
       if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
       if (!finalityProvider)
         throw new Error("Finality provider is not selected");
-      if (!versionInfo?.currentVersion)
-        throw new Error("Global params not loaded");
+      if (!currentVersion) throw new Error("Global params not loaded");
       if (!feeRate) throw new Error("Fee rates not loaded");
       if (!availableUTXOs || availableUTXOs.length === 0)
         throw new Error("No available balance");
 
-      const { currentVersion: globalParamsVersion } = versionInfo;
       // Sign the staking transaction
       const { stakingTxHex, stakingTerm } = await signStakingTx(
         btcWallet,
-        globalParamsVersion,
+        currentVersion,
         stakingAmountSat,
         stakingTimeBlocks,
         finalityProvider.btcPk,
@@ -289,30 +280,16 @@ export const Staking: React.FC<StakingProps> = ({
     // Get the transaction ID
     const newTxId = Transaction.fromHex(signedTxHex).getId();
 
-    setDelegationsLocalStorage((delegations) => {
-      // Check if the delegation with the same transaction ID already exists
-      const exists = delegations.some(
-        (delegation) => delegation.stakingTxHashHex === newTxId,
-      );
-
-      // If it doesn't exist, add the new delegation
-      if (!exists) {
-        return [
-          toLocalStorageDelegation(
-            newTxId,
-            publicKeyNoCoord,
-            finalityProvider!.btcPk,
-            stakingAmountSat,
-            signedTxHex,
-            stakingTerm,
-          ),
-          ...delegations,
-        ];
-      }
-
-      // If it exists, return the existing delegations unchanged
-      return delegations;
-    });
+    addDelegation(
+      toLocalStorageDelegation(
+        newTxId,
+        publicKeyNoCoord,
+        finalityProvider!.btcPk,
+        stakingAmountSat,
+        signedTxHex,
+        stakingTerm,
+      ),
+    );
   };
 
   // Memoize the staking fee calculation
@@ -323,7 +300,7 @@ export const Staking: React.FC<StakingProps> = ({
       publicKeyNoCoord &&
       stakingAmountSat &&
       finalityProvider &&
-      versionInfo?.currentVersion &&
+      currentVersion &&
       mempoolFeeRates &&
       availableUTXOs
     ) {
@@ -335,7 +312,7 @@ export const Staking: React.FC<StakingProps> = ({
         const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
         // Calculate the staking fee
         const { stakingFeeSat } = createStakingTx(
-          versionInfo.currentVersion,
+          currentVersion,
           stakingAmountSat,
           stakingTimeBlocks,
           finalityProvider.btcPk,
@@ -377,7 +354,7 @@ export const Staking: React.FC<StakingProps> = ({
     stakingAmountSat,
     stakingTimeBlocks,
     finalityProvider,
-    versionInfo,
+    currentVersion,
     mempoolFeeRates,
     selectedFeeRate,
     availableUTXOs,
