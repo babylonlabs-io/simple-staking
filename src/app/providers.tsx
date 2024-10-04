@@ -7,8 +7,8 @@ import { ThemeProvider } from "next-themes";
 import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
-import { GlobalParamsProvider } from "./context/api/GlobalParamsProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
+import { VersionInfoProvider } from "./context/api/VersionInfo";
 import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 import { WalletProvider } from "./context/wallet/WalletProvider";
 
@@ -20,7 +20,7 @@ function Providers({ children }: React.PropsWithChildren) {
       <QueryClientProvider client={client}>
         <ErrorProvider>
           <WalletProvider>
-            <GlobalParamsProvider>
+            <VersionInfoProvider>
               <BtcHeightProvider>
                 <StakingStatsProvider>
                   <ReactQueryStreamedHydration>
@@ -28,7 +28,7 @@ function Providers({ children }: React.PropsWithChildren) {
                   </ReactQueryStreamedHydration>
                 </StakingStatsProvider>
               </BtcHeightProvider>
-            </GlobalParamsProvider>
+            </VersionInfoProvider>
           </WalletProvider>
         </ErrorProvider>
         <ReactQueryDevtools

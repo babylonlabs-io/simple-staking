@@ -1,10 +1,9 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { useVersionInfo } from "@/app/context/api/VersionInfo";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { LoadingView } from "../Loading/Loading";
@@ -33,17 +32,9 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   awaitingWalletResponse,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
-  const { data: allGlobalParamsVersions } = useGlobalParams();
+  const versionInfo = useVersionInfo();
 
-  const getGlobalParamsForDelegation = (startHeight: number) => {
-    const { currentVersion } = getCurrentGlobalParamsVersion(
-      startHeight,
-      allGlobalParamsVersions || [],
-    );
-    return currentVersion;
-  };
-
-  const globalParams = getGlobalParamsForDelegation(delegationHeight);
+  const globalParams = versionInfo?.currentVersion;
   const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
   const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
 

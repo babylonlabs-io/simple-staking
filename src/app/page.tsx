@@ -6,14 +6,12 @@ import { useEffect } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { network } from "@/config/network.config";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 import { filterOrdinals } from "@/utils/utxo";
 import { Network } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
-import { getGlobalParams } from "./api/getGlobalParams";
 import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
@@ -24,6 +22,7 @@ import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
+import { useVersionInfo } from "./context/api/VersionInfo";
 import { useError } from "./context/Error/ErrorContext";
 import { useWallet } from "./context/wallet/WalletProvider";
 import { Delegation, DelegationState } from "./types/delegations";
@@ -41,33 +40,7 @@ const Home: React.FC<HomeProps> = () => {
 
   const { isErrorOpen, showError, handleError } = useError();
 
-  const {
-    data: paramWithContext,
-    isLoading: isLoadingCurrentParams,
-    error: globalParamsVersionError,
-    isError: hasGlobalParamsVersionError,
-    refetch: refetchGlobalParamsVersion,
-  } = useQuery({
-    queryKey: ["global params"],
-    queryFn: async () => {
-      const [height, versions] = await Promise.all([
-        btcWallet!.getBTCTipHeight(),
-        getGlobalParams(),
-      ]);
-      return {
-        // The staking parameters are retrieved based on the current height + 1
-        // so this verification should take this into account.
-        currentHeight: height,
-        nextBlockParams: getCurrentGlobalParamsVersion(height + 1, versions),
-      };
-    },
-    refetchInterval: 60000, // 1 minute
-    // Should be enabled only when the wallet is connected
-    enabled: !!btcWallet,
-    retry: (failureCount, error) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
+  const versionInfo = useVersionInfo();
 
   const {
     data: delegations,
@@ -142,24 +115,15 @@ const Home: React.FC<HomeProps> = () => {
       refetchFunction: refetchDelegationData,
     });
     handleError({
-      error: globalParamsVersionError,
-      hasError: hasGlobalParamsVersionError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchGlobalParamsVersion,
-    });
-    handleError({
       error: availableUTXOsError,
       hasError: hasAvailableUTXOsError,
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchAvailableUTXOs,
     });
   }, [
-    hasGlobalParamsVersionError,
     hasDelegationsError,
     delegationsError,
     refetchDelegationData,
-    globalParamsVersionError,
-    refetchGlobalParamsVersion,
     showError,
     availableUTXOsError,
     hasAvailableUTXOsError,
@@ -239,23 +203,21 @@ const Home: React.FC<HomeProps> = () => {
             />
           )}
           <Staking
-            disabled={hasGlobalParamsVersionError || hasAvailableUTXOsError}
-            btcHeight={paramWithContext?.currentHeight}
-            isLoading={isLoadingCurrentParams || isLoadingAvailableUTXOs}
+            disabled={versionInfo?.isError || hasAvailableUTXOsError}
+            btcHeight={versionInfo?.currentHeight}
+            isLoading={versionInfo?.isLoading || isLoadingAvailableUTXOs}
             btcWalletBalanceSat={btcWalletBalanceSat}
             setDelegationsLocalStorage={setDelegationsLocalStorage}
             availableUTXOs={availableUTXOs}
           />
           {btcWallet &&
             delegations &&
-            paramWithContext?.nextBlockParams.currentVersion &&
+            versionInfo?.currentVersion &&
             btcWalletNetwork && (
               <Delegations
                 delegationsAPI={delegations.delegations}
                 delegationsLocalStorage={delegationsLocalStorage}
-                globalParamsVersion={
-                  paramWithContext.nextBlockParams.currentVersion
-                }
+                globalParamsVersion={versionInfo.currentVersion}
                 signPsbtTx={signPsbtTransaction(btcWallet)}
                 pushTx={btcWallet.pushTx}
                 queryMeta={{
