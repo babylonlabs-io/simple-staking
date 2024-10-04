@@ -71,20 +71,23 @@ export function DelegationState({ children }: PropsWithChildren) {
   );
 
   // Methods
-  const addDelegation = useCallback((newDelegation: Delegation) => {
-    setDelegations((delegations) => {
-      const exists = delegations.some(
-        (delegation) =>
-          delegation.stakingTxHashHex === newDelegation.stakingTxHashHex,
-      );
+  const addDelegation = useCallback(
+    (newDelegation: Delegation) => {
+      setDelegations((delegations) => {
+        const exists = delegations.some(
+          (delegation) =>
+            delegation.stakingTxHashHex === newDelegation.stakingTxHashHex,
+        );
 
-      if (!exists) {
-        return [newDelegation, ...delegations];
-      }
+        if (!exists) {
+          return [newDelegation, ...delegations];
+        }
 
-      return delegations;
-    });
-  }, []);
+        return delegations;
+      });
+    },
+    [setDelegations],
+  );
 
   // Context
   const state = useMemo(
@@ -96,7 +99,14 @@ export function DelegationState({ children }: PropsWithChildren) {
       addDelegation,
       fetchMoreDelegations: fetchNextPage,
     }),
-    [delegations, totalStaked, isFetchingNextPage, hasNextPage, addDelegation],
+    [
+      delegations,
+      totalStaked,
+      isFetchingNextPage,
+      hasNextPage,
+      addDelegation,
+      fetchNextPage,
+    ],
   );
 
   return <StateProvider value={state}>{children}</StateProvider>;

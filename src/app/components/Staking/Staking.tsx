@@ -114,7 +114,7 @@ export const Staking = () => {
         return await btcWallet.getNetworkFees();
       }
     },
-    enabled: !!btcWallet?.getNetworkFees,
+    enabled: Boolean(btcWallet?.getNetworkFees),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
@@ -557,7 +557,7 @@ export const Staking = () => {
           maxStakingTimeBlocks,
           stakingAmountSat,
           stakingTimeBlocksWithFixed,
-          !!finalityProvider,
+          Boolean(finalityProvider),
           stakingFeeSat,
         );
 
