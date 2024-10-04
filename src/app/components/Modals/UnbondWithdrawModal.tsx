@@ -1,6 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 
 import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
+import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -16,21 +17,23 @@ export const MODE_WITHDRAW = "withdraw";
 export type MODE = typeof MODE_UNBOND | typeof MODE_WITHDRAW;
 
 interface PreviewModalProps {
-  delegationHeight: number;
   open: boolean;
   onClose: (value: boolean) => void;
   onProceed: () => void;
   mode: MODE;
   awaitingWalletResponse: boolean;
+  delegationsAPI: DelegationInterface[];
+  txID: string;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
-  delegationHeight,
   open,
   onClose,
   onProceed,
   mode,
   awaitingWalletResponse,
+  delegationsAPI,
+  txID,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
   const { data: allGlobalParamsVersions } = useGlobalParams();
@@ -43,7 +46,16 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
     return currentVersion;
   };
 
-  const globalParams = getGlobalParamsForDelegation(delegationHeight);
+  const delegation = delegationsAPI.find(
+    (delegation) => delegation.stakingTxHashHex === txID,
+  );
+  if (!delegation) {
+    throw new Error("Delegation not found");
+  }
+
+  const globalParams = getGlobalParamsForDelegation(
+    delegation.stakingTx.startHeight,
+  );
   const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
   const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
 
