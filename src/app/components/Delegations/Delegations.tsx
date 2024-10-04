@@ -111,6 +111,9 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   const { showError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
+  const [selectedDelegationHeight, setSelectedDelegationHeight] = useState<
+    number | undefined
+  >();
 
   const shouldShowPoints =
     isApiNormal && !isGeoBlocked && shouldDisplayPoints();
@@ -182,13 +185,15 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           message: error.message,
           errorState: ErrorState.UNBONDING,
         },
-        retryAction: () => handleModal(id, MODE_UNBOND),
+        retryAction: () =>
+          handleModal(id, MODE_UNBOND, selectedDelegationHeight!),
       });
     } finally {
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
       setAwaitingWalletResponse(false);
+      setSelectedDelegationHeight(undefined);
     }
   };
 
@@ -217,20 +222,23 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           message: error.message,
           errorState: ErrorState.WITHDRAW,
         },
-        retryAction: () => handleModal(id, MODE_WITHDRAW),
+        retryAction: () =>
+          handleModal(id, MODE_WITHDRAW, selectedDelegationHeight!),
       });
     } finally {
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
       setAwaitingWalletResponse(false);
+      setSelectedDelegationHeight(undefined);
     }
   };
 
-  const handleModal = (txID: string, mode: MODE) => {
+  const handleModal = (txID: string, mode: MODE, delegationHeight: number) => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
+    setSelectedDelegationHeight(delegationHeight);
   };
 
   useEffect(() => {
@@ -336,9 +344,19 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
                     stakingValueSat={stakingValueSat}
                     stakingTxHash={stakingTxHashHex}
                     state={state}
-                    onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
+                    onUnbond={() =>
+                      handleModal(
+                        stakingTxHashHex,
+                        MODE_UNBOND,
+                        stakingTx.startHeight,
+                      )
+                    }
                     onWithdraw={() =>
-                      handleModal(stakingTxHashHex, MODE_WITHDRAW)
+                      handleModal(
+                        stakingTxHashHex,
+                        MODE_WITHDRAW,
+                        stakingTx.startHeight,
+                      )
                     }
                     intermediateState={intermediateDelegation?.state}
                     isOverflow={isOverflow}
@@ -350,11 +368,9 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           </div>
         </>
       )}
-
-      {modalMode && txID && (
+      {modalMode && txID && selectedDelegationHeight !== undefined && (
         <UnbondWithdrawModal
-          unbondingTimeBlocks={globalParamsVersion.unbondingTime}
-          unbondingFeeSat={globalParamsVersion.unbondingFeeSat}
+          delegationHeight={selectedDelegationHeight}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           onProceed={() => {
