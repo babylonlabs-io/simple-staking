@@ -49,9 +49,13 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const delegation = delegationsAPI.find(
     (delegation) => delegation.stakingTxHashHex === txID,
   );
-  const delegationHeight = delegation?.stakingTx.startHeight || 0;
+  if (!delegation) {
+    throw new Error("Delegation not found");
+  }
 
-  const globalParams = getGlobalParamsForDelegation(delegationHeight);
+  const globalParams = getGlobalParamsForDelegation(
+    delegation.stakingTx.startHeight,
+  );
   const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
   const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
 
