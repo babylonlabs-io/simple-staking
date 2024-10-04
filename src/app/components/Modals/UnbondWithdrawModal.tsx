@@ -1,16 +1,17 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useGlobalParams } from "@/app/context/api/GlobalParamsProvider";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
+import { useVersionInfo } from "@/app/context/api/VersionInfo";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { LoadingView } from "../Loading/Loading";
 
 import { GeneralModal } from "./GeneralModal";
+import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { useVersions } from "@/app/hooks/useVersions";
 
 export const MODE_UNBOND = "unbond";
 export const MODE_WITHDRAW = "withdraw";
@@ -36,12 +37,12 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   txID,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
-  const { data: allGlobalParamsVersions } = useGlobalParams();
+  const { data: versions } = useVersions();
 
   const getGlobalParamsForDelegation = (startHeight: number) => {
     const { currentVersion } = getCurrentGlobalParamsVersion(
       startHeight,
-      allGlobalParamsVersions || [],
+      versions || [],
     );
     return currentVersion;
   };
