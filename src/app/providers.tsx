@@ -8,7 +8,6 @@ import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
-import { BtcHeightProvider } from "./context/mempool/BtcHeightProvider";
 import { WalletProvider } from "./context/wallet/WalletProvider";
 import { AppState } from "./state";
 
@@ -21,13 +20,11 @@ function Providers({ children }: React.PropsWithChildren) {
         <ErrorProvider>
           <WalletProvider>
             <AppState>
-              <BtcHeightProvider>
-                <StakingStatsProvider>
-                  <ReactQueryStreamedHydration>
-                    {children}
-                  </ReactQueryStreamedHydration>
-                </StakingStatsProvider>
-              </BtcHeightProvider>
+              <StakingStatsProvider>
+                <ReactQueryStreamedHydration>
+                  {children}
+                </ReactQueryStreamedHydration>
+              </StakingStatsProvider>
             </AppState>
           </WalletProvider>
         </ErrorProvider>

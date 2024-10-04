@@ -5,6 +5,7 @@ import {
   getDelegations,
   type PaginatedDelegations,
 } from "@/app/api/getDelegations";
+import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useWallet } from "@/app/context/wallet/WalletProvider";
 import { ErrorState } from "@/app/types/errors";
@@ -24,7 +25,7 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
         ? lastPage?.pagination?.next_key
         : null,
     initialPageParam: "",
-    refetchInterval: 60000, // 1 minute
+    refetchInterval: ONE_MINUTE,
     enabled: Boolean(publicKeyNoCoord) && enabled,
     select: (data) => {
       const flattenedData = data.pages.reduce<PaginatedDelegations>(
