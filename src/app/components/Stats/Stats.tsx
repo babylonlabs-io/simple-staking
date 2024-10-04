@@ -7,7 +7,7 @@ import {
   StakingStats,
   useStakingStats,
 } from "@/app/context/api/StakingStatsProvider";
-import { useVersionInfo } from "@/app/context/api/VersionInfo";
+import { useAppState } from "@/app/state";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -81,7 +81,7 @@ export const Stats: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(true);
   const stakingStatsProvider = useStakingStats();
-  const versionInfo = useVersionInfo();
+  const appState = useAppState();
 
   const { coinName } = getNetworkConfig();
 
@@ -91,12 +91,12 @@ export const Stats: React.FC = () => {
       setStakingStats(stakingStatsProvider.data);
     }
     setIsLoading(
-      stakingStatsProvider.isLoading || Boolean(versionInfo?.isLoading),
+      stakingStatsProvider.isLoading || Boolean(appState?.isLoading),
     );
-  }, [stakingStatsProvider, versionInfo?.isLoading]);
+  }, [stakingStatsProvider, appState?.isLoading]);
 
   const stakingCapText = useMemo(() => {
-    if (!versionInfo?.currentHeight) {
+    if (!appState?.currentHeight) {
       return {
         title: "Staking TVL Cap",
         value: "-",
@@ -105,8 +105,8 @@ export const Stats: React.FC = () => {
 
     const cap = buildStakingCapSection(
       coinName,
-      versionInfo.currentHeight,
-      versionInfo,
+      appState.currentHeight,
+      appState,
     );
 
     return (
@@ -115,7 +115,7 @@ export const Stats: React.FC = () => {
         value: "-",
       }
     );
-  }, [coinName, versionInfo]);
+  }, [coinName, appState]);
 
   const formatter = Intl.NumberFormat("en", {
     notation: "compact",

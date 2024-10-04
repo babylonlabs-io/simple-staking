@@ -24,6 +24,7 @@
         "pathGroupsExcludedImportTypes": ["builtin", "external"],
         "newlines-between": "always"
       }
-    ]
+    ],
+    "no-implicit-coercion": "error"
   }
 }

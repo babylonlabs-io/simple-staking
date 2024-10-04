@@ -14,7 +14,7 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
   const { data: stakerPoints, isLoading } = useQuery({
     queryKey: ["stakerPoints", publicKeyNoCoord],
     queryFn: () => getStakersPoints([publicKeyNoCoord]),
-    enabled: !!publicKeyNoCoord,
+    enabled: Boolean(publicKeyNoCoord),
     refetchInterval: 300000, // Refresh every 5 minutes
     refetchOnWindowFocus: false,
     retry: 1,

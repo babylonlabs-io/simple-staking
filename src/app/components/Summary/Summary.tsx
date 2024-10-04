@@ -2,8 +2,10 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 
-import { useVersionInfo } from "@/app/context/api/VersionInfo";
+import { useWallet } from "@/app/context/wallet/WalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useAppState } from "@/app/state";
+import { useDelegationState } from "@/app/state/DelegationState";
 import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -13,24 +15,16 @@ import { Network } from "@/utils/wallet/wallet_provider";
 import { LoadingSmall } from "../Loading/Loading";
 import { StakerPoints } from "../Points/StakerPoints";
 
-interface SummaryProps {
-  loading?: boolean;
-  totalStakedSat: number;
-  btcWalletBalanceSat?: number;
-  publicKeyNoCoord: string;
-}
-
-export const Summary: React.FC<SummaryProps> = ({
-  loading = false,
-  totalStakedSat,
-  btcWalletBalanceSat,
-  publicKeyNoCoord,
-}) => {
+export const Summary = () => {
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
-  const versionInfo = useVersionInfo();
+  const { totalStaked } = useDelegationState();
+  const { totalBalance, currentVersion, isLoading: loading } = useAppState();
+  const { address, publicKeyNoCoord } = useWallet();
 
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
+
+  if (!address) return;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm xl:gap-4">
@@ -44,7 +38,7 @@ export const Summary: React.FC<SummaryProps> = ({
                 <span
                   className="cursor-pointer text-xs"
                   data-tooltip-id="tooltip-total-staked"
-                  data-tooltip-content={`Total staked is updated after ${versionInfo?.currentVersion?.confirmationDepth || 10} confirmations`}
+                  data-tooltip-content={`Total staked is updated after ${currentVersion?.confirmationDepth || 10} confirmations`}
                   data-tooltip-place="bottom"
                 >
                   <AiOutlineInfoCircle />
@@ -54,9 +48,7 @@ export const Summary: React.FC<SummaryProps> = ({
               <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">
                 <FaBitcoin className="text-primary" size={16} />
                 <p className="whitespace-nowrap font-semibold">
-                  {totalStakedSat
-                    ? maxDecimals(satoshiToBtc(totalStakedSat), 8)
-                    : 0}{" "}
+                  {totalStaked ? maxDecimals(satoshiToBtc(totalStaked), 8) : 0}{" "}
                   {coinName}
                 </p>
               </div>
@@ -104,13 +96,12 @@ export const Summary: React.FC<SummaryProps> = ({
               </div>
               <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">
                 <FaBitcoin className="text-primary" size={16} />
-                {typeof btcWalletBalanceSat === "number" ? (
+                {typeof totalBalance === "number" ? (
                   <p
                     className="whitespace-nowrap font-semibold"
                     data-testid="balance"
                   >
-                    {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)}{" "}
-                    {coinName}
+                    {maxDecimals(satoshiToBtc(totalBalance), 8)} {coinName}
                   </p>
                 ) : loading ? (
                   <LoadingSmall text="Loading..." />
