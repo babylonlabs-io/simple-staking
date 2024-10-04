@@ -172,7 +172,7 @@ export const Staking: React.FC<StakingProps> = ({
       firstActivationHeight &&
       btcHeight + 1 < firstActivationHeight);
 
-  const { isErrorOpen, showError } = useError();
+  const { isErrorOpen, showError, captureError } = useError();
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   useEffect(() => {
@@ -199,11 +199,13 @@ export const Staking: React.FC<StakingProps> = ({
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchMempoolFeeRates,
     });
+    captureError(mempoolFeeRatesError);
   }, [
     mempoolFeeRatesError,
     hasMempoolFeeRatesError,
     refetchMempoolFeeRates,
     showError,
+    captureError,
   ]);
 
   const handleResetState = () => {

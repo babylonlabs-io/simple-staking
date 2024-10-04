@@ -38,7 +38,7 @@ const Home: React.FC<HomeProps> = () => {
     publicKeyNoCoord,
   } = useWallet();
 
-  const { isErrorOpen, showError, handleError } = useError();
+  const { isErrorOpen, showError, handleError, captureError } = useError();
 
   const versionInfo = useVersionInfo();
 
@@ -114,12 +114,14 @@ const Home: React.FC<HomeProps> = () => {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchDelegationData,
     });
+    captureError(delegationsError);
     handleError({
       error: availableUTXOsError,
       hasError: hasAvailableUTXOsError,
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchAvailableUTXOs,
     });
+    captureError(availableUTXOsError);
   }, [
     hasDelegationsError,
     delegationsError,
@@ -129,6 +131,7 @@ const Home: React.FC<HomeProps> = () => {
     hasAvailableUTXOsError,
     refetchAvailableUTXOs,
     handleError,
+    captureError,
   ]);
 
   // Initializing btc curve is a required one-time operation
