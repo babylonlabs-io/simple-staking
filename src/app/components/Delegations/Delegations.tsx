@@ -367,9 +367,8 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           </div>
         </>
       )}
-      {modalMode && txID && selectedDelegationHeight !== undefined && (
+      {modalMode && txID && (
         <UnbondWithdrawModal
-          delegationHeight={selectedDelegationHeight}
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           onProceed={() => {

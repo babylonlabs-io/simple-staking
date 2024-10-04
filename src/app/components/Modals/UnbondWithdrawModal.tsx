@@ -1,6 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useVersionInfo } from "@/app/context/api/VersionInfo";
+import { useAppState } from "@/app/state";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -15,7 +15,6 @@ export const MODE_WITHDRAW = "withdraw";
 export type MODE = typeof MODE_UNBOND | typeof MODE_WITHDRAW;
 
 interface PreviewModalProps {
-  delegationHeight: number;
   open: boolean;
   onClose: (value: boolean) => void;
   onProceed: () => void;
@@ -24,7 +23,6 @@ interface PreviewModalProps {
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
-  delegationHeight,
   open,
   onClose,
   onProceed,
@@ -32,9 +30,8 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   awaitingWalletResponse,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
-  const versionInfo = useVersionInfo();
+  const { currentVersion: globalParams } = useAppState();
 
-  const globalParams = versionInfo?.currentVersion;
   const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
   const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
 

@@ -4,7 +4,7 @@ import { useBTCTipHeight } from "@/app/hooks/useBTCTipHeight";
 import { useUTXOs } from "@/app/hooks/useUTXOs";
 import { useVersions } from "@/app/hooks/useVersions";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { createStateUtils } from "@/utils/createState";
+import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import type { UTXO } from "@/utils/wallet/wallet_provider";
 

@@ -5,7 +5,7 @@ import { useWallet } from "@/app/context/wallet/WalletProvider";
 import { useDelegations } from "@/app/hooks/useDelegations";
 import type { Delegation } from "@/app/types/delegations";
 import { DelegationState as DelegationEnum } from "@/app/types/delegations";
-import { createStateUtils } from "@/utils/createState";
+import { createStateUtils } from "@/utils/createStateUtils";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
 
