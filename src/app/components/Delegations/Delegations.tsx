@@ -3,13 +3,18 @@ import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
+import {
+  signPsbtTransaction,
+  SignPsbtTransaction,
+} from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useDelegations } from "@/app/hooks/useDelegations";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
-import { QueryMeta } from "@/app/types/api";
+import { useAppState } from "@/app/state";
+import { useDelegationState } from "@/app/state/DelegationState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
@@ -32,43 +37,35 @@ import {
 
 import { Delegation } from "./Delegation";
 
-interface DelegationsProps {
-  delegationsAPI: DelegationInterface[];
-  delegationsLocalStorage: DelegationInterface[];
-  globalParamsVersion: GlobalParamsVersion;
-  signPsbtTx: SignPsbtTransaction;
-  pushTx: WalletProvider["pushTx"];
-  queryMeta: QueryMeta;
-  getNetworkFees: WalletProvider["getNetworkFees"];
-}
+export const Delegations = () => {
+  const { currentVersion } = useAppState();
+  const { data: delegationsAPI } = useDelegations();
+  const {
+    walletProvider: btcWallet,
+    address,
+    publicKeyNoCoord,
+    connected,
+    network,
+  } = useWallet();
 
-export const Delegations: React.FC<DelegationsProps> = ({
-  delegationsAPI,
-  delegationsLocalStorage,
-  globalParamsVersion,
-  signPsbtTx,
-  pushTx,
-  queryMeta,
-  getNetworkFees,
-}) => {
-  const { address, publicKeyNoCoord, connected, network } = useWallet();
+  if (!btcWallet || !delegationsAPI || !currentVersion || !network) {
+    return;
+  }
 
   return (
     network && (
       <DelegationsPointsProvider
         publicKeyNoCoord={publicKeyNoCoord}
-        delegationsAPI={delegationsAPI}
+        delegationsAPI={delegationsAPI.delegations}
         isWalletConnected={connected}
         address={address}
       >
         <DelegationsContent
-          delegationsAPI={delegationsAPI}
-          delegationsLocalStorage={delegationsLocalStorage}
-          globalParamsVersion={globalParamsVersion}
-          signPsbtTx={signPsbtTx}
-          pushTx={pushTx}
-          queryMeta={queryMeta}
-          getNetworkFees={getNetworkFees}
+          delegationsAPI={delegationsAPI.delegations}
+          globalParamsVersion={currentVersion}
+          signPsbtTx={signPsbtTransaction(btcWallet)}
+          pushTx={btcWallet.pushTx}
+          getNetworkFees={btcWallet.getNetworkFees}
           address={address}
           btcWalletNetwork={network}
           publicKeyNoCoord={publicKeyNoCoord}
@@ -81,25 +78,21 @@ export const Delegations: React.FC<DelegationsProps> = ({
 
 interface DelegationsContentProps {
   delegationsAPI: DelegationInterface[];
-  delegationsLocalStorage: DelegationInterface[];
   globalParamsVersion: GlobalParamsVersion;
   publicKeyNoCoord: string;
   btcWalletNetwork: networks.Network;
   address: string;
   signPsbtTx: SignPsbtTransaction;
   pushTx: WalletProvider["pushTx"];
-  queryMeta: QueryMeta;
   getNetworkFees: WalletProvider["getNetworkFees"];
   isWalletConnected: boolean;
 }
 
 const DelegationsContent: React.FC<DelegationsContentProps> = ({
   delegationsAPI,
-  delegationsLocalStorage,
   globalParamsVersion,
   signPsbtTx,
   pushTx,
-  queryMeta,
   getNetworkFees,
   address,
   btcWalletNetwork,
@@ -111,6 +104,15 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   const { showError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
+  const [selectedDelegationHeight, setSelectedDelegationHeight] = useState<
+    number | undefined
+  >();
+  const {
+    delegations = [],
+    fetchMoreDelegations,
+    hasMoreDelegations,
+    isLoading,
+  } = useDelegationState();
 
   const shouldShowPoints =
     isApiNormal && !isGeoBlocked && shouldDisplayPoints();
@@ -280,9 +282,9 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
 
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-    ? [...delegationsLocalStorage, ...delegationsAPI]
+    ? [...delegations, ...delegationsAPI]
     : // if no API data, fallback to using only local storage delegations
-      delegationsLocalStorage;
+      delegations;
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
@@ -310,9 +312,9 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
             <InfiniteScroll
               className="flex flex-col gap-4 pt-3"
               dataLength={combinedDelegationsData.length}
-              next={queryMeta.next}
-              hasMore={queryMeta.hasMore}
-              loader={queryMeta.isFetchingMore ? <LoadingTableList /> : null}
+              next={fetchMoreDelegations}
+              hasMore={hasMoreDelegations}
+              loader={isLoading ? <LoadingTableList /> : null}
               scrollableTarget="staking-history"
             >
               {combinedDelegationsData?.map((delegation) => {

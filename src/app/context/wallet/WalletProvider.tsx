@@ -151,7 +151,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
         open={connectModalOpen}
         onClose={setConnectModalOpen}
         onConnect={connect}
-        connectDisabled={!!address}
+        connectDisabled={Boolean(address)}
       />
     </WalletContext.Provider>
   );

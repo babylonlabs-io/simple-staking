@@ -16,5 +16,5 @@ export const getNetworkAppUrl = (): string => {
 // shouldDisplayPoints function is used to check if the application should
 // display points or not based on the existence of the environment variable.
 export const shouldDisplayPoints = (): boolean => {
-  return !!process.env.NEXT_PUBLIC_POINTS_API_URL;
+  return Boolean(process.env.NEXT_PUBLIC_POINTS_API_URL);
 };

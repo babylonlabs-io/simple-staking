@@ -1,7 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
-import { useVersionInfo } from "@/app/context/api/VersionInfo";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -57,6 +56,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   const globalParams = getGlobalParamsForDelegation(
     delegation.stakingTx.startHeight,
   );
+
   const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
   const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
 
