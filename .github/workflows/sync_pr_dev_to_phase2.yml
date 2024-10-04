@@ -1,6 +1,9 @@
 name: Create Sync PR from Dev to Phase-2
 
 on:
+  push:
+    branches:
+      - "hiep/add-sync-workflow"
   schedule:
     - cron: "0 0 * * *"
 
