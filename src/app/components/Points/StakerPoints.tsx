@@ -30,10 +30,12 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
 
   const points = stakerPoints?.[0]?.points;
 
+  console.log(points !== undefined || points !== 0);
+
   return (
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap font-semibold">
-        {points !== undefined ? (
+        {points !== undefined && points !== 0 ? (
           <NumericFormat
             value={points.toFixed(3)}
             displayType="text"
