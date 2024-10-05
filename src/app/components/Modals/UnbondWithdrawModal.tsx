@@ -22,8 +22,7 @@ interface PreviewModalProps {
   onProceed: () => void;
   mode: MODE;
   awaitingWalletResponse: boolean;
-  delegationsAPI: DelegationInterface[];
-  txID: string;
+  delegation: DelegationInterface;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -32,8 +31,7 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onProceed,
   mode,
   awaitingWalletResponse,
-  delegationsAPI,
-  txID,
+  delegation,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
   const { data: allGlobalParamsVersions } = useGlobalParams();
@@ -46,15 +44,8 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
     return currentVersion;
   };
 
-  const delegation = delegationsAPI.find(
-    (delegation) => delegation.stakingTxHashHex === txID,
-  );
-  if (!delegation) {
-    throw new Error("Delegation not found");
-  }
-
   const globalParams = getGlobalParamsForDelegation(
-    delegation.stakingTx.startHeight,
+    delegation.stakingTx.startHeight ?? 0,
   );
   const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
   const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
