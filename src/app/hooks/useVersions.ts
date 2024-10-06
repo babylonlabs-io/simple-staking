@@ -1,7 +1,8 @@
+import { useMemo } from "react";
+
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { useAPIQuery } from "@/app/hooks/useApi";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import { useMemo } from "react";
 
 export const VERSIONS_KEY = "VERSIONS";
 

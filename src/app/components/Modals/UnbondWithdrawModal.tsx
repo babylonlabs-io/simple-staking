@@ -1,6 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useAppState } from "@/app/state";
+import { useVersionByHeight } from "@/app/hooks/useVersions";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
@@ -10,7 +10,6 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { LoadingView } from "../Loading/Loading";
 
 import { GeneralModal } from "./GeneralModal";
-import { useVersionByHeight } from "@/app/hooks/useVersions";
 
 export const MODE_UNBOND = "unbond";
 export const MODE_WITHDRAW = "withdraw";
