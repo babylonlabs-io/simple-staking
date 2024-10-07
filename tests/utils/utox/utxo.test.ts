@@ -1,6 +1,9 @@
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { filterOrdinals, WALLET_FETCH_INSRIPTIONS_TIMEOUT } from "@/utils/utxo";
-import { InscriptionIdentifier, UTXO } from "@/utils/wallet/wallet_provider";
+import {
+  InscriptionIdentifier,
+  UTXO,
+} from "@/utils/wallet/btc_wallet_provider";
 
 // Mock the dependencies
 jest.mock("@/app/api/postFilterOrdinals");

@@ -7,13 +7,13 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
+  BTCWalletProvider,
   Fees,
   InscriptionIdentifier,
   Network,
   UTXO,
   WalletInfo,
-  WalletProvider,
-} from "../wallet_provider";
+} from "../btc_wallet_provider";
 
 export const oneKeyProvider = "$onekey";
 
@@ -24,7 +24,7 @@ const INTERNAL_NETWORK_NAMES = {
   [Network.SIGNET]: "signet",
 };
 
-export class OneKeyWallet extends WalletProvider {
+export class OneKeyWallet extends BTCWalletProvider {
   private oneKeyWalletInfo: WalletInfo | undefined;
   private oneKeyWallet: any;
   private bitcoinNetworkProvider: any;

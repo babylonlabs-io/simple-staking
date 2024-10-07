@@ -74,7 +74,7 @@ export const DEFAULT_INSCRIPTION_LIMIT = 100;
  * Provides methods for connecting to a wallet, retrieving wallet information, signing transactions, and more.
  */
 
-export abstract class WalletProvider {
+export abstract class BTCWalletProvider {
   /**
    * Connects to the wallet and returns the instance of the wallet provider.
    * Currently only supports "native segwit" and "taproot" address types.
@@ -189,7 +189,7 @@ instance of it under the `window.btcwallet` global object when the Babylon dApp
 is loaded.
 
 ```ts
-class MobileAppWallet extends WalletProvider {
+class MobileAppWallet extends BTCWalletProvider {
     ...
     Interface Methods definitions
     ...
@@ -211,7 +211,7 @@ are implemented using external calls to the mempool.space API as they are not
 provided out of the box from the wallet exposed methods.
 
 ```ts
-import { WalletProvider, Network, Fees, UTXO } from "../wallet_provider";
+import { BTCWalletProvider, Network, Fees, UTXO } from "../btc_wallet_provider";
 import {
   getAddressBalance,
   getTipHeight,
@@ -225,7 +225,7 @@ type OKXWalletInfo = {
   address: string;
 };
 
-export class OKXWallet extends WalletProvider {
+export class OKXWallet extends BTCWalletProvider {
   private okxWalletInfo: OKXWalletInfo | undefined;
 
   constructor() {
@@ -392,7 +392,7 @@ export class OKXWallet extends WalletProvider {
 As a reference, we provide the mempool.space retrieval methods that we used below:
 
 ```ts
-import { Fees, UTXO } from "./wallet/wallet_provider";
+import { Fees, UTXO } from "./wallet/btc_wallet_provider";
 
 /*
     URL Construction methods

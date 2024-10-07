@@ -29,14 +29,14 @@ import {
   getTipHeight,
   pushTx,
 } from "../../../mempool_api";
-import { WalletError, WalletErrorType } from "../../errors";
 import {
+  BTCWalletProvider,
   Fees,
   InscriptionIdentifier,
   Network,
   UTXO,
-  WalletProvider,
-} from "../../wallet_provider";
+} from "../../btc_wallet_provider";
+import { WalletError, WalletErrorType } from "../../errors";
 
 import BIP322 from "./bip322";
 
@@ -49,7 +49,7 @@ type KeystoneWalletInfo = {
   scriptPubKeyHex: string | undefined;
 };
 
-export class KeystoneWallet extends WalletProvider {
+export class KeystoneWallet extends BTCWalletProvider {
   private keystoneWaleltInfo: KeystoneWalletInfo | undefined;
   private viewSdk: typeof sdk;
   private dataSdk: KeystoneSDK;

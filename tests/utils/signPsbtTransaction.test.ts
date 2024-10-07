@@ -2,7 +2,7 @@ import { Psbt, Transaction } from "bitcoinjs-lib";
 
 import { signPsbtTransaction } from "@/app/common/utils/psbt";
 
-// Mock the WalletProvider
+// Mock the BTCWalletProvider
 const mockWalletProvider = (providerName: string, signedHex: string) => ({
   signPsbt: jest.fn().mockResolvedValue(signedHex),
   getWalletProviderName: jest.fn().mockResolvedValue(providerName),
@@ -29,7 +29,10 @@ describe("signPsbtTransaction", () => {
       mockProviderName,
       mocked_signedPsbtHexPair.signedPsbtHex,
     ) as any;
-    const signTransaction = signPsbtTransaction(wallet);
+    const signTransaction = signPsbtTransaction(
+      wallet.signPsbt,
+      wallet.getWalletProviderName,
+    );
 
     const result = await signTransaction(mocked_signedPsbtHexPair.psbtHex);
 
@@ -48,7 +51,10 @@ describe("signPsbtTransaction", () => {
       mockProviderName,
       mocked_signedPsbtHexPair.signedPsbtHex,
     ) as any;
-    const signTransaction = signPsbtTransaction(wallet);
+    const signTransaction = signPsbtTransaction(
+      wallet.signPsbt,
+      wallet.getWalletProviderName,
+    );
 
     const result = await signTransaction(mocked_signedPsbtHexPair.psbtHex);
 
@@ -67,7 +73,10 @@ describe("signPsbtTransaction", () => {
       mockProviderName,
       mocked_signedTxHexPair.signedTxHex,
     ) as any;
-    const signTransaction = signPsbtTransaction(wallet);
+    const signTransaction = signPsbtTransaction(
+      wallet.signPsbt,
+      wallet.getWalletProviderName,
+    );
 
     const result = await signTransaction(mocked_signedTxHexPair.psbtHex);
 

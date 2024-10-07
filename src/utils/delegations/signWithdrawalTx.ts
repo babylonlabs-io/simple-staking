@@ -12,7 +12,7 @@ import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
 import { getFeeRateFromMempool } from "../getFeeRateFromMempool";
-import { Fees } from "../wallet/wallet_provider";
+import { Fees } from "../wallet/btc_wallet_provider";
 
 import { txFeeSafetyCheck } from "./fee";
 

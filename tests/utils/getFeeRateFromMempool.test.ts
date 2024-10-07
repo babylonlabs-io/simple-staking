@@ -1,5 +1,5 @@
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { Fees } from "@/utils/wallet/wallet_provider";
+import { Fees } from "@/utils/wallet/btc_wallet_provider";
 
 describe("getFeeRateFromMempool", () => {
   const mempoolFeeRates: Fees = {
