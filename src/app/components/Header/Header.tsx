@@ -1,4 +1,4 @@
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
 import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
@@ -9,7 +9,7 @@ import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 export const Header = () => {
-  const { address, open, disconnect } = useWallet();
+  const { address, open, disconnect } = useBTCWallet();
   const { totalBalance, isLoading: loading } = useAppState();
 
   return (

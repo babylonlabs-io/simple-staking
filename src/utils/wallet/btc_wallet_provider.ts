@@ -47,7 +47,7 @@ export type WalletInfo = {
  * Provides methods for connecting to a wallet, retrieving wallet information, signing transactions, and more.
  */
 
-export abstract class WalletProvider {
+export abstract class BTCWalletProvider {
   /**
    * Connects to the wallet and returns the instance of the wallet provider.
    * Currently only supports "native segwit" and "taproot" address types.

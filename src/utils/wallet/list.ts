@@ -1,3 +1,4 @@
+import { Network } from "./btc_wallet_provider";
 import bitgetWalletIcon from "./icons/bitget.svg";
 import cactusIcon from "./icons/cactuslink.svg";
 import keystoneIcon from "./icons/keystone.svg";
@@ -13,7 +14,6 @@ import { KeystoneWallet } from "./providers/keystone";
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";
 import { OneKeyWallet, oneKeyProvider } from "./providers/onekey_wallet";
 import { TomoWallet, tomoProvider } from "./providers/tomo_wallet";
-import { Network } from "./wallet_provider";
 
 interface IntegratedWallet {
   name: string;

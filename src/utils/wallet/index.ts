@@ -1,6 +1,6 @@
 import { networks } from "bitcoinjs-lib";
 
-import { Network } from "./wallet_provider";
+import { Network } from "./btc_wallet_provider";
 
 const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;

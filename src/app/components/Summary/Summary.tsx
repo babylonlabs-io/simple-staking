@@ -2,7 +2,7 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";
@@ -10,7 +10,7 @@ import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
-import { Network } from "@/utils/wallet/wallet_provider";
+import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import { LoadingSmall } from "../Loading/Loading";
 import { StakerPoints } from "../Points/StakerPoints";
@@ -19,7 +19,7 @@ export const Summary = () => {
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { totalStaked } = useDelegationState();
   const { totalBalance, currentVersion, isLoading: loading } = useAppState();
-  const { address, publicKeyNoCoord } = useWallet();
+  const { address, publicKeyNoCoord } = useBTCWallet();
 
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;

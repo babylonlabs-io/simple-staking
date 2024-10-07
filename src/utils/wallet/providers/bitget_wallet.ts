@@ -10,12 +10,12 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
+  BTCWalletProvider,
   Fees,
   InscriptionIdentifier,
   Network,
   UTXO,
-  WalletProvider,
-} from "../wallet_provider";
+} from "../btc_wallet_provider";
 
 // window object for Bitget Wallet extension
 export const bitgetWalletProvider = "bitkeep";
@@ -27,7 +27,7 @@ const INTERNAL_NETWORK_NAMES = {
   [Network.SIGNET]: "signet",
 };
 
-export class BitgetWallet extends WalletProvider {
+export class BitgetWallet extends BTCWalletProvider {
   private bitcoinNetworkProvider: any;
   private networkEnv: Network | undefined;
 

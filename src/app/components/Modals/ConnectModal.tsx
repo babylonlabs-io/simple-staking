@@ -8,15 +8,15 @@ import { Tooltip } from "react-tooltip";
 import { twJoin } from "tailwind-merge";
 
 import { getNetworkConfig } from "@/config/network.config";
+import { BTCWalletProvider } from "@/utils/wallet/btc_wallet_provider";
 import { BROWSER_INJECTED_WALLET_NAME, walletList } from "@/utils/wallet/list";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { GeneralModal } from "./GeneralModal";
 
 interface ConnectModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
-  onConnect: (walletProvider: WalletProvider) => void;
+  onConnect: (walletProvider: BTCWalletProvider) => void;
   connectDisabled: boolean;
 }
 
@@ -69,7 +69,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
 
   const handleConnect = async () => {
     if (selectedWallet) {
-      let walletInstance: WalletProvider;
+      let walletInstance: BTCWalletProvider;
 
       if (selectedWallet === BROWSER) {
         if (!isInjectable) {

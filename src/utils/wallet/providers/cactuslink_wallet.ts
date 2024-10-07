@@ -8,13 +8,13 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
+  BTCWalletProvider,
   Fees,
   InscriptionIdentifier,
   Network,
   UTXO,
   WalletInfo,
-  WalletProvider,
-} from "../wallet_provider";
+} from "../btc_wallet_provider";
 
 // Internal network names
 const INTERNAL_NETWORK_NAMES = {
@@ -24,7 +24,7 @@ const INTERNAL_NETWORK_NAMES = {
 };
 export const cactusLinkProvider = "cactuslink";
 
-export class CactusLinkWallet extends WalletProvider {
+export class CactusLinkWallet extends BTCWalletProvider {
   private cactuslinkWalletInfo: WalletInfo | undefined;
   private bitcoinNetworkProvider: any;
   private networkEnv: Network | undefined;

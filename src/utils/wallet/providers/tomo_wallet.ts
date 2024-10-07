@@ -8,13 +8,13 @@ import {
 } from "@/utils/mempool_api";
 
 import {
+  BTCWalletProvider,
   Fees,
   InscriptionIdentifier,
   Network,
   UTXO,
   WalletInfo,
-  WalletProvider,
-} from "../wallet_provider";
+} from "../btc_wallet_provider";
 
 export const tomoProvider = "tomo_btc";
 
@@ -25,7 +25,7 @@ const INTERNAL_NETWORK_NAMES = {
   [Network.SIGNET]: "signet",
 };
 
-export class TomoWallet extends WalletProvider {
+export class TomoWallet extends BTCWalletProvider {
   private tomoWalletInfo: WalletInfo | undefined;
   private bitcoinNetworkProvider: any;
   private networkEnv: Network | undefined;

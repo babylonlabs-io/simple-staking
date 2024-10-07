@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { Fees } from "@/utils/wallet/wallet_provider";
+import { Fees } from "@/utils/wallet/btc_wallet_provider";
 
 import { LoadingSmall } from "../../Loading/Loading";
 

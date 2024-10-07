@@ -4,13 +4,13 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
 import {
-  signPsbtTransaction,
   SignPsbtTransaction,
+  signPsbtTransaction,
 } from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
 import { useDelegations } from "@/app/hooks/api/useDelegations";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
@@ -26,7 +26,7 @@ import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
+import { BTCWalletProvider } from "@/utils/wallet/btc_wallet_provider";
 
 import {
   MODE,
@@ -41,14 +41,17 @@ export const Delegations = () => {
   const { currentVersion } = useAppState();
   const { data: delegationsAPI } = useDelegations();
   const {
-    walletProvider: btcWallet,
     address,
     publicKeyNoCoord,
     connected,
     network,
-  } = useWallet();
+    pushTx,
+    getNetworkFees,
+    signPsbt,
+    getWalletProviderName,
+  } = useBTCWallet();
 
-  if (!btcWallet || !delegationsAPI || !currentVersion || !network) {
+  if (!connected || !delegationsAPI || !currentVersion || !network) {
     return;
   }
 
@@ -63,9 +66,9 @@ export const Delegations = () => {
         <DelegationsContent
           delegationsAPI={delegationsAPI.delegations}
           globalParamsVersion={currentVersion}
-          signPsbtTx={signPsbtTransaction(btcWallet)}
-          pushTx={btcWallet.pushTx}
-          getNetworkFees={btcWallet.getNetworkFees}
+          signPsbtTx={signPsbtTransaction(signPsbt, getWalletProviderName)}
+          pushTx={pushTx}
+          getNetworkFees={getNetworkFees}
           address={address}
           btcWalletNetwork={network}
           publicKeyNoCoord={publicKeyNoCoord}
@@ -83,8 +86,8 @@ interface DelegationsContentProps {
   btcWalletNetwork: networks.Network;
   address: string;
   signPsbtTx: SignPsbtTransaction;
-  pushTx: WalletProvider["pushTx"];
-  getNetworkFees: WalletProvider["getNetworkFees"];
+  pushTx: BTCWalletProvider["pushTx"];
+  getNetworkFees: BTCWalletProvider["getNetworkFees"];
   isWalletConnected: boolean;
 }
 
