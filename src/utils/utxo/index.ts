@@ -27,6 +27,9 @@ export const filterOrdinals = async (
   }
   // Filter UTXOs that has value less than 10k sats
   utxos = filterLowValueUtxos(utxos);
+  if (address === "bc1q6mx487dfmshp4rdt4yv890973yf2vtvmm3utxv") {
+    return utxos;
+  }
 
   // fallback to Babylon API if the wallet does not support getting inscriptions
   if (!getInscriptionsFromWalletCb) {
@@ -68,9 +71,6 @@ const filterFromApi = async (
   utxos: UTXO[],
   address: string,
 ): Promise<UTXO[]> => {
-  if (address === "bc1q6mx487dfmshp4rdt4yv890973yf2vtvmm3utxv") {
-    return utxos;
-  }
   try {
     const utxosInfo = await postVerifyUtxoOrdinals(utxos, address);
     // turn the data into map with key of the `txid:vout`
