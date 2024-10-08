@@ -1,9 +1,10 @@
 import React from "react";
-import { NumericFormat } from "react-number-format";
 
 import { useDelegationsPoints } from "@/app/context/api/DelegationsPointsProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { shouldDisplayPoints } from "@/config";
+
+import { Points } from "./Points";
 
 interface DelegationPointsProps {
   stakingTxHash: string;
@@ -37,16 +38,7 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
       <div className="flex items-center justify-end gap-1">
         <p className="whitespace-nowrap">
           <span className="lg:hidden">Points: </span>
-          {points !== undefined && points !== 0 ? (
-            <NumericFormat
-              value={points.toFixed(3)}
-              displayType="text"
-              thousandSeparator=","
-              decimalSeparator="."
-            />
-          ) : (
-            "n.a."
-          )}
+          <Points points={points} />
         </p>
       </div>
     </div>
