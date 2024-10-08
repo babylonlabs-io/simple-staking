@@ -1,5 +1,5 @@
 import { networks } from "bitcoinjs-lib";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -100,6 +100,12 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
   const { showError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
+
+  const delegation = useMemo(
+    () =>
+      delegationsAPI.find((delegation) => delegation.stakingTxHashHex === txID),
+    [delegationsAPI, txID],
+  );
 
   const shouldShowPoints =
     isApiNormal && !isGeoBlocked && shouldDisplayPoints();
@@ -267,6 +273,21 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
     });
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
+  useEffect(() => {
+    if (modalOpen && !delegation) {
+      showError({
+        error: {
+          message: "Delegation not found",
+          errorState: ErrorState.SERVER_ERROR,
+        },
+        noCancel: false,
+      });
+      setModalOpen(false);
+      setTxID("");
+      setModalMode(undefined);
+    }
+  }, [modalOpen, delegation, showError]);
+
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
     ? [...delegationsLocalStorage, ...delegationsAPI]
@@ -339,7 +360,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
           </div>
         </>
       )}
-      {modalMode && txID && (
+      {modalMode && txID && delegation && (
         <UnbondWithdrawModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -350,8 +371,7 @@ const DelegationsContent: React.FC<DelegationsProps> = ({
           }}
           mode={modalMode}
           awaitingWalletResponse={awaitingWalletResponse}
-          delegationsAPI={delegationsAPI}
-          txID={txID}
+          delegation={delegation}
         />
       )}
     </div>
