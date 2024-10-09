@@ -1,5 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 
+import { useVersionByHeight } from "@/app/hooks/useVersions";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
@@ -22,8 +23,7 @@ interface PreviewModalProps {
   onProceed: () => void;
   mode: MODE;
   awaitingWalletResponse: boolean;
-  delegationsAPI: DelegationInterface[];
-  txID: string;
+  delegation: DelegationInterface;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -32,33 +32,16 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onProceed,
   mode,
   awaitingWalletResponse,
-  delegationsAPI,
-  txID,
+  delegation,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
-  const { data: versions } = useVersions();
 
-  const getGlobalParamsForDelegation = (startHeight: number) => {
-    const { currentVersion } = getCurrentGlobalParamsVersion(
-      startHeight,
-      versions || [],
-    );
-    return currentVersion;
-  };
-
-  const delegation = delegationsAPI.find(
-    (delegation) => delegation.stakingTxHashHex === txID,
-  );
-  if (!delegation) {
-    throw new Error("Delegation not found");
-  }
-
-  const globalParams = getGlobalParamsForDelegation(
-    delegation.stakingTx.startHeight,
+  const { currentVersion: delegationGlobalParams } = useVersionByHeight(
+    delegation.stakingTx.startHeight ?? 0,
   );
 
-  const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
-  const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
+  const unbondingFeeSat = delegationGlobalParams?.unbondingFeeSat ?? 0;
+  const unbondingTimeBlocks = delegationGlobalParams?.unbondingTime ?? 0;
 
   const unbondTitle = "Unbond";
 

@@ -1,5 +1,5 @@
 import type { networks } from "bitcoinjs-lib";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -104,15 +104,18 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   const { showError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
-  const [selectedDelegationHeight, setSelectedDelegationHeight] = useState<
-    number | undefined
-  >();
   const {
     delegations = [],
     fetchMoreDelegations,
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
+
+  const delegation = useMemo(
+    () =>
+      delegationsAPI.find((delegation) => delegation.stakingTxHashHex === txID),
+    [delegationsAPI, txID],
+  );
 
   const shouldShowPoints =
     isApiNormal && !isGeoBlocked && shouldDisplayPoints();
@@ -280,6 +283,21 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     });
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
+  useEffect(() => {
+    if (modalOpen && !delegation) {
+      showError({
+        error: {
+          message: "Delegation not found",
+          errorState: ErrorState.SERVER_ERROR,
+        },
+        noCancel: false,
+      });
+      setModalOpen(false);
+      setTxID("");
+      setModalMode(undefined);
+    }
+  }, [modalOpen, delegation, showError]);
+
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
     ? [...delegations, ...delegationsAPI]
@@ -352,7 +370,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           </div>
         </>
       )}
-      {modalMode && txID && (
+      {modalMode && txID && delegation && (
         <UnbondWithdrawModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
@@ -363,8 +381,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           }}
           mode={modalMode}
           awaitingWalletResponse={awaitingWalletResponse}
-          delegationsAPI={delegationsAPI}
-          txID={txID}
+          delegation={delegation}
         />
       )}
     </div>
