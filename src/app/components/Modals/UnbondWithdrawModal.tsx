@@ -1,6 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useAppState } from "@/app/state";
+import { useVersionByHeight } from "@/app/hooks/useVersions";
+import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -20,6 +21,7 @@ interface PreviewModalProps {
   onProceed: () => void;
   mode: MODE;
   awaitingWalletResponse: boolean;
+  delegation: DelegationInterface;
 }
 
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
@@ -28,12 +30,16 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   onProceed,
   mode,
   awaitingWalletResponse,
+  delegation,
 }) => {
   const { coinName, networkName } = getNetworkConfig();
-  const { currentVersion: globalParams } = useAppState();
 
-  const unbondingFeeSat = globalParams?.unbondingFeeSat || 0;
-  const unbondingTimeBlocks = globalParams?.unbondingTime || 0;
+  const { currentVersion: delegationGlobalParams } = useVersionByHeight(
+    delegation.stakingTx.startHeight ?? 0,
+  );
+
+  const unbondingFeeSat = delegationGlobalParams?.unbondingFeeSat ?? 0;
+  const unbondingTimeBlocks = delegationGlobalParams?.unbondingTime ?? 0;
 
   const unbondTitle = "Unbond";
 
