@@ -2,10 +2,6 @@
 
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
-import { twJoin } from "tailwind-merge";
-
-import { network } from "@/config/network.config";
-import { Network } from "@/utils/wallet/wallet_provider";
 
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -22,12 +18,7 @@ const Home = () => {
   }, []);
 
   return (
-    <main
-      className={twJoin(
-        `relative h-full min-h-svh w-full`,
-        network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet",
-      )}
-    >
+    <>
       <NetworkBadge />
       <Header />
       <div className="container mx-auto flex justify-center p-6">
@@ -40,7 +31,7 @@ const Home = () => {
       </div>
       <FAQ />
       <Footer />
-    </main>
+    </>
   );
 };
 
