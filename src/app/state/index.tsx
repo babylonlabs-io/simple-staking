@@ -1,8 +1,8 @@
 import { useMemo, type PropsWithChildren } from "react";
 
-import { useBTCTipHeight } from "@/app/hooks/useBTCTipHeight";
-import { useUTXOs } from "@/app/hooks/useUTXOs";
-import { useVersions } from "@/app/hooks/useVersions";
+import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
+import { useUTXOs } from "@/app/hooks/api/useUTXOs";
+import { useVersions } from "@/app/hooks/api/useVersions";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
@@ -12,7 +12,7 @@ import { DelegationState } from "./DelegationState";
 
 const STATE_LIST = [DelegationState];
 
-interface AppState {
+export interface AppState {
   availableUTXOs?: UTXO[];
   totalBalance: number;
   nextVersion?: GlobalParamsVersion;
