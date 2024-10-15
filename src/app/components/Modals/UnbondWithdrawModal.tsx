@@ -10,8 +10,6 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { LoadingView } from "../Loading/Loading";
 
 import { GeneralModal } from "./GeneralModal";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import { useVersions } from "@/app/hooks/useVersions";
 
 export const MODE_UNBOND = "unbond";
 export const MODE_WITHDRAW = "withdraw";
