@@ -5,9 +5,15 @@ import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
 
-import { confirmedTVL, delegations, pendingStake, stakers } from "./icons";
-import { StakingCapItem } from "./StakingCapItem";
 import { StatItem } from "./StatItem";
+import {
+  delegationIcon,
+  finalityProviderIcon,
+  rewardHistoryIcon,
+  rewardRateIcon,
+  stakerIcon,
+  tvlIcon,
+} from "./icons";
 
 const { coinName } = getNetworkConfig();
 
@@ -19,59 +25,74 @@ const formatter = Intl.NumberFormat("en", {
 export const Stats = memo(() => {
   const {
     data: {
-      activeTVLSat = 0,
-      unconfirmedTVLSat = 0,
-      activeDelegations = 0,
-      totalStakers = 0,
-    } = {},
+      activeTvl,
+      activeStakers,
+      activeDelegations,
+      totalFinalityProviders,
+      activeFinalityProviders,
+    },
     isLoading,
   } = useSystemStats();
 
   return (
-    <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm lg:flex-row lg:justify-between">
+    <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm xl:flex-row xl:justify-between">
       <div className="card flex justify-between bg-base-400 p-4 text-sm md:flex-row">
-        <StakingCapItem />
-
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
-
         <StatItem
           loading={isLoading}
-          icon={confirmedTVL}
-          title="Confirmed TVL"
-          value={`${maxDecimals(satoshiToBtc(activeTVLSat), 8)} ${coinName}`}
+          icon={tvlIcon}
+          title="TVL"
+          value={`${maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinName}`}
+          tooltip="Total number of active bitcoins staked"
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
           loading={isLoading}
-          icon={pendingStake}
-          title="Pending Stake"
-          value={`${maxDecimals(satoshiToBtc(activeTVLSat), 8)} ${coinName}`}
-          tooltip={
-            unconfirmedTVLSat - activeTVLSat < 0
-              ? "Pending TVL can be negative when there are unbonding requests"
-              : undefined
-          }
+          icon={stakerIcon}
+          title="Stakers"
+          value={formatter.format(activeStakers)}
+          tooltip="Total number of active bitcoin stakers"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+
+        <StatItem
+          loading={isLoading}
+          icon={finalityProviderIcon}
+          title="Finality Providers"
+          value={`${activeFinalityProviders}/${totalFinalityProviders}`}
+          tooltip="Active and total number of finality providers"
         />
       </div>
 
       <div className="card flex justify-between bg-base-400 p-4 text-sm md:flex-row">
         <StatItem
           loading={isLoading}
-          icon={delegations}
+          icon={delegationIcon}
           title="Delegations"
           value={formatter.format(activeDelegations)}
-          tooltip="Total number of stake delegations"
+          tooltip="Total number of active bitcoin staking delegations"
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
           loading={isLoading}
-          icon={stakers}
-          title="Stakers"
-          value={formatter.format(totalStakers)}
+          icon={rewardRateIcon}
+          title="Reward Rate"
+          value="0 BBN"
+          tooltip="Current number of BBN token reward per 24 hrs per one bitcoin staked"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+
+        <StatItem
+          loading={isLoading}
+          icon={rewardHistoryIcon}
+          title="Reward History"
+          value="O BBN"
+          tooltip="Total number of BBN tokens rewarded to bitcoin stakers"
         />
       </div>
     </div>
