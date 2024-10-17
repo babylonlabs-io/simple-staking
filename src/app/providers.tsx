@@ -8,6 +8,7 @@ import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
+import { TomoProvider } from "./context/wallet/TomoProvider";
 import { WalletProvider } from "./context/wallet/WalletProvider";
 import { AppState } from "./state";
 
@@ -18,15 +19,17 @@ function Providers({ children }: React.PropsWithChildren) {
     <ThemeProvider defaultTheme="dark" attribute="data-theme">
       <QueryClientProvider client={client}>
         <ErrorProvider>
-          <WalletProvider>
-            <AppState>
-              <StakingStatsProvider>
-                <ReactQueryStreamedHydration>
-                  {children}
-                </ReactQueryStreamedHydration>
-              </StakingStatsProvider>
-            </AppState>
-          </WalletProvider>
+          <TomoProvider>
+            <WalletProvider>
+              <AppState>
+                <StakingStatsProvider>
+                  <ReactQueryStreamedHydration>
+                    {children}
+                  </ReactQueryStreamedHydration>
+                </StakingStatsProvider>
+              </AppState>
+            </WalletProvider>
+          </TomoProvider>
         </ErrorProvider>
         <ReactQueryDevtools
           buttonPosition="bottom-left"

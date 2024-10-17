@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { twJoin } from "tailwind-merge";
 
 import { network } from "@/config/network.config";
-import { Network } from "@/utils/wallet/wallet_provider";
+import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import MetaTags from "./components/Meta/MetaTags";
 import "./globals.css";

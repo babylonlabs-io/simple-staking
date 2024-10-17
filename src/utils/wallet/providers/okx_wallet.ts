@@ -12,18 +12,18 @@ import {
   pushTx,
 } from "../../mempool_api";
 import {
+  BTCWalletProvider,
   Fees,
   InscriptionIdentifier,
   Network,
   UTXO,
   WalletInfo,
-  WalletProvider,
-} from "../wallet_provider";
+} from "../btc_wallet_provider";
 
 // window object for OKX Wallet extension
 export const okxProvider = "okxwallet";
 
-export class OKXWallet extends WalletProvider {
+export class OKXWallet extends BTCWalletProvider {
   private okxWalletInfo: WalletInfo | undefined;
   private okxWallet: any;
   private bitcoinNetworkProvider: any;

@@ -6,7 +6,7 @@ import {
   isTaproot,
   toNetwork,
 } from "@/utils/wallet";
-import { Network } from "@/utils/wallet/wallet_provider";
+import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import { testingNetworks } from "../../helper";
 

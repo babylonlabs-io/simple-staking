@@ -9,10 +9,11 @@ import {
   OVERFLOW_TVL_WARNING_THRESHOLD,
   UTXO_KEY,
 } from "@/app/common/constants";
+import { signPsbtTransaction } from "@/app/common/utils/psbt";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";
@@ -67,9 +68,12 @@ export const Staking = () => {
     connected,
     address,
     publicKeyNoCoord,
-    walletProvider: btcWallet,
     network: btcWalletNetwork,
-  } = useWallet();
+    getNetworkFees,
+    signPsbt,
+    getWalletProviderName,
+    pushTx,
+  } = useBTCWallet();
 
   const disabled = isError;
 
@@ -110,11 +114,11 @@ export const Staking = () => {
   } = useQuery({
     queryKey: ["mempool fee rates"],
     queryFn: async () => {
-      if (btcWallet?.getNetworkFees) {
-        return await btcWallet.getNetworkFees();
+      if (getNetworkFees) {
+        return await getNetworkFees();
       }
     },
-    enabled: Boolean(btcWallet?.getNetworkFees),
+    enabled: Boolean(connected) && Boolean(getNetworkFees),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
@@ -221,7 +225,7 @@ export const Staking = () => {
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
       // Initial validation
-      if (!btcWallet) throw new Error("Wallet is not connected");
+      if (!connected) throw new Error("Wallet is not connected");
       if (!address) throw new Error("Address is not set");
       if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
       if (!finalityProvider)
@@ -233,7 +237,8 @@ export const Staking = () => {
 
       // Sign the staking transaction
       const { stakingTxHex, stakingTerm } = await signStakingTx(
-        btcWallet,
+        signPsbtTransaction(signPsbt, getWalletProviderName),
+        pushTx,
         currentVersion,
         stakingAmountSat,
         stakingTimeBlocks,

@@ -46,7 +46,11 @@ describe.each(testingNetworks)(
       }));
 
       const result = await signStakingTx(
-        btcWallet as any,
+        signPsbtTransaction(
+          btcWallet.signPsbt,
+          btcWallet.getWalletProviderName,
+        ),
+        btcWallet.pushTx,
         randomParam,
         randomStakingAmount,
         randomStakingTimeBlocks,
@@ -73,7 +77,11 @@ describe.each(testingNetworks)(
 
       try {
         await signStakingTx(
-          btcWallet as any,
+          signPsbtTransaction(
+            btcWallet.signPsbt,
+            btcWallet.getWalletProviderName,
+          ),
+          btcWallet.pushTx,
           randomParam,
           randomStakingAmount,
           randomStakingTimeBlocks,

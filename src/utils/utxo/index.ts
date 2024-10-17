@@ -1,6 +1,6 @@
 import { postVerifyUtxoOrdinals, UtxoInfo } from "@/app/api/postFilterOrdinals";
 
-import { InscriptionIdentifier, UTXO } from "../wallet/wallet_provider";
+import { InscriptionIdentifier, UTXO } from "../wallet/btc_wallet_provider";
 
 export const LOW_VALUE_UTXO_THRESHOLD = 10000;
 export const WALLET_FETCH_INSRIPTIONS_TIMEOUT = 3000; // 3 seconds

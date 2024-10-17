@@ -1,6 +1,6 @@
 import { getNetworkConfig } from "@/config/network.config";
 
-import { Fees, UTXO } from "./wallet/wallet_provider";
+import { Fees, UTXO } from "./wallet/btc_wallet_provider";
 
 const { mempoolApiUrl } = getNetworkConfig();
 
