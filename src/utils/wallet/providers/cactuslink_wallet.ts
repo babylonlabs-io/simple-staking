@@ -169,6 +169,7 @@ export class CactusLinkWallet extends WalletProvider {
   };
 
   getInscriptions(): Promise<InscriptionIdentifier[]> {
-    throw new Error("Method not implemented.");
+    // Temporary solution to ignore inscriptions filtering for Cactus Link Wallet
+    return Promise.resolve([]);
   }
 }

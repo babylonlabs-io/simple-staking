@@ -1,8 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { NumericFormat } from "react-number-format";
 
 import { getStakersPoints } from "@/app/api/getPoints";
+
+import { Points } from "./Points";
 
 interface StakerPointsProps {
   publicKeyNoCoord: string;
@@ -30,19 +31,12 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
 
   const points = stakerPoints?.[0]?.points;
 
+  console.log(points !== undefined || points !== 0);
+
   return (
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap font-semibold">
-        {points !== undefined ? (
-          <NumericFormat
-            value={points.toFixed(3)}
-            displayType="text"
-            thousandSeparator=","
-            decimalSeparator="."
-          />
-        ) : (
-          "n.a."
-        )}
+        <Points points={points} />
       </p>
     </div>
   );
