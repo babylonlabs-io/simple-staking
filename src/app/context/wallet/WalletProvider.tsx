@@ -116,6 +116,9 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
     setNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
+    setCosmosWalletProvider(undefined);
+    setCosmosBech32Address("");
+    setCosmosPubKey("");
     await tomoWalletConnect.disconnect();
   }, [tomoWalletConnect]);
 
@@ -147,18 +150,12 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
     }
   }, [providers.cosmosProvider, showError]);
 
-  const disconnectCosmos = useCallback(async () => {
-    setCosmosWalletProvider(undefined);
-    setCosmosBech32Address("");
-    setCosmosPubKey("");
-  }, []);
-
   const cosmosContextValue = useMemo(
     () => ({
       bech32Address: cosmosBech32Address,
       pubKey: cosmosPubKey,
       connected: Boolean(cosmosWalletProvider),
-      disconnect: disconnectCosmos,
+      disconnect,
       open,
       signArbitrary: async (message: string) =>
         await cosmosWalletProvider.provider.signArbitrary(
@@ -172,7 +169,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
       cosmosBech32Address,
       cosmosPubKey,
       cosmosWalletProvider,
-      disconnectCosmos,
+      disconnect,
       open,
     ],
   );
