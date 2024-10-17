@@ -36,3 +36,12 @@ npm run dev
 
 Instructions for wallet integration can be found in this
 [document](./docs/WalletIntegration.md).
+
+## Building Protobuf Files
+This project utilizes Protocol Buffers (protobuf) from the [Babylon](https://github.com/babylonlabs-io/babylon) repository. The protobuf files are essential for generating TypeScript definitions used within the application.
+
+To fetch and compile the protobuf files from the Babylon repository, simply run:
+
+```bash
+npm run build:proto
+```
