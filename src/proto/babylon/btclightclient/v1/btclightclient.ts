@@ -47,7 +47,7 @@ export const BTCHeaderInfo: MessageFns<BTCHeaderInfo> = {
       writer.uint32(18).bytes(message.hash);
     }
     if (message.height !== 0) {
-      writer.uint32(24).uint32(message.height);
+      writer.uint32(24).uint64(message.height);
     }
     if (message.work.length !== 0) {
       writer.uint32(34).bytes(message.work);
@@ -82,7 +82,7 @@ export const BTCHeaderInfo: MessageFns<BTCHeaderInfo> = {
             break;
           }
 
-          message.height = reader.uint32();
+          message.height = longToNumber(reader.uint64());
           continue;
         case 4:
           if (tag !== 34) {
@@ -199,6 +199,17 @@ export type Exact<P, I extends P> = P extends Builtin
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
       [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
     };
+
+function longToNumber(int64: { toString(): string }): number {
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

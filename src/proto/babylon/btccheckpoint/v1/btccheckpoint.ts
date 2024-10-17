@@ -912,7 +912,7 @@ export const BTCCheckpointInfo: MessageFns<BTCCheckpointInfo> = {
       writer.uint32(8).uint64(message.epochNumber);
     }
     if (message.bestSubmissionBtcBlockHeight !== 0) {
-      writer.uint32(16).uint32(message.bestSubmissionBtcBlockHeight);
+      writer.uint32(16).uint64(message.bestSubmissionBtcBlockHeight);
     }
     if (message.bestSubmissionBtcBlockHash.length !== 0) {
       writer.uint32(26).bytes(message.bestSubmissionBtcBlockHash);
@@ -946,7 +946,7 @@ export const BTCCheckpointInfo: MessageFns<BTCCheckpointInfo> = {
             break;
           }
 
-          message.bestSubmissionBtcBlockHeight = reader.uint32();
+          message.bestSubmissionBtcBlockHeight = longToNumber(reader.uint64());
           continue;
         case 3:
           if (tag !== 26) {

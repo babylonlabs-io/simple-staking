@@ -6,7 +6,6 @@
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import { Timestamp } from "../../../google/protobuf/timestamp";
 
 export const protobufPackage = "babylon.finality.v1";
 
@@ -38,8 +37,6 @@ export interface PubRandCommit {
    * currently, it is the root of the merkle tree constructed by the public randomness
    */
   commitment: Uint8Array;
-  /** epoch_num defines the epoch number that the commit falls into */
-  epochNum: number;
 }
 
 /**
@@ -85,8 +82,6 @@ export interface FinalityProviderSigningInfo {
    * Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
    */
   missedBlocksCounter: number;
-  /** Timestamp until which the validator is jailed due to liveness downtime. */
-  jailedUntil: Date | undefined;
 }
 
 function createBaseIndexedBlock(): IndexedBlock {
@@ -191,12 +186,7 @@ export const IndexedBlock: MessageFns<IndexedBlock> = {
 };
 
 function createBasePubRandCommit(): PubRandCommit {
-  return {
-    startHeight: 0,
-    numPubRand: 0,
-    commitment: new Uint8Array(0),
-    epochNum: 0,
-  };
+  return { startHeight: 0, numPubRand: 0, commitment: new Uint8Array(0) };
 }
 
 export const PubRandCommit: MessageFns<PubRandCommit> = {
@@ -212,9 +202,6 @@ export const PubRandCommit: MessageFns<PubRandCommit> = {
     }
     if (message.commitment.length !== 0) {
       writer.uint32(26).bytes(message.commitment);
-    }
-    if (message.epochNum !== 0) {
-      writer.uint32(32).uint64(message.epochNum);
     }
     return writer;
   },
@@ -248,13 +235,6 @@ export const PubRandCommit: MessageFns<PubRandCommit> = {
 
           message.commitment = reader.bytes();
           continue;
-        case 4:
-          if (tag !== 32) {
-            break;
-          }
-
-          message.epochNum = longToNumber(reader.uint64());
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -275,7 +255,6 @@ export const PubRandCommit: MessageFns<PubRandCommit> = {
       commitment: isSet(object.commitment)
         ? bytesFromBase64(object.commitment)
         : new Uint8Array(0),
-      epochNum: isSet(object.epochNum) ? globalThis.Number(object.epochNum) : 0,
     };
   },
 
@@ -289,9 +268,6 @@ export const PubRandCommit: MessageFns<PubRandCommit> = {
     }
     if (message.commitment.length !== 0) {
       obj.commitment = base64FromBytes(message.commitment);
-    }
-    if (message.epochNum !== 0) {
-      obj.epochNum = Math.round(message.epochNum);
     }
     return obj;
   },
@@ -308,7 +284,6 @@ export const PubRandCommit: MessageFns<PubRandCommit> = {
     message.startHeight = object.startHeight ?? 0;
     message.numPubRand = object.numPubRand ?? 0;
     message.commitment = object.commitment ?? new Uint8Array(0);
-    message.epochNum = object.epochNum ?? 0;
     return message;
   },
 };
@@ -490,12 +465,7 @@ export const Evidence: MessageFns<Evidence> = {
 };
 
 function createBaseFinalityProviderSigningInfo(): FinalityProviderSigningInfo {
-  return {
-    fpBtcPk: new Uint8Array(0),
-    startHeight: 0,
-    missedBlocksCounter: 0,
-    jailedUntil: undefined,
-  };
+  return { fpBtcPk: new Uint8Array(0), startHeight: 0, missedBlocksCounter: 0 };
 }
 
 export const FinalityProviderSigningInfo: MessageFns<FinalityProviderSigningInfo> =
@@ -512,12 +482,6 @@ export const FinalityProviderSigningInfo: MessageFns<FinalityProviderSigningInfo
       }
       if (message.missedBlocksCounter !== 0) {
         writer.uint32(24).int64(message.missedBlocksCounter);
-      }
-      if (message.jailedUntil !== undefined) {
-        Timestamp.encode(
-          toTimestamp(message.jailedUntil),
-          writer.uint32(34).fork(),
-        ).join();
       }
       return writer;
     },
@@ -554,15 +518,6 @@ export const FinalityProviderSigningInfo: MessageFns<FinalityProviderSigningInfo
 
             message.missedBlocksCounter = longToNumber(reader.int64());
             continue;
-          case 4:
-            if (tag !== 34) {
-              break;
-            }
-
-            message.jailedUntil = fromTimestamp(
-              Timestamp.decode(reader, reader.uint32()),
-            );
-            continue;
         }
         if ((tag & 7) === 4 || tag === 0) {
           break;
@@ -583,9 +538,6 @@ export const FinalityProviderSigningInfo: MessageFns<FinalityProviderSigningInfo
         missedBlocksCounter: isSet(object.missedBlocksCounter)
           ? globalThis.Number(object.missedBlocksCounter)
           : 0,
-        jailedUntil: isSet(object.jailedUntil)
-          ? fromJsonTimestamp(object.jailedUntil)
-          : undefined,
       };
     },
 
@@ -599,9 +551,6 @@ export const FinalityProviderSigningInfo: MessageFns<FinalityProviderSigningInfo
       }
       if (message.missedBlocksCounter !== 0) {
         obj.missedBlocksCounter = Math.round(message.missedBlocksCounter);
-      }
-      if (message.jailedUntil !== undefined) {
-        obj.jailedUntil = message.jailedUntil.toISOString();
       }
       return obj;
     },
@@ -618,7 +567,6 @@ export const FinalityProviderSigningInfo: MessageFns<FinalityProviderSigningInfo
       message.fpBtcPk = object.fpBtcPk ?? new Uint8Array(0);
       message.startHeight = object.startHeight ?? 0;
       message.missedBlocksCounter = object.missedBlocksCounter ?? 0;
-      message.jailedUntil = object.jailedUntil ?? undefined;
       return message;
     },
   };
@@ -673,28 +621,6 @@ export type Exact<P, I extends P> = P extends Builtin
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
       [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
     };
-
-function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
-}
-
-function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
-  millis += (t.nanos || 0) / 1_000_000;
-  return new globalThis.Date(millis);
-}
-
-function fromJsonTimestamp(o: any): Date {
-  if (o instanceof globalThis.Date) {
-    return o;
-  } else if (typeof o === "string") {
-    return new globalThis.Date(o);
-  } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
-  }
-}
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());

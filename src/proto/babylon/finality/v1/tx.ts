@@ -83,16 +83,6 @@ export interface MsgUpdateParams {
 /** MsgUpdateParamsResponse is the response to the MsgUpdateParams message. */
 export interface MsgUpdateParamsResponse {}
 
-/** MsgUnjailFinalityProvider defines the Msg/UnjailFinalityProvider request type */
-export interface MsgUnjailFinalityProvider {
-  signer: string;
-  /** fp_btc_pk is the BTC PK of the finality provider that commits the public randomness */
-  fpBtcPk: Uint8Array;
-}
-
-/** MsgUnjailFinalityProviderResponse defines the Msg/UnjailFinalityProvider response type */
-export interface MsgUnjailFinalityProviderResponse {}
-
 function createBaseMsgCommitPubRandList(): MsgCommitPubRandList {
   return {
     signer: "",
@@ -682,149 +672,6 @@ export const MsgUpdateParamsResponse: MessageFns<MsgUpdateParamsResponse> = {
   },
 };
 
-function createBaseMsgUnjailFinalityProvider(): MsgUnjailFinalityProvider {
-  return { signer: "", fpBtcPk: new Uint8Array(0) };
-}
-
-export const MsgUnjailFinalityProvider: MessageFns<MsgUnjailFinalityProvider> =
-  {
-    encode(
-      message: MsgUnjailFinalityProvider,
-      writer: BinaryWriter = new BinaryWriter(),
-    ): BinaryWriter {
-      if (message.signer !== "") {
-        writer.uint32(10).string(message.signer);
-      }
-      if (message.fpBtcPk.length !== 0) {
-        writer.uint32(18).bytes(message.fpBtcPk);
-      }
-      return writer;
-    },
-
-    decode(
-      input: BinaryReader | Uint8Array,
-      length?: number,
-    ): MsgUnjailFinalityProvider {
-      const reader =
-        input instanceof BinaryReader ? input : new BinaryReader(input);
-      let end = length === undefined ? reader.len : reader.pos + length;
-      const message = createBaseMsgUnjailFinalityProvider();
-      while (reader.pos < end) {
-        const tag = reader.uint32();
-        switch (tag >>> 3) {
-          case 1:
-            if (tag !== 10) {
-              break;
-            }
-
-            message.signer = reader.string();
-            continue;
-          case 2:
-            if (tag !== 18) {
-              break;
-            }
-
-            message.fpBtcPk = reader.bytes();
-            continue;
-        }
-        if ((tag & 7) === 4 || tag === 0) {
-          break;
-        }
-        reader.skip(tag & 7);
-      }
-      return message;
-    },
-
-    fromJSON(object: any): MsgUnjailFinalityProvider {
-      return {
-        signer: isSet(object.signer) ? globalThis.String(object.signer) : "",
-        fpBtcPk: isSet(object.fpBtcPk)
-          ? bytesFromBase64(object.fpBtcPk)
-          : new Uint8Array(0),
-      };
-    },
-
-    toJSON(message: MsgUnjailFinalityProvider): unknown {
-      const obj: any = {};
-      if (message.signer !== "") {
-        obj.signer = message.signer;
-      }
-      if (message.fpBtcPk.length !== 0) {
-        obj.fpBtcPk = base64FromBytes(message.fpBtcPk);
-      }
-      return obj;
-    },
-
-    create<I extends Exact<DeepPartial<MsgUnjailFinalityProvider>, I>>(
-      base?: I,
-    ): MsgUnjailFinalityProvider {
-      return MsgUnjailFinalityProvider.fromPartial(base ?? ({} as any));
-    },
-    fromPartial<I extends Exact<DeepPartial<MsgUnjailFinalityProvider>, I>>(
-      object: I,
-    ): MsgUnjailFinalityProvider {
-      const message = createBaseMsgUnjailFinalityProvider();
-      message.signer = object.signer ?? "";
-      message.fpBtcPk = object.fpBtcPk ?? new Uint8Array(0);
-      return message;
-    },
-  };
-
-function createBaseMsgUnjailFinalityProviderResponse(): MsgUnjailFinalityProviderResponse {
-  return {};
-}
-
-export const MsgUnjailFinalityProviderResponse: MessageFns<MsgUnjailFinalityProviderResponse> =
-  {
-    encode(
-      _: MsgUnjailFinalityProviderResponse,
-      writer: BinaryWriter = new BinaryWriter(),
-    ): BinaryWriter {
-      return writer;
-    },
-
-    decode(
-      input: BinaryReader | Uint8Array,
-      length?: number,
-    ): MsgUnjailFinalityProviderResponse {
-      const reader =
-        input instanceof BinaryReader ? input : new BinaryReader(input);
-      let end = length === undefined ? reader.len : reader.pos + length;
-      const message = createBaseMsgUnjailFinalityProviderResponse();
-      while (reader.pos < end) {
-        const tag = reader.uint32();
-        switch (tag >>> 3) {
-        }
-        if ((tag & 7) === 4 || tag === 0) {
-          break;
-        }
-        reader.skip(tag & 7);
-      }
-      return message;
-    },
-
-    fromJSON(_: any): MsgUnjailFinalityProviderResponse {
-      return {};
-    },
-
-    toJSON(_: MsgUnjailFinalityProviderResponse): unknown {
-      const obj: any = {};
-      return obj;
-    },
-
-    create<I extends Exact<DeepPartial<MsgUnjailFinalityProviderResponse>, I>>(
-      base?: I,
-    ): MsgUnjailFinalityProviderResponse {
-      return MsgUnjailFinalityProviderResponse.fromPartial(base ?? ({} as any));
-    },
-    fromPartial<
-      I extends Exact<DeepPartial<MsgUnjailFinalityProviderResponse>, I>,
-    >(_: I): MsgUnjailFinalityProviderResponse {
-      const message = createBaseMsgUnjailFinalityProviderResponse();
-      return message;
-    },
-  };
-
 /** Msg defines the Msg service. */
 export interface Msg {
   /** CommitPubRandList commits a list of public randomness for EOTS */
@@ -840,13 +687,6 @@ export interface Msg {
    * UpdateParams updates the finality module parameters.
    */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
-  /**
-   * UnjailFinalityProvider defines a method for unjailing a jailed
-   * finality provider, thus it can receive voting power
-   */
-  UnjailFinalityProvider(
-    request: MsgUnjailFinalityProvider,
-  ): Promise<MsgUnjailFinalityProviderResponse>;
 }
 
 export const MsgServiceName = "babylon.finality.v1.Msg";
@@ -859,7 +699,6 @@ export class MsgClientImpl implements Msg {
     this.CommitPubRandList = this.CommitPubRandList.bind(this);
     this.AddFinalitySig = this.AddFinalitySig.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
-    this.UnjailFinalityProvider = this.UnjailFinalityProvider.bind(this);
   }
   CommitPubRandList(
     request: MsgCommitPubRandList,
@@ -886,20 +725,6 @@ export class MsgClientImpl implements Msg {
     const promise = this.rpc.request(this.service, "UpdateParams", data);
     return promise.then((data) =>
       MsgUpdateParamsResponse.decode(new BinaryReader(data)),
-    );
-  }
-
-  UnjailFinalityProvider(
-    request: MsgUnjailFinalityProvider,
-  ): Promise<MsgUnjailFinalityProviderResponse> {
-    const data = MsgUnjailFinalityProvider.encode(request).finish();
-    const promise = this.rpc.request(
-      this.service,
-      "UnjailFinalityProvider",
-      data,
-    );
-    return promise.then((data) =>
-      MsgUnjailFinalityProviderResponse.decode(new BinaryReader(data)),
     );
   }
 }

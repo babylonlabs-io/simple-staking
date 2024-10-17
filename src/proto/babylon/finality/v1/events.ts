@@ -20,10 +20,19 @@ export interface EventSlashedFinalityProvider {
 }
 
 /**
- * EventJailedFinalityProvider is the event emitted when a finality provider is
- * jailed due to inactivity
+ * EventSluggishFinalityProviderDetected is the event emitted when a finality provider is
+ * detected as sluggish
  */
-export interface EventJailedFinalityProvider {
+export interface EventSluggishFinalityProviderDetected {
+  /** public_key is the BTC public key of the finality provider */
+  publicKey: string;
+}
+
+/**
+ * EventSluggishFinalityProviderReverted is the event emitted when a sluggish finality
+ * provider is no longer considered sluggish
+ */
+export interface EventSluggishFinalityProviderReverted {
   /** public_key is the BTC public key of the finality provider */
   publicKey: string;
 }
@@ -104,14 +113,14 @@ export const EventSlashedFinalityProvider: MessageFns<EventSlashedFinalityProvid
     },
   };
 
-function createBaseEventJailedFinalityProvider(): EventJailedFinalityProvider {
+function createBaseEventSluggishFinalityProviderDetected(): EventSluggishFinalityProviderDetected {
   return { publicKey: "" };
 }
 
-export const EventJailedFinalityProvider: MessageFns<EventJailedFinalityProvider> =
+export const EventSluggishFinalityProviderDetected: MessageFns<EventSluggishFinalityProviderDetected> =
   {
     encode(
-      message: EventJailedFinalityProvider,
+      message: EventSluggishFinalityProviderDetected,
       writer: BinaryWriter = new BinaryWriter(),
     ): BinaryWriter {
       if (message.publicKey !== "") {
@@ -123,11 +132,11 @@ export const EventJailedFinalityProvider: MessageFns<EventJailedFinalityProvider
     decode(
       input: BinaryReader | Uint8Array,
       length?: number,
-    ): EventJailedFinalityProvider {
+    ): EventSluggishFinalityProviderDetected {
       const reader =
         input instanceof BinaryReader ? input : new BinaryReader(input);
       let end = length === undefined ? reader.len : reader.pos + length;
-      const message = createBaseEventJailedFinalityProvider();
+      const message = createBaseEventSluggishFinalityProviderDetected();
       while (reader.pos < end) {
         const tag = reader.uint32();
         switch (tag >>> 3) {
@@ -147,7 +156,7 @@ export const EventJailedFinalityProvider: MessageFns<EventJailedFinalityProvider
       return message;
     },
 
-    fromJSON(object: any): EventJailedFinalityProvider {
+    fromJSON(object: any): EventSluggishFinalityProviderDetected {
       return {
         publicKey: isSet(object.publicKey)
           ? globalThis.String(object.publicKey)
@@ -155,7 +164,7 @@ export const EventJailedFinalityProvider: MessageFns<EventJailedFinalityProvider
       };
     },
 
-    toJSON(message: EventJailedFinalityProvider): unknown {
+    toJSON(message: EventSluggishFinalityProviderDetected): unknown {
       const obj: any = {};
       if (message.publicKey !== "") {
         obj.publicKey = message.publicKey;
@@ -163,15 +172,92 @@ export const EventJailedFinalityProvider: MessageFns<EventJailedFinalityProvider
       return obj;
     },
 
-    create<I extends Exact<DeepPartial<EventJailedFinalityProvider>, I>>(
-      base?: I,
-    ): EventJailedFinalityProvider {
-      return EventJailedFinalityProvider.fromPartial(base ?? ({} as any));
+    create<
+      I extends Exact<DeepPartial<EventSluggishFinalityProviderDetected>, I>,
+    >(base?: I): EventSluggishFinalityProviderDetected {
+      return EventSluggishFinalityProviderDetected.fromPartial(
+        base ?? ({} as any),
+      );
     },
-    fromPartial<I extends Exact<DeepPartial<EventJailedFinalityProvider>, I>>(
-      object: I,
-    ): EventJailedFinalityProvider {
-      const message = createBaseEventJailedFinalityProvider();
+    fromPartial<
+      I extends Exact<DeepPartial<EventSluggishFinalityProviderDetected>, I>,
+    >(object: I): EventSluggishFinalityProviderDetected {
+      const message = createBaseEventSluggishFinalityProviderDetected();
+      message.publicKey = object.publicKey ?? "";
+      return message;
+    },
+  };
+
+function createBaseEventSluggishFinalityProviderReverted(): EventSluggishFinalityProviderReverted {
+  return { publicKey: "" };
+}
+
+export const EventSluggishFinalityProviderReverted: MessageFns<EventSluggishFinalityProviderReverted> =
+  {
+    encode(
+      message: EventSluggishFinalityProviderReverted,
+      writer: BinaryWriter = new BinaryWriter(),
+    ): BinaryWriter {
+      if (message.publicKey !== "") {
+        writer.uint32(10).string(message.publicKey);
+      }
+      return writer;
+    },
+
+    decode(
+      input: BinaryReader | Uint8Array,
+      length?: number,
+    ): EventSluggishFinalityProviderReverted {
+      const reader =
+        input instanceof BinaryReader ? input : new BinaryReader(input);
+      let end = length === undefined ? reader.len : reader.pos + length;
+      const message = createBaseEventSluggishFinalityProviderReverted();
+      while (reader.pos < end) {
+        const tag = reader.uint32();
+        switch (tag >>> 3) {
+          case 1:
+            if (tag !== 10) {
+              break;
+            }
+
+            message.publicKey = reader.string();
+            continue;
+        }
+        if ((tag & 7) === 4 || tag === 0) {
+          break;
+        }
+        reader.skip(tag & 7);
+      }
+      return message;
+    },
+
+    fromJSON(object: any): EventSluggishFinalityProviderReverted {
+      return {
+        publicKey: isSet(object.publicKey)
+          ? globalThis.String(object.publicKey)
+          : "",
+      };
+    },
+
+    toJSON(message: EventSluggishFinalityProviderReverted): unknown {
+      const obj: any = {};
+      if (message.publicKey !== "") {
+        obj.publicKey = message.publicKey;
+      }
+      return obj;
+    },
+
+    create<
+      I extends Exact<DeepPartial<EventSluggishFinalityProviderReverted>, I>,
+    >(base?: I): EventSluggishFinalityProviderReverted {
+      return EventSluggishFinalityProviderReverted.fromPartial(
+        base ?? ({} as any),
+      );
+    },
+    fromPartial<
+      I extends Exact<DeepPartial<EventSluggishFinalityProviderReverted>, I>,
+    >(object: I): EventSluggishFinalityProviderReverted {
+      const message = createBaseEventSluggishFinalityProviderReverted();
       message.publicKey = object.publicKey ?? "";
       return message;
     },

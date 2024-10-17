@@ -12,7 +12,6 @@ export const protobufPackage = "babylon.btcstaking.v1";
 /** Params defines the parameters for the module. */
 export interface Params {
   /**
-   * PARAMETERS COVERING STAKING
    * covenant_pks is the list of public keys held by the covenant committee
    * each PK follows encoding in BIP-340 spec on Bitcoin
    */
@@ -22,50 +21,36 @@ export interface Params {
    * multisignature
    */
   covenantQuorum: number;
-  /** min_staking_value_sat is the minimum of satoshis locked in staking output */
-  minStakingValueSat: number;
-  /** max_staking_value_sat is the maximum of satoshis locked in staking output */
-  maxStakingValueSat: number;
-  /** min_staking_time is the minimum lock time specified in staking output script */
-  minStakingTimeBlocks: number;
-  /** max_staking_time_blocks is the maximum lock time time specified in staking output script */
-  maxStakingTimeBlocks: number;
   /**
-   * PARAMETERS COVERING SLASHING
-   * slashing_pk_script is the pk_script expected in slashing output ie. the first
-   * output of slashing transaction
+   * slashing address is the address that the slashed BTC goes to
+   * the address is in string on Bitcoin
    */
-  slashingPkScript: Uint8Array;
+  slashingAddress: string;
   /**
    * min_slashing_tx_fee_sat is the minimum amount of tx fee (quantified
-   * in Satoshi) needed for the pre-signed slashing tx. It covers both:
-   * staking slashing transaction and unbonding slashing transaction
+   * in Satoshi) needed for the pre-signed slashing tx
+   * TODO: change to satoshi per byte?
    */
   minSlashingTxFeeSat: number;
+  /** min_commission_rate is the chain-wide minimum commission rate that a finality provider can charge their delegators */
+  minCommissionRate: string;
   /**
    * slashing_rate determines the portion of the staked amount to be slashed,
-   * expressed as a decimal (e.g., 0.5 for 50%). Maximal precion is 2 decimal
-   * places
+   * expressed as a decimal (e.g., 0.5 for 50%).
    */
   slashingRate: string;
-  /**
-   * PARAMETERS COVERING UNBONDING
-   * min_unbonding_time is the minimum time for unbonding transaction timelock in BTC blocks
-   */
-  minUnbondingTimeBlocks: number;
-  /** unbonding_fee exact fee required for unbonding transaction */
-  unbondingFeeSat: number;
-  /**
-   * PARAMETERS COVERING FINALITY PROVIDERS
-   * min_commission_rate is the chain-wide minimum commission rate that a finality provider
-   * can charge their delegators expressed as a decimal (e.g., 0.5 for 50%). Maximal precion
-   * is 2 decimal places
-   */
-  minCommissionRate: string;
   /** max_active_finality_providers is the maximum number of active finality providers in the BTC staking protocol */
   maxActiveFinalityProviders: number;
-  /** base gas fee for delegation creation */
-  delegationCreationBaseGasFee: number;
+  /** min_unbonding_time is the minimum time for unbonding transaction timelock in BTC blocks */
+  minUnbondingTime: number;
+  /**
+   * min_unbonding_rate is the minimum amount of BTC that are required in unbonding
+   * output, expressed as a fraction of staking output
+   * example: if min_unbonding_rate=0.9, then the unbonding output value
+   * must be at least 90% of staking output, for staking request to be considered
+   * valid
+   */
+  minUnbondingRate: string;
 }
 
 /** StoredParams attach information about the version of stored parameters */
@@ -83,18 +68,13 @@ function createBaseParams(): Params {
   return {
     covenantPks: [],
     covenantQuorum: 0,
-    minStakingValueSat: 0,
-    maxStakingValueSat: 0,
-    minStakingTimeBlocks: 0,
-    maxStakingTimeBlocks: 0,
-    slashingPkScript: new Uint8Array(0),
+    slashingAddress: "",
     minSlashingTxFeeSat: 0,
-    slashingRate: "",
-    minUnbondingTimeBlocks: 0,
-    unbondingFeeSat: 0,
     minCommissionRate: "",
+    slashingRate: "",
     maxActiveFinalityProviders: 0,
-    delegationCreationBaseGasFee: 0,
+    minUnbondingTime: 0,
+    minUnbondingRate: "",
   };
 }
 
@@ -109,41 +89,26 @@ export const Params: MessageFns<Params> = {
     if (message.covenantQuorum !== 0) {
       writer.uint32(16).uint32(message.covenantQuorum);
     }
-    if (message.minStakingValueSat !== 0) {
-      writer.uint32(24).int64(message.minStakingValueSat);
-    }
-    if (message.maxStakingValueSat !== 0) {
-      writer.uint32(32).int64(message.maxStakingValueSat);
-    }
-    if (message.minStakingTimeBlocks !== 0) {
-      writer.uint32(40).uint32(message.minStakingTimeBlocks);
-    }
-    if (message.maxStakingTimeBlocks !== 0) {
-      writer.uint32(48).uint32(message.maxStakingTimeBlocks);
-    }
-    if (message.slashingPkScript.length !== 0) {
-      writer.uint32(58).bytes(message.slashingPkScript);
+    if (message.slashingAddress !== "") {
+      writer.uint32(26).string(message.slashingAddress);
     }
     if (message.minSlashingTxFeeSat !== 0) {
-      writer.uint32(64).int64(message.minSlashingTxFeeSat);
-    }
-    if (message.slashingRate !== "") {
-      writer.uint32(74).string(message.slashingRate);
-    }
-    if (message.minUnbondingTimeBlocks !== 0) {
-      writer.uint32(80).uint32(message.minUnbondingTimeBlocks);
-    }
-    if (message.unbondingFeeSat !== 0) {
-      writer.uint32(88).int64(message.unbondingFeeSat);
+      writer.uint32(32).int64(message.minSlashingTxFeeSat);
     }
     if (message.minCommissionRate !== "") {
-      writer.uint32(98).string(message.minCommissionRate);
+      writer.uint32(42).string(message.minCommissionRate);
+    }
+    if (message.slashingRate !== "") {
+      writer.uint32(50).string(message.slashingRate);
     }
     if (message.maxActiveFinalityProviders !== 0) {
-      writer.uint32(104).uint32(message.maxActiveFinalityProviders);
+      writer.uint32(56).uint32(message.maxActiveFinalityProviders);
     }
-    if (message.delegationCreationBaseGasFee !== 0) {
-      writer.uint32(112).uint64(message.delegationCreationBaseGasFee);
+    if (message.minUnbondingTime !== 0) {
+      writer.uint32(64).uint32(message.minUnbondingTime);
+    }
+    if (message.minUnbondingRate !== "") {
+      writer.uint32(74).string(message.minUnbondingRate);
     }
     return writer;
   },
@@ -171,88 +136,53 @@ export const Params: MessageFns<Params> = {
           message.covenantQuorum = reader.uint32();
           continue;
         case 3:
-          if (tag !== 24) {
+          if (tag !== 26) {
             break;
           }
 
-          message.minStakingValueSat = longToNumber(reader.int64());
+          message.slashingAddress = reader.string();
           continue;
         case 4:
           if (tag !== 32) {
             break;
           }
 
-          message.maxStakingValueSat = longToNumber(reader.int64());
+          message.minSlashingTxFeeSat = longToNumber(reader.int64());
           continue;
         case 5:
-          if (tag !== 40) {
+          if (tag !== 42) {
             break;
           }
 
-          message.minStakingTimeBlocks = reader.uint32();
+          message.minCommissionRate = reader.string();
           continue;
         case 6:
-          if (tag !== 48) {
+          if (tag !== 50) {
             break;
           }
 
-          message.maxStakingTimeBlocks = reader.uint32();
+          message.slashingRate = reader.string();
           continue;
         case 7:
-          if (tag !== 58) {
+          if (tag !== 56) {
             break;
           }
 
-          message.slashingPkScript = reader.bytes();
+          message.maxActiveFinalityProviders = reader.uint32();
           continue;
         case 8:
           if (tag !== 64) {
             break;
           }
 
-          message.minSlashingTxFeeSat = longToNumber(reader.int64());
+          message.minUnbondingTime = reader.uint32();
           continue;
         case 9:
           if (tag !== 74) {
             break;
           }
 
-          message.slashingRate = reader.string();
-          continue;
-        case 10:
-          if (tag !== 80) {
-            break;
-          }
-
-          message.minUnbondingTimeBlocks = reader.uint32();
-          continue;
-        case 11:
-          if (tag !== 88) {
-            break;
-          }
-
-          message.unbondingFeeSat = longToNumber(reader.int64());
-          continue;
-        case 12:
-          if (tag !== 98) {
-            break;
-          }
-
-          message.minCommissionRate = reader.string();
-          continue;
-        case 13:
-          if (tag !== 104) {
-            break;
-          }
-
-          message.maxActiveFinalityProviders = reader.uint32();
-          continue;
-        case 14:
-          if (tag !== 112) {
-            break;
-          }
-
-          message.delegationCreationBaseGasFee = longToNumber(reader.uint64());
+          message.minUnbondingRate = reader.string();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -271,42 +201,27 @@ export const Params: MessageFns<Params> = {
       covenantQuorum: isSet(object.covenantQuorum)
         ? globalThis.Number(object.covenantQuorum)
         : 0,
-      minStakingValueSat: isSet(object.minStakingValueSat)
-        ? globalThis.Number(object.minStakingValueSat)
-        : 0,
-      maxStakingValueSat: isSet(object.maxStakingValueSat)
-        ? globalThis.Number(object.maxStakingValueSat)
-        : 0,
-      minStakingTimeBlocks: isSet(object.minStakingTimeBlocks)
-        ? globalThis.Number(object.minStakingTimeBlocks)
-        : 0,
-      maxStakingTimeBlocks: isSet(object.maxStakingTimeBlocks)
-        ? globalThis.Number(object.maxStakingTimeBlocks)
-        : 0,
-      slashingPkScript: isSet(object.slashingPkScript)
-        ? bytesFromBase64(object.slashingPkScript)
-        : new Uint8Array(0),
+      slashingAddress: isSet(object.slashingAddress)
+        ? globalThis.String(object.slashingAddress)
+        : "",
       minSlashingTxFeeSat: isSet(object.minSlashingTxFeeSat)
         ? globalThis.Number(object.minSlashingTxFeeSat)
-        : 0,
-      slashingRate: isSet(object.slashingRate)
-        ? globalThis.String(object.slashingRate)
-        : "",
-      minUnbondingTimeBlocks: isSet(object.minUnbondingTimeBlocks)
-        ? globalThis.Number(object.minUnbondingTimeBlocks)
-        : 0,
-      unbondingFeeSat: isSet(object.unbondingFeeSat)
-        ? globalThis.Number(object.unbondingFeeSat)
         : 0,
       minCommissionRate: isSet(object.minCommissionRate)
         ? globalThis.String(object.minCommissionRate)
         : "",
+      slashingRate: isSet(object.slashingRate)
+        ? globalThis.String(object.slashingRate)
+        : "",
       maxActiveFinalityProviders: isSet(object.maxActiveFinalityProviders)
         ? globalThis.Number(object.maxActiveFinalityProviders)
         : 0,
-      delegationCreationBaseGasFee: isSet(object.delegationCreationBaseGasFee)
-        ? globalThis.Number(object.delegationCreationBaseGasFee)
+      minUnbondingTime: isSet(object.minUnbondingTime)
+        ? globalThis.Number(object.minUnbondingTime)
         : 0,
+      minUnbondingRate: isSet(object.minUnbondingRate)
+        ? globalThis.String(object.minUnbondingRate)
+        : "",
     };
   },
 
@@ -318,45 +233,28 @@ export const Params: MessageFns<Params> = {
     if (message.covenantQuorum !== 0) {
       obj.covenantQuorum = Math.round(message.covenantQuorum);
     }
-    if (message.minStakingValueSat !== 0) {
-      obj.minStakingValueSat = Math.round(message.minStakingValueSat);
-    }
-    if (message.maxStakingValueSat !== 0) {
-      obj.maxStakingValueSat = Math.round(message.maxStakingValueSat);
-    }
-    if (message.minStakingTimeBlocks !== 0) {
-      obj.minStakingTimeBlocks = Math.round(message.minStakingTimeBlocks);
-    }
-    if (message.maxStakingTimeBlocks !== 0) {
-      obj.maxStakingTimeBlocks = Math.round(message.maxStakingTimeBlocks);
-    }
-    if (message.slashingPkScript.length !== 0) {
-      obj.slashingPkScript = base64FromBytes(message.slashingPkScript);
+    if (message.slashingAddress !== "") {
+      obj.slashingAddress = message.slashingAddress;
     }
     if (message.minSlashingTxFeeSat !== 0) {
       obj.minSlashingTxFeeSat = Math.round(message.minSlashingTxFeeSat);
     }
-    if (message.slashingRate !== "") {
-      obj.slashingRate = message.slashingRate;
-    }
-    if (message.minUnbondingTimeBlocks !== 0) {
-      obj.minUnbondingTimeBlocks = Math.round(message.minUnbondingTimeBlocks);
-    }
-    if (message.unbondingFeeSat !== 0) {
-      obj.unbondingFeeSat = Math.round(message.unbondingFeeSat);
-    }
     if (message.minCommissionRate !== "") {
       obj.minCommissionRate = message.minCommissionRate;
+    }
+    if (message.slashingRate !== "") {
+      obj.slashingRate = message.slashingRate;
     }
     if (message.maxActiveFinalityProviders !== 0) {
       obj.maxActiveFinalityProviders = Math.round(
         message.maxActiveFinalityProviders,
       );
     }
-    if (message.delegationCreationBaseGasFee !== 0) {
-      obj.delegationCreationBaseGasFee = Math.round(
-        message.delegationCreationBaseGasFee,
-      );
+    if (message.minUnbondingTime !== 0) {
+      obj.minUnbondingTime = Math.round(message.minUnbondingTime);
+    }
+    if (message.minUnbondingRate !== "") {
+      obj.minUnbondingRate = message.minUnbondingRate;
     }
     return obj;
   },
@@ -368,19 +266,13 @@ export const Params: MessageFns<Params> = {
     const message = createBaseParams();
     message.covenantPks = object.covenantPks?.map((e) => e) || [];
     message.covenantQuorum = object.covenantQuorum ?? 0;
-    message.minStakingValueSat = object.minStakingValueSat ?? 0;
-    message.maxStakingValueSat = object.maxStakingValueSat ?? 0;
-    message.minStakingTimeBlocks = object.minStakingTimeBlocks ?? 0;
-    message.maxStakingTimeBlocks = object.maxStakingTimeBlocks ?? 0;
-    message.slashingPkScript = object.slashingPkScript ?? new Uint8Array(0);
+    message.slashingAddress = object.slashingAddress ?? "";
     message.minSlashingTxFeeSat = object.minSlashingTxFeeSat ?? 0;
-    message.slashingRate = object.slashingRate ?? "";
-    message.minUnbondingTimeBlocks = object.minUnbondingTimeBlocks ?? 0;
-    message.unbondingFeeSat = object.unbondingFeeSat ?? 0;
     message.minCommissionRate = object.minCommissionRate ?? "";
+    message.slashingRate = object.slashingRate ?? "";
     message.maxActiveFinalityProviders = object.maxActiveFinalityProviders ?? 0;
-    message.delegationCreationBaseGasFee =
-      object.delegationCreationBaseGasFee ?? 0;
+    message.minUnbondingTime = object.minUnbondingTime ?? 0;
+    message.minUnbondingRate = object.minUnbondingRate ?? "";
     return message;
   },
 };

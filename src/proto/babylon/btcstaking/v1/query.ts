@@ -16,6 +16,7 @@ import {
   bTCDelegationStatusFromJSON,
   bTCDelegationStatusToJSON,
   CovenantAdaptorSignatures,
+  FinalityProviderWithMeta,
   SignatureInfo,
 } from "./btcstaking";
 import { Params } from "./params";
@@ -156,40 +157,13 @@ export interface QueryActiveFinalityProvidersAtHeightRequest {
   pagination: PageRequest | undefined;
 }
 
-/** ActiveFinalityProvidersAtHeightResponse wraps the FinalityProvider with metadata. */
-export interface ActiveFinalityProvidersAtHeightResponse {
-  /**
-   * btc_pk is the Bitcoin secp256k1 PK of thisfinality provider
-   * the PK follows encoding in BIP-340 spec
-   */
-  btcPkHex: string;
-  /** height is the queried Babylon height */
-  height: number;
-  /** voting_power is the voting power of this finality provider at the given height */
-  votingPower: number;
-  /**
-   * slashed_babylon_height indicates the Babylon height when
-   * the finality provider is slashed.
-   * if it's 0 then the finality provider is not slashed
-   */
-  slashedBabylonHeight: number;
-  /**
-   * slashed_btc_height indicates the BTC height when
-   * the finality provider is slashed.
-   * if it's 0 then the finality provider is not slashed
-   */
-  slashedBtcHeight: number;
-  /** jailed defines whether the finality provider is detected jailed */
-  jailed: boolean;
-}
-
 /**
  * QueryActiveFinalityProvidersAtHeightResponse is the response type for the
  * Query/ActiveFinalityProvidersAtHeight RPC method.
  */
 export interface QueryActiveFinalityProvidersAtHeightResponse {
   /** finality_providers contains all the queried finality providersn. */
-  finalityProviders: ActiveFinalityProvidersAtHeightResponse[];
+  finalityProviders: FinalityProviderWithMeta[];
   /** pagination defines the pagination in the response. */
   pagination: PageResponse | undefined;
 }
@@ -260,8 +234,6 @@ export interface BTCDelegationResponse {
    * this BTC delegation delegates to
    */
   fpBtcPkList: Uint8Array[];
-  /** staking_time is the number of blocks for which the delegation is locked on BTC chain */
-  stakingTime: number;
   /**
    * start_height is the start BTC height of the BTC delegation
    * it is the start BTC height of the timelock
@@ -387,8 +359,8 @@ export interface FinalityProviderResponse {
   height: number;
   /** voting_power is the voting power of this finality provider at the given height */
   votingPower: number;
-  /** jailed defines whether the finality provider is jailed */
-  jailed: boolean;
+  /** sluggish defines whether the finality provider is detected sluggish */
+  sluggish: boolean;
 }
 
 function createBaseQueryParamsRequest(): QueryParamsRequest {
@@ -1649,171 +1621,6 @@ export const QueryActiveFinalityProvidersAtHeightRequest: MessageFns<QueryActive
     },
   };
 
-function createBaseActiveFinalityProvidersAtHeightResponse(): ActiveFinalityProvidersAtHeightResponse {
-  return {
-    btcPkHex: "",
-    height: 0,
-    votingPower: 0,
-    slashedBabylonHeight: 0,
-    slashedBtcHeight: 0,
-    jailed: false,
-  };
-}
-
-export const ActiveFinalityProvidersAtHeightResponse: MessageFns<ActiveFinalityProvidersAtHeightResponse> =
-  {
-    encode(
-      message: ActiveFinalityProvidersAtHeightResponse,
-      writer: BinaryWriter = new BinaryWriter(),
-    ): BinaryWriter {
-      if (message.btcPkHex !== "") {
-        writer.uint32(10).string(message.btcPkHex);
-      }
-      if (message.height !== 0) {
-        writer.uint32(16).uint64(message.height);
-      }
-      if (message.votingPower !== 0) {
-        writer.uint32(24).uint64(message.votingPower);
-      }
-      if (message.slashedBabylonHeight !== 0) {
-        writer.uint32(32).uint64(message.slashedBabylonHeight);
-      }
-      if (message.slashedBtcHeight !== 0) {
-        writer.uint32(40).uint32(message.slashedBtcHeight);
-      }
-      if (message.jailed !== false) {
-        writer.uint32(48).bool(message.jailed);
-      }
-      return writer;
-    },
-
-    decode(
-      input: BinaryReader | Uint8Array,
-      length?: number,
-    ): ActiveFinalityProvidersAtHeightResponse {
-      const reader =
-        input instanceof BinaryReader ? input : new BinaryReader(input);
-      let end = length === undefined ? reader.len : reader.pos + length;
-      const message = createBaseActiveFinalityProvidersAtHeightResponse();
-      while (reader.pos < end) {
-        const tag = reader.uint32();
-        switch (tag >>> 3) {
-          case 1:
-            if (tag !== 10) {
-              break;
-            }
-
-            message.btcPkHex = reader.string();
-            continue;
-          case 2:
-            if (tag !== 16) {
-              break;
-            }
-
-            message.height = longToNumber(reader.uint64());
-            continue;
-          case 3:
-            if (tag !== 24) {
-              break;
-            }
-
-            message.votingPower = longToNumber(reader.uint64());
-            continue;
-          case 4:
-            if (tag !== 32) {
-              break;
-            }
-
-            message.slashedBabylonHeight = longToNumber(reader.uint64());
-            continue;
-          case 5:
-            if (tag !== 40) {
-              break;
-            }
-
-            message.slashedBtcHeight = reader.uint32();
-            continue;
-          case 6:
-            if (tag !== 48) {
-              break;
-            }
-
-            message.jailed = reader.bool();
-            continue;
-        }
-        if ((tag & 7) === 4 || tag === 0) {
-          break;
-        }
-        reader.skip(tag & 7);
-      }
-      return message;
-    },
-
-    fromJSON(object: any): ActiveFinalityProvidersAtHeightResponse {
-      return {
-        btcPkHex: isSet(object.btcPkHex)
-          ? globalThis.String(object.btcPkHex)
-          : "",
-        height: isSet(object.height) ? globalThis.Number(object.height) : 0,
-        votingPower: isSet(object.votingPower)
-          ? globalThis.Number(object.votingPower)
-          : 0,
-        slashedBabylonHeight: isSet(object.slashedBabylonHeight)
-          ? globalThis.Number(object.slashedBabylonHeight)
-          : 0,
-        slashedBtcHeight: isSet(object.slashedBtcHeight)
-          ? globalThis.Number(object.slashedBtcHeight)
-          : 0,
-        jailed: isSet(object.jailed)
-          ? globalThis.Boolean(object.jailed)
-          : false,
-      };
-    },
-
-    toJSON(message: ActiveFinalityProvidersAtHeightResponse): unknown {
-      const obj: any = {};
-      if (message.btcPkHex !== "") {
-        obj.btcPkHex = message.btcPkHex;
-      }
-      if (message.height !== 0) {
-        obj.height = Math.round(message.height);
-      }
-      if (message.votingPower !== 0) {
-        obj.votingPower = Math.round(message.votingPower);
-      }
-      if (message.slashedBabylonHeight !== 0) {
-        obj.slashedBabylonHeight = Math.round(message.slashedBabylonHeight);
-      }
-      if (message.slashedBtcHeight !== 0) {
-        obj.slashedBtcHeight = Math.round(message.slashedBtcHeight);
-      }
-      if (message.jailed !== false) {
-        obj.jailed = message.jailed;
-      }
-      return obj;
-    },
-
-    create<
-      I extends Exact<DeepPartial<ActiveFinalityProvidersAtHeightResponse>, I>,
-    >(base?: I): ActiveFinalityProvidersAtHeightResponse {
-      return ActiveFinalityProvidersAtHeightResponse.fromPartial(
-        base ?? ({} as any),
-      );
-    },
-    fromPartial<
-      I extends Exact<DeepPartial<ActiveFinalityProvidersAtHeightResponse>, I>,
-    >(object: I): ActiveFinalityProvidersAtHeightResponse {
-      const message = createBaseActiveFinalityProvidersAtHeightResponse();
-      message.btcPkHex = object.btcPkHex ?? "";
-      message.height = object.height ?? 0;
-      message.votingPower = object.votingPower ?? 0;
-      message.slashedBabylonHeight = object.slashedBabylonHeight ?? 0;
-      message.slashedBtcHeight = object.slashedBtcHeight ?? 0;
-      message.jailed = object.jailed ?? false;
-      return message;
-    },
-  };
-
 function createBaseQueryActiveFinalityProvidersAtHeightResponse(): QueryActiveFinalityProvidersAtHeightResponse {
   return { finalityProviders: [], pagination: undefined };
 }
@@ -1825,10 +1632,7 @@ export const QueryActiveFinalityProvidersAtHeightResponse: MessageFns<QueryActiv
       writer: BinaryWriter = new BinaryWriter(),
     ): BinaryWriter {
       for (const v of message.finalityProviders) {
-        ActiveFinalityProvidersAtHeightResponse.encode(
-          v!,
-          writer.uint32(10).fork(),
-        ).join();
+        FinalityProviderWithMeta.encode(v!, writer.uint32(10).fork()).join();
       }
       if (message.pagination !== undefined) {
         PageResponse.encode(
@@ -1856,10 +1660,7 @@ export const QueryActiveFinalityProvidersAtHeightResponse: MessageFns<QueryActiv
             }
 
             message.finalityProviders.push(
-              ActiveFinalityProvidersAtHeightResponse.decode(
-                reader,
-                reader.uint32(),
-              ),
+              FinalityProviderWithMeta.decode(reader, reader.uint32()),
             );
             continue;
           case 2:
@@ -1882,7 +1683,7 @@ export const QueryActiveFinalityProvidersAtHeightResponse: MessageFns<QueryActiv
       return {
         finalityProviders: globalThis.Array.isArray(object?.finalityProviders)
           ? object.finalityProviders.map((e: any) =>
-              ActiveFinalityProvidersAtHeightResponse.fromJSON(e),
+              FinalityProviderWithMeta.fromJSON(e),
             )
           : [],
         pagination: isSet(object.pagination)
@@ -1895,7 +1696,7 @@ export const QueryActiveFinalityProvidersAtHeightResponse: MessageFns<QueryActiv
       const obj: any = {};
       if (message.finalityProviders?.length) {
         obj.finalityProviders = message.finalityProviders.map((e) =>
-          ActiveFinalityProvidersAtHeightResponse.toJSON(e),
+          FinalityProviderWithMeta.toJSON(e),
         );
       }
       if (message.pagination !== undefined) {
@@ -1923,7 +1724,7 @@ export const QueryActiveFinalityProvidersAtHeightResponse: MessageFns<QueryActiv
       const message = createBaseQueryActiveFinalityProvidersAtHeightResponse();
       message.finalityProviders =
         object.finalityProviders?.map((e) =>
-          ActiveFinalityProvidersAtHeightResponse.fromPartial(e),
+          FinalityProviderWithMeta.fromPartial(e),
         ) || [];
       message.pagination =
         object.pagination !== undefined && object.pagination !== null
@@ -2426,7 +2227,6 @@ function createBaseBTCDelegationResponse(): BTCDelegationResponse {
     stakerAddr: "",
     btcPk: new Uint8Array(0),
     fpBtcPkList: [],
-    stakingTime: 0,
     startHeight: 0,
     endHeight: 0,
     totalSat: 0,
@@ -2457,50 +2257,47 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
     for (const v of message.fpBtcPkList) {
       writer.uint32(26).bytes(v!);
     }
-    if (message.stakingTime !== 0) {
-      writer.uint32(32).uint32(message.stakingTime);
-    }
     if (message.startHeight !== 0) {
-      writer.uint32(40).uint32(message.startHeight);
+      writer.uint32(32).uint64(message.startHeight);
     }
     if (message.endHeight !== 0) {
-      writer.uint32(48).uint32(message.endHeight);
+      writer.uint32(40).uint64(message.endHeight);
     }
     if (message.totalSat !== 0) {
-      writer.uint32(56).uint64(message.totalSat);
+      writer.uint32(48).uint64(message.totalSat);
     }
     if (message.stakingTxHex !== "") {
-      writer.uint32(66).string(message.stakingTxHex);
+      writer.uint32(58).string(message.stakingTxHex);
     }
     if (message.slashingTxHex !== "") {
-      writer.uint32(74).string(message.slashingTxHex);
+      writer.uint32(66).string(message.slashingTxHex);
     }
     if (message.delegatorSlashSigHex !== "") {
-      writer.uint32(82).string(message.delegatorSlashSigHex);
+      writer.uint32(74).string(message.delegatorSlashSigHex);
     }
     for (const v of message.covenantSigs) {
-      CovenantAdaptorSignatures.encode(v!, writer.uint32(90).fork()).join();
+      CovenantAdaptorSignatures.encode(v!, writer.uint32(82).fork()).join();
     }
     if (message.stakingOutputIdx !== 0) {
-      writer.uint32(96).uint32(message.stakingOutputIdx);
+      writer.uint32(88).uint32(message.stakingOutputIdx);
     }
     if (message.active !== false) {
-      writer.uint32(104).bool(message.active);
+      writer.uint32(96).bool(message.active);
     }
     if (message.statusDesc !== "") {
-      writer.uint32(114).string(message.statusDesc);
+      writer.uint32(106).string(message.statusDesc);
     }
     if (message.unbondingTime !== 0) {
-      writer.uint32(120).uint32(message.unbondingTime);
+      writer.uint32(112).uint32(message.unbondingTime);
     }
     if (message.undelegationResponse !== undefined) {
       BTCUndelegationResponse.encode(
         message.undelegationResponse,
-        writer.uint32(130).fork(),
+        writer.uint32(122).fork(),
       ).join();
     }
     if (message.paramsVersion !== 0) {
-      writer.uint32(136).uint32(message.paramsVersion);
+      writer.uint32(128).uint32(message.paramsVersion);
     }
     return writer;
   },
@@ -2542,52 +2339,45 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
             break;
           }
 
-          message.stakingTime = reader.uint32();
+          message.startHeight = longToNumber(reader.uint64());
           continue;
         case 5:
           if (tag !== 40) {
             break;
           }
 
-          message.startHeight = reader.uint32();
+          message.endHeight = longToNumber(reader.uint64());
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.endHeight = reader.uint32();
+          message.totalSat = longToNumber(reader.uint64());
           continue;
         case 7:
-          if (tag !== 56) {
+          if (tag !== 58) {
             break;
           }
 
-          message.totalSat = longToNumber(reader.uint64());
+          message.stakingTxHex = reader.string();
           continue;
         case 8:
           if (tag !== 66) {
             break;
           }
 
-          message.stakingTxHex = reader.string();
+          message.slashingTxHex = reader.string();
           continue;
         case 9:
           if (tag !== 74) {
             break;
           }
 
-          message.slashingTxHex = reader.string();
+          message.delegatorSlashSigHex = reader.string();
           continue;
         case 10:
           if (tag !== 82) {
-            break;
-          }
-
-          message.delegatorSlashSigHex = reader.string();
-          continue;
-        case 11:
-          if (tag !== 90) {
             break;
           }
 
@@ -2595,36 +2385,36 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
             CovenantAdaptorSignatures.decode(reader, reader.uint32()),
           );
           continue;
-        case 12:
-          if (tag !== 96) {
+        case 11:
+          if (tag !== 88) {
             break;
           }
 
           message.stakingOutputIdx = reader.uint32();
           continue;
-        case 13:
-          if (tag !== 104) {
+        case 12:
+          if (tag !== 96) {
             break;
           }
 
           message.active = reader.bool();
           continue;
-        case 14:
-          if (tag !== 114) {
+        case 13:
+          if (tag !== 106) {
             break;
           }
 
           message.statusDesc = reader.string();
           continue;
-        case 15:
-          if (tag !== 120) {
+        case 14:
+          if (tag !== 112) {
             break;
           }
 
           message.unbondingTime = reader.uint32();
           continue;
-        case 16:
-          if (tag !== 130) {
+        case 15:
+          if (tag !== 122) {
             break;
           }
 
@@ -2633,8 +2423,8 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
             reader.uint32(),
           );
           continue;
-        case 17:
-          if (tag !== 136) {
+        case 16:
+          if (tag !== 128) {
             break;
           }
 
@@ -2660,9 +2450,6 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
       fpBtcPkList: globalThis.Array.isArray(object?.fpBtcPkList)
         ? object.fpBtcPkList.map((e: any) => bytesFromBase64(e))
         : [],
-      stakingTime: isSet(object.stakingTime)
-        ? globalThis.Number(object.stakingTime)
-        : 0,
       startHeight: isSet(object.startHeight)
         ? globalThis.Number(object.startHeight)
         : 0,
@@ -2713,9 +2500,6 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
     }
     if (message.fpBtcPkList?.length) {
       obj.fpBtcPkList = message.fpBtcPkList.map((e) => base64FromBytes(e));
-    }
-    if (message.stakingTime !== 0) {
-      obj.stakingTime = Math.round(message.stakingTime);
     }
     if (message.startHeight !== 0) {
       obj.startHeight = Math.round(message.startHeight);
@@ -2775,7 +2559,6 @@ export const BTCDelegationResponse: MessageFns<BTCDelegationResponse> = {
     message.stakerAddr = object.stakerAddr ?? "";
     message.btcPk = object.btcPk ?? new Uint8Array(0);
     message.fpBtcPkList = object.fpBtcPkList?.map((e) => e) || [];
-    message.stakingTime = object.stakingTime ?? 0;
     message.startHeight = object.startHeight ?? 0;
     message.endHeight = object.endHeight ?? 0;
     message.totalSat = object.totalSat ?? 0;
@@ -3073,7 +2856,7 @@ function createBaseFinalityProviderResponse(): FinalityProviderResponse {
     slashedBtcHeight: 0,
     height: 0,
     votingPower: 0,
-    jailed: false,
+    sluggish: false,
   };
 }
 
@@ -3101,7 +2884,7 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
       writer.uint32(48).uint64(message.slashedBabylonHeight);
     }
     if (message.slashedBtcHeight !== 0) {
-      writer.uint32(56).uint32(message.slashedBtcHeight);
+      writer.uint32(56).uint64(message.slashedBtcHeight);
     }
     if (message.height !== 0) {
       writer.uint32(64).uint64(message.height);
@@ -3109,8 +2892,8 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
     if (message.votingPower !== 0) {
       writer.uint32(72).uint64(message.votingPower);
     }
-    if (message.jailed !== false) {
-      writer.uint32(80).bool(message.jailed);
+    if (message.sluggish !== false) {
+      writer.uint32(80).bool(message.sluggish);
     }
     return writer;
   },
@@ -3173,7 +2956,7 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
             break;
           }
 
-          message.slashedBtcHeight = reader.uint32();
+          message.slashedBtcHeight = longToNumber(reader.uint64());
           continue;
         case 8:
           if (tag !== 64) {
@@ -3194,7 +2977,7 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
             break;
           }
 
-          message.jailed = reader.bool();
+          message.sluggish = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -3230,7 +3013,9 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
       votingPower: isSet(object.votingPower)
         ? globalThis.Number(object.votingPower)
         : 0,
-      jailed: isSet(object.jailed) ? globalThis.Boolean(object.jailed) : false,
+      sluggish: isSet(object.sluggish)
+        ? globalThis.Boolean(object.sluggish)
+        : false,
     };
   },
 
@@ -3263,8 +3048,8 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
     if (message.votingPower !== 0) {
       obj.votingPower = Math.round(message.votingPower);
     }
-    if (message.jailed !== false) {
-      obj.jailed = message.jailed;
+    if (message.sluggish !== false) {
+      obj.sluggish = message.sluggish;
     }
     return obj;
   },
@@ -3293,7 +3078,7 @@ export const FinalityProviderResponse: MessageFns<FinalityProviderResponse> = {
     message.slashedBtcHeight = object.slashedBtcHeight ?? 0;
     message.height = object.height ?? 0;
     message.votingPower = object.votingPower ?? 0;
-    message.jailed = object.jailed ?? false;
+    message.sluggish = object.sluggish ?? false;
     return message;
   },
 };

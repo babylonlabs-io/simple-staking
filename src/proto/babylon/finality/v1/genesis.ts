@@ -26,9 +26,9 @@ export interface GenesisState {
   evidences: Evidence[];
   /** votes_sigs contains all the votes of finality providers ever registered. */
   voteSigs: VoteSig[];
-  /** public_randomness contains all the public randomness ever committed from the finality providers. */
+  /** public_randomness contains all the public randomness ever commited from the finality providers. */
   publicRandomness: PublicRandomness[];
-  /** pub_rand_commit contains all the public randomness commitment ever committed from the finality providers. */
+  /** pub_rand_commit contains all the public randomness commitment ever commited from the finality providers. */
   pubRandCommit: PubRandCommitWithPK[];
   /**
    * signing_infos represents a map between finality provider public key and their
@@ -60,7 +60,7 @@ export interface VoteSig {
 
 /** PublicRandomness the block height and public randomness that the finality provider has submitted. */
 export interface PublicRandomness {
-  /** block_height is the height of block which the finality provider submitted public randomness. */
+  /** block_height is the height of block which the finality provider submited public randomness. */
   blockHeight: number;
   /** fp_btc_pk is the BTC PK of the finality provider that casts this vote. */
   fpBtcPk: Uint8Array;

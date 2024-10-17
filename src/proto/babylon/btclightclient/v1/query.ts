@@ -1232,7 +1232,7 @@ export const QueryHeaderDepthResponse: MessageFns<QueryHeaderDepthResponse> = {
     writer: BinaryWriter = new BinaryWriter(),
   ): BinaryWriter {
     if (message.depth !== 0) {
-      writer.uint32(8).uint32(message.depth);
+      writer.uint32(8).uint64(message.depth);
     }
     return writer;
   },
@@ -1253,7 +1253,7 @@ export const QueryHeaderDepthResponse: MessageFns<QueryHeaderDepthResponse> = {
             break;
           }
 
-          message.depth = reader.uint32();
+          message.depth = longToNumber(reader.uint64());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1306,7 +1306,7 @@ export const BTCHeaderInfoResponse: MessageFns<BTCHeaderInfoResponse> = {
       writer.uint32(18).string(message.hashHex);
     }
     if (message.height !== 0) {
-      writer.uint32(24).uint32(message.height);
+      writer.uint32(24).uint64(message.height);
     }
     if (message.work !== "") {
       writer.uint32(34).string(message.work);
@@ -1344,7 +1344,7 @@ export const BTCHeaderInfoResponse: MessageFns<BTCHeaderInfoResponse> = {
             break;
           }
 
-          message.height = reader.uint32();
+          message.height = longToNumber(reader.uint64());
           continue;
         case 4:
           if (tag !== 34) {
@@ -1418,7 +1418,7 @@ export interface Query {
   /**
    * ContainsBytes is a temporary method that
    * checks whether a hash is maintained by the module.
-   * See discussion at https://github.com/babylonlabs-io/babylon/pull/132
+   * See discussion at https://github.com/babylonchain/babylon/pull/132
    * for more details.
    */
   ContainsBytes(
@@ -1587,6 +1587,17 @@ export type Exact<P, I extends P> = P extends Builtin
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
       [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
     };
+
+function longToNumber(int64: { toString(): string }): number {
+  const num = globalThis.Number(int64.toString());
+  if (num > globalThis.Number.MAX_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is larger than Number.MAX_SAFE_INTEGER");
+  }
+  if (num < globalThis.Number.MIN_SAFE_INTEGER) {
+    throw new globalThis.Error("Value is smaller than Number.MIN_SAFE_INTEGER");
+  }
+  return num;
+}
 
 function isSet(value: any): boolean {
   return value !== null && value !== undefined;

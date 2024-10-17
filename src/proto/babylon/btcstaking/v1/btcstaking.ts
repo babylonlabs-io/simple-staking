@@ -7,41 +7,29 @@
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
 import { Description } from "../../../cosmos/staking/v1beta1/staking";
-import { TransactionKey } from "../../btccheckpoint/v1/btccheckpoint";
 import { ProofOfPossessionBTC } from "./pop";
 
 export const protobufPackage = "babylon.btcstaking.v1";
 
 /**
- * BTCDelegationStatus is the status of a delegation.
- * There are two possible valid state transition paths for a BTC delegation:
- * - PENDING -> ACTIVE -> UNBONDED
- * - PENDING -> VERIFIED -> ACTIVE -> UNBONDED
- * and one invalid state transition path:
- * - PENDING -> VERIFIED -> UNBONDED i.e the staker unbonded before
- * activating delegation on Babylon chain.
- * In valid transition paths, the delegation becomes UNBONDED when:
- * - either the staking transaction timelock expires
- * - or the staker requests early undelegation through MsgBTCUndelegate message.
+ * BTCDelegationStatus is the status of a delegation. The state transition path is
+ * PENDING -> ACTIVE -> UNBONDED with two possibilities:
+ * 1. the typical path when timelock of staking transaction expires.
+ * 2. the path when staker requests early undelegation through MsgBTCUndelegate message.
  */
 export enum BTCDelegationStatus {
-  /** PENDING - PENDING defines a delegation that is waiting for covenant signatures. */
+  /** PENDING - PENDING defines a delegation that is waiting for covenant signatures to become active. */
   PENDING = 0,
-  /**
-   * VERIFIED - VERIFIED defines a delegation that has covenant signatures but is not yet
-   * included in the BTC chain.
-   */
-  VERIFIED = 1,
   /** ACTIVE - ACTIVE defines a delegation that has voting power */
-  ACTIVE = 2,
+  ACTIVE = 1,
   /**
    * UNBONDED - UNBONDED defines a delegation no longer has voting power:
    * - either reaching the end of staking transaction timelock
    * - or receiving unbonding tx with signatures from staker and covenant committee
    */
-  UNBONDED = 3,
+  UNBONDED = 2,
   /** ANY - ANY is any of the above status */
-  ANY = 4,
+  ANY = 3,
   UNRECOGNIZED = -1,
 }
 
@@ -51,15 +39,12 @@ export function bTCDelegationStatusFromJSON(object: any): BTCDelegationStatus {
     case "PENDING":
       return BTCDelegationStatus.PENDING;
     case 1:
-    case "VERIFIED":
-      return BTCDelegationStatus.VERIFIED;
-    case 2:
     case "ACTIVE":
       return BTCDelegationStatus.ACTIVE;
-    case 3:
+    case 2:
     case "UNBONDED":
       return BTCDelegationStatus.UNBONDED;
-    case 4:
+    case 3:
     case "ANY":
       return BTCDelegationStatus.ANY;
     case -1:
@@ -73,8 +58,6 @@ export function bTCDelegationStatusToJSON(object: BTCDelegationStatus): string {
   switch (object) {
     case BTCDelegationStatus.PENDING:
       return "PENDING";
-    case BTCDelegationStatus.VERIFIED:
-      return "VERIFIED";
     case BTCDelegationStatus.ACTIVE:
       return "ACTIVE";
     case BTCDelegationStatus.UNBONDED:
@@ -117,8 +100,8 @@ export interface FinalityProvider {
    * if it's 0 then the finality provider is not slashed
    */
   slashedBtcHeight: number;
-  /** jailed defines whether the finality provider is jailed */
-  jailed: boolean;
+  /** sluggish defines whether the finality provider is detected sluggish */
+  sluggish: boolean;
 }
 
 /** FinalityProviderWithMeta wraps the FinalityProvider with metadata. */
@@ -144,8 +127,8 @@ export interface FinalityProviderWithMeta {
    * if it's 0 then the finality provider is not slashed
    */
   slashedBtcHeight: number;
-  /** jailed defines whether the finality provider is detected jailed */
-  jailed: boolean;
+  /** sluggish defines whether the finality provider is detected sluggish */
+  sluggish: boolean;
 }
 
 /** BTCDelegation defines a BTC delegation */
@@ -166,8 +149,6 @@ export interface BTCDelegation {
    * to multiple finality providers
    */
   fpBtcPkList: Uint8Array[];
-  /** staking_time is the number of blocks for which the delegation is locked on BTC chain */
-  stakingTime: number;
   /**
    * start_height is the start BTC height of the BTC delegation
    * it is the start BTC height of the timelock
@@ -175,7 +156,7 @@ export interface BTCDelegation {
   startHeight: number;
   /**
    * end_height is the end height of the BTC delegation
-   * it is calculated by end_height = start_height + staking_time
+   * it is the end BTC height of the timelock - w
    */
   endHeight: number;
   /**
@@ -312,19 +293,6 @@ export interface SelectiveSlashingEvidence {
   recoveredFpBtcSk: Uint8Array;
 }
 
-/**
- * InclusionProof proves the existence of tx on BTC blockchain
- * including
- * - the position of the tx on BTC blockchain
- * - the Merkle proof that this tx is on the above position
- */
-export interface InclusionProof {
-  /** key is the position (txIdx, blockHash) of this tx on BTC blockchain */
-  key: TransactionKey | undefined;
-  /** proof is the Merkle proof that this tx is included in the position in `key` */
-  proof: Uint8Array;
-}
-
 function createBaseFinalityProvider(): FinalityProvider {
   return {
     addr: "",
@@ -334,7 +302,7 @@ function createBaseFinalityProvider(): FinalityProvider {
     pop: undefined,
     slashedBabylonHeight: 0,
     slashedBtcHeight: 0,
-    jailed: false,
+    sluggish: false,
   };
 }
 
@@ -362,10 +330,10 @@ export const FinalityProvider: MessageFns<FinalityProvider> = {
       writer.uint32(48).uint64(message.slashedBabylonHeight);
     }
     if (message.slashedBtcHeight !== 0) {
-      writer.uint32(56).uint32(message.slashedBtcHeight);
+      writer.uint32(56).uint64(message.slashedBtcHeight);
     }
-    if (message.jailed !== false) {
-      writer.uint32(64).bool(message.jailed);
+    if (message.sluggish !== false) {
+      writer.uint32(64).bool(message.sluggish);
     }
     return writer;
   },
@@ -425,14 +393,14 @@ export const FinalityProvider: MessageFns<FinalityProvider> = {
             break;
           }
 
-          message.slashedBtcHeight = reader.uint32();
+          message.slashedBtcHeight = longToNumber(reader.uint64());
           continue;
         case 8:
           if (tag !== 64) {
             break;
           }
 
-          message.jailed = reader.bool();
+          message.sluggish = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -464,7 +432,9 @@ export const FinalityProvider: MessageFns<FinalityProvider> = {
       slashedBtcHeight: isSet(object.slashedBtcHeight)
         ? globalThis.Number(object.slashedBtcHeight)
         : 0,
-      jailed: isSet(object.jailed) ? globalThis.Boolean(object.jailed) : false,
+      sluggish: isSet(object.sluggish)
+        ? globalThis.Boolean(object.sluggish)
+        : false,
     };
   },
 
@@ -491,8 +461,8 @@ export const FinalityProvider: MessageFns<FinalityProvider> = {
     if (message.slashedBtcHeight !== 0) {
       obj.slashedBtcHeight = Math.round(message.slashedBtcHeight);
     }
-    if (message.jailed !== false) {
-      obj.jailed = message.jailed;
+    if (message.sluggish !== false) {
+      obj.sluggish = message.sluggish;
     }
     return obj;
   },
@@ -519,7 +489,7 @@ export const FinalityProvider: MessageFns<FinalityProvider> = {
         : undefined;
     message.slashedBabylonHeight = object.slashedBabylonHeight ?? 0;
     message.slashedBtcHeight = object.slashedBtcHeight ?? 0;
-    message.jailed = object.jailed ?? false;
+    message.sluggish = object.sluggish ?? false;
     return message;
   },
 };
@@ -531,7 +501,7 @@ function createBaseFinalityProviderWithMeta(): FinalityProviderWithMeta {
     votingPower: 0,
     slashedBabylonHeight: 0,
     slashedBtcHeight: 0,
-    jailed: false,
+    sluggish: false,
   };
 }
 
@@ -553,10 +523,10 @@ export const FinalityProviderWithMeta: MessageFns<FinalityProviderWithMeta> = {
       writer.uint32(32).uint64(message.slashedBabylonHeight);
     }
     if (message.slashedBtcHeight !== 0) {
-      writer.uint32(40).uint32(message.slashedBtcHeight);
+      writer.uint32(40).uint64(message.slashedBtcHeight);
     }
-    if (message.jailed !== false) {
-      writer.uint32(48).bool(message.jailed);
+    if (message.sluggish !== false) {
+      writer.uint32(48).bool(message.sluggish);
     }
     return writer;
   },
@@ -605,14 +575,14 @@ export const FinalityProviderWithMeta: MessageFns<FinalityProviderWithMeta> = {
             break;
           }
 
-          message.slashedBtcHeight = reader.uint32();
+          message.slashedBtcHeight = longToNumber(reader.uint64());
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.jailed = reader.bool();
+          message.sluggish = reader.bool();
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -638,7 +608,9 @@ export const FinalityProviderWithMeta: MessageFns<FinalityProviderWithMeta> = {
       slashedBtcHeight: isSet(object.slashedBtcHeight)
         ? globalThis.Number(object.slashedBtcHeight)
         : 0,
-      jailed: isSet(object.jailed) ? globalThis.Boolean(object.jailed) : false,
+      sluggish: isSet(object.sluggish)
+        ? globalThis.Boolean(object.sluggish)
+        : false,
     };
   },
 
@@ -659,8 +631,8 @@ export const FinalityProviderWithMeta: MessageFns<FinalityProviderWithMeta> = {
     if (message.slashedBtcHeight !== 0) {
       obj.slashedBtcHeight = Math.round(message.slashedBtcHeight);
     }
-    if (message.jailed !== false) {
-      obj.jailed = message.jailed;
+    if (message.sluggish !== false) {
+      obj.sluggish = message.sluggish;
     }
     return obj;
   },
@@ -679,7 +651,7 @@ export const FinalityProviderWithMeta: MessageFns<FinalityProviderWithMeta> = {
     message.votingPower = object.votingPower ?? 0;
     message.slashedBabylonHeight = object.slashedBabylonHeight ?? 0;
     message.slashedBtcHeight = object.slashedBtcHeight ?? 0;
-    message.jailed = object.jailed ?? false;
+    message.sluggish = object.sluggish ?? false;
     return message;
   },
 };
@@ -690,7 +662,6 @@ function createBaseBTCDelegation(): BTCDelegation {
     btcPk: new Uint8Array(0),
     pop: undefined,
     fpBtcPkList: [],
-    stakingTime: 0,
     startHeight: 0,
     endHeight: 0,
     totalSat: 0,
@@ -722,44 +693,41 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
     for (const v of message.fpBtcPkList) {
       writer.uint32(34).bytes(v!);
     }
-    if (message.stakingTime !== 0) {
-      writer.uint32(40).uint32(message.stakingTime);
-    }
     if (message.startHeight !== 0) {
-      writer.uint32(48).uint32(message.startHeight);
+      writer.uint32(40).uint64(message.startHeight);
     }
     if (message.endHeight !== 0) {
-      writer.uint32(56).uint32(message.endHeight);
+      writer.uint32(48).uint64(message.endHeight);
     }
     if (message.totalSat !== 0) {
-      writer.uint32(64).uint64(message.totalSat);
+      writer.uint32(56).uint64(message.totalSat);
     }
     if (message.stakingTx.length !== 0) {
-      writer.uint32(74).bytes(message.stakingTx);
+      writer.uint32(66).bytes(message.stakingTx);
     }
     if (message.stakingOutputIdx !== 0) {
-      writer.uint32(80).uint32(message.stakingOutputIdx);
+      writer.uint32(72).uint32(message.stakingOutputIdx);
     }
     if (message.slashingTx.length !== 0) {
-      writer.uint32(90).bytes(message.slashingTx);
+      writer.uint32(82).bytes(message.slashingTx);
     }
     if (message.delegatorSig.length !== 0) {
-      writer.uint32(98).bytes(message.delegatorSig);
+      writer.uint32(90).bytes(message.delegatorSig);
     }
     for (const v of message.covenantSigs) {
-      CovenantAdaptorSignatures.encode(v!, writer.uint32(106).fork()).join();
+      CovenantAdaptorSignatures.encode(v!, writer.uint32(98).fork()).join();
     }
     if (message.unbondingTime !== 0) {
-      writer.uint32(112).uint32(message.unbondingTime);
+      writer.uint32(104).uint32(message.unbondingTime);
     }
     if (message.btcUndelegation !== undefined) {
       BTCUndelegation.encode(
         message.btcUndelegation,
-        writer.uint32(122).fork(),
+        writer.uint32(114).fork(),
       ).join();
     }
     if (message.paramsVersion !== 0) {
-      writer.uint32(128).uint32(message.paramsVersion);
+      writer.uint32(120).uint32(message.paramsVersion);
     }
     return writer;
   },
@@ -805,59 +773,52 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
             break;
           }
 
-          message.stakingTime = reader.uint32();
+          message.startHeight = longToNumber(reader.uint64());
           continue;
         case 6:
           if (tag !== 48) {
             break;
           }
 
-          message.startHeight = reader.uint32();
+          message.endHeight = longToNumber(reader.uint64());
           continue;
         case 7:
           if (tag !== 56) {
             break;
           }
 
-          message.endHeight = reader.uint32();
-          continue;
-        case 8:
-          if (tag !== 64) {
-            break;
-          }
-
           message.totalSat = longToNumber(reader.uint64());
           continue;
-        case 9:
-          if (tag !== 74) {
+        case 8:
+          if (tag !== 66) {
             break;
           }
 
           message.stakingTx = reader.bytes();
           continue;
-        case 10:
-          if (tag !== 80) {
+        case 9:
+          if (tag !== 72) {
             break;
           }
 
           message.stakingOutputIdx = reader.uint32();
+          continue;
+        case 10:
+          if (tag !== 82) {
+            break;
+          }
+
+          message.slashingTx = reader.bytes();
           continue;
         case 11:
           if (tag !== 90) {
             break;
           }
 
-          message.slashingTx = reader.bytes();
+          message.delegatorSig = reader.bytes();
           continue;
         case 12:
           if (tag !== 98) {
-            break;
-          }
-
-          message.delegatorSig = reader.bytes();
-          continue;
-        case 13:
-          if (tag !== 106) {
             break;
           }
 
@@ -865,15 +826,15 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
             CovenantAdaptorSignatures.decode(reader, reader.uint32()),
           );
           continue;
-        case 14:
-          if (tag !== 112) {
+        case 13:
+          if (tag !== 104) {
             break;
           }
 
           message.unbondingTime = reader.uint32();
           continue;
-        case 15:
-          if (tag !== 122) {
+        case 14:
+          if (tag !== 114) {
             break;
           }
 
@@ -882,8 +843,8 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
             reader.uint32(),
           );
           continue;
-        case 16:
-          if (tag !== 128) {
+        case 15:
+          if (tag !== 120) {
             break;
           }
 
@@ -912,9 +873,6 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
       fpBtcPkList: globalThis.Array.isArray(object?.fpBtcPkList)
         ? object.fpBtcPkList.map((e: any) => bytesFromBase64(e))
         : [],
-      stakingTime: isSet(object.stakingTime)
-        ? globalThis.Number(object.stakingTime)
-        : 0,
       startHeight: isSet(object.startHeight)
         ? globalThis.Number(object.startHeight)
         : 0,
@@ -964,9 +922,6 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
     }
     if (message.fpBtcPkList?.length) {
       obj.fpBtcPkList = message.fpBtcPkList.map((e) => base64FromBytes(e));
-    }
-    if (message.stakingTime !== 0) {
-      obj.stakingTime = Math.round(message.stakingTime);
     }
     if (message.startHeight !== 0) {
       obj.startHeight = Math.round(message.startHeight);
@@ -1022,7 +977,6 @@ export const BTCDelegation: MessageFns<BTCDelegation> = {
         ? ProofOfPossessionBTC.fromPartial(object.pop)
         : undefined;
     message.fpBtcPkList = object.fpBtcPkList?.map((e) => e) || [];
-    message.stakingTime = object.stakingTime ?? 0;
     message.startHeight = object.startHeight ?? 0;
     message.endHeight = object.endHeight ?? 0;
     message.totalSat = object.totalSat ?? 0;
@@ -1660,93 +1614,6 @@ export const SelectiveSlashingEvidence: MessageFns<SelectiveSlashingEvidence> =
       return message;
     },
   };
-
-function createBaseInclusionProof(): InclusionProof {
-  return { key: undefined, proof: new Uint8Array(0) };
-}
-
-export const InclusionProof: MessageFns<InclusionProof> = {
-  encode(
-    message: InclusionProof,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
-    if (message.key !== undefined) {
-      TransactionKey.encode(message.key, writer.uint32(10).fork()).join();
-    }
-    if (message.proof.length !== 0) {
-      writer.uint32(18).bytes(message.proof);
-    }
-    return writer;
-  },
-
-  decode(input: BinaryReader | Uint8Array, length?: number): InclusionProof {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseInclusionProof();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.key = TransactionKey.decode(reader, reader.uint32());
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.proof = reader.bytes();
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): InclusionProof {
-    return {
-      key: isSet(object.key) ? TransactionKey.fromJSON(object.key) : undefined,
-      proof: isSet(object.proof)
-        ? bytesFromBase64(object.proof)
-        : new Uint8Array(0),
-    };
-  },
-
-  toJSON(message: InclusionProof): unknown {
-    const obj: any = {};
-    if (message.key !== undefined) {
-      obj.key = TransactionKey.toJSON(message.key);
-    }
-    if (message.proof.length !== 0) {
-      obj.proof = base64FromBytes(message.proof);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<InclusionProof>, I>>(
-    base?: I,
-  ): InclusionProof {
-    return InclusionProof.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<InclusionProof>, I>>(
-    object: I,
-  ): InclusionProof {
-    const message = createBaseInclusionProof();
-    message.key =
-      object.key !== undefined && object.key !== null
-        ? TransactionKey.fromPartial(object.key)
-        : undefined;
-    message.proof = object.proof ?? new Uint8Array(0);
-    return message;
-  },
-};
 
 function bytesFromBase64(b64: string): Uint8Array {
   if ((globalThis as any).Buffer) {

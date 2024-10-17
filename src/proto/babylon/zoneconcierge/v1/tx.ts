@@ -2,31 +2,15 @@
 // versions:
 //   protoc-gen-ts_proto  v2.2.0
 //   protoc               unknown
-// source: babylon/btccheckpoint/v1/tx.proto
+// source: babylon/zoneconcierge/v1/tx.proto
 
 /* eslint-disable */
 import { BinaryReader, BinaryWriter } from "@bufbuild/protobuf/wire";
-import { BTCSpvProof } from "./btccheckpoint";
 import { Params } from "./params";
 
-export const protobufPackage = "babylon.btccheckpoint.v1";
+export const protobufPackage = "babylon.zoneconcierge.v1";
 
-/**
- * MsgInsertBTCSpvProof defines resquest to insert a new checkpoint into the
- * store
- */
-export interface MsgInsertBTCSpvProof {
-  submitter: string;
-  proofs: BTCSpvProof[];
-}
-
-/**
- * MsgInsertBTCSpvProofResponse defines the response for the
- * MsgInsertBTCSpvProof message
- */
-export interface MsgInsertBTCSpvProofResponse {}
-
-/** MsgUpdateParams defines a message to update the btccheckpoint module params. */
+/** MsgUpdateParams defines a message for updating zoneconcierge module parameters. */
 export interface MsgUpdateParams {
   /**
    * authority is the address of the governance account.
@@ -36,160 +20,15 @@ export interface MsgUpdateParams {
    */
   authority: string;
   /**
-   * params defines the btccheckpoint parameters to update.
+   * params defines the zoneconcierge parameters to update.
    *
    * NOTE: All parameters must be supplied.
    */
   params: Params | undefined;
 }
 
-/** MsgUpdateParamsResponse defines the response to the MsgUpdateParams message. */
+/** MsgUpdateParamsResponse is the response to the MsgUpdateParams message. */
 export interface MsgUpdateParamsResponse {}
-
-function createBaseMsgInsertBTCSpvProof(): MsgInsertBTCSpvProof {
-  return { submitter: "", proofs: [] };
-}
-
-export const MsgInsertBTCSpvProof: MessageFns<MsgInsertBTCSpvProof> = {
-  encode(
-    message: MsgInsertBTCSpvProof,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
-    if (message.submitter !== "") {
-      writer.uint32(10).string(message.submitter);
-    }
-    for (const v of message.proofs) {
-      BTCSpvProof.encode(v!, writer.uint32(18).fork()).join();
-    }
-    return writer;
-  },
-
-  decode(
-    input: BinaryReader | Uint8Array,
-    length?: number,
-  ): MsgInsertBTCSpvProof {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseMsgInsertBTCSpvProof();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.submitter = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.proofs.push(BTCSpvProof.decode(reader, reader.uint32()));
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): MsgInsertBTCSpvProof {
-    return {
-      submitter: isSet(object.submitter)
-        ? globalThis.String(object.submitter)
-        : "",
-      proofs: globalThis.Array.isArray(object?.proofs)
-        ? object.proofs.map((e: any) => BTCSpvProof.fromJSON(e))
-        : [],
-    };
-  },
-
-  toJSON(message: MsgInsertBTCSpvProof): unknown {
-    const obj: any = {};
-    if (message.submitter !== "") {
-      obj.submitter = message.submitter;
-    }
-    if (message.proofs?.length) {
-      obj.proofs = message.proofs.map((e) => BTCSpvProof.toJSON(e));
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<MsgInsertBTCSpvProof>, I>>(
-    base?: I,
-  ): MsgInsertBTCSpvProof {
-    return MsgInsertBTCSpvProof.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<MsgInsertBTCSpvProof>, I>>(
-    object: I,
-  ): MsgInsertBTCSpvProof {
-    const message = createBaseMsgInsertBTCSpvProof();
-    message.submitter = object.submitter ?? "";
-    message.proofs =
-      object.proofs?.map((e) => BTCSpvProof.fromPartial(e)) || [];
-    return message;
-  },
-};
-
-function createBaseMsgInsertBTCSpvProofResponse(): MsgInsertBTCSpvProofResponse {
-  return {};
-}
-
-export const MsgInsertBTCSpvProofResponse: MessageFns<MsgInsertBTCSpvProofResponse> =
-  {
-    encode(
-      _: MsgInsertBTCSpvProofResponse,
-      writer: BinaryWriter = new BinaryWriter(),
-    ): BinaryWriter {
-      return writer;
-    },
-
-    decode(
-      input: BinaryReader | Uint8Array,
-      length?: number,
-    ): MsgInsertBTCSpvProofResponse {
-      const reader =
-        input instanceof BinaryReader ? input : new BinaryReader(input);
-      let end = length === undefined ? reader.len : reader.pos + length;
-      const message = createBaseMsgInsertBTCSpvProofResponse();
-      while (reader.pos < end) {
-        const tag = reader.uint32();
-        switch (tag >>> 3) {
-        }
-        if ((tag & 7) === 4 || tag === 0) {
-          break;
-        }
-        reader.skip(tag & 7);
-      }
-      return message;
-    },
-
-    fromJSON(_: any): MsgInsertBTCSpvProofResponse {
-      return {};
-    },
-
-    toJSON(_: MsgInsertBTCSpvProofResponse): unknown {
-      const obj: any = {};
-      return obj;
-    },
-
-    create<I extends Exact<DeepPartial<MsgInsertBTCSpvProofResponse>, I>>(
-      base?: I,
-    ): MsgInsertBTCSpvProofResponse {
-      return MsgInsertBTCSpvProofResponse.fromPartial(base ?? ({} as any));
-    },
-    fromPartial<I extends Exact<DeepPartial<MsgInsertBTCSpvProofResponse>, I>>(
-      _: I,
-    ): MsgInsertBTCSpvProofResponse {
-      const message = createBaseMsgInsertBTCSpvProofResponse();
-      return message;
-    },
-  };
 
 function createBaseMsgUpdateParams(): MsgUpdateParams {
   return { authority: "", params: undefined };
@@ -334,34 +173,19 @@ export const MsgUpdateParamsResponse: MessageFns<MsgUpdateParamsResponse> = {
 
 /** Msg defines the Msg service. */
 export interface Msg {
-  /** InsertBTCSpvProof tries to insert a new checkpoint into the store. */
-  InsertBTCSpvProof(
-    request: MsgInsertBTCSpvProof,
-  ): Promise<MsgInsertBTCSpvProofResponse>;
-  /** UpdateParams updates the btccheckpoint module parameters. */
+  /** UpdateParams updates the zoneconcierge module parameters. */
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse>;
 }
 
-export const MsgServiceName = "babylon.btccheckpoint.v1.Msg";
+export const MsgServiceName = "babylon.zoneconcierge.v1.Msg";
 export class MsgClientImpl implements Msg {
   private readonly rpc: Rpc;
   private readonly service: string;
   constructor(rpc: Rpc, opts?: { service?: string }) {
     this.service = opts?.service || MsgServiceName;
     this.rpc = rpc;
-    this.InsertBTCSpvProof = this.InsertBTCSpvProof.bind(this);
     this.UpdateParams = this.UpdateParams.bind(this);
   }
-  InsertBTCSpvProof(
-    request: MsgInsertBTCSpvProof,
-  ): Promise<MsgInsertBTCSpvProofResponse> {
-    const data = MsgInsertBTCSpvProof.encode(request).finish();
-    const promise = this.rpc.request(this.service, "InsertBTCSpvProof", data);
-    return promise.then((data) =>
-      MsgInsertBTCSpvProofResponse.decode(new BinaryReader(data)),
-    );
-  }
-
   UpdateParams(request: MsgUpdateParams): Promise<MsgUpdateParamsResponse> {
     const data = MsgUpdateParams.encode(request).finish();
     const promise = this.rpc.request(this.service, "UpdateParams", data);

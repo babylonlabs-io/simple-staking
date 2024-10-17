@@ -11,6 +11,7 @@ import {
   PageResponse,
 } from "../../../cosmos/base/query/v1beta1/pagination";
 import { Timestamp } from "../../../google/protobuf/timestamp";
+import { ValidatorWithBlsKey } from "./bls_key";
 import {
   CheckpointStatus,
   checkpointStatusFromJSON,
@@ -90,24 +91,11 @@ export interface QueryBlsPublicKeyListRequest {
 }
 
 /**
- * BlsPublicKeyListResponse couples validator address, voting power, and its bls
- * public key
- */
-export interface BlsPublicKeyListResponse {
-  /** validator_address is the address of the validator */
-  validatorAddress: string;
-  /** bls_pub_key is the BLS public key of the validator */
-  blsPubKeyHex: string;
-  /** voting_power is the voting power of the validator at the given epoch */
-  votingPower: number;
-}
-
-/**
  * QueryBlsPublicKeyListResponse is the response type for the
  * Query/BlsPublicKeys RPC method.
  */
 export interface QueryBlsPublicKeyListResponse {
-  validatorWithBlsKeys: BlsPublicKeyListResponse[];
+  validatorWithBlsKeys: ValidatorWithBlsKey[];
   /** pagination defines the pagination in the response. */
   pagination: PageResponse | undefined;
 }
@@ -193,7 +181,7 @@ export interface RawCheckpointResponse {
 export interface CheckpointStateUpdateResponse {
   /** state defines the event of a state transition towards this state */
   state: CheckpointStatus;
-  /** status_desc represents the description of status enum. */
+  /** status_desc respresents the description of status enum. */
   statusDesc: string;
   /**
    * block_height is the height of the Babylon block that triggers the state
@@ -212,7 +200,7 @@ export interface RawCheckpointWithMetaResponse {
   ckpt: RawCheckpointResponse | undefined;
   /** status defines the status of the checkpoint */
   status: CheckpointStatus;
-  /** status_desc represents the description of status enum. */
+  /** status_desc respresents the description of status enum. */
   statusDesc: string;
   /** bls_aggr_pk defines the aggregated BLS public key */
   blsAggrPk: Uint8Array;
@@ -861,112 +849,6 @@ export const QueryBlsPublicKeyListRequest: MessageFns<QueryBlsPublicKeyListReque
     },
   };
 
-function createBaseBlsPublicKeyListResponse(): BlsPublicKeyListResponse {
-  return { validatorAddress: "", blsPubKeyHex: "", votingPower: 0 };
-}
-
-export const BlsPublicKeyListResponse: MessageFns<BlsPublicKeyListResponse> = {
-  encode(
-    message: BlsPublicKeyListResponse,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
-    if (message.validatorAddress !== "") {
-      writer.uint32(10).string(message.validatorAddress);
-    }
-    if (message.blsPubKeyHex !== "") {
-      writer.uint32(18).string(message.blsPubKeyHex);
-    }
-    if (message.votingPower !== 0) {
-      writer.uint32(24).uint64(message.votingPower);
-    }
-    return writer;
-  },
-
-  decode(
-    input: BinaryReader | Uint8Array,
-    length?: number,
-  ): BlsPublicKeyListResponse {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseBlsPublicKeyListResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.validatorAddress = reader.string();
-          continue;
-        case 2:
-          if (tag !== 18) {
-            break;
-          }
-
-          message.blsPubKeyHex = reader.string();
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.votingPower = longToNumber(reader.uint64());
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): BlsPublicKeyListResponse {
-    return {
-      validatorAddress: isSet(object.validatorAddress)
-        ? globalThis.String(object.validatorAddress)
-        : "",
-      blsPubKeyHex: isSet(object.blsPubKeyHex)
-        ? globalThis.String(object.blsPubKeyHex)
-        : "",
-      votingPower: isSet(object.votingPower)
-        ? globalThis.Number(object.votingPower)
-        : 0,
-    };
-  },
-
-  toJSON(message: BlsPublicKeyListResponse): unknown {
-    const obj: any = {};
-    if (message.validatorAddress !== "") {
-      obj.validatorAddress = message.validatorAddress;
-    }
-    if (message.blsPubKeyHex !== "") {
-      obj.blsPubKeyHex = message.blsPubKeyHex;
-    }
-    if (message.votingPower !== 0) {
-      obj.votingPower = Math.round(message.votingPower);
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<BlsPublicKeyListResponse>, I>>(
-    base?: I,
-  ): BlsPublicKeyListResponse {
-    return BlsPublicKeyListResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<BlsPublicKeyListResponse>, I>>(
-    object: I,
-  ): BlsPublicKeyListResponse {
-    const message = createBaseBlsPublicKeyListResponse();
-    message.validatorAddress = object.validatorAddress ?? "";
-    message.blsPubKeyHex = object.blsPubKeyHex ?? "";
-    message.votingPower = object.votingPower ?? 0;
-    return message;
-  },
-};
-
 function createBaseQueryBlsPublicKeyListResponse(): QueryBlsPublicKeyListResponse {
   return { validatorWithBlsKeys: [], pagination: undefined };
 }
@@ -978,7 +860,7 @@ export const QueryBlsPublicKeyListResponse: MessageFns<QueryBlsPublicKeyListResp
       writer: BinaryWriter = new BinaryWriter(),
     ): BinaryWriter {
       for (const v of message.validatorWithBlsKeys) {
-        BlsPublicKeyListResponse.encode(v!, writer.uint32(10).fork()).join();
+        ValidatorWithBlsKey.encode(v!, writer.uint32(10).fork()).join();
       }
       if (message.pagination !== undefined) {
         PageResponse.encode(
@@ -1006,7 +888,7 @@ export const QueryBlsPublicKeyListResponse: MessageFns<QueryBlsPublicKeyListResp
             }
 
             message.validatorWithBlsKeys.push(
-              BlsPublicKeyListResponse.decode(reader, reader.uint32()),
+              ValidatorWithBlsKey.decode(reader, reader.uint32()),
             );
             continue;
           case 2:
@@ -1031,7 +913,7 @@ export const QueryBlsPublicKeyListResponse: MessageFns<QueryBlsPublicKeyListResp
           object?.validatorWithBlsKeys,
         )
           ? object.validatorWithBlsKeys.map((e: any) =>
-              BlsPublicKeyListResponse.fromJSON(e),
+              ValidatorWithBlsKey.fromJSON(e),
             )
           : [],
         pagination: isSet(object.pagination)
@@ -1044,7 +926,7 @@ export const QueryBlsPublicKeyListResponse: MessageFns<QueryBlsPublicKeyListResp
       const obj: any = {};
       if (message.validatorWithBlsKeys?.length) {
         obj.validatorWithBlsKeys = message.validatorWithBlsKeys.map((e) =>
-          BlsPublicKeyListResponse.toJSON(e),
+          ValidatorWithBlsKey.toJSON(e),
         );
       }
       if (message.pagination !== undefined) {
@@ -1064,7 +946,7 @@ export const QueryBlsPublicKeyListResponse: MessageFns<QueryBlsPublicKeyListResp
       const message = createBaseQueryBlsPublicKeyListResponse();
       message.validatorWithBlsKeys =
         object.validatorWithBlsKeys?.map((e) =>
-          BlsPublicKeyListResponse.fromPartial(e),
+          ValidatorWithBlsKey.fromPartial(e),
         ) || [];
       message.pagination =
         object.pagination !== undefined && object.pagination !== null

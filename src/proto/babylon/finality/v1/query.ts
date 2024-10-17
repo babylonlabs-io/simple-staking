@@ -10,8 +10,11 @@ import {
   PageRequest,
   PageResponse,
 } from "../../../cosmos/base/query/v1beta1/pagination";
-import { Timestamp } from "../../../google/protobuf/timestamp";
-import { Evidence, IndexedBlock } from "./finality";
+import {
+  Evidence,
+  FinalityProviderSigningInfo,
+  IndexedBlock,
+} from "./finality";
 import { Params } from "./params";
 
 export const protobufPackage = "babylon.finality.v1";
@@ -104,8 +107,6 @@ export interface PubRandCommitResponse {
   numPubRand: number;
   /** commitment is the value of the commitment */
   commitment: Uint8Array;
-  /** epoch_num defines the epoch number that the commit falls into */
-  epochNum: number;
 }
 
 /**
@@ -257,29 +258,12 @@ export interface QuerySigningInfoRequest {
 }
 
 /**
- * SigningInfoResponse defines the API response containing a finality provider's signing info
- * for monitoring their liveness activity.
- */
-export interface SigningInfoResponse {
-  /** fp_btc_pk is the BTC PK of the finality provider that casts this vote */
-  fpBtcPkHex: string;
-  /** start_height is the block height at which finality provider become active */
-  startHeight: number;
-  /**
-   * missed_blocks_counter defines a counter to avoid unnecessary array reads.
-   * Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`.
-   */
-  missedBlocksCounter: number;
-  /** Timestamp until which the validator is jailed due to liveness downtime. */
-  jailedUntil: Date | undefined;
-}
-
-/**
  * QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
  * method
  */
 export interface QuerySigningInfoResponse {
-  signingInfo: SigningInfoResponse | undefined;
+  /** fp_signing_info is the signing info of requested finality provider BTC public key */
+  fpSigningInfo: FinalityProviderSigningInfo | undefined;
 }
 
 /**
@@ -296,7 +280,7 @@ export interface QuerySigningInfosRequest {
  */
 export interface QuerySigningInfosResponse {
   /** info is the signing info of all finality providers with signing info */
-  signingInfos: SigningInfoResponse[];
+  fpSigningInfos: FinalityProviderSigningInfo[];
   pagination: PageResponse | undefined;
 }
 
@@ -745,7 +729,7 @@ export const QueryListPublicRandomnessResponse_PubRandMapEntry: MessageFns<Query
   };
 
 function createBasePubRandCommitResponse(): PubRandCommitResponse {
-  return { numPubRand: 0, commitment: new Uint8Array(0), epochNum: 0 };
+  return { numPubRand: 0, commitment: new Uint8Array(0) };
 }
 
 export const PubRandCommitResponse: MessageFns<PubRandCommitResponse> = {
@@ -758,9 +742,6 @@ export const PubRandCommitResponse: MessageFns<PubRandCommitResponse> = {
     }
     if (message.commitment.length !== 0) {
       writer.uint32(18).bytes(message.commitment);
-    }
-    if (message.epochNum !== 0) {
-      writer.uint32(24).uint64(message.epochNum);
     }
     return writer;
   },
@@ -790,13 +771,6 @@ export const PubRandCommitResponse: MessageFns<PubRandCommitResponse> = {
 
           message.commitment = reader.bytes();
           continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.epochNum = longToNumber(reader.uint64());
-          continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
         break;
@@ -814,7 +788,6 @@ export const PubRandCommitResponse: MessageFns<PubRandCommitResponse> = {
       commitment: isSet(object.commitment)
         ? bytesFromBase64(object.commitment)
         : new Uint8Array(0),
-      epochNum: isSet(object.epochNum) ? globalThis.Number(object.epochNum) : 0,
     };
   },
 
@@ -825,9 +798,6 @@ export const PubRandCommitResponse: MessageFns<PubRandCommitResponse> = {
     }
     if (message.commitment.length !== 0) {
       obj.commitment = base64FromBytes(message.commitment);
-    }
-    if (message.epochNum !== 0) {
-      obj.epochNum = Math.round(message.epochNum);
     }
     return obj;
   },
@@ -843,7 +813,6 @@ export const PubRandCommitResponse: MessageFns<PubRandCommitResponse> = {
     const message = createBasePubRandCommitResponse();
     message.numPubRand = object.numPubRand ?? 0;
     message.commitment = object.commitment ?? new Uint8Array(0);
-    message.epochNum = object.epochNum ?? 0;
     return message;
   },
 };
@@ -2061,141 +2030,8 @@ export const QuerySigningInfoRequest: MessageFns<QuerySigningInfoRequest> = {
   },
 };
 
-function createBaseSigningInfoResponse(): SigningInfoResponse {
-  return {
-    fpBtcPkHex: "",
-    startHeight: 0,
-    missedBlocksCounter: 0,
-    jailedUntil: undefined,
-  };
-}
-
-export const SigningInfoResponse: MessageFns<SigningInfoResponse> = {
-  encode(
-    message: SigningInfoResponse,
-    writer: BinaryWriter = new BinaryWriter(),
-  ): BinaryWriter {
-    if (message.fpBtcPkHex !== "") {
-      writer.uint32(10).string(message.fpBtcPkHex);
-    }
-    if (message.startHeight !== 0) {
-      writer.uint32(16).int64(message.startHeight);
-    }
-    if (message.missedBlocksCounter !== 0) {
-      writer.uint32(24).int64(message.missedBlocksCounter);
-    }
-    if (message.jailedUntil !== undefined) {
-      Timestamp.encode(
-        toTimestamp(message.jailedUntil),
-        writer.uint32(34).fork(),
-      ).join();
-    }
-    return writer;
-  },
-
-  decode(
-    input: BinaryReader | Uint8Array,
-    length?: number,
-  ): SigningInfoResponse {
-    const reader =
-      input instanceof BinaryReader ? input : new BinaryReader(input);
-    let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseSigningInfoResponse();
-    while (reader.pos < end) {
-      const tag = reader.uint32();
-      switch (tag >>> 3) {
-        case 1:
-          if (tag !== 10) {
-            break;
-          }
-
-          message.fpBtcPkHex = reader.string();
-          continue;
-        case 2:
-          if (tag !== 16) {
-            break;
-          }
-
-          message.startHeight = longToNumber(reader.int64());
-          continue;
-        case 3:
-          if (tag !== 24) {
-            break;
-          }
-
-          message.missedBlocksCounter = longToNumber(reader.int64());
-          continue;
-        case 4:
-          if (tag !== 34) {
-            break;
-          }
-
-          message.jailedUntil = fromTimestamp(
-            Timestamp.decode(reader, reader.uint32()),
-          );
-          continue;
-      }
-      if ((tag & 7) === 4 || tag === 0) {
-        break;
-      }
-      reader.skip(tag & 7);
-    }
-    return message;
-  },
-
-  fromJSON(object: any): SigningInfoResponse {
-    return {
-      fpBtcPkHex: isSet(object.fpBtcPkHex)
-        ? globalThis.String(object.fpBtcPkHex)
-        : "",
-      startHeight: isSet(object.startHeight)
-        ? globalThis.Number(object.startHeight)
-        : 0,
-      missedBlocksCounter: isSet(object.missedBlocksCounter)
-        ? globalThis.Number(object.missedBlocksCounter)
-        : 0,
-      jailedUntil: isSet(object.jailedUntil)
-        ? fromJsonTimestamp(object.jailedUntil)
-        : undefined,
-    };
-  },
-
-  toJSON(message: SigningInfoResponse): unknown {
-    const obj: any = {};
-    if (message.fpBtcPkHex !== "") {
-      obj.fpBtcPkHex = message.fpBtcPkHex;
-    }
-    if (message.startHeight !== 0) {
-      obj.startHeight = Math.round(message.startHeight);
-    }
-    if (message.missedBlocksCounter !== 0) {
-      obj.missedBlocksCounter = Math.round(message.missedBlocksCounter);
-    }
-    if (message.jailedUntil !== undefined) {
-      obj.jailedUntil = message.jailedUntil.toISOString();
-    }
-    return obj;
-  },
-
-  create<I extends Exact<DeepPartial<SigningInfoResponse>, I>>(
-    base?: I,
-  ): SigningInfoResponse {
-    return SigningInfoResponse.fromPartial(base ?? ({} as any));
-  },
-  fromPartial<I extends Exact<DeepPartial<SigningInfoResponse>, I>>(
-    object: I,
-  ): SigningInfoResponse {
-    const message = createBaseSigningInfoResponse();
-    message.fpBtcPkHex = object.fpBtcPkHex ?? "";
-    message.startHeight = object.startHeight ?? 0;
-    message.missedBlocksCounter = object.missedBlocksCounter ?? 0;
-    message.jailedUntil = object.jailedUntil ?? undefined;
-    return message;
-  },
-};
-
 function createBaseQuerySigningInfoResponse(): QuerySigningInfoResponse {
-  return { signingInfo: undefined };
+  return { fpSigningInfo: undefined };
 }
 
 export const QuerySigningInfoResponse: MessageFns<QuerySigningInfoResponse> = {
@@ -2203,9 +2039,9 @@ export const QuerySigningInfoResponse: MessageFns<QuerySigningInfoResponse> = {
     message: QuerySigningInfoResponse,
     writer: BinaryWriter = new BinaryWriter(),
   ): BinaryWriter {
-    if (message.signingInfo !== undefined) {
-      SigningInfoResponse.encode(
-        message.signingInfo,
+    if (message.fpSigningInfo !== undefined) {
+      FinalityProviderSigningInfo.encode(
+        message.fpSigningInfo,
         writer.uint32(10).fork(),
       ).join();
     }
@@ -2228,7 +2064,7 @@ export const QuerySigningInfoResponse: MessageFns<QuerySigningInfoResponse> = {
             break;
           }
 
-          message.signingInfo = SigningInfoResponse.decode(
+          message.fpSigningInfo = FinalityProviderSigningInfo.decode(
             reader,
             reader.uint32(),
           );
@@ -2244,16 +2080,18 @@ export const QuerySigningInfoResponse: MessageFns<QuerySigningInfoResponse> = {
 
   fromJSON(object: any): QuerySigningInfoResponse {
     return {
-      signingInfo: isSet(object.signingInfo)
-        ? SigningInfoResponse.fromJSON(object.signingInfo)
+      fpSigningInfo: isSet(object.fpSigningInfo)
+        ? FinalityProviderSigningInfo.fromJSON(object.fpSigningInfo)
         : undefined,
     };
   },
 
   toJSON(message: QuerySigningInfoResponse): unknown {
     const obj: any = {};
-    if (message.signingInfo !== undefined) {
-      obj.signingInfo = SigningInfoResponse.toJSON(message.signingInfo);
+    if (message.fpSigningInfo !== undefined) {
+      obj.fpSigningInfo = FinalityProviderSigningInfo.toJSON(
+        message.fpSigningInfo,
+      );
     }
     return obj;
   },
@@ -2267,9 +2105,9 @@ export const QuerySigningInfoResponse: MessageFns<QuerySigningInfoResponse> = {
     object: I,
   ): QuerySigningInfoResponse {
     const message = createBaseQuerySigningInfoResponse();
-    message.signingInfo =
-      object.signingInfo !== undefined && object.signingInfo !== null
-        ? SigningInfoResponse.fromPartial(object.signingInfo)
+    message.fpSigningInfo =
+      object.fpSigningInfo !== undefined && object.fpSigningInfo !== null
+        ? FinalityProviderSigningInfo.fromPartial(object.fpSigningInfo)
         : undefined;
     return message;
   },
@@ -2351,7 +2189,7 @@ export const QuerySigningInfosRequest: MessageFns<QuerySigningInfosRequest> = {
 };
 
 function createBaseQuerySigningInfosResponse(): QuerySigningInfosResponse {
-  return { signingInfos: [], pagination: undefined };
+  return { fpSigningInfos: [], pagination: undefined };
 }
 
 export const QuerySigningInfosResponse: MessageFns<QuerySigningInfosResponse> =
@@ -2360,8 +2198,8 @@ export const QuerySigningInfosResponse: MessageFns<QuerySigningInfosResponse> =
       message: QuerySigningInfosResponse,
       writer: BinaryWriter = new BinaryWriter(),
     ): BinaryWriter {
-      for (const v of message.signingInfos) {
-        SigningInfoResponse.encode(v!, writer.uint32(10).fork()).join();
+      for (const v of message.fpSigningInfos) {
+        FinalityProviderSigningInfo.encode(v!, writer.uint32(10).fork()).join();
       }
       if (message.pagination !== undefined) {
         PageResponse.encode(
@@ -2388,8 +2226,8 @@ export const QuerySigningInfosResponse: MessageFns<QuerySigningInfosResponse> =
               break;
             }
 
-            message.signingInfos.push(
-              SigningInfoResponse.decode(reader, reader.uint32()),
+            message.fpSigningInfos.push(
+              FinalityProviderSigningInfo.decode(reader, reader.uint32()),
             );
             continue;
           case 2:
@@ -2410,8 +2248,10 @@ export const QuerySigningInfosResponse: MessageFns<QuerySigningInfosResponse> =
 
     fromJSON(object: any): QuerySigningInfosResponse {
       return {
-        signingInfos: globalThis.Array.isArray(object?.signingInfos)
-          ? object.signingInfos.map((e: any) => SigningInfoResponse.fromJSON(e))
+        fpSigningInfos: globalThis.Array.isArray(object?.fpSigningInfos)
+          ? object.fpSigningInfos.map((e: any) =>
+              FinalityProviderSigningInfo.fromJSON(e),
+            )
           : [],
         pagination: isSet(object.pagination)
           ? PageResponse.fromJSON(object.pagination)
@@ -2421,9 +2261,9 @@ export const QuerySigningInfosResponse: MessageFns<QuerySigningInfosResponse> =
 
     toJSON(message: QuerySigningInfosResponse): unknown {
       const obj: any = {};
-      if (message.signingInfos?.length) {
-        obj.signingInfos = message.signingInfos.map((e) =>
-          SigningInfoResponse.toJSON(e),
+      if (message.fpSigningInfos?.length) {
+        obj.fpSigningInfos = message.fpSigningInfos.map((e) =>
+          FinalityProviderSigningInfo.toJSON(e),
         );
       }
       if (message.pagination !== undefined) {
@@ -2441,9 +2281,10 @@ export const QuerySigningInfosResponse: MessageFns<QuerySigningInfosResponse> =
       object: I,
     ): QuerySigningInfosResponse {
       const message = createBaseQuerySigningInfosResponse();
-      message.signingInfos =
-        object.signingInfos?.map((e) => SigningInfoResponse.fromPartial(e)) ||
-        [];
+      message.fpSigningInfos =
+        object.fpSigningInfos?.map((e) =>
+          FinalityProviderSigningInfo.fromPartial(e),
+        ) || [];
       message.pagination =
         object.pagination !== undefined && object.pagination !== null
           ? PageResponse.fromPartial(object.pagination)
@@ -2459,7 +2300,7 @@ export interface Query {
   /**
    * ListPublicRandomness is a range query for public randomness of a given finality provider
    * NOTE: Babylon only has the knowledge of public randomness that is already revealed by
-   * finality providers, i.e., the finality provider already provides a finality signature
+   * finality providers, i.e., the finality provider alreayd provides a finality signature
    * at the corresponding height
    * TODO: remove public randomness storage?
    */
@@ -2669,28 +2510,6 @@ export type Exact<P, I extends P> = P extends Builtin
   : P & { [K in keyof P]: Exact<P[K], I[K]> } & {
       [K in Exclude<keyof I, KeysOfUnion<P>>]: never;
     };
-
-function toTimestamp(date: Date): Timestamp {
-  const seconds = Math.trunc(date.getTime() / 1_000);
-  const nanos = (date.getTime() % 1_000) * 1_000_000;
-  return { seconds, nanos };
-}
-
-function fromTimestamp(t: Timestamp): Date {
-  let millis = (t.seconds || 0) * 1_000;
-  millis += (t.nanos || 0) / 1_000_000;
-  return new globalThis.Date(millis);
-}
-
-function fromJsonTimestamp(o: any): Date {
-  if (o instanceof globalThis.Date) {
-    return o;
-  } else if (typeof o === "string") {
-    return new globalThis.Date(o);
-  } else {
-    return fromTimestamp(Timestamp.fromJSON(o));
-  }
-}
 
 function longToNumber(int64: { toString(): string }): number {
   const num = globalThis.Number(int64.toString());

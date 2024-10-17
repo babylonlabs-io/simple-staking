@@ -128,7 +128,7 @@ export const QueryEndedEpochBtcHeightResponse: MessageFns<QueryEndedEpochBtcHeig
       writer: BinaryWriter = new BinaryWriter(),
     ): BinaryWriter {
       if (message.btcLightClientHeight !== 0) {
-        writer.uint32(8).uint32(message.btcLightClientHeight);
+        writer.uint32(8).uint64(message.btcLightClientHeight);
       }
       return writer;
     },
@@ -149,7 +149,7 @@ export const QueryEndedEpochBtcHeightResponse: MessageFns<QueryEndedEpochBtcHeig
               break;
             }
 
-            message.btcLightClientHeight = reader.uint32();
+            message.btcLightClientHeight = longToNumber(reader.uint64());
             continue;
         }
         if ((tag & 7) === 4 || tag === 0) {
@@ -276,7 +276,7 @@ export const QueryReportedCheckpointBtcHeightResponse: MessageFns<QueryReportedC
       writer: BinaryWriter = new BinaryWriter(),
     ): BinaryWriter {
       if (message.btcLightClientHeight !== 0) {
-        writer.uint32(8).uint32(message.btcLightClientHeight);
+        writer.uint32(8).uint64(message.btcLightClientHeight);
       }
       return writer;
     },
@@ -297,7 +297,7 @@ export const QueryReportedCheckpointBtcHeightResponse: MessageFns<QueryReportedC
               break;
             }
 
-            message.btcLightClientHeight = reader.uint32();
+            message.btcLightClientHeight = longToNumber(reader.uint64());
             continue;
         }
         if ((tag & 7) === 4 || tag === 0) {
