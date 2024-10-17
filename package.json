@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build:proto": "./src/scripts/get-proto.sh",
+    "build:proto": "./src/scripts/get-proto.sh && npm run format:fix",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
