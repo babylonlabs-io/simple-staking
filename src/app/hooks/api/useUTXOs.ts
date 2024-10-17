@@ -1,6 +1,6 @@
 import { ONE_MINUTE } from "@/app/constants";
 import { useWallet } from "@/app/context/wallet/WalletProvider";
-import { useAPIQuery } from "@/app/hooks/useApi";
+import { useAPIQuery } from "@/app/hooks/api/useApi";
 import { filterOrdinals } from "@/utils/utxo";
 
 export const UTXO_KEY = "UTXO";

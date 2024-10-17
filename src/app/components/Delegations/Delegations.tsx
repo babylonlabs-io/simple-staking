@@ -11,7 +11,7 @@ import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useWallet } from "@/app/context/wallet/WalletProvider";
-import { useDelegations } from "@/app/hooks/useDelegations";
+import { useDelegations } from "@/app/hooks/api/useDelegations";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";

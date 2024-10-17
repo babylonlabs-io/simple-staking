@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useWallet } from "@/app/context/wallet/WalletProvider";
-import { useDelegations } from "@/app/hooks/useDelegations";
+import { useDelegations } from "@/app/hooks/api/useDelegations";
 import type { Delegation } from "@/app/types/delegations";
 import { DelegationState as DelegationEnum } from "@/app/types/delegations";
 import { createStateUtils } from "@/utils/createStateUtils";

@@ -1,6 +1,6 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useVersionByHeight } from "@/app/hooks/useVersions";
+import { useVersionByHeight } from "@/app/hooks/useVersionByHeight";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";

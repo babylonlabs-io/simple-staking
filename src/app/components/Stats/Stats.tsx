@@ -1,224 +1,102 @@
-import Image from "next/image";
-import { Fragment, useEffect, useMemo, useState } from "react";
-import { AiOutlineInfoCircle } from "react-icons/ai";
-import { Tooltip } from "react-tooltip";
+import { memo } from "react";
 
-import {
-  StakingStats,
-  useStakingStats,
-} from "@/app/context/api/StakingStatsProvider";
-import { useAppState } from "@/app/state";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { useSystemStats } from "@/app/hooks/api/useSystemStats";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
-import { ParamsWithContext } from "@/utils/globalParams";
 import { maxDecimals } from "@/utils/maxDecimals";
 
-import confirmedTvl from "./icons/confirmed-tvl.svg";
-import delegations from "./icons/delegations.svg";
-import pendingStake from "./icons/pending-stake.svg";
-import stakers from "./icons/stakers.svg";
-import stakingTvlCap from "./icons/staking-tvl-cap.svg";
+import { StatItem } from "./StatItem";
+import {
+  delegationIcon,
+  finalityProviderIcon,
+  rewardHistoryIcon,
+  rewardRateIcon,
+  stakerIcon,
+  tvlIcon,
+} from "./icons";
 
-const buildNextCapText = (
-  coinName: string,
-  btcHeight: number,
-  nextVersion: GlobalParamsVersion,
-) => {
-  const { stakingCapHeight, stakingCapSat, activationHeight } = nextVersion;
-  if (stakingCapHeight) {
-    const remainingBlocks = activationHeight - btcHeight - 1;
-    return {
-      title: "Staking Window",
-      value: `opens in ${remainingBlocks} ${remainingBlocks == 1 ? "block" : "blocks"}`,
-    };
-  } else if (stakingCapSat) {
-    return {
-      title: "Next Staking TVL Cap",
-      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
-    };
-  }
-};
+const { coinName } = getNetworkConfig();
 
-const buildStakingCapSection = (
-  coinName: string,
-  btcHeight: number,
-  paramsCtx: ParamsWithContext,
-) => {
-  const { currentVersion, nextVersion, isApprochingNextVersion } = paramsCtx;
-  if (!currentVersion) {
-    return;
-  }
-  if (isApprochingNextVersion && nextVersion) {
-    return buildNextCapText(coinName, btcHeight, nextVersion);
-  }
-  const { stakingCapHeight, stakingCapSat } = currentVersion;
-  if (stakingCapHeight) {
-    const numOfBlockLeft = stakingCapHeight - btcHeight;
-    return {
-      title: "Staking Window",
-      value:
-        numOfBlockLeft > 0
-          ? `closes in ${numOfBlockLeft} ${numOfBlockLeft == 1 ? "block" : "blocks"}`
-          : "closed",
-    };
-  } else if (stakingCapSat) {
-    return {
-      title: "Staking TVL Cap",
-      value: `${maxDecimals(satoshiToBtc(stakingCapSat), 8)} ${coinName}`,
-    };
-  }
-};
+const formatter = Intl.NumberFormat("en", {
+  notation: "compact",
+  maximumFractionDigits: 2,
+});
 
-export const Stats: React.FC = () => {
-  const [stakingStats, setStakingStats] = useState<StakingStats | undefined>({
-    activeTVLSat: 0,
-    totalTVLSat: 0,
-    activeDelegations: 0,
-    totalDelegations: 0,
-    totalStakers: 0,
-    unconfirmedTVLSat: 0,
-  });
-  const [isLoading, setIsLoading] = useState(true);
-  const stakingStatsProvider = useStakingStats();
-  const appState = useAppState();
-
-  const { coinName } = getNetworkConfig();
-
-  // Load the data from staking stats provider
-  useEffect(() => {
-    if (stakingStatsProvider.data) {
-      setStakingStats(stakingStatsProvider.data);
-    }
-    setIsLoading(
-      stakingStatsProvider.isLoading || Boolean(appState?.isLoading),
-    );
-  }, [stakingStatsProvider, appState?.isLoading]);
-
-  const stakingCapText = useMemo(() => {
-    if (!appState?.currentHeight) {
-      return {
-        title: "Staking TVL Cap",
-        value: "-",
-      };
-    }
-
-    const cap = buildStakingCapSection(
-      coinName,
-      appState.currentHeight,
-      appState,
-    );
-
-    return (
-      cap ?? {
-        title: "Staking TVL Cap",
-        value: "-",
-      }
-    );
-  }, [coinName, appState]);
-
-  const formatter = Intl.NumberFormat("en", {
-    notation: "compact",
-    maximumFractionDigits: 2,
-  });
-
-  const sections = [
-    [
-      {
-        title: stakingCapText.title,
-        value: stakingCapText.value,
-        icon: stakingTvlCap,
-      },
-      {
-        title: "Confirmed TVL",
-        value: stakingStats?.activeTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 8)} ${coinName}`
-          : 0,
-        icon: confirmedTvl,
-      },
-      {
-        title: "Pending Stake",
-        value: stakingStats?.unconfirmedTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 8)} ${coinName}`
-          : 0,
-        icon: pendingStake,
-        tooltip:
-          stakingStats &&
-          stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat < 0
-            ? "Pending TVL can be negative when there are unbonding requests"
-            : undefined,
-      },
-    ],
-    [
-      {
-        title: "Delegations",
-        value: stakingStats?.activeDelegations
-          ? formatter.format(stakingStats.activeDelegations as number)
-          : 0,
-        icon: delegations,
-        tooltip: "Total number of stake delegations",
-      },
-      {
-        title: "Stakers",
-        value: stakingStats?.totalStakers
-          ? formatter.format(stakingStats.totalStakers as number)
-          : 0,
-        icon: stakers,
-      },
-    ],
-  ];
+export const Stats = memo(() => {
+  const {
+    data: {
+      activeTvl,
+      activeStakers,
+      activeDelegations,
+      totalFinalityProviders,
+      activeFinalityProviders,
+    },
+    isLoading,
+  } = useSystemStats();
 
   return (
-    <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm lg:flex-row lg:justify-between">
-      {sections.map((section, index) => (
-        <div
-          key={index}
-          className="card flex justify-between bg-base-400 p-4 text-sm md:flex-row"
-        >
-          {section.map((subSection, subIndex) => (
-            <Fragment key={subSection.title}>
-              <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-center">
-                <div className="flex items-center gap-2">
-                  <Image src={subSection.icon} alt={subSection.title} />
-                  <div className="flex items-center gap-1">
-                    <p className="dark:text-neutral-content">
-                      {subSection.title}
-                    </p>
-                    {subSection.tooltip && (
-                      <>
-                        <span
-                          className="cursor-pointer text-xs"
-                          data-tooltip-id={`tooltip-${subSection.title}`}
-                          data-tooltip-content={subSection.tooltip}
-                          data-tooltip-place="top"
-                        >
-                          <AiOutlineInfoCircle />
-                        </span>
-                        <Tooltip
-                          id={`tooltip-${subSection.title}`}
-                          className="tooltip-wrap"
-                        />
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div>
-                  <p className="flex-1 text-right">
-                    {isLoading ? (
-                      <span className="loading loading-spinner text-primary" />
-                    ) : (
-                      <strong>{subSection.value}</strong>
-                    )}
-                  </p>
-                </div>
-              </div>
-              {subIndex !== section.length - 1 && (
-                <div className="divider mx-0 my-2 md:divider-horizontal" />
-              )}
-            </Fragment>
-          ))}
-        </div>
-      ))}
+    <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm xl:flex-row xl:justify-between">
+      <div className="card flex justify-between bg-base-400 p-4 text-sm md:flex-row">
+        <StatItem
+          loading={isLoading}
+          icon={tvlIcon}
+          title="TVL"
+          value={`${maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinName}`}
+          tooltip="Total number of active bitcoins staked"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+
+        <StatItem
+          loading={isLoading}
+          icon={stakerIcon}
+          title="Stakers"
+          value={formatter.format(activeStakers)}
+          tooltip="Total number of active bitcoin stakers"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+
+        <StatItem
+          loading={isLoading}
+          icon={finalityProviderIcon}
+          title="Finality Providers"
+          value={`${activeFinalityProviders}/${totalFinalityProviders}`}
+          tooltip="Active and total number of finality providers"
+        />
+      </div>
+
+      <div className="card flex justify-between bg-base-400 p-4 text-sm md:flex-row">
+        <StatItem
+          loading={isLoading}
+          icon={delegationIcon}
+          title="Delegations"
+          value={formatter.format(activeDelegations)}
+          tooltip="Total number of active bitcoin staking delegations"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+
+        <StatItem
+          loading={isLoading}
+          icon={rewardRateIcon}
+          title="Reward Rate"
+          value="0 BBN"
+          tooltip="Current number of BBN token reward per 24 hrs per one bitcoin staked"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+
+        <StatItem
+          loading={isLoading}
+          icon={rewardHistoryIcon}
+          title="Reward History"
+          value="O BBN"
+          tooltip="Total number of BBN tokens rewarded to bitcoin stakers"
+        />
+      </div>
     </div>
   );
-};
+});
+
+Stats.displayName = "Stats";
