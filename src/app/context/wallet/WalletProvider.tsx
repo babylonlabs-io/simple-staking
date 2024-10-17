@@ -161,7 +161,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
         await cosmosWalletProvider.provider.signArbitrary(
           cosmosChainID,
           cosmosBech32Address,
-          message,
+          message, // This might be Buffer.from(message)
         ),
     }),
     [
