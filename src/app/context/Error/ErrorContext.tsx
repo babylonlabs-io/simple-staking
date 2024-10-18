@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import React, {
   ReactNode,
   createContext,
@@ -31,6 +32,7 @@ interface ErrorContextType {
     errorState,
     refetchFunction,
   }: ErrorHandlerParam) => void;
+  captureError: (error: Error | null) => void;
 }
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
@@ -81,6 +83,12 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     [showError],
   );
 
+  const captureError = useCallback((error: Error | null) => {
+    if (error) {
+      Sentry.captureException(error);
+    }
+  }, []);
+
   const value: ErrorContextType = {
     isErrorOpen: isErrorOpen,
     error,
@@ -89,6 +97,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     retryErrorAction,
     noCancel: isNoCancel,
     handleError,
+    captureError,
   };
 
   return (
