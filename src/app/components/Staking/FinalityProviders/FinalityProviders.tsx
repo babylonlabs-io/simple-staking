@@ -23,7 +23,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   onFinalityProviderChange,
   onFinalityProvidersLoad,
 }) => {
-  const { isErrorOpen, showError, handleError } = useError();
+  const { isErrorOpen, showError, handleError, captureError } = useError();
   const {
     data: fps,
     fetchNextPage: finalityProvidersFetchNext,
@@ -83,6 +83,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchFinalityProvidersData,
     });
+    captureError(finalityProvidersError);
   }, [
     hasFinalityProvidersError,
     isRefetchFinalityProvidersError,
@@ -90,6 +91,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     refetchFinalityProvidersData,
     showError,
     handleError,
+    captureError,
   ]);
 
   const { handleSearch, filteredProviders } = useFinalityProvidersData(
