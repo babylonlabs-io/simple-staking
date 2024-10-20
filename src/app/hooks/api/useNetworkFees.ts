@@ -1,4 +1,4 @@
-import { useAPIQuery } from "@/app/hooks/useApi";
+import { useAPIQuery } from "@/app/hooks/api/useApi";
 import { getNetworkFees } from "@/utils/mempool_api";
 
 export const NETWORK_FEES_KEY = "NETWORK_FEES";
