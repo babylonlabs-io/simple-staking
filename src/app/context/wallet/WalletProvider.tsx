@@ -157,8 +157,8 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
       connected: Boolean(cosmosWalletProvider),
       disconnect,
       open,
-      signArbitrary: async (message: string) =>
-        await cosmosWalletProvider.provider.signArbitrary(
+      signArbitrary: (message: string) =>
+        cosmosWalletProvider.provider.signArbitrary(
           cosmosChainID,
           cosmosBech32Address,
           message, // This might be Buffer.from(message)
