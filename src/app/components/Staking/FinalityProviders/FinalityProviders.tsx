@@ -1,102 +1,44 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
 import {
-  PaginatedFinalityProviders,
-  getFinalityProviders,
-} from "@/app/api/getFinalityProviders";
-import {
   LoadingTableList,
   LoadingView,
 } from "@/app/components/Loading/Loading";
-import { useError } from "@/app/context/Error/ErrorContext";
-import { useFinalityProvidersData } from "@/app/hooks/finalityProviders/useFinalityProvidersData";
-import { ErrorState } from "@/app/types/errors";
-import { FinalityProvidersProps } from "@/app/types/finalityProviders";
+import { useFinalityProviderService } from "@/app/hooks/services/useFinalityProviderService";
+import type { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 
 import { FinalityProvider } from "./FinalityProvider";
 import { FinalityProviderSearch } from "./FinalityProviderSearch";
+
+export interface FinalityProvidersProps {
+  onFinalityProvidersLoad: (data: FinalityProviderInterface[]) => void;
+  selectedFinalityProvider: FinalityProviderInterface | undefined;
+  onFinalityProviderChange: (btcPkHex: string) => void;
+}
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   selectedFinalityProvider,
   onFinalityProviderChange,
   onFinalityProvidersLoad,
 }) => {
-  const { isErrorOpen, showError, handleError } = useError();
   const {
-    data: fps,
-    fetchNextPage: finalityProvidersFetchNext,
-    hasNextPage: finalityProvidersHasNext,
-    isFetchingNextPage: finalityProvidersIsFetchingMore,
-    error: finalityProvidersError,
-    isError: hasFinalityProvidersError,
-    refetch: refetchFinalityProvidersData,
-    isRefetchError: isRefetchFinalityProvidersError,
-  } = useInfiniteQuery({
-    queryKey: ["finality providers"],
-    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
-    getNextPageParam: (lastPage) =>
-      lastPage?.pagination?.next_key !== ""
-        ? lastPage?.pagination?.next_key
-        : null,
-    initialPageParam: "",
-    refetchInterval: 60000, // 1 minute
-    select: (data) => {
-      const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
-        (acc, page) => {
-          acc.finalityProviders.push(...page.finalityProviders);
-          acc.pagination = page.pagination;
-          return acc;
-        },
-        { finalityProviders: [], pagination: { next_key: "" } },
-      );
-      return flattenedData;
-    },
-    retry: (failureCount) => {
-      return !isErrorOpen && failureCount <= 3;
-    },
-  });
+    finalityProviders,
+    filteredProviders,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+    handleSearch,
+    handleSort,
+  } = useFinalityProviderService();
 
   useEffect(() => {
-    fps?.finalityProviders && onFinalityProvidersLoad(fps.finalityProviders);
-  }, [fps, onFinalityProvidersLoad]);
-
-  useEffect(() => {
-    if (
-      finalityProvidersHasNext &&
-      finalityProvidersFetchNext &&
-      !finalityProvidersIsFetchingMore
-    ) {
-      finalityProvidersFetchNext();
+    if (finalityProviders) {
+      onFinalityProvidersLoad(finalityProviders);
     }
-  }, [
-    finalityProvidersHasNext,
-    finalityProvidersFetchNext,
-    finalityProvidersIsFetchingMore,
-  ]);
+  }, [finalityProviders, onFinalityProvidersLoad]);
 
-  useEffect(() => {
-    handleError({
-      error: finalityProvidersError,
-      hasError: hasFinalityProvidersError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: refetchFinalityProvidersData,
-    });
-  }, [
-    hasFinalityProvidersError,
-    isRefetchFinalityProvidersError,
-    finalityProvidersError,
-    refetchFinalityProvidersData,
-    showError,
-    handleError,
-  ]);
-
-  const { handleSearch, filteredProviders } = useFinalityProvidersData(
-    fps?.finalityProviders,
-  );
-
-  if (!fps?.finalityProviders?.length) {
+  if (!finalityProviders?.length) {
     return <LoadingView />;
   }
 
@@ -109,10 +51,17 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <FinalityProviderSearch onSearch={handleSearch} />
       </div>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
-        <p>Finality Provider</p>
-        <p>BTC PK</p>
-        <p>Total Delegation</p>
-        <p>Commission</p>
+        <p className="cursor-pointer" onClick={() => handleSort("name")}>
+          Finality Provider
+        </p>
+        <p className="cursor-default">BTC PK</p>
+        <p className="cursor-pointer" onClick={() => handleSort("active_tvl")}>
+          Total Delegation
+        </p>
+        <p className="cursor-pointer" onClick={() => handleSort("commission")}>
+          Commission
+        </p>
+        <p className="cursor-default text-right">Status</p>
       </div>
       <div
         id="finality-providers"
@@ -121,14 +70,15 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <InfiniteScroll
           className="flex flex-col gap-4"
           dataLength={filteredProviders?.length || 0}
-          next={finalityProvidersFetchNext}
-          hasMore={finalityProvidersHasNext}
-          loader={finalityProvidersIsFetchingMore ? <LoadingTableList /> : null}
+          next={fetchNextPage}
+          hasMore={hasNextPage}
+          loader={isFetchingNextPage ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
           {filteredProviders?.map((fp) => (
             <FinalityProvider
               key={fp.btcPk}
+              state={fp.state}
               moniker={fp.description?.moniker}
               website={fp.description?.website}
               pkHex={fp.btcPk}

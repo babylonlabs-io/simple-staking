@@ -1,7 +1,6 @@
-import { Dispatch, SetStateAction } from "react";
-
 export interface FinalityProvider {
   description: Description;
+  state: "active" | "standby";
   commission: string;
   btcPk: string;
   activeTVLSat: number;
@@ -16,12 +15,4 @@ export interface Description {
   website: string;
   securityContact: string;
   details: string;
-}
-
-export interface FinalityProvidersProps {
-  onFinalityProvidersLoad: Dispatch<
-    SetStateAction<FinalityProvider[] | undefined>
-  >;
-  selectedFinalityProvider: FinalityProvider | undefined;
-  onFinalityProviderChange: (btcPkHex: string) => void;
 }

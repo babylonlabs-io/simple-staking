@@ -13,6 +13,7 @@ import { maxDecimals } from "@/utils/maxDecimals";
 interface FinalityProviderProps {
   moniker: string;
   pkHex: string;
+  state: "active" | "standby";
   stakeSat: number;
   commission: string;
   onClick: () => void;
@@ -22,6 +23,7 @@ interface FinalityProviderProps {
 
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   moniker,
+  state = "active",
   pkHex,
   stakeSat,
   commission,
@@ -126,6 +128,9 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             id={`tooltip-delegation-${pkHex}`}
             className="tooltip-wrap"
           />
+        </div>
+        <div className="flex justify-start gap-1 capitalize lg:justify-end">
+          <span className="lg:hidden">Status:</span> {state}
         </div>
       </div>
     </div>
