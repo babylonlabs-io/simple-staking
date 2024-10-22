@@ -1,10 +1,4 @@
-import {
-  useTomoModalControl,
-  useTomoProviders,
-  useTomoWalletConnect,
-  useTomoWalletState,
-} from "@tomo-inc/wallet-connect-sdk";
-import "@tomo-inc/wallet-connect-sdk/style.css";
+// BTCWalletProvider.tsx
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -31,6 +25,8 @@ import {
   type BTCWalletProvider as IBTCWalletProvider,
 } from "@/utils/wallet/btc_wallet_provider";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
+
+import { useWalletConnection } from "./WalletConnectionProvider";
 
 interface BTCWalletContextProps {
   network?: networks.Network;
@@ -76,127 +72,22 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
   getInscriptions: () => Promise.resolve([]),
 });
 
-// Define the interface for the Cosmos wallet context
-interface CosmosWalletContextProps {
-  bech32Address: string;
-  pubKey: string;
-  connected: boolean;
-  disconnect: () => void;
-  signArbitrary: (message: string) => Promise<any>;
-}
-
-const CosmosWalletContext = createContext<CosmosWalletContextProps>({
-  bech32Address: "",
-  pubKey: "",
-  connected: false,
-  disconnect: () => {},
-  signArbitrary: async () => {},
-});
-
-export const WalletProvider = ({ children }: PropsWithChildren) => {
+export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const [btcWalletProvider, setBTCWalletProvider] =
     useState<IBTCWalletProvider>();
   const [network, setNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
   const [address, setAddress] = useState("");
 
-  const [cosmosWalletProvider, setCosmosWalletProvider] = useState<any>();
-  const [cosmosBech32Address, setCosmosBech32Address] = useState("");
-  const [cosmosPubKey, setCosmosPubKey] = useState("");
-  const [cosmosChainID, setCosmosChainID] = useState("");
-
   const { showError } = useError();
+  const { open, disconnect, isConnected, providers } = useWalletConnection();
 
-  const tomoModal = useTomoModalControl();
-  const tomoWalletConnect = useTomoWalletConnect();
-
-  const tomowalletState = useTomoWalletState();
-  const providers = useTomoProviders();
-
-  const disconnect = useCallback(async () => {
+  const btcDisconnect = useCallback(() => {
     setBTCWalletProvider(undefined);
     setNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
-    setCosmosWalletProvider(undefined);
-    setCosmosBech32Address("");
-    setCosmosPubKey("");
-    await tomoWalletConnect.disconnect();
-  }, [tomoWalletConnect]);
-
-  const open = useCallback(async () => {
-    await tomoModal.open("connect");
-  }, [tomoModal]);
-
-  const connectCosmos = useCallback(async () => {
-    if (!providers.cosmosProvider) return;
-
-    try {
-      const chainID = providers.cosmosProvider.getChainId();
-      const cosmosInfo =
-        await providers.cosmosProvider.provider.getKey(chainID);
-
-      const { bech32Address, pubKey } = cosmosInfo;
-      setCosmosWalletProvider(providers.cosmosProvider);
-      setCosmosBech32Address(bech32Address);
-      setCosmosPubKey(Buffer.from(pubKey).toString("hex"));
-      setCosmosChainID(chainID);
-    } catch (error: any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.WALLET,
-        },
-        retryAction: connectCosmos,
-      });
-    }
-  }, [providers.cosmosProvider, showError]);
-
-  const cosmosContextValue = useMemo(
-    () => ({
-      bech32Address: cosmosBech32Address,
-      pubKey: cosmosPubKey,
-      connected: Boolean(cosmosWalletProvider),
-      disconnect,
-      open,
-      signArbitrary: (message: string) =>
-        cosmosWalletProvider.provider.signArbitrary(
-          cosmosChainID,
-          cosmosBech32Address,
-          message, // This might be Buffer.from(message)
-        ),
-    }),
-    [
-      cosmosChainID,
-      cosmosBech32Address,
-      cosmosPubKey,
-      cosmosWalletProvider,
-      disconnect,
-      open,
-    ],
-  );
-
-  const btcWalletMethods = useMemo(
-    () => ({
-      getWalletProviderName: () => btcWalletProvider!.getWalletProviderName(),
-      getAddress: () => btcWalletProvider!.getAddress(),
-      getPublicKeyHex: () => btcWalletProvider!.getPublicKeyHex(),
-      signPsbt: (psbtHex: string) => btcWalletProvider!.signPsbt(psbtHex),
-      signPsbts: (psbtsHexes: string[]) =>
-        btcWalletProvider!.signPsbts(psbtsHexes),
-      getNetwork: () => btcWalletProvider!.getNetwork(),
-      signMessageBIP322: (message: string) =>
-        btcWalletProvider!.signMessageBIP322(message),
-      getBalance: () => btcWalletProvider!.getBalance(),
-      getNetworkFees: () => btcWalletProvider!.getNetworkFees(),
-      pushTx: (txHex: string) => btcWalletProvider!.pushTx(txHex),
-      getUtxos: (address: string, amount?: number) =>
-        btcWalletProvider!.getUtxos(address, amount),
-      getBTCTipHeight: () => btcWalletProvider!.getBTCTipHeight(),
-      getInscriptions: () => btcWalletProvider!.getInscriptions(),
-    }),
-    [btcWalletProvider],
-  );
+  }, []);
 
   const connectBTC = useCallback(
     async (walletProvider: IBTCWalletProvider) => {
@@ -206,7 +97,6 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
       try {
         await walletProvider.connectWallet();
         const address = await walletProvider.getAddress();
-        // check if the wallet address type is supported in babylon
         const supported = isSupportedAddressType(address);
         if (!supported) {
           throw new Error(supportedNetworkMessage);
@@ -225,7 +115,6 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
           error instanceof WalletError &&
           error.getType() === WalletErrorType.ConnectionCancelled
         ) {
-          // User cancelled the connection, hence do nothing
           return;
         }
         let errorMessage;
@@ -266,6 +155,28 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
     }
   }, [btcWalletProvider, connectBTC]);
 
+  const btcWalletMethods = useMemo(
+    () => ({
+      getWalletProviderName: () => btcWalletProvider!.getWalletProviderName(),
+      getAddress: () => btcWalletProvider!.getAddress(),
+      getPublicKeyHex: () => btcWalletProvider!.getPublicKeyHex(),
+      signPsbt: (psbtHex: string) => btcWalletProvider!.signPsbt(psbtHex),
+      signPsbts: (psbtsHexes: string[]) =>
+        btcWalletProvider!.signPsbts(psbtsHexes),
+      getNetwork: () => btcWalletProvider!.getNetwork(),
+      signMessageBIP322: (message: string) =>
+        btcWalletProvider!.signMessageBIP322(message),
+      getBalance: () => btcWalletProvider!.getBalance(),
+      getNetworkFees: () => btcWalletProvider!.getNetworkFees(),
+      pushTx: (txHex: string) => btcWalletProvider!.pushTx(txHex),
+      getUtxos: (address: string, amount?: number) =>
+        btcWalletProvider!.getUtxos(address, amount),
+      getBTCTipHeight: () => btcWalletProvider!.getBTCTipHeight(),
+      getInscriptions: () => btcWalletProvider!.getInscriptions(),
+    }),
+    [btcWalletProvider],
+  );
+
   const btcContextValue = useMemo(
     () => ({
       network,
@@ -273,7 +184,7 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
       address,
       connected: Boolean(btcWalletProvider),
       open,
-      disconnect,
+      disconnect: btcDisconnect,
       ...btcWalletMethods,
     }),
     [
@@ -282,39 +193,37 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
       publicKeyNoCoord,
       address,
       open,
-      disconnect,
+      btcDisconnect,
       btcWalletMethods,
     ],
   );
 
   useEffect(() => {
-    if (tomowalletState.isConnected && providers.state) {
+    if (isConnected && providers.state) {
       if (!btcWalletProvider && providers.bitcoinProvider) {
         connectBTC(providers.bitcoinProvider as unknown as IBTCWalletProvider);
-      }
-      if (!cosmosWalletProvider && providers.cosmosProvider) {
-        connectCosmos();
       }
     }
   }, [
     connectBTC,
-    connectCosmos,
     providers.bitcoinProvider,
-    providers.cosmosProvider,
     providers.state,
-    tomowalletState.isConnected,
+    isConnected,
     btcWalletProvider,
-    cosmosWalletProvider,
   ]);
+
+  // Clean up the state when isConnected becomes false
+  useEffect(() => {
+    if (!isConnected) {
+      btcDisconnect();
+    }
+  }, [isConnected, btcDisconnect]);
 
   return (
     <BTCWalletContext.Provider value={btcContextValue}>
-      <CosmosWalletContext.Provider value={cosmosContextValue}>
-        {children}
-      </CosmosWalletContext.Provider>
+      {children}
     </BTCWalletContext.Provider>
   );
 };
 
 export const useBTCWallet = () => useContext(BTCWalletContext);
-export const useCosmosWallet = () => useContext(CosmosWalletContext);

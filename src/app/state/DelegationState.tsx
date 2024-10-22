@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/api/useDelegations";
 import type { Delegation } from "@/app/types/delegations";
 import { DelegationState as DelegationEnum } from "@/app/types/delegations";

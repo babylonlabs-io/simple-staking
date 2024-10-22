@@ -1,5 +1,5 @@
 import { ONE_MINUTE } from "@/app/constants";
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAPIQuery } from "@/app/hooks/api/useApi";
 import { filterOrdinals } from "@/utils/utxo";
 

@@ -8,8 +8,10 @@ import React from "react";
 
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
+import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
+import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { TomoProvider } from "./context/wallet/TomoProvider";
-import { WalletProvider } from "./context/wallet/WalletProvider";
+import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
 import { AppState } from "./state";
 
 function Providers({ children }: React.PropsWithChildren) {
@@ -20,15 +22,19 @@ function Providers({ children }: React.PropsWithChildren) {
       <QueryClientProvider client={client}>
         <ErrorProvider>
           <TomoProvider>
-            <WalletProvider>
-              <AppState>
-                <StakingStatsProvider>
-                  <ReactQueryStreamedHydration>
-                    {children}
-                  </ReactQueryStreamedHydration>
-                </StakingStatsProvider>
-              </AppState>
-            </WalletProvider>
+            <WalletConnectionProvider>
+              <BTCWalletProvider>
+                <CosmosWalletProvider>
+                  <AppState>
+                    <StakingStatsProvider>
+                      <ReactQueryStreamedHydration>
+                        {children}
+                      </ReactQueryStreamedHydration>
+                    </StakingStatsProvider>
+                  </AppState>
+                </CosmosWalletProvider>
+              </BTCWalletProvider>
+            </WalletConnectionProvider>
           </TomoProvider>
         </ErrorProvider>
         <ReactQueryDevtools

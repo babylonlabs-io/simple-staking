@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
 import connectIcon from "./connect-icon.svg";
 import walletIcon from "./wallet-icon.svg";

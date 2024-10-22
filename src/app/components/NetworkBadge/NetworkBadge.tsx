@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { twJoin } from "tailwind-merge";
 
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { network } from "@/config/network.config";
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 

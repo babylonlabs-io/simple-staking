@@ -2,7 +2,7 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";

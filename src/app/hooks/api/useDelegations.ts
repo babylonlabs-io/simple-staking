@@ -7,7 +7,7 @@ import {
 } from "@/app/api/getDelegations";
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { ErrorState } from "@/app/types/errors";
 
 export const DELEGATIONS_KEY = "DELEGATIONS";

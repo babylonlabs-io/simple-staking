@@ -6,7 +6,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useBTCWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/api/useDelegations";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
