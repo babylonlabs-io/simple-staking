@@ -2,6 +2,7 @@ import Image from "next/image";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FiExternalLink } from "react-icons/fi";
 import { Tooltip } from "react-tooltip";
+import { twJoin } from "tailwind-merge";
 
 import blue from "@/app/assets/blue-check.svg";
 import { Hash } from "@/app/components/Hash/Hash";
@@ -43,11 +44,11 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
 
   return (
     <div
-      className={`
-        ${generalStyles}
-        ${selected ? "fp-selected" : ""}
-        ${finalityProviderHasData ? "" : "opacity-50 pointer-events-none"}
-        `}
+      className={twJoin(
+        generalStyles,
+        selected ? "fp-selected" : "",
+        finalityProviderHasData ? "" : "opacity-50 pointer-events-none",
+      )}
       onClick={handleClick}
     >
       <div className="grid grid-cols-stakingFinalityProvidersMobile grid-rows-2 items-center gap-2 lg:grid-cols-stakingFinalityProvidersDesktop lg:grid-rows-1">
@@ -72,7 +73,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           ) : (
             <div className="flex items-center gap-1 justify-start">
               <span
-                className="cursor-pointer text-xs text-error"
+                className="cursor-pointer text-xs text-error pointer-events-auto"
                 data-tooltip-id="tooltip-missing-fp"
                 data-tooltip-content="This finality provider did not provide any information."
                 data-tooltip-place="top"
@@ -84,9 +85,11 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             </div>
           )}
         </div>
+
         <div className="flex justify-end lg:justify-start">
           <Hash value={pkHex} address small noFade />
         </div>
+
         <div className="flex items-center gap-1">
           <p className="hidden sm:flex lg:hidden">Delegation:</p>
           <p>
@@ -105,6 +108,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
             className="tooltip-wrap"
           />
         </div>
+
         <div className="flex items-center justify-end gap-1 lg:justify-start">
           <p className="hidden sm:flex lg:hidden">Commission:</p>
           {finalityProviderHasData

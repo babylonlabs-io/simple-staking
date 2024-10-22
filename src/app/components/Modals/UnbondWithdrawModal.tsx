@@ -24,6 +24,8 @@ interface PreviewModalProps {
   delegation: DelegationInterface;
 }
 
+const { coinName, networkName } = getNetworkConfig();
+
 export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   open,
   onClose,
@@ -32,8 +34,6 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
   awaitingWalletResponse,
   delegation,
 }) => {
-  const { coinName, networkName } = getNetworkConfig();
-
   const { currentVersion: delegationGlobalParams } = useVersionByHeight(
     delegation.stakingTx.startHeight ?? 0,
   );

@@ -49,6 +49,7 @@
     "react-infinite-scroll-component": "^6.1.0",
     "react-number-format": "^5.4.2",
     "react-responsive-modal": "^6.4.2",
+    "react-tabs": "^6.0.2",
     "react-tooltip": "^5.26.4",
     "sharp": "^0.33.4",
     "tailwind-merge": "^2.5.2",
