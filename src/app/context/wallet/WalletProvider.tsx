@@ -25,7 +25,9 @@ import {
 } from "@/utils/wallet";
 import {
   Fees,
+  InscriptionIdentifier,
   Network,
+  UTXO,
   type BTCWalletProvider as IBTCWalletProvider,
 } from "@/utils/wallet/btc_wallet_provider";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
@@ -37,19 +39,19 @@ interface BTCWalletContextProps {
   connected: boolean;
   disconnect: () => void;
   open: () => void;
-  getWalletProviderName: IBTCWalletProvider["getWalletProviderName"];
-  getAddress: IBTCWalletProvider["getAddress"];
-  getPublicKeyHex: IBTCWalletProvider["getPublicKeyHex"];
-  signPsbt: IBTCWalletProvider["signPsbt"];
-  signPsbts: IBTCWalletProvider["signPsbts"];
-  getNetwork: IBTCWalletProvider["getNetwork"];
-  signMessageBIP322: IBTCWalletProvider["signMessageBIP322"];
-  getBalance: IBTCWalletProvider["getBalance"];
-  getNetworkFees: IBTCWalletProvider["getNetworkFees"];
-  pushTx: IBTCWalletProvider["pushTx"];
-  getUtxos: IBTCWalletProvider["getUtxos"];
-  getBTCTipHeight: IBTCWalletProvider["getBTCTipHeight"];
-  getInscriptions: IBTCWalletProvider["getInscriptions"];
+  getWalletProviderName: () => Promise<string>;
+  getAddress: () => Promise<string>;
+  getPublicKeyHex: () => Promise<string>;
+  signPsbt: (psbtHex: string) => Promise<string>;
+  signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
+  getNetwork: () => Promise<Network>;
+  signMessageBIP322: (message: string) => Promise<string>;
+  getBalance: () => Promise<number>;
+  getNetworkFees: () => Promise<Fees>;
+  pushTx: (txHex: string) => Promise<string>;
+  getUtxos: (address: string, amount?: number) => Promise<UTXO[]>;
+  getBTCTipHeight: () => Promise<number>;
+  getInscriptions: () => Promise<InscriptionIdentifier[]>;
 }
 
 const BTCWalletContext = createContext<BTCWalletContextProps>({
