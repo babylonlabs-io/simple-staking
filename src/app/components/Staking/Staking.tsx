@@ -112,11 +112,7 @@ export const Staking = () => {
     refetch: refetchMempoolFeeRates,
   } = useQuery({
     queryKey: ["mempool fee rates"],
-    queryFn: async () => {
-      if (getNetworkFees) {
-        return await getNetworkFees();
-      }
-    },
+    queryFn: getNetworkFees,
     enabled: connected && Boolean(getNetworkFees),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
