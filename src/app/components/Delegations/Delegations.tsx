@@ -22,7 +22,6 @@ import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
-import { BTCWalletProvider } from "@/utils/wallet/btc_wallet_provider";
 
 import {
   MODE,
@@ -36,16 +35,7 @@ import { Delegation } from "./Delegation";
 export const Delegations = () => {
   const { currentVersion } = useAppState();
   const { data: delegationsAPI } = useDelegations();
-  const {
-    address,
-    publicKeyNoCoord,
-    connected,
-    network,
-    pushTx,
-    getNetworkFees,
-    signPsbt,
-    getWalletProviderName,
-  } = useBTCWallet();
+  const { address, publicKeyNoCoord, connected, network } = useBTCWallet();
 
   if (!connected || !delegationsAPI || !currentVersion || !network) {
     return;
@@ -62,9 +52,6 @@ export const Delegations = () => {
         <DelegationsContent
           delegationsAPI={delegationsAPI.delegations}
           globalParamsVersion={currentVersion}
-          signPsbt={signPsbt}
-          pushTx={pushTx}
-          getNetworkFees={getNetworkFees}
           address={address}
           btcWalletNetwork={network}
           publicKeyNoCoord={publicKeyNoCoord}
@@ -81,18 +68,12 @@ interface DelegationsContentProps {
   publicKeyNoCoord: string;
   btcWalletNetwork: networks.Network;
   address: string;
-  signPsbt: (psbtHex: string) => Promise<string>;
-  pushTx: BTCWalletProvider["pushTx"];
-  getNetworkFees: BTCWalletProvider["getNetworkFees"];
   isWalletConnected: boolean;
 }
 
 const DelegationsContent: React.FC<DelegationsContentProps> = ({
   delegationsAPI,
   globalParamsVersion,
-  signPsbt,
-  pushTx,
-  getNetworkFees,
   address,
   btcWalletNetwork,
   publicKeyNoCoord,
@@ -109,6 +90,8 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
+
+  const { signPsbt, getNetworkFees, pushTx } = useBTCWallet();
 
   const delegation = useMemo(
     () =>
