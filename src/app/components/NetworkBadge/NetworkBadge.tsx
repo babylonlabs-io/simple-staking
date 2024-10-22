@@ -14,9 +14,7 @@ export const NetworkBadge = () => {
     <div
       className={twJoin(
         `absolute left-2`,
-        Boolean(connected)
-          ? "top-40 md:top-24 lg:top-32"
-          : "top-24 md:top-24 lg:top-32",
+        connected ? "top-40 md:top-24 lg:top-32" : "top-24 md:top-24 lg:top-32",
       )}
     >
       {[Network.SIGNET, Network.TESTNET].includes(network) && (

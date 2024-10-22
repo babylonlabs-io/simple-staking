@@ -117,7 +117,7 @@ export const Staking = () => {
         return await getNetworkFees();
       }
     },
-    enabled: Boolean(connected) && Boolean(getNetworkFees),
+    enabled: connected && Boolean(getNetworkFees),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
