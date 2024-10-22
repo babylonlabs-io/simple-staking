@@ -1,11 +1,9 @@
-jest.mock("@/app/common/utils/psbt", () => ({
-  signPsbtTransaction: jest.fn(),
-}));
+import { Psbt } from "bitcoinjs-lib";
+
 jest.mock("@/utils/delegations/fee", () => ({
   txFeeSafetyCheck: jest.fn().mockReturnValue(undefined),
 }));
 
-import { signPsbtTransaction } from "@/app/common/utils/psbt";
 import { signStakingTx } from "@/utils/delegations/signStakingTx";
 
 import { DEFAULT_TEST_FEE_RATE, testingNetworks } from "../../helper";
@@ -41,15 +39,18 @@ describe.each(testingNetworks)(
     };
 
     it("should successfully sign a staking transaction", async () => {
-      (signPsbtTransaction as any).mockImplementationOnce(() => async () => ({
-        toHex: () => txHex,
-      }));
+      const mockTransaction = {
+        toHex: jest.fn().mockReturnValue(txHex),
+      };
+
+      jest.spyOn(Psbt, "fromHex").mockReturnValue({
+        extractTransaction: jest.fn().mockReturnValue(mockTransaction),
+      } as any);
+
+      const mockSignPsbt = jest.fn().mockResolvedValue(txHex);
 
       const result = await signStakingTx(
-        signPsbtTransaction(
-          btcWallet.signPsbt,
-          btcWallet.getWalletProviderName,
-        ),
+        mockSignPsbt,
         btcWallet.pushTx,
         randomParam,
         randomStakingAmount,
@@ -71,16 +72,13 @@ describe.each(testingNetworks)(
     });
 
     it("should throw an error when signing a staking transaction", async () => {
-      (signPsbtTransaction as any).mockImplementationOnce(() => async () => {
-        throw new Error("signing error");
-      });
+      const mockSignPsbt = jest
+        .fn()
+        .mockRejectedValue(new Error("signing error"));
 
       try {
         await signStakingTx(
-          signPsbtTransaction(
-            btcWallet.signPsbt,
-            btcWallet.getWalletProviderName,
-          ),
+          mockSignPsbt,
           btcWallet.pushTx,
           randomParam,
           randomStakingAmount,

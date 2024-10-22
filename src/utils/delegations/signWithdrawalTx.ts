@@ -3,10 +3,9 @@ import {
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
 } from "@babylonlabs-io/btc-staking-ts";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 
 import { getGlobalParams } from "@/app/api/getGlobalParams";
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
@@ -25,7 +24,7 @@ export const signWithdrawalTx = async (
   delegationsAPI: DelegationInterface[],
   publicKeyNoCoord: string,
   btcWalletNetwork: networks.Network,
-  signPsbtTx: SignPsbtTransaction,
+  signPsbt: (psbtHex: string) => Promise<string>,
   address: string,
   getNetworkFees: () => Promise<Fees>,
   pushTx: (txHex: string) => Promise<string>,
@@ -113,7 +112,8 @@ export const signWithdrawalTx = async (
 
   try {
     const { psbt } = withdrawPsbtTxResult;
-    withdrawalTx = await signPsbtTx(psbt.toHex());
+    const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
+    withdrawalTx = Psbt.fromHex(signedWithdrawalPsbtHex).extractTransaction();
   } catch (error) {
     throw new Error("Failed to sign PSBT for the withdrawal transaction");
   }

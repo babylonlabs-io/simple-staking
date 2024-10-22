@@ -1,7 +1,6 @@
 import { stakingTransaction } from "@babylonlabs-io/btc-staking-ts";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { isTaproot } from "@/utils/wallet";
@@ -95,7 +94,7 @@ export const createStakingTx = (
 // - stakingTxHex: the signed staking transaction
 // - stakingTerm: the staking term
 export const signStakingTx = async (
-  signPsbtTx: SignPsbtTransaction,
+  signPsbt: (psbtHex: string) => Promise<string>,
   pushTx: any,
   globalParamsVersion: GlobalParamsVersion,
   stakingAmountSat: number,
@@ -123,7 +122,8 @@ export const signStakingTx = async (
   // Sign the staking transaction
   let stakingTx: Transaction;
   try {
-    stakingTx = await signPsbtTx(unsignedStakingPsbt.toHex());
+    const signedStakingPsbtHex = await signPsbt(unsignedStakingPsbt.toHex());
+    stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
   } catch (error: Error | any) {
     throw new Error(error?.message || "Staking transaction signing PSBT error");
   }

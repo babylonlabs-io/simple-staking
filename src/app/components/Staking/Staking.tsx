@@ -9,7 +9,6 @@ import {
   OVERFLOW_TVL_WARNING_THRESHOLD,
   UTXO_KEY,
 } from "@/app/common/constants";
-import { signPsbtTransaction } from "@/app/common/utils/psbt";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
@@ -237,7 +236,7 @@ export const Staking = () => {
 
       // Sign the staking transaction
       const { stakingTxHex, stakingTerm } = await signStakingTx(
-        signPsbtTransaction(signPsbt, getWalletProviderName),
+        signPsbt,
         pushTx,
         currentVersion,
         stakingAmountSat,

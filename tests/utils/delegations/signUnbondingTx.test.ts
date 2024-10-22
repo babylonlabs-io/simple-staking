@@ -51,14 +51,13 @@ describe("signUnbondingTx", () => {
       },
     },
   ] as any;
-  const mockedSignPsbtTx = jest
+  const mockedSignPsbtHex = jest
     .fn()
     .mockImplementation(async (psbtHex: string) => {
       const psbt = Psbt.fromHex(psbtHex);
-      return psbt
-        .signAllInputs(stakerKeys.keyPair)
-        .finalizeAllInputs()
-        .extractTransaction();
+      psbt.signAllInputs(stakerKeys.keyPair).finalizeAllInputs();
+
+      return psbt.toHex();
     });
 
   beforeEach(() => {
@@ -72,7 +71,7 @@ describe("signUnbondingTx", () => {
         [],
         stakerKeys.noCoordPublicKey,
         network,
-        mockedSignPsbtTx,
+        mockedSignPsbtHex,
       ),
     ).rejects.toThrow("Delegation not found");
   });
@@ -87,7 +86,7 @@ describe("signUnbondingTx", () => {
         delegationApi,
         stakerKeys.noCoordPublicKey,
         network,
-        mockedSignPsbtTx,
+        mockedSignPsbtHex,
       ),
     ).rejects.toThrow("Delegation not found");
   });
@@ -103,7 +102,7 @@ describe("signUnbondingTx", () => {
         mockedDelegationApi,
         stakerKeys.noCoordPublicKey,
         network,
-        mockedSignPsbtTx,
+        mockedSignPsbtHex,
       ),
     ).rejects.toThrow("Not eligible for unbonding");
   });
@@ -122,7 +121,7 @@ describe("signUnbondingTx", () => {
         mockedDelegationApi,
         stakerKeys.noCoordPublicKey,
         network,
-        mockedSignPsbtTx,
+        mockedSignPsbtHex,
       ),
     ).rejects.toThrow("No global params versions found");
   });
@@ -151,7 +150,7 @@ describe("signUnbondingTx", () => {
         delegationApi,
         stakerKeys.noCoordPublicKey,
         network,
-        mockedSignPsbtTx,
+        mockedSignPsbtHex,
       ),
     ).rejects.toThrow("Current version not found");
   });
@@ -163,7 +162,7 @@ describe("signUnbondingTx", () => {
     (getGlobalParams as any).mockImplementationOnce(async () => {
       return randomGlobalParamsVersions;
     });
-    mockedSignPsbtTx.mockRejectedValueOnce(new Error("oops!"));
+    mockedSignPsbtHex.mockRejectedValueOnce(new Error("oops!"));
 
     expect(
       signUnbondingTx(
@@ -171,7 +170,7 @@ describe("signUnbondingTx", () => {
         mockedDelegationApi,
         stakerKeys.noCoordPublicKey,
         network,
-        mockedSignPsbtTx,
+        mockedSignPsbtHex,
       ),
     ).rejects.toThrow("Failed to sign PSBT for the unbonding transaction");
   });
@@ -192,7 +191,7 @@ describe("signUnbondingTx", () => {
       mockedDelegationApi,
       stakerKeys.noCoordPublicKey,
       network,
-      mockedSignPsbtTx,
+      mockedSignPsbtHex,
     );
     const unbondingTx = Transaction.fromHex(unbondingTxHex);
     const sig = unbondingTx.ins[0].witness[0].toString("hex");

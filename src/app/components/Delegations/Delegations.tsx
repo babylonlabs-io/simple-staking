@@ -3,10 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
-import {
-  SignPsbtTransaction,
-  signPsbtTransaction,
-} from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
@@ -66,7 +62,7 @@ export const Delegations = () => {
         <DelegationsContent
           delegationsAPI={delegationsAPI.delegations}
           globalParamsVersion={currentVersion}
-          signPsbtTx={signPsbtTransaction(signPsbt, getWalletProviderName)}
+          signPsbt={signPsbt}
           pushTx={pushTx}
           getNetworkFees={getNetworkFees}
           address={address}
@@ -85,7 +81,7 @@ interface DelegationsContentProps {
   publicKeyNoCoord: string;
   btcWalletNetwork: networks.Network;
   address: string;
-  signPsbtTx: SignPsbtTransaction;
+  signPsbt: (psbtHex: string) => Promise<string>;
   pushTx: BTCWalletProvider["pushTx"];
   getNetworkFees: BTCWalletProvider["getNetworkFees"];
   isWalletConnected: boolean;
@@ -94,7 +90,7 @@ interface DelegationsContentProps {
 const DelegationsContent: React.FC<DelegationsContentProps> = ({
   delegationsAPI,
   globalParamsVersion,
-  signPsbtTx,
+  signPsbt,
   pushTx,
   getNetworkFees,
   address,
@@ -180,7 +176,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
         delegationsAPI,
         publicKeyNoCoord,
         btcWalletNetwork,
-        signPsbtTx,
+        signPsbt,
       );
       // Update the local state with the new intermediate delegation
       updateLocalStorage(delegation, DelegationState.INTERMEDIATE_UNBONDING);
@@ -212,7 +208,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
         delegationsAPI,
         publicKeyNoCoord,
         btcWalletNetwork,
-        signPsbtTx,
+        signPsbt,
         address,
         getNetworkFees,
         pushTx,
