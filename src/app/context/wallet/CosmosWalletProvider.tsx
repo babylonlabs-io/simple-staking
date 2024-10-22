@@ -1,4 +1,3 @@
-// CosmosWalletProvider.tsx
 import {
   createContext,
   useCallback,

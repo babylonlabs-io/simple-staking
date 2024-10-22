@@ -1,4 +1,3 @@
-// BTCWalletProvider.tsx
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
