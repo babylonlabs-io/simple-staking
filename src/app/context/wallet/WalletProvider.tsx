@@ -176,24 +176,22 @@ export const WalletProvider = ({ children }: PropsWithChildren) => {
 
   const btcWalletMethods = useMemo(
     () => ({
-      getWalletProviderName: async () =>
-        await btcWalletProvider!.getWalletProviderName(),
-      getAddress: async () => await btcWalletProvider!.getAddress(),
-      getPublicKeyHex: async () => await btcWalletProvider!.getPublicKeyHex(),
-      signPsbt: async (psbtHex: string) =>
-        await btcWalletProvider!.signPsbt(psbtHex),
-      signPsbts: async (psbtsHexes: string[]) =>
-        await btcWalletProvider!.signPsbts(psbtsHexes),
-      getNetwork: async () => await btcWalletProvider!.getNetwork(),
-      signMessageBIP322: async (message: string) =>
-        await btcWalletProvider!.signMessageBIP322(message),
-      getBalance: async () => await btcWalletProvider!.getBalance(),
-      getNetworkFees: async () => await btcWalletProvider!.getNetworkFees(),
-      pushTx: async (txHex: string) => await btcWalletProvider!.pushTx(txHex),
-      getUtxos: async (address: string, amount?: number) =>
-        await btcWalletProvider!.getUtxos(address, amount),
-      getBTCTipHeight: async () => await btcWalletProvider!.getBTCTipHeight(),
-      getInscriptions: async () => await btcWalletProvider!.getInscriptions(),
+      getWalletProviderName: () => btcWalletProvider!.getWalletProviderName(),
+      getAddress: () => btcWalletProvider!.getAddress(),
+      getPublicKeyHex: () => btcWalletProvider!.getPublicKeyHex(),
+      signPsbt: (psbtHex: string) => btcWalletProvider!.signPsbt(psbtHex),
+      signPsbts: (psbtsHexes: string[]) =>
+        btcWalletProvider!.signPsbts(psbtsHexes),
+      getNetwork: () => btcWalletProvider!.getNetwork(),
+      signMessageBIP322: (message: string) =>
+        btcWalletProvider!.signMessageBIP322(message),
+      getBalance: () => btcWalletProvider!.getBalance(),
+      getNetworkFees: () => btcWalletProvider!.getNetworkFees(),
+      pushTx: (txHex: string) => btcWalletProvider!.pushTx(txHex),
+      getUtxos: (address: string, amount?: number) =>
+        btcWalletProvider!.getUtxos(address, amount),
+      getBTCTipHeight: () => btcWalletProvider!.getBTCTipHeight(),
+      getInscriptions: () => btcWalletProvider!.getInscriptions(),
     }),
     [btcWalletProvider],
   );
