@@ -6,7 +6,7 @@ import { useVersions } from "@/app/hooks/api/useVersions";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import type { UTXO } from "@/utils/wallet/wallet_provider";
+import type { UTXO } from "@/utils/wallet/btc_wallet_provider";
 
 import { DelegationState } from "./DelegationState";
 

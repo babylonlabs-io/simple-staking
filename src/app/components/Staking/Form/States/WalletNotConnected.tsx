@@ -1,12 +1,12 @@
 import Image from "next/image";
 
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
 import connectIcon from "./connect-icon.svg";
 import walletIcon from "./wallet-icon.svg";
 
 export const WalletNotConnected = () => {
-  const { open } = useWallet();
+  const { open } = useBTCWallet();
 
   return (
     <div className="flex flex-1 flex-col">

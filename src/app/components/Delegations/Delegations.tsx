@@ -3,14 +3,10 @@ import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
-import {
-  signPsbtTransaction,
-  SignPsbtTransaction,
-} from "@/app/common/utils/psbt";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/api/useDelegations";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
@@ -26,7 +22,6 @@ import { signUnbondingTx } from "@/utils/delegations/signUnbondingTx";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
-import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import {
   MODE,
@@ -40,15 +35,9 @@ import { Delegation } from "./Delegation";
 export const Delegations = () => {
   const { currentVersion } = useAppState();
   const { data: delegationsAPI } = useDelegations();
-  const {
-    walletProvider: btcWallet,
-    address,
-    publicKeyNoCoord,
-    connected,
-    network,
-  } = useWallet();
+  const { address, publicKeyNoCoord, connected, network } = useBTCWallet();
 
-  if (!btcWallet || !delegationsAPI || !currentVersion || !network) {
+  if (!connected || !delegationsAPI || !currentVersion || !network) {
     return;
   }
 
@@ -63,9 +52,6 @@ export const Delegations = () => {
         <DelegationsContent
           delegationsAPI={delegationsAPI.delegations}
           globalParamsVersion={currentVersion}
-          signPsbtTx={signPsbtTransaction(btcWallet)}
-          pushTx={btcWallet.pushTx}
-          getNetworkFees={btcWallet.getNetworkFees}
           address={address}
           btcWalletNetwork={network}
           publicKeyNoCoord={publicKeyNoCoord}
@@ -82,18 +68,12 @@ interface DelegationsContentProps {
   publicKeyNoCoord: string;
   btcWalletNetwork: networks.Network;
   address: string;
-  signPsbtTx: SignPsbtTransaction;
-  pushTx: WalletProvider["pushTx"];
-  getNetworkFees: WalletProvider["getNetworkFees"];
   isWalletConnected: boolean;
 }
 
 const DelegationsContent: React.FC<DelegationsContentProps> = ({
   delegationsAPI,
   globalParamsVersion,
-  signPsbtTx,
-  pushTx,
-  getNetworkFees,
   address,
   btcWalletNetwork,
   publicKeyNoCoord,
@@ -110,6 +90,8 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
+
+  const { signPsbt, getNetworkFees, pushTx } = useBTCWallet();
 
   const delegation = useMemo(
     () =>
@@ -177,7 +159,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
         delegationsAPI,
         publicKeyNoCoord,
         btcWalletNetwork,
-        signPsbtTx,
+        signPsbt,
       );
       // Update the local state with the new intermediate delegation
       updateLocalStorage(delegation, DelegationState.INTERMEDIATE_UNBONDING);
@@ -209,7 +191,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
         delegationsAPI,
         publicKeyNoCoord,
         btcWalletNetwork,
-        signPsbtTx,
+        signPsbt,
         address,
         getNetworkFees,
         pushTx,

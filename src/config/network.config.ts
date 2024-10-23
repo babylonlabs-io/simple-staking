@@ -1,4 +1,4 @@
-import { Network } from "@/utils/wallet/wallet_provider";
+import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 export const network =
   (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.SIGNET;

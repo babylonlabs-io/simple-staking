@@ -12,7 +12,7 @@ import {
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";
@@ -67,9 +67,12 @@ export const Staking = () => {
     connected,
     address,
     publicKeyNoCoord,
-    walletProvider: btcWallet,
     network: btcWalletNetwork,
-  } = useWallet();
+    getNetworkFees,
+    signPsbt,
+    getWalletProviderName,
+    pushTx,
+  } = useBTCWallet();
 
   const disabled = isError;
 
@@ -109,12 +112,8 @@ export const Staking = () => {
     refetch: refetchMempoolFeeRates,
   } = useQuery({
     queryKey: ["mempool fee rates"],
-    queryFn: async () => {
-      if (btcWallet?.getNetworkFees) {
-        return await btcWallet.getNetworkFees();
-      }
-    },
-    enabled: Boolean(btcWallet?.getNetworkFees),
+    queryFn: getNetworkFees,
+    enabled: connected && Boolean(getNetworkFees),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
@@ -221,7 +220,7 @@ export const Staking = () => {
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
       // Initial validation
-      if (!btcWallet) throw new Error("Wallet is not connected");
+      if (!connected) throw new Error("Wallet is not connected");
       if (!address) throw new Error("Address is not set");
       if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
       if (!finalityProvider)
@@ -233,7 +232,8 @@ export const Staking = () => {
 
       // Sign the staking transaction
       const { stakingTxHex, stakingTerm } = await signStakingTx(
-        btcWallet,
+        signPsbt,
+        pushTx,
         currentVersion,
         stakingAmountSat,
         stakingTimeBlocks,

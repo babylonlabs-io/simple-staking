@@ -1,10 +1,9 @@
 import { unbondingTransaction } from "@babylonlabs-io/btc-staking-ts";
-import { Transaction, networks } from "bitcoinjs-lib";
+import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
-import { SignPsbtTransaction } from "@/app/common/utils/psbt";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
@@ -27,7 +26,7 @@ export const signUnbondingTx = async (
   delegationsAPI: DelegationInterface[],
   publicKeyNoCoord: string,
   btcWalletNetwork: networks.Network,
-  signPsbtTx: SignPsbtTransaction,
+  signPsbt: (psbtHex: string) => Promise<string>,
 ): Promise<{ unbondingTxHex: string; delegation: DelegationInterface }> => {
   // Check if the data is available
   if (!delegationsAPI) {
@@ -82,7 +81,8 @@ export const signUnbondingTx = async (
   // Sign the unbonding transaction
   let unbondingTx: Transaction;
   try {
-    unbondingTx = await signPsbtTx(unsignedUnbondingTx.toHex());
+    const signedUnbondingPsbtHex = await signPsbt(unsignedUnbondingTx.toHex());
+    unbondingTx = Psbt.fromHex(signedUnbondingPsbtHex).extractTransaction();
   } catch (error) {
     throw new Error("Failed to sign PSBT for the unbonding transaction");
   }

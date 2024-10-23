@@ -1,5 +1,5 @@
 import { nextPowerOfTwo } from "./nextPowerOfTwo";
-import { Fees } from "./wallet/wallet_provider";
+import { Fees } from "./wallet/btc_wallet_provider";
 
 // Returns min, default and max fee rate from mempool
 export const getFeeRateFromMempool = (mempoolFeeRates?: Fees) => {

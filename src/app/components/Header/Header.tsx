@@ -1,4 +1,5 @@
-import { useWallet } from "@/app/context/wallet/WalletProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvider";
 import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
@@ -9,7 +10,8 @@ import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 export const Header = () => {
-  const { address, open, disconnect } = useWallet();
+  const { disconnect, open } = useWalletConnection();
+  const { address } = useBTCWallet();
   const { totalBalance, isLoading: loading } = useAppState();
 
   return (

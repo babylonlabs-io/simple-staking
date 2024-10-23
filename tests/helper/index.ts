@@ -11,7 +11,7 @@ import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { getPublicKeyNoCoord } from "@/utils/wallet";
-import { UTXO } from "@/utils/wallet/wallet_provider";
+import { UTXO } from "@/utils/wallet/btc_wallet_provider";
 
 // Initialize the ECC library
 initBTCCurve();
