@@ -11,6 +11,8 @@ interface HeaderProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
+  shouldFilterOrdinals: boolean;
+  setShouldFilterOrdinals: (value: boolean) => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -18,6 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
+  shouldFilterOrdinals,
+  setShouldFilterOrdinals,
 }) => {
   return (
     <nav>
@@ -36,6 +40,8 @@ export const Header: React.FC<HeaderProps> = ({
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
+            shouldFilterOrdinals={shouldFilterOrdinals}
+            setShouldFilterOrdinals={setShouldFilterOrdinals}
           />
           <ThemeToggle />
         </div>
@@ -46,6 +52,8 @@ export const Header: React.FC<HeaderProps> = ({
             address={address}
             btcWalletBalanceSat={btcWalletBalanceSat}
             onDisconnect={onDisconnect}
+            shouldFilterOrdinals={shouldFilterOrdinals}
+            setShouldFilterOrdinals={setShouldFilterOrdinals}
           />
         </div>
       </div>
