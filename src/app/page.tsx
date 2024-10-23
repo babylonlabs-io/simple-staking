@@ -21,6 +21,7 @@ import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { getGlobalParams } from "./api/getGlobalParams";
+import { postTerms } from "./api/postTerms";
 import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
@@ -205,6 +206,8 @@ const Home: React.FC<HomeProps> = () => {
   const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
     Delegation[]
   >(delegationsLocalStorageKey, []);
+  const [termsAcceptedLocalStorage, setTermsAcceptedLocalStorage] =
+    useLocalStorage("termsAccepted", false);
 
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
@@ -218,6 +221,9 @@ const Home: React.FC<HomeProps> = () => {
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
+    if (termsAcceptedLocalStorage) {
+      setTermsAcceptedLocalStorage(false);
+    }
   };
 
   const handleConnectBTC = useCallback(
@@ -328,6 +334,32 @@ const Home: React.FC<HomeProps> = () => {
     (accumulator, item) => accumulator + item.value,
     0,
   );
+
+  useEffect(() => {
+    const acceptTerms = async () => {
+      if (address && publicKeyNoCoord && !termsAcceptedLocalStorage) {
+        try {
+          await postTerms(address, true, publicKeyNoCoord);
+          setTermsAcceptedLocalStorage(true);
+        } catch (error: Error | any) {
+          handleError({
+            error: error,
+            hasError: true,
+            errorState: ErrorState.TERMS,
+            refetchFunction: () => acceptTerms(),
+          });
+        }
+      }
+    };
+
+    acceptTerms();
+  }, [
+    address,
+    publicKeyNoCoord,
+    termsAcceptedLocalStorage,
+    setTermsAcceptedLocalStorage,
+    handleError,
+  ]);
 
   return (
     <main

@@ -54,6 +54,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return "Stake Error";
       case ErrorState.UNBONDING:
         return "Unbonding Error";
+      case ErrorState.TERMS:
+        return "Terms Error";
       default:
         return "Unknown Error";
     }
@@ -71,6 +73,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return `Failed to stake due to: ${errorMessage}`;
       case ErrorState.WALLET:
         return `Failed to switch network due to: ${errorMessage}`;
+      case ErrorState.TERMS:
+        return `Failed to accept terms due to: ${errorMessage}`;
       default:
         return errorMessage;
     }
