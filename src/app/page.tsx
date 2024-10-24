@@ -54,6 +54,7 @@ const Home: React.FC<HomeProps> = () => {
     retryErrorAction,
     noCancel,
     handleError,
+    captureError,
   } = useError();
   const {
     data: paramWithContext,
@@ -167,18 +168,21 @@ const Home: React.FC<HomeProps> = () => {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchDelegationData,
     });
+    captureError(delegationsError);
     handleError({
       error: globalParamsVersionError,
       hasError: hasGlobalParamsVersionError,
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchGlobalParamsVersion,
     });
+    captureError(globalParamsVersionError);
     handleError({
       error: availableUTXOsError,
       hasError: hasAvailableUTXOsError,
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: refetchAvailableUTXOs,
     });
+    captureError(availableUTXOsError);
   }, [
     hasGlobalParamsVersionError,
     hasDelegationsError,
@@ -191,6 +195,7 @@ const Home: React.FC<HomeProps> = () => {
     hasAvailableUTXOsError,
     refetchAvailableUTXOs,
     handleError,
+    captureError,
   ]);
 
   // Initializing btc curve is a required one-time operation
