@@ -26,12 +26,12 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
           <IoMdClose size={24} />
         </button>
       </div>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 md:max-w-[34rem]">
         <div className="flex flex-col gap-4 leading-snug text-sm">
-          <p className="md:max-w-[34rem]">
-            We’ve detected that your wallet contains Bitcoin Ordinals, which are
-            unique digital assets. If you proceed without filtering, these
-            Ordinals could be included in future actions involving your balance.
+          <p>
+            Your wallet can contain Bitcoin Ordinals, which are unique digital
+            assets. If you proceed without filtering, these Ordinals could be
+            included in future actions involving your balance.
           </p>
           <p>Please select:</p>
         </div>
@@ -46,8 +46,11 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
                 onChange={() => setShouldFilterOrdinals(false)}
               />
               <span className="label-text">
-                I would like to <strong>include</strong> Ordinals in my
-                stakeable balance
+                I want to <strong>include</strong> ordinals, bitcoin NFTs,
+                Ruins, and any other bitcoin inscriptions in my stakable bitcoin
+                balance. I understand that doing so can cause their complete and
+                permanent loss and agree that I am solely liable and responsible
+                for their loss. I have been warned.
               </span>
             </label>
           </div>
@@ -61,8 +64,9 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
                 onChange={() => setShouldFilterOrdinals(true)}
               />
               <span className="label-text">
-                I would like to <strong>exclude</strong> Ordinals in my
-                stakeable balance
+                I would like to <strong>exclude</strong> ordinals, bitcoin NFTs,
+                Ruins, and any other bitcoin inscriptions in my stakable bitcoin
+                balance
               </span>
             </label>
           </div>
