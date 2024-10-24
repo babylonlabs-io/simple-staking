@@ -622,7 +622,6 @@ export const Staking = () => {
                 stakingFeeSat={stakingFeeSat}
                 confirmationDepth={confirmationDepth}
                 feeRate={feeRate}
-                unbondingTimeBlocks={unbondingTime}
                 unbondingFeeSat={unbondingFeeSat}
                 awaitingWalletResponse={awaitingWalletResponse}
               />
