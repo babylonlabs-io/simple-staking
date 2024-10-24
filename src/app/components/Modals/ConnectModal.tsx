@@ -188,7 +188,7 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                   onChange={(e) => setNoInscription(e.target.checked)}
                   checked={noInscription}
                 />
-                <span className="label-text text-xs leading-snug md:text-sm">
+                <span className="label-text text-xs leading-snug md:text-sm md:max-w-[34rem]">
                   I certify that staking bitcoin with ordinals, bitcoin NFTs,
                   Ruins, or any other bitcoin inscriptions can cause their
                   complete and permanent loss.
