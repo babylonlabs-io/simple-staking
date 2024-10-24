@@ -10,6 +10,7 @@ import {
   UTXO_KEY,
 } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
+import { EOIModal } from "@/app/components/Modals/EOIModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -653,6 +654,16 @@ export const Staking = () => {
         open={feedbackModal.isOpen}
         onClose={handleCloseFeedbackModal}
         type={feedbackModal.type}
+      />
+      <EOIModal
+        statuses={{
+          slashing: "signed",
+          unbonding: "signed",
+          reward: "processing",
+          eoi: "unsigned",
+        }}
+        open={false}
+        onClose={() => null}
       />
     </div>
   );
