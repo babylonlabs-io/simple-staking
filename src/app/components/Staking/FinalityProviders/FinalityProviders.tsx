@@ -53,7 +53,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       );
       return flattenedData;
     },
-    retry: (failureCount, error) => {
+    retry: (failureCount) => {
       return !isErrorOpen && failureCount <= 3;
     },
   });

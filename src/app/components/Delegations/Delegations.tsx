@@ -42,23 +42,21 @@ export const Delegations = () => {
   }
 
   return (
-    network && (
-      <DelegationsPointsProvider
-        publicKeyNoCoord={publicKeyNoCoord}
+    <DelegationsPointsProvider
+      publicKeyNoCoord={publicKeyNoCoord}
+      delegationsAPI={delegationsAPI.delegations}
+      isWalletConnected={connected}
+      address={address}
+    >
+      <DelegationsContent
         delegationsAPI={delegationsAPI.delegations}
-        isWalletConnected={connected}
+        globalParamsVersion={currentVersion}
         address={address}
-      >
-        <DelegationsContent
-          delegationsAPI={delegationsAPI.delegations}
-          globalParamsVersion={currentVersion}
-          address={address}
-          btcWalletNetwork={network}
-          publicKeyNoCoord={publicKeyNoCoord}
-          isWalletConnected={connected}
-        />
-      </DelegationsPointsProvider>
-    )
+        btcWalletNetwork={network}
+        publicKeyNoCoord={publicKeyNoCoord}
+        isWalletConnected={connected}
+      />
+    </DelegationsPointsProvider>
   );
 };
 
@@ -287,8 +285,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
       delegations;
 
   return (
-    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
-      <h3 className="mb-4 font-bold">Staking history</h3>
+    <>
       {combinedDelegationsData.length === 0 ? (
         <div className="rounded-2xl border border-neutral-content p-4 text-center dark:border-neutral-content/20">
           <p>No history found</p>
@@ -366,6 +363,6 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           delegation={delegation}
         />
       )}
-    </div>
+    </>
   );
 };
