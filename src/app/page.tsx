@@ -6,6 +6,7 @@ import { networks } from "bitcoinjs-lib";
 import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { useAcceptTerms } from "@/app/hooks/useAcceptTerms";
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
@@ -21,7 +22,6 @@ import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { postTerms } from "./api/postTerms";
 import { UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
@@ -206,8 +206,6 @@ const Home: React.FC<HomeProps> = () => {
   const [delegationsLocalStorage, setDelegationsLocalStorage] = useLocalStorage<
     Delegation[]
   >(delegationsLocalStorageKey, []);
-  const [termsAcceptedLocalStorage, setTermsAcceptedLocalStorage] =
-    useLocalStorage("termsAccepted", false);
 
   const [connectModalOpen, setConnectModalOpen] = useState(false);
 
@@ -215,16 +213,18 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
-  const handleDisconnectBTC = () => {
-    setBTCWallet(undefined);
+  const { clearTermsAccepted } = useAcceptTerms(address, publicKeyNoCoord);
 
-    setBTCWalletNetwork(undefined);
-    setPublicKeyNoCoord("");
-    setAddress("");
-    if (termsAcceptedLocalStorage) {
-      setTermsAcceptedLocalStorage(false);
-    }
-  };
+  const handleDisconnectBTC = useCallback(
+    ({ address }: { address: string }) => {
+      setBTCWallet(undefined);
+      setBTCWalletNetwork(undefined);
+      setPublicKeyNoCoord("");
+      setAddress("");
+      clearTermsAccepted(address);
+    },
+    [clearTermsAccepted],
+  );
 
   const handleConnectBTC = useCallback(
     async (walletProvider: WalletProvider) => {
@@ -335,32 +335,6 @@ const Home: React.FC<HomeProps> = () => {
     0,
   );
 
-  useEffect(() => {
-    const acceptTerms = async () => {
-      if (address && publicKeyNoCoord && !termsAcceptedLocalStorage) {
-        try {
-          await postTerms(address, true, publicKeyNoCoord);
-          setTermsAcceptedLocalStorage(true);
-        } catch (error: Error | any) {
-          handleError({
-            error: error,
-            hasError: true,
-            errorState: ErrorState.TERMS,
-            refetchFunction: () => acceptTerms(),
-          });
-        }
-      }
-    };
-
-    acceptTerms();
-  }, [
-    address,
-    publicKeyNoCoord,
-    termsAcceptedLocalStorage,
-    setTermsAcceptedLocalStorage,
-    handleError,
-  ]);
-
   return (
     <main
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
@@ -368,7 +342,7 @@ const Home: React.FC<HomeProps> = () => {
       <NetworkBadge isWalletConnected={!!btcWallet} />
       <Header
         onConnect={handleConnectModal}
-        onDisconnect={handleDisconnectBTC}
+        onDisconnect={() => handleDisconnectBTC({ address })}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
         shouldFilterOrdinals={shouldFilterOrdinals}
