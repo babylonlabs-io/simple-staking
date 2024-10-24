@@ -29,6 +29,7 @@ import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
+import { FilterOrdinalsModal } from "./components/Modals/FilterOrdinalsModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
@@ -118,6 +119,15 @@ const Home: React.FC<HomeProps> = () => {
     },
   });
 
+  // Whether or not to filter out ordinals from the UTXOs
+  const [shouldFilterOrdinals, setShouldFilterOrdinals] = useState(true);
+
+  const [filterOrdinalsModalOpen, setFilterOrdinalsModalOpen] = useState(false);
+
+  const handleShouldFilterOrdinals = (value: boolean) => {
+    setShouldFilterOrdinals(value);
+  };
+
   // Fetch all UTXOs
   const {
     data: availableUTXOs,
@@ -125,11 +135,15 @@ const Home: React.FC<HomeProps> = () => {
     isError: hasAvailableUTXOsError,
     refetch: refetchAvailableUTXOs,
   } = useQuery({
-    queryKey: [UTXO_KEY, address],
+    queryKey: [UTXO_KEY, address, shouldFilterOrdinals],
     queryFn: async () => {
       if (btcWallet?.getUtxos && address) {
         // all confirmed UTXOs from the wallet
         const mempoolUTXOs = await btcWallet.getUtxos(address);
+
+        // return the UTXOs if we don't need to filter out the ordinals
+        if (!shouldFilterOrdinals) return mempoolUTXOs;
+
         // filter out the ordinals
         const filteredUTXOs = await filterOrdinals(
           mempoolUTXOs,
@@ -230,6 +244,7 @@ const Home: React.FC<HomeProps> = () => {
         setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+        setFilterOrdinalsModalOpen(true);
       } catch (error: Error | any) {
         if (
           error instanceof WalletError &&
@@ -324,6 +339,8 @@ const Home: React.FC<HomeProps> = () => {
         onDisconnect={handleDisconnectBTC}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
+        shouldFilterOrdinals={shouldFilterOrdinals}
+        setShouldFilterOrdinals={handleShouldFilterOrdinals}
       />
       <div className="container mx-auto flex justify-center p-6">
         <div className="container flex flex-col gap-6">
@@ -387,6 +404,12 @@ const Home: React.FC<HomeProps> = () => {
         onClose={setConnectModalOpen}
         onConnect={handleConnectBTC}
         connectDisabled={!!address}
+      />
+      <FilterOrdinalsModal
+        open={filterOrdinalsModalOpen}
+        onClose={setFilterOrdinalsModalOpen}
+        shouldFilterOrdinals={shouldFilterOrdinals}
+        setShouldFilterOrdinals={handleShouldFilterOrdinals}
       />
       <ErrorModal
         open={isErrorOpen}
