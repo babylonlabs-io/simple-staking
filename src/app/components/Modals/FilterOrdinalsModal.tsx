@@ -18,7 +18,9 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">Ordinals</h3>
+        <h3 className="font-bold">
+          Ordinals, Bitcoin NFTs, Runes, Bitcoin inscriptions
+        </h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
           onClick={() => onClose(false)}
@@ -29,7 +31,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
       <div className="flex flex-col gap-4 md:max-w-[34rem]">
         <div className="flex flex-col gap-4 leading-snug text-sm">
           <p>
-            Your wallet can contain Bitcoin Ordinals, which are unique digital
+            Your wallet may contain Bitcoin Ordinals, which are unique digital
             assets. If you proceed without filtering, these Ordinals could be
             included in future actions involving your balance.
           </p>
