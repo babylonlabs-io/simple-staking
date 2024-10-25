@@ -5,9 +5,7 @@ import { filterOrdinals } from "@/utils/utxo";
 
 export const UTXO_KEY = "UTXO";
 
-export function useUTXOs({
-  enabled = true,
-}: { enabled?: boolean; shouldFilterOrdinals?: boolean } = {}) {
+export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
   const { getUtxos, getInscriptions, address, shouldFilterOrdinals } =
     useBTCWallet();
 
