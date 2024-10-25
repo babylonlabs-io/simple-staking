@@ -7,9 +7,9 @@ export const UTXO_KEY = "UTXO";
 
 export function useUTXOs({
   enabled = true,
-  shouldFilterOrdinals = true,
 }: { enabled?: boolean; shouldFilterOrdinals?: boolean } = {}) {
-  const { getUtxos, getInscriptions, address } = useBTCWallet();
+  const { getUtxos, getInscriptions, address, shouldFilterOrdinals } =
+    useBTCWallet();
 
   const fetchAvailableUTXOs = async () => {
     if (!getUtxos || !address) {

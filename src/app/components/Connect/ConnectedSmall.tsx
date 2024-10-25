@@ -3,7 +3,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useOnClickOutside } from "usehooks-ts";
 
-import { useAppState } from "@/app/state";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -25,7 +25,7 @@ export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
   btcWalletBalanceSat,
   onDisconnect,
 }) => {
-  const { shouldFilterOrdinals, setShouldFilterOrdinals } = useAppState();
+  const { shouldFilterOrdinals, setShouldFilterOrdinals } = useBTCWallet();
 
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {

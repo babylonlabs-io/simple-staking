@@ -1,19 +1,20 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useAppState } from "@/app/state";
-
 import { GeneralModal } from "./GeneralModal";
 
 interface FilterOrdinalsModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
+  shouldFilterOrdinals: boolean;
+  setShouldFilterOrdinals: (value: boolean) => void;
 }
 
 export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
   open,
   onClose,
+  shouldFilterOrdinals,
+  setShouldFilterOrdinals,
 }) => {
-  const { shouldFilterOrdinals, setShouldFilterOrdinals } = useAppState();
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
