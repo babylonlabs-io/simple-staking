@@ -5,7 +5,10 @@ import { filterOrdinals } from "@/utils/utxo";
 
 export const UTXO_KEY = "UTXO";
 
-export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
+export function useUTXOs({
+  enabled = true,
+  shouldFilterOrdinals = true,
+}: { enabled?: boolean; shouldFilterOrdinals?: boolean } = {}) {
   const { getUtxos, getInscriptions, address } = useBTCWallet();
 
   const fetchAvailableUTXOs = async () => {
@@ -14,6 +17,11 @@ export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
     }
 
     const mempoolUTXOs = await getUtxos(address);
+    // Return UTXOs without filtering if not required
+    if (!shouldFilterOrdinals) {
+      return mempoolUTXOs;
+    }
+
     const filteredUTXOs = await filterOrdinals(
       mempoolUTXOs,
       address,
@@ -24,7 +32,7 @@ export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
   };
 
   const data = useAPIQuery({
-    queryKey: [UTXO_KEY, address],
+    queryKey: [UTXO_KEY, address, shouldFilterOrdinals],
     queryFn: fetchAvailableUTXOs,
     enabled: Boolean(getUtxos) && Boolean(address) && enabled,
     refetchInterval: 5 * ONE_MINUTE,

@@ -7,6 +7,7 @@ import { Tooltip } from "react-tooltip";
 import { useOnClickOutside } from "usehooks-ts";
 
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useAppState } from "@/app/state";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -21,8 +22,6 @@ interface ConnectSmallProps {
   address: string;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
-  shouldFilterOrdinals: boolean;
-  setShouldFilterOrdinals: (value: boolean) => void;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
@@ -31,9 +30,9 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   address,
   btcWalletBalanceSat,
   onDisconnect,
-  shouldFilterOrdinals,
-  setShouldFilterOrdinals,
 }) => {
+  const { shouldFilterOrdinals, setShouldFilterOrdinals } = useAppState();
+
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
     setShowMenu(false);

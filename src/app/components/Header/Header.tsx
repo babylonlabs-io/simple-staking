@@ -6,12 +6,14 @@ import { shouldDisplayTestingMsg } from "@/config";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { Logo } from "../Logo/Logo";
+import { FilterOrdinalsModal } from "../Modals/FilterOrdinalsModal";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 export const Header = () => {
   const { disconnect, open } = useWalletConnection();
-  const { address } = useBTCWallet();
+  const { address, filterOrdinalsModalOpen, setFilterOrdinalsModalOpen } =
+    useBTCWallet();
   const { totalBalance, isLoading: loading } = useAppState();
 
   return (
@@ -51,6 +53,10 @@ export const Header = () => {
           <TestingInfo />
         </div>
       )}
+      <FilterOrdinalsModal
+        open={filterOrdinalsModalOpen}
+        onClose={setFilterOrdinalsModalOpen}
+      />
     </nav>
   );
 };

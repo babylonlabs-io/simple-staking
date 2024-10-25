@@ -1,4 +1,8 @@
-import { useMemo, type PropsWithChildren } from "react";
+import {
+  useMemo,
+  useState as useReactState,
+  type PropsWithChildren,
+} from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
@@ -22,6 +26,8 @@ export interface AppState {
   firstActivationHeight: number;
   isError: boolean;
   isLoading: boolean;
+  shouldFilterOrdinals: boolean;
+  setShouldFilterOrdinals: (value: boolean) => void;
 }
 
 const { StateProvider, useState } = createStateUtils<AppState>({
@@ -30,6 +36,8 @@ const { StateProvider, useState } = createStateUtils<AppState>({
   totalBalance: 0,
   isApprochingNextVersion: false,
   firstActivationHeight: 0,
+  shouldFilterOrdinals: true,
+  setShouldFilterOrdinals: () => {},
 });
 
 const defaultVersionParams = {
@@ -41,11 +49,12 @@ const defaultVersionParams = {
 
 export function AppState({ children }: PropsWithChildren) {
   // States
+  const [shouldFilterOrdinals, setShouldFilterOrdinals] = useReactState(true);
   const {
     data: availableUTXOs = [],
     isLoading: isUTXOLoading,
     isError: isUTXOError,
-  } = useUTXOs();
+  } = useUTXOs({ shouldFilterOrdinals });
   const {
     data: versions,
     isError: isVersionError,
@@ -82,10 +91,21 @@ export function AppState({ children }: PropsWithChildren) {
       currentHeight: height,
       totalBalance,
       ...versionInfo,
+      shouldFilterOrdinals,
+      setShouldFilterOrdinals,
       isError,
       isLoading,
     }),
-    [availableUTXOs, height, totalBalance, versionInfo, isError, isLoading],
+    [
+      availableUTXOs,
+      height,
+      totalBalance,
+      versionInfo,
+      shouldFilterOrdinals,
+      setShouldFilterOrdinals,
+      isError,
+      isLoading,
+    ],
   );
 
   const states = useMemo(
