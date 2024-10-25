@@ -26,7 +26,7 @@ where,
 - `NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES` boolean value to indicate whether display 
 testing network related message. Default to true
 
-Then, to start a development server:
+Then, command to start a development server:
 
 ```bash
 npm run dev
