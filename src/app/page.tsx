@@ -6,6 +6,7 @@ import { networks } from "bitcoinjs-lib";
 import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { useAcceptTerms } from "@/app/hooks/useAcceptTerms";
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
@@ -212,13 +213,18 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
-  const handleDisconnectBTC = () => {
-    setBTCWallet(undefined);
+  const { clearTermsAccepted } = useAcceptTerms(address, publicKeyNoCoord);
 
-    setBTCWalletNetwork(undefined);
-    setPublicKeyNoCoord("");
-    setAddress("");
-  };
+  const handleDisconnectBTC = useCallback(
+    ({ address }: { address: string }) => {
+      setBTCWallet(undefined);
+      setBTCWalletNetwork(undefined);
+      setPublicKeyNoCoord("");
+      setAddress("");
+      clearTermsAccepted(address);
+    },
+    [clearTermsAccepted],
+  );
 
   const handleConnectBTC = useCallback(
     async (walletProvider: WalletProvider) => {
@@ -336,7 +342,7 @@ const Home: React.FC<HomeProps> = () => {
       <NetworkBadge isWalletConnected={!!btcWallet} />
       <Header
         onConnect={handleConnectModal}
-        onDisconnect={handleDisconnectBTC}
+        onDisconnect={() => handleDisconnectBTC({ address })}
         address={address}
         btcWalletBalanceSat={btcWalletBalanceSat}
         shouldFilterOrdinals={shouldFilterOrdinals}
