@@ -1,3 +1,4 @@
+//TODO: remove all mocks after integration with backend
 import type { Delegation } from "./type";
 
 export const data: Delegation[] = [
