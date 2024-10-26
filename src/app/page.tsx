@@ -6,6 +6,7 @@ import { networks } from "bitcoinjs-lib";
 import { useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
+import { useTermsAcceptance } from "@/app/hooks/useAcceptTerms";
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
@@ -212,13 +213,13 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
-  const handleDisconnectBTC = () => {
+  const { logTermsAcceptance } = useTermsAcceptance();
+  const handleDisconnectBTC = useCallback(() => {
     setBTCWallet(undefined);
-
     setBTCWalletNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
-  };
+  }, []);
 
   const handleConnectBTC = useCallback(
     async (walletProvider: WalletProvider) => {
@@ -245,6 +246,11 @@ const Home: React.FC<HomeProps> = () => {
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
         setFilterOrdinalsModalOpen(true);
+        // Log the terms acceptance
+        logTermsAcceptance({
+          address,
+          publicKey: publicKeyNoCoord.toString("hex"),
+        });
       } catch (error: Error | any) {
         if (
           error instanceof WalletError &&

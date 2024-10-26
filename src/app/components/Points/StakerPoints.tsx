@@ -31,8 +31,6 @@ export const StakerPoints: React.FC<StakerPointsProps> = ({
 
   const points = stakerPoints?.[0]?.points;
 
-  console.log(points !== undefined || points !== 0);
-
   return (
     <div className="flex items-center justify-end gap-1">
       <p className="whitespace-nowrap font-semibold">

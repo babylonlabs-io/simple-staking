@@ -54,6 +54,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return "Stake Error";
       case ErrorState.UNBONDING:
         return "Unbonding Error";
+      case ErrorState.TERMS:
+        return "Terms Error";
       default:
         return "Unknown Error";
     }
