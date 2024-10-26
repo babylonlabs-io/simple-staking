@@ -17,7 +17,7 @@ export const postLogTermsAcceptance = async ({
 
   const response = await apiWrapper(
     "POST",
-    "/log_terms_acceptance",
+    "/log-terms-acceptance",
     "Error submitting terms acceptance request",
     payload,
   );
