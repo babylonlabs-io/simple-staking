@@ -2,24 +2,22 @@ import { apiWrapper } from "./apiWrapper";
 
 interface TermsPayload {
   address: string;
-  termsAccepted: boolean;
   publicKey: string;
 }
 
-export const postTerms = async (
-  address: string,
-  termsAccepted: boolean,
-  publicKey: string,
-) => {
+// postLogTermsAcceptance is used to log the terms acceptance for a given address and public key
+export const postLogTermsAcceptance = async ({
+  address,
+  publicKey,
+}: TermsPayload) => {
   const payload: TermsPayload = {
     address: address,
-    termsAccepted: termsAccepted,
     publicKey: publicKey,
   };
 
   const response = await apiWrapper(
     "POST",
-    "/terms_acceptance",
+    "/log_terms_acceptance",
     "Error submitting terms acceptance request",
     payload,
   );

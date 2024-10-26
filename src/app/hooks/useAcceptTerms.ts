@@ -1,47 +1,24 @@
-import { useEffect } from "react";
-import { useLocalStorage } from "usehooks-ts";
+import { useMutation } from "@tanstack/react-query";
 
-import { postTerms } from "@/app/api/postTerms";
-import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
+import { postLogTermsAcceptance } from "@/app/api/postLogTermAcceptance";
 
-export const useAcceptTerms = (address: string, publicKeyNoCoord: string) => {
-  const [termsAcceptedAddresses, setTermsAcceptedAddresses] = useLocalStorage<
-    Record<string, boolean>
-  >("termsAcceptedAddresses", {});
-  const { handleError } = useError();
+// useTermsAcceptance is used to log the terms acceptance for a given address and public key
+export const useTermsAcceptance = () => {
+  const mutation = useMutation({
+    mutationFn: postLogTermsAcceptance,
+    retry: 3,
+    retryDelay: 1500,
+  });
 
-  const isTermsAccepted = address ? termsAcceptedAddresses[address] : false;
-
-  useEffect(() => {
-    const acceptTerms = async () => {
-      if (address && publicKeyNoCoord && !isTermsAccepted) {
-        try {
-          await postTerms(address, true, publicKeyNoCoord);
-          setTermsAcceptedAddresses((prev) => ({ ...prev, [address]: true }));
-        } catch (error: Error | any) {
-          handleError({
-            error: error,
-            hasError: true,
-            errorState: ErrorState.TERMS,
-            refetchFunction: () => acceptTerms(),
-          });
-        }
-      }
-    };
-
-    acceptTerms();
-  }, [
+  const logTermsAcceptance = async ({
     address,
-    publicKeyNoCoord,
-    isTermsAccepted,
-    setTermsAcceptedAddresses,
-    handleError,
-  ]);
-
-  const clearTermsAccepted = (address: string) => {
-    setTermsAcceptedAddresses((prev) => ({ ...prev, [address]: false }));
+    publicKey,
+  }: {
+    address: string;
+    publicKey: string;
+  }) => {
+    await mutation.mutateAsync({ address, publicKey });
   };
 
-  return { isTermsAccepted, clearTermsAccepted };
+  return { logTermsAcceptance };
 };

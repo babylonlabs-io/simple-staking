@@ -73,8 +73,6 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         return `Failed to stake due to: ${errorMessage}`;
       case ErrorState.WALLET:
         return `Failed to switch network due to: ${errorMessage}`;
-      case ErrorState.TERMS:
-        return `Failed to accept terms due to: ${errorMessage}`;
       default:
         return errorMessage;
     }
