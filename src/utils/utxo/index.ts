@@ -5,8 +5,6 @@ import { InscriptionIdentifier, UTXO } from "../wallet/btc_wallet_provider";
 export const LOW_VALUE_UTXO_THRESHOLD = 10000;
 export const WALLET_FETCH_INSRIPTIONS_TIMEOUT = 3000; // 3 seconds
 
-// 2 parts - leaving wallet CB and API callback, extracting to useOrdinals hook
-
 /**
  * Filters out UTXOs that contain ordinals.
  * This method first attempts to get inscriptions from the wallet.
