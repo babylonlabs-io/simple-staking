@@ -8,7 +8,7 @@ export const UTXO_KEY = "UTXO";
 
 export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
   const { getUtxos, getInscriptions, address } = useBTCWallet();
-  const { shouldFilterOrdinals } = useAppState();
+  const { ordinalsExcluded } = useAppState();
 
   const fetchAvailableUTXOs = async () => {
     if (!getUtxos || !address) {
@@ -17,7 +17,7 @@ export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
 
     const mempoolUTXOs = await getUtxos(address);
     // Return UTXOs without filtering if not required
-    if (!shouldFilterOrdinals) {
+    if (!ordinalsExcluded) {
       return mempoolUTXOs;
     }
 
@@ -31,7 +31,7 @@ export function useUTXOs({ enabled = true }: { enabled?: boolean } = {}) {
   };
 
   const data = useAPIQuery({
-    queryKey: [UTXO_KEY, address, shouldFilterOrdinals],
+    queryKey: [UTXO_KEY, address, ordinalsExcluded],
     queryFn: fetchAvailableUTXOs,
     enabled: Boolean(getUtxos) && Boolean(address) && enabled,
     refetchInterval: 5 * ONE_MINUTE,

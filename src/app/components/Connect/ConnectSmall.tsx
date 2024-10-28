@@ -31,8 +31,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   btcWalletBalanceSat,
   onDisconnect,
 }) => {
-  const { shouldFilterOrdinals, includeOrdinals, excludeOrdinals } =
-    useAppState();
+  const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
 
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
@@ -120,10 +119,8 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
               <input
                 type="checkbox"
                 className="toggle toggle-primary"
-                checked={!shouldFilterOrdinals}
-                onChange={
-                  shouldFilterOrdinals ? includeOrdinals : excludeOrdinals
-                }
+                checked={!ordinalsExcluded}
+                onChange={ordinalsExcluded ? includeOrdinals : excludeOrdinals}
               />
             </label>
           </div>

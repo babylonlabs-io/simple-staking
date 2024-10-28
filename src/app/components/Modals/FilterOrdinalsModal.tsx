@@ -13,8 +13,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({}) => {
   const handleClose = () => setModalOpen(false);
 
   const { isConnected } = useWalletConnection();
-  const { shouldFilterOrdinals, includeOrdinals, excludeOrdinals } =
-    useAppState();
+  const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
 
   useEffect(() => {
     if (isConnected) {
@@ -51,7 +50,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({}) => {
                 type="radio"
                 name="ordinals-radio"
                 className="radio checked:bg-primary"
-                checked={!shouldFilterOrdinals}
+                checked={!ordinalsExcluded}
                 onChange={includeOrdinals}
               />
               <span className="label-text">
@@ -69,7 +68,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({}) => {
                 type="radio"
                 name="ordinals-radio"
                 className="radio checked:bg-primary"
-                checked={shouldFilterOrdinals}
+                checked={ordinalsExcluded}
                 onChange={excludeOrdinals}
               />
               <span className="label-text">

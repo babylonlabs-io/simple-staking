@@ -26,7 +26,7 @@ export interface AppState {
   firstActivationHeight: number;
   isError: boolean;
   isLoading: boolean;
-  shouldFilterOrdinals: boolean;
+  ordinalsExcluded: boolean;
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
 }
@@ -38,7 +38,7 @@ const { StateProvider, useState: useApplicationState } =
     totalBalance: 0,
     isApprochingNextVersion: false,
     firstActivationHeight: 0,
-    shouldFilterOrdinals: true,
+    ordinalsExcluded: true,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
   });
@@ -51,10 +51,10 @@ const defaultVersionParams = {
 };
 
 export function AppState({ children }: PropsWithChildren) {
-  const [shouldFilterOrdinals, setShouldFilterOrdinals] = useReactState(true);
+  const [ordinalsExcluded, setOrdinalsExcluded] = useReactState(true);
 
-  const includeOrdinals = () => setShouldFilterOrdinals(false);
-  const excludeOrdinals = () => setShouldFilterOrdinals(true);
+  const includeOrdinals = () => setOrdinalsExcluded(false);
+  const excludeOrdinals = () => setOrdinalsExcluded(true);
 
   // States
   const {
@@ -100,7 +100,7 @@ export function AppState({ children }: PropsWithChildren) {
       ...versionInfo,
       isError,
       isLoading,
-      shouldFilterOrdinals,
+      ordinalsExcluded,
       includeOrdinals,
       excludeOrdinals,
     }),
@@ -111,7 +111,7 @@ export function AppState({ children }: PropsWithChildren) {
       versionInfo,
       isError,
       isLoading,
-      shouldFilterOrdinals,
+      ordinalsExcluded,
       includeOrdinals,
       excludeOrdinals,
     ],
