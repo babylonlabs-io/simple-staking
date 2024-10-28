@@ -19,6 +19,7 @@ interface FinalityProvidersAPIResponse {
 
 interface FinalityProviderAPI {
   description: DescriptionAPI;
+  state: "active" | "standby";
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -35,14 +36,28 @@ interface DescriptionAPI {
   details: string;
 }
 
-export const getFinalityProviders = async (
-  key: string,
-): Promise<PaginatedFinalityProviders> => {
+export const getFinalityProviders = async ({
+  key,
+  pk,
+  sortBy,
+  order,
+  name,
+}: {
+  key: string;
+  name?: string;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  pk?: string;
+}): Promise<PaginatedFinalityProviders> => {
   // const limit = 100;
   // const reverse = false;
 
   const params = {
     pagination_key: encode(key),
+    finality_provider_pk: pk,
+    sort_by: sortBy,
+    order,
+    name,
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
   };
@@ -70,6 +85,7 @@ export const getFinalityProviders = async (
         securityContact: fp.description.security_contact,
         details: fp.description.details,
       },
+      state: fp.state,
       commission: fp.commission,
       btcPk: fp.btc_pk,
       activeTVLSat: fp.active_tvl,
