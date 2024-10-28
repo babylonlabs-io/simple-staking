@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useCallback, useState } from "react";
 
 import { useFinalityProviders } from "@/app/hooks/api/useFinalityProviders";
 
@@ -16,18 +17,14 @@ const SORT_DIRECTIONS = {
 export function useFinalityProviderService() {
   const [searchValue, setSearchValue] = useState("");
   const [sortState, setSortState] = useState<SortState>({});
+  const name = useDebounce(searchValue, 300);
 
   const { data, hasNextPage, isFetchingNextPage, fetchNextPage } =
     useFinalityProviders({
       sortBy: sortState.field,
       order: sortState.direction,
+      name,
     });
-
-  useEffect(() => {
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage?.();
-    }
-  }, [hasNextPage, fetchNextPage, isFetchingNextPage]);
 
   const handleSearch = useCallback((searchTerm: string) => {
     setSearchValue(searchTerm);
@@ -47,23 +44,11 @@ export function useFinalityProviderService() {
     );
   }, []);
 
-  const filteredProviders = useMemo(() => {
-    const searchRegEx = new RegExp(`${searchValue}`, "i");
-
-    return (
-      data?.finalityProviders?.filter(
-        (fp) =>
-          searchRegEx.test(fp.description?.moniker) ||
-          searchRegEx.test(fp.btcPk),
-      ) ?? []
-    );
-  }, [data?.finalityProviders, searchValue]);
-
   return {
+    searchValue,
     finalityProviders: data?.finalityProviders,
-    filteredProviders,
     hasNextPage,
-    isFetchingNextPage,
+    isLoading: isFetchingNextPage,
     fetchNextPage,
     handleSearch,
     handleSort,

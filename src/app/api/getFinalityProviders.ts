@@ -41,8 +41,10 @@ export const getFinalityProviders = async ({
   pk,
   sortBy,
   order,
+  name,
 }: {
   key: string;
+  name?: string;
   sortBy?: string;
   order?: "asc" | "desc";
   pk?: string;
@@ -55,6 +57,7 @@ export const getFinalityProviders = async ({
     finality_provider_pk: pk,
     sort_by: sortBy,
     order,
+    name,
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
   };

@@ -23,10 +23,10 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   onFinalityProvidersLoad,
 }) => {
   const {
+    isLoading,
     finalityProviders,
-    filteredProviders,
+    searchValue,
     hasNextPage,
-    isFetchingNextPage,
     fetchNextPage,
     handleSearch,
     handleSort,
@@ -48,7 +48,10 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <strong>Step-1:</strong> Select a finality provider
       </p>
       <div className="flex gap-3">
-        <FinalityProviderSearch onSearch={handleSearch} />
+        <FinalityProviderSearch
+          searchValue={searchValue}
+          onSearch={handleSearch}
+        />
       </div>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
         <p className="cursor-pointer" onClick={() => handleSort("name")}>
@@ -69,13 +72,13 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       >
         <InfiniteScroll
           className="flex flex-col gap-4"
-          dataLength={filteredProviders?.length || 0}
+          dataLength={finalityProviders?.length || 0}
           next={fetchNextPage}
           hasMore={hasNextPage}
-          loader={isFetchingNextPage ? <LoadingTableList /> : null}
+          loader={isLoading ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
-          {filteredProviders?.map((fp) => (
+          {finalityProviders?.map((fp) => (
             <FinalityProvider
               key={fp.btcPk}
               state={fp.state}

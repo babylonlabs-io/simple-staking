@@ -13,17 +13,18 @@ const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_KEY";
 
 interface Params {
   pk?: string;
+  name?: string;
   sortBy?: string;
   order?: "asc" | "desc";
 }
 
-export function useFinalityProviders({ pk, sortBy, order }: Params = {}) {
+export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
   const { isErrorOpen, handleError } = useError();
 
   const query = useInfiniteQuery({
-    queryKey: [FINALITY_PROVIDERS_KEY, pk, sortBy, order],
+    queryKey: [FINALITY_PROVIDERS_KEY, pk, name, sortBy, order],
     queryFn: ({ pageParam = "" }) =>
-      getFinalityProviders({ key: pageParam, pk, sortBy, order }),
+      getFinalityProviders({ key: pageParam, pk, sortBy, order, name }),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key
