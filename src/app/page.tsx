@@ -249,7 +249,7 @@ const Home: React.FC<HomeProps> = () => {
         // Log the terms acceptance
         logTermsAcceptance({
           address,
-          publicKey: publicKeyNoCoord.toString("hex"),
+          public_key: publicKeyNoCoord.toString("hex"),
         });
       } catch (error: Error | any) {
         if (

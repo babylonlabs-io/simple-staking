@@ -12,12 +12,12 @@ export const useTermsAcceptance = () => {
 
   const logTermsAcceptance = async ({
     address,
-    publicKey,
+    public_key,
   }: {
     address: string;
-    publicKey: string;
+    public_key: string;
   }) => {
-    await mutation.mutateAsync({ address, publicKey });
+    await mutation.mutateAsync({ address, public_key });
   };
 
   return { logTermsAcceptance };
