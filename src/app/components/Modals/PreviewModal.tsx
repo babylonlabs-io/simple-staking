@@ -1,4 +1,5 @@
 import { IoMdClose } from "react-icons/io";
+import { twJoin } from "tailwind-merge";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
@@ -18,7 +19,6 @@ interface PreviewModalProps {
   stakingTimeBlocks: number;
   stakingFeeSat: number;
   feeRate: number;
-  unbondingTimeBlocks: number;
   confirmationDepth: number;
   unbondingFeeSat: number;
   awaitingWalletResponse: boolean;
@@ -30,7 +30,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   finalityProvider,
   stakingAmountSat,
   stakingTimeBlocks,
-  unbondingTimeBlocks,
   onSign,
   stakingFeeSat,
   feeRate,
@@ -63,62 +62,48 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
       </div>
       <div className="flex flex-col gap-4 text-sm">
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className={`${cardStyles} flex-1`}>
+          <div className={twJoin(cardStyles, "flex-1")}>
             <p className="text-xs dark:text-neutral-content">
               Finality Provider
             </p>
             <p>{finalityProvider || "-"}</p>
           </div>
-          <div className={`${cardStyles} flex-1`}>
+          <div className={twJoin(cardStyles, "flex-1")}>
             <p className="text-xs dark:text-neutral-content">Stake Amount</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className={`${cardStyles} flex-1`}>
+          <div className={twJoin(cardStyles, "flex-1")}>
             <p className="text-xs dark:text-neutral-content">Fee rate</p>
             <p>{feeRate} sat/vB</p>
           </div>
-          <div className={`${cardStyles} flex-1`}>
+          <div className={twJoin(cardStyles, "flex-1")}>
             <p className="text-xs dark:text-neutral-content">Transaction fee</p>
             <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <div className="flex flex-col gap-4 md:flex-row">
-          <div className={`${cardStyles} basis-1/5`}>
+          <div className={twJoin(cardStyles, "basis-1/5")}>
             <p className="text-xs dark:text-neutral-content">Term</p>
             <p>{blocksToDisplayTime(stakingTimeBlocks)}</p>
           </div>
-          <div className={`${cardStyles} basis-3/5`}>
-            <p className="text-xs dark:text-neutral-content">
-              On-demand unbonding
-            </p>
-            <p>
-              Enabled ({blocksToDisplayTime(unbondingTimeBlocks)} unbonding
-              time)
-            </p>
+          <div className={twJoin(cardStyles, "basis-2/5")}>
+            <p className="text-xs dark:text-neutral-content">Slashing ratio</p>
+            <p>12.3%</p>
           </div>
-          <div className={`${cardStyles} basis-1/5`}>
+          <div className={twJoin(cardStyles, "basis-2/5")}>
             <p className="text-xs dark:text-neutral-content">Unbonding fee</p>
             <p>{`${maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} ${coinName}`}</p>
           </div>
         </div>
         <h4 className="text-center text-base">Attention!</h4>
         <p className="dark:text-neutral-content">
-          1. Your stake may &quot;overflow&quot; the staking TVL cap and need to
-          be unbonded and withdrawn, which will cost you {coinName} transaction
-          fees. So please stake wisely. Unbonding will cost you a static
-          transaction fee of{" "}
-          <strong>{`${maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} ${coinName}`}</strong>
-          , while the withdrawal fee depends on network conditions. All fees go
-          to the {coinName} miners.
-        </p>
-        <p className="dark:text-neutral-content">
-          2. No third party possesses your staked {coinName}. You are the only
+          1. No third party possesses your staked {coinName}. You are the only
           one who can unbond and withdraw your stake.
         </p>
         <p className="dark:text-neutral-content">
-          3. Your stake will initially have the status of &quot;Pending&quot;
+          2. Your stake will initially have the status of &quot;Pending&quot;
           until it receives {confirmationDepth} Bitcoin confirmations.
           &quot;Pending&quot; stake is only accessible through the device it was
           created.
@@ -139,7 +124,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
               Cancel
             </button>
             <button className="btn-primary btn flex-1" onClick={onSign}>
-              Stake
+              Proceed To Signing
             </button>
           </div>
         )}
