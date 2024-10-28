@@ -6,8 +6,8 @@ import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 import { useOnClickOutside } from "usehooks-ts";
 
-import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useAppState } from "@/app/state";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -31,7 +31,8 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   btcWalletBalanceSat,
   onDisconnect,
 }) => {
-  const { shouldFilterOrdinals, setShouldFilterOrdinals } = useBTCWallet();
+  const { shouldFilterOrdinals, includeOrdinals, excludeOrdinals } =
+    useAppState();
 
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
@@ -120,7 +121,9 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
                 type="checkbox"
                 className="toggle toggle-primary"
                 checked={!shouldFilterOrdinals}
-                onChange={() => setShouldFilterOrdinals(!shouldFilterOrdinals)}
+                onChange={
+                  shouldFilterOrdinals ? includeOrdinals : excludeOrdinals
+                }
               />
             </label>
           </div>

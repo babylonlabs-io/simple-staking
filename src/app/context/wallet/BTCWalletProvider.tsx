@@ -9,7 +9,6 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { FilterOrdinalsModal } from "@/app/components/Modals/FilterOrdinalsModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import {
@@ -48,8 +47,6 @@ interface BTCWalletContextProps {
   getUtxos: (address: string, amount?: number) => Promise<UTXO[]>;
   getBTCTipHeight: () => Promise<number>;
   getInscriptions: () => Promise<InscriptionIdentifier[]>;
-  shouldFilterOrdinals: boolean;
-  setShouldFilterOrdinals: (value: boolean) => void;
 }
 
 const BTCWalletContext = createContext<BTCWalletContextProps>({
@@ -72,8 +69,6 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
   getUtxos: () => Promise.resolve([]),
   getBTCTipHeight: () => Promise.resolve(0),
   getInscriptions: () => Promise.resolve([]),
-  shouldFilterOrdinals: true,
-  setShouldFilterOrdinals: () => {},
 });
 
 export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
@@ -92,9 +87,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     setPublicKeyNoCoord("");
     setAddress("");
   }, []);
-
-  const [filterOrdinalsModalOpen, setFilterOrdinalsModalOpen] = useState(false);
-  const [shouldFilterOrdinals, setShouldFilterOrdinals] = useState(true);
 
   const connectBTC = useCallback(
     async (walletProvider: IBTCWalletProvider) => {
@@ -117,7 +109,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setNetwork(toNetwork(await walletProvider.getNetwork()));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
-        setFilterOrdinalsModalOpen(true);
       } catch (error: any) {
         if (
           error instanceof WalletError &&
@@ -194,8 +185,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       open,
       disconnect: btcDisconnect,
       ...btcWalletMethods,
-      shouldFilterOrdinals,
-      setShouldFilterOrdinals,
     }),
     [
       btcWalletProvider,
@@ -205,8 +194,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       open,
       btcDisconnect,
       btcWalletMethods,
-      shouldFilterOrdinals,
-      setShouldFilterOrdinals,
     ],
   );
 
@@ -234,12 +221,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   return (
     <BTCWalletContext.Provider value={btcContextValue}>
       {children}
-      <FilterOrdinalsModal
-        open={filterOrdinalsModalOpen}
-        onClose={setFilterOrdinalsModalOpen}
-        shouldFilterOrdinals={shouldFilterOrdinals}
-        setShouldFilterOrdinals={setShouldFilterOrdinals}
-      />
     </BTCWalletContext.Provider>
   );
 };

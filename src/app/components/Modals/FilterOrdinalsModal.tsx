@@ -1,29 +1,36 @@
+import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
+
+import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvider";
+import { useAppState } from "@/app/state";
 
 import { GeneralModal } from "./GeneralModal";
 
-interface FilterOrdinalsModalProps {
-  open: boolean;
-  onClose: (value: boolean) => void;
-  shouldFilterOrdinals: boolean;
-  setShouldFilterOrdinals: (value: boolean) => void;
-}
+interface FilterOrdinalsModalProps {}
 
-export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
-  open,
-  onClose,
-  shouldFilterOrdinals,
-  setShouldFilterOrdinals,
-}) => {
+export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({}) => {
+  const [modalOpen, setModalOpen] = useState(false);
+  const handleClose = () => setModalOpen(false);
+
+  const { isConnected } = useWalletConnection();
+  const { shouldFilterOrdinals, includeOrdinals, excludeOrdinals } =
+    useAppState();
+
+  useEffect(() => {
+    if (isConnected) {
+      setModalOpen(true);
+    }
+  }, [isConnected]);
+
   return (
-    <GeneralModal open={open} onClose={onClose}>
+    <GeneralModal open={modalOpen} onClose={handleClose}>
       <div className="mb-4 flex items-center justify-between">
         <h3 className="font-bold">
           Ordinals, Bitcoin NFTs, Runes, Bitcoin inscriptions
         </h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose(false)}
+          onClick={handleClose}
         >
           <IoMdClose size={24} />
         </button>
@@ -45,7 +52,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
                 name="ordinals-radio"
                 className="radio checked:bg-primary"
                 checked={!shouldFilterOrdinals}
-                onChange={() => setShouldFilterOrdinals(false)}
+                onChange={includeOrdinals}
               />
               <span className="label-text">
                 I want to <strong>include</strong> ordinals, bitcoin NFTs,
@@ -63,7 +70,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
                 name="ordinals-radio"
                 className="radio checked:bg-primary"
                 checked={shouldFilterOrdinals}
-                onChange={() => setShouldFilterOrdinals(true)}
+                onChange={excludeOrdinals}
               />
               <span className="label-text">
                 I would like to <strong>exclude</strong> ordinals, bitcoin NFTs,
@@ -76,10 +83,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
         <p className="text-xs opacity-50">
           * You can change this setting later if needed
         </p>
-        <button
-          className="btn-primary btn flex-1"
-          onClick={() => onClose(false)}
-        >
+        <button className="btn-primary btn flex-1" onClick={handleClose}>
           Confirm
         </button>
       </div>

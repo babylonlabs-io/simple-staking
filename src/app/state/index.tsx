@@ -1,4 +1,8 @@
-import { useMemo, type PropsWithChildren } from "react";
+import {
+  useMemo,
+  useState as useReactState,
+  type PropsWithChildren,
+} from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
@@ -22,15 +26,22 @@ export interface AppState {
   firstActivationHeight: number;
   isError: boolean;
   isLoading: boolean;
+  shouldFilterOrdinals: boolean;
+  includeOrdinals: () => void;
+  excludeOrdinals: () => void;
 }
 
-const { StateProvider, useState } = createStateUtils<AppState>({
-  isLoading: false,
-  isError: false,
-  totalBalance: 0,
-  isApprochingNextVersion: false,
-  firstActivationHeight: 0,
-});
+const { StateProvider, useState: useApplicationState } =
+  createStateUtils<AppState>({
+    isLoading: false,
+    isError: false,
+    totalBalance: 0,
+    isApprochingNextVersion: false,
+    firstActivationHeight: 0,
+    shouldFilterOrdinals: true,
+    includeOrdinals: () => {},
+    excludeOrdinals: () => {},
+  });
 
 const defaultVersionParams = {
   isApprochingNextVersion: false,
@@ -40,6 +51,11 @@ const defaultVersionParams = {
 };
 
 export function AppState({ children }: PropsWithChildren) {
+  const [shouldFilterOrdinals, setShouldFilterOrdinals] = useReactState(true);
+
+  const includeOrdinals = () => setShouldFilterOrdinals(false);
+  const excludeOrdinals = () => setShouldFilterOrdinals(true);
+
   // States
   const {
     data: availableUTXOs = [],
@@ -84,8 +100,21 @@ export function AppState({ children }: PropsWithChildren) {
       ...versionInfo,
       isError,
       isLoading,
+      shouldFilterOrdinals,
+      includeOrdinals,
+      excludeOrdinals,
     }),
-    [availableUTXOs, height, totalBalance, versionInfo, isError, isLoading],
+    [
+      availableUTXOs,
+      height,
+      totalBalance,
+      versionInfo,
+      isError,
+      isLoading,
+      shouldFilterOrdinals,
+      includeOrdinals,
+      excludeOrdinals,
+    ],
   );
 
   const states = useMemo(
@@ -100,4 +129,4 @@ export function AppState({ children }: PropsWithChildren) {
   return <StateProvider value={context}>{states}</StateProvider>;
 }
 
-export const useAppState = useState;
+export const useAppState = useApplicationState;
