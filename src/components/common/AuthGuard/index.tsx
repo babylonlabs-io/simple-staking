@@ -1,4 +1,9 @@
-import type { PropsWithChildren, ReactNode } from "react";
+import {
+  useEffect,
+  useState,
+  type PropsWithChildren,
+  type ReactNode,
+} from "react";
 
 import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvider";
 
@@ -11,6 +16,11 @@ export function AuthGuard({
   fallback,
 }: PropsWithChildren<AuthGuardProps>) {
   const { isConnected } = useWalletConnection();
+  const [displayComponent, setDisplayComponent] = useState(false);
 
-  return isConnected ? children : fallback;
+  useEffect(() => {
+    setDisplayComponent(isConnected);
+  }, [isConnected]);
+
+  return displayComponent ? children : fallback;
 }
