@@ -1,4 +1,8 @@
-import { useMemo, type PropsWithChildren } from "react";
+import {
+  useMemo,
+  useState as useReactState,
+  type PropsWithChildren,
+} from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
@@ -22,15 +26,22 @@ export interface AppState {
   firstActivationHeight: number;
   isError: boolean;
   isLoading: boolean;
+  ordinalsExcluded: boolean;
+  includeOrdinals: () => void;
+  excludeOrdinals: () => void;
 }
 
-const { StateProvider, useState } = createStateUtils<AppState>({
-  isLoading: false,
-  isError: false,
-  totalBalance: 0,
-  isApprochingNextVersion: false,
-  firstActivationHeight: 0,
-});
+const { StateProvider, useState: useApplicationState } =
+  createStateUtils<AppState>({
+    isLoading: false,
+    isError: false,
+    totalBalance: 0,
+    isApprochingNextVersion: false,
+    firstActivationHeight: 0,
+    ordinalsExcluded: true,
+    includeOrdinals: () => {},
+    excludeOrdinals: () => {},
+  });
 
 const defaultVersionParams = {
   isApprochingNextVersion: false,
@@ -40,6 +51,11 @@ const defaultVersionParams = {
 };
 
 export function AppState({ children }: PropsWithChildren) {
+  const [ordinalsExcluded, setOrdinalsExcluded] = useReactState(true);
+
+  const includeOrdinals = () => setOrdinalsExcluded(false);
+  const excludeOrdinals = () => setOrdinalsExcluded(true);
+
   // States
   const {
     data: availableUTXOs = [],
@@ -84,8 +100,21 @@ export function AppState({ children }: PropsWithChildren) {
       ...versionInfo,
       isError,
       isLoading,
+      ordinalsExcluded,
+      includeOrdinals,
+      excludeOrdinals,
     }),
-    [availableUTXOs, height, totalBalance, versionInfo, isError, isLoading],
+    [
+      availableUTXOs,
+      height,
+      totalBalance,
+      versionInfo,
+      isError,
+      isLoading,
+      ordinalsExcluded,
+      includeOrdinals,
+      excludeOrdinals,
+    ],
   );
 
   const states = useMemo(
@@ -100,4 +129,4 @@ export function AppState({ children }: PropsWithChildren) {
   return <StateProvider value={context}>{states}</StateProvider>;
 }
 
-export const useAppState = useState;
+export const useAppState = useApplicationState;

@@ -7,6 +7,7 @@ import { DelegationTabs } from "./components/Delegations/DelegationTabs";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
+import { FilterOrdinalsModal } from "./components/Modals/FilterOrdinalsModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Staking } from "./components/Staking/Staking";
@@ -31,6 +32,7 @@ const Home = () => {
       </div>
       <FAQ />
       <Footer />
+      <FilterOrdinalsModal />
     </>
   );
 };

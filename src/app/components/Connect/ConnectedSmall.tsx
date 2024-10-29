@@ -3,6 +3,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { useOnClickOutside } from "usehooks-ts";
 
+import { useAppState } from "@/app/state";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -24,6 +25,8 @@ export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
   btcWalletBalanceSat,
   onDisconnect,
 }) => {
+  const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
+
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
     setShowMenu(false);
@@ -72,6 +75,19 @@ export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
             </div>
             <div className="flex flex-col">
               <Hash value={address} address noFade fullWidth />
+            </div>
+            <div className="form-control">
+              <label className="label cursor-pointer">
+                <span className="label-text">Ordinals included</span>
+                <input
+                  type="checkbox"
+                  className="toggle toggle-primary"
+                  checked={!ordinalsExcluded}
+                  onChange={
+                    ordinalsExcluded ? includeOrdinals : excludeOrdinals
+                  }
+                />
+              </label>
             </div>
             <button
               className="btn btn-outline btn-sm"

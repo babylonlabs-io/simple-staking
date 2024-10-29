@@ -79,7 +79,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const [address, setAddress] = useState("");
 
   const { showError } = useError();
-  const { open, disconnect, isConnected, providers } = useWalletConnection();
+  const { open, isConnected, providers } = useWalletConnection();
 
   const btcDisconnect = useCallback(() => {
     setBTCWalletProvider(undefined);

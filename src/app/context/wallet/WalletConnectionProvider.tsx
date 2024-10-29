@@ -32,6 +32,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
     <TomoContextProvider
       bitcoinChains={bitcoinChains}
       multiNetworkConnection={true}
+      // TODO change options (ordinals) wording as soon as it's available
       cosmosChains={[
         {
           id: 1,
