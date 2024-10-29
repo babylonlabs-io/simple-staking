@@ -37,7 +37,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const [cosmosPubKey, setCosmosPubKey] = useState("");
   const [cosmosChainID, setCosmosChainID] = useState("");
 
-  const { showError } = useError();
+  const { showError, captureError } = useError();
   const { open, isConnected, providers } = useWalletConnection();
 
   const cosmosDisconnect = useCallback(() => {
@@ -68,6 +68,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         },
         retryAction: connectCosmos,
       });
+      captureError(error);
     }
   }, [providers.cosmosProvider, showError]);
 

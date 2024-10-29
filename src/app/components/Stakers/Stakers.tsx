@@ -13,7 +13,7 @@ import { Staker } from "./Staker";
 interface StakersProps {}
 
 export const Stakers: React.FC<StakersProps> = () => {
-  const { showError, hideError, isErrorOpen } = useError();
+  const { showError, hideError, isErrorOpen, captureError } = useError();
 
   const {
     data: stakersData,
@@ -38,8 +38,9 @@ export const Stakers: React.FC<StakersProps> = () => {
         },
         retryAction: refetch,
       });
+      captureError(error);
     }
-  }, [error, refetch, showError, hideError]);
+  }, [error, refetch, showError, hideError, captureError]);
 
   return (
     <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">

@@ -38,7 +38,7 @@ export function useAPIQuery<
 >(
   options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
 ): UseQueryResult<TData, TError> {
-  const { isErrorOpen, handleError } = useError();
+  const { isErrorOpen, handleError, captureError } = useError();
 
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
@@ -55,6 +55,7 @@ export function useAPIQuery<
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: data.refetch,
     });
+    captureError(data.error as Error);
   }, [handleError, data.error, data.isError, data.refetch]);
 
   return data;
