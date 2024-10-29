@@ -1,20 +1,21 @@
-import {
-  useMemo,
-  useState as useReactState,
-  type PropsWithChildren,
-} from "react";
+import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
+import { useOrdinals } from "@/app/hooks/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
 import { useVersions } from "@/app/hooks/api/useVersions";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
-import type { UTXO } from "@/utils/wallet/btc_wallet_provider";
+import type {
+  InscriptionIdentifier,
+  UTXO,
+} from "@/utils/wallet/btc_wallet_provider";
 
 import { DelegationState } from "./DelegationState";
 
 const STATE_LIST = [DelegationState];
+export const LOW_VALUE_UTXO_THRESHOLD = 10000;
 
 export interface AppState {
   availableUTXOs?: UTXO[];
@@ -51,31 +52,60 @@ const defaultVersionParams = {
 };
 
 export function AppState({ children }: PropsWithChildren) {
-  const [ordinalsExcluded, setOrdinalsExcluded] = useReactState(true);
-
-  const includeOrdinals = () => setOrdinalsExcluded(false);
-  const excludeOrdinals = () => setOrdinalsExcluded(true);
+  const [ordinalsExcluded, setOrdinalsExcluded] = useState(true);
 
   // States
   const {
-    data: availableUTXOs = [],
+    data: utxos = [],
     isLoading: isUTXOLoading,
     isError: isUTXOError,
   } = useUTXOs();
   const {
+    data: ordinals = [],
+    isLoading: isOrdinalLoading,
+    isError: isOrdinalError,
+  } = useOrdinals(utxos, {
+    enabled: !isUTXOLoading,
+  });
+  const {
     data: versions,
-    isError: isVersionError,
     isLoading: isVersionLoading,
+    isError: isVersionError,
   } = useVersions();
   const {
     data: height,
-    isError: isHeightError,
     isLoading: isHeightLoading,
+    isError: isHeightError,
   } = useBTCTipHeight();
 
   // Computed
-  const isLoading = isVersionLoading || isHeightLoading || isUTXOLoading;
-  const isError = isHeightError || isVersionError || isUTXOError;
+  const isLoading =
+    isVersionLoading || isHeightLoading || isUTXOLoading || isOrdinalLoading;
+  const isError =
+    isHeightError || isVersionError || isUTXOError || isOrdinalError;
+
+  const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
+    () =>
+      ordinals.reduce(
+        (acc, ordinal) => ({ ...acc, [ordinal.txid]: ordinal }),
+        {},
+      ),
+    [ordinals],
+  );
+
+  const utxosWithoutDust = useMemo(
+    () => utxos.filter((utxo) => utxo.value > LOW_VALUE_UTXO_THRESHOLD),
+    [utxos],
+  );
+
+  const availableUTXOs = useMemo(() => {
+    debugger;
+    if (isLoading) return [];
+
+    return ordinalsExcluded
+      ? utxosWithoutDust.filter((utxo) => !ordinalMap[utxo.txid])
+      : utxosWithoutDust;
+  }, [isLoading, ordinalsExcluded, utxosWithoutDust, ordinalMap]);
 
   const totalBalance = useMemo(
     () =>
@@ -90,6 +120,10 @@ export function AppState({ children }: PropsWithChildren) {
         : defaultVersionParams,
     [versions, height],
   );
+
+  // Handlers
+  const includeOrdinals = useCallback(() => setOrdinalsExcluded(false), []);
+  const excludeOrdinals = useCallback(() => setOrdinalsExcluded(true), []);
 
   // Context
   const context = useMemo(
