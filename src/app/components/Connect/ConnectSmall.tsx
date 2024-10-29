@@ -115,7 +115,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           </div>
           <div className="form-control">
             <label className="label cursor-pointer">
-              <span className="label-text">Ordinals included</span>
+              <span className="label-text">Unlock all UTXOs</span>
               <input
                 type="checkbox"
                 className="toggle toggle-primary"
