@@ -3,6 +3,7 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAPIQuery } from "@/app/hooks/api/useApi";
 import { wait } from "@/utils";
+import { filterDust } from "@/utils/wallet";
 import {
   InscriptionIdentifier,
   UTXO,
@@ -27,7 +28,10 @@ export function useOrdinals(
       return inscriptions;
     }
 
-    const verifiedUTXOs = await postVerifyUtxoOrdinals(utxos, address);
+    const verifiedUTXOs = await postVerifyUtxoOrdinals(
+      filterDust(utxos),
+      address,
+    );
     return verifiedUTXOs.filter((utxo) => utxo.inscription);
   };
 

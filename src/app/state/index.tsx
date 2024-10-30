@@ -7,6 +7,7 @@ import { useVersions } from "@/app/hooks/api/useVersions";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { filterDust } from "@/utils/wallet";
 import type {
   InscriptionIdentifier,
   UTXO,
@@ -15,7 +16,6 @@ import type {
 import { DelegationState } from "./DelegationState";
 
 const STATE_LIST = [DelegationState];
-export const LOW_VALUE_UTXO_THRESHOLD = 10000;
 
 export interface AppState {
   availableUTXOs?: UTXO[];
@@ -93,18 +93,13 @@ export function AppState({ children }: PropsWithChildren) {
     [ordinals],
   );
 
-  const utxosWithoutDust = useMemo(
-    () => utxos.filter((utxo) => utxo.value > LOW_VALUE_UTXO_THRESHOLD),
-    [utxos],
-  );
-
   const availableUTXOs = useMemo(() => {
     if (isLoading) return [];
 
     return ordinalsExcluded
-      ? utxosWithoutDust.filter((utxo) => !ordinalMap[utxo.txid])
-      : utxosWithoutDust;
-  }, [isLoading, ordinalsExcluded, utxosWithoutDust, ordinalMap]);
+      ? filterDust(utxos).filter((utxo) => !ordinalMap[utxo.txid])
+      : utxos;
+  }, [isLoading, ordinalsExcluded, utxos, ordinalMap]);
 
   const totalBalance = useMemo(
     () =>
