@@ -99,7 +99,6 @@ export function AppState({ children }: PropsWithChildren) {
   );
 
   const availableUTXOs = useMemo(() => {
-    debugger;
     if (isLoading) return [];
 
     return ordinalsExcluded

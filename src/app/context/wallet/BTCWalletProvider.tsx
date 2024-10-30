@@ -1,3 +1,4 @@
+import type { BTCProvider } from "@tomo-inc/tomo-wallet-provider";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -21,7 +22,6 @@ import {
   InscriptionIdentifier,
   Network,
   UTXO,
-  type BTCWalletProvider as IBTCWalletProvider,
 } from "@/utils/wallet/btc_wallet_provider";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 
@@ -34,7 +34,6 @@ interface BTCWalletContextProps {
   connected: boolean;
   disconnect: () => void;
   open: () => void;
-  getWalletProviderName: () => Promise<string>;
   getAddress: () => Promise<string>;
   getPublicKeyHex: () => Promise<string>;
   signPsbt: (psbtHex: string) => Promise<string>;
@@ -56,24 +55,22 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
   address: "",
   disconnect: () => {},
   open: () => {},
-  getWalletProviderName: () => Promise.resolve(""),
-  getAddress: () => Promise.resolve(""),
-  getPublicKeyHex: () => Promise.resolve(""),
-  signPsbt: () => Promise.resolve(""),
-  signPsbts: () => Promise.resolve([]),
-  getNetwork: () => Promise.resolve({} as Network),
-  signMessageBIP322: () => Promise.resolve(""),
-  getBalance: () => Promise.resolve(0),
-  getNetworkFees: () => Promise.resolve({} as Fees),
-  pushTx: () => Promise.resolve(""),
-  getUtxos: () => Promise.resolve([]),
-  getBTCTipHeight: () => Promise.resolve(0),
-  getInscriptions: () => Promise.resolve([]),
+  getAddress: async () => "",
+  getPublicKeyHex: async () => "",
+  signPsbt: async () => "",
+  signPsbts: async () => [],
+  getNetwork: async () => ({}) as Network,
+  signMessageBIP322: async () => "",
+  getBalance: async () => 0,
+  getNetworkFees: async () => ({}) as Fees,
+  pushTx: async () => "",
+  getUtxos: async () => [],
+  getBTCTipHeight: async () => 0,
+  getInscriptions: async () => [],
 });
 
 export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
-  const [btcWalletProvider, setBTCWalletProvider] =
-    useState<IBTCWalletProvider>();
+  const [btcWalletProvider, setBTCWalletProvider] = useState<BTCProvider>();
   const [network, setNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
   const [address, setAddress] = useState("");
@@ -89,7 +86,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const connectBTC = useCallback(
-    async (walletProvider: IBTCWalletProvider) => {
+    async (walletProvider: BTCProvider) => {
       const supportedNetworkMessage =
         "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
 
@@ -156,22 +153,33 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
   const btcWalletMethods = useMemo(
     () => ({
-      getWalletProviderName: () => btcWalletProvider!.getWalletProviderName(),
-      getAddress: () => btcWalletProvider!.getAddress(),
-      getPublicKeyHex: () => btcWalletProvider!.getPublicKeyHex(),
-      signPsbt: (psbtHex: string) => btcWalletProvider!.signPsbt(psbtHex),
-      signPsbts: (psbtsHexes: string[]) =>
-        btcWalletProvider!.signPsbts(psbtsHexes),
-      getNetwork: () => btcWalletProvider!.getNetwork(),
-      signMessageBIP322: (message: string) =>
-        btcWalletProvider!.signMessageBIP322(message),
-      getBalance: () => btcWalletProvider!.getBalance(),
-      getNetworkFees: () => btcWalletProvider!.getNetworkFees(),
-      pushTx: (txHex: string) => btcWalletProvider!.pushTx(txHex),
-      getUtxos: (address: string, amount?: number) =>
-        btcWalletProvider!.getUtxos(address, amount),
-      getBTCTipHeight: () => btcWalletProvider!.getBTCTipHeight(),
-      getInscriptions: () => btcWalletProvider!.getInscriptions(),
+      getAddress: async () => btcWalletProvider?.getAddress() ?? "",
+      getPublicKeyHex: async () => btcWalletProvider?.getPublicKeyHex() ?? "",
+      signPsbt: async (psbtHex: string) =>
+        btcWalletProvider?.signPsbt(psbtHex) ?? "",
+      signPsbts: async (psbtsHexes: string[]) =>
+        btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
+      getNetwork: async () =>
+        btcWalletProvider?.getNetwork() ?? ({} as Network),
+      signMessageBIP322: async (message: string) =>
+        btcWalletProvider?.signMessageBIP322(message) ?? "",
+      getBalance: async () => btcWalletProvider?.getBalance() ?? 0,
+      getNetworkFees: async () =>
+        btcWalletProvider?.getNetworkFees() ?? ({} as Fees),
+      pushTx: async (txHex: string) => btcWalletProvider?.pushTx(txHex) ?? "",
+      getUtxos: async (address: string, amount?: number) =>
+        btcWalletProvider?.getUtxos(address, amount) ?? [],
+      getBTCTipHeight: async () => btcWalletProvider?.getBTCTipHeight() ?? 0,
+      getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
+        btcWalletProvider
+          ?.getInscriptions()
+          .then((result) =>
+            result.list.map((ordinal) => ({
+              txid: ordinal.inscriptionId,
+              vout: ordinal.outputValue,
+            })),
+          )
+          .catch((e) => []) ?? [],
     }),
     [btcWalletProvider],
   );
@@ -200,7 +208,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (isConnected && providers.state) {
       if (!btcWalletProvider && providers.bitcoinProvider) {
-        connectBTC(providers.bitcoinProvider as unknown as IBTCWalletProvider);
+        connectBTC(providers.bitcoinProvider);
       }
     }
   }, [

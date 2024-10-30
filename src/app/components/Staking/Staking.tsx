@@ -71,7 +71,6 @@ export const Staking = () => {
     network: btcWalletNetwork,
     getNetworkFees,
     signPsbt,
-    getWalletProviderName,
     pushTx,
   } = useBTCWallet();
 
