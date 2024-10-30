@@ -22,7 +22,7 @@ import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
 import { getDelegations, PaginatedDelegations } from "./api/getDelegations";
 import { getGlobalParams } from "./api/getGlobalParams";
-import { UTXO_KEY } from "./common/constants";
+import { FILTER_ORDINALS_MODAL_KEY, UTXO_KEY } from "./common/constants";
 import { signPsbtTransaction } from "./common/utils/psbt";
 import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -213,6 +213,9 @@ const Home: React.FC<HomeProps> = () => {
     setConnectModalOpen(true);
   };
 
+  const [hasSeenFilterOrdinalsModal, setHasSeenFilterOrdinalsModal] =
+    useLocalStorage<Record<string, boolean>>(FILTER_ORDINALS_MODAL_KEY, {});
+
   const { logTermsAcceptance } = useTermsAcceptance();
   const handleDisconnectBTC = useCallback(() => {
     setBTCWallet(undefined);
@@ -245,7 +248,12 @@ const Home: React.FC<HomeProps> = () => {
         setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
-        setFilterOrdinalsModalOpen(true);
+
+        // Show the modal only if it hasn't been seen before for the address
+        if (!hasSeenFilterOrdinalsModal[address]) {
+          setFilterOrdinalsModalOpen(true);
+        }
+
         // Log the terms acceptance
         logTermsAcceptance({
           address,
@@ -279,7 +287,7 @@ const Home: React.FC<HomeProps> = () => {
         });
       }
     },
-    [showError],
+    [showError, hasSeenFilterOrdinalsModal],
   );
 
   // Subscribe to account changes
@@ -334,6 +342,14 @@ const Home: React.FC<HomeProps> = () => {
     (accumulator, item) => accumulator + item.value,
     0,
   );
+
+  const handleCloseFilterOrdinalsModal = () => {
+    setFilterOrdinalsModalOpen(false);
+    setHasSeenFilterOrdinalsModal((prev) => ({
+      ...prev,
+      [address]: true,
+    }));
+  };
 
   return (
     <main
@@ -413,7 +429,7 @@ const Home: React.FC<HomeProps> = () => {
       />
       <FilterOrdinalsModal
         open={filterOrdinalsModalOpen}
-        onClose={setFilterOrdinalsModalOpen}
+        onClose={handleCloseFilterOrdinalsModal}
         shouldFilterOrdinals={shouldFilterOrdinals}
         setShouldFilterOrdinals={handleShouldFilterOrdinals}
       />
