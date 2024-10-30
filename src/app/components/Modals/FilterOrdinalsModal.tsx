@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
+import { useLocalStorage } from "usehooks-ts";
 
+import { FILTER_ORDINALS_MODAL_KEY } from "@/app/common/constants";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvider";
 import { useAppState } from "@/app/state";
 
@@ -10,16 +13,27 @@ interface FilterOrdinalsModalProps {}
 
 export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({}) => {
   const [modalOpen, setModalOpen] = useState(false);
-  const handleClose = () => setModalOpen(false);
+  const { address } = useBTCWallet();
+
+  const handleClose = () => {
+    setModalOpen(false);
+    setHasSeenFilterOrdinalsModal((prev) => ({
+      ...prev,
+      [address]: true,
+    }));
+  };
 
   const { isConnected } = useWalletConnection();
   const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
 
+  const [hasSeenFilterOrdinalsModal, setHasSeenFilterOrdinalsModal] =
+    useLocalStorage<Record<string, boolean>>(FILTER_ORDINALS_MODAL_KEY, {});
+
   useEffect(() => {
-    if (isConnected) {
+    if (isConnected && address && !hasSeenFilterOrdinalsModal[address]) {
       setModalOpen(true);
     }
-  }, [isConnected]);
+  }, [isConnected, hasSeenFilterOrdinalsModal, address]);
 
   return (
     <GeneralModal open={modalOpen} onClose={handleClose}>
