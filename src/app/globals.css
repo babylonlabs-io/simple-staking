@@ -1,5 +1,6 @@
 @import "react-responsive-modal/styles.css";
 @import "react-tooltip/dist/react-tooltip.css";
+@import "react-toastify/dist/ReactToastify.css";
 
 @tailwind base;
 @tailwind components;
@@ -8,6 +9,13 @@
 :root {
   --primary: #ff7c2a;
   --secondary: "#0DB7BF";
+  --toastify-toast-width: 344px;
+}
+
+@media screen and (min-width: 768px) {
+  :root {
+    --toastify-toast-width: 671px;
+  }
 }
 
 /* disable number input arrows */
