@@ -1,6 +1,8 @@
 import { ToastContainer } from "react-toastify";
 import { twJoin } from "tailwind-merge";
-import { useWindowSize } from "usehooks-ts";
+import { useMediaQuery } from "usehooks-ts";
+
+import { screenBreakPoints } from "@/config/screen-breakpoints";
 
 const commonClassName = "relative overflow-hidden rounded-lg px-4 py-3 md:p-3";
 
@@ -16,8 +18,7 @@ const BG_COLOR = {
 } as const;
 
 export const NotificationContainer = () => {
-  const { width: screenWidth } = useWindowSize();
-  const isMobileView = screenWidth < 768;
+  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
 
   return (
     <ToastContainer

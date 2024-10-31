@@ -5,26 +5,23 @@ import { toast } from "react-toastify";
 
 import { Notification } from "@/app/components/Notification/Notification";
 
-const LoremText =
-  "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-
-export const notifySuccess = (title: string, text: string = LoremText) => {
+export const notifySuccess = (title: string, text: string) => {
   toast.success(<Notification title={title} text={text} reactIcon={FaCheck} />);
 };
 
-export const notifyWraning = (title: string, text: string = LoremText) => {
+export const notifyWraning = (title: string, text: string) => {
   toast.warning(
     <Notification title={title} text={text} reactIcon={PiWarningCircleBold} />,
   );
 };
 
-export const notifyError = (title: string, text: string = LoremText) => {
+export const notifyError = (title: string, text: string) => {
   toast.error(
     <Notification title={title} text={text} reactIcon={PiWarningCircleBold} />,
   );
 };
 
-export const notifyInfo = (title: string, text: string = LoremText) => {
+export const notifyInfo = (title: string, text: string) => {
   toast.info(
     <Notification title={title} text={text} reactIcon={LuBadgeCheck} />,
   );

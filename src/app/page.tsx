@@ -12,28 +12,14 @@ import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
-import {
-  notifyError,
-  notifyInfo,
-  notifySuccess,
-  notifyWraning,
-} from "./hooks/useNotification";
 
 const Home = () => {
   useEffect(() => {
     initBTCCurve();
   }, []);
 
-  const notify = () => {
-    notifySuccess("Wow so success!");
-    notifyWraning("Wow so warning!");
-    notifyError("Wow so error!");
-    notifyInfo("Wow so info!");
-  };
-
   return (
     <>
-      <button onClick={notify}>Notify!</button>
       <NetworkBadge />
       <Header />
       <div className="container mx-auto flex justify-center p-6">
