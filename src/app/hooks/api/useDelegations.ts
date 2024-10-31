@@ -14,7 +14,7 @@ export const DELEGATIONS_KEY = "DELEGATIONS";
 
 export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
   const { publicKeyNoCoord } = useBTCWallet();
-  const { isErrorOpen, handleError } = useError();
+  const { isErrorOpen, handleError, captureError } = useError();
 
   const query = useInfiniteQuery({
     queryKey: [DELEGATIONS_KEY, publicKeyNoCoord],
@@ -51,6 +51,7 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: query.refetch,
     });
+    captureError(query.error);
   }, [query.isError, query.error, query.refetch, handleError]);
 
   return query;

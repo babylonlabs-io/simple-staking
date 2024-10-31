@@ -79,7 +79,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
-  const { showError } = useError();
+  const { showError, captureError } = useError();
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
   const {
@@ -169,6 +169,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
         },
         retryAction: () => handleModal(id, MODE_UNBOND),
       });
+      captureError(error);
     } finally {
       setModalOpen(false);
       setTxID("");

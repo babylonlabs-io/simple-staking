@@ -11,7 +11,7 @@ import { useError } from "../context/Error/ErrorContext";
 import { ErrorState } from "../types/errors";
 
 export const useHealthCheck = () => {
-  const { showError } = useError();
+  const { showError, captureError } = useError();
 
   const { data, error, isError, refetch } = useQuery({
     queryKey: ["api available"],
@@ -29,6 +29,7 @@ export const useHealthCheck = () => {
         },
         retryAction: refetch,
       });
+      captureError(error);
     }
   }, [isError, error, showError, refetch]);
 
