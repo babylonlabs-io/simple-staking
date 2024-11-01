@@ -31,7 +31,7 @@ export const useHealthCheck = () => {
       });
       captureError(error);
     }
-  }, [isError, error, showError, refetch]);
+  }, [isError, error, showError, refetch, captureError]);
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
   const isGeoBlocked = data ? isGeoBlockedResult(data) : false;

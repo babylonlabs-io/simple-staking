@@ -134,7 +134,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         captureError(error);
       }
     },
-    [showError],
+    [showError, captureError],
   );
 
   // Listen for BTC account changes
