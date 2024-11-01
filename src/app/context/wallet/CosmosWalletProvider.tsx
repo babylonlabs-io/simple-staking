@@ -24,7 +24,7 @@ interface CosmosWalletContextProps {
 }
 
 const getSigningStargateClientDefault = async () => {
-  throw new Error("Not implemented");
+  throw new Error("Not initialized");
 };
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
