@@ -56,7 +56,7 @@ export function useAPIQuery<
       refetchFunction: data.refetch,
     });
     captureError(data.error as Error);
-  }, [handleError, data.error, data.isError, data.refetch]);
+  }, [handleError, data.error, data.isError, data.refetch, captureError]);
 
   return data;
 }

@@ -52,7 +52,7 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       refetchFunction: query.refetch,
     });
     captureError(query.error);
-  }, [query.isError, query.error, query.refetch, handleError]);
+  }, [query.isError, query.error, query.refetch, handleError, captureError]);
 
   return query;
 }
