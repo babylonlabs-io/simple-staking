@@ -1,3 +1,4 @@
+import { SigningStargateClient } from "@cosmjs/stargate";
 import {
   createContext,
   useCallback,
@@ -10,32 +11,33 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
+import { getBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 import { useWalletConnection } from "./WalletConnectionProvider";
 
 interface CosmosWalletContextProps {
   bech32Address: string;
-  pubKey: string;
   connected: boolean;
   disconnect: () => void;
   open: () => void;
-  signArbitrary: (message: string) => Promise<any>;
+  getSigningStargateClient(): Promise<SigningStargateClient>;
 }
+
+const getSigningStargateClientDefault = async () => {
+  throw new Error("Not implemented");
+};
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
   bech32Address: "",
-  pubKey: "",
   connected: false,
   disconnect: () => {},
   open: () => {},
-  signArbitrary: async () => {},
+  getSigningStargateClient: getSigningStargateClientDefault,
 });
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const [cosmosWalletProvider, setCosmosWalletProvider] = useState<any>();
   const [cosmosBech32Address, setCosmosBech32Address] = useState("");
-  const [cosmosPubKey, setCosmosPubKey] = useState("");
-  const [cosmosChainID, setCosmosChainID] = useState("");
 
   const { showError, captureError } = useError();
   const { open, isConnected, providers } = useWalletConnection();
@@ -43,23 +45,19 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const cosmosDisconnect = useCallback(() => {
     setCosmosWalletProvider(undefined);
     setCosmosBech32Address("");
-    setCosmosPubKey("");
-    setCosmosChainID("");
   }, []);
 
   const connectCosmos = useCallback(async () => {
     if (!providers.cosmosProvider) return;
 
     try {
-      const chainID = providers.cosmosProvider.getChainId();
-      const cosmosInfo =
-        await providers.cosmosProvider.provider.getKey(chainID);
+      await providers.cosmosProvider.connectWallet();
+      const address = await providers.cosmosProvider.getAddress();
+      const registry = getBbnRegistry();
+      await providers.cosmosProvider.getSigningStargateClient({ registry });
 
-      const { bech32Address, pubKey } = cosmosInfo;
       setCosmosWalletProvider(providers.cosmosProvider);
-      setCosmosBech32Address(bech32Address);
-      setCosmosPubKey(Buffer.from(pubKey).toString("hex"));
-      setCosmosChainID(chainID);
+      setCosmosBech32Address(address);
     } catch (error: any) {
       showError({
         error: {
@@ -75,25 +73,12 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const cosmosContextValue = useMemo(
     () => ({
       bech32Address: cosmosBech32Address,
-      pubKey: cosmosPubKey,
       connected: Boolean(cosmosWalletProvider),
       disconnect: cosmosDisconnect,
       open,
-      signArbitrary: (message: string) =>
-        cosmosWalletProvider.provider.signArbitrary(
-          cosmosChainID,
-          cosmosBech32Address,
-          message,
-        ),
+      getSigningStargateClient: cosmosWalletProvider?.getSigningStargateClient,
     }),
-    [
-      cosmosChainID,
-      cosmosBech32Address,
-      cosmosPubKey,
-      cosmosWalletProvider,
-      cosmosDisconnect,
-      open,
-    ],
+    [cosmosBech32Address, cosmosWalletProvider, cosmosDisconnect, open],
   );
 
   useEffect(() => {
