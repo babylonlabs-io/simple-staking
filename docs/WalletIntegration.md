@@ -184,7 +184,7 @@ export abstract class BTCWalletProvider {
 ## 2. Mobile Wallet Integration
 
 A mobile wallet with an in-app browser option can be integrated into the dApp
-by defining a class that implements the wallet interface and injecting an
+by defining a class that implements the wallet interface and by injecting an
 instance of it under the `window.btcwallet` global object when the Babylon dApp
 is loaded.
 
