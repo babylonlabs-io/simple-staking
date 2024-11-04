@@ -6,6 +6,7 @@ import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experime
 import { ThemeProvider } from "next-themes";
 import React from "react";
 
+import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
@@ -39,6 +40,7 @@ function Providers({ children }: React.PropsWithChildren) {
           initialIsOpen={false}
         />
       </QueryClientProvider>
+      <NotificationContainer />
     </ThemeProvider>
   );
 }

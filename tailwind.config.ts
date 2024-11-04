@@ -1,5 +1,7 @@
 import type { Config } from "tailwindcss";
 
+import { screenBreakPoints } from "./src/config/screen-breakpoints";
+
 const config: Config = {
   darkMode: ["selector", '[data-theme="dark"]'],
   content: [
@@ -8,13 +10,7 @@ const config: Config = {
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
-    screens: {
-      sm: "600px",
-      md: "768px",
-      lg: "1000px",
-      xl: "1130px",
-      "2xl": "1350px",
-    },
+    screens: screenBreakPoints,
     extend: {
       colors: {
         primary: "#FF7C2A",
