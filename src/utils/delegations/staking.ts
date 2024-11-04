@@ -12,7 +12,6 @@ import {
 } from "@babylonlabs-io/btc-staking-ts";
 import { fromBech32 } from "@cosmjs/encoding";
 import { networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
-import { createHash } from "crypto";
 import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -57,6 +56,43 @@ export const useCreateBtcDelegation = () => {
       );
 
       try {
+        // Create Proof of Possession
+        const addrBytes = fromBech32(bech32Address).data;
+        const hashedMessage = await sha256(Buffer.from(addrBytes));
+        const signedBbnAddress = await signMessageBIP322(
+          // same with golang
+          hashedMessage.toString("hex"),
+        );
+
+        // Build the BIP322 format data
+        const btcPk = await getPublicKeyHex();
+        const { address: btcAddress } = payments.p2wpkh({
+          // different to golang
+          pubkey: Buffer.from(btcPk, "hex"),
+          network: btcInput.btcNetwork,
+        });
+        // Construct the BIP322Sig message using `fromPartial`
+        console.log("btc pk", btcPk);
+        console.log("bech32Address", bech32Address);
+        console.log("bech32Address base64", uint8ArrayToBase64(addrBytes));
+        console.log("btc address", btcAddress);
+
+        console.log("hashedMessageHex", hashedMessage.toString("hex"));
+        console.log("hashedMessageBase64", hashedMessage.toString("base64"));
+        console.log("bip322 sig", signedBbnAddress);
+        // console.log("publicKeyNoCoord", publicKeyNoCoord);
+
+        const bip322SigMessage: BIP322Sig = BIP322Sig.fromJSON({
+          address: btcAddress!,
+          sig: signedBbnAddress,
+        });
+        // Encode to Uint8Array
+        const btcSigBytes = BIP322Sig.encode(bip322SigMessage).finish();
+        console.log("btcSigBytes", uint8ArrayToBase64(btcSigBytes));
+        const proofOfPossession: ProofOfPossessionBTC = {
+          btcSigType: BTCSigType.BIP322,
+          btcSig: btcSigBytes,
+        };
         // Create and sign staking transaction
         const { psbt: stakingPsbt } = staking.createStakingTransaction(
           btcInput.stakingAmountSat,
@@ -109,41 +145,41 @@ export const useCreateBtcDelegation = () => {
           );
         }
 
-        // Create Proof of Possession
-        const addrBytes = fromBech32(bech32Address).data;
-        const hashedMessage = createHash("sha256")
-          .update(addrBytes)
-          .digest("hex");
-        const signedBbnAddress = await signMessageBIP322(
-          // hashedMessage.toString("hex"),
-          hashedMessage,
-        );
+        // // Create Proof of Possession
+        // const addrBytes = fromBech32(bech32Address).data;
+        // const hashedMessage = createHash("sha256")
+        //   .update(addrBytes)
+        //   .digest("hex");
+        // const signedBbnAddress = await signMessageBIP322(
+        //   // hashedMessage.toString("hex"),
+        //   hashedMessage,
+        // );
 
-        // Build the BIP322 format data
-        const btcPk = await getPublicKeyHex();
-        const { address: btcAddress } = payments.p2wpkh({
-          pubkey: Buffer.from(btcPk, "hex"),
-          network: btcInput.btcNetwork,
-        });
-        // Construct the BIP322Sig message using `fromPartial`
-        console.log("btc pk", btcPk);
-        // console.log("publicKeyNoCoord", publicKeyNoCoord);
-        console.log("bech32Address", bech32Address);
-        console.log("prefix: ", fromBech32(bech32Address).prefix);
-        console.log("address", btcAddress);
-        console.log("sig", signedBbnAddress);
+        // // Build the BIP322 format data
+        // const btcPk = await getPublicKeyHex();
+        // const { address: btcAddress } = payments.p2wpkh({
+        //   pubkey: Buffer.from(btcPk, "hex"),
+        //   network: btcInput.btcNetwork,
+        // });
+        // // Construct the BIP322Sig message using `fromPartial`
+        // console.log("btc pk", btcPk);
+        // // console.log("publicKeyNoCoord", publicKeyNoCoord);
+        // console.log("bech32Address", bech32Address);
+        // console.log("prefix: ", fromBech32(bech32Address).prefix);
+        // console.log("address", btcAddress);
+        // console.log("sig", signedBbnAddress);
 
-        const bip322SigMessage: BIP322Sig = BIP322Sig.fromJSON({
-          address: btcAddress!,
-          sig: signedBbnAddress,
-        });
-        // Encode to Uint8Array
-        const btcSigBytes = BIP322Sig.encode(bip322SigMessage).finish();
-        console.log("btcSigBytes", uint8ArrayToBase64(btcSigBytes));
-        const proofOfPossession: ProofOfPossessionBTC = {
-          btcSigType: BTCSigType.BIP322,
-          btcSig: btcSigBytes,
-        };
+        // const bip322SigMessage: BIP322Sig = BIP322Sig.fromJSON({
+        //   address: btcAddress!,
+        //   sig: signedBbnAddress,
+        // });
+        // // Encode to Uint8Array
+        // const btcSigBytes = BIP322Sig.encode(bip322SigMessage).finish();
+        // console.log("btcSigBytes", uint8ArrayToBase64(btcSigBytes));
+        // const proofOfPossession: ProofOfPossessionBTC = {
+        //   btcSigType: BTCSigType.BIP322,
+        //   btcSig: btcSigBytes,
+        // };
 
         // Prepare and send protobuf message
         const msg: btcstakingtx.MsgCreateBTCDelegation = {
@@ -267,4 +303,9 @@ function uint8ArrayToBase64(uint8Array: Uint8Array) {
 
   // Convert binary string to Base64
   return btoa(binaryString);
+}
+
+export async function sha256(data: Buffer): Promise<Buffer> {
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return Buffer.from(hashBuffer);
 }
