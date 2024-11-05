@@ -32,7 +32,12 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   return (
     <TomoContextProvider
       chainTypes={["bitcoin", "cosmos"]}
-      bitcoinChains={bitcoinChains}
+      bitcoinChains={[
+        {
+          ...tomoBitcoinSignet,
+          // rpc: "https://babylon.mempool.space",
+        },
+      ]}
       cosmosChains={[
         {
           id: 2,

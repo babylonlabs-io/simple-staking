@@ -1,6 +1,5 @@
 import { btcstakingtx } from "@babylonlabs-io/babylon-proto-ts";
 import {
-  BIP322Sig,
   BTCSigType,
   ProofOfPossessionBTC,
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
@@ -11,7 +10,7 @@ import {
   UTXO,
 } from "@babylonlabs-io/btc-staking-ts";
 import { fromBech32 } from "@cosmjs/encoding";
-import { networks, payments, Psbt, Transaction } from "bitcoinjs-lib";
+import { networks, Psbt, Transaction } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -57,41 +56,20 @@ export const useCreateBtcDelegation = () => {
 
       try {
         // Create Proof of Possession
-        const addrBytes = fromBech32(bech32Address).data;
-        const hashedMessage = await sha256(Buffer.from(addrBytes));
-        const signedBbnAddress = await signMessageBIP322(
-          // same with golang
-          hashedMessage.toString("hex"),
+        const bech32AddressHex = uint8ArrayToHex(
+          fromBech32(bech32Address).data,
         );
-
-        // Build the BIP322 format data
-        const btcPk = await getPublicKeyHex();
-        const { address: btcAddress } = payments.p2wpkh({
-          // different to golang
-          pubkey: Buffer.from(btcPk, "hex"),
-          network: btcInput.btcNetwork,
-        });
-        // Construct the BIP322Sig message using `fromPartial`
-        console.log("btc pk", btcPk);
-        console.log("bech32Address", bech32Address);
-        console.log("bech32Address base64", uint8ArrayToBase64(addrBytes));
-        console.log("btc address", btcAddress);
-
-        console.log("hashedMessageHex", hashedMessage.toString("hex"));
-        console.log("hashedMessageBase64", hashedMessage.toString("base64"));
-        console.log("bip322 sig", signedBbnAddress);
-        // console.log("publicKeyNoCoord", publicKeyNoCoord);
-
-        const bip322SigMessage: BIP322Sig = BIP322Sig.fromJSON({
-          address: btcAddress!,
-          sig: signedBbnAddress,
-        });
-        // Encode to Uint8Array
-        const btcSigBytes = BIP322Sig.encode(bip322SigMessage).finish();
-        console.log("btcSigBytes", uint8ArrayToBase64(btcSigBytes));
+        const signedBbnAddress =
+          await window.okxwallet.bitcoinSignet.signMessage(
+            bech32AddressHex,
+            "ecdsa",
+          );
+        const ecdsaSig = Uint8Array.from(
+          globalThis.Buffer.from(signedBbnAddress, "base64"),
+        );
         const proofOfPossession: ProofOfPossessionBTC = {
-          btcSigType: BTCSigType.BIP322,
-          btcSig: btcSigBytes,
+          btcSigType: BTCSigType.ECDSA,
+          btcSig: ecdsaSig,
         };
         // Create and sign staking transaction
         const { psbt: stakingPsbt } = staking.createStakingTransaction(

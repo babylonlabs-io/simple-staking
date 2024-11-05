@@ -240,7 +240,8 @@ export const Staking = () => {
         },
         stakerAddress: address,
         stakerNocoordPk: publicKeyNoCoord,
-        finalityProviderPublicKey: finalityProvider.btcPk,
+        finalityProviderPublicKey:
+          "74238a4148f44394d4fe0071c8b8afd84fc3c7f019c745bb6c42dacb46798819",
         stakingAmountSat: paramsMock.minStakingAmountSat,
         stakingTimeBlocks: paramsMock.minStakingTimeBlocks,
         inputUTXOs: availableUTXOs,
