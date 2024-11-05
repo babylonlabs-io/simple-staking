@@ -81,17 +81,21 @@ export const useCreateBtcDelegation = () => {
         const stakingTx =
           Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
 
-        // Create and sign unbonding transaction
+        const cleanedStakingTx = clearTxSignatures(stakingTx);
+        console.log("stakingTxId:", cleanedStakingTx.getId());
+        // Create and sign unbonding transactionst
         const { psbt: unbondingPsbt } =
-          staking.createUnbondingTransaction(stakingTx);
+          staking.createUnbondingTransaction(cleanedStakingTx);
         const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
         const unbondingTx = Psbt.fromHex(
           signedUnbondingPsbtHex,
         ).extractTransaction();
 
+        const cleanedUnbondingTx = clearTxSignatures(unbondingTx);
+
         // Create slashing transactions and extract signatures
         const { psbt: slashingPsbt } =
-          staking.createStakingOutputSlashingTransaction(stakingTx);
+          staking.createStakingOutputSlashingTransaction(cleanedStakingTx);
         const signedSlashingPsbtHex = await signPsbt(slashingPsbt.toHex());
         const signedSlashingTx = Psbt.fromHex(
           signedSlashingPsbtHex,
@@ -122,43 +126,6 @@ export const useCreateBtcDelegation = () => {
             "No signature found in the unbonding output slashing PSBT",
           );
         }
-
-        // // Create Proof of Possession
-        // const addrBytes = fromBech32(bech32Address).data;
-        // const hashedMessage = createHash("sha256")
-        //   .update(addrBytes)
-        //   .digest("hex");
-        // const signedBbnAddress = await signMessageBIP322(
-        //   // hashedMessage.toString("hex"),
-        //   hashedMessage,
-        // );
-
-        // // Build the BIP322 format data
-        // const btcPk = await getPublicKeyHex();
-        // const { address: btcAddress } = payments.p2wpkh({
-        //   pubkey: Buffer.from(btcPk, "hex"),
-        //   network: btcInput.btcNetwork,
-        // });
-        // // Construct the BIP322Sig message using `fromPartial`
-        // console.log("btc pk", btcPk);
-        // // console.log("publicKeyNoCoord", publicKeyNoCoord);
-        // console.log("bech32Address", bech32Address);
-        // console.log("prefix: ", fromBech32(bech32Address).prefix);
-        // console.log("address", btcAddress);
-        // console.log("sig", signedBbnAddress);
-
-        // const bip322SigMessage: BIP322Sig = BIP322Sig.fromJSON({
-        //   address: btcAddress!,
-        //   sig: signedBbnAddress,
-        // });
-        // // Encode to Uint8Array
-        // const btcSigBytes = BIP322Sig.encode(bip322SigMessage).finish();
-        // console.log("btcSigBytes", uint8ArrayToBase64(btcSigBytes));
-        // const proofOfPossession: ProofOfPossessionBTC = {
-        //   btcSigType: BTCSigType.BIP322,
-        //   btcSig: btcSigBytes,
-        // };
-
         // Prepare and send protobuf message
         const msg: btcstakingtx.MsgCreateBTCDelegation = {
           stakerAddr: bech32Address,
@@ -171,18 +138,15 @@ export const useCreateBtcDelegation = () => {
           ],
           stakingTime: btcInput.stakingTimeBlocks,
           stakingValue: btcInput.stakingAmountSat,
-          stakingTx: Uint8Array.from(
-            Buffer.from(clearTxSignatures(stakingTx).toHex(), "hex"),
-          ),
+          stakingTx: Uint8Array.from(cleanedStakingTx.toBuffer()),
           slashingTx: Uint8Array.from(
             Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
           ),
           delegatorSlashingSig: Uint8Array.from(stakingOutputSignatures),
           unbondingTime: btcInput.params.unbondingTime,
-          unbondingTx: Uint8Array.from(
-            Buffer.from(clearTxSignatures(unbondingTx).toHex(), "hex"),
-          ),
-          unbondingValue: btcInput.params.unbondingFeeSat,
+          unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
+          unbondingValue:
+            btcInput.stakingAmountSat - btcInput.params.unbondingFeeSat,
           unbondingSlashingTx: Uint8Array.from(
             Buffer.from(
               clearTxSignatures(signedUnbondingSlashingTx).toHex(),
@@ -193,10 +157,6 @@ export const useCreateBtcDelegation = () => {
           stakingTxInclusionProof: undefined,
         };
 
-        // const protoMsg = {
-        //   typeUrl: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
-        //   value: btcstakingtx.MsgCreateBTCDelegation.encode(msg).finish(),
-        // };
         const protoMsg = {
           typeUrl: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
           value: msg,
