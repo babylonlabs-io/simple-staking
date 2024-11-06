@@ -8,7 +8,7 @@ export const keplrRegistry = {
   rpc: "https://rpc.devnet.babylonlabs.io",
   rest: "https://lcd.devnet.babylonlabs.io",
   nodeProvider: {
-    name: "Babylonchain",
+    name: "Babylonlabs",
     email: "contact@babylonlabs.io",
     website: "https://babylonlabs.io/",
   },
