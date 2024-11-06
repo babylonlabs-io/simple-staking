@@ -68,7 +68,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       });
       captureError(error);
     }
-  }, [providers.cosmosProvider, showError]);
+  }, [captureError, providers.cosmosProvider, showError]);
 
   const cosmosContextValue = useMemo(
     () => ({

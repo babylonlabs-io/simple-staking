@@ -1,6 +1,4 @@
 import {
-  tomoBitcoin,
-  tomoBitcoinSignet,
   TomoContextProvider,
   useTomoModalControl,
   useTomoProviders,
@@ -16,24 +14,29 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { network } from "@/config/network.config";
-
-import { keplrRegistry } from "./keplrSetup";
+import { getNetworkConfig } from "@/config/network.config";
+import { keplrRegistry } from "@/config/wallet/babylon";
 
 // We have to split the connection into two parts
 // so we can use the tomoWalletConnect and tomoModal hooks
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { resolvedTheme } = useTheme();
 
-  const bitcoinChains = [tomoBitcoin, tomoBitcoinSignet].filter(
-    (item) => item.network === network,
-  );
+  const { mempoolApiUrl, network, networkName } = getNetworkConfig();
+  const bitcoinChain = {
+    id: 1,
+    name: networkName,
+    type: "bitcoin" as any,
+    network: network,
+    backendUrls: {
+      mempoolUrl: mempoolApiUrl + "/api/",
+    },
+  };
 
   return (
     <TomoContextProvider
-      bitcoinChains={bitcoinChains}
+      bitcoinChains={[bitcoinChain]}
       chainTypes={["bitcoin", "cosmos"]}
-      // TODO change options (ordinals) wording as soon as it's available
       cosmosChains={[
         {
           id: 2,
@@ -41,12 +44,6 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
           type: "cosmos",
           network: "devnet-4",
           modularData: keplrRegistry,
-          rpc: "https://rpc.devnet.babylonlabs.io",
-          nativeCurrency: {
-            name: "BBN",
-            symbol: "BBN",
-            decimals: 6,
-          },
           logo: "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
         },
       ]}
@@ -54,10 +51,6 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
         rounded: "medium",
         theme: resolvedTheme as "dark" | "light",
         primaryColor: "#FF7C2A",
-      }}
-      uiOptions={{
-        termsAndServiceUrl: "https://babylonlabs.io/terms-of-use",
-        privacyPolicyUrl: "https://babylonlabs.io/privacy-policy",
       }}
     >
       <WalletConnectionProviderInternal>

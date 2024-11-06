@@ -46,7 +46,6 @@ export type WalletInfo = {
  * Abstract class representing a wallet provider.
  * Provides methods for connecting to a wallet, retrieving wallet information, signing transactions, and more.
  */
-
 export abstract class BTCWalletProvider {
   /**
    * Connects to the wallet and returns the instance of the wallet provider.
@@ -95,11 +94,15 @@ export abstract class BTCWalletProvider {
   abstract getNetwork(): Promise<Network>;
 
   /**
-   * Signs a message using BIP-322 simple.
-   * @param message - The message to sign.
-   * @returns A promise that resolves to the signed message.
+   * Signs a message
+   * @param message - The message to sign
+   * @param type - The type of the message to sign, defaults to 'ecdsa'
+   * @returns A promise that resolves to the signed message
    */
-  abstract signMessageBIP322(message: string): Promise<string>;
+  abstract signMessage(
+    message: string,
+    type?: "ecdsa" | "bip322-simple",
+  ): Promise<string>;
 
   /**
    * Registers an event listener for the specified event.

@@ -1,3 +1,7 @@
+import { Network } from "@/utils/wallet/btc_wallet_provider";
+
+import { network } from "./network.config";
+
 // shouldDisplayTestingMsg function is used to check if the application is running in testing mode or not.
 // Default to true if the environment variable is not set.
 export const shouldDisplayTestingMsg = (): boolean => {
@@ -17,4 +21,9 @@ export const getNetworkAppUrl = (): string => {
 // display points or not based on the existence of the environment variable.
 export const shouldDisplayPoints = (): boolean => {
   return Boolean(process.env.NEXT_PUBLIC_POINTS_API_URL);
+};
+
+// getBtcNetwork function is used to get the BTC network based on the environment
+export const getBtcNetwork = (): Network => {
+  return network;
 };
