@@ -4,6 +4,7 @@ import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useOrdinals } from "@/app/hooks/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
 import { useVersions } from "@/app/hooks/api/useVersions";
+import { useVersionsV2 } from "@/app/hooks/api/useVersionsV2";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
@@ -72,6 +73,13 @@ export function AppState({ children }: PropsWithChildren) {
     isLoading: isVersionLoading,
     isError: isVersionError,
   } = useVersions();
+
+  const {
+    data: versionsV2,
+    isLoading: isVersionV2Loading,
+    isError: isVersionV2Error,
+  } = useVersionsV2();
+
   const {
     data: height,
     isLoading: isHeightLoading,
