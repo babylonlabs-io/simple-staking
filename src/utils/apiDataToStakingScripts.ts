@@ -1,5 +1,5 @@
 import {
-  StakingScriptData,
+  ObservableStakingScriptData,
   StakingScripts,
 } from "@babylonlabs-io/btc-staking-ts";
 
@@ -25,7 +25,7 @@ export const apiDataToStakingScripts = (
   // Create staking script data
   let stakingScriptData;
   try {
-    stakingScriptData = new StakingScriptData(
+    stakingScriptData = new ObservableStakingScriptData(
       Buffer.from(publicKeyNoCoord, "hex"),
       [Buffer.from(finalityProviderPkHex, "hex")],
       covenantPKsBuffer,

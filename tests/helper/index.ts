@@ -1,6 +1,6 @@
 import {
   initBTCCurve,
-  StakingScriptData,
+  ObservableStakingScriptData,
   StakingScripts,
 } from "@babylonlabs-io/btc-staking-ts";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
@@ -192,7 +192,7 @@ export class DataGenerator {
     // Create staking script data
     let stakingScriptData;
     try {
-      stakingScriptData = new StakingScriptData(
+      stakingScriptData = new ObservableStakingScriptData(
         Buffer.from(publicKeyNoCoord, "hex"),
         [Buffer.from(finalityProviderPk, "hex")],
         covenantPKsBuffer,
