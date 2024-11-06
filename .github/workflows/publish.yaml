@@ -41,7 +41,7 @@ jobs:
             NEXT_PUBLIC_POINTS_API_URL=${{ vars.NEXT_PUBLIC_POINTS_API_URL }}
             NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}
             NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
-
+            NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
       - name: Upload Docker image to workspace
         uses: actions/upload-artifact@v4
         with:

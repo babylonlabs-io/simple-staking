@@ -39,7 +39,10 @@ interface BTCWalletContextProps {
   signPsbt: (psbtHex: string) => Promise<string>;
   signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
   getNetwork: () => Promise<Network>;
-  signMessageBIP322: (message: string) => Promise<string>;
+  signMessage: (
+    message: string,
+    type?: "ecdsa" | "bip322-simple",
+  ) => Promise<string>;
   getBalance: () => Promise<number>;
   getNetworkFees: () => Promise<Fees>;
   pushTx: (txHex: string) => Promise<string>;
@@ -60,7 +63,7 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
   signPsbt: async () => "",
   signPsbts: async () => [],
   getNetwork: async () => ({}) as Network,
-  signMessageBIP322: async () => "",
+  signMessage: async () => "",
   getBalance: async () => 0,
   getNetworkFees: async () => ({}) as Fees,
   pushTx: async () => "",
@@ -162,8 +165,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
-      signMessageBIP322: async (message: string) =>
-        btcWalletProvider?.signMessageBIP322(message) ?? "",
+      signMessage: async (message: string, type?: "ecdsa" | "bip322-simple") =>
+        btcWalletProvider?.signMessage(message, type) ?? "",
       getBalance: async () => btcWalletProvider?.getBalance() ?? 0,
       getNetworkFees: async () =>
         btcWalletProvider?.getNetworkFees() ?? ({} as Fees),
