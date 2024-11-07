@@ -53,8 +53,9 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     try {
       await providers.cosmosProvider.connectWallet();
       const address = await providers.cosmosProvider.getAddress();
-      const registry = getBbnRegistry();
-      await providers.cosmosProvider.getSigningStargateClient({ registry });
+      await providers.cosmosProvider.getSigningStargateClient({
+        registry: getBbnRegistry(),
+      });
 
       setCosmosWalletProvider(providers.cosmosProvider);
       setCosmosBech32Address(address);
