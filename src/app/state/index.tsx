@@ -2,9 +2,9 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useOrdinals } from "@/app/hooks/api/useOrdinals";
+import { useParams } from "@/app/hooks/api/useParams";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
 import { useVersions } from "@/app/hooks/api/useVersions";
-import { useVersionsV2 } from "@/app/hooks/api/useVersionsV2";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
@@ -75,10 +75,10 @@ export function AppState({ children }: PropsWithChildren) {
   } = useVersions();
 
   const {
-    data: versionsV2,
-    isLoading: isVersionV2Loading,
-    isError: isVersionV2Error,
-  } = useVersionsV2();
+    data: params,
+    isLoading: isParamsLoading,
+    isError: isParamsError,
+  } = useParams();
 
   const {
     data: height,
