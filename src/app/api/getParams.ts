@@ -1,3 +1,4 @@
+import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 import { AxiosResponse } from "axios";
 
 import { Params } from "../types/params";
@@ -34,28 +35,43 @@ export const getParams = async (): Promise<Params> => {
   const { data } = (await apiWrapper(
     "GET",
     "/v2/global-params",
-    "Error getting global params",
+    "Error getting params",
   )) as AxiosResponse<ParamsDataResponse>;
 
   const params = data.data;
 
-  const bbnParams = params.bbn.map((v) => ({
+  const versions = params.bbn.map((v) => ({
     version: v.version,
-    covenantPks: v.covenant_pks,
+    covenantNoCoordPks: v.covenant_pks.map((pk) =>
+      String(getPublicKeyNoCoord(pk)),
+    ),
     covenantQuorum: v.covenant_quorum,
     minStakingValueSat: v.min_staking_value_sat,
     maxStakingValueSat: v.max_staking_value_sat,
     minStakingTimeBlocks: v.min_staking_time_blocks,
     maxStakingTimeBlocks: v.max_staking_time_blocks,
-    slashingPkScript: v.slashing_pk_script,
-    minSlashingTxFeeSat: v.min_slashing_tx_fee_sat,
-    slashingRate: v.slashing_rate,
-    minUnbondingTimeBlocks: v.min_unbonding_time_blocks,
+    unbondingTime: v.min_unbonding_time_blocks,
     unbondingFeeSat: v.unbonding_fee_sat,
     minCommissionRate: v.min_commission_rate,
     maxActiveFinalityProviders: v.max_active_finality_providers,
     delegationCreationBaseGasFee: v.delegation_creation_base_gas_fee,
+    slashing: {
+      slashingPkScriptHex: v.slashing_pk_script,
+      slashingRate: parseFloat(v.slashing_rate),
+      minSlashingTxFeeSat: v.min_slashing_tx_fee_sat,
+    },
+    maxStakingAmountSat: v.max_staking_value_sat,
+    minStakingAmountSat: v.min_staking_value_sat,
   }));
 
-  return { bbn: bbnParams };
+  const latestVersion = versions.reduce((prev, current) =>
+    current.version > prev.version ? current : prev,
+  );
+
+  return {
+    bbnStakingParams: {
+      latestVersion,
+      versions,
+    },
+  };
 };
