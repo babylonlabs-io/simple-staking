@@ -40,29 +40,31 @@ export const getParams = async (): Promise<Params> => {
 
   const params = data.data;
 
-  const versions = params.bbn.map((v) => ({
-    version: v.version,
-    covenantNoCoordPks: v.covenant_pks.map((pk) =>
-      String(getPublicKeyNoCoord(pk)),
-    ),
-    covenantQuorum: v.covenant_quorum,
-    minStakingValueSat: v.min_staking_value_sat,
-    maxStakingValueSat: v.max_staking_value_sat,
-    minStakingTimeBlocks: v.min_staking_time_blocks,
-    maxStakingTimeBlocks: v.max_staking_time_blocks,
-    unbondingTime: v.min_unbonding_time_blocks,
-    unbondingFeeSat: v.unbonding_fee_sat,
-    minCommissionRate: v.min_commission_rate,
-    maxActiveFinalityProviders: v.max_active_finality_providers,
-    delegationCreationBaseGasFee: v.delegation_creation_base_gas_fee,
-    slashing: {
-      slashingPkScriptHex: v.slashing_pk_script,
-      slashingRate: parseFloat(v.slashing_rate),
-      minSlashingTxFeeSat: v.min_slashing_tx_fee_sat,
-    },
-    maxStakingAmountSat: v.max_staking_value_sat,
-    minStakingAmountSat: v.min_staking_value_sat,
-  }));
+  const versions = params.bbn
+    .sort((a, b) => a.version - b.version) // Sort by version ascending
+    .map((v) => ({
+      version: v.version,
+      covenantNoCoordPks: v.covenant_pks.map((pk) =>
+        String(getPublicKeyNoCoord(pk)),
+      ),
+      covenantQuorum: v.covenant_quorum,
+      minStakingValueSat: v.min_staking_value_sat,
+      maxStakingValueSat: v.max_staking_value_sat,
+      minStakingTimeBlocks: v.min_staking_time_blocks,
+      maxStakingTimeBlocks: v.max_staking_time_blocks,
+      unbondingTime: v.min_unbonding_time_blocks,
+      unbondingFeeSat: v.unbonding_fee_sat,
+      minCommissionRate: v.min_commission_rate,
+      maxActiveFinalityProviders: v.max_active_finality_providers,
+      delegationCreationBaseGasFee: v.delegation_creation_base_gas_fee,
+      slashing: {
+        slashingPkScriptHex: v.slashing_pk_script,
+        slashingRate: parseFloat(v.slashing_rate),
+        minSlashingTxFeeSat: v.min_slashing_tx_fee_sat,
+      },
+      maxStakingAmountSat: v.max_staking_value_sat,
+      minStakingAmountSat: v.min_staking_value_sat,
+    }));
 
   const latestVersion = versions.reduce((prev, current) =>
     current.version > prev.version ? current : prev,
