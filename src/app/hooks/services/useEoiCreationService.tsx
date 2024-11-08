@@ -3,24 +3,33 @@ import {
   BTCSigType,
   ProofOfPossessionBTC,
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
-import { Staking, StakingParams, UTXO } from "@babylonlabs-io/btc-staking-ts";
+import { Staking } from "@babylonlabs-io/btc-staking-ts";
 import { Psbt, Transaction } from "bitcoinjs-lib";
 import { fromBech32 } from "bitcoinjs-lib/src/address";
 import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { useAppState } from "@/app/state";
+
+import { useParams } from "../api/useParams";
 
 export interface BtcStakingInputs {
   finalityProviderPublicKey: string;
   stakingAmountSat: number;
   stakingTimeBlocks: number;
-  inputUTXOs: UTXO[];
   feeRate: number;
-  params: StakingParams; // Todo: to be replaced with the new params hook
+}
+
+export enum SigningStep {
+  STAKING_SLASHING = "staking_slashing",
+  UNBONDING_SLASHING = "unbonding_slashing",
+  PROOF_OF_POSSESSION = "proof_of_possession",
+  SEND_BBN = "send_bbn",
 }
 
 export const useEoiCreationService = () => {
+  const { availableUTXOs: inputUTXOs } = useAppState();
   const {
     connected: cosmosConnected,
     bech32Address,
@@ -32,22 +41,46 @@ export const useEoiCreationService = () => {
     publicKeyNoCoord,
     address,
     signMessage,
-    network,
+    network: btcNetwork,
   } = useBTCWallet();
 
-  const createEoiDelegation = useCallback(
-    async (btcInput: BtcStakingInputs) => {
-      if (!cosmosConnected || !btcConnected || !network) {
+  const { params } = useParams();
+
+  const createDelegationEoi = useCallback(
+    async (
+      btcInput: BtcStakingInputs,
+      signingCallback: (step: SigningStep) => Promise<void>,
+    ) => {
+      // Perform initial validation
+      if (!cosmosConnected || !btcConnected || !btcNetwork) {
         throw new Error("Wallet not connected");
+      }
+      if (!params) {
+        throw new Error("Staking params not loaded");
+      }
+      if (!btcInput.finalityProviderPublicKey) {
+        throw new Error("Finality provider not selected");
+      }
+      if (!btcInput.stakingAmountSat) {
+        throw new Error("Staking amount not set");
+      }
+      if (!btcInput.stakingTimeBlocks) {
+        throw new Error("Staking time not set");
+      }
+      if (!inputUTXOs || inputUTXOs.length === 0) {
+        throw new Error("No input UTXOs");
+      }
+      if (!btcInput.feeRate) {
+        throw new Error("Fee rate not set");
       }
 
       const staking = new Staking(
-        network,
+        btcNetwork,
         {
           address,
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
-        btcInput.params,
+        params,
         btcInput.finalityProviderPublicKey,
         btcInput.stakingTimeBlocks,
       );
@@ -55,7 +88,7 @@ export const useEoiCreationService = () => {
       // Create and sign staking transaction
       const { psbt: stakingPsbt } = staking.createStakingTransaction(
         btcInput.stakingAmountSat,
-        btcInput.inputUTXOs,
+        inputUTXOs,
         btcInput.feeRate,
       );
       // TODO: This is temporary solution until we have
@@ -73,8 +106,8 @@ export const useEoiCreationService = () => {
       const unbondingTx = Psbt.fromHex(
         signedUnbondingPsbtHex,
       ).extractTransaction();
-
       const cleanedUnbondingTx = clearTxSignatures(unbondingTx);
+
       // Create slashing transactions and extract signatures
       const { psbt: slashingPsbt } =
         staking.createStakingOutputSlashingTransaction(cleanedStakingTx);
@@ -82,14 +115,14 @@ export const useEoiCreationService = () => {
       const signedSlashingTx = Psbt.fromHex(
         signedSlashingPsbtHex,
       ).extractTransaction();
-      const stakingOutputSignatures =
+      const slashingSig =
         extractSchnorrSignaturesFromTransaction(signedSlashingTx);
-
-      if (!stakingOutputSignatures) {
+      if (!slashingSig) {
         throw new Error(
           "No signature found in the staking output slashing PSBT",
         );
       }
+      await signingCallback(SigningStep.STAKING_SLASHING);
 
       const { psbt: unbondingSlashingPsbt } =
         staking.createUnbondingOutputSlashingTransaction(unbondingTx);
@@ -102,12 +135,12 @@ export const useEoiCreationService = () => {
       const unbondingSignatures = extractSchnorrSignaturesFromTransaction(
         signedUnbondingSlashingTx,
       );
-
       if (!unbondingSignatures) {
         throw new Error(
           "No signature found in the unbonding output slashing PSBT",
         );
       }
+      await signingCallback(SigningStep.UNBONDING_SLASHING);
 
       // Create Proof of Possession
       const signedBbnAddress = await signMessage(
@@ -121,6 +154,7 @@ export const useEoiCreationService = () => {
         btcSigType: BTCSigType.ECDSA,
         btcSig: ecdsaSig,
       };
+      await signingCallback(SigningStep.PROOF_OF_POSSESSION);
 
       // Prepare and send protobuf message
       const msg: btcstakingtx.MsgCreateBTCDelegation =
@@ -139,11 +173,10 @@ export const useEoiCreationService = () => {
           slashingTx: Uint8Array.from(
             Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
           ),
-          delegatorSlashingSig: Uint8Array.from(stakingOutputSignatures),
-          unbondingTime: btcInput.params.unbondingTime,
+          delegatorSlashingSig: Uint8Array.from(slashingSig),
+          unbondingTime: params.unbondingTime,
           unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
-          unbondingValue:
-            btcInput.stakingAmountSat - btcInput.params.unbondingFeeSat,
+          unbondingValue: btcInput.stakingAmountSat - params.unbondingFeeSat,
           unbondingSlashingTx: Uint8Array.from(
             Buffer.from(
               clearTxSignatures(signedUnbondingSlashingTx).toHex(),
@@ -173,11 +206,14 @@ export const useEoiCreationService = () => {
       };
       // sign it
       await stargateClient.signAndBroadcast(bech32Address, [protoMsg], fee);
+      await signingCallback(SigningStep.SEND_BBN);
     },
     [
       cosmosConnected,
       btcConnected,
-      network,
+      btcNetwork,
+      params,
+      inputUTXOs,
       address,
       publicKeyNoCoord,
       signPsbt,
@@ -187,7 +223,7 @@ export const useEoiCreationService = () => {
     ],
   );
 
-  return { createEoiDelegation };
+  return { createDelegationEoi };
 };
 
 const clearTxSignatures = (tx: Transaction): Transaction => {
