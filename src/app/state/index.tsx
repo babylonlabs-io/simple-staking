@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useOrdinals } from "@/app/hooks/api/useOrdinals";
+import { useParams } from "@/app/hooks/api/useParams";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
 import { useVersions } from "@/app/hooks/api/useVersions";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
@@ -13,6 +14,8 @@ import type {
   UTXO,
 } from "@/utils/wallet/btc_wallet_provider";
 
+import { BbnStakingParamsVersion } from "../types/params";
+
 import { DelegationState } from "./DelegationState";
 
 const STATE_LIST = [DelegationState];
@@ -22,6 +25,8 @@ export interface AppState {
   totalBalance: number;
   nextVersion?: GlobalParamsVersion;
   currentVersion?: GlobalParamsVersion;
+  latestBbnStakingParamsVersion?: BbnStakingParamsVersion;
+  bbnStakingParamsVersions?: BbnStakingParamsVersion[];
   currentHeight?: number;
   isApprochingNextVersion: boolean;
   firstActivationHeight: number;
@@ -72,6 +77,13 @@ export function AppState({ children }: PropsWithChildren) {
     isLoading: isVersionLoading,
     isError: isVersionError,
   } = useVersions();
+
+  const {
+    data: params,
+    isLoading: isParamsLoading,
+    isError: isParamsError,
+  } = useParams();
+
   const {
     data: height,
     isLoading: isHeightLoading,
@@ -80,9 +92,17 @@ export function AppState({ children }: PropsWithChildren) {
 
   // Computed
   const isLoading =
-    isVersionLoading || isHeightLoading || isUTXOLoading || isOrdinalLoading;
+    isVersionLoading ||
+    isHeightLoading ||
+    isUTXOLoading ||
+    isOrdinalLoading ||
+    isParamsLoading;
   const isError =
-    isHeightError || isVersionError || isUTXOError || isOrdinalError;
+    isHeightError ||
+    isVersionError ||
+    isUTXOError ||
+    isOrdinalError ||
+    isParamsError;
 
   const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
     () =>
@@ -115,6 +135,8 @@ export function AppState({ children }: PropsWithChildren) {
     [versions, height],
   );
 
+  const bbnStakingParams = useMemo(() => params?.bbnStakingParams, [params]);
+
   // Handlers
   const includeOrdinals = useCallback(() => setOrdinalsExcluded(false), []);
   const excludeOrdinals = useCallback(() => setOrdinalsExcluded(true), []);
@@ -126,6 +148,8 @@ export function AppState({ children }: PropsWithChildren) {
       currentHeight: height,
       totalBalance,
       ...versionInfo,
+      latestBbnStakingParamsVersion: bbnStakingParams?.latestVersion,
+      bbnStakingParamsVersions: bbnStakingParams?.versions,
       isError,
       isLoading,
       ordinalsExcluded,
@@ -137,6 +161,7 @@ export function AppState({ children }: PropsWithChildren) {
       height,
       totalBalance,
       versionInfo,
+      bbnStakingParams,
       isError,
       isLoading,
       ordinalsExcluded,

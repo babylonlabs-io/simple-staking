@@ -57,13 +57,17 @@ export const getStakersPoints = async (
 export const getDelegationPointsByStakingTxHashHexes = async (
   stakingTxHashHexes: string[],
 ): Promise<DelegationPointsAPI[]> => {
-  const response = await pointsApiWrapper(
-    "POST",
-    "/v1/points/delegations",
-    "Error getting delegation points by staking transaction hashes",
-    { staking_tx_hash_hex: stakingTxHashHexes },
-  );
+  try {
+    const response = await pointsApiWrapper(
+      "POST",
+      "/v1/points/delegations",
+      "Error getting delegation points by staking transaction hashes",
+      { staking_tx_hash_hex: stakingTxHashHexes },
+    );
 
-  const responseData: PaginatedDelegationsPointsAPIResponse = response.data;
-  return responseData.data;
+    const responseData: PaginatedDelegationsPointsAPIResponse = response.data;
+    return responseData.data;
+  } catch (error) {
+    throw error;
+  }
 };
