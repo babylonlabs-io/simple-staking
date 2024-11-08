@@ -1,6 +1,6 @@
 export interface FinalityProvider {
   description: Description;
-  state: "active" | "standby";
+  state: FinalityProviderState;
   commission: string;
   btcPk: string;
   activeTVLSat: number;
@@ -16,3 +16,9 @@ export interface Description {
   securityContact: string;
   details: string;
 }
+
+export type FinalityProviderState =
+  | "FINALITY_PROVIDER_STATUS_INACTIVE"
+  | "FINALITY_PROVIDER_STATUS_ACTIVE"
+  | "FINALITY_PROVIDER_STATUS_JAILED"
+  | "FINALITY_PROVIDER_STATUS_SLASHED";

@@ -3,7 +3,10 @@ import { encode } from "url-safe-base64";
 import { isValidUrl } from "@/utils/url";
 
 import { Pagination } from "../types/api";
-import { FinalityProvider } from "../types/finalityProviders";
+import {
+  FinalityProvider,
+  FinalityProviderState,
+} from "../types/finalityProviders";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -19,7 +22,7 @@ interface FinalityProvidersAPIResponse {
 
 interface FinalityProviderAPI {
   description: DescriptionAPI;
-  state: "active" | "standby";
+  state: FinalityProviderState;
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -64,7 +67,7 @@ export const getFinalityProviders = async ({
 
   const response = await apiWrapper(
     "GET",
-    "/v1/finality-providers",
+    "/v2/finality-providers",
     "Error getting finality providers",
     params,
   );
