@@ -1,5 +1,6 @@
 import bitgetWalletIcon from "./icons/bitget.svg";
 import cactusIcon from "./icons/cactuslink.svg";
+import gatewalletIcon from "./icons/gatewallet.svg";
 import keystoneIcon from "./icons/keystone.svg";
 import okxIcon from "./icons/okx.svg";
 import oneKeyIcon from "./icons/onekey.svg";
@@ -9,6 +10,7 @@ import {
   CactusLinkWallet,
   cactusLinkProvider,
 } from "./providers/cactuslink_wallet";
+import { GateWallet, gateProvider } from "./providers/gate_wallet";
 import { KeystoneWallet } from "./providers/keystone";
 import { OKXWallet, okxProvider } from "./providers/okx_wallet";
 import { OneKeyWallet, oneKeyProvider } from "./providers/onekey_wallet";
@@ -29,6 +31,14 @@ interface IntegratedWallet {
 export const BROWSER_INJECTED_WALLET_NAME = "Browser";
 
 export const walletList: IntegratedWallet[] = [
+  {
+    name: "GateWallet",
+    icon: gatewalletIcon,
+    wallet: GateWallet,
+    provider: gateProvider,
+    linkToDocs: "https://www.gate.io/mobileapp",
+    supportedNetworks: [Network.MAINNET, Network.SIGNET],
+  },
   {
     name: "OKX",
     icon: okxIcon,
