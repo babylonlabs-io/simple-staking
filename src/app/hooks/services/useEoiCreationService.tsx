@@ -5,12 +5,17 @@ import {
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
 import { Staking } from "@babylonlabs-io/btc-staking-ts";
 import { fromBech32 } from "@cosmjs/encoding";
-import { Psbt, Transaction } from "bitcoinjs-lib";
+import { Psbt } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
+import {
+  clearTxSignatures,
+  extractSchnorrSignaturesFromTransaction,
+  uint8ArrayToHex,
+} from "@/utils/delegations";
 
 import { useParams } from "../api/useParams";
 
@@ -236,34 +241,3 @@ export const useEoiCreationService = () => {
 
   return { createDelegationEoi };
 };
-
-const clearTxSignatures = (tx: Transaction): Transaction => {
-  tx.ins.forEach((input) => {
-    input.script = Buffer.alloc(0);
-    input.witness = [];
-  });
-  return tx;
-};
-
-const extractSchnorrSignaturesFromTransaction = (
-  singedTransaction: Transaction,
-): Buffer | undefined => {
-  // Loop through each input to extract the witness signature
-  for (const input of singedTransaction.ins) {
-    if (input.witness && input.witness.length > 0) {
-      const schnorrSignature = input.witness[0];
-
-      // Check that it's a 64-byte Schnorr signature
-      if (schnorrSignature.length === 64) {
-        return schnorrSignature; // Return the first valid signature found
-      }
-    }
-  }
-  return undefined;
-};
-
-function uint8ArrayToHex(uint8Array: Uint8Array): string {
-  return Array.from(uint8Array)
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
