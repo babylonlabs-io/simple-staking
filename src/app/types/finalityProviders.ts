@@ -1,6 +1,6 @@
 export interface FinalityProvider {
   description: Description;
-  state: "active" | "standby";
+  state: FinalityProviderState;
   commission: string;
   btcPk: string;
   activeTVLSat: number;
@@ -16,3 +16,18 @@ export interface Description {
   securityContact: string;
   details: string;
 }
+
+export type FinalityProviderState = keyof typeof stateMap;
+
+const stateMap = {
+  FINALITY_PROVIDER_STATUS_INACTIVE: "Inactive",
+  FINALITY_PROVIDER_STATUS_ACTIVE: "Active",
+  FINALITY_PROVIDER_STATUS_JAILED: "Jailed",
+  FINALITY_PROVIDER_STATUS_SLASHED: "Slashed",
+};
+
+export const mapFinalityProviderState = (
+  state: FinalityProviderState,
+): string => {
+  return stateMap[state];
+};

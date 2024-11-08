@@ -6,6 +6,10 @@ import { twJoin } from "tailwind-merge";
 
 import blue from "@/app/assets/blue-check.svg";
 import { Hash } from "@/app/components/Hash/Hash";
+import {
+  FinalityProviderState,
+  mapFinalityProviderState,
+} from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -13,7 +17,7 @@ import { maxDecimals } from "@/utils/maxDecimals";
 interface FinalityProviderProps {
   moniker: string;
   pkHex: string;
-  state: "active" | "standby";
+  state: FinalityProviderState;
   stakeSat: number;
   commission: string;
   onClick: () => void;
@@ -23,7 +27,7 @@ interface FinalityProviderProps {
 
 export const FinalityProvider: React.FC<FinalityProviderProps> = ({
   moniker,
-  state = "active",
+  state,
   pkHex,
   stakeSat,
   commission,
@@ -130,7 +134,8 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
           />
         </div>
         <div className="flex justify-start gap-1 capitalize lg:justify-end">
-          <span className="lg:hidden">Status:</span> {state}
+          <span className="lg:hidden">Status:</span>{" "}
+          {mapFinalityProviderState(state as FinalityProviderState)}
         </div>
       </div>
     </div>
