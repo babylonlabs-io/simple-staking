@@ -14,7 +14,7 @@
     "clean-docker": "docker rmi babylonlabs/simple-staking 2>/dev/null; true",
     "prepare": "husky",
     "sort-imports": "eslint --fix .",
-    "test": "jest",
+    "test": "node --trace-deprecation ./node_modules/.bin/jest",
     "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
@@ -90,5 +90,10 @@
     "ts-jest": "^29.1.4",
     "ts-node": "^10.9.2",
     "typescript": "^5"
+  },
+  "overrides": {
+    "whatwg-url@11.0.0": {
+      "tr46": "4.0.0"
+    }
   }
 }
