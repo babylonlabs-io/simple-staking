@@ -1,4 +1,5 @@
 import { SigningStargateClient } from "@cosmjs/stargate";
+import { CosmosProvider } from "@tomo-inc/wallet-connect-sdk";
 import {
   createContext,
   useCallback,
@@ -20,31 +21,32 @@ interface CosmosWalletContextProps {
   connected: boolean;
   disconnect: () => void;
   open: () => void;
-  getSigningStargateClient(): Promise<SigningStargateClient>;
+  signingStargateClient: SigningStargateClient | undefined;
 }
-
-const getSigningStargateClientDefault = async () => {
-  throw new Error("Not initialized");
-};
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
   bech32Address: "",
   connected: false,
   disconnect: () => {},
   open: () => {},
-  getSigningStargateClient: getSigningStargateClientDefault,
+  signingStargateClient: undefined,
 });
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
-  const [cosmosWalletProvider, setCosmosWalletProvider] = useState<any>();
+  const [cosmosWalletProvider, setCosmosWalletProvider] = useState<
+    CosmosProvider | undefined
+  >();
   const [cosmosBech32Address, setCosmosBech32Address] = useState("");
-
+  const [signingStargateClient, setSigningStargateClient] = useState<
+    SigningStargateClient | undefined
+  >();
   const { showError, captureError } = useError();
   const { open, isConnected, providers } = useWalletConnection();
 
   const cosmosDisconnect = useCallback(() => {
     setCosmosWalletProvider(undefined);
     setCosmosBech32Address("");
+    setSigningStargateClient(undefined);
   }, []);
 
   const connectCosmos = useCallback(async () => {
@@ -53,10 +55,10 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     try {
       await providers.cosmosProvider.connectWallet();
       const address = await providers.cosmosProvider.getAddress();
-      await providers.cosmosProvider.getSigningStargateClient({
+      const client = await providers.cosmosProvider.getSigningStargateClient({
         registry: getBbnRegistry(),
       });
-
+      setSigningStargateClient(client);
       setCosmosWalletProvider(providers.cosmosProvider);
       setCosmosBech32Address(address);
     } catch (error: any) {
@@ -74,12 +76,19 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const cosmosContextValue = useMemo(
     () => ({
       bech32Address: cosmosBech32Address,
-      connected: Boolean(cosmosWalletProvider),
+      connected:
+        Boolean(cosmosWalletProvider) && Boolean(signingStargateClient),
       disconnect: cosmosDisconnect,
       open,
-      getSigningStargateClient: cosmosWalletProvider?.getSigningStargateClient,
+      signingStargateClient,
     }),
-    [cosmosBech32Address, cosmosWalletProvider, cosmosDisconnect, open],
+    [
+      cosmosBech32Address,
+      cosmosWalletProvider,
+      cosmosDisconnect,
+      open,
+      signingStargateClient,
+    ],
   );
 
   useEffect(() => {

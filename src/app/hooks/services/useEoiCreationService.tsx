@@ -4,8 +4,8 @@ import {
   ProofOfPossessionBTC,
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
 import { Staking } from "@babylonlabs-io/btc-staking-ts";
+import { fromBech32 } from "@cosmjs/encoding";
 import { Psbt, Transaction } from "bitcoinjs-lib";
-import { fromBech32 } from "bitcoinjs-lib/src/address";
 import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -33,7 +33,7 @@ export const useEoiCreationService = () => {
   const {
     connected: cosmosConnected,
     bech32Address,
-    getSigningStargateClient,
+    signingStargateClient,
   } = useCosmosWallet();
   const {
     connected: btcConnected,
@@ -44,15 +44,24 @@ export const useEoiCreationService = () => {
     network: btcNetwork,
   } = useBTCWallet();
 
-  const { params } = useParams();
+  const { data: params } = useParams();
 
   const createDelegationEoi = useCallback(
     async (
       btcInput: BtcStakingInputs,
       signingCallback: (step: SigningStep) => Promise<void>,
     ) => {
+      const stakingParams = params?.bbnStakingParams.latestVersion;
+      if (!stakingParams) {
+        throw new Error("Staking params not loaded");
+      }
       // Perform initial validation
-      if (!cosmosConnected || !btcConnected || !btcNetwork) {
+      if (
+        !cosmosConnected ||
+        !btcConnected ||
+        !btcNetwork ||
+        !signingStargateClient
+      ) {
         throw new Error("Wallet not connected");
       }
       if (!params) {
@@ -80,7 +89,7 @@ export const useEoiCreationService = () => {
           address,
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
-        params,
+        stakingParams,
         btcInput.finalityProviderPublicKey,
         btcInput.stakingTimeBlocks,
       );
@@ -143,10 +152,8 @@ export const useEoiCreationService = () => {
       await signingCallback(SigningStep.UNBONDING_SLASHING);
 
       // Create Proof of Possession
-      const signedBbnAddress = await signMessage(
-        fromBech32(bech32Address).data.toString("hex"),
-        "ecdsa",
-      );
+      const bech32AddressHex = uint8ArrayToHex(fromBech32(bech32Address).data);
+      const signedBbnAddress = await signMessage(bech32AddressHex, "ecdsa");
       const ecdsaSig = Uint8Array.from(
         globalThis.Buffer.from(signedBbnAddress, "base64"),
       );
@@ -174,9 +181,10 @@ export const useEoiCreationService = () => {
             Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
           ),
           delegatorSlashingSig: Uint8Array.from(slashingSig),
-          unbondingTime: params.unbondingTime,
+          unbondingTime: stakingParams.unbondingTime,
           unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
-          unbondingValue: btcInput.stakingAmountSat - params.unbondingFeeSat,
+          unbondingValue:
+            btcInput.stakingAmountSat - stakingParams.unbondingFeeSat,
           unbondingSlashingTx: Uint8Array.from(
             Buffer.from(
               clearTxSignatures(signedUnbondingSlashingTx).toHex(),
@@ -192,9 +200,8 @@ export const useEoiCreationService = () => {
         value: msg,
       };
 
-      const stargateClient = await getSigningStargateClient();
       // estimate gas
-      const gasEstimate = await stargateClient.simulate(
+      const gasEstimate = await signingStargateClient.simulate(
         bech32Address,
         [protoMsg],
         "estimate fee",
@@ -205,7 +212,11 @@ export const useEoiCreationService = () => {
         gas: gasWanted.toString(),
       };
       // sign it
-      await stargateClient.signAndBroadcast(bech32Address, [protoMsg], fee);
+      await signingStargateClient.signAndBroadcast(
+        bech32Address,
+        [protoMsg],
+        fee,
+      );
       await signingCallback(SigningStep.SEND_BBN);
     },
     [
@@ -219,7 +230,7 @@ export const useEoiCreationService = () => {
       signPsbt,
       signMessage,
       bech32Address,
-      getSigningStargateClient,
+      signingStargateClient,
     ],
   );
 

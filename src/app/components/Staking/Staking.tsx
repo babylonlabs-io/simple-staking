@@ -76,7 +76,7 @@ export const Staking = () => {
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
   const { createDelegationEoi } = useEoiCreationService();
-  const { params: stakingParams } = useParams();
+  const { data: params } = useParams();
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -352,6 +352,10 @@ export const Staking = () => {
     }
     // Staking form
     else {
+      const stakingParams = params?.bbnStakingParams.latestVersion;
+      if (!stakingParams) {
+        throw new Error("Staking params not loaded");
+      }
       const {
         minStakingAmountSat,
         maxStakingAmountSat,

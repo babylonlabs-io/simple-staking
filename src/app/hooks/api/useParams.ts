@@ -5,11 +5,9 @@ import { Params } from "@/app/types/params";
 export const PARAMS_KEY = "PARAMS";
 
 export function useParams({ enabled = true }: { enabled?: boolean } = {}) {
-  const data = useAPIQuery<Params>({
+  return useAPIQuery<Params>({
     queryKey: [PARAMS_KEY],
     queryFn: getParams,
     enabled,
   });
-
-  return data;
 }
