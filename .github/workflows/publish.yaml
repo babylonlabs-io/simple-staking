@@ -34,7 +34,7 @@ jobs:
         with:
           tags: simple-staking:${{ github.sha }}
           outputs: type=docker,dest=/tmp/simple-staking-${{ matrix.environment }}.tar
-          file: "{{defaultContext}}/docker/Dockerfile"
+          file: ./docker/Dockerfile
           build-args: |
             NEXT_PUBLIC_MEMPOOL_API=${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
             NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
