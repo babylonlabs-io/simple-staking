@@ -1,4 +1,7 @@
-import { stakingTransaction } from "@babylonlabs-io/btc-staking-ts";
+import {
+  StakingParams,
+  stakingTransaction,
+} from "@babylonlabs-io/btc-staking-ts";
 import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 
 import { GlobalParamsVersion } from "@/app/types/globalParams";
@@ -15,7 +18,7 @@ import { txFeeSafetyCheck } from "./fee";
 // - stakingTerm: the staking term
 // - stakingFee: the staking fee
 export const createStakingTx = (
-  globalParamsVersion: GlobalParamsVersion,
+  params: StakingParams,
   stakingAmountSat: number,
   stakingTimeBlocks: number,
   finalityProviderPublicKey: string,
@@ -27,14 +30,14 @@ export const createStakingTx = (
 ) => {
   // Get the staking term, it will ignore the `stakingTimeBlocks` and use the value from params
   // if the min and max staking time blocks are the same
-  const stakingTerm = getStakingTerm(globalParamsVersion, stakingTimeBlocks);
+  const stakingTerm = getStakingTerm(params, stakingTimeBlocks);
 
   // Check the staking data
   if (
-    stakingAmountSat < globalParamsVersion.minStakingAmountSat ||
-    stakingAmountSat > globalParamsVersion.maxStakingAmountSat ||
-    stakingTerm < globalParamsVersion.minStakingTimeBlocks ||
-    stakingTerm > globalParamsVersion.maxStakingTimeBlocks
+    stakingAmountSat < params.minStakingAmountSat ||
+    stakingAmountSat > params.maxStakingAmountSat ||
+    stakingTerm < params.minStakingTimeBlocks ||
+    stakingTerm > params.maxStakingTimeBlocks
   ) {
     throw new Error("Invalid staking data");
   }

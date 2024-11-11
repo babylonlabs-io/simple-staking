@@ -8,6 +8,7 @@ export interface BbnStakingParamsVersion extends StakingParams {
 }
 
 export interface BbnStakingParams {
+  v1Params: BbnStakingParamsVersion;
   latestVersion: BbnStakingParamsVersion;
   versions: BbnStakingParamsVersion[];
 }

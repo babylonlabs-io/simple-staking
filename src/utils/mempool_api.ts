@@ -4,6 +4,12 @@ import { Fees, UTXO } from "./wallet/btc_wallet_provider";
 
 const { mempoolApiUrl } = getNetworkConfig();
 
+interface MerkleProof {
+  blockHeight: number;
+  merkle: string[];
+  pos: number;
+}
+
 export class ServerError extends Error {
   constructor(
     message: string,
@@ -55,6 +61,11 @@ function validateAddressUrl(address: string): URL {
 // URL for the transaction info endpoint
 function txInfoUrl(txId: string): URL {
   return new URL(mempoolAPI + "tx/" + txId);
+}
+
+// URL for the transaction merkle proof endpoint
+function txMerkleProofUrl(txId: string): URL {
+  return new URL(mempoolAPI + "tx/" + txId + "/merkle-proof");
 }
 
 /**
@@ -211,4 +222,23 @@ export async function getTxInfo(txId: string): Promise<any> {
     throw new ServerError(err, response.status);
   }
   return await response.json();
+}
+
+/**
+ * Retrieve the merkle proof for a transaction.
+ * @param txId - The transaction ID in string format.
+ * @returns A promise that resolves into the merkle proof.
+ */
+export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
+  const response = await fetch(txMerkleProofUrl(txId));
+  if (!response.ok) {
+    const err = await response.text();
+    throw new ServerError(err, response.status);
+  }
+  const data = await response.json();
+  return {
+    blockHeight: data.block_height,
+    merkle: data.merkle,
+    pos: data.pos,
+  };
 }
