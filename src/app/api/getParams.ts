@@ -70,10 +70,17 @@ export const getParams = async (): Promise<Params> => {
     current.version > prev.version ? current : prev,
   );
 
+  // Find the v1 params which is the first version
+  const v1Params = versions.find((v) => v.version === 0);
+  if (!v1Params) {
+    throw new Error("V1 params not found");
+  }
+
   return {
     bbnStakingParams: {
       latestVersion,
       versions,
+      v1Params,
     },
   };
 };

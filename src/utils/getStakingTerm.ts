@@ -1,6 +1,6 @@
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { StakingParams } from "@babylonlabs-io/btc-staking-ts";
 
-export const getStakingTerm = (params: GlobalParamsVersion, term: number) => {
+export const getStakingTerm = (params: StakingParams, term: number) => {
   // check if term is fixed
   let termWithFixed;
   if (params && params.minStakingTimeBlocks === params.maxStakingTimeBlocks) {

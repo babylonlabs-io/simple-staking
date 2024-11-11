@@ -5,7 +5,8 @@ import {
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
 import { Staking } from "@babylonlabs-io/btc-staking-ts";
 import { fromBech32 } from "@cosmjs/encoding";
-import { Psbt } from "bitcoinjs-lib";
+import { SigningStargateClient } from "@cosmjs/stargate";
+import { Network, Psbt } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -16,8 +17,6 @@ import {
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
 } from "@/utils/delegations";
-
-import { useParams } from "../api/useParams";
 
 export interface BtcStakingInputs {
   finalityProviderPublicKey: string;
@@ -33,7 +32,7 @@ export enum SigningStep {
   SEND_BBN = "send_bbn",
 }
 
-export const useEoiCreationService = () => {
+export const useTransactionService = () => {
   const { availableUTXOs: inputUTXOs } = useAppState();
   const {
     connected: cosmosConnected,
@@ -49,61 +48,40 @@ export const useEoiCreationService = () => {
     network: btcNetwork,
   } = useBTCWallet();
 
-  const { data: params } = useParams();
+  const { params } = useAppState();
+  const latestStakingParam = params?.stakingParams?.latestBbnStakingParam;
 
   const createDelegationEoi = useCallback(
     async (
-      btcInput: BtcStakingInputs,
+      stakingInput: BtcStakingInputs,
       signingCallback: (step: SigningStep) => Promise<void>,
     ) => {
-      const stakingParams = params?.bbnStakingParams.latestVersion;
-      if (!stakingParams) {
-        throw new Error("Staking params not loaded");
-      }
-      // Perform initial validation
-      if (
-        !cosmosConnected ||
-        !btcConnected ||
-        !btcNetwork ||
-        !signingStargateClient
-      ) {
-        throw new Error("Wallet not connected");
-      }
-      if (!params) {
-        throw new Error("Staking params not loaded");
-      }
-      if (!btcInput.finalityProviderPublicKey) {
-        throw new Error("Finality provider not selected");
-      }
-      if (!btcInput.stakingAmountSat) {
-        throw new Error("Staking amount not set");
-      }
-      if (!btcInput.stakingTimeBlocks) {
-        throw new Error("Staking time not set");
-      }
-      if (!inputUTXOs || inputUTXOs.length === 0) {
-        throw new Error("No input UTXOs");
-      }
-      if (!btcInput.feeRate) {
-        throw new Error("Fee rate not set");
-      }
+      // Perform checks
+      checkWalletConnection(
+        cosmosConnected,
+        btcConnected,
+        btcNetwork,
+        signingStargateClient,
+      );
+      validateStakingInput(stakingInput);
+      if (!latestStakingParam) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
-        btcNetwork,
+        btcNetwork!,
         {
           address,
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
-        stakingParams,
-        btcInput.finalityProviderPublicKey,
-        btcInput.stakingTimeBlocks,
+        latestStakingParam,
+        stakingInput.finalityProviderPublicKey,
+        stakingInput.stakingTimeBlocks,
       );
 
       // Create and sign staking transaction
       const { psbt: stakingPsbt } = staking.createStakingTransaction(
-        btcInput.stakingAmountSat,
-        inputUTXOs,
-        btcInput.feeRate,
+        stakingInput.stakingAmountSat,
+        inputUTXOs!,
+        stakingInput.feeRate,
       );
       // TODO: This is temporary solution until we have
       // https://github.com/babylonlabs-io/btc-staking-ts/issues/40
@@ -176,21 +154,21 @@ export const useEoiCreationService = () => {
           btcPk: Uint8Array.from(Buffer.from(publicKeyNoCoord, "hex")),
           fpBtcPkList: [
             Uint8Array.from(
-              Buffer.from(btcInput.finalityProviderPublicKey, "hex"),
+              Buffer.from(stakingInput.finalityProviderPublicKey, "hex"),
             ),
           ],
-          stakingTime: btcInput.stakingTimeBlocks,
-          stakingValue: btcInput.stakingAmountSat,
+          stakingTime: stakingInput.stakingTimeBlocks,
+          stakingValue: stakingInput.stakingAmountSat,
           stakingTx: Uint8Array.from(cleanedStakingTx.toBuffer()),
           slashingTx: Uint8Array.from(
             Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
           ),
           delegatorSlashingSig: Uint8Array.from(slashingSig),
           // TODO: Confirm with core on the value whether its inclusive or exclusive
-          unbondingTime: stakingParams.unbondingTime + 1,
+          unbondingTime: latestStakingParam.unbondingTime + 1,
           unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
           unbondingValue:
-            btcInput.stakingAmountSat - stakingParams.unbondingFeeSat,
+            stakingInput.stakingAmountSat - latestStakingParam.unbondingFeeSat,
           unbondingSlashingTx: Uint8Array.from(
             Buffer.from(
               clearTxSignatures(signedUnbondingSlashingTx).toHex(),
@@ -207,7 +185,7 @@ export const useEoiCreationService = () => {
       };
 
       // estimate gas
-      const gasEstimate = await signingStargateClient.simulate(
+      const gasEstimate = await signingStargateClient!.simulate(
         bech32Address,
         [protoMsg],
         "estimate fee",
@@ -218,7 +196,7 @@ export const useEoiCreationService = () => {
         gas: gasWanted.toString(),
       };
       // sign it
-      await signingStargateClient.signAndBroadcast(
+      await signingStargateClient!.signAndBroadcast(
         bech32Address,
         [protoMsg],
         fee,
@@ -229,16 +207,81 @@ export const useEoiCreationService = () => {
       cosmosConnected,
       btcConnected,
       btcNetwork,
-      params,
-      inputUTXOs,
+      signingStargateClient,
+      latestStakingParam,
       address,
       publicKeyNoCoord,
+      inputUTXOs,
       signPsbt,
-      signMessage,
       bech32Address,
-      signingStargateClient,
+      signMessage,
     ],
   );
 
-  return { createDelegationEoi };
+  const estimateStakingFee = useCallback(
+    (stakingInput: BtcStakingInputs): number => {
+      // Perform checks
+      checkWalletConnection(
+        cosmosConnected,
+        btcConnected,
+        btcNetwork,
+        signingStargateClient,
+      );
+      if (!latestStakingParam) throw new Error("Staking params not loaded");
+      validateStakingInput(stakingInput);
+
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        latestStakingParam,
+        stakingInput.finalityProviderPublicKey,
+        stakingInput.stakingTimeBlocks,
+      );
+
+      const { fee: stakingFee } = staking.createStakingTransaction(
+        stakingInput.stakingAmountSat,
+        inputUTXOs!,
+        stakingInput.feeRate,
+      );
+      return stakingFee;
+    },
+    [
+      cosmosConnected,
+      btcConnected,
+      btcNetwork,
+      signingStargateClient,
+      latestStakingParam,
+      address,
+      publicKeyNoCoord,
+      inputUTXOs,
+    ],
+  );
+
+  return { createDelegationEoi, estimateStakingFee };
+};
+
+const validateStakingInput = (stakingInput: BtcStakingInputs) => {
+  if (!stakingInput.finalityProviderPublicKey)
+    throw new Error("Finality provider not selected");
+  if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
+  if (!stakingInput.stakingTimeBlocks) throw new Error("Staking time not set");
+  if (!stakingInput.feeRate) throw new Error("Fee rate not set");
+};
+
+const checkWalletConnection = (
+  cosmosConnected: boolean,
+  btcConnected: boolean,
+  btcNetwork: Network | undefined,
+  signingStargateClient: SigningStargateClient | undefined,
+) => {
+  if (
+    !cosmosConnected ||
+    !btcConnected ||
+    !btcNetwork ||
+    !signingStargateClient
+  )
+    throw new Error("Wallet not connected");
 };
