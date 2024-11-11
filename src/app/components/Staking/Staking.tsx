@@ -19,7 +19,6 @@ import {
   FinalityProvider,
   FinalityProvider as FinalityProviderInterface,
 } from "@/app/types/finalityProviders";
-import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
@@ -73,7 +72,7 @@ export const Staking = () => {
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
-  const { createDelegationEoi } = useTransactionService();
+  const { createDelegationEoi, estimateStakingFee } = useTransactionService();
   const { params } = useAppState();
   const latestStakingParam = params?.stakingParams?.latestBbnStakingParam;
 
@@ -207,19 +206,15 @@ export const Staking = () => {
           throw new Error("Selected fee rate is lower than the hour fee");
         }
         const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
-        // Calculate the staking fee
-        const { stakingFeeSat } = createStakingTx(
-          latestStakingParam,
+
+        const eoiInput = {
+          finalityProviderPublicKey: finalityProvider.btcPk,
           stakingAmountSat,
           stakingTimeBlocks,
-          finalityProvider.btcPk,
-          btcWalletNetwork,
-          address,
-          publicKeyNoCoord,
-          memoizedFeeRate,
-          availableUTXOs,
-        );
-        return stakingFeeSat;
+          feeRate: memoizedFeeRate,
+        };
+        // Calculate the staking fee
+        return estimateStakingFee(eoiInput);
       } catch (error: Error | any) {
         let errorMsg = error?.message;
         // Turn the error message into a user-friendly message
@@ -257,6 +252,7 @@ export const Staking = () => {
     minFeeRate,
     defaultFeeRate,
     stakingTimeBlocks,
+    estimateStakingFee,
     showError,
   ]);
 
