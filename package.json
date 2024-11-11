@@ -10,7 +10,7 @@
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "clean": "rm -r node_modules",
-    "build-docker": "docker build -t babylonlabs/simple-staking .",
+    "build-docker": "docker build -t babylonlabs/simple-staking -f docker/Dockerfile .",
     "clean-docker": "docker rmi babylonlabs/simple-staking 2>/dev/null; true",
     "prepare": "husky",
     "sort-imports": "eslint --fix .",
