@@ -166,7 +166,7 @@ export const Staking = () => {
         feeRate,
       };
       await createDelegationEoi(eoiInput, signingCallback);
-      // UI
+      // TODO: Hook up with the react pending verify modal
       handleResetState();
     } catch (error: Error | any) {
       showError({

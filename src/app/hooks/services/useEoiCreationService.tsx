@@ -186,7 +186,8 @@ export const useEoiCreationService = () => {
             Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
           ),
           delegatorSlashingSig: Uint8Array.from(slashingSig),
-          unbondingTime: stakingParams.unbondingTime,
+          // TODO: Confirm with core on the value whether its inclusive or exclusive
+          unbondingTime: stakingParams.unbondingTime + 1,
           unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
           unbondingValue:
             btcInput.stakingAmountSat - stakingParams.unbondingFeeSat,
