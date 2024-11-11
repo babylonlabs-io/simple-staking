@@ -44,6 +44,9 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
           type: "cosmos",
           network: "devnet-4",
           modularData: keplrRegistry,
+          backendUrls: {
+            rpcRrl: "https://rpc.devnet.babylonlabs.io",
+          },
           logo: "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
         },
       ]}

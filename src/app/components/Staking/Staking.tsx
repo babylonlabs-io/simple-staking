@@ -1,35 +1,28 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Transaction } from "bitcoinjs-lib";
 import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
-import {
-  OVERFLOW_HEIGHT_WARNING_THRESHOLD,
-  OVERFLOW_TVL_WARNING_THRESHOLD,
-  UTXO_KEY,
-} from "@/app/common/constants";
+import { UTXO_KEY } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
 import { EOIModal } from "@/app/components/Modals/EOIModal";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useParams } from "@/app/hooks/api/useParams";
+import {
+  SigningStep,
+  useEoiCreationService,
+} from "@/app/hooks/services/useEoiCreationService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
-import { useDelegationState } from "@/app/state/DelegationState";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import {
   FinalityProvider,
   FinalityProvider as FinalityProviderInterface,
 } from "@/app/types/finalityProviders";
-import { getNetworkConfig } from "@/config/network.config";
-import {
-  createStakingTx,
-  signStakingTx,
-} from "@/utils/delegations/signStakingTx";
+import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
-import { toLocalStorageDelegation } from "@/utils/local_storage/toLocalStorageDelegation";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
 import { PreviewModal } from "../Modals/PreviewModal";
@@ -42,36 +35,21 @@ import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import apiNotAvailable from "./Form/States/api-not-available.svg";
 import geoRestricted from "./Form/States/geo-restricted.svg";
-import stakingCapReached from "./Form/States/staking-cap-reached.svg";
-import stakingNotStarted from "./Form/States/staking-not-started.svg";
-import stakingUpgrading from "./Form/States/staking-upgrading.svg";
-
-interface OverflowProperties {
-  isHeightCap: boolean;
-  overTheCapRange: boolean;
-  approchingCapRange: boolean;
-}
 
 export const Staking = () => {
   const {
     availableUTXOs,
-    currentHeight: btcHeight,
     currentVersion,
     totalBalance: btcWalletBalanceSat,
-    firstActivationHeight,
-    isApprochingNextVersion,
     isError,
     isLoading,
   } = useAppState();
-  const { addDelegation } = useDelegationState();
   const {
     connected,
     address,
     publicKeyNoCoord,
     network: btcWalletNetwork,
     getNetworkFees,
-    signPsbt,
-    pushTx,
   } = useBTCWallet();
 
   const disabled = isError;
@@ -96,11 +74,9 @@ export const Staking = () => {
     useLocalStorage<boolean>("bbn-staking-successFeedbackModalOpened", false);
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
-  const [overflow, setOverflow] = useState<OverflowProperties>({
-    isHeightCap: false,
-    overTheCapRange: false,
-    approchingCapRange: false,
-  });
+
+  const { createDelegationEoi } = useEoiCreationService();
+  const { data: params } = useParams();
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -119,50 +95,6 @@ export const Staking = () => {
       return !isErrorOpen && failureCount <= 3;
     },
   });
-
-  const stakingStats = useStakingStats();
-
-  // Calculate the overflow properties
-  useEffect(() => {
-    if (!currentVersion || !btcHeight) {
-      return;
-    }
-    const nextBlockHeight = btcHeight + 1;
-    const { stakingCapHeight, stakingCapSat } = currentVersion;
-    // Use height based cap than value based cap if it is set
-    if (stakingCapHeight) {
-      setOverflow({
-        isHeightCap: true,
-        overTheCapRange: nextBlockHeight > stakingCapHeight,
-        /*
-          When btc height is approching the staking cap height,
-          there is higher chance of overflow due to tx not being included in the next few blocks on time
-          We also don't take the confirmation depth into account here as majority
-          of the delegation will be overflow after the cap is reached, unless btc fork happens but it's unlikely
-        */
-        approchingCapRange:
-          nextBlockHeight >=
-          stakingCapHeight - OVERFLOW_HEIGHT_WARNING_THRESHOLD,
-      });
-    } else if (stakingCapSat && stakingStats.data) {
-      const { activeTVLSat, unconfirmedTVLSat } = stakingStats.data;
-      setOverflow({
-        isHeightCap: false,
-        overTheCapRange: stakingCapSat <= activeTVLSat,
-        approchingCapRange:
-          stakingCapSat * OVERFLOW_TVL_WARNING_THRESHOLD < unconfirmedTVLSat,
-      });
-    }
-  }, [currentVersion, btcHeight, stakingStats]);
-
-  const { coinName } = getNetworkConfig();
-  const stakingParams = currentVersion;
-  const isUpgrading = isApprochingNextVersion;
-  const isBlockHeightUnderActivation =
-    !stakingParams ||
-    (btcHeight &&
-      firstActivationHeight &&
-      btcHeight + 1 < firstActivationHeight);
 
   const { isErrorOpen, showError, captureError } = useError();
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
@@ -217,40 +149,24 @@ export const Staking = () => {
 
   const queryClient = useQueryClient();
 
-  const handleSign = async () => {
-    try {
-      // Prevent the modal from closing
-      setAwaitingWalletResponse(true);
-      // Initial validation
-      if (!connected) throw new Error("Wallet is not connected");
-      if (!address) throw new Error("Address is not set");
-      if (!btcWalletNetwork) throw new Error("Wallet network is not connected");
-      if (!finalityProvider)
-        throw new Error("Finality provider is not selected");
-      if (!currentVersion) throw new Error("Global params not loaded");
-      if (!feeRate) throw new Error("Fee rates not loaded");
-      if (!availableUTXOs || availableUTXOs.length === 0)
-        throw new Error("No available balance");
+  // TODO: To hook up with the react signing modal
+  const signingCallback = async (step: SigningStep) => {
+    console.log("Signing step:", step);
+  };
 
-      // Sign the staking transaction
-      const { stakingTxHex, stakingTerm } = await signStakingTx(
-        signPsbt,
-        pushTx,
-        currentVersion,
+  const handleDelegationEoiCreation = async () => {
+    try {
+      if (!finalityProvider) {
+        throw new Error("Finality provider not selected");
+      }
+      const eoiInput = {
+        finalityProviderPublicKey: finalityProvider.btcPk,
         stakingAmountSat,
         stakingTimeBlocks,
-        finalityProvider.btcPk,
-        btcWalletNetwork,
-        address,
-        publicKeyNoCoord,
         feeRate,
-        availableUTXOs,
-      );
-      // Invalidate UTXOs
-      queryClient.invalidateQueries({ queryKey: [UTXO_KEY, address] });
-      // UI
-      handleFeedbackModal("success");
-      handleLocalStorageDelegations(stakingTxHex, stakingTerm);
+      };
+      await createDelegationEoi(eoiInput, signingCallback);
+      // TODO: Hook up with the react pending verify modal
       handleResetState();
     } catch (error: Error | any) {
       showError({
@@ -272,26 +188,6 @@ export const Staking = () => {
     } finally {
       setAwaitingWalletResponse(false);
     }
-  };
-
-  // Save the delegation to local storage
-  const handleLocalStorageDelegations = (
-    signedTxHex: string,
-    stakingTerm: number,
-  ) => {
-    // Get the transaction ID
-    const newTxId = Transaction.fromHex(signedTxHex).getId();
-
-    addDelegation(
-      toLocalStorageDelegation(
-        newTxId,
-        publicKeyNoCoord,
-        finalityProvider!.btcPk,
-        stakingAmountSat,
-        signedTxHex,
-        stakingTerm,
-      ),
-    );
   };
 
   // Memoize the staking fee calculation
@@ -423,34 +319,6 @@ export const Staking = () => {
     handleFeedbackModal("cancel");
   };
 
-  const showOverflowWarning = (overflow: OverflowProperties) => {
-    if (overflow.isHeightCap) {
-      return (
-        <Message
-          title="Staking window closed"
-          messages={[
-            "Staking is temporarily disabled due to the staking window being closed.",
-            "Please check your staking history to see if any of your stake is tagged overflow.",
-            "Overflow stake should be unbonded and withdrawn.",
-          ]}
-          icon={stakingCapReached}
-        />
-      );
-    } else {
-      return (
-        <Message
-          title="Staking cap reached"
-          messages={[
-            "Staking is temporarily disabled due to the staking cap getting reached.",
-            "Please check your staking history to see if any of your stake is tagged overflow.",
-            "Overflow stake should be unbonded and withdrawn.",
-          ]}
-          icon={stakingCapReached}
-        />
-      );
-    }
-  };
-
   const handleCloseFeedbackModal = () => {
     if (feedbackModal.type === "success") {
       setSuccessFeedbackModalOpened(true);
@@ -458,24 +326,6 @@ export const Staking = () => {
       setCancelFeedbackModalOpened(true);
     }
     setFeedbackModal({ type: null, isOpen: false });
-  };
-
-  const showApproachingCapWarning = () => {
-    if (!overflow.approchingCapRange) {
-      return;
-    }
-    if (overflow.isHeightCap) {
-      return (
-        <p className="text-center text-sm text-error">
-          Staking window is closing. Your stake may <b>overflow</b>!
-        </p>
-      );
-    }
-    return (
-      <p className="text-center text-sm text-error">
-        Staking cap is filling up. Your stake may <b>overflow</b>!
-      </p>
-    );
   };
 
   const hasError = disabled || hasMempoolFeeRatesError;
@@ -500,45 +350,18 @@ export const Staking = () => {
     else if (isLoading || areMempoolFeeRatesLoading) {
       return <LoadingView />;
     }
-    // Staking has not started yet
-    else if (isBlockHeightUnderActivation) {
-      return (
-        <Message
-          title="Staking has not yet started"
-          messages={[
-            `Staking will be activated once ${coinName} block height reaches ${
-              firstActivationHeight ? firstActivationHeight - 1 : "-"
-            }. The current ${coinName} block height is ${btcHeight || "-"}.`,
-          ]}
-          icon={stakingNotStarted}
-        />
-      );
-    }
-    // Staking params upgrading
-    else if (isUpgrading) {
-      return (
-        <Message
-          title="Staking parameters upgrading"
-          messages={[
-            "The staking parameters are getting upgraded, staking will be re-enabled soon.",
-          ]}
-          icon={stakingUpgrading}
-        />
-      );
-    }
-    // Staking cap reached
-    else if (overflow.overTheCapRange) {
-      return showOverflowWarning(overflow);
-    }
     // Staking form
     else {
+      const stakingParams = params?.bbnStakingParams.latestVersion;
+      if (!stakingParams) {
+        throw new Error("Staking params not loaded");
+      }
       const {
         minStakingAmountSat,
         maxStakingAmountSat,
         minStakingTimeBlocks,
         maxStakingTimeBlocks,
         unbondingTime,
-        confirmationDepth,
         unbondingFeeSat,
       } = stakingParams;
 
@@ -576,7 +399,7 @@ export const Staking = () => {
               <StakingTime
                 minStakingTimeBlocks={minStakingTimeBlocks}
                 maxStakingTimeBlocks={maxStakingTimeBlocks}
-                unbondingTimeBlocks={stakingParams.unbondingTime}
+                unbondingTimeBlocks={unbondingTime}
                 onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
                 reset={resetFormInputs}
               />
@@ -597,7 +420,6 @@ export const Staking = () => {
                 />
               )}
             </div>
-            {showApproachingCapWarning()}
             <span
               className="cursor-pointer text-xs"
               data-tooltip-id="tooltip-staking-preview"
@@ -617,12 +439,11 @@ export const Staking = () => {
               <PreviewModal
                 open={previewModalOpen}
                 onClose={handlePreviewModalClose}
-                onSign={handleSign}
+                onSign={handleDelegationEoiCreation}
                 finalityProvider={finalityProvider?.description.moniker}
                 stakingAmountSat={stakingAmountSat}
                 stakingTimeBlocks={stakingTimeBlocksWithFixed}
                 stakingFeeSat={stakingFeeSat}
-                confirmationDepth={confirmationDepth}
                 feeRate={feeRate}
                 unbondingFeeSat={unbondingFeeSat}
                 awaitingWalletResponse={awaitingWalletResponse}

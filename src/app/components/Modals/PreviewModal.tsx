@@ -19,7 +19,6 @@ interface PreviewModalProps {
   stakingTimeBlocks: number;
   stakingFeeSat: number;
   feeRate: number;
-  confirmationDepth: number;
   unbondingFeeSat: number;
   awaitingWalletResponse: boolean;
 }
@@ -33,7 +32,6 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
   onSign,
   stakingFeeSat,
   feeRate,
-  confirmationDepth,
   unbondingFeeSat,
   awaitingWalletResponse,
 }) => {
@@ -41,6 +39,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
     "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
 
   const { coinName } = getNetworkConfig();
+
+  // TODO: Get confirmation depth from params
+  const confirmationDepth = 10;
 
   return (
     <GeneralModal
