@@ -59,8 +59,8 @@ export const useTransactionService = () => {
   } = useBTCWallet();
 
   const { params } = useAppState();
-  const latestStakingParam = params?.stakingParams?.latestBbnStakingParam;
-  const v1Params = params?.stakingParams?.v1Param;
+  const latestParam = params?.bbnStakingParams?.latestParam;
+  const genesisParam = params?.bbnStakingParams?.genesisParam;
 
   const createDelegationEoi = useCallback(
     async (
@@ -76,7 +76,7 @@ export const useTransactionService = () => {
         signingStargateClient,
       );
       validateStakingInput(stakingInput);
-      if (!latestStakingParam) throw new Error("Staking params not loaded");
+      if (!latestParam) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
         btcNetwork!,
@@ -84,7 +84,7 @@ export const useTransactionService = () => {
           address,
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
-        latestStakingParam,
+        latestParam,
         stakingInput.finalityProviderPublicKey,
         stakingInput.stakingTimeBlocks,
       );
@@ -106,7 +106,7 @@ export const useTransactionService = () => {
         stakingTx,
         bech32Address,
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
-        latestStakingParam,
+        latestParam,
         { signPsbt, signMessage, signingCallback },
       );
       await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
@@ -117,7 +117,7 @@ export const useTransactionService = () => {
       btcConnected,
       btcNetwork,
       signingStargateClient,
-      latestStakingParam,
+      latestParam,
       address,
       publicKeyNoCoord,
       inputUTXOs,
@@ -136,7 +136,7 @@ export const useTransactionService = () => {
         btcNetwork,
         signingStargateClient,
       );
-      if (!latestStakingParam) throw new Error("Staking params not loaded");
+      if (!latestParam) throw new Error("Staking params not loaded");
       validateStakingInput(stakingInput);
 
       const staking = new Staking(
@@ -145,7 +145,7 @@ export const useTransactionService = () => {
           address,
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
-        latestStakingParam,
+        latestParam,
         stakingInput.finalityProviderPublicKey,
         stakingInput.stakingTimeBlocks,
       );
@@ -162,7 +162,7 @@ export const useTransactionService = () => {
       btcConnected,
       btcNetwork,
       signingStargateClient,
-      latestStakingParam,
+      latestParam,
       address,
       publicKeyNoCoord,
       inputUTXOs,
@@ -182,14 +182,14 @@ export const useTransactionService = () => {
         btcNetwork,
         signingStargateClient,
       );
-      if (!v1Params) throw new Error("V1 params not loaded");
+      if (!genesisParam) throw new Error("V1 params not loaded");
       validateStakingInput(stakingInput);
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
       const stakingInstance = new Staking(
         btcNetwork!,
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
-        v1Params,
+        genesisParam,
         stakingInput.finalityProviderPublicKey,
         stakingInput.stakingTimeBlocks,
       );
@@ -200,7 +200,7 @@ export const useTransactionService = () => {
         stakingTx,
         bech32Address,
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
-        v1Params,
+        genesisParam,
         {
           signPsbt,
           signMessage,
@@ -215,7 +215,7 @@ export const useTransactionService = () => {
       btcConnected,
       btcNetwork,
       signingStargateClient,
-      v1Params,
+      genesisParam,
       bech32Address,
       address,
       publicKeyNoCoord,

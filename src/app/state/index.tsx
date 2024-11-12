@@ -12,7 +12,7 @@ import type {
   UTXO,
 } from "@/utils/wallet/btc_wallet_provider";
 
-import { BbnStakingParamsVersion } from "../types/params";
+import { Params } from "../types/params";
 
 import { DelegationState } from "./DelegationState";
 
@@ -21,13 +21,7 @@ const STATE_LIST = [DelegationState];
 export interface AppState {
   availableUTXOs?: UTXO[];
   totalBalance: number;
-  params?: {
-    stakingParams?: {
-      v1Param?: BbnStakingParamsVersion;
-      latestBbnStakingParam?: BbnStakingParamsVersion;
-      bbnStakingParams?: BbnStakingParamsVersion[];
-    };
-  };
+  params?: Params;
   currentHeight?: number;
   isError: boolean;
   isLoading: boolean;
@@ -117,8 +111,6 @@ export function AppState({ children }: PropsWithChildren) {
     [availableUTXOs],
   );
 
-  const bbnStakingParams = useMemo(() => params?.bbnStakingParams, [params]);
-
   // Handlers
   const includeOrdinals = useCallback(() => setOrdinalsExcluded(false), []);
   const excludeOrdinals = useCallback(() => setOrdinalsExcluded(true), []);
@@ -129,13 +121,7 @@ export function AppState({ children }: PropsWithChildren) {
       availableUTXOs,
       currentHeight: height,
       totalBalance,
-      params: {
-        stakingParams: {
-          latestBbnStakingParam: bbnStakingParams?.latestVersion,
-          bbnStakingParams: bbnStakingParams?.versions,
-          v1Param: bbnStakingParams?.v1Params,
-        },
-      },
+      params,
       isError,
       isLoading,
       ordinalsExcluded,
@@ -146,7 +132,7 @@ export function AppState({ children }: PropsWithChildren) {
       availableUTXOs,
       height,
       totalBalance,
-      bbnStakingParams,
+      params,
       isError,
       isLoading,
       ordinalsExcluded,

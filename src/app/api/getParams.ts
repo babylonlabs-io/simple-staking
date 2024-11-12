@@ -66,21 +66,21 @@ export const getParams = async (): Promise<Params> => {
       minStakingAmountSat: v.min_staking_value_sat,
     }));
 
-  const latestVersion = versions.reduce((prev, current) =>
+  const latestParam = versions.reduce((prev, current) =>
     current.version > prev.version ? current : prev,
   );
 
   // Find the v1 params which is the first version
-  const v1Params = versions.find((v) => v.version === 0);
-  if (!v1Params) {
+  const genesisParam = versions.find((v) => v.version === 0);
+  if (!genesisParam) {
     throw new Error("V1 params not found");
   }
 
   return {
     bbnStakingParams: {
-      latestVersion,
-      versions,
-      v1Params,
+      latestParam,
+      bbnStakingParams: versions,
+      genesisParam,
     },
   };
 };

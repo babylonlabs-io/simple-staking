@@ -74,7 +74,7 @@ export const Staking = () => {
 
   const { createDelegationEoi, estimateStakingFee } = useTransactionService();
   const { params } = useAppState();
-  const latestStakingParam = params?.stakingParams?.latestBbnStakingParam;
+  const latestParam = params?.bbnStakingParams?.latestParam;
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -193,7 +193,7 @@ export const Staking = () => {
     if (
       btcWalletNetwork &&
       address &&
-      latestStakingParam &&
+      latestParam &&
       publicKeyNoCoord &&
       stakingAmountSat &&
       finalityProvider &&
@@ -242,7 +242,7 @@ export const Staking = () => {
   }, [
     btcWalletNetwork,
     address,
-    latestStakingParam,
+    latestParam,
     publicKeyNoCoord,
     stakingAmountSat,
     finalityProvider,
@@ -347,7 +347,7 @@ export const Staking = () => {
     }
     // Staking form
     else {
-      if (!latestStakingParam) {
+      if (!latestParam) {
         throw new Error("Staking params not loaded");
       }
       const {
@@ -357,7 +357,7 @@ export const Staking = () => {
         maxStakingTimeBlocks,
         unbondingTime,
         unbondingFeeSat,
-      } = latestStakingParam;
+      } = latestParam;
 
       // Staking time is fixed
       const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
