@@ -163,7 +163,7 @@ export const Staking = () => {
         stakingTimeBlocks,
         feeRate,
       };
-      await createDelegationEoi(eoiInput, signingCallback);
+      await createDelegationEoi(eoiInput, feeRate, signingCallback);
       // TODO: Hook up with the react pending verify modal
       handleResetState();
     } catch (error: Error | any) {
@@ -214,7 +214,7 @@ export const Staking = () => {
           feeRate: memoizedFeeRate,
         };
         // Calculate the staking fee
-        return estimateStakingFee(eoiInput);
+        return estimateStakingFee(eoiInput, memoizedFeeRate);
       } catch (error: Error | any) {
         let errorMsg = error?.message;
         // Turn the error message into a user-friendly message
