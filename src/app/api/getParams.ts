@@ -70,10 +70,11 @@ export const getParams = async (): Promise<Params> => {
     current.version > prev.version ? current : prev,
   );
 
-  // Find the v1 params which is the first version
+  // Find the genesis params which is the first version
+  // This param can be used for transitioning phase-1 delegations
   const genesisParam = versions.find((v) => v.version === 0);
   if (!genesisParam) {
-    throw new Error("V1 params not found");
+    throw new Error("Genesis params not found");
   }
 
   return {

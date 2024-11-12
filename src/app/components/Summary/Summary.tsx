@@ -18,11 +18,13 @@ import { StakerPoints } from "../Points/StakerPoints";
 export const Summary = () => {
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { totalStaked } = useDelegationState();
-  const { totalBalance, currentVersion, isLoading: loading } = useAppState();
+  const { totalBalance, isLoading: loading } = useAppState();
   const { address, publicKeyNoCoord } = useBTCWallet();
 
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
+  // TODO: To be handled by https://github.com/babylonlabs-io/simple-staking/issues/325
+  const confirmationDepth = 10;
 
   if (!address) return;
 
@@ -38,7 +40,7 @@ export const Summary = () => {
                 <span
                   className="cursor-pointer text-xs"
                   data-tooltip-id="tooltip-total-staked"
-                  data-tooltip-content={`Total staked is updated after ${currentVersion?.confirmationDepth || 10} confirmations`}
+                  data-tooltip-content={`Total staked is updated after ${confirmationDepth || 10} confirmations`}
                   data-tooltip-place="bottom"
                 >
                   <AiOutlineInfoCircle />

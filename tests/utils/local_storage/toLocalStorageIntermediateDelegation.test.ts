@@ -36,6 +36,7 @@ describe("utils/local_storage/toLocalStorageIntermediateDelegation", () => {
       },
       isOverflow: false,
       unbondingTx: undefined,
+      transitioned: false,
     });
 
     // Validate startTimestamp is a valid ISO date string
@@ -78,6 +79,7 @@ describe("utils/local_storage/toLocalStorageIntermediateDelegation", () => {
       },
       isOverflow: false,
       unbondingTx: undefined,
+      transitioned: false,
     });
 
     // Validate startTimestamp is a valid ISO date string

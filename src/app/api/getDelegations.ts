@@ -24,6 +24,7 @@ interface DelegationAPI {
   staking_tx: StakingTxAPI;
   unbonding_tx?: UnbondingTxAPI;
   is_overflow: boolean;
+  transitioned: boolean;
 }
 
 interface StakingTxAPI {
@@ -87,6 +88,7 @@ export const getDelegations = async (
             outputIndex: apiDelegation.unbonding_tx.output_index,
           }
         : undefined,
+      transitioned: apiDelegation.transitioned,
     }),
   );
 
