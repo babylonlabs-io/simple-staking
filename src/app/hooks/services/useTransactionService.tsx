@@ -21,7 +21,7 @@ import {
 } from "@/utils/delegations";
 
 export interface BtcStakingInputs {
-  finalityProviderPublicKey: string;
+  finalityProviderPkNoCoordHex: string;
   stakingAmountSat: number;
   stakingTimeBlocks: number;
 }
@@ -85,7 +85,7 @@ export const useTransactionService = () => {
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
         latestParam,
-        stakingInput.finalityProviderPublicKey,
+        stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimeBlocks,
       );
 
@@ -146,7 +146,7 @@ export const useTransactionService = () => {
           publicKeyNoCoordHex: publicKeyNoCoord,
         },
         latestParam,
-        stakingInput.finalityProviderPublicKey,
+        stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimeBlocks,
       );
 
@@ -182,7 +182,7 @@ export const useTransactionService = () => {
         btcNetwork,
         signingStargateClient,
       );
-      if (!genesisParam) throw new Error("V1 params not loaded");
+      if (!genesisParam) throw new Error("Genesis params not loaded");
       validateStakingInput(stakingInput);
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
@@ -190,7 +190,7 @@ export const useTransactionService = () => {
         btcNetwork!,
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
         genesisParam,
-        stakingInput.finalityProviderPublicKey,
+        stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimeBlocks,
       );
 
@@ -338,7 +338,7 @@ const createBtcDelegationMsg = async (
       ),
       fpBtcPkList: [
         Uint8Array.from(
-          Buffer.from(stakingInput.finalityProviderPublicKey, "hex"),
+          Buffer.from(stakingInput.finalityProviderPkNoCoordHex, "hex"),
         ),
       ],
       stakingTime: stakingInput.stakingTimeBlocks,
@@ -369,7 +369,7 @@ const createBtcDelegationMsg = async (
 };
 
 const validateStakingInput = (stakingInput: BtcStakingInputs) => {
-  if (!stakingInput.finalityProviderPublicKey)
+  if (!stakingInput.finalityProviderPkNoCoordHex)
     throw new Error("Finality provider not selected");
   if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
   if (!stakingInput.stakingTimeBlocks) throw new Error("Staking time not set");

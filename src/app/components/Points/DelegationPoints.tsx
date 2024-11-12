@@ -7,12 +7,12 @@ import { shouldDisplayPoints } from "@/config";
 import { Points } from "./Points";
 
 interface DelegationPointsProps {
-  stakingTxHash: string;
+  stakingTxHashHex: string;
   className?: string;
 }
 
 export const DelegationPoints: React.FC<DelegationPointsProps> = ({
-  stakingTxHash,
+  stakingTxHashHex,
   className,
 }) => {
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
@@ -22,7 +22,7 @@ export const DelegationPoints: React.FC<DelegationPointsProps> = ({
     return null;
   }
 
-  const points = delegationPoints.get(stakingTxHash);
+  const points = delegationPoints.get(stakingTxHashHex);
   if (isLoading) {
     return (
       <div className={className}>

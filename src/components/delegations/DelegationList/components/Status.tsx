@@ -1,5 +1,5 @@
 import { useAppState } from "@/app/state";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import { BbnStakingParamsVersion } from "@/app/types/params";
 import { Hint } from "@/components/common/Hint";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 
@@ -11,7 +11,7 @@ interface StatusProps {
 
 const STATUSES: Record<
   string,
-  (state?: GlobalParamsVersion) => { label: string; tooltip: string }
+  (state?: BbnStakingParamsVersion) => { label: string; tooltip: string }
 > = {
   [DelegationState.ACTIVE]: () => ({
     label: "Active",
@@ -35,7 +35,9 @@ const STATUSES: Record<
   }),
   [DelegationState.PENDING]: (state) => ({
     label: "Pending",
-    tooltip: `Stake that is pending ${state?.confirmationDepth || 10} Bitcoin confirmations will only be visible from this device`,
+    // TODO: get confirmation depth from params
+    // https://github.com/babylonlabs-io/simple-staking/issues/325
+    tooltip: `Stake that is pending ${10} Bitcoin confirmations will only be visible from this device`,
   }),
   [DelegationState.OVERFLOW]: () => ({
     label: "Overflow",
@@ -56,9 +58,9 @@ const STATUSES: Record<
 };
 
 export function Status({ value }: StatusProps) {
-  const { currentVersion } = useAppState();
+  const { params } = useAppState();
   const { label = "unknown", tooltip = "unknown" } =
-    STATUSES[value](currentVersion) ?? {};
+    STATUSES[value](params?.bbnStakingParams?.latestParam) ?? {};
 
   return <Hint tooltip={tooltip}>{label}</Hint>;
 }

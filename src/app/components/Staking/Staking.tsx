@@ -158,7 +158,7 @@ export const Staking = () => {
         throw new Error("Finality provider not selected");
       }
       const eoiInput = {
-        finalityProviderPublicKey: finalityProvider.btcPk,
+        finalityProviderPkNoCoordHex: finalityProvider.btcPk,
         stakingAmountSat,
         stakingTimeBlocks,
         feeRate,
@@ -208,7 +208,7 @@ export const Staking = () => {
         const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
 
         const eoiInput = {
-          finalityProviderPublicKey: finalityProvider.btcPk,
+          finalityProviderPkNoCoordHex: finalityProvider.btcPk,
           stakingAmountSat,
           stakingTimeBlocks,
           feeRate: memoizedFeeRate,

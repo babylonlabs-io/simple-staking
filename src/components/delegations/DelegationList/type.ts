@@ -22,4 +22,5 @@ export enum DelegationState {
   EXPIRED = "expired",
   INTERMEDIATE_UNBONDING = "intermediate_unbonding",
   INTERMEDIATE_WITHDRAWAL = "intermediate_withdrawal",
+  TRANSFORM = "transform",
 }

@@ -1,7 +1,5 @@
 import { DelegationState } from "@/app/types/delegations";
 
-import { blocksToDisplayTime } from "./blocksToDisplayTime";
-
 // Convert state to human readable format
 export const getState = (state: string) => {
   switch (state) {
@@ -26,29 +24,24 @@ export const getState = (state: string) => {
       return "Requesting Unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal Submitted";
+    case DelegationState.INTERMEDIATE_TRANSFORMING:
+      return "Transforming";
+    case DelegationState.TRANSFORMED:
+      return "Transformed";
     default:
       return "Unknown";
   }
 };
 
 // Create state tooltips for the additional information
-export const getStateTooltip = (
-  state: string,
-  params?: { confirmationDepth: number; unbondingTime: number },
-) => {
+export const getStateTooltip = (state: string) => {
   switch (state) {
     case DelegationState.ACTIVE:
       return "Stake is active";
-    case DelegationState.UNBONDING_REQUESTED:
-      return "Unbonding requested";
-    case DelegationState.UNBONDING:
-      return `Unbonding process of ${blocksToDisplayTime(params?.unbondingTime)} has started`;
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:
       return "Stake has been withdrawn";
-    case DelegationState.PENDING:
-      return `Stake that is pending ${params?.confirmationDepth || 10} Bitcoin confirmations will only be visible from this device`;
     case DelegationState.OVERFLOW:
       return "Stake is over the staking cap";
     case DelegationState.EXPIRED:
@@ -58,6 +51,10 @@ export const getStateTooltip = (
       return "Stake is requesting unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal transaction pending confirmation on Bitcoin";
+    case DelegationState.INTERMEDIATE_TRANSFORMING:
+      return "Stake is linking to the Babylon chain network";
+    case DelegationState.TRANSFORMED:
+      return "Stake has been linked to the Babylon chain network";
     default:
       return "Unknown";
   }

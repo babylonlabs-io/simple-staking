@@ -7,6 +7,7 @@ export interface Delegation {
   stakingTx: StakingTx;
   unbondingTx: UnbondingTx | undefined;
   isOverflow: boolean;
+  transformed: boolean;
 }
 
 export interface StakingTx {
@@ -32,6 +33,8 @@ export const OVERFLOW = "overflow";
 export const EXPIRED = "expired";
 export const INTERMEDIATE_UNBONDING = "intermediate_unbonding";
 export const INTERMEDIATE_WITHDRAWAL = "intermediate_withdrawal";
+export const TRANSITIONED = "transitioned";
+export const INTERMEDIATE_TRANSITIONING = "intermediate_transitioning";
 
 // Define the state of a delegation as per API
 export const DelegationState = {
@@ -45,4 +48,6 @@ export const DelegationState = {
   EXPIRED,
   INTERMEDIATE_UNBONDING,
   INTERMEDIATE_WITHDRAWAL,
+  TRANSITIONED,
+  INTERMEDIATE_TRANSITIONING,
 };
