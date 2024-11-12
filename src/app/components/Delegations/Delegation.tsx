@@ -82,7 +82,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const generateActionButton = () => {
-    // This function generates the transform or withdraw button
+    // This function generates the transition or withdraw button
     // based on the state of the delegation
     // It also disables the button if the delegation
     // is in an intermediate state (local storage)

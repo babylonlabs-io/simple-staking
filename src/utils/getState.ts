@@ -24,10 +24,10 @@ export const getState = (state: string) => {
       return "Requesting Unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal Submitted";
-    case DelegationState.INTERMEDIATE_TRANSFORMING:
-      return "Transforming";
-    case DelegationState.TRANSFORMED:
-      return "Transformed";
+    case DelegationState.INTERMEDIATE_TRANSITIONING:
+      return "Transitioning";
+    case DelegationState.TRANSITIONED:
+      return "Transitioned";
     default:
       return "Unknown";
   }
@@ -51,10 +51,10 @@ export const getStateTooltip = (state: string) => {
       return "Stake is requesting unbonding";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal transaction pending confirmation on Bitcoin";
-    case DelegationState.INTERMEDIATE_TRANSFORMING:
-      return "Stake is linking to the Babylon chain network";
-    case DelegationState.TRANSFORMED:
-      return "Stake has been linked to the Babylon chain network";
+    case DelegationState.INTERMEDIATE_TRANSITIONING:
+      return "Stake is transitioning to the Babylon chain network";
+    case DelegationState.TRANSITIONED:
+      return "Stake has been transitioned to the Babylon chain network";
     default:
       return "Unknown";
   }

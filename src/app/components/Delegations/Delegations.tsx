@@ -87,7 +87,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
 
   const shouldShowPoints =
     isApiNormal && !isGeoBlocked && shouldDisplayPoints();
-  // Local storage state for intermediate delegations (transforming, withdrawing)
+  // Local storage state for intermediate delegations (transitioning, withdrawing)
   const intermediateDelegationsLocalStorageKey =
     getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
 

@@ -7,9 +7,9 @@ import { LoadingView } from "../Loading/Loading";
 
 import { GeneralModal } from "./GeneralModal";
 
-export const MODE_TRANSFORM = "transform";
+export const MODE_TRANSITION = "transition";
 export const MODE_WITHDRAW = "withdraw";
-export type MODE = typeof MODE_TRANSFORM | typeof MODE_WITHDRAW;
+export type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW;
 
 interface PreviewModalProps {
   open: boolean;
@@ -20,7 +20,7 @@ interface PreviewModalProps {
   delegation: DelegationInterface;
 }
 
-const { coinName, networkName } = getNetworkConfig();
+const { networkName } = getNetworkConfig();
 
 export const WithdrawModal: React.FC<PreviewModalProps> = ({
   open,

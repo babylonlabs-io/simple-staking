@@ -4,7 +4,7 @@ export enum ErrorState {
   WALLET = "WALLET",
   WITHDRAW = "WITHDRAW",
   STAKING = "STAKING",
-  TRANSFORM = "TRANSFORM",
+  TRANSITION = "TRANSITION",
 }
 
 export interface ErrorType {
