@@ -15,8 +15,9 @@ import type {
 import { Params } from "../types/params";
 
 import { DelegationState } from "./DelegationState";
+import { DelegationV2State } from "./DelegationV2State";
 
-const STATE_LIST = [DelegationState];
+const STATE_LIST = [DelegationState, DelegationV2State];
 
 export interface AppState {
   availableUTXOs?: UTXO[];
@@ -144,7 +145,7 @@ export function AppState({ children }: PropsWithChildren) {
   const states = useMemo(
     () =>
       STATE_LIST.reduceRight(
-        (children, State) => <State>{children}</State>,
+        (children, State, index) => <State key={index}>{children}</State>,
         children,
       ),
     [children],

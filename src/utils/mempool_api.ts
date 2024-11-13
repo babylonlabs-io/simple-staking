@@ -245,6 +245,8 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
   if (!block_height || !merkle.length || !pos) {
     throw new Error("Invalid transaction merkle proof result returned");
   }
+  // The merkle proof from mempool is a list of hex strings,
+  // so we need to concatenate them to form the final proof
   const proofHex = merkle.reduce((acc: string, m: string) => {
     return acc + m;
   }, "");

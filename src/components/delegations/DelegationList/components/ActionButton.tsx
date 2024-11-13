@@ -1,4 +1,4 @@
-import { DelegationState } from "../type";
+import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 
 interface ActionButtonProps {
   txHash: string;
@@ -10,21 +10,30 @@ type ButtonAdapter = (props: ActionButtonProps) => JSX.Element;
 type ButtonStrategy = Record<string, ButtonAdapter>;
 
 const ACTION_BUTTONS: ButtonStrategy = {
-  [DelegationState.ACTIVE]: (props: ActionButtonProps) => (
+  [state.VERIFIED]: (props: ActionButtonProps) => (
+    <button
+      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+      onClick={() => props.onClick?.("stake", props.txHash)}
+      disabled={props.state === state.INTERMEDIATE_PENDING_CONFIRMATION}
+    >
+      Stake
+    </button>
+  ),
+  [state.ACTIVE]: (props: ActionButtonProps) => (
     <button
       className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
       onClick={() => props.onClick?.("unbound", props.txHash)}
-      disabled={props.state === DelegationState.INTERMEDIATE_UNBONDING}
+      disabled={props.state === state.INTERMEDIATE_UNBONDING}
     >
       Unbond
     </button>
   ),
 
-  [DelegationState.UNBONDED]: (props: ActionButtonProps) => (
+  [state.WITHDRAWABLE]: (props: ActionButtonProps) => (
     <button
       className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
       onClick={() => props.onClick?.("withdraw", props.txHash)}
-      disabled={props.state === DelegationState.INTERMEDIATE_WITHDRAWAL}
+      disabled={props.state === state.INTERMEDIATE_WITHDRAWAL}
     >
       Withdraw
     </button>

@@ -23,7 +23,7 @@ export function useDelegationsV2({
   const query = useInfiniteQuery({
     queryKey: [DELEGATIONS_V2_KEY, publicKeyNoCoord],
     queryFn: ({ pageParam = "" }) =>
-      getDelegationsV2(pageParam, publicKeyNoCoord),
+      getDelegationsV2(publicKeyNoCoord, pageParam),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key

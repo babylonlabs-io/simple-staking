@@ -1,7 +1,10 @@
 import { encode } from "url-safe-base64";
 
 import { Pagination } from "../types/api";
-import { DelegationV2, DelegationV2State } from "../types/delegationsV2";
+import {
+  DelegationV2,
+  DelegationV2StakingStateMap,
+} from "../types/delegationsV2";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -24,7 +27,7 @@ interface DelegationV2API {
   staking_tx_hash_hex: string;
   start_height: number;
   end_height: number;
-  state: DelegationV2State;
+  state: string;
   unbonding_time: string;
   unbonding_tx: string;
 }
@@ -51,19 +54,25 @@ export const getDelegationsV2 = async (
   const delegationsAPIResponse: DelegationsAPIResponse = response.data;
 
   const delegations: DelegationV2[] = delegationsAPIResponse.data.map(
-    (apiDelegation: DelegationV2API): DelegationV2 => ({
-      finalityProviderBtcPksHex: apiDelegation.finality_provider_btc_pks_hex,
-      paramsVersion: apiDelegation.params_version,
-      stakerBtcPkHex: apiDelegation.staker_btc_pk_hex,
-      stakingAmount: apiDelegation.staking_amount,
-      stakingTime: apiDelegation.staking_time,
-      stakingTxHashHex: apiDelegation.staking_tx_hash_hex,
-      startHeight: apiDelegation.start_height,
-      endHeight: apiDelegation.end_height,
-      state: apiDelegation.state,
-      unbondingTime: apiDelegation.unbonding_time,
-      unbondingTx: apiDelegation.unbonding_tx,
-    }),
+    (apiDelegation: DelegationV2API): DelegationV2 => {
+      const state = DelegationV2StakingStateMap[apiDelegation.state];
+      if (!state) {
+        throw new Error(`Unknown delegation state: ${apiDelegation.state}`);
+      }
+      return {
+        finalityProviderBtcPksHex: apiDelegation.finality_provider_btc_pks_hex,
+        paramsVersion: parseInt(apiDelegation.params_version),
+        stakerBtcPkHex: apiDelegation.staker_btc_pk_hex,
+        stakingAmount: parseInt(apiDelegation.staking_amount),
+        stakingTime: parseInt(apiDelegation.staking_time),
+        stakingTxHashHex: apiDelegation.staking_tx_hash_hex,
+        startHeight: apiDelegation.start_height,
+        endHeight: apiDelegation.end_height,
+        state,
+        unbondingTime: parseInt(apiDelegation.unbonding_time),
+        unbondingTx: apiDelegation.unbonding_tx,
+      };
+    },
   );
 
   const pagination: Pagination = {
