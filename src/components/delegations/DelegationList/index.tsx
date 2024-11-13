@@ -5,10 +5,8 @@ import { type TableColumn, GridTable } from "../../common/GridTable";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
-import { Overflow } from "./components/Overflow";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
-import { data } from "./mock";
 import type { Delegation, DelegationParams } from "./type";
 
 const columns: TableColumn<Delegation, DelegationParams>[] = [
@@ -45,24 +43,11 @@ const columns: TableColumn<Delegation, DelegationParams>[] = [
     renderCell: (row) => <Status value={row.state} />,
   },
   {
-    field: "points",
-    headerName: "Points",
-    align: "center",
-    width: "max-content",
-  },
-  {
     field: "actions",
     headerName: "Action",
     cellClassName: "justify-center",
     align: "center",
     renderCell: (row) => <ActionButton txHash={row.txHash} state={row.state} />,
-  },
-  {
-    field: "overflow",
-    headerName: "",
-    width: "max-content",
-    cellClassName: "justify-center",
-    renderCell: () => <Overflow />,
   },
 ];
 

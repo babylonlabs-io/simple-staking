@@ -1,10 +1,12 @@
 export interface Delegation {
-  startHeight: number;
-  stakingValue: number;
-  startTimestamp: number;
-  txHash: string;
+  stakingTxHashHex: string;
+  paramVersion: number;
+  finalityProviderPks: string[];
+  stakingTime: number;
+  stakingAmount: number;
+  unbondingTxHex: string;
+  unbondingTime: number;
   state: string;
-  points: number;
 }
 
 export interface DelegationParams {
