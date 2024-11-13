@@ -4,9 +4,15 @@ import { FaBitcoin } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
+import {
+  SigningStep,
+  useTransactionService,
+} from "@/app/hooks/services/useTransactionService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
-import { DelegationState, StakingTx } from "@/app/types/delegations";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
+import {
+  Delegation as DelegationInterface,
+  DelegationState,
+} from "@/app/types/delegations";
 import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -18,36 +24,34 @@ import { trim } from "@/utils/trim";
 import { DelegationPoints } from "../Points/DelegationPoints";
 
 interface DelegationProps {
-  stakingTx: StakingTx;
-  stakingValueSat: number;
-  stakingTxHash: string;
-  state: string;
-  onUnbond: (id: string) => void;
+  delegation: DelegationInterface;
   onWithdraw: (id: string) => void;
   // This attribute is set when an action has been taken by the user
   // that should change the status but the back-end
   // has not had time to reflect this change yet
   intermediateState?: string;
-  isOverflow: boolean;
-  globalParamsVersion: GlobalParamsVersion;
 }
 
 export const Delegation: React.FC<DelegationProps> = ({
-  stakingTx,
-  stakingTxHash,
-  state,
-  stakingValueSat,
-  onUnbond,
+  delegation,
   onWithdraw,
   intermediateState,
-  isOverflow,
-  globalParamsVersion,
 }) => {
+  const {
+    stakingTx,
+    stakingTxHashHex,
+    state,
+    stakingValueSat,
+    isOverflow,
+    finalityProviderPkHex,
+  } = delegation;
+
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const shouldShowPoints =
     isApiNormal && !isGeoBlocked && shouldDisplayPoints();
+  const { transitionPhase1Delegation } = useTransactionService();
 
   useEffect(() => {
     const timerId = setInterval(() => {
@@ -57,8 +61,28 @@ export const Delegation: React.FC<DelegationProps> = ({
     return () => clearInterval(timerId);
   }, []);
 
+  // TODO: Hook up with the transaction signing modal
+  const transitionCallback = async (step: SigningStep) => {
+    console.log(step);
+  };
+
+  const onTransition = async () => {
+    // TODO: Open the transaction signing modal
+
+    await transitionPhase1Delegation(
+      stakingTx.txHex,
+      {
+        finalityProviderPkNoCoordHex: finalityProviderPkHex,
+        stakingAmountSat: stakingValueSat,
+        stakingTimeBlocks: stakingTx.timelock,
+      },
+      transitionCallback,
+    );
+    // TODO: Close the transaction signing modal and update the UI
+  };
+
   const generateActionButton = () => {
-    // This function generates the unbond or withdraw button
+    // This function generates the transition or withdraw button
     // based on the state of the delegation
     // It also disables the button if the delegation
     // is in an intermediate state (local storage)
@@ -67,12 +91,12 @@ export const Delegation: React.FC<DelegationProps> = ({
         <div className="flex justify-end lg:justify-start">
           <button
             className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
-            onClick={() => onUnbond(stakingTxHash)}
+            onClick={onTransition}
             disabled={
-              intermediateState === DelegationState.INTERMEDIATE_UNBONDING
+              intermediateState === DelegationState.INTERMEDIATE_TRANSITIONING
             }
           >
-            Unbond
+            Transition
           </button>
         </div>
       );
@@ -81,7 +105,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         <div className="flex justify-end lg:justify-start">
           <button
             className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
-            onClick={() => onWithdraw(stakingTxHash)}
+            onClick={() => onWithdraw(stakingTxHashHex)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
             }
@@ -111,9 +135,9 @@ export const Delegation: React.FC<DelegationProps> = ({
   const renderStateTooltip = () => {
     // overflow should be shown only on active state
     if (isOverflow && isActive) {
-      return getStateTooltip(DelegationState.OVERFLOW, globalParamsVersion);
+      return getStateTooltip(DelegationState.OVERFLOW);
     } else {
-      return getStateTooltip(intermediateState || state, globalParamsVersion);
+      return getStateTooltip(intermediateState || state);
     }
   };
 
@@ -143,12 +167,12 @@ export const Delegation: React.FC<DelegationProps> = ({
         </p>
         <div className="justify-center lg:flex order-2 lg:order-3">
           <a
-            href={`${mempoolApiUrl}/tx/${stakingTxHash}`}
+            href={`${mempoolApiUrl}/tx/${stakingTxHashHex}`}
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary hover:underline"
           >
-            {trim(stakingTxHash)}
+            {trim(stakingTxHashHex)}
           </a>
         </div>
         {/*
@@ -160,17 +184,20 @@ export const Delegation: React.FC<DelegationProps> = ({
             <p>{renderState()}</p>
             <span
               className="cursor-pointer text-xs"
-              data-tooltip-id={`tooltip-${stakingTxHash}`}
+              data-tooltip-id={`tooltip-${stakingTxHashHex}`}
               data-tooltip-content={renderStateTooltip()}
               data-tooltip-place="top"
             >
               <AiOutlineInfoCircle />
             </span>
-            <Tooltip id={`tooltip-${stakingTxHash}`} className="tooltip-wrap" />
+            <Tooltip
+              id={`tooltip-${stakingTxHashHex}`}
+              className="tooltip-wrap"
+            />
           </div>
         </div>
         <DelegationPoints
-          stakingTxHash={stakingTxHash}
+          stakingTxHashHex={stakingTxHashHex}
           className="relative flex justify-end lg:justify-center order-5"
         />
         <div className="order-6">{generateActionButton()}</div>

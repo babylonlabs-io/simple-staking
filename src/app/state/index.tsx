@@ -5,16 +5,14 @@ import { useOrdinals } from "@/app/hooks/api/useOrdinals";
 import { useParams } from "@/app/hooks/api/useParams";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
 import { useVersions } from "@/app/hooks/api/useVersions";
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { createStateUtils } from "@/utils/createStateUtils";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { filterDust } from "@/utils/wallet";
 import type {
   InscriptionIdentifier,
   UTXO,
 } from "@/utils/wallet/btc_wallet_provider";
 
-import { BbnStakingParamsVersion } from "../types/params";
+import { Params } from "../types/params";
 
 import { DelegationState } from "./DelegationState";
 
@@ -23,13 +21,8 @@ const STATE_LIST = [DelegationState];
 export interface AppState {
   availableUTXOs?: UTXO[];
   totalBalance: number;
-  nextVersion?: GlobalParamsVersion;
-  currentVersion?: GlobalParamsVersion;
-  latestBbnStakingParamsVersion?: BbnStakingParamsVersion;
-  bbnStakingParamsVersions?: BbnStakingParamsVersion[];
+  params?: Params;
   currentHeight?: number;
-  isApprochingNextVersion: boolean;
-  firstActivationHeight: number;
   isError: boolean;
   isLoading: boolean;
   ordinalsExcluded: boolean;
@@ -42,19 +35,10 @@ const { StateProvider, useState: useApplicationState } =
     isLoading: false,
     isError: false,
     totalBalance: 0,
-    isApprochingNextVersion: false,
-    firstActivationHeight: 0,
     ordinalsExcluded: true,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
   });
-
-const defaultVersionParams = {
-  isApprochingNextVersion: false,
-  firstActivationHeight: 0,
-  currentVersion: undefined,
-  nextVersion: undefined,
-};
 
 export function AppState({ children }: PropsWithChildren) {
   const [ordinalsExcluded, setOrdinalsExcluded] = useState(true);
@@ -127,16 +111,6 @@ export function AppState({ children }: PropsWithChildren) {
     [availableUTXOs],
   );
 
-  const versionInfo = useMemo(
-    () =>
-      versions && height
-        ? getCurrentGlobalParamsVersion(height + 1, versions)
-        : defaultVersionParams,
-    [versions, height],
-  );
-
-  const bbnStakingParams = useMemo(() => params?.bbnStakingParams, [params]);
-
   // Handlers
   const includeOrdinals = useCallback(() => setOrdinalsExcluded(false), []);
   const excludeOrdinals = useCallback(() => setOrdinalsExcluded(true), []);
@@ -147,9 +121,7 @@ export function AppState({ children }: PropsWithChildren) {
       availableUTXOs,
       currentHeight: height,
       totalBalance,
-      ...versionInfo,
-      latestBbnStakingParamsVersion: bbnStakingParams?.latestVersion,
-      bbnStakingParamsVersions: bbnStakingParams?.versions,
+      params,
       isError,
       isLoading,
       ordinalsExcluded,
@@ -160,8 +132,7 @@ export function AppState({ children }: PropsWithChildren) {
       availableUTXOs,
       height,
       totalBalance,
-      versionInfo,
-      bbnStakingParams,
+      params,
       isError,
       isLoading,
       ordinalsExcluded,

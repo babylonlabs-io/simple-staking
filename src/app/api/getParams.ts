@@ -52,7 +52,8 @@ export const getParams = async (): Promise<Params> => {
       maxStakingValueSat: v.max_staking_value_sat,
       minStakingTimeBlocks: v.min_staking_time_blocks,
       maxStakingTimeBlocks: v.max_staking_time_blocks,
-      unbondingTime: v.min_unbonding_time_blocks,
+      // TODO: To be reverted after https://github.com/babylonlabs-io/babylon/issues/263
+      unbondingTime: v.min_unbonding_time_blocks + 1,
       unbondingFeeSat: v.unbonding_fee_sat,
       minCommissionRate: v.min_commission_rate,
       maxActiveFinalityProviders: v.max_active_finality_providers,
@@ -66,14 +67,22 @@ export const getParams = async (): Promise<Params> => {
       minStakingAmountSat: v.min_staking_value_sat,
     }));
 
-  const latestVersion = versions.reduce((prev, current) =>
+  const latestParam = versions.reduce((prev, current) =>
     current.version > prev.version ? current : prev,
   );
 
+  // Find the genesis params which is the first version
+  // This param can be used for transitioning phase-1 delegations
+  const genesisParam = versions.find((v) => v.version === 0);
+  if (!genesisParam) {
+    throw new Error("Genesis params not found");
+  }
+
   return {
     bbnStakingParams: {
-      latestVersion,
-      versions,
+      latestParam,
+      bbnStakingParams: versions,
+      genesisParam,
     },
   };
 };

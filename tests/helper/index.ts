@@ -8,8 +8,6 @@ import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
 import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { createStakingTx } from "@/utils/delegations/signStakingTx";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { getPublicKeyNoCoord } from "@/utils/wallet";
 import { UTXO } from "@/utils/wallet/btc_wallet_provider";
 
@@ -257,60 +255,6 @@ export class DataGenerator {
     return {
       taproot: this.getTaprootAddress(publicKey),
       nativeSegwit: this.getNativeSegwitAddress(publicKey),
-    };
-  };
-
-  createRandomStakingPsbt = (
-    globalParams: GlobalParamsVersion[],
-    txHeight: number,
-    stakerKeysPairs?: KeyPairs,
-  ) => {
-    const { currentVersion: selectedParam } = getCurrentGlobalParamsVersion(
-      txHeight,
-      globalParams,
-    );
-    if (!selectedParam) {
-      throw new Error("Current version not found");
-    }
-    const stakerKeys = stakerKeysPairs
-      ? stakerKeysPairs
-      : this.generateRandomKeyPair();
-    const { scriptPubKey, address } = this.getAddressAndScriptPubKey(
-      stakerKeys.publicKey,
-    ).nativeSegwit;
-    const stakingAmount = this.getRandomIntegerBetween(
-      selectedParam.minStakingAmountSat,
-      selectedParam.maxStakingAmountSat,
-    );
-    const stakingTerm = this.getRandomIntegerBetween(
-      selectedParam.minStakingTimeBlocks,
-      selectedParam.maxStakingTimeBlocks,
-    );
-    const { unsignedStakingPsbt } = createStakingTx(
-      selectedParam,
-      stakingAmount,
-      stakingTerm,
-      this.generateRandomKeyPair().noCoordPublicKey, // FP key
-      this.network,
-      address,
-      stakerKeys.noCoordPublicKey, // staker public key
-      DEFAULT_TEST_FEE_RATE,
-      this.generateRandomUTXOs(
-        stakingAmount + 1000000, // add some extra satoshis to cover the fee
-        this.getRandomIntegerBetween(1, 10),
-        scriptPubKey,
-      ),
-    );
-
-    const unsignedPsbt = unsignedStakingPsbt;
-
-    const signedPsbt = unsignedStakingPsbt
-      .signAllInputs(stakerKeys.keyPair)
-      .finalizeAllInputs();
-
-    return {
-      unsignedPsbt,
-      signedPsbt,
     };
   };
 

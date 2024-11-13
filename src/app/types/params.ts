@@ -8,8 +8,12 @@ export interface BbnStakingParamsVersion extends StakingParams {
 }
 
 export interface BbnStakingParams {
-  latestVersion: BbnStakingParamsVersion;
-  versions: BbnStakingParamsVersion[];
+  // The genesis params is the version 0 of the staking params which is
+  // compatible with the phase-1 global params
+  genesisParam: BbnStakingParamsVersion;
+  // The latest params is the param with the highest version number
+  latestParam: BbnStakingParamsVersion;
+  bbnStakingParams: BbnStakingParamsVersion[];
 }
 
 export interface Params {

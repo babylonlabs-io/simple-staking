@@ -6,10 +6,6 @@ interface MessageProps {
   icon: any;
 }
 
-// Used for
-// - Staking cap reached
-// - Staking has not started yet
-// - Staking params are upgrading
 export const Message: React.FC<MessageProps> = ({ title, messages, icon }) => {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-2 rounded-2xl border border-neutral-content p-4 dark:border-neutral-content/20">

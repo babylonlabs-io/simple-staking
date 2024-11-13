@@ -1,19 +1,15 @@
 import { IoMdClose } from "react-icons/io";
 
-import { useVersionByHeight } from "@/app/hooks/useVersionByHeight";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
-import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
-import { satoshiToBtc } from "@/utils/btcConversions";
-import { maxDecimals } from "@/utils/maxDecimals";
 
 import { LoadingView } from "../Loading/Loading";
 
 import { GeneralModal } from "./GeneralModal";
 
-export const MODE_UNBOND = "unbond";
+export const MODE_TRANSITION = "transition";
 export const MODE_WITHDRAW = "withdraw";
-export type MODE = typeof MODE_UNBOND | typeof MODE_WITHDRAW;
+export type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW;
 
 interface PreviewModalProps {
   open: boolean;
@@ -24,40 +20,14 @@ interface PreviewModalProps {
   delegation: DelegationInterface;
 }
 
-const { coinName, networkName } = getNetworkConfig();
+const { networkName } = getNetworkConfig();
 
-export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
+export const WithdrawModal: React.FC<PreviewModalProps> = ({
   open,
   onClose,
   onProceed,
-  mode,
   awaitingWalletResponse,
-  delegation,
 }) => {
-  const { currentVersion: delegationGlobalParams } = useVersionByHeight(
-    delegation.stakingTx.startHeight ?? 0,
-  );
-
-  const unbondingFeeSat = delegationGlobalParams?.unbondingFeeSat ?? 0;
-  const unbondingTimeBlocks = delegationGlobalParams?.unbondingTime ?? 0;
-
-  const unbondTitle = "Unbond";
-
-  const unbondContent = (
-    <>
-      You are about to unbond your stake before its expiration. <br />A
-      transaction fee of{" "}
-      <strong>
-        {maxDecimals(satoshiToBtc(unbondingFeeSat), 8) || 0} {coinName}
-      </strong>{" "}
-      will be deduced from your stake by the {networkName} network. <br />
-      The expected unbonding time will be about{" "}
-      <strong>{blocksToDisplayTime(unbondingTimeBlocks)}</strong>. <br />
-      After unbonded, you will need to use this dashboard to withdraw your stake
-      for it to appear in your wallet.
-    </>
-  );
-
   const withdrawTitle = "Withdraw";
   const withdrawContent = (
     <>
@@ -66,8 +36,8 @@ export const UnbondWithdrawModal: React.FC<PreviewModalProps> = ({
     </>
   );
 
-  const title = mode === MODE_UNBOND ? unbondTitle : withdrawTitle;
-  const content = mode === MODE_UNBOND ? unbondContent : withdrawContent;
+  const title = withdrawTitle;
+  const content = withdrawContent;
 
   return (
     <GeneralModal

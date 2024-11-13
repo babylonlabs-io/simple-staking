@@ -25,5 +25,6 @@ export function generateMockDelegation(
     },
     isOverflow: false,
     unbondingTx: undefined,
+    transitioned: false,
   };
 }

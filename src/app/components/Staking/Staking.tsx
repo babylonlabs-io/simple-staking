@@ -8,11 +8,10 @@ import { LoadingView } from "@/app/components/Loading/Loading";
 import { EOIModal } from "@/app/components/Modals/EOIModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useParams } from "@/app/hooks/api/useParams";
 import {
   SigningStep,
-  useEoiCreationService,
-} from "@/app/hooks/services/useEoiCreationService";
+  useTransactionService,
+} from "@/app/hooks/services/useTransactionService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
@@ -20,7 +19,6 @@ import {
   FinalityProvider,
   FinalityProvider as FinalityProviderInterface,
 } from "@/app/types/finalityProviders";
-import { createStakingTx } from "@/utils/delegations/signStakingTx";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
@@ -39,7 +37,6 @@ import geoRestricted from "./Form/States/geo-restricted.svg";
 export const Staking = () => {
   const {
     availableUTXOs,
-    currentVersion,
     totalBalance: btcWalletBalanceSat,
     isError,
     isLoading,
@@ -75,8 +72,9 @@ export const Staking = () => {
   const [cancelFeedbackModalOpened, setCancelFeedbackModalOpened] =
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
-  const { createDelegationEoi } = useEoiCreationService();
-  const { data: params } = useParams();
+  const { createDelegationEoi, estimateStakingFee } = useTransactionService();
+  const { params } = useAppState();
+  const latestParam = params?.bbnStakingParams?.latestParam;
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -160,12 +158,12 @@ export const Staking = () => {
         throw new Error("Finality provider not selected");
       }
       const eoiInput = {
-        finalityProviderPublicKey: finalityProvider.btcPk,
+        finalityProviderPkNoCoordHex: finalityProvider.btcPk,
         stakingAmountSat,
         stakingTimeBlocks,
         feeRate,
       };
-      await createDelegationEoi(eoiInput, signingCallback);
+      await createDelegationEoi(eoiInput, feeRate, signingCallback);
       // TODO: Hook up with the react pending verify modal
       handleResetState();
     } catch (error: Error | any) {
@@ -195,10 +193,10 @@ export const Staking = () => {
     if (
       btcWalletNetwork &&
       address &&
+      latestParam &&
       publicKeyNoCoord &&
       stakingAmountSat &&
       finalityProvider &&
-      currentVersion &&
       mempoolFeeRates &&
       availableUTXOs
     ) {
@@ -208,19 +206,15 @@ export const Staking = () => {
           throw new Error("Selected fee rate is lower than the hour fee");
         }
         const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
-        // Calculate the staking fee
-        const { stakingFeeSat } = createStakingTx(
-          currentVersion,
+
+        const eoiInput = {
+          finalityProviderPkNoCoordHex: finalityProvider.btcPk,
           stakingAmountSat,
           stakingTimeBlocks,
-          finalityProvider.btcPk,
-          btcWalletNetwork,
-          address,
-          publicKeyNoCoord,
-          memoizedFeeRate,
-          availableUTXOs,
-        );
-        return stakingFeeSat;
+          feeRate: memoizedFeeRate,
+        };
+        // Calculate the staking fee
+        return estimateStakingFee(eoiInput, memoizedFeeRate);
       } catch (error: Error | any) {
         let errorMsg = error?.message;
         // Turn the error message into a user-friendly message
@@ -248,17 +242,18 @@ export const Staking = () => {
   }, [
     btcWalletNetwork,
     address,
+    latestParam,
     publicKeyNoCoord,
     stakingAmountSat,
-    stakingTimeBlocks,
     finalityProvider,
-    currentVersion,
     mempoolFeeRates,
-    selectedFeeRate,
     availableUTXOs,
-    showError,
-    defaultFeeRate,
+    selectedFeeRate,
     minFeeRate,
+    defaultFeeRate,
+    stakingTimeBlocks,
+    estimateStakingFee,
+    showError,
   ]);
 
   // Select the finality provider from the list
@@ -352,8 +347,7 @@ export const Staking = () => {
     }
     // Staking form
     else {
-      const stakingParams = params?.bbnStakingParams.latestVersion;
-      if (!stakingParams) {
+      if (!latestParam) {
         throw new Error("Staking params not loaded");
       }
       const {
@@ -363,7 +357,7 @@ export const Staking = () => {
         maxStakingTimeBlocks,
         unbondingTime,
         unbondingFeeSat,
-      } = stakingParams;
+      } = latestParam;
 
       // Staking time is fixed
       const stakingTimeFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
