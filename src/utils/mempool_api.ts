@@ -4,9 +4,9 @@ import { Fees, UTXO } from "./wallet/btc_wallet_provider";
 
 const { mempoolApiUrl } = getNetworkConfig();
 
-interface MerkleProof {
+export interface MerkleProof {
   blockHeight: number;
-  merkle: string[];
+  proofHex: string;
   pos: number;
 }
 
@@ -235,10 +235,23 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
     const err = await response.text();
     throw new ServerError(err, response.status);
   }
-  const data = await response.json();
+  const data: {
+    block_height: number;
+    merkle: string[];
+    pos: number;
+  } = await response.json();
+
+  const { block_height, merkle, pos } = data;
+  if (!block_height || !merkle.length || !pos) {
+    throw new Error("Invalid transaction merkle proof result returned");
+  }
+  const proofHex = merkle.reduce((acc: string, m: string) => {
+    return acc + m;
+  }, "");
+
   return {
-    blockHeight: data.block_height,
-    merkle: data.merkle,
-    pos: data.pos,
+    blockHeight: block_height,
+    proofHex,
+    pos,
   };
 }

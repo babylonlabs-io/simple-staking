@@ -5,12 +5,12 @@ import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
 import {
-  SigningStep,
+  type SigningStep,
   useTransactionService,
 } from "@/app/hooks/services/useTransactionService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import {
-  Delegation as DelegationInterface,
+  type Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
 import { shouldDisplayPoints } from "@/config";

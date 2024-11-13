@@ -1,5 +1,8 @@
-import { btcstakingtx } from "@babylonlabs-io/babylon-proto-ts";
-import { InclusionProof } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/btcstaking";
+import {
+  btccheckpoint,
+  btcstaking,
+  btcstakingtx,
+} from "@babylonlabs-io/babylon-proto-ts";
 import {
   BTCSigType,
   ProofOfPossessionBTC,
@@ -19,6 +22,7 @@ import {
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
 } from "@/utils/delegations";
+import { getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
@@ -43,7 +47,7 @@ export enum SigningStep {
 }
 
 export const useTransactionService = () => {
-  const { availableUTXOs: inputUTXOs } = useAppState();
+  const { availableUTXOs: inputUTXOs, params } = useAppState();
   const {
     connected: cosmosConnected,
     bech32Address,
@@ -58,7 +62,6 @@ export const useTransactionService = () => {
     network: btcNetwork,
   } = useBTCWallet();
 
-  const { params } = useAppState();
   const latestParam = params?.bbnStakingParams?.latestParam;
   const genesisParam = params?.bbnStakingParams?.genesisParam;
 
@@ -194,6 +197,9 @@ export const useTransactionService = () => {
         stakingInput.stakingTimeBlocks,
       );
 
+      // Get the merkle proof
+      const inclusionProof = await getInclusionProof(stakingTx);
+      // Create delegation message
       const delegationMsg = await createBtcDelegationMsg(
         stakingInstance,
         stakingInput,
@@ -206,6 +212,7 @@ export const useTransactionService = () => {
           signMessage,
           signingCallback,
         },
+        inclusionProof,
       );
       await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
       await signingCallback(SigningStep.SEND_BBN);
@@ -268,7 +275,7 @@ const createBtcDelegationMsg = async (
   },
   param: BbnStakingParamsVersion,
   btcSigningFuncs: BtcSigningFuncs,
-  inclusionProof?: InclusionProof,
+  inclusionProof?: btcstaking.InclusionProof,
 ) => {
   const cleanedStakingTx = clearTxSignatures(stakingTx);
 
@@ -387,4 +394,27 @@ const checkWalletConnection = (
     !signingStargateClient
   )
     throw new Error("Wallet not connected");
+};
+
+const getInclusionProof = async (
+  stakingTx: Transaction,
+): Promise<btcstaking.InclusionProof> => {
+  // Get the merkle proof
+  let txMerkleProof: MerkleProof;
+  try {
+    txMerkleProof = await getTxMerkleProof(stakingTx.getId());
+  } catch (err) {
+    throw new Error("Failed to get the merkle proof", { cause: err });
+  }
+
+  const hash = Uint8Array.from(Buffer.from(stakingTx.getId(), "hex"));
+  const inclusionProofKey: btccheckpoint.TransactionKey =
+    btccheckpoint.TransactionKey.fromPartial({
+      index: txMerkleProof.pos,
+      hash,
+    });
+  return btcstaking.InclusionProof.fromPartial({
+    key: inclusionProofKey,
+    proof: Uint8Array.from(Buffer.from(txMerkleProof.proofHex, "hex")),
+  });
 };
