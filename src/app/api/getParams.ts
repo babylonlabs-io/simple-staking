@@ -34,7 +34,7 @@ export interface BbnParams {
 export const getParams = async (): Promise<Params> => {
   const { data } = (await apiWrapper(
     "GET",
-    "/v2/global-params",
+    "/v2/params",
     "Error getting params",
   )) as AxiosResponse<ParamsDataResponse>;
 
