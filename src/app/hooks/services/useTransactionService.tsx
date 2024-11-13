@@ -348,8 +348,7 @@ const createBtcDelegationMsg = async (
         Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
       ),
       delegatorSlashingSig: Uint8Array.from(slashingSig),
-      // TODO: Confirm with core on the value whether its inclusive or exclusive
-      unbondingTime: param.unbondingTime + 1,
+      unbondingTime: param.unbondingTime,
       unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
       unbondingValue: stakingInput.stakingAmountSat - param.unbondingFeeSat,
       unbondingSlashingTx: Uint8Array.from(

@@ -52,7 +52,8 @@ export const getParams = async (): Promise<Params> => {
       maxStakingValueSat: v.max_staking_value_sat,
       minStakingTimeBlocks: v.min_staking_time_blocks,
       maxStakingTimeBlocks: v.max_staking_time_blocks,
-      unbondingTime: v.min_unbonding_time_blocks,
+      // TODO: To be reverted after https://github.com/babylonlabs-io/babylon/issues/263
+      unbondingTime: v.min_unbonding_time_blocks + 1,
       unbondingFeeSat: v.unbonding_fee_sat,
       minCommissionRate: v.min_commission_rate,
       maxActiveFinalityProviders: v.max_active_finality_providers,
