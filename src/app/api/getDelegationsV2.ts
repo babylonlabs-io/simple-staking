@@ -13,24 +13,80 @@ export interface PaginatedDelegations {
   pagination: Pagination;
 }
 
-interface DelegationsAPIResponse {
+interface DelegationV2APIResponse {
+  data: DelegationV2API;
+}
+
+interface DelegationsV2APIResponse {
   data: DelegationV2API[];
   pagination: Pagination;
 }
-
 interface DelegationV2API {
   finality_provider_btc_pks_hex: string[];
   params_version: string;
   staker_btc_pk_hex: string;
-  staking_amount: string;
-  staking_time: string;
-  staking_tx_hash_hex: string;
-  start_height: number;
-  end_height: number;
+  delegation_staking: {
+    staking_tx_hash_hex: string;
+    staking_time: string;
+    staking_amount: string;
+    start_height: number;
+    end_height: number;
+  };
+  delegation_unbonding: {
+    unbonding_time: string;
+    unbonding_tx: string;
+  };
   state: string;
-  unbonding_time: string;
-  unbonding_tx: string;
 }
+
+export const getDelegationV2 = async (
+  stakingTxHashHex: string,
+): Promise<DelegationV2> => {
+  if (!stakingTxHashHex) {
+    throw new Error("No staking tx hash provided");
+  }
+  const params = {
+    staking_tx_hash_hex: stakingTxHashHex,
+  };
+
+  const response = await apiWrapper(
+    "GET",
+    "/v2/delegation",
+    "Error getting delegation v2",
+    params,
+  );
+
+  const delegationAPIResponse: DelegationV2APIResponse = response.data;
+
+  const state = DelegationV2StakingStateMap[delegationAPIResponse.data.state];
+  if (!state) {
+    throw new Error(
+      `Unknown delegation state: ${delegationAPIResponse.data.state}`,
+    );
+  }
+
+  return {
+    finalityProviderBtcPksHex:
+      delegationAPIResponse.data.finality_provider_btc_pks_hex,
+    paramsVersion: parseInt(delegationAPIResponse.data.params_version),
+    stakerBtcPkHex: delegationAPIResponse.data.staker_btc_pk_hex,
+    stakingAmount: parseInt(
+      delegationAPIResponse.data.delegation_staking.staking_amount,
+    ),
+    stakingTime: parseInt(
+      delegationAPIResponse.data.delegation_staking.staking_time,
+    ),
+    stakingTxHashHex:
+      delegationAPIResponse.data.delegation_staking.staking_tx_hash_hex,
+    startHeight: delegationAPIResponse.data.delegation_staking.start_height,
+    endHeight: delegationAPIResponse.data.delegation_staking.end_height,
+    state,
+    unbondingTime: parseInt(
+      delegationAPIResponse.data.delegation_unbonding.unbonding_time,
+    ),
+    unbondingTx: delegationAPIResponse.data.delegation_unbonding.unbonding_tx,
+  };
+};
 
 export const getDelegationsV2 = async (
   publicKeyNoCoord: string,
@@ -46,12 +102,12 @@ export const getDelegationsV2 = async (
 
   const response = await apiWrapper(
     "GET",
-    "/v2/staker/delegations",
+    "/v2/delegations",
     "Error getting delegations v2",
     params,
   );
 
-  const delegationsAPIResponse: DelegationsAPIResponse = response.data;
+  const delegationsAPIResponse: DelegationsV2APIResponse = response.data;
 
   const delegations: DelegationV2[] = delegationsAPIResponse.data.map(
     (apiDelegation: DelegationV2API): DelegationV2 => {
@@ -63,14 +119,18 @@ export const getDelegationsV2 = async (
         finalityProviderBtcPksHex: apiDelegation.finality_provider_btc_pks_hex,
         paramsVersion: parseInt(apiDelegation.params_version),
         stakerBtcPkHex: apiDelegation.staker_btc_pk_hex,
-        stakingAmount: parseInt(apiDelegation.staking_amount),
-        stakingTime: parseInt(apiDelegation.staking_time),
-        stakingTxHashHex: apiDelegation.staking_tx_hash_hex,
-        startHeight: apiDelegation.start_height,
-        endHeight: apiDelegation.end_height,
+        stakingAmount: parseInt(
+          apiDelegation.delegation_staking.staking_amount,
+        ),
+        stakingTime: parseInt(apiDelegation.delegation_staking.staking_time),
+        stakingTxHashHex: apiDelegation.delegation_staking.staking_tx_hash_hex,
+        startHeight: apiDelegation.delegation_staking.start_height,
+        endHeight: apiDelegation.delegation_staking.end_height,
         state,
-        unbondingTime: parseInt(apiDelegation.unbonding_time),
-        unbondingTx: apiDelegation.unbonding_tx,
+        unbondingTime: parseInt(
+          apiDelegation.delegation_unbonding.unbonding_time,
+        ),
+        unbondingTx: apiDelegation.delegation_unbonding.unbonding_tx,
       };
     },
   );
