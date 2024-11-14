@@ -1,9 +1,8 @@
 import { useAppState } from "@/app/state";
+import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 import { BbnStakingParamsVersion } from "@/app/types/params";
 import { Hint } from "@/components/common/Hint";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
-
-import { DelegationState } from "../type";
 
 interface StatusProps {
   value: string;
@@ -11,47 +10,43 @@ interface StatusProps {
 
 const STATUSES: Record<
   string,
-  (state?: BbnStakingParamsVersion) => { label: string; tooltip: string }
+  (param?: BbnStakingParamsVersion) => { label: string; tooltip: string }
 > = {
-  [DelegationState.ACTIVE]: () => ({
+  [state.ACTIVE]: () => ({
     label: "Active",
     tooltip: "Stake is active",
   }),
-  [DelegationState.UNBONDING_REQUESTED]: () => ({
-    label: "Unbonding Requested",
-    tooltip: "Unbonding requested",
+  [state.VERIFIED]: () => ({
+    label: "Verified",
+    tooltip: "Stake is verified, you can start staking",
   }),
-  [DelegationState.UNBONDING]: (state) => ({
+  [state.UNBONDING]: (param) => ({
     label: "Unbonding",
-    tooltip: `Unbonding process of ${blocksToDisplayTime(state?.unbondingTime)} has started`,
+    tooltip: `Unbonding process of ${blocksToDisplayTime(param?.unbondingTime)} has started`,
   }),
-  [DelegationState.UNBONDED]: () => ({
-    label: "Unbonded",
-    tooltip: "Stake has been unbonded",
+  [state.WITHDRAWABLE]: () => ({
+    label: "Withdrawable",
+    tooltip: "Stake is withdrawable",
   }),
-  [DelegationState.WITHDRAWN]: () => ({
+  [state.WITHDRAWN]: () => ({
     label: "Withdrawn",
     tooltip: "Stake has been withdrawn",
   }),
-  [DelegationState.PENDING]: (state) => ({
+  [state.PENDING]: () => ({
     label: "Pending",
     // TODO: get confirmation depth from params
     // https://github.com/babylonlabs-io/simple-staking/issues/325
     tooltip: `Stake that is pending ${10} Bitcoin confirmations will only be visible from this device`,
   }),
-  [DelegationState.OVERFLOW]: () => ({
-    label: "Overflow",
-    tooltip: "Stake is over the staking cap",
+  [state.INTERMEDIATE_PENDING_CONFIRMATION]: () => ({
+    label: "Pending",
+    tooltip: "Stake is pending confirmation",
   }),
-  [DelegationState.EXPIRED]: () => ({
-    label: "Expired",
-    tooltip: "Stake timelock has expired",
-  }),
-  [DelegationState.INTERMEDIATE_UNBONDING]: () => ({
+  [state.INTERMEDIATE_UNBONDING]: () => ({
     label: "Requesting Unbonding",
     tooltip: "Stake is requesting unbonding",
   }),
-  [DelegationState.INTERMEDIATE_WITHDRAWAL]: () => ({
+  [state.INTERMEDIATE_WITHDRAWAL]: () => ({
     label: "Withdrawal Submitted",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
