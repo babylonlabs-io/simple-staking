@@ -1,15 +1,10 @@
-import { useNetworkFees } from "@/app/hooks/api/useNetworkFees";
-import {
-  SigningStep,
-  useTransactionService,
-} from "@/app/hooks/services/useTransactionService";
+import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import type {
   DelegationV2,
   DelegationV2Params,
 } from "@/app/types/delegationsV2";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 
 import { type TableColumn, GridTable } from "../../common/GridTable";
 
@@ -62,10 +57,6 @@ const columns = (
   },
 ];
 
-const signingCallback = async (step: SigningStep) => {
-  console.log("Signing step:", step);
-};
-
 export function DelegationList() {
   const currentTime = useCurrentTime();
   const {
@@ -75,10 +66,8 @@ export function DelegationList() {
     isLoading,
     findDelegationByTxHash,
   } = useDelegationV2State();
-  const { submitStakingTx, submitUnbondingTx } = useTransactionService();
-  // TODO: Temporary solution until https://github.com/babylonlabs-io/simple-staking/issues/345 is resolved
-  const { data: networkFees } = useNetworkFees();
-  const { defaultFeeRate: feeRate } = getFeeRateFromMempool(networkFees);
+  const { submitStakingTx, submitUnbondingTx, submitWithdrawalTx } =
+    useTransactionService();
 
   // Define the onClick function here
   const handleActionClick = async (action: string, txHash: string) => {
@@ -92,6 +81,7 @@ export function DelegationList() {
       stakingAmount,
       paramsVersion,
       stakingTime,
+      unbondingTx,
     } = d;
 
     if (action === "stake") {
@@ -102,9 +92,7 @@ export function DelegationList() {
           stakingTimeBlocks: stakingTime,
         },
         paramsVersion,
-        feeRate,
         stakingTxHashHex,
-        signingCallback,
       );
       // TODO: Transition the delegation to the next immediate state - PENDING CONFIRMATION
     } else if (action === "unbound") {
@@ -115,14 +103,21 @@ export function DelegationList() {
           stakingTimeBlocks: stakingTime,
         },
         paramsVersion,
-        feeRate,
         stakingTxHashHex,
-        signingCallback,
       );
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
     } else if (action === "withdraw") {
-      console.log(`Withdrawing transaction for ${txHash}`);
-      // Handle withdrawal action
+      await submitWithdrawalTx(
+        {
+          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          stakingAmountSat: stakingAmount,
+          stakingTimeBlocks: stakingTime,
+        },
+        paramsVersion,
+        stakingTxHashHex,
+        unbondingTx,
+      );
+      // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_WITHDRAWAL
     }
   };
 

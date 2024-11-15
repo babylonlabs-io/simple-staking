@@ -22,7 +22,10 @@ import {
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
 } from "@/utils/delegations";
-import { getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
+import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
+import { getTxHex, getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
+
+import { useNetworkFees } from "../api/useNetworkFees";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
@@ -44,12 +47,13 @@ export enum SigningStep {
   UNBONDING_SLASHING = "unbonding_slashing",
   PROOF_OF_POSSESSION = "proof_of_possession",
   SEND_BBN = "send_bbn",
-  SEND_BTC_STAKING = "send_btc_staking",
-  SEND_BTC_UNBONDING = "send_btc_unbonding",
 }
 
 export const useTransactionService = () => {
   const { availableUTXOs: inputUTXOs, params } = useAppState();
+  const { data: networkFees } = useNetworkFees();
+  const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
+
   const {
     connected: cosmosConnected,
     bech32Address,
@@ -238,9 +242,7 @@ export const useTransactionService = () => {
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      feeRate: number,
       expectedTxId: string,
-      signingCallback: (step: SigningStep) => Promise<void>,
     ) => {
       // Perform checks
       if (!params || params.bbnStakingParams.versions.length === 0) {
@@ -268,7 +270,7 @@ export const useTransactionService = () => {
       const { psbt: stakingPsbt } = staking.createStakingTransaction(
         stakingInput.stakingAmountSat,
         inputUTXOs!,
-        feeRate,
+        defaultFeeRate,
       );
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
       const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
@@ -279,11 +281,11 @@ export const useTransactionService = () => {
         );
       }
       await pushTx(signedStakingPsbtHex);
-      await signingCallback(SigningStep.SEND_BTC_STAKING);
     },
     [
       btcConnected,
       btcNetwork,
+      defaultFeeRate,
       params,
       address,
       publicKeyNoCoord,
@@ -305,9 +307,56 @@ export const useTransactionService = () => {
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      feeRate: number,
-      expectedStakingTxHash: string,
-      signingCallback: (step: SigningStep) => Promise<void>,
+      stakingTxHashHex: string,
+    ) => {
+      // Perform checks
+      if (!params || params.bbnStakingParams.versions.length === 0) {
+        throw new Error("Params not loaded");
+      }
+      if (!btcConnected || !btcNetwork)
+        throw new Error("BTC Wallet not connected");
+      validateStakingInput(stakingInput);
+
+      // Get the staking transaction hex from the mempool
+      const stakingTxHex = await getTxHex(stakingTxHashHex);
+
+      const p = getParamByVersion(params, paramVersion);
+      if (!p) throw new Error("Staking params not loaded");
+
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        p,
+        stakingInput.finalityProviderPkNoCoordHex,
+        stakingInput.stakingTimeBlocks,
+      );
+
+      const stakingTx = Transaction.fromHex(stakingTxHex);
+      const { psbt: unbondingPsbt } =
+        staking.createUnbondingTransaction(stakingTx);
+      const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
+      await pushTx(signedUnbondingPsbtHex);
+    },
+    [
+      params,
+      btcConnected,
+      btcNetwork,
+      address,
+      publicKeyNoCoord,
+      signPsbt,
+      pushTx,
+    ],
+  );
+
+  const submitWithdrawalTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      paramVersion: number,
+      stakingTxHashHex: string,
+      unbondingTxHex?: string,
     ) => {
       // Perform checks
       if (!params || params.bbnStakingParams.versions.length === 0) {
@@ -331,36 +380,38 @@ export const useTransactionService = () => {
         stakingInput.stakingTimeBlocks,
       );
 
-      // Create and sign staking transaction
-      const { psbt: stakingPsbt } = staking.createStakingTransaction(
-        stakingInput.stakingAmountSat,
-        inputUTXOs!,
-        feeRate,
-      );
-      const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
-      const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
-      const stakingTxId = stakingTx.getId();
-      if (stakingTxId !== expectedStakingTxHash) {
-        throw new Error(
-          "Staking transaction hash mismatch, verified delegation might be outdated",
-        );
+      let psbtToWithdraw: Psbt;
+
+      if (unbondingTxHex) {
+        const { psbt: unbondingPsbt } =
+          staking.createWithdrawEarlyUnbondedTransaction(
+            Transaction.fromHex(unbondingTxHex),
+            defaultFeeRate,
+          );
+        psbtToWithdraw = unbondingPsbt;
+      } else {
+        // Get the staking transaction hex from the mempool
+        const stakingTxHex = await getTxHex(stakingTxHashHex);
+        const { psbt: unbondingPsbt } =
+          staking.createWithdrawTimelockUnbondedTransaction(
+            Transaction.fromHex(stakingTxHex),
+            defaultFeeRate,
+          );
+        psbtToWithdraw = unbondingPsbt;
       }
 
-      const { psbt: unbondingPsbt } =
-        staking.createUnbondingTransaction(stakingTx);
-      const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
-      await pushTx(signedUnbondingPsbtHex);
-      await signingCallback(SigningStep.SEND_BTC_UNBONDING);
+      const signedWithdrawalPsbtHex = await signPsbt(psbtToWithdraw.toHex());
+      await pushTx(signedWithdrawalPsbtHex);
     },
     [
+      params,
       btcConnected,
       btcNetwork,
-      params,
       address,
       publicKeyNoCoord,
-      inputUTXOs,
       signPsbt,
       pushTx,
+      defaultFeeRate,
     ],
   );
 
@@ -370,6 +421,7 @@ export const useTransactionService = () => {
     transitionPhase1Delegation,
     submitStakingTx,
     submitUnbondingTx,
+    submitWithdrawalTx,
   };
 };
 
