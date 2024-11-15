@@ -13,7 +13,7 @@ export interface BbnStakingParams {
   genesisParam: BbnStakingParamsVersion;
   // The latest params is the param with the highest version number
   latestParam: BbnStakingParamsVersion;
-  bbnStakingParams: BbnStakingParamsVersion[];
+  versions: BbnStakingParamsVersion[];
 }
 
 export interface Params {

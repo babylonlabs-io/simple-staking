@@ -1,9 +1,15 @@
+import { useNetworkFees } from "@/app/hooks/api/useNetworkFees";
+import {
+  SigningStep,
+  useTransactionService,
+} from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import type {
   DelegationV2,
   DelegationV2Params,
 } from "@/app/types/delegationsV2";
 import { useCurrentTime } from "@/hooks/useCurrentTime";
+import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 
 import { type TableColumn, GridTable } from "../../common/GridTable";
 
@@ -12,7 +18,9 @@ import { Amount } from "./components/Amount";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
-const columns: TableColumn<DelegationV2, DelegationV2Params>[] = [
+const columns = (
+  handleActionClick: (action: string, txHash: string) => void,
+): TableColumn<DelegationV2, DelegationV2Params>[] => [
   {
     field: "stakingAmount",
     headerName: "Amount",
@@ -45,10 +53,18 @@ const columns: TableColumn<DelegationV2, DelegationV2Params>[] = [
     cellClassName: "justify-center",
     align: "center",
     renderCell: (row) => (
-      <ActionButton txHash={row.stakingTxHashHex} state={row.state} />
+      <ActionButton
+        txHash={row.stakingTxHashHex}
+        state={row.state}
+        onClick={(action, txHash) => handleActionClick(action, txHash)}
+      />
     ),
   },
 ];
+
+const signingCallback = async (step: SigningStep) => {
+  console.log("Signing step:", step);
+};
 
 export function DelegationList() {
   const currentTime = useCurrentTime();
@@ -57,12 +73,63 @@ export function DelegationList() {
     fetchMoreDelegations,
     hasMoreDelegations,
     isLoading,
+    findDelegationByTxHash,
   } = useDelegationV2State();
+  const { submitStakingTx, submitUnbondingTx } = useTransactionService();
+  // TODO: Temporary solution until https://github.com/babylonlabs-io/simple-staking/issues/345 is resolved
+  const { data: networkFees } = useNetworkFees();
+  const { defaultFeeRate: feeRate } = getFeeRateFromMempool(networkFees);
+
+  // Define the onClick function here
+  const handleActionClick = async (action: string, txHash: string) => {
+    const d = findDelegationByTxHash(txHash);
+    if (!d) {
+      throw new Error("Delegation not found: " + txHash);
+    }
+    const {
+      stakingTxHashHex,
+      finalityProviderBtcPksHex,
+      stakingAmount,
+      paramsVersion,
+      stakingTime,
+    } = d;
+
+    if (action === "stake") {
+      await submitStakingTx(
+        {
+          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          stakingAmountSat: stakingAmount,
+          stakingTimeBlocks: stakingTime,
+        },
+        paramsVersion,
+        feeRate,
+        stakingTxHashHex,
+        signingCallback,
+      );
+      // TODO: Transition the delegation to the next immediate state - PENDING CONFIRMATION
+    } else if (action === "unbound") {
+      await submitUnbondingTx(
+        {
+          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          stakingAmountSat: stakingAmount,
+          stakingTimeBlocks: stakingTime,
+        },
+        paramsVersion,
+        feeRate,
+        stakingTxHashHex,
+        signingCallback,
+      );
+      // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
+    } else if (action === "withdraw") {
+      console.log(`Withdrawing transaction for ${txHash}`);
+      // Handle withdrawal action
+    }
+  };
 
   return (
     <GridTable
       getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-      columns={columns}
+      columns={columns(handleActionClick)}
       data={delegations}
       loading={isLoading}
       infiniteScroll={hasMoreDelegations}

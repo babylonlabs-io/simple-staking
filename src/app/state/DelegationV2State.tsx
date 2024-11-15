@@ -14,6 +14,7 @@ interface DelegationV2State {
   delegations: DelegationV2[];
   addDelegation: (delegation: DelegationV2) => void;
   fetchMoreDelegations: () => void;
+  findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
 }
 
 const { StateProvider, useState } = createStateUtils<DelegationV2State>({
@@ -22,6 +23,7 @@ const { StateProvider, useState } = createStateUtils<DelegationV2State>({
   hasMoreDelegations: false,
   addDelegation: () => null,
   fetchMoreDelegations: () => null,
+  findDelegationByTxHash: () => undefined,
 });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
@@ -68,6 +70,12 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     [setDelegations],
   );
 
+  // Get a delegation by its txHash
+  const findDelegationByTxHash = useCallback(
+    (txHash: string) => delegations.find((d) => d.stakingTxHashHex === txHash),
+    [delegations],
+  );
+
   // Context
   const state = useMemo(
     () => ({
@@ -75,6 +83,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       isLoading: isFetchingNextPage,
       hasMoreDelegations: hasNextPage,
       addDelegation,
+      findDelegationByTxHash,
       fetchMoreDelegations: fetchNextPage,
     }),
     [
@@ -83,6 +92,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       hasNextPage,
       addDelegation,
       fetchNextPage,
+      findDelegationByTxHash,
     ],
   );
 

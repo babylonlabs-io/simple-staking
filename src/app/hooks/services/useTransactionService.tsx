@@ -16,7 +16,7 @@ import { useCallback } from "react";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
-import { BbnStakingParamsVersion } from "@/app/types/params";
+import { BbnStakingParamsVersion, Params } from "@/app/types/params";
 import {
   clearTxSignatures,
   extractSchnorrSignaturesFromTransaction,
@@ -44,6 +44,8 @@ export enum SigningStep {
   UNBONDING_SLASHING = "unbonding_slashing",
   PROOF_OF_POSSESSION = "proof_of_possession",
   SEND_BBN = "send_bbn",
+  SEND_BTC_STAKING = "send_btc_staking",
+  SEND_BTC_UNBONDING = "send_btc_unbonding",
 }
 
 export const useTransactionService = () => {
@@ -60,6 +62,7 @@ export const useTransactionService = () => {
     address,
     signMessage,
     network: btcNetwork,
+    pushTx,
   } = useBTCWallet();
 
   const latestParam = params?.bbnStakingParams?.latestParam;
@@ -231,10 +234,142 @@ export const useTransactionService = () => {
     ],
   );
 
+  const submitStakingTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      paramVersion: number,
+      feeRate: number,
+      expectedTxId: string,
+      signingCallback: (step: SigningStep) => Promise<void>,
+    ) => {
+      // Perform checks
+      if (!params || params.bbnStakingParams.versions.length === 0) {
+        throw new Error("Params not loaded");
+      }
+      if (!btcConnected || !btcNetwork)
+        throw new Error("BTC Wallet not connected");
+      validateStakingInput(stakingInput);
+
+      const p = getParamByVersion(params, paramVersion);
+      if (!p) throw new Error("Staking params not loaded");
+
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        p,
+        stakingInput.finalityProviderPkNoCoordHex,
+        stakingInput.stakingTimeBlocks,
+      );
+
+      // Create and sign staking transaction
+      const { psbt: stakingPsbt } = staking.createStakingTransaction(
+        stakingInput.stakingAmountSat,
+        inputUTXOs!,
+        feeRate,
+      );
+      const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
+      const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
+      const stakingTxId = stakingTx.getId();
+      if (stakingTxId !== expectedTxId) {
+        throw new Error(
+          "Staking transaction hash mismatch, verified delegation might be outdated",
+        );
+      }
+      await pushTx(signedStakingPsbtHex);
+      await signingCallback(SigningStep.SEND_BTC_STAKING);
+    },
+    [
+      btcConnected,
+      btcNetwork,
+      params,
+      address,
+      publicKeyNoCoord,
+      inputUTXOs,
+      signPsbt,
+      pushTx,
+    ],
+  );
+
+  // TODO: Below is temporary solution until we have
+  // https://github.com/babylonlabs-io/btc-staking-ts/issues/40
+  // Here we are re-creating the stakingTx and unbondingTx which were already
+  // created as part of EOI.
+  // Ideally, we shall only create the unbondingTx at EOI(not psbt), then convert
+  // the unbondingTx here to psbt and sign it. (There are additional fields such
+  // as witnessUtxo, tapInternalKey & tapLeafScript need to be added to the psbt
+  // as it's not part of the unbondingTx)
+  const submitUnbondingTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      paramVersion: number,
+      feeRate: number,
+      expectedStakingTxHash: string,
+      signingCallback: (step: SigningStep) => Promise<void>,
+    ) => {
+      // Perform checks
+      if (!params || params.bbnStakingParams.versions.length === 0) {
+        throw new Error("Params not loaded");
+      }
+      if (!btcConnected || !btcNetwork)
+        throw new Error("BTC Wallet not connected");
+      validateStakingInput(stakingInput);
+
+      const p = getParamByVersion(params, paramVersion);
+      if (!p) throw new Error("Staking params not loaded");
+
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        p,
+        stakingInput.finalityProviderPkNoCoordHex,
+        stakingInput.stakingTimeBlocks,
+      );
+
+      // Create and sign staking transaction
+      const { psbt: stakingPsbt } = staking.createStakingTransaction(
+        stakingInput.stakingAmountSat,
+        inputUTXOs!,
+        feeRate,
+      );
+      const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
+      const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
+      const stakingTxId = stakingTx.getId();
+      if (stakingTxId !== expectedStakingTxHash) {
+        throw new Error(
+          "Staking transaction hash mismatch, verified delegation might be outdated",
+        );
+      }
+
+      const { psbt: unbondingPsbt } =
+        staking.createUnbondingTransaction(stakingTx);
+      const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
+      await pushTx(signedUnbondingPsbtHex);
+      await signingCallback(SigningStep.SEND_BTC_UNBONDING);
+    },
+    [
+      btcConnected,
+      btcNetwork,
+      params,
+      address,
+      publicKeyNoCoord,
+      inputUTXOs,
+      signPsbt,
+      pushTx,
+    ],
+  );
+
   return {
     createDelegationEoi,
     estimateStakingFee,
     transitionPhase1Delegation,
+    submitStakingTx,
+    submitUnbondingTx,
   };
 };
 
@@ -417,4 +552,10 @@ const getInclusionProof = async (
     key: inclusionProofKey,
     proof: Uint8Array.from(Buffer.from(txMerkleProof.proofHex, "hex")),
   });
+};
+
+const getParamByVersion = (params: Params, version: number) => {
+  return params.bbnStakingParams.versions.find(
+    (param) => param.version === version,
+  );
 };
