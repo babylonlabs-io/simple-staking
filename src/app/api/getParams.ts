@@ -81,7 +81,7 @@ export const getParams = async (): Promise<Params> => {
   return {
     bbnStakingParams: {
       latestParam,
-      bbnStakingParams: versions,
+      versions: versions,
       genesisParam,
     },
   };

@@ -245,8 +245,8 @@ export const useTransactionService = () => {
       expectedTxId: string,
     ) => {
       // Perform checks
-      if (!params || params.bbnStakingParams.versions.length === 0) {
-        throw new Error("Params not loaded");
+      if (!params?.bbnStakingParams.versions.length) {
+        throw new Error("Staking parameters not loaded");
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -274,10 +274,9 @@ export const useTransactionService = () => {
       );
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
       const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
-      const stakingTxId = stakingTx.getId();
-      if (stakingTxId !== expectedTxId) {
+      if (stakingTx.getId() !== expectedTxId) {
         throw new Error(
-          "Staking transaction hash mismatch, verified delegation might be outdated",
+          `Staking transaction hash mismatch, expected ${expectedTxId} but got ${stakingTx.getId()}`,
         );
       }
       await pushTx(signedStakingPsbtHex);
@@ -438,17 +437,26 @@ const sendBbnTx = async (
   );
   // TODO: The gas calculation need to be improved
   // https://github.com/babylonlabs-io/simple-staking/issues/320
-  const gasWanted = Math.ceil(gasEstimate * 1.2);
+  const gasWanted = Math.ceil(gasEstimate * 1.5);
   const fee = {
     amount: [{ denom: "ubbn", amount: (gasWanted * 0.01).toFixed(0) }],
     gas: gasWanted.toString(),
   };
   // sign it
-  await signingStargateClient!.signAndBroadcast(
+  const res = await signingStargateClient!.signAndBroadcast(
     bech32Address,
     [delegationMsg],
     fee,
   );
+  if (res.code !== 0) {
+    throw new Error(
+      `Failed to send delegation transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
+    );
+  }
+  return {
+    txHash: res.transactionHash,
+    gasUsed: res.gasUsed,
+  };
 };
 
 const createBtcDelegationMsg = async (
