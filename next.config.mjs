@@ -2,7 +2,8 @@
 import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: true,
-  output: "standalone",
+  output: "export",
+  images: { unoptimized: true },
   experimental: {
     forceSwcTransforms: true,
   },
