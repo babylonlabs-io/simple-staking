@@ -85,7 +85,9 @@ export const useTransactionService = () => {
         btcNetwork,
         signingStargateClient,
       );
+
       validateStakingInput(stakingInput);
+
       if (!latestParam) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
@@ -147,6 +149,7 @@ export const useTransactionService = () => {
         signingStargateClient,
       );
       if (!latestParam) throw new Error("Staking params not loaded");
+
       validateStakingInput(stakingInput);
 
       const staking = new Staking(
@@ -193,6 +196,7 @@ export const useTransactionService = () => {
         signingStargateClient,
       );
       if (!genesisParam) throw new Error("Genesis params not loaded");
+
       validateStakingInput(stakingInput);
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
@@ -250,6 +254,7 @@ export const useTransactionService = () => {
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
+
       validateStakingInput(stakingInput);
 
       const p = getParamByVersion(params, paramVersion);
@@ -314,6 +319,7 @@ export const useTransactionService = () => {
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
+
       validateStakingInput(stakingInput);
 
       // Get the staking transaction hex from the mempool
@@ -363,6 +369,7 @@ export const useTransactionService = () => {
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
+
       validateStakingInput(stakingInput);
 
       const p = getParamByVersion(params, paramVersion);

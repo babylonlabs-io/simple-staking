@@ -1,10 +1,6 @@
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import type {
-  DelegationV2,
-  DelegationV2Params,
-} from "@/app/types/delegationsV2";
-import { useCurrentTime } from "@/hooks/useCurrentTime";
+import type { DelegationV2 } from "@/app/types/delegationsV2";
 
 import { type TableColumn, GridTable } from "../../common/GridTable";
 
@@ -13,9 +9,10 @@ import { Amount } from "./components/Amount";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
-const columns = (
-  handleActionClick: (action: string, txHash: string) => void,
-): TableColumn<DelegationV2, DelegationV2Params>[] => [
+const columns = (): TableColumn<
+  DelegationV2,
+  { handleActionClick: (action: string, txHash: string) => void }
+>[] => [
   {
     field: "stakingAmount",
     headerName: "Amount",
@@ -47,7 +44,7 @@ const columns = (
     headerName: "Action",
     cellClassName: "justify-center",
     align: "center",
-    renderCell: (row) => (
+    renderCell: (row, _, { handleActionClick }) => (
       <ActionButton
         txHash={row.stakingTxHashHex}
         state={row.state}
@@ -58,7 +55,6 @@ const columns = (
 ];
 
 export function DelegationList() {
-  const currentTime = useCurrentTime();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -94,7 +90,6 @@ export function DelegationList() {
         paramsVersion,
         stakingTxHashHex,
       );
-      // TODO: Transition the delegation to the next immediate state - PENDING CONFIRMATION
     } else if (action === "unbound") {
       await submitUnbondingTx(
         {
@@ -124,7 +119,7 @@ export function DelegationList() {
   return (
     <GridTable
       getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-      columns={columns(handleActionClick)}
+      columns={columns()}
       data={delegations}
       loading={isLoading}
       infiniteScroll={hasMoreDelegations}
@@ -136,7 +131,7 @@ export function DelegationList() {
         cellClassName:
           "p-4 first:pl-4 first:rounded-l-2xl last:pr-4 last:rounded-r-2xl bg-base-300 border dark:bg-base-200 dark:border-0 flex items-center text-sm",
       }}
-      params={{ currentTime }}
+      params={{ handleActionClick }}
       fallback={<div>No delegations found</div>}
     />
   );
