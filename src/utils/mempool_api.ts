@@ -68,6 +68,11 @@ function txMerkleProofUrl(txId: string): URL {
   return new URL(mempoolAPI + "tx/" + txId + "/merkle-proof");
 }
 
+// URL for the transaction hex endpoint
+function txHexUrl(txId: string): URL {
+  return new URL(mempoolAPI + "tx/" + txId + "/hex");
+}
+
 /**
  * Pushes a transaction to the Bitcoin network.
  * @param txHex - The hex string corresponding to the full transaction.
@@ -256,4 +261,18 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
     proofHex,
     pos,
   };
+}
+
+/**
+ * Retrieve the hex representation of a transaction.
+ * @param txId - The transaction ID in string format.
+ * @returns A promise that resolves into the transaction hex.
+ */
+export async function getTxHex(txId: string): Promise<string> {
+  const response = await fetch(txHexUrl(txId));
+  if (!response.ok) {
+    const err = await response.text();
+    throw new ServerError(err, response.status);
+  }
+  return await response.text();
 }

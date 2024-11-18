@@ -1,3 +1,4 @@
+import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import type {
   DelegationV2,
@@ -12,7 +13,9 @@ import { Amount } from "./components/Amount";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
-const columns: TableColumn<DelegationV2, DelegationV2Params>[] = [
+const columns = (
+  handleActionClick: (action: string, txHash: string) => void,
+): TableColumn<DelegationV2, DelegationV2Params>[] => [
   {
     field: "stakingAmount",
     headerName: "Amount",
@@ -45,7 +48,11 @@ const columns: TableColumn<DelegationV2, DelegationV2Params>[] = [
     cellClassName: "justify-center",
     align: "center",
     renderCell: (row) => (
-      <ActionButton txHash={row.stakingTxHashHex} state={row.state} />
+      <ActionButton
+        txHash={row.stakingTxHashHex}
+        state={row.state}
+        onClick={(action, txHash) => handleActionClick(action, txHash)}
+      />
     ),
   },
 ];
@@ -57,12 +64,67 @@ export function DelegationList() {
     fetchMoreDelegations,
     hasMoreDelegations,
     isLoading,
+    findDelegationByTxHash,
   } = useDelegationV2State();
+  const { submitStakingTx, submitUnbondingTx, submitWithdrawalTx } =
+    useTransactionService();
+
+  // Define the onClick function here
+  const handleActionClick = async (action: string, txHash: string) => {
+    const d = findDelegationByTxHash(txHash);
+    if (!d) {
+      throw new Error("Delegation not found: " + txHash);
+    }
+    const {
+      stakingTxHashHex,
+      finalityProviderBtcPksHex,
+      stakingAmount,
+      paramsVersion,
+      stakingTime,
+      unbondingTx,
+    } = d;
+
+    if (action === "stake") {
+      await submitStakingTx(
+        {
+          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          stakingAmountSat: stakingAmount,
+          stakingTimeBlocks: stakingTime,
+        },
+        paramsVersion,
+        stakingTxHashHex,
+      );
+      // TODO: Transition the delegation to the next immediate state - PENDING CONFIRMATION
+    } else if (action === "unbound") {
+      await submitUnbondingTx(
+        {
+          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          stakingAmountSat: stakingAmount,
+          stakingTimeBlocks: stakingTime,
+        },
+        paramsVersion,
+        stakingTxHashHex,
+      );
+      // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
+    } else if (action === "withdraw") {
+      await submitWithdrawalTx(
+        {
+          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          stakingAmountSat: stakingAmount,
+          stakingTimeBlocks: stakingTime,
+        },
+        paramsVersion,
+        stakingTxHashHex,
+        unbondingTx,
+      );
+      // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_WITHDRAWAL
+    }
+  };
 
   return (
     <GridTable
       getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-      columns={columns}
+      columns={columns(handleActionClick)}
       data={delegations}
       loading={isLoading}
       infiniteScroll={hasMoreDelegations}
