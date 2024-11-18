@@ -189,9 +189,11 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                   checked={noInscription}
                 />
                 <span className="label-text text-xs leading-snug md:text-sm md:max-w-[34rem]">
-                  I certify that staking bitcoin with ordinals, bitcoin NFTs,
-                  Ruins, or any other bitcoin inscriptions can cause their
-                  complete and permanent loss.
+                  I certify that I wish to stake bitcoin and agree that doing so
+                  may cause some or all of the bitcoin ordinals, NFTs, runes,
+                  and other inscriptions in the connected bitcoin wallet to be
+                  lost. I acknowledge that this interface will not detect all
+                  such inscriptions.
                 </span>
               </label>
             </div>
