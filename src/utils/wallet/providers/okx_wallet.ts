@@ -3,6 +3,7 @@ import {
   network,
   validateAddress,
 } from "@/config/network.config";
+import { isTaproot } from "@/utils/wallet";
 
 import {
   getAddressBalance,
@@ -122,15 +123,16 @@ export class OKXWallet extends WalletProvider {
     return await this.bitcoinNetworkProvider.signPsbt(
       psbtHex,
       // Required on 3.29.26 version
-      shouldDisableTweakSigner && {
-        toSignInputs: [
-          {
-            index: 0,
-            address: this.okxWalletInfo.address,
-            disableTweakSigner: true,
-          },
-        ],
-      },
+      shouldDisableTweakSigner &&
+        isTaproot(this.okxWalletInfo.address) && {
+          toSignInputs: [
+            {
+              index: 0,
+              address: this.okxWalletInfo.address,
+              disableTweakSigner: true,
+            },
+          ],
+        },
     );
   };
 
