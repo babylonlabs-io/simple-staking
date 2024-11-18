@@ -4,14 +4,35 @@ import { WalletProvider } from "@/utils/wallet/wallet_provider";
 
 const SIGN_PSBT_NOT_COMPATIBLE_WALLETS = ["OneKey"];
 
-export type SignPsbtTransaction = (psbtHex: string) => Promise<Transaction>;
+// wallets requiring to disable the tweakSigner option
+const SIGN_PSBT_DISABLE_TWEAK_SIGNER = ["OKX"];
+
+export type signPsbtMode = "staking" | "unbonding" | "withdrawal";
+
+export type SignPsbtTransaction = (
+  psbtHex: string,
+  signPsbtMode: signPsbtMode,
+) => Promise<Transaction>;
 
 // This method is created to accommodate backward compatibility with the
 // old implementation of signPsbt where the wallet.signPsbt method returns
 // the signed transaction in hex
 export const signPsbtTransaction = (wallet: WalletProvider) => {
-  return async (psbtHex: string) => {
-    const signedHex = await wallet.signPsbt(psbtHex);
+  return async (psbtHex: string, mode: signPsbtMode) => {
+    let shouldDisableTweakSigner = false;
+
+    if (
+      (mode === "unbonding" || mode === "withdrawal") &&
+      SIGN_PSBT_DISABLE_TWEAK_SIGNER.includes(
+        await wallet.getWalletProviderName(),
+      )
+    ) {
+      shouldDisableTweakSigner = true;
+    }
+
+    const signedHex = await wallet.signPsbt(psbtHex, {
+      disableTweakSigner: shouldDisableTweakSigner,
+    });
     const providerName = await wallet.getWalletProviderName();
     if (SIGN_PSBT_NOT_COMPATIBLE_WALLETS.includes(providerName)) {
       try {

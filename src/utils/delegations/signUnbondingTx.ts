@@ -82,7 +82,7 @@ export const signUnbondingTx = async (
   // Sign the unbonding transaction
   let unbondingTx: Transaction;
   try {
-    unbondingTx = await signPsbtTx(unsignedUnbondingTx.toHex());
+    unbondingTx = await signPsbtTx(unsignedUnbondingTx.toHex(), "unbonding");
   } catch (error) {
     throw new Error("Failed to sign PSBT for the unbonding transaction");
   }

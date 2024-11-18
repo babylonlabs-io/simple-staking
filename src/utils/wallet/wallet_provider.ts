@@ -42,6 +42,10 @@ export type WalletInfo = {
   address: string;
 };
 
+export type SignPsbtOptions = {
+  disableTweakSigner?: boolean;
+};
+
 /**
  * Abstract class representing a wallet provider.
  * Provides methods for connecting to a wallet, retrieving wallet information, signing transactions, and more.
@@ -79,14 +83,20 @@ export abstract class WalletProvider {
    * @param psbtHex - The hex string of the unsigned PSBT to sign.
    * @returns A promise that resolves to the hex string of the signed PSBT.
    */
-  abstract signPsbt(psbtHex: string): Promise<string>;
+  abstract signPsbt(
+    psbtHex: string,
+    options?: SignPsbtOptions,
+  ): Promise<string>;
 
   /**
    * Signs multiple PSBTs in hex format.
    * @param psbtsHexes - The hex strings of the unsigned PSBTs to sign.
    * @returns A promise that resolves to an array of hex strings, each representing a signed PSBT.
    */
-  abstract signPsbts(psbtsHexes: string[]): Promise<string[]>;
+  abstract signPsbts(
+    psbtsHexes: string[],
+    options?: SignPsbtOptions,
+  ): Promise<string[]>;
 
   /**
    * Gets the network of the current account.

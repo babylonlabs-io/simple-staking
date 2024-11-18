@@ -124,6 +124,7 @@ export const signStakingTx = async (
   try {
     stakingTx = await signPsbtTransaction(btcWallet)(
       unsignedStakingPsbt.toHex(),
+      "staking",
     );
   } catch (error: Error | any) {
     throw new Error(error?.message || "Staking transaction signing PSBT error");

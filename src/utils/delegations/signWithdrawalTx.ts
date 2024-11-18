@@ -112,7 +112,7 @@ export const signWithdrawalTx = async (
   let withdrawalTx: Transaction;
   try {
     const { psbt } = withdrawPsbtTxResult;
-    withdrawalTx = await signPsbtTx(psbt.toHex());
+    withdrawalTx = await signPsbtTx(psbt.toHex(), "withdrawal");
   } catch (error) {
     throw new Error("Failed to sign PSBT for the withdrawal transaction");
   }

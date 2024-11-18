@@ -15,6 +15,7 @@ import {
   Fees,
   InscriptionIdentifier,
   Network,
+  SignPsbtOptions,
   UTXO,
   WalletInfo,
   WalletProvider,
@@ -107,15 +108,21 @@ export class OKXWallet extends WalletProvider {
     return this.okxWalletInfo.publicKeyHex;
   };
 
-  signPsbt = async (psbtHex: string): Promise<string> => {
+  signPsbt = async (
+    psbtHex: string,
+    options?: SignPsbtOptions,
+  ): Promise<string> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
+
+    const shouldDisableTweakSigner = options?.disableTweakSigner || false;
+
     // Use signPsbt since it shows the fees
     return await this.bitcoinNetworkProvider.signPsbt(
       psbtHex,
       // Required on 3.29.26 version
-      {
+      shouldDisableTweakSigner && {
         toSignInputs: [
           {
             index: 0,
@@ -127,7 +134,10 @@ export class OKXWallet extends WalletProvider {
     );
   };
 
-  signPsbts = async (psbtsHexes: string[]): Promise<string[]> => {
+  signPsbts = async (
+    psbtsHexes: string[],
+    _options?: SignPsbtOptions,
+  ): Promise<string[]> => {
     if (!this.okxWalletInfo) {
       throw new Error("OKX Wallet not connected");
     }
