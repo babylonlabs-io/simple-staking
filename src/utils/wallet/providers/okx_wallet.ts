@@ -123,6 +123,8 @@ export class OKXWallet extends WalletProvider {
     return await this.bitcoinNetworkProvider.signPsbt(
       psbtHex,
       // Required on 3.29.26 version
+      // based on Unisat change
+      // https://github.com/unisat-wallet/wallet-utils/commit/23016c5a50e9e0445342c01a7647e738c18dbe05#diff-212579e144de5e197f8ab72b05c2b22544bb499ed328ff62f295c7bbc8a714bfR66-R73
       shouldDisableTweakSigner &&
         isTaproot(this.okxWalletInfo.address) && {
           toSignInputs: [
