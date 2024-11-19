@@ -9,10 +9,10 @@ import { Amount } from "./components/Amount";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
-const columns = (): TableColumn<
+const columns: TableColumn<
   DelegationV2,
   { handleActionClick: (action: string, txHash: string) => void }
->[] => [
+>[] = [
   {
     field: "stakingAmount",
     headerName: "Amount",
@@ -119,7 +119,7 @@ export function DelegationList() {
   return (
     <GridTable
       getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-      columns={columns()}
+      columns={columns}
       data={delegations}
       loading={isLoading}
       infiniteScroll={hasMoreDelegations}
