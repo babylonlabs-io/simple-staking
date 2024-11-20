@@ -106,20 +106,16 @@ export const useTransactionService = () => {
       );
 
       // Create and sign staking transaction
-      const { psbt: stakingPsbt } = staking.createStakingTransaction(
+      const { transaction } = staking.createStakingTransaction(
         stakingInput.stakingAmountSat,
         inputUTXOs!,
         feeRate,
       );
-      // TODO: This is temporary solution until we have
-      // https://github.com/babylonlabs-io/btc-staking-ts/issues/40
-      const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
-      const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
 
       const delegationMsg = await createBtcDelegationMsg(
         staking,
         stakingInput,
-        stakingTx,
+        transaction,
         bech32Address,
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
         latestParam,
@@ -258,6 +254,7 @@ export const useTransactionService = () => {
       stakingInput: BtcStakingInputs,
       paramVersion: number,
       expectedTxId: string,
+      stakingTxHex: string,
     ) => {
       // Perform checks
       if (!params?.bbnStakingParams.versions.length) {
@@ -281,13 +278,11 @@ export const useTransactionService = () => {
         stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimeBlocks,
       );
-
-      // Create and sign staking transaction
-      const { psbt: stakingPsbt } = staking.createStakingTransaction(
-        stakingInput.stakingAmountSat,
+      const stakingPsbt = staking.createStakingPsbt(
+        Transaction.fromHex(stakingTxHex),
         inputUTXOs!,
-        defaultFeeRate,
       );
+
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
       const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
       if (stakingTx.getId() !== expectedTxId) {
@@ -300,7 +295,6 @@ export const useTransactionService = () => {
     [
       btcConnected,
       btcNetwork,
-      defaultFeeRate,
       params,
       address,
       publicKeyNoCoord,
@@ -310,19 +304,12 @@ export const useTransactionService = () => {
     ],
   );
 
-  // TODO: Below is temporary solution until we have
-  // https://github.com/babylonlabs-io/btc-staking-ts/issues/40
-  // Here we are re-creating the stakingTx and unbondingTx which were already
-  // created as part of EOI.
-  // Ideally, we shall only create the unbondingTx at EOI(not psbt), then convert
-  // the unbondingTx here to psbt and sign it. (There are additional fields such
-  // as witnessUtxo, tapInternalKey & tapLeafScript need to be added to the psbt
-  // as it's not part of the unbondingTx)
   const submitUnbondingTx = useCallback(
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
       stakingTxHashHex: string,
+      unbondingTxHex: string,
     ) => {
       // Perform checks
       if (!params || params.bbnStakingParams.versions.length === 0) {
@@ -354,6 +341,16 @@ export const useTransactionService = () => {
       const { psbt: unbondingPsbt } =
         staking.createUnbondingTransaction(stakingTx);
       const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
+      // Compare the unbonding tx hash with the one from API
+      const unbondingTxHashHex = Psbt.fromHex(signedUnbondingPsbtHex)
+        .extractTransaction()
+        .getId();
+      if (unbondingTxHashHex !== unbondingTxHex) {
+        throw new Error(
+          `Unbonding transaction hash mismatch, expected ${unbondingTxHex} but got ${unbondingTxHashHex}`,
+        );
+      }
+
       await pushTx(signedUnbondingPsbtHex);
     },
     [
@@ -490,17 +487,8 @@ const createBtcDelegationMsg = async (
   btcSigningFuncs: BtcSigningFuncs,
   inclusionProof?: btcstaking.InclusionProof,
 ) => {
-  const cleanedStakingTx = clearTxSignatures(stakingTx);
-
-  const { psbt: unbondingPsbt } =
-    stakingInstance.createUnbondingTransaction(cleanedStakingTx);
-  // TODO: This is temporary solution until we have
-  // https://github.com/babylonlabs-io/btc-staking-ts/issues/40
-  const signedUnbondingPsbtHex = await btcSigningFuncs.signPsbt(
-    unbondingPsbt.toHex(),
-  );
-  const unbondingTx = Psbt.fromHex(signedUnbondingPsbtHex).extractTransaction();
-  const cleanedUnbondingTx = clearTxSignatures(unbondingTx);
+  const { transaction: unbondingTx } =
+    stakingInstance.createUnbondingTransaction(stakingTx);
 
   // Create slashing transactions and extract signatures
   await btcSigningFuncs.signingCallback(
@@ -508,7 +496,7 @@ const createBtcDelegationMsg = async (
     EOIStepStatus.PROCESSING,
   );
   const { psbt: slashingPsbt } =
-    stakingInstance.createStakingOutputSlashingTransaction(cleanedStakingTx);
+    stakingInstance.createStakingOutputSlashingTransaction(unbondingTx);
   const signedSlashingPsbtHex = await btcSigningFuncs.signPsbt(
     slashingPsbt.toHex(),
   );
@@ -557,9 +545,7 @@ const createBtcDelegationMsg = async (
     bech32AddressHex,
     "ecdsa",
   );
-  const ecdsaSig = Uint8Array.from(
-    globalThis.Buffer.from(signedBbnAddress, "base64"),
-  );
+  const ecdsaSig = Uint8Array.from(Buffer.from(signedBbnAddress, "base64"));
   const proofOfPossession: ProofOfPossessionBTC = {
     btcSigType: BTCSigType.ECDSA,
     btcSig: ecdsaSig,
@@ -584,13 +570,13 @@ const createBtcDelegationMsg = async (
       ],
       stakingTime: stakingInput.stakingTimeBlocks,
       stakingValue: stakingInput.stakingAmountSat,
-      stakingTx: Uint8Array.from(cleanedStakingTx.toBuffer()),
+      stakingTx: Uint8Array.from(stakingTx.toBuffer()),
       slashingTx: Uint8Array.from(
         Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
       ),
       delegatorSlashingSig: Uint8Array.from(slashingSig),
       unbondingTime: param.unbondingTime,
-      unbondingTx: Uint8Array.from(cleanedUnbondingTx.toBuffer()),
+      unbondingTx: Uint8Array.from(unbondingTx.toBuffer()),
       unbondingValue: stakingInput.stakingAmountSat - param.unbondingFeeSat,
       unbondingSlashingTx: Uint8Array.from(
         Buffer.from(

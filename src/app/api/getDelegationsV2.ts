@@ -23,18 +23,23 @@ interface DelegationsV2APIResponse {
 }
 interface DelegationV2API {
   finality_provider_btc_pks_hex: string[];
-  params_version: string;
+  params_version: number;
   staker_btc_pk_hex: string;
   delegation_staking: {
     staking_tx_hash_hex: string;
-    staking_time: string;
-    staking_amount: string;
+    staking_time: number;
+    staking_amount: number;
     start_height: number;
     end_height: number;
+    staking_tx_hex: string;
   };
   delegation_unbonding: {
-    unbonding_time: string;
+    unbonding_time: number;
     unbonding_tx: string;
+    covenant_unbonding_signatures?: {
+      covenant_btc_pk_hex: string;
+      signature_hex: string;
+    }[];
   };
   state: string;
 }
@@ -68,23 +73,26 @@ export const getDelegationV2 = async (
   return {
     finalityProviderBtcPksHex:
       delegationAPIResponse.data.finality_provider_btc_pks_hex,
-    paramsVersion: parseInt(delegationAPIResponse.data.params_version),
+    stakingTxHex: delegationAPIResponse.data.delegation_staking.staking_tx_hex,
+    paramsVersion: delegationAPIResponse.data.params_version,
     stakerBtcPkHex: delegationAPIResponse.data.staker_btc_pk_hex,
-    stakingAmount: parseInt(
-      delegationAPIResponse.data.delegation_staking.staking_amount,
-    ),
-    stakingTime: parseInt(
-      delegationAPIResponse.data.delegation_staking.staking_time,
-    ),
+    stakingAmount: delegationAPIResponse.data.delegation_staking.staking_amount,
+    stakingTime: delegationAPIResponse.data.delegation_staking.staking_time,
     stakingTxHashHex:
       delegationAPIResponse.data.delegation_staking.staking_tx_hash_hex,
     startHeight: delegationAPIResponse.data.delegation_staking.start_height,
     endHeight: delegationAPIResponse.data.delegation_staking.end_height,
     state,
-    unbondingTime: parseInt(
+    unbondingTime:
       delegationAPIResponse.data.delegation_unbonding.unbonding_time,
-    ),
     unbondingTx: delegationAPIResponse.data.delegation_unbonding.unbonding_tx,
+    covenantUnbondingSignatures:
+      delegationAPIResponse.data.delegation_unbonding.covenant_unbonding_signatures?.map(
+        (signature) => ({
+          covenantBtcPkHex: signature.covenant_btc_pk_hex,
+          signatureHex: signature.signature_hex,
+        }),
+      ),
   };
 };
 
@@ -117,20 +125,24 @@ export const getDelegationsV2 = async (
       }
       return {
         finalityProviderBtcPksHex: apiDelegation.finality_provider_btc_pks_hex,
-        paramsVersion: parseInt(apiDelegation.params_version),
+        stakingTxHex: apiDelegation.delegation_staking.staking_tx_hex,
+        paramsVersion: apiDelegation.params_version,
         stakerBtcPkHex: apiDelegation.staker_btc_pk_hex,
-        stakingAmount: parseInt(
-          apiDelegation.delegation_staking.staking_amount,
-        ),
-        stakingTime: parseInt(apiDelegation.delegation_staking.staking_time),
+        stakingAmount: apiDelegation.delegation_staking.staking_amount,
+        stakingTime: apiDelegation.delegation_staking.staking_time,
         stakingTxHashHex: apiDelegation.delegation_staking.staking_tx_hash_hex,
         startHeight: apiDelegation.delegation_staking.start_height,
         endHeight: apiDelegation.delegation_staking.end_height,
         state,
-        unbondingTime: parseInt(
-          apiDelegation.delegation_unbonding.unbonding_time,
-        ),
+        unbondingTime: apiDelegation.delegation_unbonding.unbonding_time,
         unbondingTx: apiDelegation.delegation_unbonding.unbonding_tx,
+        covenantUnbondingSignatures:
+          apiDelegation.delegation_unbonding.covenant_unbonding_signatures?.map(
+            (signature) => ({
+              covenantBtcPkHex: signature.covenant_btc_pk_hex,
+              signatureHex: signature.signature_hex,
+            }),
+          ),
       };
     },
   );

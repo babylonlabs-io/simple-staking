@@ -68,11 +68,13 @@ export function DelegationList() {
     }
     const {
       stakingTxHashHex,
+      stakingTxHex,
       finalityProviderBtcPksHex,
       stakingAmount,
       paramsVersion,
       stakingTime,
       unbondingTx,
+      covenantUnbondingSignatures,
     } = d;
 
     if (action === "stake") {
@@ -84,6 +86,7 @@ export function DelegationList() {
         },
         paramsVersion,
         stakingTxHashHex,
+        stakingTxHex,
       );
     } else if (action === "unbound") {
       await submitUnbondingTx(
@@ -94,6 +97,7 @@ export function DelegationList() {
         },
         paramsVersion,
         stakingTxHashHex,
+        unbondingTx,
       );
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
     } else if (action === "withdraw") {

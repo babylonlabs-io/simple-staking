@@ -1,5 +1,6 @@
 export interface DelegationV2 {
   stakingTxHashHex: string;
+  stakingTxHex: string;
   paramsVersion: number;
   finalityProviderBtcPksHex: string[];
   stakerBtcPkHex: string;
@@ -10,6 +11,10 @@ export interface DelegationV2 {
   unbondingTime: number;
   unbondingTx: string;
   state: DelegationV2StakingState;
+  covenantUnbondingSignatures?: {
+    covenantBtcPkHex: string;
+    signatureHex: string;
+  }[];
 }
 
 export enum DelegationV2StakingState {
