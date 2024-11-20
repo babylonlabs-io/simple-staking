@@ -1,71 +1,66 @@
 import { AiOutlineSignature } from "react-icons/ai";
-import { IoMdCheckmark, IoMdClose } from "react-icons/io";
+import { IoMdCheckmark } from "react-icons/io";
 
 import { GeneralModal } from "./GeneralModal";
 
-type Status = "unsigned" | "signed" | "processing";
+export enum EOIStepStatus {
+  UNSIGNED = "UNSIGNED",
+  SIGNED = "SIGNED",
+  PROCESSING = "PROCESSING",
+}
 
 interface EOIModalProps {
   statuses: {
-    slashing: Status;
-    unbonding: Status;
-    reward: Status;
-    eoi: Status;
+    slashing: EOIStepStatus;
+    unbonding: EOIStepStatus;
+    reward: EOIStepStatus;
+    eoi: EOIStepStatus;
   };
   open: boolean;
   onClose: (value: boolean) => void;
 }
 
 const STATUS_ICON = {
-  unsigned: <AiOutlineSignature size={20} />,
-  signed: <IoMdCheckmark className="text-success" size={20} />,
-  processing: (
+  [EOIStepStatus.UNSIGNED]: <AiOutlineSignature size={20} />,
+  [EOIStepStatus.SIGNED]: <IoMdCheckmark className="text-success" size={20} />,
+  [EOIStepStatus.PROCESSING]: (
     <span className="loading loading-spinner loading-xs text-primary" />
   ),
 } as const;
 
 export function EOIModal({ open, statuses, onClose }: EOIModalProps) {
   return (
-    <GeneralModal open={open} onClose={onClose}>
+    <GeneralModal
+      open={open}
+      onClose={onClose}
+      closeOnOverlayClick={false}
+      closeOnEsc={false}
+    >
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">Staking Express Of Interest</h3>
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose(false)}
-        >
-          <IoMdClose size={24} />
-        </button>
+        <h3 className="font-bold">Staking</h3>
       </div>
 
       <div className="py-4">
-        <p>
-          Please sign the messages below to prepare your staking
-          express-of-interest (EOI):
-        </p>
+        <p>Please sign the following messages</p>
 
-        <ul className="my-8 md:pl-6 text-primary">
+        <ul className="my-8 md:pl-6">
           <li className="flex gap-1 mb-4 items-center">
             {STATUS_ICON[statuses.slashing]}
-            Consent to slashing
+            Step 1: Consent to slashing
           </li>
           <li className="flex gap-1 mb-4 items-center">
             {STATUS_ICON[statuses.unbonding]}
-            Consent to slashing during unbonding
+            Step 2: Consent to slashing during unbonding
           </li>
           <li className="flex gap-1 mb-4 items-center">
             {STATUS_ICON[statuses.reward]}
-            BTC-BBN address binding for receiving staking rewards
+            Step 3: BTC-BBN address binding for receiving staking rewards
           </li>
           <li className="flex gap-1 mb-4 items-center">
             {STATUS_ICON[statuses.eoi]}
-            EOI transaction
+            Step 4: Staking transaction registration
           </li>
         </ul>
-
-        <p>
-          Please come back in a minute to check your EOI status. Once it is
-          accepted, you can proceed to submit the staking transaction to BTC.
-        </p>
       </div>
     </GeneralModal>
   );

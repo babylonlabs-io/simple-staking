@@ -1,5 +1,7 @@
 import { FaCheckCircle } from "react-icons/fa";
 
+import { useDelegationV2 } from "@/app/hooks/api/useDelegationV2";
+import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { GeneralModal } from "./GeneralModal";
@@ -7,9 +9,9 @@ import { GeneralModal } from "./GeneralModal";
 interface PendingVerificationModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
-  verified: boolean;
   onStake?: () => void;
   awaitingWalletResponse: boolean;
+  stakingTxHash: string;
 }
 
 const Verified = () => (
@@ -37,11 +39,15 @@ const NotVerified = () => (
 export function PendingVerificationModal({
   open,
   onClose,
-  verified,
   onStake,
   awaitingWalletResponse,
+  stakingTxHash,
 }: PendingVerificationModalProps) {
   const { networkName } = getNetworkConfig();
+
+  const { data: delegation = null } = useDelegationV2(stakingTxHash);
+
+  const verified = delegation?.state === state.VERIFIED;
 
   return (
     <GeneralModal

@@ -13,6 +13,7 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
+import { EOIStepStatus } from "@/app/components/Modals/EOIModal";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
@@ -39,7 +40,7 @@ interface BtcSigningFuncs {
     message: string,
     type?: "ecdsa" | "bip322-simple",
   ) => Promise<string>;
-  signingCallback: (step: SigningStep) => Promise<void>;
+  signingCallback: (step: SigningStep, status: EOIStepStatus) => Promise<void>;
 }
 
 export enum SigningStep {
@@ -76,7 +77,10 @@ export const useTransactionService = () => {
     async (
       stakingInput: BtcStakingInputs,
       feeRate: number,
-      signingCallback: (step: SigningStep) => Promise<void>,
+      signingCallback: (
+        step: SigningStep,
+        status: EOIStepStatus,
+      ) => Promise<void>,
     ) => {
       // Perform checks
       checkWalletConnection(
@@ -121,8 +125,11 @@ export const useTransactionService = () => {
         latestParam,
         { signPsbt, signMessage, signingCallback },
       );
+      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
       await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
-      await signingCallback(SigningStep.SEND_BBN);
+      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
+
+      return stakingTx;
     },
     [
       cosmosConnected,
@@ -186,7 +193,10 @@ export const useTransactionService = () => {
     async (
       stakingTxHex: string,
       stakingInput: BtcStakingInputs,
-      signingCallback: (step: SigningStep) => Promise<void>,
+      signingCallback: (
+        step: SigningStep,
+        status: EOIStepStatus,
+      ) => Promise<void>,
     ) => {
       // Perform checks
       checkWalletConnection(
@@ -225,8 +235,9 @@ export const useTransactionService = () => {
         },
         inclusionProof,
       );
+      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
       await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
-      await signingCallback(SigningStep.SEND_BBN);
+      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
     },
     [
       cosmosConnected,
@@ -492,6 +503,10 @@ const createBtcDelegationMsg = async (
   const cleanedUnbondingTx = clearTxSignatures(unbondingTx);
 
   // Create slashing transactions and extract signatures
+  await btcSigningFuncs.signingCallback(
+    SigningStep.STAKING_SLASHING,
+    EOIStepStatus.PROCESSING,
+  );
   const { psbt: slashingPsbt } =
     stakingInstance.createStakingOutputSlashingTransaction(cleanedStakingTx);
   const signedSlashingPsbtHex = await btcSigningFuncs.signPsbt(
@@ -504,8 +519,15 @@ const createBtcDelegationMsg = async (
   if (!slashingSig) {
     throw new Error("No signature found in the staking output slashing PSBT");
   }
-  await btcSigningFuncs.signingCallback(SigningStep.STAKING_SLASHING);
+  await btcSigningFuncs.signingCallback(
+    SigningStep.STAKING_SLASHING,
+    EOIStepStatus.SIGNED,
+  );
 
+  await btcSigningFuncs.signingCallback(
+    SigningStep.UNBONDING_SLASHING,
+    EOIStepStatus.PROCESSING,
+  );
   const { psbt: unbondingSlashingPsbt } =
     stakingInstance.createUnbondingOutputSlashingTransaction(unbondingTx);
   const signedUnbondingSlashingPsbtHex = await btcSigningFuncs.signPsbt(
@@ -520,8 +542,15 @@ const createBtcDelegationMsg = async (
   if (!unbondingSignatures) {
     throw new Error("No signature found in the unbonding output slashing PSBT");
   }
-  await btcSigningFuncs.signingCallback(SigningStep.UNBONDING_SLASHING);
+  await btcSigningFuncs.signingCallback(
+    SigningStep.UNBONDING_SLASHING,
+    EOIStepStatus.SIGNED,
+  );
 
+  await btcSigningFuncs.signingCallback(
+    SigningStep.PROOF_OF_POSSESSION,
+    EOIStepStatus.PROCESSING,
+  );
   // Create Proof of Possession
   const bech32AddressHex = uint8ArrayToHex(fromBech32(bech32Address).data);
   const signedBbnAddress = await btcSigningFuncs.signMessage(
@@ -535,7 +564,10 @@ const createBtcDelegationMsg = async (
     btcSigType: BTCSigType.ECDSA,
     btcSig: ecdsaSig,
   };
-  await btcSigningFuncs.signingCallback(SigningStep.PROOF_OF_POSSESSION);
+  await btcSigningFuncs.signingCallback(
+    SigningStep.PROOF_OF_POSSESSION,
+    EOIStepStatus.SIGNED,
+  );
 
   // Prepare and send protobuf message
   const msg: btcstakingtx.MsgCreateBTCDelegation =

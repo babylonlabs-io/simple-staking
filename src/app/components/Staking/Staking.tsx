@@ -1,11 +1,12 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { Transaction } from "bitcoinjs-lib";
 import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
 import { UTXO_KEY } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
-import { EOIModal } from "@/app/components/Modals/EOIModal";
+import { EOIModal, EOIStepStatus } from "@/app/components/Modals/EOIModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import {
@@ -23,6 +24,7 @@ import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
+import { PendingVerificationModal } from "../Modals/PendingVerificationModal";
 import { PreviewModal } from "../Modals/PreviewModal";
 
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
@@ -47,6 +49,7 @@ export const Staking = () => {
     publicKeyNoCoord,
     network: btcWalletNetwork,
     getNetworkFees,
+    pushTx,
   } = useBTCWallet();
 
   const disabled = isError;
@@ -75,6 +78,17 @@ export const Staking = () => {
   const { createDelegationEoi, estimateStakingFee } = useTransactionService();
   const { params } = useAppState();
   const latestParam = params?.bbnStakingParams?.latestParam;
+
+  const [pendingVerificationOpen, setPendingVerificationOpen] = useState(false);
+  const [stakingTx, setStakingTx] = useState<string | undefined>();
+
+  const [eoiModalOpen, setEoiModalOpen] = useState(false);
+  const [eoiStatuses, setEoiStatuses] = useState({
+    slashing: EOIStepStatus.UNSIGNED,
+    unbonding: EOIStepStatus.UNSIGNED,
+    reward: EOIStepStatus.UNSIGNED,
+    eoi: EOIStepStatus.UNSIGNED,
+  });
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -131,6 +145,15 @@ export const Staking = () => {
   ]);
 
   const handleResetState = () => {
+    setStakingTx(undefined);
+    setPendingVerificationOpen(false);
+    setEoiModalOpen(false);
+    setEoiStatuses({
+      slashing: EOIStepStatus.UNSIGNED,
+      unbonding: EOIStepStatus.UNSIGNED,
+      reward: EOIStepStatus.UNSIGNED,
+      eoi: EOIStepStatus.UNSIGNED,
+    });
     setAwaitingWalletResponse(false);
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
@@ -147,9 +170,40 @@ export const Staking = () => {
 
   const queryClient = useQueryClient();
 
-  // TODO: To hook up with the react signing modal
-  const signingCallback = async (step: SigningStep) => {
-    console.log("Signing step:", step);
+  const signingStepToStatusKey = (
+    step: SigningStep,
+  ): keyof typeof eoiStatuses | null => {
+    switch (step) {
+      case SigningStep.STAKING_SLASHING:
+        return "slashing";
+      case SigningStep.UNBONDING_SLASHING:
+        return "unbonding";
+      case SigningStep.PROOF_OF_POSSESSION:
+        return "reward";
+      case SigningStep.SEND_BBN:
+        return "eoi";
+      default:
+        return null;
+    }
+  };
+
+  const signingCallback = async (step: SigningStep, status: EOIStepStatus) => {
+    setEoiStatuses((prevStatuses) => {
+      const statusKey = signingStepToStatusKey(step);
+      if (statusKey) {
+        return {
+          ...prevStatuses,
+          [statusKey]: status,
+        };
+      }
+      return prevStatuses;
+    });
+  };
+
+  const handlePendingVerificationClose = () => {
+    setPendingVerificationOpen(false);
+    handleFeedbackModal("cancel");
+    handleResetState();
   };
 
   const handleDelegationEoiCreation = async () => {
@@ -163,9 +217,16 @@ export const Staking = () => {
         stakingTimeBlocks,
         feeRate,
       };
-      await createDelegationEoi(eoiInput, feeRate, signingCallback);
-      // TODO: Hook up with the react pending verify modal
-      handleResetState();
+      setAwaitingWalletResponse(true);
+      setEoiModalOpen(true);
+      const stakingTX = await createDelegationEoi(
+        eoiInput,
+        feeRate,
+        signingCallback,
+      );
+      setEoiModalOpen(false);
+      setStakingTx(stakingTX.toHex());
+      setPendingVerificationOpen(true);
     } catch (error: Error | any) {
       showError({
         error: {
@@ -185,6 +246,30 @@ export const Staking = () => {
       });
     } finally {
       setAwaitingWalletResponse(false);
+    }
+  };
+
+  const handleStake = async () => {
+    if (!stakingTx) {
+      throw new Error("Staking transaction not found");
+    }
+    try {
+      // Right now we have staking tx
+      // later on this step should be changed to building and signing
+      await pushTx(stakingTx);
+      handleResetState();
+    } catch (error: Error | any) {
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.STAKING,
+        },
+        noCancel: true,
+        retryAction: async () => {
+          await pushTx(stakingTx);
+          handleResetState();
+        },
+      });
     }
   };
 
@@ -470,15 +555,19 @@ export const Staking = () => {
         onClose={handleCloseFeedbackModal}
         type={feedbackModal.type}
       />
+      {stakingTx && (
+        <PendingVerificationModal
+          open={pendingVerificationOpen}
+          onClose={handlePendingVerificationClose}
+          stakingTxHash={Transaction.fromHex(stakingTx).getId()}
+          awaitingWalletResponse={awaitingWalletResponse}
+          onStake={handleStake}
+        />
+      )}
       <EOIModal
-        statuses={{
-          slashing: "signed",
-          unbonding: "signed",
-          reward: "processing",
-          eoi: "unsigned",
-        }}
-        open={false}
-        onClose={() => null}
+        statuses={eoiStatuses}
+        open={eoiModalOpen}
+        onClose={() => setEoiModalOpen(false)}
       />
     </div>
   );
