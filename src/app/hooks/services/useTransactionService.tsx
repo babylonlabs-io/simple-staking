@@ -310,6 +310,10 @@ export const useTransactionService = () => {
       paramVersion: number,
       stakingTxHashHex: string,
       unbondingTxHex: string,
+      stakingSig: {
+        btcPkHex: string;
+        sigHex: string;
+      }[],
     ) => {
       // Perform checks
       if (!params || params.bbnStakingParams.versions.length === 0) {
@@ -338,16 +342,22 @@ export const useTransactionService = () => {
       );
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
-      const { psbt: unbondingPsbt } =
+      const { transaction: unbondingTx } =
         staking.createUnbondingTransaction(stakingTx);
+      const unbondingPsbt = staking.createUnbondingPsbt(
+        unbondingTx,
+        stakingTx,
+        stakingSig,
+      );
       const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
       // Compare the unbonding tx hash with the one from API
       const unbondingTxHashHex = Psbt.fromHex(signedUnbondingPsbtHex)
         .extractTransaction()
         .getId();
-      if (unbondingTxHashHex !== unbondingTxHex) {
+      const unbondingTxId = Transaction.fromHex(unbondingTxHex).getId();
+      if (unbondingTxHashHex !== unbondingTxId) {
         throw new Error(
-          `Unbonding transaction hash mismatch, expected ${unbondingTxHex} but got ${unbondingTxHashHex}`,
+          `Unbonding transaction hash mismatch, expected ${unbondingTxId} but got ${unbondingTxHashHex}`,
         );
       }
 
@@ -496,7 +506,7 @@ const createBtcDelegationMsg = async (
     EOIStepStatus.PROCESSING,
   );
   const { psbt: slashingPsbt } =
-    stakingInstance.createStakingOutputSlashingTransaction(unbondingTx);
+    stakingInstance.createStakingOutputSlashingTransaction(stakingTx);
   const signedSlashingPsbtHex = await btcSigningFuncs.signPsbt(
     slashingPsbt.toHex(),
   );

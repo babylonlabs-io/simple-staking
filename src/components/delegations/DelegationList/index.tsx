@@ -81,14 +81,18 @@ export function DelegationList() {
       await submitStakingTx(
         {
           finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
-          stakingAmountSat: stakingAmount,
+          stakingAmountSat: stakingAmount || 10000,
           stakingTimeBlocks: stakingTime,
         },
         paramsVersion,
         stakingTxHashHex,
         stakingTxHex,
       );
+      console.log("stakingTxHashHex", stakingTxHashHex);
     } else if (action === "unbound") {
+      if (!covenantUnbondingSignatures) {
+        throw new Error("Covenant unbonding signatures not found");
+      }
       await submitUnbondingTx(
         {
           finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
@@ -98,6 +102,10 @@ export function DelegationList() {
         paramsVersion,
         stakingTxHashHex,
         unbondingTx,
+        covenantUnbondingSignatures?.map((sig) => ({
+          btcPkHex: sig.covenantBtcPkHex,
+          sigHex: sig.signatureHex,
+        })),
       );
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
     } else if (action === "withdraw") {
