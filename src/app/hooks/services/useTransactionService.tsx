@@ -125,7 +125,7 @@ export const useTransactionService = () => {
       await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
 
-      return stakingTx;
+      return transaction.getId();
     },
     [
       cosmosConnected,

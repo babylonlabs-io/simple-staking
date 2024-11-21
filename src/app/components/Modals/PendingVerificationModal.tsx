@@ -1,6 +1,8 @@
+import { useCallback } from "react";
 import { FaCheckCircle } from "react-icons/fa";
 
 import { useDelegationV2 } from "@/app/hooks/api/useDelegationV2";
+import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 import { getNetworkConfig } from "@/config/network.config";
 
@@ -9,7 +11,6 @@ import { GeneralModal } from "./GeneralModal";
 interface PendingVerificationModalProps {
   open: boolean;
   onClose: (value: boolean) => void;
-  onStake?: () => void;
   awaitingWalletResponse: boolean;
   stakingTxHash: string;
 }
@@ -39,13 +40,38 @@ const NotVerified = () => (
 export function PendingVerificationModal({
   open,
   onClose,
-  onStake,
   awaitingWalletResponse,
   stakingTxHash,
 }: PendingVerificationModalProps) {
+  const { submitStakingTx } = useTransactionService();
   const { networkName } = getNetworkConfig();
 
   const { data: delegation = null } = useDelegationV2(stakingTxHash);
+
+  const onStake = useCallback(async () => {
+    if (!delegation) {
+      throw new Error("Delegation not found");
+    }
+    const {
+      finalityProviderBtcPksHex,
+      stakingAmount,
+      stakingTime,
+      paramsVersion,
+      stakingTxHashHex,
+      stakingTxHex,
+    } = delegation;
+
+    await submitStakingTx(
+      {
+        finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+        stakingAmountSat: stakingAmount,
+        stakingTimeBlocks: stakingTime,
+      },
+      paramsVersion,
+      stakingTxHashHex,
+      stakingTxHex,
+    );
+  }, [delegation, submitStakingTx]);
 
   const verified = delegation?.state === state.VERIFIED;
 

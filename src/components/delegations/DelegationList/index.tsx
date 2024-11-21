@@ -81,14 +81,13 @@ export function DelegationList() {
       await submitStakingTx(
         {
           finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
-          stakingAmountSat: stakingAmount || 10000,
+          stakingAmountSat: stakingAmount,
           stakingTimeBlocks: stakingTime,
         },
         paramsVersion,
         stakingTxHashHex,
         stakingTxHex,
       );
-      console.log("stakingTxHashHex", stakingTxHashHex);
     } else if (action === "unbound") {
       if (!covenantUnbondingSignatures) {
         throw new Error("Covenant unbonding signatures not found");
