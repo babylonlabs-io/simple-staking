@@ -18,9 +18,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
   return (
     <GeneralModal open={open} onClose={onClose}>
       <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">
-          Ordinals, Bitcoin NFTs, Runes, Bitcoin inscriptions
-        </h3>
+        <h3 className="font-bold">Bitcoin inscriptions</h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
           onClick={() => onClose(false)}
@@ -31,11 +29,14 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
       <div className="flex flex-col gap-4 md:max-w-[34rem]">
         <div className="flex flex-col gap-4 leading-snug text-sm">
           <p>
-            Your wallet may contain Bitcoin Ordinals, which are unique digital
-            assets. If you proceed without filtering, these Ordinals could be
-            included in future actions involving your balance.
+            This staking interface attempts to detect bitcoin ordinals, NFTs,
+            Runes, and other inscriptions (“Inscriptions”) within the Unspent
+            Transaction Outputs (“UTXOs”) in your wallet. If you stake bitcoin
+            with Inscriptions, those UTXOs may be spent on staking, unbonding,
+            or withdrawal fees, which will cause you to lose those Inscriptions
+            permanently. This interface will not detect all Inscriptions.
           </p>
-          <p>Please select:</p>
+          <p>Choose one:</p>
         </div>
         <div className="flex flex-col gap-4 rounded-xl bg-base-100 p-3 md:p-4">
           <div className="form-control">
@@ -48,11 +49,11 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
                 onChange={() => setShouldFilterOrdinals(false)}
               />
               <span className="label-text">
-                I want to <strong>include</strong> ordinals, bitcoin NFTs,
-                Ruins, and any other bitcoin inscriptions in my stakable bitcoin
-                balance. I understand that doing so can cause their complete and
-                permanent loss and agree that I am solely liable and responsible
-                for their loss. I have been warned.
+                <strong>Use</strong> bitcoin UTXOs with detected Inscriptions in
+                my stakable balance.
+                <br />I understand and agree that doing so can cause the
+                complete and permanent loss of Inscriptions and that I am solely
+                liable and responsible for their loss.
               </span>
             </label>
           </div>
@@ -66,9 +67,8 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({
                 onChange={() => setShouldFilterOrdinals(true)}
               />
               <span className="label-text">
-                I would like to <strong>exclude</strong> ordinals, bitcoin NFTs,
-                Ruins, and any other bitcoin inscriptions in my stakable bitcoin
-                balance
+                <strong>Don&apos;t use</strong> bitcoin UTXOs with detected
+                Inscriptions so they will not be spent.
               </span>
             </label>
           </div>
