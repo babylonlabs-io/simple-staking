@@ -13,6 +13,7 @@ import { Hash } from "../Hash/Hash";
 import { LoadingSmall } from "../Loading/Loading";
 
 interface ConnectedSmallProps {
+  connected?: boolean;
   loading?: boolean;
   address: string;
   onDisconnect: () => void;
@@ -20,6 +21,7 @@ interface ConnectedSmallProps {
 }
 
 export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
+  connected = false,
   loading = false,
   address,
   btcWalletBalanceSat,
@@ -38,7 +40,7 @@ export const ConnectedSmall: React.FC<ConnectedSmallProps> = ({
   const { coinName } = getNetworkConfig();
 
   return (
-    address && (
+    connected && (
       <div className="relative flex text-sm" ref={ref}>
         <button
           className="flex cursor-pointer outline-none items-stretch w-full justify-between"

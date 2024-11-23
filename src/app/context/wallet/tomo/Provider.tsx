@@ -7,19 +7,24 @@ import {
 } from "@tomo-inc/wallet-connect-sdk";
 import "@tomo-inc/wallet-connect-sdk/style.css";
 import { useTheme } from "next-themes";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  type PropsWithChildren,
-} from "react";
+import { createContext, useCallback, type PropsWithChildren } from "react";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { keplrRegistry } from "@/config/wallet/babylon";
 
+import { BBNWalletProvider } from "./BBNWalletProvider";
+import { BTCWalletProvider } from "./BTCWalletProvider";
+
+interface ConnectorProps {
+  chain: "bitcoin" | "cosmos";
+}
+
 // We have to split the connection into two parts
 // so we can use the tomoWalletConnect and tomoModal hooks
-export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
+const WalletConnectionProvider = ({
+  chain,
+  children,
+}: PropsWithChildren<ConnectorProps>) => {
   const { resolvedTheme } = useTheme();
 
   const { mempoolApiUrl, network, networkName } = getNetworkConfig();
@@ -36,7 +41,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   return (
     <TomoContextProvider
       bitcoinChains={[bitcoinChain]}
-      chainTypes={["bitcoin", "cosmos"]}
+      chainTypes={[chain]}
       cosmosChains={[
         {
           id: 2,
@@ -56,9 +61,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
         primaryColor: "#FF7C2A",
       }}
     >
-      <WalletConnectionProviderInternal>
-        {children}
-      </WalletConnectionProviderInternal>
+      {children}
     </TomoContextProvider>
   );
 };
@@ -83,14 +86,30 @@ const WalletConnectionContext = createContext<WalletConnectionContextProps>({
   tomoWalletState: {} as ReturnType<typeof useTomoWalletState>,
 });
 
-const WalletConnectionProviderInternal = ({ children }: PropsWithChildren) => {
+export function TomoProvider({ children }: PropsWithChildren) {
+  return (
+    <WalletConnectionProvider chain="bitcoin">
+      <BTCWalletProvider>
+        <WalletConnectionProvider chain="cosmos">
+          <BBNWalletProvider>{children}</BBNWalletProvider>
+        </WalletConnectionProvider>
+      </BTCWalletProvider>
+    </WalletConnectionProvider>
+  );
+}
+
+export const useWalletConnection = () => {
   const tomoModal = useTomoModalControl();
   const tomoWalletConnect = useTomoWalletConnect();
   const tomoWalletState = useTomoWalletState();
   const providers = useTomoProviders();
 
   const open = useCallback(async () => {
-    await tomoModal.open("connect");
+    try {
+      await tomoModal.open("connect");
+    } catch (e) {
+      console.log(e);
+    }
   }, [tomoModal]);
 
   const disconnect = useCallback(async () => {
@@ -99,21 +118,5 @@ const WalletConnectionProviderInternal = ({ children }: PropsWithChildren) => {
 
   const isConnected = tomoWalletState.isConnected;
 
-  return (
-    <WalletConnectionContext.Provider
-      value={{
-        open,
-        disconnect,
-        isConnected,
-        providers,
-        tomoWalletConnect,
-        tomoModal,
-        tomoWalletState,
-      }}
-    >
-      {children}
-    </WalletConnectionContext.Provider>
-  );
+  return { open, disconnect, isConnected, providers };
 };
-
-export const useWalletConnection = () => useContext(WalletConnectionContext);

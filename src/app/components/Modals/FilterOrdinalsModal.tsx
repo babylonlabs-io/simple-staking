@@ -1,10 +1,10 @@
+import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
 import { useEffect, useState } from "react";
 import { IoMdClose } from "react-icons/io";
 import { useLocalStorage } from "usehooks-ts";
 
 import { FILTER_ORDINALS_MODAL_KEY } from "@/app/common/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvider";
 import { useAppState } from "@/app/state";
 
 import { GeneralModal } from "./GeneralModal";
@@ -23,7 +23,7 @@ export const FilterOrdinalsModal: React.FC<FilterOrdinalsModalProps> = ({}) => {
     }));
   };
 
-  const { isConnected } = useWalletConnection();
+  const { connected: isConnected } = useWalletConnect();
   const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
 
   const [hasSeenFilterOrdinalsModal, setHasSeenFilterOrdinalsModal] =
