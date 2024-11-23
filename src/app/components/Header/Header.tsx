@@ -3,6 +3,7 @@ import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvid
 import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
+import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
@@ -18,13 +19,13 @@ export const Header = () => {
       <section className="bg-primary-main dark:bg-[#181818] h-[300px] mb-[-188px]">
         <div className="container h-[84px] py-[22px] px-6 mx-auto flex items-center justify-between">
           <Logo />
-          {/* <div className="flex flex-1">
+          <div className="flex flex-1">
             {shouldDisplayTestingMsg() && (
               <div className="hidden flex-1 xl:flex">
                 <TestingInfo />
               </div>
             )}
-          </div> */}
+          </div>
           <div className="flex items-center gap-4">
             <ConnectSmall
               loading={loading}
@@ -35,16 +36,16 @@ export const Header = () => {
             />
             <ThemeToggle />
           </div>
-          {/* <div
-          className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
-        >
-          <ConnectedSmall
-            loading={loading}
-            address={address}
-            btcWalletBalanceSat={totalBalance}
-            onDisconnect={disconnect}
-          />
-        </div> */}
+          <div
+            className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
+          >
+            <ConnectedSmall
+              loading={loading}
+              address={address}
+              btcWalletBalanceSat={totalBalance}
+              onDisconnect={disconnect}
+            />
+          </div>
         </div>
       </section>
 
