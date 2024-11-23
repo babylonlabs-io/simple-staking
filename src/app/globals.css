@@ -86,26 +86,6 @@ input[type="number"] {
   width: 1px !important;
 }
 
-[data-theme="dark"] .main-app-mainnet {
-  background: rgb(43, 43, 43) url("./assets/bg-pattern.svg") left top/auto
-    repeat;
-}
-
-[data-theme="light"] .main-app-mainnet {
-  background: rgb(236, 236, 236) url("./assets/bg-pattern.svg") left top/auto
-    repeat;
-}
-
-[data-theme="dark"] .main-app-testnet {
-  background: rgb(43, 43, 43) url("./assets/testnet-bg-pattern.svg") left
-    top/auto repeat;
-}
-
-[data-theme="light"] .main-app-testnet {
-  background: rgb(236, 236, 236) url("./assets/testnet-bg-pattern.svg") left
-    top/auto repeat;
-}
-
 [data-theme="dark"] .react-responsive-modal-modal {
   background-color: #1e1e1e;
   color: #fff;

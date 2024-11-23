@@ -13,13 +13,22 @@ const config: Config = {
     screens: screenBreakPoints,
     extend: {
       colors: {
-        primary: "#FF7C2A",
+        primary: {
+          DEFAULT: "#000000DE",
+          main: "#042F40",
+          dark: "#12495E",
+          light: "#387085",
+          contrast: "#F5F7F2",
+        },
         secondary: "#0DB7BF",
         "base-400": "hsl(var(--base-400) / <alpha-value>)",
       },
       gridTemplateColumns: {
         stakingFinalityProvidersMobile: "2fr 1fr",
         stakingFinalityProvidersDesktop: "2fr 1.5fr 2fr 0.75fr 0.75fr",
+      },
+      backgroundImage: {
+        "footer-texture": "url(/footer-rectangle.svg)",
       },
     },
   },

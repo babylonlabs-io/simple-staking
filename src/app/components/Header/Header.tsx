@@ -4,7 +4,6 @@ import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
 import { ConnectSmall } from "../Connect/ConnectSmall";
-import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
@@ -16,26 +15,27 @@ export const Header = () => {
 
   return (
     <nav>
-      <div className="bg-base-300 shadow-sm">
-        <div className="container mx-auto flex w-full items-center justify-between gap-4 p-6 pb-4 md:pb-6">
+      <section className="bg-primary-main h-[300px] mb-[-188px]">
+        <div className="container h-[84px] py-[22px] mx-auto flex items-center justify-between">
           <Logo />
-          <div className="flex flex-1">
+          {/* <div className="flex flex-1">
             {shouldDisplayTestingMsg() && (
               <div className="hidden flex-1 xl:flex">
                 <TestingInfo />
               </div>
             )}
+          </div> */}
+          <div className="flex items-center gap-4">
+            <ConnectSmall
+              loading={loading}
+              onConnect={open}
+              address={address}
+              btcWalletBalanceSat={totalBalance}
+              onDisconnect={disconnect}
+            />
+            <ThemeToggle />
           </div>
-          <ConnectSmall
-            loading={loading}
-            onConnect={open}
-            address={address}
-            btcWalletBalanceSat={totalBalance}
-            onDisconnect={disconnect}
-          />
-          <ThemeToggle />
-        </div>
-        <div
+          {/* <div
           className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
         >
           <ConnectedSmall
@@ -44,8 +44,10 @@ export const Header = () => {
             btcWalletBalanceSat={totalBalance}
             onDisconnect={disconnect}
           />
+        </div> */}
         </div>
-      </div>
+      </section>
+
       {shouldDisplayTestingMsg() && (
         <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
           <TestingInfo />

@@ -41,7 +41,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   const ref = useRef(null);
   useOnClickOutside(ref, handleClickOutside);
 
-  const { coinName, networkName } = getNetworkConfig();
+  const { coinName } = getNetworkConfig();
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   // Renders the Tooltip describing the reason
@@ -146,7 +146,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
         disabled={Boolean(address) || !isApiNormal}
       >
         <PiWalletBold size={20} className="flex md:hidden" />
-        <span className="hidden md:flex">Connect to {networkName} network</span>
+        <span className="hidden md:flex">Connect Wallets</span>
       </button>
       {!isApiNormal && renderApiNotAvailableTooltip()}
     </div>

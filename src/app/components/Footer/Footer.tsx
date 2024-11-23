@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   BsDiscord,
   BsGithub,
@@ -9,6 +10,8 @@ import { FaXTwitter } from "react-icons/fa6";
 import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail, MdForum } from "react-icons/md";
+
+import babylonIcon from "@/app/assets/babylon-logo.svg";
 
 const iconLinks = [
   {
@@ -65,44 +68,48 @@ const iconLinks = [
 
 export const Footer: React.FC = () => {
   return (
-    <div className="container mx-auto flex flex-col items-center">
-      <div className="w-24">
-        <div className="divider my-1" />
-      </div>
-      <div className="flex justify-center gap-8 p-2">
-        <a
-          href="https://babylonlabs.io/terms-of-use"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-primary"
-        >
-          Terms of Use
-        </a>
-        <a
-          href="https://babylonlabs.io/privacy-policy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-primary"
-        >
-          Privacy Policy
-        </a>
-      </div>
-      <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
-        {iconLinks.map(({ name, url, Icon }) => (
-          <div
-            key={name}
-            className="flex w-4 items-center justify-center text-[22px] text-xl"
-          >
-            <a
-              href={url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-primary"
+    <div className="container mx-auto flex flex-row items-center justify-around bg-footer-texture bg-cover h-[238px] text-white">
+      <div className="flex flex-col">
+        <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
+          {iconLinks.map(({ name, url, Icon }) => (
+            <div
+              key={name}
+              className="flex w-4 items-center justify-center text-[22px] text-xl"
             >
-              <Icon title={name} />
-            </a>
-          </div>
-        ))}
+              <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-primary"
+              >
+                <Icon title={name} />
+              </a>
+            </div>
+          ))}
+        </div>
+        <div>
+          <a
+            href="https://babylonlabs.io/terms-of-use"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-primary"
+          >
+            Terms of Use
+          </a>{" "}
+          -{" "}
+          <a
+            href="https://babylonlabs.io/privacy-policy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="transition-colors hover:text-primary"
+          >
+            Privacy Policy
+          </a>{" "}
+          - 2024 Babylon Labs. All rights reserved.
+        </div>
+      </div>
+      <div>
+        <Image src={babylonIcon} alt="babylon" />
       </div>
     </div>
   );

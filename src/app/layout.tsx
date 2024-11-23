@@ -34,6 +34,7 @@ export default function RootLayout({
               network === Network.MAINNET
                 ? "main-app-mainnet"
                 : "main-app-testnet",
+              "bg-primary-contrast",
             )}
           >
             {children}
