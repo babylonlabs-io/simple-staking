@@ -1,5 +1,5 @@
 import {
-  PsbtTransactionResult,
+  PsbtResult,
   withdrawEarlyUnbondedTransaction,
   withdrawTimelockUnbondedTransaction,
 } from "@babylonlabs-io/btc-staking-ts";
@@ -78,7 +78,7 @@ export const signWithdrawalTx = async (
   const feeRate = getFeeRateFromMempool(fees);
 
   // Create the withdrawal transaction
-  let withdrawPsbtTxResult: PsbtTransactionResult;
+  let withdrawPsbtTxResult: PsbtResult;
   if (delegation?.unbondingTx) {
     // Withdraw funds from an unbonding transaction that was submitted for early unbonding and the unbonding period has passed
     withdrawPsbtTxResult = withdrawEarlyUnbondedTransaction(
