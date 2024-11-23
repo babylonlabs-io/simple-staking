@@ -57,8 +57,11 @@ export function DelegationList() {
     isLoading,
     findDelegationByTxHash,
   } = useDelegationV2State();
-  const { submitStakingTx, submitUnbondingTx, submitWithdrawalTx } =
-    useTransactionService();
+  const {
+    submitStakingTx,
+    submitUnbondingTx,
+    submitEarlyUnbondedWithdrawalTx,
+  } = useTransactionService();
 
   // Define the onClick function here
   const handleActionClick = async (action: string, txHash: string) => {
@@ -73,14 +76,17 @@ export function DelegationList() {
       stakingAmount,
       paramsVersion,
       stakingTime,
-      unbondingTx,
+      unbondingTxHex,
       covenantUnbondingSignatures,
+      state,
     } = d;
+
+    const finalityProviderPk = finalityProviderBtcPksHex[0];
 
     if (action === "stake") {
       await submitStakingTx(
         {
-          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          finalityProviderPkNoCoordHex: finalityProviderPk,
           stakingAmountSat: stakingAmount,
           stakingTimeBlocks: stakingTime,
         },
@@ -94,29 +100,28 @@ export function DelegationList() {
       }
       await submitUnbondingTx(
         {
-          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          finalityProviderPkNoCoordHex: finalityProviderPk,
           stakingAmountSat: stakingAmount,
           stakingTimeBlocks: stakingTime,
         },
         paramsVersion,
-        stakingTxHashHex,
-        unbondingTx,
-        covenantUnbondingSignatures?.map((sig) => ({
+        stakingTxHex,
+        unbondingTxHex,
+        covenantUnbondingSignatures.map((sig) => ({
           btcPkHex: sig.covenantBtcPkHex,
           sigHex: sig.signatureHex,
         })),
       );
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
-    } else if (action === "withdraw") {
-      await submitWithdrawalTx(
+    } else if (action === "withdraw_early_unbonded") {
+      await submitEarlyUnbondedWithdrawalTx(
         {
-          finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+          finalityProviderPkNoCoordHex: finalityProviderPk,
           stakingAmountSat: stakingAmount,
           stakingTimeBlocks: stakingTime,
         },
         paramsVersion,
-        stakingTxHashHex,
-        unbondingTx,
+        unbondingTxHex,
       );
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_WITHDRAWAL
     }

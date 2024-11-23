@@ -7,7 +7,7 @@ import {
   BTCSigType,
   ProofOfPossessionBTC,
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
-import { Staking } from "@babylonlabs-io/btc-staking-ts";
+import { createWitness, Staking } from "@babylonlabs-io/btc-staking-ts";
 import { fromBech32 } from "@cosmjs/encoding";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Network, Psbt, Transaction } from "bitcoinjs-lib";
@@ -73,6 +73,14 @@ export const useTransactionService = () => {
   const latestParam = params?.bbnStakingParams?.latestParam;
   const genesisParam = params?.bbnStakingParams?.genesisParam;
 
+  /**
+   * Create the delegation EOI
+   *
+   * @param stakingInput - The staking inputs
+   * @param feeRate - The fee rate
+   * @param signingCallback - The signing callback
+   * @returns The staking transaction hash
+   */
   const createDelegationEoi = useCallback(
     async (
       stakingInput: BtcStakingInputs,
@@ -142,6 +150,13 @@ export const useTransactionService = () => {
     ],
   );
 
+  /**
+   * Estimate the staking fee
+   *
+   * @param stakingInput - The staking inputs
+   * @param feeRate - The fee rate
+   * @returns The staking fee
+   */
   const estimateStakingFee = useCallback(
     (stakingInput: BtcStakingInputs, feeRate: number): number => {
       // Perform checks
@@ -185,6 +200,13 @@ export const useTransactionService = () => {
     ],
   );
 
+  /**
+   * Transition the delegation to phase 1
+   *
+   * @param stakingTxHex - The staking transaction hex
+   * @param stakingInput - The staking inputs
+   * @param signingCallback - The signing callback
+   */
   const transitionPhase1Delegation = useCallback(
     async (
       stakingTxHex: string,
@@ -249,11 +271,19 @@ export const useTransactionService = () => {
     ],
   );
 
+  /**
+   * Submit the staking transaction
+   *
+   * @param stakingInput - The staking inputs
+   * @param paramVersion - The param version
+   * @param expectedTxHashHex - The expected transaction hash hex
+   * @param stakingTxHex - The staking transaction hex
+   */
   const submitStakingTx = useCallback(
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      expectedTxId: string,
+      expectedTxHashHex: string,
       stakingTxHex: string,
     ) => {
       // Perform checks
@@ -284,13 +314,15 @@ export const useTransactionService = () => {
       );
 
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
-      const stakingTx = Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
-      if (stakingTx.getId() !== expectedTxId) {
+      const signedStakingTx =
+        Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
+      if (signedStakingTx.getId() !== expectedTxHashHex) {
         throw new Error(
-          `Staking transaction hash mismatch, expected ${expectedTxId} but got ${stakingTx.getId()}`,
+          `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
         );
       }
-      await pushTx(signedStakingPsbtHex);
+      await pushTx(signedStakingTx.toHex());
+      console.log("staking tx id", signedStakingTx.getId());
     },
     [
       btcConnected,
@@ -308,9 +340,9 @@ export const useTransactionService = () => {
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      stakingTxHashHex: string,
+      stakingTxHex: string,
       unbondingTxHex: string,
-      stakingSig: {
+      covenantUnbondingSignatures: {
         btcPkHex: string;
         sigHex: string;
       }[],
@@ -324,8 +356,7 @@ export const useTransactionService = () => {
 
       validateStakingInput(stakingInput);
 
-      // Get the staking transaction hex from the mempool
-      const stakingTxHex = await getTxHex(stakingTxHashHex);
+      const stakingTx = await Transaction.fromHex(stakingTxHex);
 
       const p = getParamByVersion(params, paramVersion);
       if (!p) throw new Error("Staking params not loaded");
@@ -341,27 +372,37 @@ export const useTransactionService = () => {
         stakingInput.stakingTimeBlocks,
       );
 
-      const stakingTx = Transaction.fromHex(stakingTxHex);
-      const { transaction: unbondingTx } =
-        staking.createUnbondingTransaction(stakingTx);
-      const unbondingPsbt = staking.createUnbondingPsbt(
-        unbondingTx,
-        stakingTx,
-        stakingSig,
-      );
+      const unbondingTx = Transaction.fromHex(unbondingTxHex);
+      const unbondingPsbt = staking.createUnbondingPsbt(unbondingTx, stakingTx);
       const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
+
       // Compare the unbonding tx hash with the one from API
-      const unbondingTxHashHex = Psbt.fromHex(signedUnbondingPsbtHex)
-        .extractTransaction()
-        .getId();
-      const unbondingTxId = Transaction.fromHex(unbondingTxHex).getId();
-      if (unbondingTxHashHex !== unbondingTxId) {
+      const signedUnbondingTx = Psbt.fromHex(
+        signedUnbondingPsbtHex,
+      ).extractTransaction();
+
+      // Add covenant unbonding signatures
+      // Convert the params of covenants to buffer
+      const covenantBuffers = p.covenantNoCoordPks.map((covenant) =>
+        Buffer.from(covenant, "hex"),
+      );
+      const witness = createWitness(
+        signedUnbondingTx.ins[0].witness,
+        covenantBuffers,
+        covenantUnbondingSignatures,
+        p.covenantQuorum,
+      );
+      // Overwrite the witness to include the covenant unbonding signatures
+      signedUnbondingTx.ins[0].witness = witness;
+      // Perform the final check on the unbonding tx hash
+      const unbondingTxId = unbondingTx.getId();
+      if (signedUnbondingTx.getId() !== unbondingTxId) {
         throw new Error(
-          `Unbonding transaction hash mismatch, expected ${unbondingTxId} but got ${unbondingTxHashHex}`,
+          `Unbonding transaction hash mismatch, expected ${unbondingTxId} but got ${signedUnbondingTx.getId()}`,
         );
       }
-
-      await pushTx(signedUnbondingPsbtHex);
+      await pushTx(signedUnbondingTx.toHex());
+      console.log("unbonding tx id", signedUnbondingTx.getId());
     },
     [
       params,
@@ -374,12 +415,18 @@ export const useTransactionService = () => {
     ],
   );
 
-  const submitWithdrawalTx = useCallback(
+  /**
+   * Submit the early unbonded withdrawal transaction
+   *
+   * @param stakingInput - The staking inputs
+   * @param paramVersion - The param version
+   * @param unbondingTxHex - The unbonding transaction hex
+   */
+  const submitEarlyUnbondedWithdrawalTx = useCallback(
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      stakingTxHashHex: string,
-      unbondingTxHex?: string,
+      unbondingTxHex: string,
     ) => {
       // Perform checks
       if (!params || params.bbnStakingParams.versions.length === 0) {
@@ -404,28 +451,86 @@ export const useTransactionService = () => {
         stakingInput.stakingTimeBlocks,
       );
 
-      let psbtToWithdraw: Psbt;
+      const { psbt: unbondingPsbt } =
+        staking.createWithdrawEarlyUnbondedTransaction(
+          Transaction.fromHex(unbondingTxHex),
+          defaultFeeRate,
+        );
 
-      if (unbondingTxHex) {
-        const { psbt: unbondingPsbt } =
-          staking.createWithdrawEarlyUnbondedTransaction(
-            Transaction.fromHex(unbondingTxHex),
-            defaultFeeRate,
-          );
-        psbtToWithdraw = unbondingPsbt;
-      } else {
-        // Get the staking transaction hex from the mempool
-        const stakingTxHex = await getTxHex(stakingTxHashHex);
-        const { psbt: unbondingPsbt } =
-          staking.createWithdrawTimelockUnbondedTransaction(
-            Transaction.fromHex(stakingTxHex),
-            defaultFeeRate,
-          );
-        psbtToWithdraw = unbondingPsbt;
+      const signedWithdrawalPsbtHex = await signPsbt(unbondingPsbt.toHex());
+      const signedWithdrawalTx = Psbt.fromHex(
+        signedWithdrawalPsbtHex,
+      ).extractTransaction();
+      await pushTx(signedWithdrawalTx.toHex());
+      console.log(
+        "early unbonded withdrawal tx id",
+        signedWithdrawalTx.getId(),
+      );
+    },
+    [
+      params,
+      btcConnected,
+      btcNetwork,
+      address,
+      publicKeyNoCoord,
+      signPsbt,
+      pushTx,
+      defaultFeeRate,
+    ],
+  );
+
+  /**
+   * Submit the timelock unbonded withdrawal transaction
+   *
+   * @param stakingInput - The staking inputs
+   * @param paramVersion - The param version
+   * @param stakingTxHashHex - The staking transaction hash hex
+   */
+  const submitTimelockUnbondedWithdrawalTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      paramVersion: number,
+      stakingTxHashHex: string,
+    ) => {
+      // Perform checks
+      if (!params || params.bbnStakingParams.versions.length === 0) {
+        throw new Error("Params not loaded");
       }
+      if (!btcConnected || !btcNetwork)
+        throw new Error("BTC Wallet not connected");
 
-      const signedWithdrawalPsbtHex = await signPsbt(psbtToWithdraw.toHex());
-      await pushTx(signedWithdrawalPsbtHex);
+      validateStakingInput(stakingInput);
+
+      const p = getParamByVersion(params, paramVersion);
+      if (!p) throw new Error("Staking params not loaded");
+
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        p,
+        stakingInput.finalityProviderPkNoCoordHex,
+        stakingInput.stakingTimeBlocks,
+      );
+
+      // Get the staking transaction hex from the mempool
+      const stakingTxHex = await getTxHex(stakingTxHashHex);
+      const { psbt } = staking.createWithdrawTimelockUnbondedTransaction(
+        Transaction.fromHex(stakingTxHex),
+        defaultFeeRate,
+      );
+
+      const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
+      const signedWithdrawalTx = Psbt.fromHex(
+        signedWithdrawalPsbtHex,
+      ).extractTransaction();
+      await pushTx(signedWithdrawalTx.toHex());
+      console.log(
+        "timelock unbonded withdrawal tx id",
+        signedWithdrawalTx.getId(),
+      );
     },
     [
       params,
@@ -445,7 +550,8 @@ export const useTransactionService = () => {
     transitionPhase1Delegation,
     submitStakingTx,
     submitUnbondingTx,
-    submitWithdrawalTx,
+    submitEarlyUnbondedWithdrawalTx,
+    submitTimelockUnbondedWithdrawalTx,
   };
 };
 

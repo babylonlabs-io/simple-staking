@@ -9,7 +9,7 @@ export interface DelegationV2 {
   startHeight: number;
   endHeight: number;
   unbondingTime: number;
-  unbondingTx: string;
+  unbondingTxHex: string;
   state: DelegationV2StakingState;
   covenantUnbondingSignatures?: {
     covenantBtcPkHex: string;

@@ -10,7 +10,7 @@ import { GeneralModal } from "./GeneralModal";
 
 interface PendingVerificationModalProps {
   open: boolean;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
   awaitingWalletResponse: boolean;
   stakingTxHash: string;
 }
@@ -71,7 +71,8 @@ export function PendingVerificationModal({
       stakingTxHashHex,
       stakingTxHex,
     );
-  }, [delegation, submitStakingTx]);
+    onClose();
+  }, [delegation, submitStakingTx, onClose]);
 
   const verified = delegation?.state === state.VERIFIED;
 

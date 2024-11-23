@@ -85,7 +85,8 @@ export const getDelegationV2 = async (
     state,
     unbondingTime:
       delegationAPIResponse.data.delegation_unbonding.unbonding_time,
-    unbondingTx: delegationAPIResponse.data.delegation_unbonding.unbonding_tx,
+    unbondingTxHex:
+      delegationAPIResponse.data.delegation_unbonding.unbonding_tx,
     covenantUnbondingSignatures:
       delegationAPIResponse.data.delegation_unbonding.covenant_unbonding_signatures?.map(
         (signature) => ({
@@ -135,7 +136,7 @@ export const getDelegationsV2 = async (
         endHeight: apiDelegation.delegation_staking.end_height,
         state,
         unbondingTime: apiDelegation.delegation_unbonding.unbonding_time,
-        unbondingTx: apiDelegation.delegation_unbonding.unbonding_tx,
+        unbondingTxHex: apiDelegation.delegation_unbonding.unbonding_tx,
         covenantUnbondingSignatures:
           apiDelegation.delegation_unbonding.covenant_unbonding_signatures?.map(
             (signature) => ({
