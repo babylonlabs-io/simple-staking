@@ -11,7 +11,7 @@ import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail, MdForum } from "react-icons/md";
 
-import babylonIcon from "@/app/assets/babylon-logo.svg";
+import babylonIcon from "@/app/assets/logo-white.svg";
 
 const iconLinks = [
   {

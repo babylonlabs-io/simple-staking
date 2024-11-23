@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import logo from "@/app/assets/logo.svg";
+import logo from "@/app/assets/logo-white.svg";
 
 interface LogoProps {}
 
