@@ -28,7 +28,8 @@ const config: Config = {
         stakingFinalityProvidersDesktop: "2fr 1.5fr 2fr 0.75fr 0.75fr",
       },
       backgroundImage: {
-        "footer-texture": "url(/footer-rectangle.svg)",
+        "footer-texture-light": "url(/footer-rectangle-light.svg)",
+        "footer-texture-dark": "url(/footer-rectangle-dark.svg)",
       },
     },
   },
