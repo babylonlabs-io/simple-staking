@@ -1,3 +1,5 @@
+import { twJoin } from "tailwind-merge";
+
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useWalletConnection } from "@/app/context/wallet/WalletConnectionProvider";
 import { useAppState } from "@/app/state";
@@ -37,7 +39,10 @@ export const Header = () => {
             <ThemeToggle />
           </div>
           <div
-            className={`${address && "justify-end p-6 pt-0"}container mx-auto flex w-full items-center gap-4 md:hidden md:p-0`}
+            className={twJoin(
+              address && "justify-end p-6 pt-0",
+              "container mx-auto flex w-full items-center gap-4 md:hidden md:p-0",
+            )}
           >
             <ConnectedSmall
               loading={loading}
