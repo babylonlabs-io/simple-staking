@@ -2,8 +2,10 @@ import type { Config } from "tailwindcss";
 
 import { screenBreakPoints } from "./src/config/screen-breakpoints";
 
+const coreUIConfig = require("@babylonlabs-io/bbn-core-ui/tailwind");
+
 const config: Config = {
-  darkMode: ["selector", '[data-theme="dark"]'],
+  presets: [coreUIConfig],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -13,14 +15,11 @@ const config: Config = {
     screens: screenBreakPoints,
     extend: {
       colors: {
-        primary: {
-          DEFAULT: "#000000DE",
-          main: "#042F40",
-          dark: "#12495E",
-          light: "#387085",
-          contrast: "#F5F7F2",
-        },
-        secondary: "#0DB7BF",
+        /**
+         * Explicitly copy the coreUIConfig theme under `extend` so that
+         * it doesn't get overridden by daisyui plugin
+         */
+        ...coreUIConfig.theme.colors,
         "base-400": "hsl(var(--base-400) / <alpha-value>)",
       },
       gridTemplateColumns: {
@@ -31,8 +30,6 @@ const config: Config = {
   },
   plugins: [require("daisyui")],
   daisyui: {
-    darkTheme: "dark", // name of one of the included themes for dark mode
-    // base: true,
     logs: false,
     themes: [
       {
@@ -45,21 +42,6 @@ const config: Config = {
           "base-300": "#FFF",
           "base-content": "#000",
           "--base-400": "0 0% 98%",
-          ".btn-primary": {
-            color: "#FFF",
-          },
-        },
-      },
-      {
-        dark: {
-          ...require("daisyui/src/theming/themes")["dark"],
-          primary: "#FF7C2A",
-          secondary: "#0DB7BF",
-          "base-100": "#000",
-          "base-200": "#303030",
-          "base-300": "#1E1E1E",
-          "base-content": "#FFF",
-          "--base-400": "0 0% 9.8%",
           ".btn-primary": {
             color: "#FFF",
           },
