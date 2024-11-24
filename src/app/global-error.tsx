@@ -37,6 +37,7 @@ export default function GlobalError({
             network === Network.MAINNET
               ? "main-app-mainnet"
               : "main-app-testnet",
+            "bg-primary-contrast",
           )}
         >
           <GenericError />

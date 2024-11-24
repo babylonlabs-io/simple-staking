@@ -6,8 +6,8 @@ import { TestingInfo } from "../TestingInfo/TestingInfo";
 export const SimplifiedHeader = () => {
   return (
     <nav>
-      <div className="bg-base-300 shadow-sm">
-        <div className="container mx-auto flex w-full items-center justify-between gap-4 p-6 pb-4 md:pb-6">
+      <section className="bg-primary-main h-[300px] mb-[-188px]">
+        <div className="container h-20 py-6 px-6 mx-auto flex items-center justify-between">
           <Logo />
           <div className="flex flex-1">
             {shouldDisplayTestingMsg() && (
@@ -17,12 +17,12 @@ export const SimplifiedHeader = () => {
             )}
           </div>
         </div>
-      </div>
-      {shouldDisplayTestingMsg() && (
-        <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
-          <TestingInfo />
-        </div>
-      )}
+        {shouldDisplayTestingMsg() && (
+          <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
+            <TestingInfo />
+          </div>
+        )}
+      </section>
     </nav>
   );
 };

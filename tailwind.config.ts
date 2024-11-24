@@ -13,7 +13,13 @@ const config: Config = {
     screens: screenBreakPoints,
     extend: {
       colors: {
-        primary: "#FF7C2A",
+        primary: {
+          DEFAULT: "#000000DE",
+          main: "#042F40",
+          dark: "#12495E",
+          light: "#387085",
+          contrast: "#F5F7F2",
+        },
         secondary: "#0DB7BF",
         "base-400": "hsl(var(--base-400) / <alpha-value>)",
       },
