@@ -7,17 +7,19 @@ import {
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 
-interface UnbondModalProps {
+interface UnbondingV2ModalProps {
   isOpen: boolean;
   onClose: () => void;
   onProceed: () => void;
+  awaitingWalletResponse: boolean;
 }
 
-export const UnbondModal = ({
+export const UnbondingV2Modal = ({
   isOpen,
   onClose,
   onProceed,
-}: UnbondModalProps) => {
+  awaitingWalletResponse,
+}: UnbondingV2ModalProps) => {
   return (
     <Dialog open={isOpen} onClose={onClose}>
       <DialogHeader className="text-primary-main" onClose={onClose}>
@@ -44,8 +46,17 @@ export const UnbondModal = ({
         >
           Done
         </Button>
-        <Button variant="contained" onClick={onProceed} className="flex-1">
-          Proceed
+        <Button
+          variant="contained"
+          onClick={onProceed}
+          className="flex-1"
+          disabled={awaitingWalletResponse}
+        >
+          {awaitingWalletResponse ? (
+            <span className="loading loading-spinner loading-xs text-white" />
+          ) : (
+            "Proceed"
+          )}
         </Button>
       </DialogFooter>
     </Dialog>

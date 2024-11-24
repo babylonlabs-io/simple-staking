@@ -10,13 +10,16 @@ import Image from "next/image";
 
 import warningIcon from "@/app/assets/warning-icon.svg";
 
-interface UnbondErrorModal {
+interface UnbondingV2ErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDone: () => void;
 }
 
-export const UnbondModal = ({ isOpen, onDone }: UnbondErrorModal) => {
+export const UnbondingV2ErrorModal = ({
+  isOpen,
+  onDone,
+}: UnbondingV2ErrorModalProps) => {
   return (
     <Dialog open={isOpen} hasBackdrop={false}>
       <DialogBody className="pb-8 pt-4 text-primary-dark flex flex-col items-center">
