@@ -27,10 +27,6 @@ const config: Config = {
         stakingFinalityProvidersMobile: "2fr 1fr",
         stakingFinalityProvidersDesktop: "2fr 1.5fr 2fr 0.75fr 0.75fr",
       },
-      backgroundImage: {
-        "footer-texture-light": "url(/footer-rectangle-light.svg)",
-        "footer-texture-dark": "url(/footer-rectangle-dark.svg)",
-      },
     },
   },
   plugins: [require("daisyui")],
