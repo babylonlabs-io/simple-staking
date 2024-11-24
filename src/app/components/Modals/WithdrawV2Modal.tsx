@@ -8,8 +8,8 @@ import {
 } from "@babylonlabs-io/bbn-core-ui";
 
 import { getNetworkConfig } from "@/config/network.config";
-interface UnbondModalProps {
-  open: boolean;
+interface WithdrawV2ModalProps {
+  isOpen: boolean;
   onClose: () => void;
   onProceed: () => void;
   awaitingWalletResponse: boolean;
@@ -17,12 +17,12 @@ interface UnbondModalProps {
 
 const { networkName } = getNetworkConfig();
 
-export const WithdrawModalV2 = ({
-  open,
+export const WithdrawV2Modal = ({
+  isOpen,
   onClose,
   onProceed,
   awaitingWalletResponse,
-}: UnbondModalProps) => {
+}: WithdrawV2ModalProps) => {
   const title = "Withdraw";
   const content = (
     <>
@@ -32,7 +32,7 @@ export const WithdrawModalV2 = ({
   );
 
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={isOpen} onClose={onClose}>
       <DialogHeader className="text-primary-main" onClose={onClose}>
         {title}
       </DialogHeader>
