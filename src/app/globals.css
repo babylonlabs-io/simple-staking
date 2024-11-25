@@ -1,6 +1,7 @@
 @import "react-responsive-modal/styles.css";
 @import "react-tooltip/dist/react-tooltip.css";
 @import "react-toastify/dist/ReactToastify.css";
+@import "@babylonlabs-io/bbn-core-ui/dist/style.css";
 
 @tailwind base;
 @tailwind components;
