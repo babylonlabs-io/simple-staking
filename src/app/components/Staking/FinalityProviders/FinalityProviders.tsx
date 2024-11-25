@@ -19,6 +19,7 @@ import { FinalityProvider } from "./FinalityProvider";
 import { FinalityProviderSearch } from "./FinalityProviderSearch";
 
 export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
+  initialSearchValue,
   selectedFinalityProvider,
   onFinalityProviderChange,
   onFinalityProvidersLoad,
@@ -106,7 +107,10 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <strong>Step-1:</strong> Select a finality provider
       </p>
       <div className="flex gap-3">
-        <FinalityProviderSearch onSearch={handleSearch} />
+        <FinalityProviderSearch
+          initialSearchValue={initialSearchValue}
+          onSearch={handleSearch}
+        />
       </div>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
         <p>Finality Provider</p>

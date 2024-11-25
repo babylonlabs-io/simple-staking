@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
 interface FinalityProviderSearchProps {
+  initialSearchValue: string | null;
   onSearch: (searchTerm: string) => void;
 }
 
 export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
+  initialSearchValue,
   onSearch,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -15,6 +17,13 @@ export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
   useEffect(() => {
     onSearch(debouncedSearchTerm);
   }, [debouncedSearchTerm, onSearch]);
+
+  useEffect(() => {
+    if (initialSearchValue) {
+      setSearchTerm(initialSearchValue);
+      onSearch(initialSearchValue);
+    }
+  }, [initialSearchValue, onSearch]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

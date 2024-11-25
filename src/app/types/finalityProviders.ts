@@ -19,6 +19,7 @@ export interface Description {
 }
 
 export interface FinalityProvidersProps {
+  initialSearchValue: string | null;
   onFinalityProvidersLoad: Dispatch<
     SetStateAction<FinalityProvider[] | undefined>
   >;

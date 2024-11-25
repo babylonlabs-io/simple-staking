@@ -1,5 +1,8 @@
+"use client";
+
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { networks, Transaction } from "bitcoinjs-lib";
+import { useSearchParams } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
@@ -82,6 +85,10 @@ export const Staking: React.FC<StakingProps> = ({
   btcWalletBalanceSat,
   availableUTXOs,
 }) => {
+  // Get the finality provider from the search params
+  const searchParams = useSearchParams();
+  const initialSearchFp = searchParams.get("fp");
+
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
   const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
@@ -681,6 +688,7 @@ export const Staking: React.FC<StakingProps> = ({
             onFinalityProvidersLoad={setFinalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
+            initialSearchValue={initialSearchFp}
           />
         </div>
         <div className="divider m-0 lg:divider-horizontal lg:m-0" />
