@@ -7,7 +7,7 @@ import {
   BTCSigType,
   ProofOfPossessionBTC,
 } from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
-import { createWitness, Staking } from "@babylonlabs-io/btc-staking-ts";
+import { createCovenantWitness, Staking } from "@babylonlabs-io/btc-staking-ts";
 import { fromBech32 } from "@cosmjs/encoding";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import { Network, Psbt, Transaction } from "bitcoinjs-lib";
@@ -308,7 +308,7 @@ export const useTransactionService = () => {
         stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimeBlocks,
       );
-      const stakingPsbt = staking.createStakingPsbt(
+      const stakingPsbt = staking.toStakingPsbt(
         Transaction.fromHex(stakingTxHex),
         inputUTXOs!,
       );
@@ -373,7 +373,7 @@ export const useTransactionService = () => {
       );
 
       const unbondingTx = Transaction.fromHex(unbondingTxHex);
-      const unbondingPsbt = staking.createUnbondingPsbt(unbondingTx, stakingTx);
+      const unbondingPsbt = staking.toUnbondingPsbt(unbondingTx, stakingTx);
       const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
 
       // Compare the unbonding tx hash with the one from API
@@ -386,7 +386,7 @@ export const useTransactionService = () => {
       const covenantBuffers = p.covenantNoCoordPks.map((covenant) =>
         Buffer.from(covenant, "hex"),
       );
-      const witness = createWitness(
+      const witness = createCovenantWitness(
         signedUnbondingTx.ins[0].witness,
         covenantBuffers,
         covenantUnbondingSignatures,
@@ -517,7 +517,7 @@ export const useTransactionService = () => {
 
       // Get the staking transaction hex from the mempool
       const stakingTxHex = await getTxHex(stakingTxHashHex);
-      const { psbt } = staking.createWithdrawTimelockUnbondedTransaction(
+      const { psbt } = staking.createWithdrawStakingExpiredTransaction(
         Transaction.fromHex(stakingTxHex),
         defaultFeeRate,
       );
