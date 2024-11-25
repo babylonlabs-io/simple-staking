@@ -23,16 +23,13 @@ const formatter = Intl.NumberFormat("en", {
 });
 
 export const Stats = memo(() => {
-  const {
-    data: {
-      activeTvl,
-      activeStakers,
-      activeDelegations,
-      totalFinalityProviders,
-      activeFinalityProviders,
-    },
-    isLoading,
-  } = useSystemStats();
+  const { data, isLoading } = useSystemStats();
+
+  const activeTvl = data?.active_tvl ?? 0;
+  const activeStakers = data?.active_stakers ?? 0;
+  const activeDelegations = data?.active_delegations ?? 0;
+  const totalFinalityProviders = data?.total_finality_providers ?? 0;
+  const activeFinalityProviders = data?.active_finality_providers ?? 0;
 
   return (
     <div className="card flex flex-col gap-4 bg-base-300 p-1 shadow-sm xl:flex-row xl:justify-between">
