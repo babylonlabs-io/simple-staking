@@ -18,15 +18,13 @@ export const Section: React.FC<SectionProps> = ({ title, content }) => {
       <Accordion className="text-primary">
         <AccordionSummary
           className="p-2 text-xl flex justify-between"
-          renderIcon={(expanded) => (
-            <div className="rounded border border-primary-light text-primary-light p-2">
-              {expanded ? (
-                <AiOutlineMinus size={24} />
-              ) : (
-                <AiOutlinePlus size={24} />
-              )}
-            </div>
-          )}
+          renderIcon={(expanded) =>
+            expanded ? (
+              <AiOutlineMinus size={24} />
+            ) : (
+              <AiOutlinePlus size={24} />
+            )
+          }
         >
           <Heading variant="h6">
             <span className="align-middle">{title}</span>
