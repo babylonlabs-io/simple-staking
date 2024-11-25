@@ -37,12 +37,14 @@ interface DescriptionAPI {
 
 export const getFinalityProviders = async (
   key: string,
+  sort: string,
 ): Promise<PaginatedFinalityProviders> => {
   // const limit = 100;
   // const reverse = false;
 
   const params = {
     pagination_key: encode(key),
+    sort,
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
   };
