@@ -5,17 +5,18 @@ import {
   Heading,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
+import { ReactNode } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 interface SectionProps {
   title: string;
-  content: string;
+  content: ReactNode;
 }
 
 export const Section: React.FC<SectionProps> = ({ title, content }) => {
   return (
     <div className="border-primary-light/20 pt-6 first:pt-0 pb-2 first:pb-0">
-      <Accordion className="text-primary">
+      <Accordion className="text-primary-dark">
         <AccordionSummary
           className="p-2 text-xl flex justify-between"
           renderIcon={(expanded) =>
