@@ -14,7 +14,7 @@ interface SectionProps {
 
 export const Section: React.FC<SectionProps> = ({ title, content }) => {
   return (
-    <div className="cursor-pointer border-primary-light/20 pt-6 first:pt-0 pb-2 first:pb-0">
+    <div className="border-primary-light/20 pt-6 first:pt-0 pb-2 first:pb-0">
       <Accordion className="text-primary">
         <AccordionSummary
           className="p-2 text-xl flex justify-between"
