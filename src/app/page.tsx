@@ -7,6 +7,7 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useTermsAcceptance } from "@/app/hooks/useAcceptTerms";
+import { shouldDisableUnbonding } from "@/config";
 import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
@@ -32,10 +33,12 @@ import { LoadingView } from "./components/Loading/Loading";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { FilterOrdinalsModal } from "./components/Modals/FilterOrdinalsModal";
+import { UnbondingDisabledModal } from "./components/Modals/UnbondingDisabledModal";
 import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
+import { UnbondingDisabledBanner } from "./components/UnbondingDisabledBanner/UnbondingDisabledBanner";
 import { useError } from "./context/Error/ErrorContext";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorState } from "./types/errors";
@@ -357,6 +360,7 @@ const Home: React.FC<HomeProps> = () => {
       className={`relative h-full min-h-svh w-full ${network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet"}`}
     >
       <NetworkBadge isWalletConnected={!!btcWallet} />
+      {shouldDisableUnbonding() && <UnbondingDisabledBanner />}
       <Header
         onConnect={handleConnectModal}
         onDisconnect={handleDisconnectBTC}
@@ -444,6 +448,7 @@ const Home: React.FC<HomeProps> = () => {
         onRetry={retryErrorAction}
         noCancel={noCancel}
       />
+      <UnbondingDisabledModal />
     </main>
   );
 };

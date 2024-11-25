@@ -25,6 +25,7 @@ where,
 - `NEXT_PUBLIC_NETWORK` specifies the BTC network environment
 - `NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES` boolean value to indicate whether display 
 testing network related message. Default to true
+- `NEXT_PUBLIC_DISABLE_UNBONDING` boolean value to indicate whether disable unbonding. Default to false
 
 Then, to start a development server:
 

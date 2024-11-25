@@ -7,7 +7,7 @@ import { Tooltip } from "react-tooltip";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { DelegationState, StakingTx } from "@/app/types/delegations";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { shouldDisplayPoints } from "@/config";
+import { shouldDisableUnbonding, shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
 import { durationTillNow } from "@/utils/formatTime";
@@ -65,15 +65,32 @@ export const Delegation: React.FC<DelegationProps> = ({
     if (state === DelegationState.ACTIVE) {
       return (
         <div className="flex justify-end lg:justify-start">
-          <button
-            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
-            onClick={() => onUnbond(stakingTxHash)}
-            disabled={
-              intermediateState === DelegationState.INTERMEDIATE_UNBONDING
+          <div
+            data-tooltip-id="tooltip-unbonding"
+            data-tooltip-content={
+              shouldDisableUnbonding()
+                ? "Unbonding is temporarily disabled"
+                : ""
             }
+            data-tooltip-place="left"
           >
-            Unbond
-          </button>
+            <button
+              className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+              onClick={() => onUnbond(stakingTxHash)}
+              disabled={
+                intermediateState === DelegationState.INTERMEDIATE_UNBONDING ||
+                shouldDisableUnbonding()
+              }
+            >
+              Unbond
+            </button>
+          </div>
+          <Tooltip
+            id="tooltip-unbonding"
+            className="tooltip-wrap"
+            place="left"
+            clickable={true}
+          />
         </div>
       );
     } else if (state === DelegationState.UNBONDED) {

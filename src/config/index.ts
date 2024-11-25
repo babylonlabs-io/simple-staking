@@ -18,3 +18,9 @@ export const getNetworkAppUrl = (): string => {
 export const shouldDisplayPoints = (): boolean => {
   return !!process.env.NEXT_PUBLIC_POINTS_API_URL;
 };
+
+// shouldDisableUnbonding function is used to check if the application should
+// disable unbonding or not based on the existence of the environment variable.
+export const shouldDisableUnbonding = (): boolean => {
+  return process.env.NEXT_PUBLIC_DISABLE_UNBONDING?.toString() === "true";
+};
