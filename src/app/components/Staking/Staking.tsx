@@ -371,8 +371,8 @@ export const Staking = () => {
     }
   };
 
-  const handlePreviewModalClose = (isOpen: boolean) => {
-    setPreviewModalOpen(isOpen);
+  const handlePreviewModalClose = () => {
+    setPreviewModalOpen(false);
     handleFeedbackModal("cancel");
   };
 

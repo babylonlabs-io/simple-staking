@@ -6,7 +6,7 @@ import { GeneralModal } from "./GeneralModal";
 
 interface FeedbackModalProps {
   open: boolean;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
   type: "success" | "cancel" | null;
 }
 
@@ -142,7 +142,7 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
         </h3>
         <button
           className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose(false)}
+          onClick={() => onClose()}
         >
           <IoMdClose size={24} />
         </button>
