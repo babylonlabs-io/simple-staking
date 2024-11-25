@@ -4,27 +4,33 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
+  MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
+import { useMediaQuery } from "usehooks-ts";
 
-interface UnbondingV2ModalProps {
+import { screenBreakPoints } from "@/config/screen-breakpoints";
+
+interface UnbondModalProps {
   isOpen: boolean;
   onClose: () => void;
   onProceed: () => void;
   awaitingWalletResponse: boolean;
 }
 
-export const UnbondingV2Modal = ({
+export const UnbondModal = ({
   isOpen,
   onClose,
   onProceed,
   awaitingWalletResponse,
-}: UnbondingV2ModalProps) => {
+}: UnbondModalProps) => {
+  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
+
+  const DialogComponent = isMobileView ? MobileDialog : Dialog;
+
   return (
-    <Dialog open={isOpen} onClose={onClose}>
-      <DialogHeader className="text-primary-main" onClose={onClose}>
-        Unbonding
-      </DialogHeader>
+    <DialogComponent open={isOpen} onClose={onClose}>
+      <DialogHeader title="Unbonding" onClose={onClose} />
       <DialogBody className="pb-8 pt-4 text-primary-dark">
         <Text variant="body1">
           You are about to unbond your stake before its expiration. A
@@ -59,6 +65,6 @@ export const UnbondingV2Modal = ({
           )}
         </Button>
       </DialogFooter>
-    </Dialog>
+    </DialogComponent>
   );
 };

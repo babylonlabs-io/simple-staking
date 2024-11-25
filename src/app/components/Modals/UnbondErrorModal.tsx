@@ -4,24 +4,28 @@ import {
   DialogBody,
   DialogFooter,
   Heading,
+  MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
+import { useMediaQuery } from "usehooks-ts";
 
 import warningIcon from "@/app/assets/warning-icon.svg";
+import { screenBreakPoints } from "@/config/screen-breakpoints";
 
-interface UnbondingV2ErrorModalProps {
+interface UnbondErrorModalProps {
   isOpen: boolean;
   onClose: () => void;
   onDone: () => void;
 }
 
-export const UnbondingV2ErrorModal = ({
-  isOpen,
-  onDone,
-}: UnbondingV2ErrorModalProps) => {
+export const UnbondErrorModal = ({ isOpen, onDone }: UnbondErrorModalProps) => {
+  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
+
+  const DialogComponent = isMobileView ? MobileDialog : Dialog;
+
   return (
-    <Dialog open={isOpen} hasBackdrop={false}>
+    <DialogComponent open={isOpen} hasBackdrop={false}>
       <DialogBody className="pb-8 pt-4 text-primary-dark flex flex-col items-center">
         <Image src={warningIcon} alt="Warning" width={88} height={88} />
         <Heading variant="h5" className="mt-4">
@@ -38,6 +42,6 @@ export const UnbondingV2ErrorModal = ({
           Done
         </Button>
       </DialogFooter>
-    </Dialog>
+    </DialogComponent>
   );
 };
