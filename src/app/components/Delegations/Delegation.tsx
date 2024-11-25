@@ -90,7 +90,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
             onClick={onTransition}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_TRANSITIONING
@@ -104,7 +104,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       return (
         <div className="flex justify-end lg:justify-start">
           <button
-            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
             onClick={() => onWithdraw(stakingTxHashHex)}
             disabled={
               intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
@@ -145,7 +145,7 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   return (
     <div
-      className={`card relative border bg-base-300 p-4 text-sm dark:bg-base-200 ${isOverflow ? "border-primary" : "dark:border-0"}`}
+      className={`relative rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-base text-primary-dark`}
     >
       {isOverflow && (
         <div className="absolute -top-1 right-1/2 flex translate-x-1/2 items-center gap-1 rounded-md bg-primary px-2 py-1 text-xs text-white lg:right-2 lg:top-1/2 lg:-translate-y-1/2 lg:translate-x-0">
@@ -165,12 +165,12 @@ export const Delegation: React.FC<DelegationProps> = ({
         <p className="order-3 lg:order-2">
           {durationTillNow(startTimestamp, currentTime)}
         </p>
-        <div className="justify-center lg:flex order-2 lg:order-3">
+        <div className="justify-start lg:flex order-2 lg:order-3">
           <a
             href={`${mempoolApiUrl}/tx/${stakingTxHashHex}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary hover:underline"
+            className="hover:underline"
           >
             {trim(stakingTxHashHex)}
           </a>
@@ -179,8 +179,8 @@ export const Delegation: React.FC<DelegationProps> = ({
         we need to center the text without the tooltip
         add its size 12px and gap 4px, 16/2 = 8px
         */}
-        <div className="relative flex justify-end lg:justify-center order-4">
-          <div className="flex items-center gap-1">
+        <div className="relative flex justify-start lg:justify-start order-4">
+          <div className="flex items-center justify-start gap-1">
             <p>{renderState()}</p>
             <span
               className="cursor-pointer text-xs"
@@ -198,7 +198,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
         <DelegationPoints
           stakingTxHashHex={stakingTxHashHex}
-          className="relative flex justify-end lg:justify-center order-5"
+          className="relative flex justify-start lg:justify-start order-5"
         />
         <div className="order-6">{generateActionButton()}</div>
       </div>

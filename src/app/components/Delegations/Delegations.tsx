@@ -1,3 +1,4 @@
+import { Heading } from "@babylonlabs-io/bbn-core-ui";
 import type { networks } from "bitcoinjs-lib";
 import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
@@ -242,46 +243,54 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
 
   return (
     <>
-      <div
-        className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 px-4 lg:grid`}
-      >
-        <p>Amount</p>
-        <p>Inception</p>
-        <p className="text-center">Transaction hash</p>
-        <p className="text-center">Status</p>
-        {shouldShowPoints && <p className="text-center">Points</p>}
-        <p>Action</p>
-      </div>
-      <div
-        id="staking-history"
-        className="no-scrollbar max-h-[21rem] overflow-y-auto"
-      >
-        <InfiniteScroll
-          className="flex flex-col gap-4 pt-3"
-          dataLength={combinedDelegationsData.length}
-          next={fetchMoreDelegations}
-          hasMore={hasMoreDelegations}
-          loader={isLoading ? <LoadingTableList /> : null}
-          scrollableTarget="staking-history"
-        >
-          {combinedDelegationsData?.map((delegation) => {
-            if (!delegation) return null;
-            const { stakingTx, stakingTxHashHex } = delegation;
-            const intermediateDelegation =
-              intermediateDelegationsLocalStorage.find(
-                (item) => item.stakingTxHashHex === stakingTxHashHex,
-              );
+      <div className="bg-secondary-contrast p-6">
+        <Heading variant="h6" className="text-primary-light py-2 mb-6">
+          Pending Transitions / Withdrawal (Phase 1)
+        </Heading>
 
-            return (
-              <Delegation
-                key={stakingTxHashHex + stakingTx.startHeight}
-                delegation={delegation}
-                onWithdraw={() => handleModal(stakingTxHashHex, MODE_WITHDRAW)}
-                intermediateState={intermediateDelegation?.state}
-              />
-            );
-          })}
-        </InfiniteScroll>
+        <div
+          className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 p-4 lg:grid text-primary-light text-xs`}
+        >
+          <p className="text-left">Amount</p>
+          <p className="text-left">Inception</p>
+          <p className="text-left">Transaction hash</p>
+          <p className="text-left">Status</p>
+          {shouldShowPoints && <p className="text-left">Points</p>}
+          <p className="text-left">Action</p>
+        </div>
+        <div
+          id="staking-history"
+          className="no-scrollbar max-h-[21rem] overflow-y-auto"
+        >
+          <InfiniteScroll
+            className="flex flex-col gap-4 pt-3"
+            dataLength={combinedDelegationsData.length}
+            next={fetchMoreDelegations}
+            hasMore={hasMoreDelegations}
+            loader={isLoading ? <LoadingTableList /> : null}
+            scrollableTarget="staking-history"
+          >
+            {combinedDelegationsData?.map((delegation) => {
+              if (!delegation) return null;
+              const { stakingTx, stakingTxHashHex } = delegation;
+              const intermediateDelegation =
+                intermediateDelegationsLocalStorage.find(
+                  (item) => item.stakingTxHashHex === stakingTxHashHex,
+                );
+
+              return (
+                <Delegation
+                  key={stakingTxHashHex + stakingTx.startHeight}
+                  delegation={delegation}
+                  onWithdraw={() =>
+                    handleModal(stakingTxHashHex, MODE_WITHDRAW)
+                  }
+                  intermediateState={intermediateDelegation?.state}
+                />
+              );
+            })}
+          </InfiniteScroll>
+        </div>
       </div>
       {modalMode && txID && delegation && (
         <WithdrawModal

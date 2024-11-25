@@ -3,9 +3,7 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
-import { DelegationList } from "@/components/delegations/DelegationList";
-
-import { DelegationTabs } from "./components/Delegations/DelegationTabs";
+import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
@@ -29,8 +27,7 @@ const Home = () => {
           <Stats />
           <PersonalBalance />
           <Staking />
-          <DelegationTabs />
-          <DelegationList />
+          <Activity />
         </div>
       </div>
       <FAQ />
