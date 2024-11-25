@@ -236,59 +236,53 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
+  if (combinedDelegationsData.length === 0) {
+    return null;
+  }
+
   return (
     <>
-      {combinedDelegationsData.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-content p-4 text-center dark:border-neutral-content/20">
-          <p>No history found</p>
-        </div>
-      ) : (
-        <>
-          <div
-            className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 px-4 lg:grid`}
-          >
-            <p>Amount</p>
-            <p>Inception</p>
-            <p className="text-center">Transaction hash</p>
-            <p className="text-center">Status</p>
-            {shouldShowPoints && <p className="text-center">Points</p>}
-            <p>Action</p>
-          </div>
-          <div
-            id="staking-history"
-            className="no-scrollbar max-h-[21rem] overflow-y-auto"
-          >
-            <InfiniteScroll
-              className="flex flex-col gap-4 pt-3"
-              dataLength={combinedDelegationsData.length}
-              next={fetchMoreDelegations}
-              hasMore={hasMoreDelegations}
-              loader={isLoading ? <LoadingTableList /> : null}
-              scrollableTarget="staking-history"
-            >
-              {combinedDelegationsData?.map((delegation) => {
-                if (!delegation) return null;
-                const { stakingTx, stakingTxHashHex } = delegation;
-                const intermediateDelegation =
-                  intermediateDelegationsLocalStorage.find(
-                    (item) => item.stakingTxHashHex === stakingTxHashHex,
-                  );
+      <div
+        className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 px-4 lg:grid`}
+      >
+        <p>Amount</p>
+        <p>Inception</p>
+        <p className="text-center">Transaction hash</p>
+        <p className="text-center">Status</p>
+        {shouldShowPoints && <p className="text-center">Points</p>}
+        <p>Action</p>
+      </div>
+      <div
+        id="staking-history"
+        className="no-scrollbar max-h-[21rem] overflow-y-auto"
+      >
+        <InfiniteScroll
+          className="flex flex-col gap-4 pt-3"
+          dataLength={combinedDelegationsData.length}
+          next={fetchMoreDelegations}
+          hasMore={hasMoreDelegations}
+          loader={isLoading ? <LoadingTableList /> : null}
+          scrollableTarget="staking-history"
+        >
+          {combinedDelegationsData?.map((delegation) => {
+            if (!delegation) return null;
+            const { stakingTx, stakingTxHashHex } = delegation;
+            const intermediateDelegation =
+              intermediateDelegationsLocalStorage.find(
+                (item) => item.stakingTxHashHex === stakingTxHashHex,
+              );
 
-                return (
-                  <Delegation
-                    key={stakingTxHashHex + stakingTx.startHeight}
-                    delegation={delegation}
-                    onWithdraw={() =>
-                      handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                    }
-                    intermediateState={intermediateDelegation?.state}
-                  />
-                );
-              })}
-            </InfiniteScroll>
-          </div>
-        </>
-      )}
+            return (
+              <Delegation
+                key={stakingTxHashHex + stakingTx.startHeight}
+                delegation={delegation}
+                onWithdraw={() => handleModal(stakingTxHashHex, MODE_WITHDRAW)}
+                intermediateState={intermediateDelegation?.state}
+              />
+            );
+          })}
+        </InfiniteScroll>
+      </div>
       {modalMode && txID && delegation && (
         <WithdrawModal
           open={modalOpen}

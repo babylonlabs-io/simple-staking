@@ -12,7 +12,7 @@ type ButtonStrategy = Record<string, ButtonAdapter>;
 const ACTION_BUTTONS: ButtonStrategy = {
   [state.VERIFIED]: (props: ActionButtonProps) => (
     <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
       onClick={() => props.onClick?.("stake", props.txHash)}
       disabled={props.state === state.INTERMEDIATE_PENDING_CONFIRMATION}
     >
@@ -21,7 +21,7 @@ const ACTION_BUTTONS: ButtonStrategy = {
   ),
   [state.ACTIVE]: (props: ActionButtonProps) => (
     <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
       onClick={() => props.onClick?.("unbound", props.txHash)}
       disabled={props.state === state.INTERMEDIATE_UNBONDING}
     >
@@ -31,7 +31,7 @@ const ACTION_BUTTONS: ButtonStrategy = {
 
   [state.WITHDRAWABLE]: (props: ActionButtonProps) => (
     <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
+      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
       onClick={() => props.onClick?.("withdraw", props.txHash)}
       disabled={props.state === state.INTERMEDIATE_WITHDRAWAL}
     >

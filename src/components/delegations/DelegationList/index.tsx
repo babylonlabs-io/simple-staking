@@ -1,6 +1,9 @@
+import { Heading } from "@babylonlabs-io/bbn-core-ui";
+
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
+import { AuthGuard } from "@/components/common/AuthGuard";
 
 import { type TableColumn, GridTable } from "../../common/GridTable";
 
@@ -23,27 +26,20 @@ const columns: TableColumn<
     field: "startHeight",
     headerName: "Duration",
     width: "max-content",
-    align: "center",
   },
   {
     field: "stakingTxHashHex",
     headerName: "Transaction hash",
-    cellClassName: "justify-center",
-    align: "center",
     renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
   },
   {
     field: "state",
     headerName: "Status",
-    cellClassName: "justify-center",
-    align: "center",
     renderCell: (row) => <Status value={row.state} />,
   },
   {
     field: "actions",
     headerName: "Action",
-    cellClassName: "justify-center",
-    align: "center",
     renderCell: (row, _, { handleActionClick }) => (
       <ActionButton
         txHash={row.stakingTxHashHex}
@@ -117,22 +113,31 @@ export function DelegationList() {
   };
 
   return (
-    <GridTable
-      getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-      columns={columns}
-      data={delegations}
-      loading={isLoading}
-      infiniteScroll={hasMoreDelegations}
-      onInfiniteScroll={fetchMoreDelegations}
-      classNames={{
-        headerCellClassName: "py-2 px-4 bg-base-300",
-        wrapperClassName: "max-h-[21rem] overflow-x-auto",
-        bodyClassName: "gap-y-4 min-w-[1000px]",
-        cellClassName:
-          "p-4 first:pl-4 first:rounded-l-2xl last:pr-4 last:rounded-r-2xl bg-base-300 border dark:bg-base-200 dark:border-0 flex items-center text-sm",
-      }}
-      params={{ handleActionClick }}
-      fallback={<div>No delegations found</div>}
-    />
+    <AuthGuard>
+      <div className="bg-secondary-contrast p-6">
+        <Heading variant="h6" className="text-primary-light py-2 mb-6">
+          Babylon Chain Stakes (Phase 2)
+        </Heading>
+        <GridTable
+          getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
+          columns={columns}
+          data={delegations}
+          loading={isLoading}
+          infiniteScroll={hasMoreDelegations}
+          onInfiniteScroll={fetchMoreDelegations}
+          classNames={{
+            headerRowClassName: "text-primary-light text-xs",
+            headerCellClassName: "p-4 text-align-left",
+            rowClassName: "group",
+            wrapperClassName: "max-h-[21rem] overflow-x-auto",
+            bodyClassName: "gap-y-4 min-w-[1000px]",
+            cellClassName:
+              "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-base justify-start group-even:bg-[#F9F9F9] text-primary-dark",
+          }}
+          params={{ handleActionClick }}
+          fallback={<div>No delegations found</div>}
+        />
+      </div>
+    </AuthGuard>
   );
 }

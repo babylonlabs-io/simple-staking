@@ -2,7 +2,6 @@ import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 
 import { Delegations } from "@/app/components/Delegations/Delegations";
 import { AuthGuard } from "@/components/common/AuthGuard";
-import { DelegationList } from "@/components/delegations/DelegationList";
 
 export function DelegationTabs() {
   return (
@@ -19,20 +18,11 @@ export function DelegationTabs() {
               >
                 Phase 1
               </Tab>
-              <Tab
-                className="text-primary cursor-pointer"
-                selectedClassName="border-b border-dashed border-primary"
-              >
-                Phase 2
-              </Tab>
             </TabList>
           </div>
 
           <TabPanel>
             <Delegations />
-          </TabPanel>
-          <TabPanel>
-            <DelegationList />
           </TabPanel>
         </div>
       </Tabs>
