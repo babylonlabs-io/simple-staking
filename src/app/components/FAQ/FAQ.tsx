@@ -12,7 +12,7 @@ export const FAQ: React.FC<FAQProps> = () => {
 
   return (
     <div className="container mx-auto flex flex-col gap-2 p-6">
-      <h3 className="mb-8 font-normal text-4xl text-primary">FAQ’s</h3>
+      <Heading as="h3" variant="h4" className="mb-8">FAQ’s</Heading>
       <div className="flex flex-col gap-4 bg-warning-contrast border border-primary-light/20 rounded divide-y p-6">
         {questions(coinName, networkName, confirmationDepth).map((question) => (
           <Section
