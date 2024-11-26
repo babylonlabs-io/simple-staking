@@ -7,6 +7,11 @@ export interface BbnStakingParamsVersion extends StakingParams {
   delegationCreationBaseGasFee: number;
 }
 
+export interface BtcEpochCheckParamsVersion {
+  version: number;
+  btcConfirmationDepth: number;
+}
+
 export interface BbnStakingParams {
   // The genesis params is the version 0 of the staking params which is
   // compatible with the phase-1 global params
@@ -16,6 +21,13 @@ export interface BbnStakingParams {
   versions: BbnStakingParamsVersion[];
 }
 
+export interface BtcEpochCheckParams {
+  genesisParam: BtcEpochCheckParamsVersion;
+  latestParam: BtcEpochCheckParamsVersion;
+  versions: BtcEpochCheckParamsVersion[];
+}
+
 export interface Params {
   bbnStakingParams: BbnStakingParams;
+  btcEpochCheckParams: BtcEpochCheckParams;
 }

@@ -9,8 +9,14 @@ export interface ParamsDataResponse {
   data: ParamsAPI;
 }
 
+export interface BtcCheckpointParams {
+  version: number;
+  btc_confirmation_depth: number;
+}
+
 export interface ParamsAPI {
   bbn: BbnParams[];
+  btc: BtcCheckpointParams[];
 }
 
 export interface BbnParams {
@@ -40,7 +46,7 @@ export const getParams = async (): Promise<Params> => {
 
   const params = data.data;
 
-  const versions = params.bbn
+  const stakingVersions = params.bbn
     .sort((a, b) => a.version - b.version) // Sort by version ascending
     .map((v) => ({
       version: v.version,
@@ -67,22 +73,46 @@ export const getParams = async (): Promise<Params> => {
       minStakingAmountSat: v.min_staking_value_sat,
     }));
 
-  const latestParam = versions.reduce((prev, current) =>
+  const latestStakingParam = stakingVersions.reduce((prev, current) =>
     current.version > prev.version ? current : prev,
   );
 
-  // Find the genesis params which is the first version
-  // This param can be used for transitioning phase-1 delegations
-  const genesisParam = versions.find((v) => v.version === 0);
-  if (!genesisParam) {
-    throw new Error("Genesis params not found");
+  // Map the BTC checkpoint params to the expected format
+  const epochCheckVersions = params.btc
+    .sort((a, b) => a.version - b.version) // Sort by version ascending
+    .map((v) => ({
+      version: v.version,
+      btcConfirmationDepth: v.btc_confirmation_depth,
+    }));
+
+  // Get the latest epoch check param
+  const latestEpochCheckParam = epochCheckVersions.reduce((prev, current) =>
+    current.version > prev.version ? current : prev,
+  );
+
+  const genesisStakingParam = stakingVersions.find((v) => v.version === 0);
+  if (!genesisStakingParam) {
+    throw new Error("Genesis staking params not found");
+  }
+
+  // Find the genesis epoch check param (version 0)
+  const genesisEpochCheckParam = epochCheckVersions.find(
+    (v) => v.version === 0,
+  );
+  if (!genesisEpochCheckParam) {
+    throw new Error("Genesis epoch check params not found");
   }
 
   return {
     bbnStakingParams: {
-      latestParam,
-      versions: versions,
-      genesisParam,
+      latestParam: latestStakingParam,
+      versions: stakingVersions,
+      genesisParam: genesisStakingParam,
+    },
+    btcEpochCheckParams: {
+      latestParam: latestEpochCheckParam,
+      versions: epochCheckVersions,
+      genesisParam: genesisEpochCheckParam,
     },
   };
 };
