@@ -69,7 +69,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             data-tooltip-id="tooltip-unbonding"
             data-tooltip-content={
               shouldDisableUnbonding()
-                ? "Unbonding is temporarily disabled"
+                ? "Unbonding temporarily unavailable"
                 : ""
             }
             data-tooltip-place="left"
