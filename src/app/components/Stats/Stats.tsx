@@ -135,14 +135,14 @@ export const Stats: React.FC = () => {
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 8)} ${coinName}`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 2)} ${coinName}`
           : 0,
         icon: confirmedTvl,
       },
       {
         title: "Pending Stake",
         value: stakingStats?.unconfirmedTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 8)} ${coinName}`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.unconfirmedTVLSat - stakingStats.activeTVLSat), 2)} ${coinName}`
           : 0,
         icon: pendingStake,
         tooltip:

@@ -90,7 +90,7 @@ export const FinalityProvider: React.FC<FinalityProviderProps> = ({
         <div className="flex items-center gap-1">
           <p className="hidden sm:flex lg:hidden">Delegation:</p>
           <p>
-            {maxDecimals(satoshiToBtc(stakeSat), 8)} {coinName}
+            {maxDecimals(satoshiToBtc(stakeSat), 2)} {coinName}
           </p>
           <span
             className="inline-flex cursor-pointer text-xs sm:hidden"
