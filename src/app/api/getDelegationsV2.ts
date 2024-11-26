@@ -3,7 +3,7 @@ import { encode } from "url-safe-base64";
 import { Pagination } from "../types/api";
 import {
   DelegationV2,
-  DelegationV2StakingStateMap,
+  getDelegationV2StakingState,
 } from "../types/delegationsV2";
 
 import { apiWrapper } from "./apiWrapper";
@@ -63,12 +63,7 @@ export const getDelegationV2 = async (
 
   const delegationAPIResponse: DelegationV2APIResponse = response.data;
 
-  const state = DelegationV2StakingStateMap[delegationAPIResponse.data.state];
-  if (!state) {
-    throw new Error(
-      `Unknown delegation state: ${delegationAPIResponse.data.state}`,
-    );
-  }
+  const state = getDelegationV2StakingState(delegationAPIResponse.data.state);
 
   return {
     finalityProviderBtcPksHex:
@@ -120,10 +115,7 @@ export const getDelegationsV2 = async (
 
   const delegations: DelegationV2[] = delegationsAPIResponse.data.map(
     (apiDelegation: DelegationV2API): DelegationV2 => {
-      const state = DelegationV2StakingStateMap[apiDelegation.state];
-      if (!state) {
-        throw new Error(`Unknown delegation state: ${apiDelegation.state}`);
-      }
+      const state = getDelegationV2StakingState(apiDelegation.state);
       return {
         finalityProviderBtcPksHex: apiDelegation.finality_provider_btc_pks_hex,
         stakingTxHex: apiDelegation.delegation_staking.staking_tx_hex,

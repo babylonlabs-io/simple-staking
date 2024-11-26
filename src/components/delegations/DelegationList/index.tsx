@@ -2,9 +2,12 @@ import { Heading } from "@babylonlabs-io/bbn-core-ui";
 
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import type { DelegationV2 } from "@/app/types/delegationsV2";
+import {
+  DelegationV2StakingState,
+  type DelegationV2,
+} from "@/app/types/delegationsV2";
 
-import { type TableColumn, GridTable } from "../../common/GridTable";
+import { GridTable, type TableColumn } from "../../common/GridTable";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -61,6 +64,7 @@ export function DelegationList() {
     submitStakingTx,
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
+    submitTimelockUnbondedWithdrawalTx,
   } = useTransactionService();
 
   // Define the onClick function here
@@ -82,14 +86,15 @@ export function DelegationList() {
     } = d;
 
     const finalityProviderPk = finalityProviderBtcPksHex[0];
+    const stakingInput = {
+      finalityProviderPkNoCoordHex: finalityProviderPk,
+      stakingAmountSat: stakingAmount,
+      stakingTimeBlocks: stakingTime,
+    };
 
     if (action === "stake") {
       await submitStakingTx(
-        {
-          finalityProviderPkNoCoordHex: finalityProviderPk,
-          stakingAmountSat: stakingAmount,
-          stakingTimeBlocks: stakingTime,
-        },
+        stakingInput,
         paramsVersion,
         stakingTxHashHex,
         stakingTxHex,
@@ -99,11 +104,7 @@ export function DelegationList() {
         throw new Error("Covenant unbonding signatures not found");
       }
       await submitUnbondingTx(
-        {
-          finalityProviderPkNoCoordHex: finalityProviderPk,
-          stakingAmountSat: stakingAmount,
-          stakingTimeBlocks: stakingTime,
-        },
+        stakingInput,
         paramsVersion,
         stakingTxHex,
         unbondingTxHex,
@@ -113,16 +114,24 @@ export function DelegationList() {
         })),
       );
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
-    } else if (action === "withdraw_early_unbonded") {
-      await submitEarlyUnbondedWithdrawalTx(
-        {
-          finalityProviderPkNoCoordHex: finalityProviderPk,
-          stakingAmountSat: stakingAmount,
-          stakingTimeBlocks: stakingTime,
-        },
-        paramsVersion,
-        unbondingTxHex,
-      );
+    } else if (action === "withdraw") {
+      if (state === DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE) {
+        await submitEarlyUnbondedWithdrawalTx(
+          stakingInput,
+          paramsVersion,
+          unbondingTxHex,
+        );
+      } else if (state === DelegationV2StakingState.TIMELOCK_WITHDRAWABLE) {
+        await submitTimelockUnbondedWithdrawalTx(
+          stakingInput,
+          paramsVersion,
+          stakingTxHex,
+        );
+      } else {
+        // TODO: Awaiting backend API to return slashing tx hex
+        throw new Error("Not implemented yet for withdrawal: " + state);
+      }
+
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_WITHDRAWAL
     }
   };
