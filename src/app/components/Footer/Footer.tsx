@@ -68,7 +68,7 @@ const iconLinks = [
 
 export const Footer: React.FC = () => {
   return (
-    <div className="hidden relative md:flex h-[238px] text-white bg-primary-main before:absolute before:h-3 before:w-2/3 before:bg-primary-main before:left-1/4 before:-top-2 text-primary-contrast">
+    <div className="relative md:flex h-[238px] text-white bg-primary-main before:absolute before:h-3 before:w-2/3 before:bg-primary-main before:left-1/4 before:-top-2 text-primary-contrast">
       <div className="container mx-auto flex flex-row items-center justify-around">
         <div className="flex flex-col">
           <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
