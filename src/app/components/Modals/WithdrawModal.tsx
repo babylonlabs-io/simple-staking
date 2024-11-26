@@ -1,86 +1,75 @@
-import { IoMdClose } from "react-icons/io";
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  MobileDialog,
+  Text,
+} from "@babylonlabs-io/bbn-core-ui";
+import { useMediaQuery } from "usehooks-ts";
 
-import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { getNetworkConfig } from "@/config/network.config";
-
-import { LoadingView } from "../Loading/Loading";
-
-import { GeneralModal } from "./GeneralModal";
+import { screenBreakPoints } from "@/config/screen-breakpoints";
 
 export const MODE_TRANSITION = "transition";
 export const MODE_WITHDRAW = "withdraw";
 export type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW;
 
-interface PreviewModalProps {
-  open: boolean;
-  onClose: (value: boolean) => void;
+interface WithdrawModalProps {
+  isOpen: boolean;
+  onClose: () => void;
   onProceed: () => void;
-  mode: MODE;
   awaitingWalletResponse: boolean;
-  delegation: DelegationInterface;
 }
 
 const { networkName } = getNetworkConfig();
 
-export const WithdrawModal: React.FC<PreviewModalProps> = ({
-  open,
+export const WithdrawModal = ({
+  isOpen,
   onClose,
   onProceed,
   awaitingWalletResponse,
-}) => {
-  const withdrawTitle = "Withdraw";
-  const withdrawContent = (
+}: WithdrawModalProps) => {
+  const title = "Withdraw";
+  const content = (
     <>
-      You are about to withdraw your stake. <br />A transaction fee will be
+      You are about to withdraw your stake. <br /> A transaction fee will be
       deduced from your stake by the {networkName} network
     </>
   );
 
-  const title = withdrawTitle;
-  const content = withdrawContent;
+  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
+
+  const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
   return (
-    <GeneralModal
-      open={open}
-      onClose={onClose}
-      closeOnEsc={false}
-      closeOnOverlayClick={!awaitingWalletResponse}
-      small
-    >
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">{title}</h3>
-        {!awaitingWalletResponse && (
-          <button
-            className="btn btn-circle btn-ghost btn-sm"
-            onClick={() => onClose(false)}
-          >
-            <IoMdClose size={24} />
-          </button>
-        )}
-      </div>
-      <div className="flex flex-col gap-4">
-        <p className="text-left dark:text-neutral-content">{content}</p>
-        {awaitingWalletResponse ? (
-          <LoadingView
-            text="Awaiting wallet signature and broadcast"
-            noBorder
-          />
-        ) : (
-          <div className="flex gap-4">
-            <button
-              className="btn btn-outline flex-1"
-              onClick={() => {
-                onClose(false);
-              }}
-            >
-              Cancel
-            </button>
-            <button className="btn-primary btn flex-1" onClick={onProceed}>
-              Proceed
-            </button>
-          </div>
-        )}
-      </div>
-    </GeneralModal>
+    <DialogComponent open={isOpen} onClose={onClose}>
+      <DialogHeader
+        title={title}
+        className="text-primary-dark"
+        onClose={onClose}
+      />
+      <DialogBody className="pb-8 pt-4 text-primary-dark">
+        <Text variant="body1">{content}</Text>
+      </DialogBody>
+      <DialogFooter className="flex gap-4">
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={onClose}
+          className="flex-1"
+        >
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={onProceed} className="flex-1">
+          {awaitingWalletResponse ? (
+            <span className="loading loading-spinner loading-xs text-white" />
+          ) : (
+            "Proceed"
+          )}
+        </Button>
+      </DialogFooter>
+    </DialogComponent>
   );
 };
