@@ -1,44 +1,27 @@
-import { BalanceItem } from "./BalanceItem";
+import { Heading } from "@babylonlabs-io/bbn-core-ui";
+
+import { StatItem } from "../Stats/StatItem";
 
 export function PersonalBalance() {
   return (
-    <div className="card flex flex-col gap-2 items-stretch sm:justify-between sm:items-center bg-base-300 shadow-sm sm:flex-row">
-      <div className="flex flex-col gap-2 card p-4 bg-base-400">
-        <h3 className="mb-4 font-bold xl:mb-0">Bitcoin Balance</h3>
+    <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
+      <Heading variant="h5" className="text-primary-dark md:text-4xl">
+        Wallet Balance
+      </Heading>
+      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">
+        <StatItem loading={false} title="Bitcoin Balance" value="100.134 BTC" />
 
-        <div className="flex flex-col gap-2 md:flex-row md:items-center">
-          <BalanceItem label="Total" value="100.134 BTC" />
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
 
-          <div className="divider xl:divider-horizontal my-0" />
+        <StatItem loading={false} title="Stakable Bitcoin" value="0.134 BTC" />
 
-          <BalanceItem label="Stakable" value="0.134 BTC" />
-        </div>
-      </div>
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
 
-      <div className="flex flex-col gap-2 card p-4 bg-base-400">
-        <h3 className="mb-4 font-bold sm:text-right xl:mb-0">
-          Babylon Balance
-        </h3>
+        <StatItem loading={false} title="Babylon Balance" value="100.134 BBN" />
 
-        <div className="flex flex-col text-right gap-2 md:flex-row md:items-center">
-          <BalanceItem
-            className="sm:justify-end"
-            label="Total"
-            value="100.134 BBN"
-          />
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
 
-          <div className="divider xl:divider-horizontal my-0" />
-
-          <BalanceItem
-            className="sm:justify-end"
-            label="Claimable Reward"
-            value={
-              <button className="btn btn-primary h-auto min-h-fit w-fit p-0.5 rounded">
-                0.134 BBN
-              </button>
-            }
-          />
-        </div>
+        <StatItem loading={false} title="BBN Rewards" value="0.134 BBN" />
       </div>
     </div>
   );

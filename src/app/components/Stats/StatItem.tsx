@@ -4,7 +4,7 @@ import { Tooltip } from "react-tooltip";
 
 interface StatItemProps {
   loading?: boolean;
-  icon: JSX.Element;
+  icon?: JSX.Element;
   title: string;
   value: string | number;
   tooltip?: string;
@@ -17,7 +17,7 @@ export const StatItem = ({
   value,
   tooltip,
 }: StatItemProps) => (
-  <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-center">
+  <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-between text-primary-light text-base">
     <div className="flex items-center gap-2">
       {icon}
       <div className="flex items-center gap-1">
@@ -41,9 +41,9 @@ export const StatItem = ({
     <div>
       <p className="flex-1 text-right">
         {loading ? (
-          <span className="loading loading-spinner text-primary" />
+          <span className="loading loading-spinner text-primary-dark" />
         ) : (
-          <strong>{value}</strong>
+          <span className="text-primary-dark">{value}</span>
         )}
       </p>
     </div>
