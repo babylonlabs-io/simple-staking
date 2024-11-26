@@ -8,10 +8,9 @@ import {
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
-import { useMediaQuery } from "usehooks-ts";
 
 import warningIcon from "@/app/assets/warning-icon.svg";
-import { screenBreakPoints } from "@/config/screen-breakpoints";
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 
 interface UnbondErrorModalProps {
   isOpen: boolean;
@@ -20,7 +19,7 @@ interface UnbondErrorModalProps {
 }
 
 export const UnbondErrorModal = ({ isOpen, onDone }: UnbondErrorModalProps) => {
-  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
+  const isMobileView = useIsMobileView();
 
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
