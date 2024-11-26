@@ -5,6 +5,11 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
+import {
+  MODE,
+  MODE_WITHDRAW,
+  WithdrawModal,
+} from "@/app/components/Modals/WithdrawModal";
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -20,8 +25,6 @@ import { shouldDisplayPoints } from "@/config";
 import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
-
-import { MODE, MODE_WITHDRAW, WithdrawModal } from "../Modals/WithdrawModal";
 
 import { Delegation } from "./Delegation";
 
@@ -294,14 +297,12 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
       </div>
       {modalMode && txID && delegation && (
         <WithdrawModal
-          open={modalOpen}
+          isOpen={modalOpen}
           onClose={() => setModalOpen(false)}
           onProceed={() => {
             handleWithdraw(txID);
           }}
-          mode={modalMode}
           awaitingWalletResponse={awaitingWalletResponse}
-          delegation={delegation}
         />
       )}
     </>
