@@ -4,13 +4,13 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
+  Loader,
   MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
-import { useMediaQuery } from "usehooks-ts";
 
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfig } from "@/config/network.config";
-import { screenBreakPoints } from "@/config/screen-breakpoints";
 
 export const MODE_TRANSITION = "transition";
 export const MODE_WITHDRAW = "withdraw";
@@ -39,7 +39,7 @@ export const WithdrawModal = ({
     </>
   );
 
-  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
+  const isMobileView = useIsMobileView();
 
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
@@ -64,7 +64,7 @@ export const WithdrawModal = ({
         </Button>
         <Button variant="contained" onClick={onProceed} className="flex-1">
           {awaitingWalletResponse ? (
-            <span className="loading loading-spinner loading-xs text-white" />
+            <Loader size={16} className="text-white" />
           ) : (
             "Proceed"
           )}

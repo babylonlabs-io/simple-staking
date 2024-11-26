@@ -493,10 +493,11 @@ export const Staking = () => {
             </span>
             {previewReady && (
               <PreviewModal
-                open={previewModalOpen}
+                isOpen={previewModalOpen}
                 onClose={handlePreviewModalClose}
                 onSign={handleDelegationEoiCreation}
                 finalityProvider={finalityProvider?.description.moniker}
+                finalityProviderAvatar={finalityProvider?.description.identity}
                 stakingAmountSat={stakingAmountSat}
                 stakingTimeBlocks={stakingTimeBlocksWithFixed}
                 stakingFeeSat={stakingFeeSat}
