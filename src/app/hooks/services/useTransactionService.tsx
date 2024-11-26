@@ -24,7 +24,7 @@ import {
   uint8ArrayToHex,
 } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { getTxHex, getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
+import { getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
 
 import { useNetworkFees } from "../api/useNetworkFees";
 
@@ -416,7 +416,7 @@ export const useTransactionService = () => {
   );
 
   /**
-   * Submit the early unbonded withdrawal transaction
+   * Withdraw from the early unbonding transaction which is now unbonded
    *
    * @param stakingInput - The staking inputs
    * @param paramVersion - The param version
@@ -484,13 +484,13 @@ export const useTransactionService = () => {
    *
    * @param stakingInput - The staking inputs
    * @param paramVersion - The param version
-   * @param stakingTxHashHex - The staking transaction hash hex
+   * @param stakingTxHex - The staking transaction hex
    */
   const submitTimelockUnbondedWithdrawalTx = useCallback(
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      stakingTxHashHex: string,
+      stakingTxHex: string,
     ) => {
       // Perform checks
       if (!params || params.bbnStakingParams.versions.length === 0) {
@@ -515,8 +515,6 @@ export const useTransactionService = () => {
         stakingInput.stakingTimeBlocks,
       );
 
-      // Get the staking transaction hex from the mempool
-      const stakingTxHex = await getTxHex(stakingTxHashHex);
       const { psbt } = staking.createWithdrawStakingExpiredTransaction(
         Transaction.fromHex(stakingTxHex),
         defaultFeeRate,

@@ -12,42 +12,81 @@ const STATUSES: Record<
   string,
   (param?: BbnStakingParamsVersion) => { label: string; tooltip: string }
 > = {
-  [state.ACTIVE]: () => ({
-    label: "Active",
-    tooltip: "Stake is active",
+  [state.PENDING]: () => ({
+    label: "Pending",
+    tooltip: "Stake is pending verification",
   }),
   [state.VERIFIED]: () => ({
     label: "Verified",
     tooltip: "Stake is verified, you can start staking",
   }),
-  [state.UNBONDING]: (param) => ({
+  [state.ACTIVE]: () => ({
+    label: "Active",
+    tooltip: "Stake is active",
+  }),
+  [state.TIMELOCK_UNBONDING]: (param) => ({
+    label: "Unbonding",
+    tooltip:
+      "Stake is about to be unbonded as it's reaching the timelock period",
+  }),
+  [state.EARLY_UNBONDING]: (param) => ({
     label: "Unbonding",
     tooltip: `Unbonding process of ${blocksToDisplayTime(param?.unbondingTime)} has started`,
   }),
-  [state.WITHDRAWABLE]: () => ({
+  [state.TIMELOCK_WITHDRAWABLE]: () => ({
     label: "Withdrawable",
-    tooltip: "Stake is withdrawable",
+    tooltip: "Stake is withdrawable as it's reached the timelock period",
   }),
-  [state.WITHDRAWN]: () => ({
+  [state.EARLY_UNBONDING_WITHDRAWABLE]: () => ({
+    label: "Withdrawable",
+    tooltip: "Stake is withdrawable after the unbonding period",
+  }),
+  [state.TIMELOCK_SLASHING_WITHDRAWABLE]: () => ({
+    label: "Withdrawable",
+    tooltip: "Slashed Stake is now withdrawable",
+  }),
+  [state.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: () => ({
+    label: "Withdrawable",
+    tooltip: "Slashed Stake is now withdrawable",
+  }),
+  [state.TIMELOCK_SLASHED]: () => ({
+    label: "Slashed",
+    tooltip: "Stake has been slashed",
+  }),
+  [state.EARLY_UNBONDING_SLASHED]: () => ({
+    label: "Slashed",
+    tooltip: "Stake has been slashed",
+  }),
+  [state.TIMELOCK_WITHDRAWN]: () => ({
     label: "Withdrawn",
     tooltip: "Stake has been withdrawn",
   }),
-  [state.PENDING]: () => ({
-    label: "Pending",
-    // TODO: get confirmation depth from params
-    // https://github.com/babylonlabs-io/simple-staking/issues/325
-    tooltip: `Stake that is pending ${10} Bitcoin confirmations will only be visible from this device`,
+  [state.EARLY_UNBONDING_WITHDRAWN]: () => ({
+    label: "Withdrawn",
+    tooltip: "Stake has been withdrawn",
   }),
-  [state.INTERMEDIATE_PENDING_CONFIRMATION]: () => ({
-    label: "Pending",
-    tooltip: "Stake is pending confirmation",
+  [state.EARLY_UNBONDING_SLASHING_WITHDRAWN]: () => ({
+    label: "Withdrawn",
+    tooltip: "Slashed Stake has been withdrawn",
   }),
-  [state.INTERMEDIATE_UNBONDING]: () => ({
-    label: "Requesting Unbonding",
+  [state.TIMELOCK_SLASHING_WITHDRAWN]: () => ({
+    label: "Withdrawn",
+    tooltip: "Slashed Stake has been withdrawn",
+  }),
+  [state.INTERMEDIATE_PENDING_VERIFICATION]: () => ({
+    label: "Pending",
+    tooltip: "Stake is pending verification",
+  }),
+  [state.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: () => ({
+    label: "Pending",
+    tooltip: "Stake is pending 10 BTC confirmations",
+  }),
+  [state.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
+    label: "Unbonding",
     tooltip: "Stake is requesting unbonding",
   }),
-  [state.INTERMEDIATE_WITHDRAWAL]: () => ({
-    label: "Withdrawal Submitted",
+  [state.INTERMEDIATE_WITHDRAWAL_SUBMITTED]: () => ({
+    label: "Withdrawal",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
 };
