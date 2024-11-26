@@ -1,5 +1,4 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Transaction } from "bitcoinjs-lib";
 import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
@@ -49,7 +48,6 @@ export const Staking = () => {
     publicKeyNoCoord,
     network: btcWalletNetwork,
     getNetworkFees,
-    pushTx,
   } = useBTCWallet();
 
   const disabled = isError;
@@ -80,7 +78,9 @@ export const Staking = () => {
   const latestParam = params?.bbnStakingParams?.latestParam;
 
   const [pendingVerificationOpen, setPendingVerificationOpen] = useState(false);
-  const [stakingTx, setStakingTx] = useState<string | undefined>();
+  const [stakingTxHashHex, setStakingTxHashHex] = useState<
+    string | undefined
+  >();
 
   const [eoiModalOpen, setEoiModalOpen] = useState(false);
   const [eoiStatuses, setEoiStatuses] = useState({
@@ -145,7 +145,7 @@ export const Staking = () => {
   ]);
 
   const handleResetState = () => {
-    setStakingTx(undefined);
+    setStakingTxHashHex(undefined);
     setPendingVerificationOpen(false);
     setEoiModalOpen(false);
     setEoiStatuses({
@@ -219,13 +219,13 @@ export const Staking = () => {
       };
       setAwaitingWalletResponse(true);
       setEoiModalOpen(true);
-      const stakingTX = await createDelegationEoi(
+      const stakingTxHashHex = await createDelegationEoi(
         eoiInput,
         feeRate,
         signingCallback,
       );
-      setEoiModalOpen(false);
-      setStakingTx(stakingTX.toHex());
+
+      setStakingTxHashHex(stakingTxHashHex);
       setPendingVerificationOpen(true);
     } catch (error: Error | any) {
       showError({
@@ -246,30 +246,7 @@ export const Staking = () => {
       });
     } finally {
       setAwaitingWalletResponse(false);
-    }
-  };
-
-  const handleStake = async () => {
-    if (!stakingTx) {
-      throw new Error("Staking transaction not found");
-    }
-    try {
-      // Right now we have staking tx
-      // later on this step should be changed to building and signing
-      await pushTx(stakingTx);
-      handleResetState();
-    } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.STAKING,
-        },
-        noCancel: true,
-        retryAction: async () => {
-          await pushTx(stakingTx);
-          handleResetState();
-        },
-      });
+      setEoiModalOpen(false);
     }
   };
 
@@ -394,8 +371,8 @@ export const Staking = () => {
     }
   };
 
-  const handlePreviewModalClose = (isOpen: boolean) => {
-    setPreviewModalOpen(isOpen);
+  const handlePreviewModalClose = () => {
+    setPreviewModalOpen(false);
     handleFeedbackModal("cancel");
   };
 
@@ -555,13 +532,12 @@ export const Staking = () => {
         onClose={handleCloseFeedbackModal}
         type={feedbackModal.type}
       />
-      {stakingTx && (
+      {stakingTxHashHex && (
         <PendingVerificationModal
           open={pendingVerificationOpen}
           onClose={handlePendingVerificationClose}
-          stakingTxHash={Transaction.fromHex(stakingTx).getId()}
+          stakingTxHash={stakingTxHashHex}
           awaitingWalletResponse={awaitingWalletResponse}
-          onStake={handleStake}
         />
       )}
       <EOIModal

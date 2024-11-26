@@ -17,7 +17,7 @@ interface EOIModalProps {
     eoi: EOIStepStatus;
   };
   open: boolean;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
 }
 
 const STATUS_ICON = {

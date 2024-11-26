@@ -4,7 +4,7 @@ import { twMerge } from "tailwind-merge";
 
 interface GeneralModalProps {
   open: boolean;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
   small?: boolean;
   children: ReactNode;
   className?: string;
@@ -39,7 +39,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
     <Modal
       ref={modalRef}
       open={open}
-      onClose={() => onClose(false)}
+      onClose={onClose}
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
         modal: twMerge(

@@ -28,7 +28,12 @@ const ACTION_BUTTONS: ButtonStrategy = {
       Unbond
     </button>
   ),
-
+  // TODO: Check which withdrawable state the delegation is in
+  // 1. EARLY_UNBONDED_WITHDRAWAL
+  // 2. NATURAL_UNBONDED_WITHDRAWAL
+  // 3. SLASHING_UNBONDED_WITHDRAWAL
+  // Below code is for the first state - EARLY_UNBONDED_WITHDRAWAL until
+  // the remaining other states are implemented
   [state.WITHDRAWABLE]: (props: ActionButtonProps) => (
     <button
       className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"

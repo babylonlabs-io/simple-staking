@@ -12,7 +12,7 @@ import { GeneralModal } from "./GeneralModal";
 
 interface PreviewModalProps {
   open: boolean;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
   onSign: () => void;
   finalityProvider: string | undefined;
   stakingAmountSat: number;
@@ -55,7 +55,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
         {!awaitingWalletResponse && (
           <button
             className="btn btn-circle btn-ghost btn-sm"
-            onClick={() => onClose(false)}
+            onClick={() => onClose()}
           >
             <IoMdClose size={24} />
           </button>
@@ -119,7 +119,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
             <button
               className="btn btn-outline flex-1"
               onClick={() => {
-                onClose(false);
+                onClose();
               }}
             >
               Cancel
