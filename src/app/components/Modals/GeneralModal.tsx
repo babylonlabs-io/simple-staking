@@ -43,7 +43,7 @@ export const GeneralModal: React.FC<GeneralModalProps> = ({
       classNames={{
         modalContainer: "flex items-end justify-center md:items-center",
         modal: twMerge(
-          `m-0 w-full max-w-none rounded-t-2xl bg-base-300 shadow-lg md:w-auto md:rounded-b-2xl max-h-[100svh] min-w-[20rem] md:max-h-[85svh] md:min-w-[30rem]`,
+          `m-0 w-full max-w-none rounded-t bg-secondary-contrast border-primary-light/20 p-6 md:w-auto md:rounded max-h-[100svh] min-w-[20rem] md:max-h-[85svh] md:min-w-[30rem]`,
           small ? "md:max-w-[25rem]" : "md:max-w-[45rem] lg:max-w-[55rem]",
           className,
         ),

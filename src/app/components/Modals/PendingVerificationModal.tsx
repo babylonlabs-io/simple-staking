@@ -1,5 +1,6 @@
+import { Button, Heading, Loader } from "@babylonlabs-io/bbn-core-ui";
 import { useCallback } from "react";
-import { FaCheckCircle } from "react-icons/fa";
+import { BiSolidBadgeCheck } from "react-icons/bi";
 
 import { useDelegationV2 } from "@/app/hooks/api/useDelegationV2";
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
@@ -17,9 +18,9 @@ interface PendingVerificationModalProps {
 
 const Verified = () => (
   <>
-    <FaCheckCircle className="text-5xl text-success" />
-    <h3 className="text-xl text-center">Verified</h3>
-    <p className="text-sm text-center">
+    <BiSolidBadgeCheck className="text-5xl" />
+    <Heading variant="h4">Verified</Heading>
+    <p className="text-base text-center">
       Your request has been verified by the babylon blockchain. You can now
       stake
     </p>
@@ -28,9 +29,9 @@ const Verified = () => (
 
 const NotVerified = () => (
   <>
-    <span className="loading loading-spinner loading-lg text-primary" />
-    <h3 className="text-xl text-center">Pending Verification</h3>
-    <p className="text-sm text-center">
+    <Loader size={48} />
+    <Heading variant="h4">Pending Verification</Heading>
+    <p className="text-base text-center">
       The babylon blockchain has received your request. Please wait while we
       confirm the neseccary amount of signatures
     </p>
@@ -83,21 +84,20 @@ export function PendingVerificationModal({
       closeOnOverlayClick={false}
       closeOnEsc={false}
     >
-      <div className="flex flex-col gap-8 md:max-w-[34rem]">
+      <div className="flex flex-col gap-8 md:max-w-[34rem] text-primary-dark">
         <div className="py-4 flex flex-col items-center gap-4">
           {verified ? <Verified /> : <NotVerified />}
         </div>
-        <button
-          className="btn btn-primary"
+        <Button
           disabled={!verified || awaitingWalletResponse}
           onClick={onStake}
         >
           {awaitingWalletResponse ? (
-            <span className="loading loading-spinner"></span>
+            <Loader size={24} />
           ) : (
             <span>Stake on {networkName}</span>
           )}
-        </button>
+        </Button>
       </div>
     </GeneralModal>
   );

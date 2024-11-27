@@ -5,7 +5,6 @@ import { shouldDisplayTestingMsg } from "@/config";
 interface TestingInfoProps {}
 
 export const TestingInfo: React.FC<TestingInfoProps> = () => {
-  return null;
   if (!shouldDisplayTestingMsg()) return null;
   return (
     <div className="flex w-full justify-center">
