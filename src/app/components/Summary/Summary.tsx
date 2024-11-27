@@ -3,7 +3,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useParams } from "@/app/hooks/api/useParams";
+import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";
@@ -24,9 +24,10 @@ export const Summary = () => {
 
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
-  const { data: params } = useParams();
+  const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
-    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 10;
 
   if (!address) return;
 

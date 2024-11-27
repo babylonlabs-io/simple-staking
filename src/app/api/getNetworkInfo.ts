@@ -1,12 +1,12 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 import { AxiosResponse } from "axios";
 
-import { Params } from "../types/params";
+import { NetworkInfo } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
 
-export interface ParamsDataResponse {
-  data: ParamsAPI;
+interface NetworkInfoDataResponse {
+  data: NetworkInfoAPI;
 }
 
 export interface BtcCheckpointParams {
@@ -14,9 +14,16 @@ export interface BtcCheckpointParams {
   btc_confirmation_depth: number;
 }
 
-export interface ParamsAPI {
-  bbn: BbnParams[];
-  btc: BtcCheckpointParams[];
+interface StakingStatus {
+  is_staking_open: boolean;
+}
+
+interface NetworkInfoAPI {
+  staking_status: StakingStatus;
+  params: {
+    bbn: BbnParams[];
+    btc: BtcCheckpointParams[];
+  };
 }
 
 export interface BbnParams {
@@ -37,14 +44,14 @@ export interface BbnParams {
   delegation_creation_base_gas_fee: number;
 }
 
-export const getParams = async (): Promise<Params> => {
+export const getNetworkInfo = async (): Promise<NetworkInfo> => {
   const { data } = (await apiWrapper(
     "GET",
-    "/v2/params",
-    "Error getting params",
-  )) as AxiosResponse<ParamsDataResponse>;
+    "/v2/network-info",
+    "Error getting network info",
+  )) as AxiosResponse<NetworkInfoDataResponse>;
 
-  const params = data.data;
+  const { params, staking_status } = data.data;
 
   const stakingVersions = params.bbn
     .sort((a, b) => a.version - b.version) // Sort by version ascending
@@ -104,15 +111,20 @@ export const getParams = async (): Promise<Params> => {
   }
 
   return {
-    bbnStakingParams: {
-      latestParam: latestStakingParam,
-      versions: stakingVersions,
-      genesisParam: genesisStakingParam,
+    stakingStatus: {
+      isStakingOpen: staking_status.is_staking_open,
     },
-    btcEpochCheckParams: {
-      latestParam: latestEpochCheckParam,
-      versions: epochCheckVersions,
-      genesisParam: genesisEpochCheckParam,
+    params: {
+      bbnStakingParams: {
+        latestParam: latestStakingParam,
+        versions: stakingVersions,
+        genesisParam: genesisStakingParam,
+      },
+      btcEpochCheckParams: {
+        latestParam: latestEpochCheckParam,
+        versions: epochCheckVersions,
+        genesisParam: genesisEpochCheckParam,
+      },
     },
   };
 };

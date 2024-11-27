@@ -74,8 +74,8 @@ export const Staking = () => {
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
   const { createDelegationEoi, estimateStakingFee } = useTransactionService();
-  const { params } = useAppState();
-  const latestParam = params?.bbnStakingParams?.latestParam;
+  const { networkInfo } = useAppState();
+  const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
   const [pendingVerificationOpen, setPendingVerificationOpen] = useState(false);
   const [stakingTxHashHex, setStakingTxHashHex] = useState<

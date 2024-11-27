@@ -1,6 +1,6 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 
-import { useParams } from "@/app/hooks/api/useParams";
+import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { questions } from "./data/questions";
@@ -9,9 +9,10 @@ interface FAQProps {}
 
 export const FAQ: React.FC<FAQProps> = () => {
   const { coinName, networkName } = getNetworkConfig();
-  const { data: params } = useParams();
+  const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
-    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 10;
 
   return (
     <div className="container mx-auto flex flex-col gap-2 p-6">

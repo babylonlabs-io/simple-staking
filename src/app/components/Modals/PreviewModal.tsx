@@ -11,7 +11,7 @@ import {
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 
-import { useParams } from "@/app/hooks/api/useParams";
+import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
@@ -48,9 +48,10 @@ export const PreviewModal = ({
   const isMobileView = useIsMobileView();
   const { coinName } = getNetworkConfig();
 
-  const { data: params } = useParams();
+  const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
-    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 10;
 
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
