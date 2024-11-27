@@ -24,7 +24,7 @@ import {
   uint8ArrayToHex,
 } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
+import { getTxInfo, getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
 
 import { useNetworkFees } from "../api/useNetworkFees";
 
@@ -736,12 +736,16 @@ const getInclusionProof = async (
   // Get the merkle proof
   let txMerkleProof: MerkleProof;
   try {
+    // TODO: Use the hook instead
     txMerkleProof = await getTxMerkleProof(stakingTx.getId());
   } catch (err) {
     throw new Error("Failed to get the merkle proof", { cause: err });
   }
+  // TODO: Use the hook instead
+  const txInfo = await getTxInfo(stakingTx.getId());
+  const blockHash = txInfo.status.block_hash;
 
-  const hash = Uint8Array.from(Buffer.from(stakingTx.getId(), "hex"));
+  const hash = Uint8Array.from(Buffer.from(blockHash, "hex"));
   const inclusionProofKey: btccheckpoint.TransactionKey =
     btccheckpoint.TransactionKey.fromPartial({
       index: txMerkleProof.pos,

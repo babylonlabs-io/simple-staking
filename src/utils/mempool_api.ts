@@ -10,6 +10,23 @@ export interface MerkleProof {
   pos: number;
 }
 
+interface TxInfo {
+  txid: string;
+  version: number;
+  locktime: number;
+  vin: string[];
+  vout: string[];
+  size: number;
+  weight: number;
+  fee: number;
+  status: {
+    confirmed: boolean;
+    block_height: number;
+    block_hash: string;
+    block_time: number;
+  };
+}
+
 export class ServerError extends Error {
   constructor(
     message: string,
@@ -220,7 +237,7 @@ export async function getFundingUTXOs(
  * @param txId - The transaction ID in string format.
  * @returns A promise that resolves into the transaction information.
  */
-export async function getTxInfo(txId: string): Promise<any> {
+export async function getTxInfo(txId: string): Promise<TxInfo> {
   const response = await fetch(txInfoUrl(txId));
   if (!response.ok) {
     const err = await response.text();
