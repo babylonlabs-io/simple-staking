@@ -1,6 +1,7 @@
 import { IoMdClose } from "react-icons/io";
 import { twJoin } from "tailwind-merge";
 
+import { useParams } from "@/app/hooks/api/useParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 import { satoshiToBtc } from "@/utils/btcConversions";
@@ -40,8 +41,9 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 
   const { coinName } = getNetworkConfig();
 
-  // TODO: Get confirmation depth from params
-  const confirmationDepth = 10;
+  const { data: params } = useParams();
+  const confirmationDepth =
+    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
 
   return (
     <GeneralModal
