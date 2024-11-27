@@ -3,7 +3,7 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import { networks } from "bitcoinjs-lib";
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useTermsAcceptance } from "@/app/hooks/useAcceptTerms";
@@ -28,6 +28,7 @@ import { Delegations } from "./components/Delegations/Delegations";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
+import { LoadingView } from "./components/Loading/Loading";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { FilterOrdinalsModal } from "./components/Modals/FilterOrdinalsModal";
@@ -287,7 +288,7 @@ const Home: React.FC<HomeProps> = () => {
         });
       }
     },
-    [showError, hasSeenFilterOrdinalsModal],
+    [showError, hasSeenFilterOrdinalsModal, logTermsAcceptance],
   );
 
   // Subscribe to account changes
@@ -374,19 +375,21 @@ const Home: React.FC<HomeProps> = () => {
               publicKeyNoCoord={publicKeyNoCoord}
             />
           )}
-          <Staking
-            btcHeight={paramWithContext?.currentHeight}
-            isWalletConnected={!!btcWallet}
-            onConnect={handleConnectModal}
-            isLoading={isLoadingCurrentParams}
-            btcWallet={btcWallet}
-            btcWalletBalanceSat={btcWalletBalanceSat}
-            btcWalletNetwork={btcWalletNetwork}
-            address={address}
-            publicKeyNoCoord={publicKeyNoCoord}
-            setDelegationsLocalStorage={setDelegationsLocalStorage}
-            availableUTXOs={availableUTXOs}
-          />
+          <Suspense fallback={<LoadingView />}>
+            <Staking
+              btcHeight={paramWithContext?.currentHeight}
+              isWalletConnected={!!btcWallet}
+              onConnect={handleConnectModal}
+              isLoading={isLoadingCurrentParams}
+              btcWallet={btcWallet}
+              btcWalletBalanceSat={btcWalletBalanceSat}
+              btcWalletNetwork={btcWalletNetwork}
+              address={address}
+              publicKeyNoCoord={publicKeyNoCoord}
+              setDelegationsLocalStorage={setDelegationsLocalStorage}
+              availableUTXOs={availableUTXOs}
+            />
+          </Suspense>
           {btcWallet &&
             delegations &&
             paramWithContext?.nextBlockParams.currentVersion &&
