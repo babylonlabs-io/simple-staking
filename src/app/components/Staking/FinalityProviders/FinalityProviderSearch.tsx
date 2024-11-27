@@ -1,29 +1,27 @@
 import { useDebounce } from "@uidotdev/usehooks";
+import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 
 interface FinalityProviderSearchProps {
-  initialSearchValue: string | null;
   onSearch: (searchTerm: string) => void;
 }
 
 export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
-  initialSearchValue,
   onSearch,
 }) => {
-  const [searchTerm, setSearchTerm] = useState("");
+  // Get the finality provider from the search params
+  const searchParams = useSearchParams();
+  const initialSearchFp = searchParams.get("fp");
+
+  const [searchTerm, setSearchTerm] = useState(initialSearchFp);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
-    onSearch(debouncedSearchTerm);
-  }, [debouncedSearchTerm, onSearch]);
-
-  useEffect(() => {
-    if (initialSearchValue) {
-      setSearchTerm(initialSearchValue);
-      onSearch(initialSearchValue);
+    if (debouncedSearchTerm) {
+      onSearch(debouncedSearchTerm);
     }
-  }, [initialSearchValue, onSearch]);
+  }, [debouncedSearchTerm, onSearch]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -38,7 +36,7 @@ export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
         <input
           type="text"
           placeholder="Search by Name or Public Key"
-          value={searchTerm}
+          value={searchTerm ?? ""}
           onChange={handleSearch}
           className="w-full pl-10 pr-4 py-2 text-sm bg-transparent border-b border-gray-300 focus:outline-none focus:border-primary"
         />
