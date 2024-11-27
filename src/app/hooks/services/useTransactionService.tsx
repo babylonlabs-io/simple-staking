@@ -120,6 +120,20 @@ export const useTransactionService = () => {
         feeRate,
       );
 
+      console.log("staking", staking);
+      console.log("staking input", stakingInput);
+      console.log("transaction", transaction);
+      console.log("bech32Address", bech32Address);
+      console.log("{ address, publicKeyNoCoordHex: publicKeyNoCoord }", {
+        address,
+        publicKeyNoCoordHex: publicKeyNoCoord,
+      });
+      console.log("latestParam", latestParam);
+      console.log("{ signPsbt, signMessage, signingCallback }", {
+        signPsbt,
+        signMessage,
+        signingCallback,
+      });
       const delegationMsg = await createBtcDelegationMsg(
         staking,
         stakingInput,
@@ -129,6 +143,7 @@ export const useTransactionService = () => {
         latestParam,
         { signPsbt, signMessage, signingCallback },
       );
+      console.log("delegationMsg", delegationMsg);
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
       await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
@@ -239,6 +254,21 @@ export const useTransactionService = () => {
       // Get the merkle proof
       const inclusionProof = await getInclusionProof(stakingTx);
       // Create delegation message
+      console.log("stakingInstance", stakingInstance);
+      console.log("stakingInput", stakingInput);
+      console.log("stakingTx", stakingTx);
+      console.log("bech32Address", bech32Address);
+      console.log("{ address, publicKeyNoCoordHex: publicKeyNoCoord }", {
+        address,
+        publicKeyNoCoordHex: publicKeyNoCoord,
+      });
+      console.log("genesisParam", genesisParam);
+      console.log("{ signPsbt, signMessage, signingCallback }", {
+        signPsbt,
+        signMessage,
+        signingCallback,
+      });
+      console.log("inclusionProof", inclusionProof);
       const delegationMsg = await createBtcDelegationMsg(
         stakingInstance,
         stakingInput,
