@@ -3,6 +3,7 @@ import { IoMdClose } from "react-icons/io";
 import { useLocalStorage } from "usehooks-ts";
 
 import { shouldDisableUnbonding } from "@/config";
+import { getNetworkConfig } from "@/config/network.config";
 
 import { GeneralModal } from "./GeneralModal";
 
@@ -13,15 +14,18 @@ const Title: React.FC = () => {
 };
 
 const Content: React.FC = () => {
+  const { network, coinName } = getNetworkConfig();
+
   return (
     <div className="text-text-black dark:text-white">
       <div className="mt-6 flex flex-col gap-4">
         <p>
-          In preparation for the upcoming Phase-2 testnet launch in DATE,
-          on-demand stake unbonding is disabled.
+          In preparation for the upcoming Phase-2 {network} launch, on-demand
+          stake unbonding is disabled.
           <br />
-          Once the Phase-2 testnet is launched, you will be able to transit your
-          Signet BTC stake to Phase-2 and then unbond.
+          Once the Phase-2 {network} is launched, you will be able to transit
+          your
+          {coinName} stake to Phase-2 and then unbond.
         </p>
       </div>
     </div>
