@@ -7,11 +7,11 @@ type BreakpointKey = keyof typeof screenBreakPoints;
 /**
  * Custom hook to check if the current viewport matches a specific breakpoint
  * @param breakpoint - The breakpoint to check against ("sm" | "md" | "lg" | "xl" | "2xl")
- * @returns boolean indicating if the viewport width is greater than or equal to the specified breakpoint
+ * @returns boolean indicating if the viewport width is less than or equal to the specified breakpoint
  */
 export const useBreakpoint = (breakpoint: BreakpointKey): boolean => {
   const matches = useMediaQuery(
-    `(min-width: ${screenBreakPoints[breakpoint]})`,
+    `(max-width: ${screenBreakPoints[breakpoint]})`,
   );
   return matches;
 };

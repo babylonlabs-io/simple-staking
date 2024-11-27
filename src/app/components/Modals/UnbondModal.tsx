@@ -4,6 +4,7 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
+  Loader,
   MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
@@ -53,7 +54,7 @@ export const UnbondModal = ({
           onClick={onClose}
           className="flex-1"
         >
-          Done
+          Cancel
         </Button>
         <Button
           variant="contained"
@@ -62,9 +63,9 @@ export const UnbondModal = ({
           disabled={awaitingWalletResponse}
         >
           {awaitingWalletResponse ? (
-            <span className="loading loading-spinner loading-xs text-white" />
+            <Loader size={16} className="text-white" />
           ) : (
-            "Cancel"
+            "Proceed"
           )}
         </Button>
       </DialogFooter>
