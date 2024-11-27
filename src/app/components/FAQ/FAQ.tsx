@@ -11,7 +11,7 @@ export const FAQ: React.FC<FAQProps> = () => {
   const { coinName, networkName } = getNetworkConfig();
   const { data: params } = useParams();
   const confirmationDepth =
-    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth;
+    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
 
   return (
     <div className="container mx-auto flex flex-col gap-2 p-6">

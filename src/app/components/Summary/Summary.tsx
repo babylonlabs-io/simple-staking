@@ -26,7 +26,7 @@ export const Summary = () => {
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
   const { data: params } = useParams();
   const confirmationDepth =
-    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth;
+    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
 
   if (!address) return;
 

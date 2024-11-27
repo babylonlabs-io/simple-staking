@@ -43,7 +43,7 @@ export const PreviewModal: React.FC<PreviewModalProps> = ({
 
   const { data: params } = useParams();
   const confirmationDepth =
-    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth;
+    params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth || 10;
 
   return (
     <GeneralModal
