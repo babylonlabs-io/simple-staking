@@ -18,13 +18,15 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
 import { BbnStakingParamsVersion, Params } from "@/app/types/networkInfo";
+import { deriveMerkleProof } from "@/utils/btc";
+import { reverseBuffer } from "@/utils/buffer";
 import {
   clearTxSignatures,
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
 } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { getTxInfo, getTxMerkleProof, MerkleProof } from "@/utils/mempool_api";
+import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
 
 import { useNetworkFees } from "../api/useNetworkFees";
 
@@ -742,27 +744,25 @@ const checkWalletConnection = (
 const getInclusionProof = async (
   stakingTx: Transaction,
 ): Promise<btcstaking.InclusionProof> => {
-  // Get the merkle proof
-  let txMerkleProof: MerkleProof;
-  try {
-    // TODO: Use the hook instead
-    txMerkleProof = await getTxMerkleProof(stakingTx.getId());
-  } catch (err) {
-    throw new Error("Failed to get the merkle proof", { cause: err });
-  }
   // TODO: Use the hook instead
-  const txInfo = await getTxInfo(stakingTx.getId());
-  const blockHash = txInfo.status.block_hash;
+  // Get the merkle proof
+  const { pos, merkle } = await getTxMerkleProof(stakingTx.getId());
+  const proofHex = deriveMerkleProof(merkle);
 
-  const hash = Uint8Array.from(Buffer.from(blockHash, "hex"));
+  // TODO: Use the hook instead
+  const {
+    status: { blockHash },
+  } = await getTxInfo(stakingTx.getId());
+
+  const hash = reverseBuffer(Uint8Array.from(Buffer.from(blockHash, "hex")));
   const inclusionProofKey: btccheckpoint.TransactionKey =
     btccheckpoint.TransactionKey.fromPartial({
-      index: txMerkleProof.pos,
+      index: pos,
       hash,
     });
   return btcstaking.InclusionProof.fromPartial({
     key: inclusionProofKey,
-    proof: Uint8Array.from(Buffer.from(txMerkleProof.proofHex, "hex")),
+    proof: Uint8Array.from(Buffer.from(proofHex, "hex")),
   });
 };
 

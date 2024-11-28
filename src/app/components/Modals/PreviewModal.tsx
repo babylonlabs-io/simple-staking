@@ -14,9 +14,9 @@ import {
 import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfig } from "@/config/network.config";
-import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { blocksToDisplayTime } from "@/utils/time";
 
 interface PreviewModalProps {
   isOpen: boolean;

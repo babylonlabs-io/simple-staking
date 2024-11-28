@@ -1,7 +1,7 @@
 import { FaBitcoin } from "react-icons/fa";
 
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 interface Amount {

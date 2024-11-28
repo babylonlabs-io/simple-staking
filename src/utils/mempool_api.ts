@@ -6,7 +6,7 @@ const { mempoolApiUrl } = getNetworkConfig();
 
 export interface MerkleProof {
   blockHeight: number;
-  proofHex: string;
+  merkle: string[];
   pos: number;
 }
 
@@ -21,9 +21,9 @@ interface TxInfo {
   fee: number;
   status: {
     confirmed: boolean;
-    block_height: number;
-    block_hash: string;
-    block_time: number;
+    blockHeight: number;
+    blockHash: string;
+    blockTime: number;
   };
 }
 
@@ -243,7 +243,24 @@ export async function getTxInfo(txId: string): Promise<TxInfo> {
     const err = await response.text();
     throw new ServerError(err, response.status);
   }
-  return await response.json();
+  const { txid, version, locktime, vin, vout, size, weight, fee, status } =
+    await response.json();
+  return {
+    txid,
+    version,
+    locktime,
+    vin,
+    vout,
+    size,
+    weight,
+    fee,
+    status: {
+      confirmed: status.confirmed,
+      blockHeight: status.block_height,
+      blockHash: status.block_hash,
+      blockTime: status.block_time,
+    },
+  };
 }
 
 /**
@@ -267,15 +284,10 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
   if (!block_height || !merkle.length || !pos) {
     throw new Error("Invalid transaction merkle proof result returned");
   }
-  // The merkle proof from mempool is a list of hex strings,
-  // so we need to concatenate them to form the final proof
-  const proofHex = merkle.reduce((acc: string, m: string) => {
-    return acc + m;
-  }, "");
 
   return {
     blockHeight: block_height,
-    proofHex,
+    merkle,
     pos,
   };
 }

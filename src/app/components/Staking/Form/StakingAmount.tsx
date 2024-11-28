@@ -1,7 +1,7 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
 import { getNetworkConfig } from "@/config/network.config";
-import { btcToSatoshi, satoshiToBtc } from "@/utils/btcConversions";
+import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { validateDecimalPoints } from "./validation/validation";
