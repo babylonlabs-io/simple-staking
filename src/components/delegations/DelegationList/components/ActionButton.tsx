@@ -1,3 +1,4 @@
+import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 
 interface ActionButtonProps {
@@ -6,50 +7,44 @@ interface ActionButtonProps {
   onClick?: (action: string, txHash: string) => void;
 }
 
-type ButtonAdapter = (props: ActionButtonProps) => JSX.Element;
-type ButtonStrategy = Record<string, ButtonAdapter>;
-
-const WithdrawButton = (props: ActionButtonProps) => (
-  <button
-    className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
-    onClick={() => props.onClick?.("withdraw", props.txHash)}
-    disabled={props.state === state.INTERMEDIATE_WITHDRAWAL_SUBMITTED}
-  >
-    Withdraw
-  </button>
-);
-
-const ACTION_BUTTONS: ButtonStrategy = {
-  [state.VERIFIED]: (props: ActionButtonProps) => (
-    <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
-      onClick={() => props.onClick?.("stake", props.txHash)}
-      disabled={props.state === state.INTERMEDIATE_PENDING_BTC_CONFIRMATION}
-    >
-      Stake
-    </button>
-  ),
-  [state.ACTIVE]: (props: ActionButtonProps) => (
-    <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
-      onClick={() => props.onClick?.("unbound", props.txHash)}
-      disabled={props.state === state.INTERMEDIATE_UNBONDING_SUBMITTED}
-    >
-      Unbond
-    </button>
-  ),
-
-  [state.EARLY_UNBONDING_WITHDRAWABLE]: WithdrawButton,
-  [state.TIMELOCK_WITHDRAWABLE]: WithdrawButton,
-  [state.TIMELOCK_SLASHING_WITHDRAWABLE]: WithdrawButton,
-  [state.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: WithdrawButton,
+const ACTION_BUTTON_PROPS: Record<string, { action: string; title: string }> = {
+  [state.VERIFIED]: {
+    action: ACTIONS.STAKE,
+    title: "Stake",
+  },
+  [state.ACTIVE]: {
+    action: ACTIONS.UNBOUND,
+    title: "Unbound",
+  },
+  [state.EARLY_UNBONDING_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING,
+    title: "Withdraw",
+  },
+  [state.TIMELOCK_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_TIMELOCK,
+    title: "Withdraw",
+  },
+  [state.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
+    title: "Withdraw",
+  },
+  [state.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING,
+    title: "Withdraw",
+  },
 };
 
 export function ActionButton(props: ActionButtonProps) {
-  const Button = ACTION_BUTTONS[props.state];
-  if (!Button) {
-    return null;
-  }
+  const buttonProps = ACTION_BUTTON_PROPS[props.state];
 
-  return <Button {...props} />;
+  if (!buttonProps) return null;
+
+  return (
+    <button
+      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
+      onClick={() => props.onClick?.(buttonProps.action, props.txHash)}
+    >
+      {buttonProps.title}
+    </button>
+  );
 }
