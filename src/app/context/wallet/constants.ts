@@ -28,5 +28,5 @@ export const bbnDefaultContext: CosmosWalletContext = {
   connected: false,
   disconnect: () => {},
   open: () => {},
-  signingStargateClient: undefined,
+  signingStargateClient: null,
 };

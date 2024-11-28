@@ -619,7 +619,7 @@ const checkWalletConnection = (
   cosmosConnected: boolean,
   btcConnected: boolean,
   btcNetwork: Network | undefined,
-  signingStargateClient: SigningStargateClient | undefined,
+  signingStargateClient: SigningStargateClient | null,
 ) => {
   if (
     !cosmosConnected ||
