@@ -4,7 +4,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
-import { useFinalityProviderV2Service } from "@/app/hooks/services/useFinalityProviderV2Service";
+import { useFinalityProviderService } from "@/app/hooks/services/useFinalityProviderService";
 import {
   type SigningStep,
   useTransactionService,
@@ -48,7 +48,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { transitionPhase1Delegation } = useTransactionService();
-  const { getFinalityProviderMoniker } = useFinalityProviderV2Service(); // get the moniker of the finality provider
+  const { getFinalityProviderMoniker } = useFinalityProviderService(); // get the moniker of the finality provider
   useEffect(() => {
     const timerId = setInterval(() => {
       setCurrentTime(Date.now());

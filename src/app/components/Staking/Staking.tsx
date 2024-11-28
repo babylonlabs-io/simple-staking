@@ -16,8 +16,8 @@ import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import {
-  FinalityProviderV2 as FinalityProviderInterface,
-  FinalityProviderV2,
+  FinalityProvider,
+  FinalityProvider as FinalityProviderInterface,
 } from "@/app/types/finalityProviders";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
@@ -58,7 +58,7 @@ export const Staking = () => {
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
   const [finalityProviders, setFinalityProviders] =
-    useState<FinalityProviderV2[]>();
+    useState<FinalityProvider[]>();
   // Selected fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);

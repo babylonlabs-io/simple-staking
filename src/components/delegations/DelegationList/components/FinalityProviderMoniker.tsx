@@ -1,11 +1,11 @@
-import { useFinalityProviderV2Service } from "@/app/hooks/services/useFinalityProviderV2Service";
+import { useFinalityProviderService } from "@/app/hooks/services/useFinalityProviderService";
 
 interface FinalityProviderMoniker {
   value: string;
 }
 
 export function FinalityProviderMoniker({ value }: FinalityProviderMoniker) {
-  const { getFinalityProviderMoniker } = useFinalityProviderV2Service();
+  const { getFinalityProviderMoniker } = useFinalityProviderService();
 
   const moniker = getFinalityProviderMoniker(value);
 

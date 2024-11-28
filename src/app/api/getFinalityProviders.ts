@@ -3,7 +3,10 @@ import { encode } from "url-safe-base64";
 import { isValidUrl } from "@/utils/url";
 
 import { Pagination } from "../types/api";
-import { FinalityProvider } from "../types/finalityProviders";
+import {
+  FinalityProvider,
+  FinalityProviderState,
+} from "../types/finalityProviders";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -19,6 +22,7 @@ interface FinalityProvidersAPIResponse {
 
 interface FinalityProviderAPI {
   description: DescriptionAPI;
+  state: FinalityProviderState;
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -35,21 +39,30 @@ interface DescriptionAPI {
   details: string;
 }
 
-export const getFinalityProviders = async (
-  key: string,
-): Promise<PaginatedFinalityProviders> => {
-  // const limit = 100;
-  // const reverse = false;
-
+export const getFinalityProviders = async ({
+  key,
+  pk,
+  sortBy,
+  order,
+  name,
+}: {
+  key: string;
+  name?: string;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  pk?: string;
+}): Promise<PaginatedFinalityProviders> => {
   const params = {
     pagination_key: encode(key),
-    // "pagination_reverse": reverse,
-    // "pagination_limit": limit,
+    finality_provider_pk: pk,
+    sort_by: sortBy,
+    order,
+    name,
   };
 
   const response = await apiWrapper(
     "GET",
-    "/v1/finality-providers",
+    "/v2/finality-providers",
     "Error getting finality providers",
     params,
   );
@@ -70,6 +83,7 @@ export const getFinalityProviders = async (
         securityContact: fp.description.security_contact,
         details: fp.description.details,
       },
+      state: fp.state,
       commission: fp.commission,
       btcPk: fp.btc_pk,
       activeTVLSat: fp.active_tvl,

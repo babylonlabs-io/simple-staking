@@ -2,9 +2,9 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import {
-  type PaginatedFinalityProvidersV2,
-  getFinalityProvidersV2,
-} from "@/app/api/getFinalityProvidersV2";
+  type PaginatedFinalityProviders,
+  getFinalityProviders,
+} from "@/app/api/getFinalityProviders";
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
@@ -18,18 +18,13 @@ interface Params {
   order?: "asc" | "desc";
 }
 
-export function useFinalityProvidersV2({
-  pk,
-  sortBy,
-  order,
-  name,
-}: Params = {}) {
+export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
   const { isErrorOpen, handleError } = useError();
 
   const query = useInfiniteQuery({
-    queryKey: [FINALITY_PROVIDERS_KEY, pk, name, sortBy, order],
+    queryKey: [FINALITY_PROVIDERS_KEY],
     queryFn: ({ pageParam = "" }) =>
-      getFinalityProvidersV2({ key: pageParam, pk, sortBy, order, name }),
+      getFinalityProviders({ key: pageParam, pk, sortBy, order, name }),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key
@@ -38,7 +33,7 @@ export function useFinalityProvidersV2({
     refetchInterval: ONE_MINUTE,
     placeholderData: (prev) => prev,
     select: (data) => {
-      const flattenedData = data.pages.reduce<PaginatedFinalityProvidersV2>(
+      const flattenedData = data.pages.reduce<PaginatedFinalityProviders>(
         (acc, page) => {
           acc.finalityProviders.push(...page.finalityProviders);
           acc.pagination = page.pagination;
