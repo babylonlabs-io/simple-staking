@@ -63,24 +63,6 @@ export const Stats = memo(() => {
           value={formatter.format(activeDelegations)}
           tooltip="Total number of active bitcoin staking delegations"
         />
-
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
-
-        <StatItem
-          loading={isLoading}
-          title="Reward Rate"
-          value="0 BBN"
-          tooltip="Current number of BBN token reward per 24 hrs per one bitcoin staked"
-        />
-
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
-
-        <StatItem
-          loading={isLoading}
-          title="Reward History"
-          value="O BBN"
-          tooltip="Total number of BBN tokens rewarded to bitcoin stakers"
-        />
       </div>
     </div>
   );
