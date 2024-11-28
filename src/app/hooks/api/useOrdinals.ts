@@ -37,7 +37,9 @@ export function useOrdinals(
 
   const data = useAPIQuery({
     queryKey: [ORDINAL_KEY, utxos, address],
-    queryFn: fetchOrdinals,
+    // TODO revert when ordinals are fixed
+    queryFn: () => [],
+    // fetchOrdinals,
     enabled: Boolean(address) || enabled,
     refetchInterval: 5 * ONE_MINUTE,
   });

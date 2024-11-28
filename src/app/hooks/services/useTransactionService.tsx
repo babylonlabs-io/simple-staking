@@ -14,8 +14,8 @@ import { Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
 import { EOIStepStatus } from "@/app/components/Modals/EOIModal";
+import { useBBNWallet } from "@/app/context/wallet";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
 import { BbnStakingParamsVersion, Params } from "@/app/types/networkInfo";
 import { deriveMerkleProof } from "@/utils/btc";
@@ -61,7 +61,7 @@ export const useTransactionService = () => {
     connected: cosmosConnected,
     bech32Address,
     signingStargateClient,
-  } = useCosmosWallet();
+  } = useBBNWallet();
   const {
     connected: btcConnected,
     signPsbt,
@@ -730,7 +730,7 @@ const checkWalletConnection = (
   cosmosConnected: boolean,
   btcConnected: boolean,
   btcNetwork: Network | undefined,
-  signingStargateClient: SigningStargateClient | undefined,
+  signingStargateClient: SigningStargateClient | null,
 ) => {
   if (
     !cosmosConnected ||

@@ -2,6 +2,7 @@
 @import "react-tooltip/dist/react-tooltip.css";
 @import "react-toastify/dist/ReactToastify.css";
 @import "@babylonlabs-io/bbn-core-ui/dist/style.css";
+@import "@babylonlabs-io/bbn-wallet-connect/dist/style.css";
 
 @tailwind base;
 @tailwind components;
@@ -105,6 +106,14 @@ body.modal-open {
   max-width: 20rem;
   white-space: normal;
   word-wrap: break-word;
+}
+
+.bbn-dialog {
+  @apply text-primary;
+}
+
+body > .tomo-social {
+  z-index: 100 !important;
 }
 
 @font-face {

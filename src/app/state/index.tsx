@@ -79,8 +79,14 @@ export function AppState({ children }: PropsWithChildren) {
 
   const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
     () =>
-      ordinals.reduce(
-        (acc, ordinal) => ({ ...acc, [ordinal.txid]: ordinal }),
+      // TODO revert when ordinals are fixed
+      // ordinals.reduce(
+      //   (acc, ordinal) => ({ ...acc, [ordinal.txid]: ordinal }),
+      ordinals.reduce<Record<string, InscriptionIdentifier>>(
+        (acc, ordinal: InscriptionIdentifier) => ({
+          ...acc,
+          [ordinal.txid]: ordinal,
+        }),
         {},
       ),
     [ordinals],
