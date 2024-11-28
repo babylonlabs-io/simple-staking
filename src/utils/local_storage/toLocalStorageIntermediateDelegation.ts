@@ -24,5 +24,4 @@ export const toLocalStorageIntermediateDelegation = (
   isOverflow: false,
   isEligibleForTransition: false,
   unbondingTx: undefined,
-  transitioned: false,
 });
