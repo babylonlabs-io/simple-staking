@@ -12,7 +12,7 @@ export interface CosmosWalletContext {
   connected: boolean;
   disconnect: () => void;
   open: () => void;
-  signingStargateClient: SigningStargateClient | undefined;
+  signingStargateClient: SigningStargateClient | null;
 }
 
 export interface BTCWalletContext {
