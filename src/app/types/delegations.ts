@@ -7,7 +7,6 @@ export interface Delegation {
   stakingTx: StakingTx;
   unbondingTx: UnbondingTx | undefined;
   isOverflow: boolean;
-  transitioned: boolean;
   isEligibleForTransition: boolean;
 }
 

@@ -38,7 +38,7 @@ export const getState = (state: string) => {
 // Create state tooltips for the additional information
 export const getStateTooltip = (state: string) => {
   switch (state) {
-    case DelegationState.ACTIVE:
+    case DelegationState.ACTIVE: // active state is shwon
       return "Stake is active";
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";

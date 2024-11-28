@@ -82,32 +82,34 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const generateActionButton = () => {
-    if (delegation.isEligibleForTransition) {
+    if (
+      state === DelegationState.ACTIVE ||
+      delegation.isEligibleForTransition
+    ) {
       return (
-        <div className="flex justify-end lg:justify-start">
+        <div
+          className="flex justify-end lg:justify-start"
+          data-tooltip-id="tooltip-transition"
+          data-tooltip-content={
+            state === DelegationState.ACTIVE &&
+            !delegation.isEligibleForTransition
+              ? "Staking transition is not available yet, come back later"
+              : ""
+          }
+        >
           <button
             className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
             onClick={onTransition}
             disabled={
-              intermediateState === DelegationState.INTERMEDIATE_TRANSITIONING
+              intermediateState ===
+                DelegationState.INTERMEDIATE_TRANSITIONING ||
+              (state === DelegationState.ACTIVE &&
+                !delegation.isEligibleForTransition)
             }
           >
             Transition
           </button>
-        </div>
-      );
-    } else if (state === DelegationState.ACTIVE) {
-      return (
-        <div className="flex justify-end lg:justify-start">
-          <button
-            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
-            onClick={onTransition}
-            disabled={
-              intermediateState === DelegationState.INTERMEDIATE_TRANSITIONING
-            }
-          >
-            Transition
-          </button>
+          <Tooltip id="tooltip-transition" className="tooltip-wrap" />
         </div>
       );
     } else if (state === DelegationState.UNBONDED) {

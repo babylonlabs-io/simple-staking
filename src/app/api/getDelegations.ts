@@ -54,8 +54,6 @@ export const getDelegations = async (
 
   const params = {
     pagination_key: encode(key),
-    // "pagination_reverse": reverse,
-    // "pagination_limit": limit,
     staker_btc_pk: encode(publicKeyNoCoord),
     state: ["active", "unbonded"],
   };
@@ -90,7 +88,6 @@ export const getDelegations = async (
             outputIndex: apiDelegation.unbonding_tx.output_index,
           }
         : undefined,
-      transitioned: apiDelegation.transitioned,
       isEligibleForTransition: apiDelegation.is_eligible_for_transition,
     }),
   );
