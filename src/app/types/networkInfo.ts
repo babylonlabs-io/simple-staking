@@ -40,8 +40,3 @@ export interface NetworkInfo {
   stakingStatus: StakingStatus;
   params: Params;
 }
-
-// export interface NetworkInfoAPI {
-//   stakingStatus: StakingStatus;
-//   params: Params;
-// }
