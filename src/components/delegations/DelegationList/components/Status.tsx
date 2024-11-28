@@ -49,11 +49,7 @@ const STATUSES: Record<
     label: "Withdrawable",
     tooltip: "Slashed Stake is now withdrawable",
   }),
-  [state.TIMELOCK_SLASHED]: () => ({
-    label: "Slashed",
-    tooltip: "Stake has been slashed",
-  }),
-  [state.EARLY_UNBONDING_SLASHED]: () => ({
+  [state.SLASHED]: () => ({
     label: "Slashed",
     tooltip: "Stake has been slashed",
   }),

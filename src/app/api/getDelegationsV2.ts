@@ -32,6 +32,7 @@ interface DelegationV2API {
     start_height: number;
     end_height: number;
     staking_tx_hex: string;
+    slashing_tx_hex: string;
   };
   delegation_unbonding: {
     unbonding_time: number;
@@ -40,6 +41,7 @@ interface DelegationV2API {
       covenant_btc_pk_hex: string;
       signature_hex: string;
     }[];
+    slashing_tx_hex: string;
   };
   state: string;
 }
@@ -82,6 +84,10 @@ export const getDelegationV2 = async (
       delegationAPIResponse.data.delegation_unbonding.unbonding_time,
     unbondingTxHex:
       delegationAPIResponse.data.delegation_unbonding.unbonding_tx,
+    slashingTxHex:
+      delegationAPIResponse.data.delegation_staking.slashing_tx_hex,
+    unbondingSlashingTxHex:
+      delegationAPIResponse.data.delegation_unbonding.slashing_tx_hex,
     covenantUnbondingSignatures:
       delegationAPIResponse.data.delegation_unbonding.covenant_unbonding_signatures?.map(
         (signature) => ({
@@ -129,6 +135,9 @@ export const getDelegationsV2 = async (
         state,
         unbondingTime: apiDelegation.delegation_unbonding.unbonding_time,
         unbondingTxHex: apiDelegation.delegation_unbonding.unbonding_tx,
+        slashingTxHex: apiDelegation.delegation_staking.slashing_tx_hex,
+        unbondingSlashingTxHex:
+          apiDelegation.delegation_unbonding.slashing_tx_hex,
         covenantUnbondingSignatures:
           apiDelegation.delegation_unbonding.covenant_unbonding_signatures?.map(
             (signature) => ({
