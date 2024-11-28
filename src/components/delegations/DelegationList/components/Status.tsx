@@ -1,6 +1,6 @@
 import { useAppState } from "@/app/state";
 import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
-import { BbnStakingParamsVersion } from "@/app/types/params";
+import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
 import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
 
@@ -92,9 +92,9 @@ const STATUSES: Record<
 };
 
 export function Status({ value }: StatusProps) {
-  const { params } = useAppState();
+  const { networkInfo } = useAppState();
   const { label = "unknown", tooltip = "unknown" } =
-    STATUSES[value](params?.bbnStakingParams?.latestParam) ?? {};
+    STATUSES[value](networkInfo?.params.bbnStakingParams?.latestParam) ?? {};
 
   return <Hint tooltip={tooltip}>{label}</Hint>;
 }

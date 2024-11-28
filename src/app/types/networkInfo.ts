@@ -27,7 +27,16 @@ export interface BtcEpochCheckParams {
   versions: BtcEpochCheckParamsVersion[];
 }
 
+export interface StakingStatus {
+  isStakingOpen: boolean;
+}
+
 export interface Params {
   bbnStakingParams: BbnStakingParams;
   btcEpochCheckParams: BtcEpochCheckParams;
+}
+
+export interface NetworkInfo {
+  stakingStatus: StakingStatus;
+  params: Params;
 }

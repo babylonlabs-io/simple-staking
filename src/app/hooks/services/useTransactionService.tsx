@@ -17,7 +17,7 @@ import { EOIStepStatus } from "@/app/components/Modals/EOIModal";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
-import { BbnStakingParamsVersion, Params } from "@/app/types/params";
+import { BbnStakingParamsVersion, Params } from "@/app/types/networkInfo";
 import {
   clearTxSignatures,
   extractSchnorrSignaturesFromTransaction,
@@ -51,7 +51,7 @@ export enum SigningStep {
 }
 
 export const useTransactionService = () => {
-  const { availableUTXOs: inputUTXOs, params } = useAppState();
+  const { availableUTXOs: inputUTXOs, networkInfo } = useAppState();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
 
@@ -70,8 +70,8 @@ export const useTransactionService = () => {
     pushTx,
   } = useBTCWallet();
 
-  const latestParam = params?.bbnStakingParams?.latestParam;
-  const genesisParam = params?.bbnStakingParams?.genesisParam;
+  const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
+  const genesisParam = networkInfo?.params.bbnStakingParams?.genesisParam;
 
   /**
    * Create the delegation EOI
@@ -287,7 +287,7 @@ export const useTransactionService = () => {
       stakingTxHex: string,
     ) => {
       // Perform checks
-      if (!params?.bbnStakingParams.versions.length) {
+      if (!networkInfo?.params.bbnStakingParams.versions.length) {
         throw new Error("Staking parameters not loaded");
       }
       if (!btcConnected || !btcNetwork)
@@ -295,7 +295,7 @@ export const useTransactionService = () => {
 
       validateStakingInput(stakingInput);
 
-      const p = getParamByVersion(params, paramVersion);
+      const p = getParamByVersion(networkInfo.params, paramVersion);
       if (!p) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
@@ -327,7 +327,7 @@ export const useTransactionService = () => {
     [
       btcConnected,
       btcNetwork,
-      params,
+      networkInfo,
       address,
       publicKeyNoCoord,
       inputUTXOs,
@@ -348,7 +348,10 @@ export const useTransactionService = () => {
       }[],
     ) => {
       // Perform checks
-      if (!params || params.bbnStakingParams.versions.length === 0) {
+      if (
+        !networkInfo ||
+        networkInfo.params.bbnStakingParams.versions.length === 0
+      ) {
         throw new Error("Params not loaded");
       }
       if (!btcConnected || !btcNetwork)
@@ -358,7 +361,7 @@ export const useTransactionService = () => {
 
       const stakingTx = await Transaction.fromHex(stakingTxHex);
 
-      const p = getParamByVersion(params, paramVersion);
+      const p = getParamByVersion(networkInfo.params, paramVersion);
       if (!p) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
@@ -405,7 +408,7 @@ export const useTransactionService = () => {
       console.log("unbonding tx id", signedUnbondingTx.getId());
     },
     [
-      params,
+      networkInfo,
       btcConnected,
       btcNetwork,
       address,
@@ -429,7 +432,10 @@ export const useTransactionService = () => {
       unbondingTxHex: string,
     ) => {
       // Perform checks
-      if (!params || params.bbnStakingParams.versions.length === 0) {
+      if (
+        !networkInfo ||
+        networkInfo.params.bbnStakingParams.versions.length === 0
+      ) {
         throw new Error("Params not loaded");
       }
       if (!btcConnected || !btcNetwork)
@@ -437,7 +443,7 @@ export const useTransactionService = () => {
 
       validateStakingInput(stakingInput);
 
-      const p = getParamByVersion(params, paramVersion);
+      const p = getParamByVersion(networkInfo.params, paramVersion);
       if (!p) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
@@ -468,7 +474,7 @@ export const useTransactionService = () => {
       );
     },
     [
-      params,
+      networkInfo,
       btcConnected,
       btcNetwork,
       address,
@@ -493,7 +499,10 @@ export const useTransactionService = () => {
       stakingTxHex: string,
     ) => {
       // Perform checks
-      if (!params || params.bbnStakingParams.versions.length === 0) {
+      if (
+        !networkInfo ||
+        networkInfo.params.bbnStakingParams.versions.length === 0
+      ) {
         throw new Error("Params not loaded");
       }
       if (!btcConnected || !btcNetwork)
@@ -501,7 +510,7 @@ export const useTransactionService = () => {
 
       validateStakingInput(stakingInput);
 
-      const p = getParamByVersion(params, paramVersion);
+      const p = getParamByVersion(networkInfo.params, paramVersion);
       if (!p) throw new Error("Staking params not loaded");
 
       const staking = new Staking(
@@ -531,7 +540,7 @@ export const useTransactionService = () => {
       );
     },
     [
-      params,
+      networkInfo,
       btcConnected,
       btcNetwork,
       address,

@@ -2,9 +2,7 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useOrdinals } from "@/app/hooks/api/useOrdinals";
-import { useParams } from "@/app/hooks/api/useParams";
 import { useUTXOs } from "@/app/hooks/api/useUTXOs";
-import { useVersions } from "@/app/hooks/api/useVersions";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { filterDust } from "@/utils/wallet";
 import type {
@@ -12,7 +10,8 @@ import type {
   UTXO,
 } from "@/utils/wallet/btc_wallet_provider";
 
-import { Params } from "../types/params";
+import { useNetworkInfo } from "../hooks/api/useNetworkInfo";
+import { NetworkInfo } from "../types/networkInfo";
 
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
@@ -22,7 +21,7 @@ const STATE_LIST = [DelegationState, DelegationV2State];
 export interface AppState {
   availableUTXOs?: UTXO[];
   totalBalance: number;
-  params?: Params;
+  networkInfo?: NetworkInfo;
   currentHeight?: number;
   isError: boolean;
   isLoading: boolean;
@@ -58,16 +57,10 @@ export function AppState({ children }: PropsWithChildren) {
     enabled: !isUTXOLoading,
   });
   const {
-    data: versions,
-    isLoading: isVersionLoading,
-    isError: isVersionError,
-  } = useVersions();
-
-  const {
-    data: params,
-    isLoading: isParamsLoading,
-    isError: isParamsError,
-  } = useParams();
+    data: networkInfo,
+    isLoading: isNetworkInfoLoading,
+    isError: isNetworkInfoError,
+  } = useNetworkInfo();
 
   const {
     data: height,
@@ -77,17 +70,12 @@ export function AppState({ children }: PropsWithChildren) {
 
   // Computed
   const isLoading =
-    isVersionLoading ||
     isHeightLoading ||
     isUTXOLoading ||
     isOrdinalLoading ||
-    isParamsLoading;
+    isNetworkInfoLoading;
   const isError =
-    isHeightError ||
-    isVersionError ||
-    isUTXOError ||
-    isOrdinalError ||
-    isParamsError;
+    isHeightError || isUTXOError || isOrdinalError || isNetworkInfoError;
 
   const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
     () =>
@@ -122,7 +110,7 @@ export function AppState({ children }: PropsWithChildren) {
       availableUTXOs,
       currentHeight: height,
       totalBalance,
-      params,
+      networkInfo,
       isError,
       isLoading,
       ordinalsExcluded,
@@ -133,7 +121,7 @@ export function AppState({ children }: PropsWithChildren) {
       availableUTXOs,
       height,
       totalBalance,
-      params,
+      networkInfo,
       isError,
       isLoading,
       ordinalsExcluded,
