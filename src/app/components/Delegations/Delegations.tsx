@@ -43,13 +43,16 @@ export const Delegations = () => {
       isWalletConnected={connected}
       address={address}
     >
-      <DelegationsContent
-        delegationsAPI={delegationsAPI.delegations}
-        address={address}
-        btcWalletNetwork={network}
-        publicKeyNoCoord={publicKeyNoCoord}
-        isWalletConnected={connected}
-      />
+      {/* If there are no delegations, don't render the content */}
+      {delegationsAPI.delegations.length > 0 && (
+        <DelegationsContent
+          delegationsAPI={delegationsAPI.delegations}
+          address={address}
+          btcWalletNetwork={network}
+          publicKeyNoCoord={publicKeyNoCoord}
+          isWalletConnected={connected}
+        />
+      )}
     </DelegationsPointsProvider>
   );
 };

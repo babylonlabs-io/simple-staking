@@ -76,6 +76,7 @@ export const Staking = () => {
   const { createDelegationEoi, estimateStakingFee } = useTransactionService();
   const { networkInfo } = useAppState();
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
+  const stakingStatus = networkInfo?.stakingStatus;
 
   const [pendingVerificationOpen, setPendingVerificationOpen] = useState(false);
   const [stakingTxHashHex, setStakingTxHashHex] = useState<
@@ -390,7 +391,12 @@ export const Staking = () => {
   const renderStakingForm = () => {
     // States of the staking form:
     // Health check failed
-    if (!isApiNormal || isGeoBlocked || hasError) {
+    if (
+      !isApiNormal ||
+      isGeoBlocked ||
+      hasError ||
+      !stakingStatus?.isStakingOpen
+    ) {
       return (
         <Message
           title="Staking is not available"

@@ -25,6 +25,7 @@ interface DelegationAPI {
   unbonding_tx?: UnbondingTxAPI;
   is_overflow: boolean;
   transitioned: boolean;
+  is_eligible_for_transition: boolean;
 }
 
 interface StakingTxAPI {
@@ -56,6 +57,7 @@ export const getDelegations = async (
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
     staker_btc_pk: encode(publicKeyNoCoord),
+    state: ["active", "unbonded"],
   };
 
   const response = await apiWrapper(
@@ -89,6 +91,7 @@ export const getDelegations = async (
           }
         : undefined,
       transitioned: apiDelegation.transitioned,
+      isEligibleForTransition: apiDelegation.is_eligible_for_transition,
     }),
   );
 

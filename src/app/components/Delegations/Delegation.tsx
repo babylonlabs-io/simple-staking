@@ -82,11 +82,21 @@ export const Delegation: React.FC<DelegationProps> = ({
   };
 
   const generateActionButton = () => {
-    // This function generates the transition or withdraw button
-    // based on the state of the delegation
-    // It also disables the button if the delegation
-    // is in an intermediate state (local storage)
-    if (state === DelegationState.ACTIVE) {
+    if (delegation.isEligibleForTransition) {
+      return (
+        <div className="flex justify-end lg:justify-start">
+          <button
+            className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
+            onClick={onTransition}
+            disabled={
+              intermediateState === DelegationState.INTERMEDIATE_TRANSITIONING
+            }
+          >
+            Transition
+          </button>
+        </div>
+      );
+    } else if (state === DelegationState.ACTIVE) {
       return (
         <div className="flex justify-end lg:justify-start">
           <button
@@ -143,6 +153,10 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   const { coinName, mempoolApiUrl } = getNetworkConfig();
 
+  const renderActionRequired = () => {
+    return <p className="text-error-main text-sm">Action Required</p>;
+  };
+
   return (
     <div
       className={`relative rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-base text-primary-dark`}
@@ -180,21 +194,25 @@ export const Delegation: React.FC<DelegationProps> = ({
         add its size 12px and gap 4px, 16/2 = 8px
         */}
         <div className="relative flex justify-start lg:justify-start order-4">
-          <div className="flex items-center justify-start gap-1">
-            <p>{renderState()}</p>
-            <span
-              className="cursor-pointer text-xs"
-              data-tooltip-id={`tooltip-${stakingTxHashHex}`}
-              data-tooltip-content={renderStateTooltip()}
-              data-tooltip-place="top"
-            >
-              <AiOutlineInfoCircle />
-            </span>
-            <Tooltip
-              id={`tooltip-${stakingTxHashHex}`}
-              className="tooltip-wrap"
-            />
-          </div>
+          {delegation.isEligibleForTransition ? (
+            renderActionRequired()
+          ) : (
+            <div className="flex items-center justify-start gap-1">
+              <p>{renderState()}</p>
+              <span
+                className="cursor-pointer text-xs"
+                data-tooltip-id={`tooltip-${stakingTxHashHex}`}
+                data-tooltip-content={renderStateTooltip()}
+                data-tooltip-place="top"
+              >
+                <AiOutlineInfoCircle />
+              </span>
+              <Tooltip
+                id={`tooltip-${stakingTxHashHex}`}
+                className="tooltip-wrap"
+              />
+            </div>
+          )}
         </div>
         <DelegationPoints
           stakingTxHashHex={stakingTxHashHex}
