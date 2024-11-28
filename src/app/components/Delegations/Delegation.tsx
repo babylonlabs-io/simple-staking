@@ -15,10 +15,10 @@ import {
 } from "@/app/types/delegations";
 import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
-import { durationTillNow } from "@/utils/formatTime";
+import { satoshiToBtc } from "@/utils/btc";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { durationTillNow } from "@/utils/time";
 import { trim } from "@/utils/trim";
 
 import { DelegationPoints } from "../Points/DelegationPoints";

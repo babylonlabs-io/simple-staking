@@ -1,6 +1,6 @@
 import { Hint } from "@/components/common/Hint";
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 interface DelegationProps {

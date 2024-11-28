@@ -9,7 +9,7 @@ import { useOnClickOutside } from "usehooks-ts";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
 

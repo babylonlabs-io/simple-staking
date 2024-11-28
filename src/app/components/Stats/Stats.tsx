@@ -3,7 +3,7 @@ import { memo } from "react";
 
 import { useSystemStats } from "@/app/hooks/api/useSystemStats";
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { StatItem } from "./StatItem";

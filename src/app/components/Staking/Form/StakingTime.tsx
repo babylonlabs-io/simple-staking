@@ -1,7 +1,7 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
 import { getNetworkConfig } from "@/config/network.config";
-import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
+import { blocksToDisplayTime } from "@/utils/time";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 

@@ -2,7 +2,7 @@ import { useAppState } from "@/app/state";
 import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
-import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
+import { blocksToDisplayTime } from "@/utils/time";
 
 interface StatusProps {
   value: string;

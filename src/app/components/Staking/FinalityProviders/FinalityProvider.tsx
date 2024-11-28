@@ -8,7 +8,7 @@ import blue from "@/app/assets/blue-check.svg";
 import { Hash } from "@/app/components/Hash/Hash";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 interface FinalityProviderProps {

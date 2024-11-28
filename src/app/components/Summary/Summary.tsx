@@ -9,7 +9,7 @@ import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";
 import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
