@@ -15,6 +15,8 @@ export interface DelegationV2 {
     covenantBtcPkHex: string;
     signatureHex: string;
   }[];
+  slashingTxHex: string;
+  unbondingSlashingTxHex: string;
 }
 
 export enum DelegationV2StakingState {
@@ -40,8 +42,7 @@ export enum DelegationV2StakingState {
   EARLY_UNBONDING_SLASHING_WITHDRAWN = "EARLY_UNBONDING_SLASHING_WITHDRAWN",
 
   // Slashed states
-  TIMELOCK_SLASHED = "TIMELOCK_SLASHED",
-  EARLY_UNBONDING_SLASHED = "EARLY_UNBONDING_SLASHED",
+  SLASHED = "SLASHED",
 
   // Intermediate states
   INTERMEDIATE_PENDING_VERIFICATION = "INTERMEDIATE_PENDING_VERIFICATION",

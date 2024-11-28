@@ -431,7 +431,7 @@ export const useTransactionService = () => {
     async (
       stakingInput: BtcStakingInputs,
       paramVersion: number,
-      unbondingTxHex: string,
+      earlyUnbondingTxHex: string,
     ) => {
       // Perform checks
       if (
@@ -461,7 +461,7 @@ export const useTransactionService = () => {
 
       const { psbt: unbondingPsbt } =
         staking.createWithdrawEarlyUnbondedTransaction(
-          Transaction.fromHex(unbondingTxHex),
+          Transaction.fromHex(earlyUnbondingTxHex),
           defaultFeeRate,
         );
 

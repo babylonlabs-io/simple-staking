@@ -83,6 +83,8 @@ export function DelegationList() {
       unbondingTxHex,
       covenantUnbondingSignatures,
       state,
+      slashingTxHex,
+      unbondingSlashingTxHex,
     } = d;
 
     const finalityProviderPk = finalityProviderBtcPksHex[0];
@@ -127,11 +129,31 @@ export function DelegationList() {
           paramsVersion,
           stakingTxHex,
         );
-      } else {
-        // TODO: Awaiting backend API to return slashing tx hex
-        throw new Error("Not implemented yet for withdrawal: " + state);
+      } else if (
+        state === DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE
+      ) {
+        if (!unbondingSlashingTxHex) {
+          throw new Error(
+            "Unbonding slashing tx not found, can't submit withdrawal",
+          );
+        }
+        await submitEarlyUnbondedWithdrawalTx(
+          stakingInput,
+          paramsVersion,
+          unbondingSlashingTxHex,
+        );
+      } else if (
+        state === DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE
+      ) {
+        if (!slashingTxHex) {
+          throw new Error("Slashing tx not found, can't submit withdrawal");
+        }
+        await submitEarlyUnbondedWithdrawalTx(
+          stakingInput,
+          paramsVersion,
+          slashingTxHex,
+        );
       }
-
       // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_WITHDRAWAL
     }
   };
