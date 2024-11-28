@@ -1,15 +1,19 @@
 export interface DelegationV2 {
   stakingTxHashHex: string;
   stakingTxHex: string;
+  stakingSlashingTxHex: string;
   paramsVersion: number;
   finalityProviderBtcPksHex: string[];
   stakerBtcPkHex: string;
   stakingAmount: number;
   stakingTime: number;
+  bbnInceptionHeight: number;
+  bbnInceptionTime: number;
   startHeight: number;
   endHeight: number;
   unbondingTime: number;
   unbondingTxHex: string;
+  unbondingSlashingTxHex: string;
   state: DelegationV2StakingState;
   covenantUnbondingSignatures?: {
     covenantBtcPkHex: string;

@@ -3,12 +3,15 @@ import { encode } from "url-safe-base64";
 import { isValidUrl } from "@/utils/url";
 
 import { Pagination } from "../types/api";
-import { FinalityProvider } from "../types/finalityProviders";
+import {
+  FinalityProviderState,
+  FinalityProviderV2,
+} from "../types/finalityProviders";
 
 import { apiWrapper } from "./apiWrapper";
 
-export interface PaginatedFinalityProviders {
-  finalityProviders: FinalityProvider[];
+export interface PaginatedFinalityProvidersV2 {
+  finalityProviders: FinalityProviderV2[];
   pagination: Pagination;
 }
 
@@ -19,6 +22,7 @@ interface FinalityProvidersAPIResponse {
 
 interface FinalityProviderAPI {
   description: DescriptionAPI;
+  state: FinalityProviderState;
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -35,21 +39,35 @@ interface DescriptionAPI {
   details: string;
 }
 
-export const getFinalityProviders = async (
-  key: string,
-): Promise<PaginatedFinalityProviders> => {
+export const getFinalityProvidersV2 = async ({
+  key,
+  pk,
+  sortBy,
+  order,
+  name,
+}: {
+  key: string;
+  name?: string;
+  sortBy?: string;
+  order?: "asc" | "desc";
+  pk?: string;
+}): Promise<PaginatedFinalityProvidersV2> => {
   // const limit = 100;
   // const reverse = false;
 
   const params = {
     pagination_key: encode(key),
+    finality_provider_pk: pk,
+    sort_by: sortBy,
+    order,
+    name,
     // "pagination_reverse": reverse,
     // "pagination_limit": limit,
   };
 
   const response = await apiWrapper(
     "GET",
-    "/v1/finality-providers",
+    "/v2/finality-providers",
     "Error getting finality providers",
     params,
   );
@@ -60,7 +78,7 @@ export const getFinalityProviders = async (
     finalityProvidersAPIResponse.data;
 
   const finalityProviders = finalityProvidersAPI.map(
-    (fp: FinalityProviderAPI): FinalityProvider => ({
+    (fp: FinalityProviderAPI): FinalityProviderV2 => ({
       description: {
         moniker: fp.description.moniker,
         identity: fp.description.identity,
@@ -70,6 +88,7 @@ export const getFinalityProviders = async (
         securityContact: fp.description.security_contact,
         details: fp.description.details,
       },
+      state: fp.state,
       commission: fp.commission,
       btcPk: fp.btc_pk,
       activeTVLSat: fp.active_tvl,

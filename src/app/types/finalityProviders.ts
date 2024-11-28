@@ -1,5 +1,15 @@
 export interface FinalityProvider {
   description: Description;
+  commission: string;
+  btcPk: string;
+  activeTVLSat: number;
+  totalTVLSat: number;
+  activeDelegations: number;
+  totalDelegations: number;
+}
+
+export interface FinalityProviderV2 {
+  description: Description;
   state: FinalityProviderState;
   commission: string;
   btcPk: string;

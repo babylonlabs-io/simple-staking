@@ -5,8 +5,8 @@ import {
   LoadingTableList,
   LoadingView,
 } from "@/app/components/Loading/Loading";
-import { useFinalityProviderService } from "@/app/hooks/services/useFinalityProviderService";
-import type { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
+import { useFinalityProviderV2Service } from "@/app/hooks/services/useFinalityProviderV2Service";
+import type { FinalityProviderV2 as FinalityProviderInterface } from "@/app/types/finalityProviders";
 
 import { FinalityProvider } from "./FinalityProvider";
 import { FinalityProviderSearch } from "./FinalityProviderSearch";
@@ -30,7 +30,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     fetchNextPage,
     handleSearch,
     handleSort,
-  } = useFinalityProviderService();
+  } = useFinalityProviderV2Service();
 
   useEffect(() => {
     if (finalityProviders) {
