@@ -31,8 +31,8 @@ interface CosmosWalletContextProps {
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
   bech32Address: "",
   connected: false,
-  disconnect: () => {},
-  open: () => {},
+  disconnect: () => { },
+  open: () => { },
   signingStargateClient: undefined,
 });
 
@@ -46,7 +46,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   >();
 
   const { showError, captureError } = useError();
-  const { open = () => {}, connected } = useWalletConnect();
+  const { open = () => { }, connected } = useWalletConnect();
   const bbnConnector = useChainConnector("BBN");
 
   const cosmosDisconnect = useCallback(() => {
