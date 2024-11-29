@@ -254,14 +254,12 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           Pending Transitions / Withdrawal (Phase 1)
         </Heading>
 
-        <div
-          className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 p-4 lg:grid text-primary-light text-xs`}
-        >
-          <p className="text-left">Amount</p>
+        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-primary-light text-xs">
           <p className="text-left">Inception</p>
-          <p className="text-left">Transaction hash</p>
+          <p className="text-left">Finality Provider</p>
+          <p className="text-left">Amount</p>
+          <p className="text-left">Transaction ID</p>
           <p className="text-left">Status</p>
-          {shouldShowPoints && <p className="text-left">Points</p>}
           <p className="text-left">Action</p>
         </div>
         <div

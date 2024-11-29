@@ -1,7 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useState } from "react";
 
-import { useFinalityProviders } from "@/app/hooks/api/useFinalityProviders";
+import { useFinalityProviders } from "@/app/hooks/api/useFinalityProvidersV2";
 
 interface SortState {
   field?: string;
@@ -44,6 +44,20 @@ export function useFinalityProviderService() {
     );
   }, []);
 
+  const getFinalityProviderMoniker = useCallback(
+    (btcPkHex: string) => {
+      const moniker = data?.finalityProviders.find(
+        (fp) => fp.btcPk === btcPkHex,
+      )?.description?.moniker;
+
+      if (moniker === undefined || moniker === null || moniker === "") {
+        return "-";
+      }
+      return moniker;
+    },
+    [data?.finalityProviders],
+  );
+
   return {
     searchValue,
     finalityProviders: data?.finalityProviders,
@@ -52,5 +66,6 @@ export function useFinalityProviderService() {
     fetchNextPage,
     handleSearch,
     handleSort,
+    getFinalityProviderMoniker,
   };
 }

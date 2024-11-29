@@ -6,11 +6,13 @@ import {
   DelegationV2StakingState,
   type DelegationV2,
 } from "@/app/types/delegationsV2";
+import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 
 import { GridTable, type TableColumn } from "../../common/GridTable";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
+import { Inscription } from "./components/Inscription";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
@@ -19,15 +21,26 @@ const columns: TableColumn<
   { handleActionClick: (action: string, txHash: string) => void }
 >[] = [
   {
+    field: "inscription",
+    headerName: "Inscription",
+    width: "max-content",
+    renderCell: (row) => (
+      <Inscription value={row.bbnInceptionHeight.toString()} />
+    ),
+  },
+  {
+    field: "finalityProvider",
+    headerName: "Finality Provider",
+    width: "max-content",
+    renderCell: (row) => (
+      <FinalityProviderMoniker value={row.finalityProviderBtcPksHex[0]} />
+    ),
+  },
+  {
     field: "stakingAmount",
     headerName: "Amount",
     width: "max-content",
     renderCell: (row) => <Amount value={row.stakingAmount} />,
-  },
-  {
-    field: "startHeight",
-    headerName: "Duration",
-    width: "max-content",
   },
   {
     field: "stakingTxHashHex",
@@ -177,7 +190,7 @@ export function DelegationList() {
           wrapperClassName: "max-h-[21rem] overflow-x-auto",
           bodyClassName: "gap-y-4 min-w-[1000px]",
           cellClassName:
-            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-base justify-start group-even:bg-[#F9F9F9] text-primary-dark",
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-sm justify-start group-even:bg-[#F9F9F9] text-primary-dark",
         }}
         params={{ handleActionClick }}
         fallback={<div>No delegations found</div>}

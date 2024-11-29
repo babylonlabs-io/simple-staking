@@ -52,17 +52,12 @@ export const getFinalityProviders = async ({
   order?: "asc" | "desc";
   pk?: string;
 }): Promise<PaginatedFinalityProviders> => {
-  // const limit = 100;
-  // const reverse = false;
-
   const params = {
     pagination_key: encode(key),
     finality_provider_pk: pk,
     sort_by: sortBy,
     order,
     name,
-    // "pagination_reverse": reverse,
-    // "pagination_limit": limit,
   };
 
   const response = await apiWrapper(
