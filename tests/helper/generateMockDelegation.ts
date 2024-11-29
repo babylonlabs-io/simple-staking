@@ -24,7 +24,7 @@ export function generateMockDelegation(
       timelock: 3600,
     },
     isOverflow: false,
+    isEligibleForTransition: false,
     unbondingTx: undefined,
-    transitioned: false,
   };
 }
