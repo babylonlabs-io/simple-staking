@@ -28,8 +28,6 @@ export const getState = (state: string) => {
       return "Transitioning";
     case DelegationState.TRANSITIONED:
       return "Transitioned";
-    case DelegationState.SLASHED:
-      return "Slashed";
     default:
       return "Unknown";
   }
@@ -57,8 +55,6 @@ export const getStateTooltip = (state: string) => {
       return "Stake is transitioning to the Babylon chain network";
     case DelegationState.TRANSITIONED:
       return "Stake has been transitioned to the Babylon chain network";
-    case DelegationState.SLASHED:
-      return "Stake has been slashed";
     default:
       return "Unknown";
   }
