@@ -145,7 +145,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
         onClick={onConnect}
         // Disable the button if the user is already connected
         // or: API is not available, geo-blocked, or has an error
-        disabled={Boolean(address) || !isApiNormal}
+        disabled={connected || !isApiNormal || isGeoBlocked}
       >
         <PiWalletBold size={20} className="flex md:hidden" />
         <span className="hidden md:flex">Connect Wallets</span>
