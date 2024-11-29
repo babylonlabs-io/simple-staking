@@ -1,4 +1,10 @@
-import type { BTCProvider } from "@tomo-inc/tomo-wallet-provider";
+"use client";
+import {
+  BTCProvider,
+  useChainConnector,
+  useWalletConnect,
+  UTXO,
+} from "@babylonlabs-io/bbn-wallet-connect";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -21,11 +27,8 @@ import {
   Fees,
   InscriptionIdentifier,
   Network,
-  UTXO,
 } from "@/utils/wallet/btc_wallet_provider";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
-
-import { useWalletConnection } from "./WalletConnectionProvider";
 
 interface BTCWalletContextProps {
   network?: networks.Network;
@@ -79,7 +82,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const [address, setAddress] = useState("");
 
   const { showError, captureError } = useError();
-  const { open, isConnected, providers } = useWalletConnection();
+  const btcConnector = useChainConnector("BTC");
+  const { open = () => {}, connected } = useWalletConnect();
 
   const btcDisconnect = useCallback(() => {
     setBTCWalletProvider(undefined);
@@ -89,12 +93,13 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const connectBTC = useCallback(
-    async (walletProvider: BTCProvider) => {
+    async (walletProvider: BTCProvider | null) => {
+      if (!walletProvider) return;
+
       const supportedNetworkMessage =
         "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
 
       try {
-        await walletProvider.connectWallet();
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
@@ -140,19 +145,22 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     [showError, captureError],
   );
 
+  useEffect(() => {
+    const unsubscribe = btcConnector?.on("connect", (wallet) => {
+      connectBTC(wallet.provider);
+    });
+
+    return unsubscribe;
+  }, [btcConnector, connectBTC]);
+
   // Listen for BTC account changes
   useEffect(() => {
-    if (btcWalletProvider) {
-      let once = false;
-      btcWalletProvider.on("accountChanged", () => {
-        if (!once) {
-          connectBTC(btcWalletProvider);
-        }
-      });
-      return () => {
-        once = true;
-      };
-    }
+    if (!btcWalletProvider) return;
+
+    const cb = () => void connectBTC(btcWalletProvider);
+    btcWalletProvider.on("accountChanged", cb);
+
+    return () => void btcWalletProvider.off("accountChanged", cb);
   }, [btcWalletProvider, connectBTC]);
 
   const btcWalletMethods = useMemo(
@@ -165,8 +173,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
-      signMessage: async (message: string, type?: "ecdsa" | "bip322-simple") =>
-        btcWalletProvider?.signMessage(message, type) ?? "",
+      signMessage: async (
+        message: string,
+        type: "ecdsa" | "bip322-simple" = "bip322-simple",
+      ) => btcWalletProvider?.signMessage(message, type) ?? "",
       getBalance: async () => btcWalletProvider?.getBalance() ?? 0,
       getNetworkFees: async () =>
         btcWalletProvider?.getNetworkFees() ?? ({} as Fees),
@@ -175,15 +185,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.getUtxos(address, amount) ?? [],
       getBTCTipHeight: async () => btcWalletProvider?.getBTCTipHeight() ?? 0,
       getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
-        btcWalletProvider
-          ?.getInscriptions()
-          .then((result) =>
-            result.list.map((ordinal) => ({
-              txid: ordinal.inscriptionId,
-              vout: ordinal.outputValue,
-            })),
-          )
-          .catch((e) => []) ?? [],
+        btcWalletProvider?.getInscriptions() ?? [],
     }),
     [btcWalletProvider],
   );
@@ -193,13 +195,13 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       network,
       publicKeyNoCoord,
       address,
-      connected: Boolean(btcWalletProvider),
+      connected,
       open,
       disconnect: btcDisconnect,
       ...btcWalletMethods,
     }),
     [
-      btcWalletProvider,
+      connected,
       network,
       publicKeyNoCoord,
       address,
@@ -208,27 +210,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       btcWalletMethods,
     ],
   );
-
-  useEffect(() => {
-    if (isConnected && providers.state) {
-      if (!btcWalletProvider && providers.bitcoinProvider) {
-        connectBTC(providers.bitcoinProvider);
-      }
-    }
-  }, [
-    connectBTC,
-    providers.bitcoinProvider,
-    providers.state,
-    isConnected,
-    btcWalletProvider,
-  ]);
-
-  // Clean up the state when isConnected becomes false
-  useEffect(() => {
-    if (!isConnected) {
-      btcDisconnect();
-    }
-  }, [isConnected, btcDisconnect]);
 
   return (
     <BTCWalletContext.Provider value={btcContextValue}>

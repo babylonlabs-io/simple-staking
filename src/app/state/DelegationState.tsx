@@ -38,7 +38,6 @@ export function DelegationState({ children }: PropsWithChildren) {
     [],
   );
 
-  // Effects
   useEffect(
     function syncDelegations() {
       if (!data?.delegations) {

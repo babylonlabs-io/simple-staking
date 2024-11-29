@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, type PropsWithChildren } from "react";
+import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -37,19 +37,19 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     [],
   );
 
-  // Effects
-  useEffect(
-    function syncDelegations() {
-      if (!data?.delegations) {
-        return;
-      }
-      // TODO: Find the difference and update only the difference
-      if (!areDelegationsEqual(delegations, data.delegations)) {
-        setDelegations(data.delegations);
-      }
-    },
-    [data?.delegations, delegations, setDelegations],
-  );
+  // // Effects
+  // useEffect(
+  //   function syncDelegations() {
+  //     if (!data?.delegations) {
+  //       return;
+  //     }
+  //     // TODO: Find the difference and update only the difference
+  //     if (!areDelegationsEqual(delegations, data.delegations)) {
+  //       setDelegations(data.delegations);
+  //     }
+  //   },
+  //   [data?.delegations, delegations, setDelegations],
+  // );
 
   // Methods
   const addDelegation = useCallback(
@@ -76,10 +76,12 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     [delegations],
   );
 
+  console.log(delegations, data?.delegations);
+
   // Context
   const state = useMemo(
     () => ({
-      delegations,
+      delegations: data?.delegations ?? [],
       isLoading: isFetchingNextPage,
       hasMoreDelegations: hasNextPage,
       addDelegation,
@@ -87,7 +89,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchMoreDelegations: fetchNextPage,
     }),
     [
-      delegations,
+      data?.delegations,
       isFetchingNextPage,
       hasNextPage,
       addDelegation,

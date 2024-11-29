@@ -2,6 +2,7 @@
 @import "react-tooltip/dist/react-tooltip.css";
 @import "react-toastify/dist/ReactToastify.css";
 @import "@babylonlabs-io/bbn-core-ui/dist/style.css";
+@import "@babylonlabs-io/bbn-wallet-connect/dist/style.css";
 
 @tailwind base;
 @tailwind components;
