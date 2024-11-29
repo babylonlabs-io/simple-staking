@@ -1,5 +1,5 @@
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
-import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
+import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
 
 interface ActionButtonProps {
   txHash: string;
@@ -8,27 +8,27 @@ interface ActionButtonProps {
 }
 
 const ACTION_BUTTON_PROPS: Record<string, { action: string; title: string }> = {
-  [state.VERIFIED]: {
+  [State.VERIFIED]: {
     action: ACTIONS.STAKE,
     title: "Stake",
   },
-  [state.ACTIVE]: {
+  [State.ACTIVE]: {
     action: ACTIONS.UNBOUND,
     title: "Unbound",
   },
-  [state.EARLY_UNBONDING_WITHDRAWABLE]: {
+  [State.EARLY_UNBONDING_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING,
     title: "Withdraw",
   },
-  [state.TIMELOCK_WITHDRAWABLE]: {
+  [State.TIMELOCK_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_TIMELOCK,
     title: "Withdraw",
   },
-  [state.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
     title: "Withdraw",
   },
-  [state.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING,
     title: "Withdraw",
   },

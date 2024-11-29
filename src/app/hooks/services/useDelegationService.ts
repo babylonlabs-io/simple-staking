@@ -39,6 +39,7 @@ export function useDelegationService() {
     hasMoreDelegations,
     isLoading,
     findDelegationByTxHash,
+    addDelegation,
   } = useDelegationV2State();
 
   const {
@@ -46,6 +47,7 @@ export function useDelegationService() {
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
+    createDelegationEoi,
   } = useTransactionService();
 
   const COMMANDS: Record<ActionType, DelegationCommand> = useMemo(
@@ -140,7 +142,12 @@ export function useDelegationService() {
         );
       },
     }),
-    [],
+    [
+      submitStakingTx,
+      submitUnbondingTx,
+      submitEarlyUnbondedWithdrawalTx,
+      submitTimelockUnbondedWithdrawalTx,
+    ],
   );
 
   const executeDelegationAction = useCallback(

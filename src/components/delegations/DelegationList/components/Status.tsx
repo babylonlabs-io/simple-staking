@@ -81,7 +81,19 @@ const STATUSES: Record<
     label: "Unbonding",
     tooltip: "Stake is requesting unbonding",
   }),
-  [state.INTERMEDIATE_WITHDRAWAL_SUBMITTED]: () => ({
+  [state.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: () => ({
+    label: "Withdrawal",
+    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+  }),
+  [state.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED]: () => ({
+    label: "Withdrawal",
+    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+  }),
+  [state.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED]: () => ({
+    label: "Withdrawal",
+    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+  }),
+  [state.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED]: () => ({
     label: "Withdrawal",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
