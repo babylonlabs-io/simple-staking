@@ -148,14 +148,14 @@ export const getDelegationsV2 = async (
         unbondingTime: apiDelegation.delegation_unbonding.unbonding_time,
         unbondingTxHex: apiDelegation.delegation_unbonding.unbonding_tx,
         unbondingSlashingTxHex:
-        apiDelegation.delegation_unbonding.slashing_tx_hex,
+          apiDelegation.delegation_unbonding.slashing_tx_hex,
         covenantUnbondingSignatures:
-        apiDelegation.delegation_unbonding.covenant_unbonding_signatures?.map(
-          (signature) => ({
-            covenantBtcPkHex: signature.covenant_btc_pk_hex,
-            signatureHex: signature.signature_hex,
-          }),
-        ),
+          apiDelegation.delegation_unbonding.covenant_unbonding_signatures?.map(
+            (signature) => ({
+              covenantBtcPkHex: signature.covenant_btc_pk_hex,
+              signatureHex: signature.signature_hex,
+            }),
+          ),
         slashingTxHex: apiDelegation.delegation_staking.slashing_tx_hex,
       };
     },
