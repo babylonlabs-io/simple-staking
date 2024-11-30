@@ -21,7 +21,15 @@ export function PersonalBalance() {
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
-        <StatItem loading={false} title="BBN Rewards" value="0.134 BBN" />
+        <StatItem
+          loading={false}
+          title="BBN Rewards"
+          value="0.134 BBN"
+          actionComponent={{
+            title: "Claim",
+            onAction: () => {},
+          }}
+        />
       </div>
     </div>
   );
