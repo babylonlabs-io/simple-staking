@@ -42,28 +42,7 @@ export function StageStepping({
           Please sign the following messages
         </Text>
         <div className="py-4 flex flex-col items-start gap-6">
-          {StepContent.map((content, index) => (
-            <div
-              key={content}
-              className={twMerge(
-                "p-4 flex flex-row items-center justify-start gap-3 rounded border border-primary-dark/20 bg-secondary-contrast self-stretch",
-                step !== index + 1 && "opacity-25",
-              )}
-            >
-              {step > index + 1 ? (
-                <Tick />
-              ) : (
-                <div className="rounded-full bg-secondary-main flex h-10 w-10 items-center justify-center">
-                  <Text variant="body1" className="text-secondary-contrast">
-                    {index + 1}
-                  </Text>
-                </div>
-              )}
-              <Text variant="body1" className="text-primary-dark">
-                {content}
-              </Text>
-            </div>
-          ))}
+          {stepContent.map((content, index) => <Step completed={step > index + 1}  active={step === index + 1} current={index + 1} content={content} />}
         </div>
       </DialogBody>
       <DialogFooter className="flex gap-4">
