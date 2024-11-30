@@ -1,5 +1,4 @@
 import { Dialog, MobileDialog } from "@babylonlabs-io/bbn-core-ui";
-import { useMemo } from "react";
 
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 
@@ -21,52 +20,52 @@ interface TransitionModalProps {
     | "end";
 }
 const stageUIMapping = {
-      start: ({ onClose }: TransitionModalProps) => <StageStart onClose={onClose} />,
-      "step-1": ({ onClose, onSign }: TransitionModalProps) =>  <StageStepping step={1} onClose={onClose} onSign={onSign} />,
-      "step-2": ({ onClose, onSign }: TransitionModalProps) =>  (
-        <StageStepping
-          step={2}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      "step-3": ({ onClose, onSign }: TransitionModalProps) =>  (
-        <StageStepping
-          step={3}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      "step-4": ({ onClose, onSign }: TransitionModalProps) =>  (
-        <StageStepping
-          step={4}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      "pre-end": ({ onClose, onSign }: TransitionModalProps) =>  (
-        <StageStepping
-          step={5}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      end: ({ onClose }: TransitionModalProps) => <StageEnd onClose={onClose} />,
-    } as const
-export function TransitionModal({
-  open,
-  onClose,
-  onSign,
-  stage,
-}: TransitionModalProps) {
+  start: ({ onClose }: TransitionModalProps) => (
+    <StageStart onClose={onClose} />
+  ),
+  "step-1": ({ onClose, onSign }: TransitionModalProps) => (
+    <StageStepping step={1} onClose={onClose} onSign={onSign} />
+  ),
+  "step-2": ({ onClose, onSign }: TransitionModalProps) => (
+    <StageStepping
+      step={2}
+      onClose={onClose}
+      onSign={onSign}
+      awaitingResponse={true}
+    />
+  ),
+  "step-3": ({ onClose, onSign }: TransitionModalProps) => (
+    <StageStepping
+      step={3}
+      onClose={onClose}
+      onSign={onSign}
+      awaitingResponse={true}
+    />
+  ),
+  "step-4": ({ onClose, onSign }: TransitionModalProps) => (
+    <StageStepping
+      step={4}
+      onClose={onClose}
+      onSign={onSign}
+      awaitingResponse={true}
+    />
+  ),
+  "pre-end": ({ onClose, onSign }: TransitionModalProps) => (
+    <StageStepping
+      step={5}
+      onClose={onClose}
+      onSign={onSign}
+      awaitingResponse={true}
+    />
+  ),
+  end: ({ onClose }: TransitionModalProps) => <StageEnd onClose={onClose} />,
+} as const;
+export function TransitionModal(props: TransitionModalProps) {
+  const { open, onClose, stage } = props;
   const isMobileView = useIsMobileView();
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
-  const Content = stageUIMapping[props.stage]
+  const Content = stageUIMapping[stage];
 
   return (
     <DialogComponent open={open} onClose={onClose}>
