@@ -5,8 +5,8 @@ export const bbnDevnet = {
   chainName: "Babylon Devnet 7",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
-  rpc: "https://rpc.devnet.babylonlabs.io",
-  rest: "https://lcd.devnet.babylonlabs.io",
+  rpc: "https://rpc-dapp.devnet.babylonlabs.io",
+  rest: "https://lcd-dapp.devnet.babylonlabs.io",
   nodeProvider: {
     name: "Babylonlabs",
     email: "contact@babylonlabs.io",
