@@ -21,6 +21,7 @@ export function PersonalBalance() {
   const [rewards, setRewards] = useState<number>();
   const [btcBalance, setBTCBalance] = useState<number>();
   const [cosmosBalance, setCosmosBalance] = useState<number>();
+  const { claimRewards } = useRewardsService();
 
   useEffect(() => {
     const fetchRewards = async () => {
@@ -54,7 +55,8 @@ export function PersonalBalance() {
         Wallet Balance
       </Heading>
       <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">
-        {/* TODO: Need to add the staker tvl value for the bitcoin balance */}
+        {/* TODO: Need to add the staker tvl value for the bitcoin balance 
+          as well as remove the filtering on inscription balance*/}
         <StatItem
           loading={false}
           title="Bitcoin Balance"
@@ -85,7 +87,7 @@ export function PersonalBalance() {
           value={`${ubbnToBbn(rewards ?? 0)} BBN`}
           actionComponent={{
             title: "Claim",
-            onAction: () => {},
+            onAction: claimRewards,
           }}
         />
       </div>

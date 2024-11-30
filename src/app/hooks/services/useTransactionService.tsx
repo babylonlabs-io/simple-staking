@@ -25,11 +25,12 @@ import {
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
 } from "@/utils/delegations";
-import { estimateBbnGasFee } from "@/utils/delegations/fee";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
+import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
+import { useBbnTransaction } from "../client/query/useBbnTransaction";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
@@ -55,6 +56,7 @@ export enum SigningStep {
 
 export const useTransactionService = () => {
   const { availableUTXOs: inputUTXOs, networkInfo } = useAppState();
+  const { sendBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
 
@@ -133,7 +135,7 @@ export const useTransactionService = () => {
         { signPsbt, signMessage, signingCallback },
       );
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
-      await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
+      await sendBbnTx(delegationMsg);
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
 
       return transaction.getId();
@@ -147,9 +149,10 @@ export const useTransactionService = () => {
       address,
       publicKeyNoCoord,
       inputUTXOs,
-      signPsbt,
       bech32Address,
+      signPsbt,
       signMessage,
+      sendBbnTx,
     ],
   );
 
@@ -257,7 +260,7 @@ export const useTransactionService = () => {
         inclusionProof,
       );
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
-      await sendBbnTx(signingStargateClient!, bech32Address, delegationMsg);
+      await sendBbnTx(delegationMsg);
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
     },
     [
@@ -266,11 +269,12 @@ export const useTransactionService = () => {
       btcNetwork,
       signingStargateClient,
       genesisParam,
-      bech32Address,
       address,
       publicKeyNoCoord,
+      bech32Address,
       signPsbt,
       signMessage,
+      sendBbnTx,
     ],
   );
 
@@ -565,39 +569,6 @@ export const useTransactionService = () => {
   };
 };
 
-// TODO: Abstract this into utils
-const sendBbnTx = async <T extends object>(
-  signingStargateClient: SigningStargateClient,
-  bech32Address: string,
-  delegationMsg: {
-    typeUrl: string;
-    value: T;
-  },
-) => {
-  // estimate gas
-  const fee = await estimateBbnGasFee(
-    signingStargateClient.simulate,
-    bech32Address,
-    delegationMsg,
-  );
-
-  // sign it
-  const res = await signingStargateClient.signAndBroadcast(
-    bech32Address,
-    [delegationMsg],
-    fee,
-  );
-  if (res.code !== 0) {
-    throw new Error(
-      `Failed to send delegation transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
-    );
-  }
-  return {
-    txHash: res.transactionHash,
-    gasUsed: res.gasUsed,
-  };
-};
-
 const createBtcDelegationMsg = async (
   stakingInstance: Staking,
   stakingInput: BtcStakingInputs,
@@ -713,7 +684,7 @@ const createBtcDelegationMsg = async (
     });
 
   return {
-    typeUrl: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgCreateBTCDelegation,
     value: msg,
   };
 };

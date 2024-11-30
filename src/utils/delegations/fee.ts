@@ -2,11 +2,6 @@ import { Transaction } from "bitcoinjs-lib";
 
 const FEE_TOLERANCE_COEFFICIENT = 2;
 
-export interface BbnGasFee {
-  amount: { denom: string; amount: string }[];
-  gas: string;
-}
-
 /**
  * Performs a safety check on the estimated transaction fee.
  * The function calculates the expected transaction fee based on the transaction
@@ -34,35 +29,4 @@ export const txFeeSafetyCheck = (
   } else if (estimatedFee < lowerBound) {
     throw new Error("Estimated fee is too low");
   }
-};
-
-/**
- * Estimates the gas fee for a given message.
- * @param {Function} simulateClient - The simulate function from the stargate client.
- * @param {string} bech32Address - The bech32 address of the user.
- * @param {Object} msg - The message to estimate the fee for.
- * @returns {Promise<BbnGasFee>} An object containing the gas fee and gas wanted.
- */
-export const estimateBbnGasFee = async <T>(
-  simulateClient: (
-    address: string,
-    messages: T[],
-    options?: string,
-  ) => Promise<number>,
-  bech32Address: string,
-  msg: T,
-): Promise<BbnGasFee> => {
-  // estimate gas
-  const gasEstimate = await simulateClient(
-    bech32Address,
-    [msg],
-    `estimate ${typeof msg} fee`,
-  );
-  // TODO: The gas calculation need to be improved
-  // https://github.com/babylonlabs-io/simple-staking/issues/320
-  const gasWanted = Math.ceil(gasEstimate * 1.5);
-  return {
-    amount: [{ denom: "ubbn", amount: (gasWanted * 0.01).toFixed(0) }],
-    gas: gasWanted.toString(),
-  };
 };

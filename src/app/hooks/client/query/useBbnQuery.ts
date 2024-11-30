@@ -4,8 +4,6 @@ import { useCallback } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 
-const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
-
 /**
  * Query service for Babylon which contains all the queries for
  * interacting with Babylon RPC nodes
@@ -13,9 +11,11 @@ const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
 export const useBbnQuery = () => {
   const { queryClient, bech32Address } = useCosmosWallet();
 
-  const getRewards = useCallback(async (): Promise<number> => {
+  const getRewards = useCallback(async (): Promise<
+    incentivequery.QueryRewardGaugesResponse | undefined
+  > => {
     if (!queryClient || !bech32Address) {
-      return 0;
+      return undefined;
     }
     const { incentive } = setupIncentiveExtension(queryClient);
 
@@ -24,17 +24,7 @@ export const useBbnQuery = () => {
         address: bech32Address,
       });
 
-    const { rewardGauges } = await incentive.RewardGauges(req);
-    const btcDelegationRewards =
-      rewardGauges[REWARD_GAUGE_KEY_BTC_DELEGATION]?.coins;
-    if (!btcDelegationRewards) {
-      return 0;
-    }
-
-    return btcDelegationRewards.reduce(
-      (acc, coin) => acc + Number(coin.amount),
-      0,
-    );
+    return incentive.RewardGauges(req);
   }, [queryClient, bech32Address]);
 
   return {

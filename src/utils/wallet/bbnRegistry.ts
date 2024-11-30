@@ -8,16 +8,21 @@ type ProtoToRegister<T> = {
   messageType: MessageFns<T>;
 };
 
+export const BBN_REGISTRY_TYPE_URLS = {
+  MsgCreateBTCDelegation: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
+  MsgWithdrawReward: "/babylon.incentive.MsgWithdrawReward",
+};
+
 // List of protos to register in the registry
 const protosToRegister: ProtoToRegister<any>[] = [
   // BTC Staking
   {
-    typeUrl: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgCreateBTCDelegation,
     messageType: btcstakingtx.MsgCreateBTCDelegation,
   },
   // Incentives
   {
-    typeUrl: "/babylon.incentive.Msg/WithdrawReward",
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward,
     messageType: incentivetx.MsgWithdrawReward,
   },
 ];

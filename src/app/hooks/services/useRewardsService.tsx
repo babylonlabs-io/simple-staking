@@ -2,9 +2,12 @@ import { incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { useCallback } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
-import { estimateBbnGasFee } from "@/utils/delegations/fee";
+import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useBbnQuery } from "../client/query/useBbnQuery";
+import { useBbnTransaction } from "../client/query/useBbnTransaction";
+
+const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
 
 export const useRewardsService = () => {
   const {
@@ -14,6 +17,7 @@ export const useRewardsService = () => {
   } = useCosmosWallet();
 
   const { getRewards: getBbnRewards } = useBbnQuery();
+  const { estimateBbnGasFee, sendBbnTx } = useBbnTransaction();
 
   /**
    * Gets the rewards from the user's account.
@@ -23,8 +27,40 @@ export const useRewardsService = () => {
     if (!cosmosConnected || !bech32Address || !signingStargateClient) {
       return 0;
     }
-    return getBbnRewards();
+    const rewards = await getBbnRewards();
+    if (!rewards) {
+      return 0;
+    }
+
+    const coins = rewards.rewardGauges[REWARD_GAUGE_KEY_BTC_DELEGATION]?.coins;
+    if (!coins) {
+      return 0;
+    }
+
+    const withdrawnCoins = rewards.rewardGauges[
+      REWARD_GAUGE_KEY_BTC_DELEGATION
+    ]?.withdrawnCoins.reduce((acc, coin) => acc + Number(coin.amount), 0);
+
+    return (
+      coins.reduce((acc, coin) => acc + Number(coin.amount), 0) -
+      (withdrawnCoins || 0)
+    );
   }, [cosmosConnected, bech32Address, signingStargateClient, getBbnRewards]);
+
+  /**
+   * Estimates the gas fee for claiming rewards.
+   * @returns {Promise<number>} The gas fee for claiming rewards.
+   */
+  const estimateClaimRewardsGas = useCallback(async (): Promise<number> => {
+    if (!signingStargateClient || !bech32Address) {
+      return 0;
+    }
+
+    const withdrawRewardMsg = createWithdrawRewardMsg(bech32Address);
+
+    const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
+    return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
+  }, [signingStargateClient, bech32Address, estimateBbnGasFee]);
 
   /**
    * Claims the rewards from the user's account.
@@ -34,24 +70,26 @@ export const useRewardsService = () => {
       return;
     }
 
-    const withdrawRewardMsg = incentivetx.MsgWithdrawReward.fromPartial({
-      address: bech32Address,
-    });
-    const msg = {
-      typeUrl: "/babylon.incentive.Msg/WithdrawReward",
-      value: withdrawRewardMsg,
-    };
+    const msg = createWithdrawRewardMsg(bech32Address);
 
-    const fee = await estimateBbnGasFee(
-      signingStargateClient?.simulate,
-      bech32Address,
-      msg,
-    );
-    await signingStargateClient.signAndBroadcast(bech32Address, [msg], fee);
-  }, [bech32Address, signingStargateClient]);
+    const { txHash } = await sendBbnTx(msg);
+    console.log("successfully claimed rewards with txHash", txHash);
+  }, [bech32Address, signingStargateClient, sendBbnTx]);
 
   return {
     getRewards,
     claimRewards,
+    estimateClaimRewardsGas,
+  };
+};
+
+const createWithdrawRewardMsg = (bech32Address: string) => {
+  const withdrawRewardMsg = incentivetx.MsgWithdrawReward.fromPartial({
+    type: "btc_delegation",
+    address: bech32Address,
+  });
+  return {
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward,
+    value: withdrawRewardMsg,
   };
 };
