@@ -70,7 +70,7 @@ export function TransitionModal({
 
   return (
     <DialogComponent open={open} onClose={onClose}>
-      {content}
+      <Content {...props} />
     </DialogComponent>
   );
 }
