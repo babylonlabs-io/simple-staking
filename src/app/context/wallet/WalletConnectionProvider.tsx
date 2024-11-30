@@ -4,7 +4,7 @@ import { Network, WalletProvider } from "@babylonlabs-io/bbn-wallet-connect";
 import { type PropsWithChildren } from "react";
 
 import { ErrorState } from "@/app/types/errors";
-import { keplrRegistry } from "@/config/wallet/babylon";
+import { bbnDevnet } from "@/config/wallet/babylon";
 
 import { useError } from "../Error/ErrorContext";
 
@@ -23,9 +23,9 @@ const config = [
   {
     chain: "BBN",
     config: {
-      chainId: keplrRegistry.chainId,
-      rpc: keplrRegistry.rpc,
-      chainData: keplrRegistry,
+      chainId: bbnDevnet.chainId,
+      rpc: bbnDevnet.rpc,
+      chainData: bbnDevnet,
     },
   },
 ] as const;
