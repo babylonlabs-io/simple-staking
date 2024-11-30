@@ -85,7 +85,7 @@ export function PersonalBalance() {
           value={`${ubbnToBbn(rewards ?? 0)} BBN`}
           actionComponent={{
             title: "Claim",
-            onAction: () => { },
+            onAction: () => {},
           }}
         />
       </div>
