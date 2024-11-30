@@ -1,5 +1,5 @@
 import { getNetworkInfo } from "@/app/api/getNetworkInfo";
-import { useAPIQuery } from "@/app/hooks/api/useApi";
+import { useAPIQuery } from "@/app/hooks/client/api/useApi";
 import { NetworkInfo } from "@/app/types/networkInfo";
 
 export const NETWORK_INFO_KEY = "NETWORK_INFO";

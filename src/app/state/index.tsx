@@ -1,9 +1,9 @@
 import { useInscriptionProvider } from "@babylonlabs-io/bbn-wallet-connect";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
-import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
-import { useOrdinals } from "@/app/hooks/api/useOrdinals";
-import { useUTXOs } from "@/app/hooks/api/useUTXOs";
+import { useBTCTipHeight } from "@/app/hooks/client/api/useBTCTipHeight";
+import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
+import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { filterDust } from "@/utils/wallet";
 import type {
@@ -11,7 +11,7 @@ import type {
   UTXO,
 } from "@/utils/wallet/btc_wallet_provider";
 
-import { useNetworkInfo } from "../hooks/api/useNetworkInfo";
+import { useNetworkInfo } from "../hooks/client/api/useNetworkInfo";
 import { NetworkInfo } from "../types/networkInfo";
 
 import { DelegationState } from "./DelegationState";

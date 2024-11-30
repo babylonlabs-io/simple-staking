@@ -1,7 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useState } from "react";
 
-import { useFinalityProviders } from "@/app/hooks/api/useFinalityProvidersV2";
+import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProvidersV2";
 
 interface SortState {
   field?: string;

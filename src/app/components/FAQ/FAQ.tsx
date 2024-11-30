@@ -1,6 +1,6 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 
-import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { questions } from "./data/questions";

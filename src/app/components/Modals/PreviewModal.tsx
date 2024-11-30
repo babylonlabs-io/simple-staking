@@ -11,7 +11,7 @@ import {
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 
-import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";

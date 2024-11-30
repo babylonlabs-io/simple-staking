@@ -28,7 +28,7 @@ import {
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
 
-import { useNetworkFees } from "../api/useNetworkFees";
+import { useNetworkFees } from "../client/api/useNetworkFees";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;

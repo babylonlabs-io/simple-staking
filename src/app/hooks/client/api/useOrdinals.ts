@@ -1,7 +1,7 @@
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useAPIQuery } from "@/app/hooks/api/useApi";
+import { useAPIQuery } from "@/app/hooks/client/api/useApi";
 import { wait } from "@/utils";
 import { filterDust } from "@/utils/wallet";
 import {

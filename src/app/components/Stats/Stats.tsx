@@ -1,7 +1,7 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
-import { useSystemStats } from "@/app/hooks/api/useSystemStats";
+import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
