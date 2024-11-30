@@ -25,6 +25,7 @@ import {
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
 } from "@/utils/delegations";
+import { estimateBbnGasFee } from "@/utils/delegations/fee";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
 
@@ -564,26 +565,24 @@ export const useTransactionService = () => {
   };
 };
 
-const sendBbnTx = async (
+// TODO: Abstract this into utils
+const sendBbnTx = async <T extends object>(
   signingStargateClient: SigningStargateClient,
   bech32Address: string,
-  delegationMsg: any,
+  delegationMsg: {
+    typeUrl: string;
+    value: T;
+  },
 ) => {
   // estimate gas
-  const gasEstimate = await signingStargateClient!.simulate(
+  const fee = await estimateBbnGasFee(
+    signingStargateClient.simulate,
     bech32Address,
-    [delegationMsg],
-    "estimate fee",
+    delegationMsg,
   );
-  // TODO: The gas calculation need to be improved
-  // https://github.com/babylonlabs-io/simple-staking/issues/320
-  const gasWanted = Math.ceil(gasEstimate * 1.5);
-  const fee = {
-    amount: [{ denom: "ubbn", amount: (gasWanted * 0.01).toFixed(0) }],
-    gas: gasWanted.toString(),
-  };
+
   // sign it
-  const res = await signingStargateClient!.signAndBroadcast(
+  const res = await signingStargateClient.signAndBroadcast(
     bech32Address,
     [delegationMsg],
     fee,
