@@ -1,7 +1,14 @@
-import { Button, Heading } from "@babylonlabs-io/bbn-core-ui";
+import {
+  Button,
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  Heading,
+  MobileDialog,
+} from "@babylonlabs-io/bbn-core-ui";
 import { LuPartyPopper } from "react-icons/lu";
 
-import { GeneralModal } from "./GeneralModal";
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 
 interface CongratModalProps {
   open: boolean;
@@ -9,16 +16,16 @@ interface CongratModalProps {
 }
 
 export function CongratModal({ open, onClose }: CongratModalProps) {
+  const isMobileView = useIsMobileView();
+  const DialogComponent = isMobileView ? MobileDialog : Dialog;
+
   return (
-    <GeneralModal
-      open={open}
-      onClose={onClose}
-      closeOnOverlayClick={false}
-      closeOnEsc={false}
-    >
-      <div className="flex flex-col gap-8 md:max-w-[34rem] text-primary-dark">
+    <DialogComponent open={open} onClose={onClose}>
+      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
         <div className="py-4 flex flex-col items-center gap-4">
-          <LuPartyPopper className="text-5xl" />
+          <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
+            <LuPartyPopper className="text-5xl" />
+          </div>
           <Heading variant="h4">Conratulations</Heading>
           <p className="text-base text-center">
             Share feedback or report issues on our{" "}
@@ -43,10 +50,16 @@ export function CongratModal({ open, onClose }: CongratModalProps) {
             community!
           </p>
         </div>
-        <Button onClick={onClose}>
-          <span>Done</span>
+      </DialogBody>
+      <DialogFooter className="flex gap-4">
+        <Button
+          variant="contained"
+          className="flex-1 text-xs sm:text-base"
+          onClick={onClose}
+        >
+          Done
         </Button>
-      </div>
-    </GeneralModal>
+      </DialogFooter>
+    </DialogComponent>
   );
 }
