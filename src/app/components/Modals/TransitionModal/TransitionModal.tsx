@@ -66,47 +66,7 @@ export function TransitionModal({
   const isMobileView = useIsMobileView();
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
-  const content = useMemo(() => {
-    const stageUIMapping = {
-      start: <StageStart onClose={onClose} />,
-      "step-1": <StageStepping step={1} onClose={onClose} onSign={onSign} />,
-      "step-2": (
-        <StageStepping
-          step={2}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      "step-3": (
-        <StageStepping
-          step={3}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      "step-4": (
-        <StageStepping
-          step={4}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      "pre-end": (
-        <StageStepping
-          step={5}
-          onClose={onClose}
-          onSign={onSign}
-          awaitingResponse={true}
-        />
-      ),
-      end: <StageEnd onClose={onClose} />,
-    };
-
-    return stageUIMapping[stage];
-  }, [onClose, onSign, stage]);
+  const Content = stageUIMapping[props.stage]
 
   return (
     <DialogComponent open={open} onClose={onClose}>
