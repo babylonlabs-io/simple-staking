@@ -56,7 +56,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
             <div className="flex flex-row items-center justify-between text-primary-dark">
               <Text variant="body1">Network Fee Rate</Text>
               <div className="flex flex-row gap-2 items-center">
-                <Text variant="body1">25 Sats/vB</Text>
+                <Text variant="body1">{defaultFeeRate} Sats/vB</Text>
                 <Button
                   size="small"
                   variant="outlined"
