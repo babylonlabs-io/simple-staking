@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, type PropsWithChildren } from "react";
+import { useCallback, useMemo, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -37,20 +37,6 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     [],
   );
 
-  // Effects
-  useEffect(
-    function syncDelegations() {
-      if (!data?.delegations) {
-        return;
-      }
-      // TODO: Find the difference and update only the difference
-      if (!areDelegationsEqual(delegations, data.delegations)) {
-        setDelegations(data.delegations);
-      }
-    },
-    [data?.delegations, delegations, setDelegations],
-  );
-
   // Methods
   const addDelegation = useCallback(
     (newDelegation: DelegationV2) => {
@@ -79,7 +65,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   // Context
   const state = useMemo(
     () => ({
-      delegations,
+      delegations: data?.delegations ?? [],
       isLoading: isFetchingNextPage,
       hasMoreDelegations: hasNextPage,
       addDelegation,
@@ -87,7 +73,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchMoreDelegations: fetchNextPage,
     }),
     [
-      delegations,
+      data?.delegations,
       isFetchingNextPage,
       hasNextPage,
       addDelegation,
@@ -100,18 +86,3 @@ export function DelegationV2State({ children }: PropsWithChildren) {
 }
 
 export const useDelegationV2State = useState;
-
-function areDelegationsEqual(
-  arr1: DelegationV2[],
-  arr2: DelegationV2[],
-): boolean {
-  if (arr1.length !== arr2.length) return false;
-
-  return arr1.every((item, index) => {
-    const other = arr2[index];
-    return (
-      item.stakingTxHashHex === other.stakingTxHashHex &&
-      item.state === other.state
-    );
-  });
-}

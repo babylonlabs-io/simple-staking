@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import { useInscriptionProvider } from "@babylonlabs-io/bbn-wallet-connect";
+import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
 import { useOrdinals } from "@/app/hooks/api/useOrdinals";
@@ -41,7 +42,8 @@ const { StateProvider, useState: useApplicationState } =
   });
 
 export function AppState({ children }: PropsWithChildren) {
-  const [ordinalsExcluded, setOrdinalsExcluded] = useState(true);
+  const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
+    useInscriptionProvider();
 
   // States
   const {
@@ -101,8 +103,14 @@ export function AppState({ children }: PropsWithChildren) {
   );
 
   // Handlers
-  const includeOrdinals = useCallback(() => setOrdinalsExcluded(false), []);
-  const excludeOrdinals = useCallback(() => setOrdinalsExcluded(true), []);
+  const includeOrdinals = useCallback(
+    () => toggleLockInscriptions?.(false),
+    [toggleLockInscriptions],
+  );
+  const excludeOrdinals = useCallback(
+    () => toggleLockInscriptions?.(true),
+    [toggleLockInscriptions],
+  );
 
   // Context
   const context = useMemo(

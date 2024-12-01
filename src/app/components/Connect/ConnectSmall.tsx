@@ -20,12 +20,14 @@ interface ConnectSmallProps {
   loading?: boolean;
   onConnect: () => void;
   address: string;
+  connected: boolean;
   btcWalletBalanceSat?: number;
   onDisconnect: () => void;
 }
 
 export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   loading = false,
+  connected,
   onConnect,
   address,
   btcWalletBalanceSat,
@@ -64,7 +66,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
     );
   };
 
-  return address ? (
+  return connected ? (
     <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>
       <button
         className="flex cursor-pointer outline-none items-stretch"
@@ -143,7 +145,7 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
         onClick={onConnect}
         // Disable the button if the user is already connected
         // or: API is not available, geo-blocked, or has an error
-        disabled={Boolean(address) || !isApiNormal}
+        disabled={connected || !isApiNormal}
       >
         <PiWalletBold size={20} className="flex md:hidden" />
         <span className="hidden md:flex">Connect Wallets</span>

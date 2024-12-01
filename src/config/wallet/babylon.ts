@@ -1,6 +1,6 @@
 // Temporary solution until we have a stable chain registry
 // The values here shall match from https://rpc.devnet.babylonlabs.io/genesis?
-export const keplrRegistry = {
+export const bbnDevnet = {
   chainId: "devnet-7",
   chainName: "Babylon Devnet 7",
   chainSymbolImageUrl:
