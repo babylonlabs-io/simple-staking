@@ -5,7 +5,7 @@ import { StatItem } from "../Stats/StatItem";
 export function PersonalBalance() {
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
-      <Heading variant="h5" className="text-primary-dark md:text-4xl">
+      <Heading variant="h4" className="text-primary-dark md:text-4xl">
         Wallet Balance
       </Heading>
       <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">

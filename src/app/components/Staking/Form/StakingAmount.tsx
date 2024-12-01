@@ -1,4 +1,7 @@
+import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+import { FaBitcoin } from "react-icons/fa6";
+import { twJoin } from "tailwind-merge";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
@@ -118,24 +121,61 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   return (
     <label className="form-control w-full flex-1">
       <div className="label pt-0">
-        <span className="label-text-alt text-base">Amount</span>
-        <span className="label-text-alt opacity-50">
-          min/max: {minStakeAmount}/{maxStakeAmount} {coinName}
-        </span>
+        <Heading variant="h6" className="text-xl text-primary-dark">
+          Amount
+        </Heading>
       </div>
-      <input
-        type="string"
-        className={`no-focus input input-bordered w-full ${error ? "input-error" : ""}`}
-        value={value}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        placeholder={coinName}
-      />
-      {error && (
-        <div className="my-2 min-h-[20px]">
-          <p className="text-center text-sm text-error">{error}</p>
+      <div className={"flex flex-col gap-6"}>
+        <div className="flex flex-col">
+          <div
+            className={twJoin(
+              "flex flex-col gap-2 border rounded border-primary-light p-3",
+              error ? "border-error-main" : "",
+            )}
+          >
+            <div className="flex flex-row items-center">
+              <input
+                type="string"
+                className={twJoin(
+                  "no-focus w-full bg-transparent",
+                  error ? "text-error-main" : "",
+                )}
+                value={value}
+                onChange={handleChange}
+                onBlur={handleBlur}
+              />
+              <div className="flex flex-row items-center p-1 border rounded-[100px] border-primary-light/20">
+                <FaBitcoin size={24} className="text-secondary-main" />
+                <Text variant="body1" className="text-sm px-2 py-1">
+                  BTC
+                </Text>
+              </div>
+            </div>
+            <div className="flex flex-row items-center justify-between text-primary-light">
+              <Text variant="body1" className="text-xs">
+                $90,000.42
+              </Text>
+              <div className="flex flex-row items-center gap-2">
+                <Text variant="body1" className="text-xs">
+                  10.0000 BTC
+                </Text>
+                <Button
+                  size="small"
+                  color="secondary"
+                  className="bg-primary-contrast text-xs h-5"
+                >
+                  Max
+                </Button>
+              </div>
+            </div>
+          </div>
+          {error && (
+            <div className="my-2 min-h-[20px]">
+              <p className="text-center text-sm text-error-main">{error}</p>
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </label>
   );
 };
