@@ -135,7 +135,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
           >
             <div className="flex flex-row items-center">
               <input
-                type="string"
+                type="number"
                 className={twJoin(
                   "no-focus w-full bg-transparent",
                   error ? "text-error-main" : "",
