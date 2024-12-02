@@ -1,6 +1,6 @@
 "use client";
 import {
-  BTCProvider,
+  IBTCProvider,
   useChainConnector,
   useWalletConnect,
   UTXO,
@@ -76,7 +76,7 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
 });
 
 export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
-  const [btcWalletProvider, setBTCWalletProvider] = useState<BTCProvider>();
+  const [btcWalletProvider, setBTCWalletProvider] = useState<IBTCProvider>();
   const [network, setNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
   const [address, setAddress] = useState("");
@@ -93,7 +93,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const connectBTC = useCallback(
-    async (walletProvider: BTCProvider | null) => {
+    async (walletProvider: IBTCProvider | null) => {
       if (!walletProvider) return;
 
       const supportedNetworkMessage =
@@ -147,7 +147,9 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     const unsubscribe = btcConnector?.on("connect", (wallet) => {
-      connectBTC(wallet.provider);
+      if (wallet.provider) {
+        connectBTC(wallet.provider);
+      }
     });
 
     return unsubscribe;
