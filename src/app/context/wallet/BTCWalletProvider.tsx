@@ -187,7 +187,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.getUtxos(address, amount) ?? [],
       getBTCTipHeight: async () => btcWalletProvider?.getBTCTipHeight() ?? 0,
       getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
-        btcWalletProvider?.getInscriptions() ?? [],
+        btcWalletProvider?.getInscriptions().catch(() => []) ?? [],
     }),
     [btcWalletProvider],
   );

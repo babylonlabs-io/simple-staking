@@ -43,7 +43,7 @@ const createProvider = (provider: BTCProvider): IBTCProvider => {
             vout: ordinal.outputValue,
           })),
         )
-        .catch((e) => []),
+        .catch(() => []),
   };
 };
 

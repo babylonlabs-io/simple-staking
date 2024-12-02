@@ -18,7 +18,8 @@ const createProvider = (provider: CosmosProvider): IBBNProvider => {
     connectWallet: async () => void provider.connectWallet(),
     getAddress: () => provider.getAddress(),
     getPublicKeyHex: async () => "",
-    getSigningStargateClient: () => provider.getSigningStargateClient(),
+    getSigningStargateClient: (options) =>
+      provider.getSigningStargateClient(options),
     getBalance: (searchDenom) => provider.getBalance(searchDenom),
   };
 };
@@ -41,14 +42,14 @@ export const TomoBBNConnector = memo(() => {
   }, [tomoWalletState.cosmos, walletList]);
 
   const connect = useCallback(
-    async (btcWallet: any, btcProvider: CosmosProvider) => {
+    async (bbnWallet: any, bbnProvider: CosmosProvider) => {
       if (!connector) return;
 
       const wallet = createExternalWallet({
         id: "tomo-bbn-connector",
-        name: btcWallet.name,
-        icon: btcWallet.img,
-        provider: createProvider(btcProvider),
+        name: bbnWallet.name,
+        icon: bbnWallet.img,
+        provider: createProvider(bbnProvider),
       });
 
       await connector.connect(wallet);

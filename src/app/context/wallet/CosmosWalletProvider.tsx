@@ -1,4 +1,5 @@
 "use client";
+
 import {
   BBNProvider,
   useChainConnector,
@@ -17,6 +18,7 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
+import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 interface CosmosWalletContextProps {
   bech32Address: string;
@@ -59,7 +61,9 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const address = await provider.getAddress();
-        const client = await provider.getSigningStargateClient();
+        const client = await provider.getSigningStargateClient({
+          registry: createBbnRegistry(),
+        });
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);

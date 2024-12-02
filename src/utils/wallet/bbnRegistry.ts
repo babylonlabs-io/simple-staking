@@ -29,7 +29,7 @@ const createGeneratedType = <T>(messageType: any): GeneratedType => {
 };
 
 // Create the registry with the protos to register
-export const getBbnRegistry = (): Registry => {
+export const createBbnRegistry = (): Registry => {
   const registry = new Registry();
 
   protosToRegister.forEach((proto) => {
