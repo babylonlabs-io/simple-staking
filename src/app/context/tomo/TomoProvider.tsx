@@ -27,14 +27,14 @@ export const TomoConnectionProvider = ({ children }: PropsWithChildren) => {
       cosmosChains={[
         {
           id: 2,
-          name: "Babylon Devnet 7",
+          name: bbnDevnet.chainName,
           type: "cosmos",
-          network: "devnet-7",
+          network: bbnDevnet.chainId,
           modularData: bbnDevnet,
           backendUrls: {
-            rpcRrl: "https://rpc.devnet.babylonlabs.io",
+            rpcRrl: bbnDevnet.rpc,
           },
-          logo: "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
+          logo: bbnDevnet.chainSymbolImageUrl,
         },
       ]}
       style={{
