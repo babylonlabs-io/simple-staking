@@ -18,9 +18,7 @@ export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   useEffect(() => {
-    if (debouncedSearchTerm) {
-      onSearch(debouncedSearchTerm);
-    }
+    onSearch(debouncedSearchTerm ?? "");
   }, [debouncedSearchTerm, onSearch]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
