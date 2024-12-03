@@ -15,7 +15,7 @@ import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
  * interacting with Babylon RPC nodes
  */
 export const useBbnQueryClient = () => {
-  const { bech32Address } = useCosmosWallet();
+  const { bech32Address, connected } = useCosmosWallet();
   const [queryClient, setQueryClient] = useState<QueryClient>();
 
   useEffect(() => {
@@ -35,7 +35,7 @@ export const useBbnQueryClient = () => {
   const getRewards = useCallback(async (): Promise<
     incentivequery.QueryRewardGaugesResponse | undefined
   > => {
-    if (!queryClient || !bech32Address) {
+    if (!connected || !queryClient || !bech32Address) {
       return undefined;
     }
     const { incentive } = setupIncentiveExtension(queryClient);
@@ -46,17 +46,17 @@ export const useBbnQueryClient = () => {
       });
 
     return incentive.RewardGauges(req);
-  }, [queryClient, bech32Address]);
+  }, [connected, queryClient, bech32Address]);
 
   const getBalance = useCallback(async (): Promise<number> => {
-    if (!queryClient || !bech32Address) {
+    if (!connected || !queryClient || !bech32Address) {
       return 0;
     }
 
     const { bank } = setupBankExtension(queryClient);
     const balance = await bank.balance(bech32Address, "ubbn");
     return Number(balance?.amount ?? 0);
-  }, [queryClient, bech32Address]);
+  }, [connected, queryClient, bech32Address]);
 
   return {
     getRewards,

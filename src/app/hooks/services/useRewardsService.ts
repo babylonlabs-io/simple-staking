@@ -10,11 +10,7 @@ import { useBbnTransaction } from "../client/query/useBbnTransaction";
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
 
 export const useRewardsService = () => {
-  const {
-    connected: cosmosConnected,
-    bech32Address,
-    signingStargateClient,
-  } = useCosmosWallet();
+  const { bech32Address } = useCosmosWallet();
 
   const { getRewards: getBbnRewards } = useBbnQueryClient();
   const { estimateBbnGasFee, sendBbnTx } = useBbnTransaction();
@@ -24,9 +20,6 @@ export const useRewardsService = () => {
    * @returns {Promise<number>} The rewards from the user's account.
    */
   const getRewards = useCallback(async (): Promise<number> => {
-    if (!cosmosConnected || !bech32Address || !signingStargateClient) {
-      return 0;
-    }
     const rewards = await getBbnRewards();
     if (!rewards) {
       return 0;
@@ -45,35 +38,27 @@ export const useRewardsService = () => {
       coins.reduce((acc, coin) => acc + Number(coin.amount), 0) -
       (withdrawnCoins || 0)
     );
-  }, [cosmosConnected, bech32Address, signingStargateClient, getBbnRewards]);
+  }, [getBbnRewards]);
 
   /**
    * Estimates the gas fee for claiming rewards.
    * @returns {Promise<number>} The gas fee for claiming rewards.
    */
   const estimateClaimRewardsGas = useCallback(async (): Promise<number> => {
-    if (!signingStargateClient || !bech32Address) {
-      return 0;
-    }
-
     const withdrawRewardMsg = createWithdrawRewardMsg(bech32Address);
 
     const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
     return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
-  }, [signingStargateClient, bech32Address, estimateBbnGasFee]);
+  }, [bech32Address, estimateBbnGasFee]);
 
   /**
    * Claims the rewards from the user's account.
    */
   const claimRewards = useCallback(async () => {
-    if (!signingStargateClient || !bech32Address) {
-      return;
-    }
-
     const msg = createWithdrawRewardMsg(bech32Address);
 
     await sendBbnTx(msg);
-  }, [bech32Address, signingStargateClient, sendBbnTx]);
+  }, [bech32Address, sendBbnTx]);
 
   return {
     getRewards,
