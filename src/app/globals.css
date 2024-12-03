@@ -108,6 +108,10 @@ body.modal-open {
   word-wrap: break-word;
 }
 
+body > .tomo-social {
+  z-index: 100 !important;
+}
+
 @font-face {
   font-family: "Px Grotesk";
   src: url("/fonts/Px-Grotesk/Px-Grotesk-Black.eot");

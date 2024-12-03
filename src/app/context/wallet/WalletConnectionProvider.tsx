@@ -1,17 +1,31 @@
 "use client";
 
-import { Network, WalletProvider } from "@babylonlabs-io/bbn-wallet-connect";
+import {
+  ChainConfigArr,
+  Network,
+  WalletProvider,
+} from "@babylonlabs-io/bbn-wallet-connect";
 import { type PropsWithChildren } from "react";
 
+import { ConnectButton } from "@/app/context/tomo/ConnectButton";
+import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
 import { ErrorState } from "@/app/types/errors";
 import { bbnDevnet } from "@/config/wallet/babylon";
 
 import { useError } from "../Error/ErrorContext";
+import { TomoBBNConnector } from "../tomo/BBNConnector";
+import { TomoBTCConnector } from "../tomo/BTCConnector";
 
 const context = typeof window !== "undefined" ? window : {};
-const config = [
+const config: ChainConfigArr = [
   {
     chain: "BTC",
+    connectors: [
+      {
+        id: "tomo-btc-connector",
+        widget: () => <ConnectButton chainName="bitcoin" />,
+      },
+    ],
     config: {
       coinName: "Signet BTC",
       coinSymbol: "sBTC",
@@ -22,6 +36,12 @@ const config = [
   },
   {
     chain: "BBN",
+    connectors: [
+      {
+        id: "tomo-bbn-connector",
+        widget: () => <ConnectButton chainName="cosmos" />,
+      },
+    ],
     config: {
       chainId: bbnDevnet.chainId,
       rpc: bbnDevnet.rpc,
@@ -44,8 +64,12 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   };
 
   return (
-    <WalletProvider config={config} context={context} onError={handleError}>
-      {children}
-    </WalletProvider>
+    <TomoConnectionProvider>
+      <WalletProvider config={config} context={context} onError={handleError}>
+        <TomoBTCConnector />
+        <TomoBBNConnector />
+        {children}
+      </WalletProvider>
+    </TomoConnectionProvider>
   );
 };
