@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import type { DelegationV2StakingState } from "@/app/types/delegationsV2";
+import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -20,7 +20,7 @@ interface TxProps {
     covenantBtcPkHex: string;
     signatureHex: string;
   }[];
-  state: DelegationV2StakingState;
+  state: State;
   stakingInput: {
     finalityProviderPkNoCoordHex: string;
     stakingAmountSat: number;
@@ -39,7 +39,7 @@ export function useDelegationService() {
     hasMoreDelegations,
     isLoading,
     findDelegationByTxHash,
-    addDelegation,
+    updateDelegationStatus,
   } = useDelegationV2State();
 
   const {
@@ -47,27 +47,33 @@ export function useDelegationService() {
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
-    createDelegationEoi,
   } = useTransactionService();
 
   const COMMANDS: Record<ActionType, DelegationCommand> = useMemo(
     () => ({
-      [ACTIONS.STAKE]: ({
+      [ACTIONS.STAKE]: async ({
         stakingInput,
         paramsVersion,
         stakingTxHashHex,
         stakingTxHex,
-      }: TxProps) =>
-        submitStakingTx(
+      }: TxProps) => {
+        await submitStakingTx(
           stakingInput,
           paramsVersion,
           stakingTxHashHex,
           stakingTxHex,
-        ),
+        );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
+        );
+      },
 
       [ACTIONS.UNBOUND]: async ({
         stakingInput,
         paramsVersion,
+        stakingTxHashHex,
         stakingTxHex,
         unbondingTxHex,
         covenantUnbondingSignatures,
@@ -86,34 +92,54 @@ export function useDelegationService() {
             sigHex: sig.signatureHex,
           })),
         );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_UNBONDING_SUBMITTED,
+        );
       },
 
-      [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING]: ({
+      [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING]: async ({
+        stakingTxHashHex,
         stakingInput,
         paramsVersion,
         unbondingTxHex,
-      }: TxProps) =>
-        submitEarlyUnbondedWithdrawalTx(
+      }: TxProps) => {
+        await submitEarlyUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
           unbondingTxHex,
-        ),
+        );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED,
+        );
+      },
 
       [ACTIONS.WITHDRAW_ON_TIMELOCK]: async ({
         stakingInput,
         paramsVersion,
         stakingTxHex,
-      }: TxProps) =>
-        submitTimelockUnbondedWithdrawalTx(
+        stakingTxHashHex,
+      }: TxProps) => {
+        await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
           stakingTxHex,
-        ),
+        );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED,
+        );
+      },
 
       [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING]: async ({
         stakingInput,
         paramsVersion,
         unbondingSlashingTxHex,
+        stakingTxHashHex,
       }) => {
         if (!unbondingSlashingTxHex) {
           throw new Error(
@@ -125,12 +151,18 @@ export function useDelegationService() {
           paramsVersion,
           unbondingSlashingTxHex,
         );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED,
+        );
       },
 
       [ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING]: async ({
         stakingInput,
         paramsVersion,
         slashingTxHex,
+        stakingTxHashHex,
       }) => {
         if (!slashingTxHex) {
           throw new Error("Slashing tx not found, can't submit withdrawal");
@@ -140,9 +172,15 @@ export function useDelegationService() {
           paramsVersion,
           slashingTxHex,
         );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED,
+        );
       },
     }),
     [
+      updateDelegationStatus,
       submitStakingTx,
       submitUnbondingTx,
       submitEarlyUnbondedWithdrawalTx,

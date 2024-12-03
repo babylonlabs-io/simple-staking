@@ -50,8 +50,6 @@ export enum DelegationV2StakingState {
 
   // Slashed states
   SLASHED = "SLASHED",
-  EARLY_UNBONDING_SLASHED = "EARLY_UNBONDING_SLASHED",
-  TIMELOCK_SLASHED = "TIMELOCK_SLASHED",
 
   // Intermediate states
   INTERMEDIATE_PENDING_VERIFICATION = "INTERMEDIATE_PENDING_VERIFICATION",
@@ -65,32 +63,30 @@ export enum DelegationV2StakingState {
 
 export const DELEGATION_STATUSES = {
   [DelegationV2StakingState.PENDING]: 0,
-  [DelegationV2StakingState.INTERMEDIATE_PENDING_VERIFICATION]: 0,
+  [DelegationV2StakingState.INTERMEDIATE_PENDING_VERIFICATION]: 0.5,
   [DelegationV2StakingState.VERIFIED]: 1,
-  [DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: 2,
-  [DelegationV2StakingState.ACTIVE]: 3,
+  [DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: 1.5,
+  [DelegationV2StakingState.ACTIVE]: 2,
 
-  [DelegationV2StakingState.INTERMEDIATE_UNBONDING_SUBMITTED]: 4,
-  [DelegationV2StakingState.EARLY_UNBONDING]: 5,
-  [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: 6,
-  [DelegationV2StakingState.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: 7,
-  [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWN]: 8,
+  [DelegationV2StakingState.INTERMEDIATE_UNBONDING_SUBMITTED]: 2.5,
+  [DelegationV2StakingState.EARLY_UNBONDING]: 3,
+  [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: 4,
+  [DelegationV2StakingState.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: 4.5,
+  [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWN]: 5,
 
-  [DelegationV2StakingState.SLASHED]: 9,
-  [DelegationV2StakingState.EARLY_UNBONDING_SLASHED]: 9,
-  [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: 10,
-  [DelegationV2StakingState.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED]: 11,
-  [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWN]: 12,
+  [DelegationV2StakingState.SLASHED]: 4,
+  [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: 5,
+  [DelegationV2StakingState.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED]: 5.5,
+  [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWN]: 6,
 
-  [DelegationV2StakingState.TIMELOCK_UNBONDING]: 13,
-  [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: 14,
-  [DelegationV2StakingState.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED]: 15,
-  [DelegationV2StakingState.TIMELOCK_WITHDRAWN]: 16,
+  [DelegationV2StakingState.TIMELOCK_UNBONDING]: 3,
+  [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: 4,
+  [DelegationV2StakingState.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED]: 4.5,
+  [DelegationV2StakingState.TIMELOCK_WITHDRAWN]: 5,
 
-  [DelegationV2StakingState.TIMELOCK_SLASHED]: 17,
-  [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: 18,
-  [DelegationV2StakingState.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED]: 19,
-  [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWN]: 20,
+  [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: 5,
+  [DelegationV2StakingState.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED]: 5.5,
+  [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWN]: 6,
 } as const;
 
 export const getDelegationV2StakingState = (

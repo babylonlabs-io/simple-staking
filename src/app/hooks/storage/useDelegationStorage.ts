@@ -64,16 +64,14 @@ export function useDelegationStorage(
     function syncPendingDelegations() {
       if (!key) return;
 
-      setPendingDelegations((delegations) => {
-        const result = Object.values(delegations)
+      setPendingDelegations((delegations) =>
+        Object.values(delegations)
           .filter((d) => !delegationMap[d.stakingTxHashHex])
           .reduce(
             (acc, d) => ({ ...acc, [d.stakingTxHashHex]: d }),
             {} as Record<string, DelegationLike>,
-          );
-
-        return result;
-      });
+          ),
+      );
     },
     [key, delegationMap, setPendingDelegations],
   );
@@ -86,8 +84,8 @@ export function useDelegationStorage(
         Object.entries(statuses)
           .filter(
             ([hash, status]) =>
-              DELEGATION_STATUSES[status] <
-              DELEGATION_STATUSES[delegationMap[hash].state],
+              DELEGATION_STATUSES[delegationMap[hash].state] <
+              DELEGATION_STATUSES[status],
           )
           .reduce(
             (acc, [hash, status]) => ({ ...acc, [hash]: status }),
