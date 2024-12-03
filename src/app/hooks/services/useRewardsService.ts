@@ -4,7 +4,7 @@ import { useCallback } from "react";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
-import { useBbnQuery } from "../client/query/useBbnQuery";
+import { useBbnQueryClient } from "../client/query/useBbnQueryClient";
 import { useBbnTransaction } from "../client/query/useBbnTransaction";
 
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
@@ -16,7 +16,7 @@ export const useRewardsService = () => {
     signingStargateClient,
   } = useCosmosWallet();
 
-  const { getRewards: getBbnRewards } = useBbnQuery();
+  const { getRewards: getBbnRewards } = useBbnQueryClient();
   const { estimateBbnGasFee, sendBbnTx } = useBbnTransaction();
 
   /**
@@ -72,8 +72,7 @@ export const useRewardsService = () => {
 
     const msg = createWithdrawRewardMsg(bech32Address);
 
-    const { txHash } = await sendBbnTx(msg);
-    console.log("successfully claimed rewards with txHash", txHash);
+    await sendBbnTx(msg);
   }, [bech32Address, signingStargateClient, sendBbnTx]);
 
   return {

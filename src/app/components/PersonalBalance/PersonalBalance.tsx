@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { useBbnQueryClient } from "@/app/hooks/client/query/useBbnQueryClient";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
@@ -11,12 +12,9 @@ import { StatItem } from "../Stats/StatItem";
 
 export function PersonalBalance() {
   const { getBalance: getBTCBalance, connected: btcConnected } = useBTCWallet();
-  const {
-    signingStargateClient,
-    connected: cosmosConnected,
-    bech32Address,
-  } = useCosmosWallet();
+  const { connected: cosmosConnected } = useCosmosWallet();
 
+  const { getBalance } = useBbnQueryClient();
   const { getRewards } = useRewardsService();
   const [rewards, setRewards] = useState<number>();
   const [btcBalance, setBTCBalance] = useState<number>();
@@ -33,17 +31,13 @@ export function PersonalBalance() {
       setBTCBalance(balance);
     };
     const fetchCosmosBalance = async () => {
-      const balance = await signingStargateClient?.getBalance(
-        bech32Address,
-        "ubbn",
-      );
-      const bbnAmount = Number(balance?.amount ?? 0);
+      const bbnAmount = await getBalance();
       setCosmosBalance(bbnAmount);
     };
     fetchRewards();
     fetchBTCBalance();
     fetchCosmosBalance();
-  }, [getRewards, getBTCBalance, signingStargateClient, bech32Address]);
+  }, [getRewards, getBTCBalance, getBalance]);
 
   if (!btcConnected || !cosmosConnected) {
     return null;

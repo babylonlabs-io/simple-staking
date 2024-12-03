@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { useSigningStargateClient } from "./useSigningStargateClient";
 
 export interface BbnGasFee {
   amount: { denom: string; amount: string }[];
@@ -12,7 +12,7 @@ export interface BbnGasFee {
  * interacting with Babylon RPC nodes
  */
 export const useBbnTransaction = () => {
-  const { signingStargateClient, bech32Address } = useCosmosWallet();
+  const { simulate, signAndBroadcast } = useSigningStargateClient();
 
   /**
    * Estimates the gas fee for a transaction.
@@ -21,16 +21,7 @@ export const useBbnTransaction = () => {
    */
   const estimateBbnGasFee = useCallback(
     async <T>(msg: { typeUrl: string; value: T }): Promise<BbnGasFee> => {
-      if (!signingStargateClient || !bech32Address) {
-        throw new Error("Wallet not connected");
-      }
-
-      // estimate gas
-      const gasEstimate = await signingStargateClient.simulate(
-        bech32Address,
-        [msg],
-        `estimate transaction fee for ${msg.typeUrl}`,
-      );
+      const gasEstimate = await simulate(msg);
       // TODO: The gas calculation need to be improved
       // https://github.com/babylonlabs-io/simple-staking/issues/320
       const gasWanted = Math.ceil(gasEstimate * 1.5);
@@ -39,7 +30,7 @@ export const useBbnTransaction = () => {
         gas: gasWanted.toString(),
       };
     },
-    [signingStargateClient, bech32Address],
+    [simulate],
   );
 
   /**
@@ -48,34 +39,13 @@ export const useBbnTransaction = () => {
    * @returns {Promise<Object>} - The transaction hash and gas used.
    */
   const sendBbnTx = useCallback(
-    async <T extends object>(msg: {
-      typeUrl: string;
-      value: T;
-    }): Promise<{ txHash: string; gasUsed: string }> => {
-      if (!signingStargateClient || !bech32Address) {
-        throw new Error("Wallet not connected");
-      }
-
+    async <T extends object>(msg: { typeUrl: string; value: T }) => {
       // estimate gas
       const fee = await estimateBbnGasFee(msg);
-
       // sign it
-      const res = await signingStargateClient.signAndBroadcast(
-        bech32Address,
-        [msg],
-        fee,
-      );
-      if (res.code !== 0) {
-        throw new Error(
-          `Failed to send ${msg.typeUrl} transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
-        );
-      }
-      return {
-        txHash: res.transactionHash,
-        gasUsed: res.gasUsed.toString(),
-      };
+      await signAndBroadcast(msg, fee);
     },
-    [signingStargateClient, bech32Address, estimateBbnGasFee],
+    [estimateBbnGasFee, signAndBroadcast],
   );
 
   return {
