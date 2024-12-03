@@ -1,5 +1,5 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
@@ -10,34 +10,34 @@ import { satoshiToBtc } from "@/utils/btc";
 
 import { StatItem } from "../Stats/StatItem";
 
+const QUERY_KEYS = {
+  REWARDS: ["REWARDS"],
+  BTC_BALANCE: ["BTC_BALANCE"],
+  COSMOS_BALANCE: ["COSMOS_BALANCE"],
+};
+
 export function PersonalBalance() {
   const { getBalance: getBTCBalance, connected: btcConnected } = useBTCWallet();
   const { connected: cosmosConnected } = useCosmosWallet();
 
   const { getBalance } = useBbnQueryClient();
   const { getRewards } = useRewardsService();
-  const [rewards, setRewards] = useState<number>();
-  const [btcBalance, setBTCBalance] = useState<number>();
-  const [cosmosBalance, setCosmosBalance] = useState<number>();
   const { claimRewards } = useRewardsService();
 
-  useEffect(() => {
-    const fetchRewards = async () => {
-      const result = await getRewards();
-      setRewards(result);
-    };
-    const fetchBTCBalance = async () => {
-      const balance = await getBTCBalance();
-      setBTCBalance(balance);
-    };
-    const fetchCosmosBalance = async () => {
-      const bbnAmount = await getBalance();
-      setCosmosBalance(bbnAmount);
-    };
-    fetchRewards();
-    fetchBTCBalance();
-    fetchCosmosBalance();
-  }, [getRewards, getBTCBalance, getBalance]);
+  const { data: rewards } = useQuery({
+    queryKey: [QUERY_KEYS.REWARDS],
+    queryFn: getRewards,
+  });
+
+  const { data: btcBalance } = useQuery({
+    queryKey: [QUERY_KEYS.BTC_BALANCE],
+    queryFn: getBTCBalance,
+  });
+
+  const { data: cosmosBalance } = useQuery({
+    queryKey: [QUERY_KEYS.COSMOS_BALANCE],
+    queryFn: getBalance,
+  });
 
   if (!btcConnected || !cosmosConnected) {
     return null;
