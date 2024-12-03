@@ -26,7 +26,7 @@ export const Stats = memo(() => {
 
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
-      <Heading variant="h4" className="text-primary-contrast md:text-4xl">
+      <Heading variant="h5" className="text-primary-contrast md:text-4xl">
         Babylon Stats
       </Heading>
       <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">

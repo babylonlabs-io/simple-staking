@@ -1,6 +1,4 @@
-import { Button, Text } from "@babylonlabs-io/bbn-core-ui";
 import { useEffect, useState } from "react";
-import { FaPen } from "react-icons/fa6";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";
@@ -50,58 +48,31 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
   const defaultModeRender = () => {
     return (
-      <div className="flex flex-col gap-6">
-        {mempoolFeeRates ? (
-          <>
-            <div className="flex flex-row items-center justify-between text-primary-dark">
-              <Text variant="body1">Network Fee Rate</Text>
-              <div className="flex flex-row gap-2 items-center">
-                <Text variant="body1">{defaultFeeRate} Sats/vB</Text>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  className="pl-1 w-6 h-6"
-                >
-                  <FaPen size={16} />
-                </Button>
-              </div>
+      <div className="flex flex-col justify-center gap-1 items-center">
+        <div className="min-h-8 flex justify-center flex-col items-center">
+          {mempoolFeeRates ? (
+            <div>
+              <p>
+                Recommended fee rate: <strong>{defaultFeeRate} sats/vB</strong>
+              </p>
+              <p>
+                Transaction fee amount:{" "}
+                <strong>
+                  {satoshiToBtc(stakingFeeSat)} {coinName}
+                </strong>
+              </p>
             </div>
-            <div className="flex flex-row items-start justify-between text-primary-dark">
-              <Text variant="body1">Bitcoin Network Fee</Text>
-              <div className="flex flex-col items-end justify-center">
-                <Text variant="body1">0.00000025</Text>
-                <Text variant="body1" className="text-primary-light text-sm">
-                  $0.02
-                </Text>
-              </div>
-            </div>
-            <div className="flex flex-row items-start justify-between text-primary-dark">
-              <Text variant="body1">Babylon Network Fee</Text>
-              <div className="flex flex-col items-end justify-center">
-                <Text variant="body1">2.0000</Text>
-                <Text variant="body1" className="text-primary-light text-sm">
-                  $0.02
-                </Text>
-              </div>
-            </div>
-            <div className="divider mx-0 my-0" />
-            <div className="flex flex-row items-start justify-between text-primary-dark">
-              <Text variant="body1" className="font-bold">
-                Total
-              </Text>
-              <div className="flex flex-col items-end justify-center">
-                <Text variant="body1" className="font-bold">
-                  0.004
-                </Text>
-                <Text variant="body1" className="text-primary-light text-sm">
-                  $370.03
-                </Text>
-              </div>
-            </div>
-          </>
-        ) : (
-          <LoadingSmall text="Loading recommended fee rate..." />
-        )}
+          ) : (
+            <LoadingSmall text="Loading recommended fee rate..." />
+          )}
+        </div>
+        <button
+          className="btn btn-sm btn-link no-underline"
+          onClick={() => setCustomMode(true)}
+          disabled={!mempoolFeeRates || !stakingFeeSat}
+        >
+          Use Custom
+        </button>
       </div>
     );
   };

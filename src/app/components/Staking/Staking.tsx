@@ -1,7 +1,5 @@
-import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { MdErrorOutline } from "react-icons/md";
 import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -31,6 +29,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { StakingAmount } from "./Form/StakingAmount";
 import { StakingFee } from "./Form/StakingFee";
+import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import apiNotAvailable from "./Form/States/api-not-available.svg";
@@ -453,115 +452,85 @@ export const Staking = () => {
         signReady && feeRate && availableUTXOs && stakingAmountSat;
 
       return (
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4">
-            <Heading variant="h5" className="text-primary-dark">
-              Step 2
-            </Heading>
-            <Text variant="body1" className="text-primary-light">
-              Set Staking Amount
-            </Text>
-            <div className="rounded bg-[#F9F9F9] flex flex-row items-start justify-between py-2 px-4 text-primary-light">
-              <div className="py-2 pr-3">
-                <MdErrorOutline size={22} />
-              </div>
-              <div className="flex flex-col gap-1 grow">
-                <Text
-                  variant="subtitle1"
-                  className="font-medium text-primary-dark"
-                >
-                  Info
-                </Text>
-                <Text variant="body1">
-                  You can unbond and withdraw your stake anytime with an
-                  unbonding time of 7 days.
-                </Text>
-                <a
-                  href="#"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-secondary-main hover:text-primary-main"
-                >
-                  Learn More
-                </a>
-              </div>
-            </div>
+        <>
+          <p>
+            <strong>Step-2:</strong> Set up staking terms
+          </p>
+          <div className="flex flex-1 flex-col">
             <div className="flex flex-1 flex-col">
-              <div className="flex flex-1 flex-col">
-                <StakingAmount
-                  minStakingAmountSat={minStakingAmountSat}
-                  maxStakingAmountSat={maxStakingAmountSat}
-                  btcWalletBalanceSat={btcWalletBalanceSat}
-                  onStakingAmountSatChange={handleStakingAmountSatChange}
-                  reset={resetFormInputs}
-                />
-                {signReady && (
-                  <StakingFee
-                    mempoolFeeRates={mempoolFeeRates}
-                    stakingFeeSat={stakingFeeSat}
-                    selectedFeeRate={selectedFeeRate}
-                    onSelectedFeeRateChange={setSelectedFeeRate}
-                    reset={resetFormInputs}
-                  />
-                )}
-              </div>
-              <span
-                className="cursor-pointer text-xs"
-                data-tooltip-id="tooltip-staking-preview"
-                data-tooltip-content={signNotReadyReason}
-                data-tooltip-place="top"
-              >
-                <Button
-                  size="large"
-                  fluid={true}
-                  disabled={!previewReady}
-                  onClick={() => setPreviewModalOpen(true)}
-                >
-                  Preview
-                </Button>
-                <Tooltip
-                  id="tooltip-staking-preview"
-                  className="tooltip-wrap"
-                />
-              </span>
-              {previewReady && (
-                <PreviewModal
-                  isOpen={previewModalOpen}
-                  onClose={handlePreviewModalClose}
-                  onSign={handleDelegationEoiCreation}
-                  finalityProvider={finalityProvider?.description.moniker}
-                  finalityProviderAvatar={
-                    finalityProvider?.description.identity
-                  }
-                  stakingAmountSat={stakingAmountSat}
-                  stakingTimeBlocks={stakingTimeBlocksWithFixed}
+              <StakingTime
+                minStakingTimeBlocks={minStakingTimeBlocks}
+                maxStakingTimeBlocks={maxStakingTimeBlocks}
+                unbondingTimeBlocks={unbondingTime}
+                onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
+                reset={resetFormInputs}
+              />
+              <StakingAmount
+                minStakingAmountSat={minStakingAmountSat}
+                maxStakingAmountSat={maxStakingAmountSat}
+                btcWalletBalanceSat={btcWalletBalanceSat}
+                onStakingAmountSatChange={handleStakingAmountSatChange}
+                reset={resetFormInputs}
+              />
+              {signReady && (
+                <StakingFee
+                  mempoolFeeRates={mempoolFeeRates}
                   stakingFeeSat={stakingFeeSat}
-                  feeRate={feeRate}
-                  unbondingFeeSat={unbondingFeeSat}
-                  awaitingWalletResponse={awaitingWalletResponse}
+                  selectedFeeRate={selectedFeeRate}
+                  onSelectedFeeRateChange={setSelectedFeeRate}
+                  reset={resetFormInputs}
                 />
               )}
             </div>
+            <span
+              className="cursor-pointer text-xs"
+              data-tooltip-id="tooltip-staking-preview"
+              data-tooltip-content={signNotReadyReason}
+              data-tooltip-place="top"
+            >
+              <button
+                className="btn-primary btn mt-2 w-full"
+                disabled={!previewReady}
+                onClick={() => setPreviewModalOpen(true)}
+              >
+                Preview
+              </button>
+              <Tooltip id="tooltip-staking-preview" className="tooltip-wrap" />
+            </span>
+            {previewReady && (
+              <PreviewModal
+                isOpen={previewModalOpen}
+                onClose={handlePreviewModalClose}
+                onSign={handleDelegationEoiCreation}
+                finalityProvider={finalityProvider?.description.moniker}
+                finalityProviderAvatar={finalityProvider?.description.identity}
+                stakingAmountSat={stakingAmountSat}
+                stakingTimeBlocks={stakingTimeBlocksWithFixed}
+                stakingFeeSat={stakingFeeSat}
+                feeRate={feeRate}
+                unbondingFeeSat={unbondingFeeSat}
+                awaitingWalletResponse={awaitingWalletResponse}
+              />
+            )}
           </div>
-        </div>
+        </>
       );
     }
   };
 
   return (
-    <div className="card flex flex-col gap-2 p-4 lg:flex-1">
-      <Heading variant="h4" className="text-primary-dark md:text-4xl">
-        Bitcoin Staking
-      </Heading>
+    <div className="card flex flex-col gap-2 bg-base-300 p-4 shadow-sm lg:flex-1">
+      <h3 className="mb-4 font-bold">Staking</h3>
       <div className="flex flex-col gap-4 lg:flex-row">
-        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
+        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3">
           <FinalityProviders
             onFinalityProvidersLoad={setFinalityProviders}
             selectedFinalityProvider={finalityProvider}
             onFinalityProviderChange={handleChooseFinalityProvider}
           />
         </div>
-        <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
+        <div className="divider m-0 lg:divider-horizontal lg:m-0" />
+        <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3">
           {renderStakingForm()}
         </div>
       </div>
