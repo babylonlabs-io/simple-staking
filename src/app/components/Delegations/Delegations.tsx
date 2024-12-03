@@ -13,7 +13,7 @@ import {
 import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useDelegations } from "@/app/hooks/api/useDelegations";
+import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useDelegationState } from "@/app/state/DelegationState";
 import {

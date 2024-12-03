@@ -2,7 +2,7 @@ import { Button, Heading, Loader } from "@babylonlabs-io/bbn-core-ui";
 import { useCallback } from "react";
 import { BiSolidBadgeCheck } from "react-icons/bi";
 
-import { useDelegationV2 } from "@/app/hooks/api/useDelegationV2";
+import { useDelegationV2 } from "@/app/hooks/client/api/useDelegationV2";
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
 import { getNetworkConfig } from "@/config/network.config";

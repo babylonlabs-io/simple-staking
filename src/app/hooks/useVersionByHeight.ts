@@ -2,7 +2,7 @@ import { useMemo } from "react";
 
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 
-import { useVersions } from "./api/useVersions";
+import { useVersions } from "./client/api/useVersions";
 
 export function useVersionByHeight(height: number) {
   const { data: versions } = useVersions();

@@ -3,7 +3,7 @@ import { FaBitcoin } from "react-icons/fa";
 import { Tooltip } from "react-tooltip";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useNetworkInfo } from "@/app/hooks/api/useNetworkInfo";
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";

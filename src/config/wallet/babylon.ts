@@ -1,12 +1,15 @@
 // Temporary solution until we have a stable chain registry
+
+import { BBN_LCD_URL, BBN_RPC_URL } from "@/app/common/rpc";
+
 // The values here shall match from https://rpc.devnet.babylonlabs.io/genesis?
 export const bbnDevnet = {
   chainId: "devnet-7",
   chainName: "Babylon Devnet 7",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
-  rpc: "https://rpc-dapp.devnet.babylonlabs.io",
-  rest: "https://lcd-dapp.devnet.babylonlabs.io",
+  rpc: BBN_RPC_URL,
+  rest: BBN_LCD_URL,
   nodeProvider: {
     name: "Babylonlabs",
     email: "contact@babylonlabs.io",

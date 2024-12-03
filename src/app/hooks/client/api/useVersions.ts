@@ -1,5 +1,5 @@
 import { getGlobalParams } from "@/app/api/getGlobalParams";
-import { useAPIQuery } from "@/app/hooks/api/useApi";
+import { useAPIQuery } from "@/app/hooks/client/api/useApi";
 
 export const VERSIONS_KEY = "VERSIONS";
 

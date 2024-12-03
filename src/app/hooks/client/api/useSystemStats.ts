@@ -1,6 +1,6 @@
 import { getSystemStats } from "@/app/api/getSystemStats";
 import { ONE_MINUTE } from "@/app/constants";
-import { useAPIQuery } from "@/app/hooks/api/useApi";
+import { useAPIQuery } from "@/app/hooks/client/api/useApi";
 
 export const BTC_TIP_HEIGHT_KEY = "API_STATS";
 
