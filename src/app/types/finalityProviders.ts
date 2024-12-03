@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
-
 export interface FinalityProvider {
   description: Description;
   commission: string;
@@ -19,9 +17,7 @@ export interface Description {
 }
 
 export interface FinalityProvidersProps {
-  onFinalityProvidersLoad: Dispatch<
-    SetStateAction<FinalityProvider[] | undefined>
-  >;
+  onFinalityProvidersLoad: (finalityProviders: FinalityProvider[]) => void;
   selectedFinalityProvider: FinalityProvider | undefined;
   onFinalityProviderChange: (btcPkHex: string) => void;
 }

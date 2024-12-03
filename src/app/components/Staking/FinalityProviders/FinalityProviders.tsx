@@ -29,13 +29,15 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     fetchNextPage: finalityProvidersFetchNext,
     hasNextPage: finalityProvidersHasNext,
     isFetchingNextPage: finalityProvidersIsFetchingMore,
+    isFetching: isFetchingFinalityProviders,
+    isFetched: isFetchedFinalityProviders,
     error: finalityProvidersError,
     isError: hasFinalityProvidersError,
     refetch: refetchFinalityProvidersData,
     isRefetchError: isRefetchFinalityProvidersError,
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
-    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam, "random"),
+    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key
@@ -92,8 +94,10 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     handleError,
   ]);
 
-  const { handleSearch, filteredProviders } = useFinalityProvidersData(
+  const { handleSearch, filteredFinalityProviders } = useFinalityProvidersData(
     fps?.finalityProviders,
+    isFetchingFinalityProviders,
+    isFetchedFinalityProviders,
   );
 
   if (!fps?.finalityProviders?.length) {
@@ -120,13 +124,13 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
       >
         <InfiniteScroll
           className="flex flex-col gap-4"
-          dataLength={filteredProviders?.length || 0}
+          dataLength={filteredFinalityProviders?.length || 0}
           next={finalityProvidersFetchNext}
           hasMore={finalityProvidersHasNext}
           loader={finalityProvidersIsFetchingMore ? <LoadingTableList /> : null}
           scrollableTarget="finality-providers"
         >
-          {filteredProviders?.map((fp) => (
+          {filteredFinalityProviders?.map((fp) => (
             <FinalityProvider
               key={fp.btcPk}
               moniker={fp.description?.moniker}

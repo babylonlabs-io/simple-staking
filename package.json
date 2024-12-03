@@ -1,6 +1,6 @@
 {
   "name": "simple-staking",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -25,6 +25,7 @@
     "node": "22.3.0"
   },
   "dependencies": {
+    "@babylonlabs-io/btc-staking-ts": "0.3.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@keystonehq/animated-qr": "^0.8.6",
@@ -36,7 +37,6 @@
     "@uidotdev/usehooks": "^2.4.1",
     "axios": "^1.7.4",
     "bitcoinjs-lib": "6.1.5",
-    "@babylonlabs-io/btc-staking-ts": "0.3.0",
     "date-fns": "^3.6.0",
     "decimal.js-light": "^2.5.1",
     "framer-motion": "^11.1.9",
