@@ -14,6 +14,8 @@ import {
 } from "@/app/hooks/services/useTransactionService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
+import { useDelegationV2State } from "@/app/state/DelegationV2State";
+import { DelegationV2StakingState } from "@/app/types/delegationsV2";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import {
   FinalityProvider,
@@ -74,6 +76,7 @@ export const Staking = () => {
     useLocalStorage<boolean>("bbn-staking-cancelFeedbackModalOpened ", false);
 
   const { createDelegationEoi, estimateStakingFee } = useTransactionService();
+  const { addDelegation } = useDelegationV2State();
   const { networkInfo } = useAppState();
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
   const stakingStatus = networkInfo?.stakingStatus;
@@ -225,6 +228,13 @@ export const Staking = () => {
         feeRate,
         signingCallback,
       );
+
+      addDelegation({
+        stakingAmount: stakingAmountSat,
+        stakingTxHashHex,
+        startHeight: 0,
+        state: DelegationV2StakingState.INTERMEDIATE_PENDING_VERIFICATION,
+      });
 
       setStakingTxHashHex(stakingTxHashHex);
       setPendingVerificationOpen(true);

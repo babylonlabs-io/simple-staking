@@ -1,11 +1,16 @@
-export interface DelegationV2 {
+export interface DelegationLike {
+  stakingAmount: number;
   stakingTxHashHex: string;
+  startHeight: number;
+  state: DelegationV2StakingState;
+}
+
+export interface DelegationV2 extends DelegationLike {
   stakingTxHex: string;
   stakingSlashingTxHex: string;
   paramsVersion: number;
   finalityProviderBtcPksHex: string[];
   stakerBtcPkHex: string;
-  stakingAmount: number;
   stakingTime: number;
   bbnInceptionHeight: number;
   bbnInceptionTime: number;
@@ -13,7 +18,6 @@ export interface DelegationV2 {
   endHeight: number;
   unbondingTime: number;
   unbondingTxHex: string;
-  state: DelegationV2StakingState;
   covenantUnbondingSignatures?: {
     covenantBtcPkHex: string;
     signatureHex: string;
@@ -51,8 +55,39 @@ export enum DelegationV2StakingState {
   INTERMEDIATE_PENDING_VERIFICATION = "INTERMEDIATE_PENDING_VERIFICATION",
   INTERMEDIATE_PENDING_BTC_CONFIRMATION = "INTERMEDIATE_PENDING_BTC_CONFIRMATION",
   INTERMEDIATE_UNBONDING_SUBMITTED = "INTERMEDIATE_UNBONDING_SUBMITTED",
-  INTERMEDIATE_WITHDRAWAL_SUBMITTED = "INTERMEDIATE_WITHDRAWAL_SUBMITTED",
+  INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED = "INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED",
+  INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED = "INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED",
+  INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED = "INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED",
+  INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED = "INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED",
 }
+
+export const DELEGATION_STATUSES = {
+  [DelegationV2StakingState.PENDING]: 0,
+  [DelegationV2StakingState.INTERMEDIATE_PENDING_VERIFICATION]: 0.5,
+  [DelegationV2StakingState.VERIFIED]: 1,
+  [DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: 1.5,
+  [DelegationV2StakingState.ACTIVE]: 2,
+
+  [DelegationV2StakingState.INTERMEDIATE_UNBONDING_SUBMITTED]: 2.5,
+  [DelegationV2StakingState.EARLY_UNBONDING]: 3,
+  [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: 4,
+  [DelegationV2StakingState.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: 4.5,
+  [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWN]: 5,
+
+  [DelegationV2StakingState.SLASHED]: 4,
+  [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: 5,
+  [DelegationV2StakingState.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED]: 5.5,
+  [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWN]: 6,
+
+  [DelegationV2StakingState.TIMELOCK_UNBONDING]: 3,
+  [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: 4,
+  [DelegationV2StakingState.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED]: 4.5,
+  [DelegationV2StakingState.TIMELOCK_WITHDRAWN]: 5,
+
+  [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: 5,
+  [DelegationV2StakingState.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED]: 5.5,
+  [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWN]: 6,
+} as const;
 
 export const getDelegationV2StakingState = (
   state: string,

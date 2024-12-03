@@ -50,10 +50,9 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     "/v2/network-info",
     "Error getting network info",
   )) as AxiosResponse<NetworkInfoDataResponse>;
-
   const { params, staking_status } = data.data;
 
-  const stakingVersions = params.bbn
+  const stakingVersions = (params.bbn || [])
     .sort((a, b) => a.version - b.version) // Sort by version ascending
     .map((v) => ({
       version: v.version,
@@ -85,7 +84,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
   );
 
   // Map the BTC checkpoint params to the expected format
-  const epochCheckVersions = params.btc
+  const epochCheckVersions = (params.btc || [])
     .sort((a, b) => a.version - b.version) // Sort by version ascending
     .map((v) => ({
       version: v.version,

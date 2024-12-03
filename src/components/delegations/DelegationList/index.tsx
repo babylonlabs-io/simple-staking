@@ -1,14 +1,9 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 
-import { useTransactionService } from "@/app/hooks/services/useTransactionService";
-import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import {
-  DelegationV2StakingState,
-  type DelegationV2,
-} from "@/app/types/delegationsV2";
+import { useDelegationService } from "@/app/hooks/services/useDelegationService";
+import { type DelegationV2 } from "@/app/types/delegationsV2";
+import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
-
-import { GridTable, type TableColumn } from "../../common/GridTable";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -67,109 +62,12 @@ const columns: TableColumn<
 
 export function DelegationList() {
   const {
-    delegations = [],
-    fetchMoreDelegations,
-    hasMoreDelegations,
+    delegations,
     isLoading,
-    findDelegationByTxHash,
-  } = useDelegationV2State();
-  const {
-    submitStakingTx,
-    submitUnbondingTx,
-    submitEarlyUnbondedWithdrawalTx,
-    submitTimelockUnbondedWithdrawalTx,
-  } = useTransactionService();
-
-  // Define the onClick function here
-  const handleActionClick = async (action: string, txHash: string) => {
-    const d = findDelegationByTxHash(txHash);
-    if (!d) {
-      throw new Error("Delegation not found: " + txHash);
-    }
-    const {
-      stakingTxHashHex,
-      stakingTxHex,
-      finalityProviderBtcPksHex,
-      stakingAmount,
-      paramsVersion,
-      stakingTime,
-      unbondingTxHex,
-      covenantUnbondingSignatures,
-      state,
-      slashingTxHex,
-      unbondingSlashingTxHex,
-    } = d;
-
-    const finalityProviderPk = finalityProviderBtcPksHex[0];
-    const stakingInput = {
-      finalityProviderPkNoCoordHex: finalityProviderPk,
-      stakingAmountSat: stakingAmount,
-      stakingTimeBlocks: stakingTime,
-    };
-
-    if (action === "stake") {
-      await submitStakingTx(
-        stakingInput,
-        paramsVersion,
-        stakingTxHashHex,
-        stakingTxHex,
-      );
-    } else if (action === "unbound") {
-      if (!covenantUnbondingSignatures) {
-        throw new Error("Covenant unbonding signatures not found");
-      }
-      await submitUnbondingTx(
-        stakingInput,
-        paramsVersion,
-        stakingTxHex,
-        unbondingTxHex,
-        covenantUnbondingSignatures.map((sig) => ({
-          btcPkHex: sig.covenantBtcPkHex,
-          sigHex: sig.signatureHex,
-        })),
-      );
-      // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_UNBONDING
-    } else if (action === "withdraw") {
-      if (state === DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE) {
-        await submitEarlyUnbondedWithdrawalTx(
-          stakingInput,
-          paramsVersion,
-          unbondingTxHex,
-        );
-      } else if (state === DelegationV2StakingState.TIMELOCK_WITHDRAWABLE) {
-        await submitTimelockUnbondedWithdrawalTx(
-          stakingInput,
-          paramsVersion,
-          stakingTxHex,
-        );
-      } else if (
-        state === DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE
-      ) {
-        if (!unbondingSlashingTxHex) {
-          throw new Error(
-            "Unbonding slashing tx not found, can't submit withdrawal",
-          );
-        }
-        await submitEarlyUnbondedWithdrawalTx(
-          stakingInput,
-          paramsVersion,
-          unbondingSlashingTxHex,
-        );
-      } else if (
-        state === DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE
-      ) {
-        if (!slashingTxHex) {
-          throw new Error("Slashing tx not found, can't submit withdrawal");
-        }
-        await submitEarlyUnbondedWithdrawalTx(
-          stakingInput,
-          paramsVersion,
-          slashingTxHex,
-        );
-      }
-      // TODO: Transition the delegation to the next immediate state - INTERMEDIATE_WITHDRAWAL
-    }
-  };
+    hasMoreDelegations,
+    fetchMoreDelegations,
+    executeDelegationAction,
+  } = useDelegationService();
 
   return (
     <div className="bg-secondary-contrast p-6">
@@ -192,7 +90,7 @@ export function DelegationList() {
           cellClassName:
             "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-sm justify-start group-even:bg-[#F9F9F9] text-primary-dark",
         }}
-        params={{ handleActionClick }}
+        params={{ handleActionClick: executeDelegationAction }}
         fallback={<div>No delegations found</div>}
       />
     </div>
