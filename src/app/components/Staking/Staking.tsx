@@ -33,6 +33,7 @@ import { PreviewModal } from "../Modals/PreviewModal";
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { StakingAmount } from "./Form/StakingAmount";
 import { StakingFee } from "./Form/StakingFee";
+import { StakingTime } from "./Form/StakingTime";
 import { Message } from "./Form/States/Message";
 import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import apiNotAvailable from "./Form/States/api-not-available.svg";
@@ -498,6 +499,13 @@ export const Staking = () => {
             </div>
             <div className="flex flex-1 flex-col">
               <div className="flex flex-1 flex-col">
+                <StakingTime
+                  minStakingTimeBlocks={minStakingTimeBlocks}
+                  maxStakingTimeBlocks={maxStakingTimeBlocks}
+                  unbondingTimeBlocks={unbondingTime}
+                  onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
+                  reset={resetFormInputs}
+                />
                 <StakingAmount
                   minStakingAmountSat={minStakingAmountSat}
                   maxStakingAmountSat={maxStakingAmountSat}
@@ -571,6 +579,7 @@ export const Staking = () => {
             onFinalityProviderChange={handleChooseFinalityProvider}
           />
         </div>
+        <div className="divider m-0 lg:divider-horizontal lg:m-0" />
         <div className="flex flex-1 flex-col gap-4 lg:basis-2/5 xl:basis-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
           {renderStakingForm()}
         </div>

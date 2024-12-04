@@ -1,8 +1,5 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 
-import { getNetworkConfig } from "@/config/network.config";
-import { blocksToDisplayTime } from "@/utils/time";
-
 import { validateNoDecimalPoints } from "./validation/validation";
 
 interface StakingTimeProps {
@@ -27,8 +24,6 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
   const errorLabel = "Staking term";
   const generalErrorMessage = "You should input staking term";
-
-  const { coinName } = getNetworkConfig();
 
   // Use effect to reset the state when reset prop changes
   useEffect(() => {
@@ -99,26 +94,9 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
   const isFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
   if (isFixed) {
-    return (
-      <div className="card mb-2 bg-base-200 p-4">
-        <p>
-          You can unbond and withdraw your stake anytime with an unbonding time
-          of {blocksToDisplayTime(unbondingTimeBlocks)}.
-        </p>
-        <p>
-          There is also a build-in maximum staking period of{" "}
-          {blocksToDisplayTime(minStakingTimeBlocks)}.
-        </p>
-        <p>
-          If the stake is not unbonded before the end of this period, it will
-          automatically become withdrawable by you anytime afterwards.
-        </p>
-        <p>
-          The above times are approximates based on average {coinName} block
-          time.
-        </p>
-      </div>
-    );
+    // If the staking time is fixed, don't show the input field, but make sure value is set
+    onStakingTimeBlocksChange(minStakingTimeBlocks);
+    return null;
   }
 
   return (
