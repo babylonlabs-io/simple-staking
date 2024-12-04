@@ -524,14 +524,14 @@ export const Staking = () => {
                 )}
               </div>
               <span
-                className="cursor-pointer text-xs"
+                className="cursor-pointer text-xs mt-4"
                 data-tooltip-id="tooltip-staking-preview"
                 data-tooltip-content={signNotReadyReason}
                 data-tooltip-place="top"
               >
                 <Button
                   size="large"
-                  fluid={true}
+                  fluid
                   disabled={!previewReady}
                   onClick={() => setPreviewModalOpen(true)}
                 >

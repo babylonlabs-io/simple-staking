@@ -1,4 +1,5 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+import { twJoin } from "tailwind-merge";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 
@@ -100,7 +101,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
   }
 
   return (
-    <label className="form-control w-full flex-1">
+    <label className="form-control w-full">
       <div className="label">
         <span className="label-text-alt text-base">Term</span>
         <span className="label-text-alt">
@@ -109,14 +110,17 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
       </div>
       <input
         type="string"
-        className={`no-focus input input-bordered w-full ${error && "input-error"}`}
+        className={twJoin(
+          `no-focus input input-bordered w-full`,
+          error && "input-error",
+        )}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder="Blocks"
       />
-      <div className="mb-2 mt-4 min-h-[20px]">
-        <p className="text-center text-sm text-error">{error}</p>
+      <div className="text-left my-2 min-h-5">
+        <p className="text-sm text-error-main">{error}</p>
       </div>
     </label>
   );
