@@ -44,7 +44,7 @@ export function useDelegationStorage(
           unbondingTxHex: "",
           stakingSlashingTxHex: "",
           bbnInceptionHeight: 0,
-          bbnInceptionTime: "",
+          bbnInceptionTime: new Date().toISOString(),
           slashingTxHex: "",
           unbondingSlashingTxHex: "",
         }) as DelegationV2,
@@ -82,11 +82,14 @@ export function useDelegationStorage(
 
       setDelegationStatuses((statuses) =>
         Object.entries(statuses)
-          .filter(
-            ([hash, status]) =>
+          .filter(([hash, status]) => {
+            if (!delegationMap[hash]?.state) return true;
+
+            return (
               DELEGATION_STATUSES[delegationMap[hash].state] <
-              DELEGATION_STATUSES[status],
-          )
+              DELEGATION_STATUSES[status]
+            );
+          })
           .reduce(
             (acc, [hash, status]) => ({ ...acc, [hash]: status }),
             {} as Record<string, State>,

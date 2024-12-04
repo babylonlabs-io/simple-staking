@@ -1,19 +1,23 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 
-import { useDelegationService } from "@/app/hooks/services/useDelegationService";
+import {
+  ActionType,
+  useDelegationService,
+} from "@/app/hooks/services/useDelegationService";
 import { type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
+import { DelegationModal } from "./components/DelegationModal";
 import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
 const columns: TableColumn<
   DelegationV2,
-  { handleActionClick: (action: string, txHash: string) => void }
+  { handleActionClick: (action: ActionType, delegation: DelegationV2) => void }
 >[] = [
   {
     field: "Inception",
@@ -48,23 +52,29 @@ const columns: TableColumn<
   {
     field: "actions",
     headerName: "Action",
-    renderCell: (row, _, { handleActionClick }) => (
-      <ActionButton
-        txHash={row.stakingTxHashHex}
-        state={row.state}
-        onClick={(action, txHash) => handleActionClick(action, txHash)}
-      />
-    ),
+    renderCell: (row, _, { handleActionClick }) => {
+      return (
+        <ActionButton
+          delegation={row}
+          state={row.state}
+          onClick={handleActionClick}
+        />
+      );
+    },
   },
 ];
 
 export function DelegationList() {
   const {
+    processing,
+    confirmationModal,
     delegations,
     isLoading,
     hasMoreDelegations,
     fetchMoreDelegations,
     executeDelegationAction,
+    openConfirmationModal,
+    closeConfirmationModal,
   } = useDelegationService();
 
   return (
@@ -72,6 +82,7 @@ export function DelegationList() {
       <Heading variant="h6" className="text-primary-light py-2 mb-6">
         Babylon Chain Stakes (Phase 2)
       </Heading>
+
       <GridTable
         getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
         columns={columns}
@@ -88,8 +99,16 @@ export function DelegationList() {
           cellClassName:
             "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-sm justify-start group-even:bg-[#F9F9F9] text-primary-dark",
         }}
-        params={{ handleActionClick: executeDelegationAction }}
+        params={{ handleActionClick: openConfirmationModal }}
         fallback={<div>No delegations found</div>}
+      />
+
+      <DelegationModal
+        action={confirmationModal?.action}
+        delegation={confirmationModal?.delegation ?? null}
+        processing={processing}
+        onSubmit={executeDelegationAction}
+        onClose={closeConfirmationModal}
       />
     </div>
   );
