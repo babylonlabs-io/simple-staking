@@ -4,11 +4,7 @@ import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
-import {
-  MODE,
-  MODE_WITHDRAW,
-  WithdrawModal,
-} from "@/app/components/Modals/WithdrawModal";
+import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
@@ -24,6 +20,10 @@ import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 import { Delegation } from "./Delegation";
+
+const MODE_TRANSITION = "transition";
+const MODE_WITHDRAW = "withdraw";
+type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW;
 
 export const Delegations = ({}) => {
   const { publicKeyNoCoord, connected, network } = useBTCWallet();
@@ -302,12 +302,12 @@ export const Delegations = ({}) => {
       </div>
       {modalMode && txID && selectedDelegation && (
         <WithdrawModal
-          isOpen={modalOpen}
+          open={modalOpen}
           onClose={() => setModalOpen(false)}
-          onProceed={() => {
+          onSubmit={() => {
             handleWithdraw(txID);
           }}
-          awaitingWalletResponse={awaitingWalletResponse}
+          processing={awaitingWalletResponse}
         />
       )}
     </>

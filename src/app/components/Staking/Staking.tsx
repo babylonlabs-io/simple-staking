@@ -269,43 +269,36 @@ export const Staking = () => {
   // Memoize the staking fee calculation
   const stakingFeeSat = useMemo(() => {
     if (
-      btcWalletNetwork &&
-      address &&
-      latestParam &&
-      publicKeyNoCoord &&
-      stakingAmountSat &&
-      finalityProvider &&
-      mempoolFeeRates &&
-      availableUTXOs
+      !(
+        btcWalletNetwork &&
+        address &&
+        latestParam &&
+        publicKeyNoCoord &&
+        stakingAmountSat &&
+        finalityProvider &&
+        mempoolFeeRates &&
+        availableUTXOs
+      )
     ) {
-      try {
-        // check that selected Fee rate (if present) is bigger than the min fee
-        if (selectedFeeRate && selectedFeeRate < minFeeRate) {
-          throw new Error("Selected fee rate is lower than the hour fee");
-        }
-        const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
+      return 0;
+    }
 
-        const eoiInput = {
-          finalityProviderPkNoCoordHex: finalityProvider.btcPk,
-          stakingAmountSat,
-          stakingTimelock,
-          feeRate: memoizedFeeRate,
-        };
-        // Calculate the staking fee
-        return estimateStakingFee(eoiInput, memoizedFeeRate);
-      } catch (error: Error | any) {
-        let errorMsg = error?.message;
-        // Turn the error message into a user-friendly message
-        // The btc-staking-ts lib will be improved to return propert error types
-        // in the future. For now, we need to handle the errors manually by
-        // matching the error message.
-        if (errorMsg.includes("Insufficient funds")) {
-          errorMsg =
-            "Not enough balance to cover staking amount and fees, please lower the staking amount";
-        }
-        return 0;
+    try {
+      // check that selected Fee rate (if present) is bigger than the min fee
+      if (selectedFeeRate && selectedFeeRate < minFeeRate) {
+        throw new Error("Selected fee rate is lower than the hour fee");
       }
-    } else {
+      const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
+
+      const eoiInput = {
+        finalityProviderPkNoCoordHex: finalityProvider.btcPk,
+        stakingAmountSat,
+        stakingTimelock,
+        feeRate: memoizedFeeRate,
+      };
+      // Calculate the staking fee
+      return estimateStakingFee(eoiInput, memoizedFeeRate);
+    } catch {
       return 0;
     }
   }, [
