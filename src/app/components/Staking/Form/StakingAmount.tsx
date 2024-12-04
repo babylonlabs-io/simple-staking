@@ -1,4 +1,5 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
+import { twJoin } from "tailwind-merge";
 
 import { getNetworkConfig } from "@/config/network.config";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
@@ -125,17 +126,19 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       </div>
       <input
         type="string"
-        className={`no-focus input input-bordered w-full ${error ? "input-error" : ""}`}
+        className={twJoin(
+          "no-focus input input-bordered w-full",
+          error ? "input-error" : "",
+        )}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={coinName}
       />
-      {error && (
-        <div className="my-2 min-h-[20px]">
-          <p className="text-center text-sm text-error">{error}</p>
-        </div>
-      )}
+
+      <div className="text-left my-2 min-h-5">
+        {error && <p className="text-sm text-error-main">{error}</p>}
+      </div>
     </label>
   );
 };

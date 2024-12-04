@@ -48,7 +48,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
 
   const defaultModeRender = () => {
     return (
-      <div className="flex flex-col justify-center gap-1 items-center">
+      <div className="flex flex-col gap-1 items-start">
         <div className="min-h-8 flex justify-center flex-col items-center">
           {mempoolFeeRates ? (
             <div>
@@ -67,7 +67,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           )}
         </div>
         <button
-          className="btn btn-sm btn-link no-underline"
+          className="btn btn-sm btn-link w-full no-underline"
           onClick={() => setCustomMode(true)}
           disabled={!mempoolFeeRates || !stakingFeeSat}
         >
@@ -83,8 +83,8 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
       selectedFeeRate && mempoolFeeRates && selectedFeeRate < defaultFeeRate;
 
     return (
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col items-center">
+      <div className="flex flex-col gap-1">
+        <div className="flex flex-col items-start">
           <p>
             Selected fee rate:{" "}
             <strong>{selectedFeeRate || defaultFeeRate} sat/vB</strong>
@@ -123,7 +123,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
   const customModeReady = customMode && mempoolFeeRates && stakingFeeSat;
 
   return (
-    <div className="my-2 text-sm">
+    <div className="text-sm">
       {customModeReady ? selectedModeRender() : defaultModeRender()}
     </div>
   );

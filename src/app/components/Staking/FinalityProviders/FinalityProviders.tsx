@@ -1,3 +1,4 @@
+import { Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import { useEffect } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
@@ -43,10 +44,13 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
   }
 
   return (
-    <>
-      <p>
-        <strong>Step-1:</strong> Select a finality provider
-      </p>
+    <div className="flex flex-col">
+      <Heading variant="h5" className="text-primary-dark">
+        Step 1
+      </Heading>
+      <Text variant="body1" className="text-primary-light">
+        Select a Finality Provider
+      </Text>
       <div className="flex gap-3">
         <FinalityProviderSearch
           searchValue={searchValue}
@@ -95,6 +99,6 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
           ))}
         </InfiniteScroll>
       </div>
-    </>
+    </div>
   );
 };

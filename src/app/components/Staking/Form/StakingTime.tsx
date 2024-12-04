@@ -1,7 +1,5 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
-
-import { getNetworkConfig } from "@/config/network.config";
-import { blocksToDisplayTime } from "@/utils/time";
+import { twJoin } from "tailwind-merge";
 
 import { validateNoDecimalPoints } from "./validation/validation";
 
@@ -27,8 +25,6 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
   const errorLabel = "Staking term";
   const generalErrorMessage = "You should input staking term";
-
-  const { coinName } = getNetworkConfig();
 
   // Use effect to reset the state when reset prop changes
   useEffect(() => {
@@ -99,30 +95,13 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
 
   const isFixed = minStakingTimeBlocks === maxStakingTimeBlocks;
   if (isFixed) {
-    return (
-      <div className="card mb-2 bg-base-200 p-4">
-        <p>
-          You can unbond and withdraw your stake anytime with an unbonding time
-          of {blocksToDisplayTime(unbondingTimeBlocks)}.
-        </p>
-        <p>
-          There is also a build-in maximum staking period of{" "}
-          {blocksToDisplayTime(minStakingTimeBlocks)}.
-        </p>
-        <p>
-          If the stake is not unbonded before the end of this period, it will
-          automatically become withdrawable by you anytime afterwards.
-        </p>
-        <p>
-          The above times are approximates based on average {coinName} block
-          time.
-        </p>
-      </div>
-    );
+    // If the staking time is fixed, don't show the input field, but make sure value is set
+    onStakingTimeBlocksChange(minStakingTimeBlocks);
+    return null;
   }
 
   return (
-    <label className="form-control w-full flex-1">
+    <label className="form-control w-full">
       <div className="label">
         <span className="label-text-alt text-base">Term</span>
         <span className="label-text-alt">
@@ -131,14 +110,17 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
       </div>
       <input
         type="string"
-        className={`no-focus input input-bordered w-full ${error && "input-error"}`}
+        className={twJoin(
+          `no-focus input input-bordered w-full`,
+          error && "input-error",
+        )}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder="Blocks"
       />
-      <div className="mb-2 mt-4 min-h-[20px]">
-        <p className="text-center text-sm text-error">{error}</p>
+      <div className="text-left my-2 min-h-5">
+        <p className="text-sm text-error-main">{error}</p>
       </div>
     </label>
   );
