@@ -83,10 +83,10 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     }));
 
   // Verify that version numbers and BTC activation heights are consistently ordered
-  const sortedByVersion = [...stakingVersions].sort(
+  const sortedByVersion = stakingVersions.toSorted(
     (a, b) => b.version - a.version,
   );
-  const sortedByHeight = [...stakingVersions].sort(
+  const sortedByHeight = stakingVersions.toSorted(
     (a, b) => b.btcActivationHeight - a.btcActivationHeight,
   );
 
