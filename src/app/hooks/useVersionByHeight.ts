@@ -1,14 +1,30 @@
 import { useMemo } from "react";
 
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { BbnStakingParamsVersion } from "../types/networkInfo";
 
-import { useVersions } from "./client/api/useVersions";
+import { useNetworkInfo } from "./client/api/useNetworkInfo";
 
-export function useVersionByHeight(height: number) {
-  const { data: versions } = useVersions();
-
+export function useParamByHeight(height: number) {
+  const { data: networkInfo } = useNetworkInfo();
   return useMemo(
-    () => getCurrentGlobalParamsVersion(height, versions ?? []),
-    [versions, height],
+    () =>
+      getBbnParamByBtcHeight(
+        height,
+        networkInfo?.params.bbnStakingParams.versions ?? [],
+      ),
+    [networkInfo, height],
   );
 }
+
+const getBbnParamByBtcHeight = (
+  height: number,
+  bbnParams: BbnStakingParamsVersion[],
+) => {
+  // Sort by btcActivationHeight in ascending order
+  const sortedParams = [...bbnParams].sort(
+    (a, b) => a.btcActivationHeight - b.btcActivationHeight,
+  );
+
+  // Find first param where height is >= btcActivationHeight
+  return sortedParams.find((param) => height >= param.btcActivationHeight);
+};

@@ -37,11 +37,13 @@ export interface BbnParams {
   slashing_pk_script: string;
   min_slashing_tx_fee_sat: number;
   slashing_rate: string;
-  min_unbonding_time_blocks: number;
+  unbonding_time_blocks: number;
   unbonding_fee_sat: number;
   min_commission_rate: string;
   max_active_finality_providers: number;
   delegation_creation_base_gas_fee: number;
+  btc_activation_height: number;
+  allow_list_expiration_height: number;
 }
 
 export const getNetworkInfo = async (): Promise<NetworkInfo> => {
@@ -64,8 +66,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
       maxStakingValueSat: v.max_staking_value_sat,
       minStakingTimeBlocks: v.min_staking_time_blocks,
       maxStakingTimeBlocks: v.max_staking_time_blocks,
-      // TODO: To be reverted after https://github.com/babylonlabs-io/babylon/issues/263
-      unbondingTime: v.min_unbonding_time_blocks + 1,
+      unbondingTime: v.unbonding_time_blocks,
       unbondingFeeSat: v.unbonding_fee_sat,
       minCommissionRate: v.min_commission_rate,
       maxActiveFinalityProviders: v.max_active_finality_providers,
@@ -77,7 +78,27 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
       },
       maxStakingAmountSat: v.max_staking_value_sat,
       minStakingAmountSat: v.min_staking_value_sat,
+      btcActivationHeight: v.btc_activation_height,
+      allowListExpirationHeight: v.allow_list_expiration_height,
     }));
+
+  // Verify that version numbers and BTC activation heights are consistently ordered
+  const sortedByVersion = [...stakingVersions].sort(
+    (a, b) => b.version - a.version,
+  );
+  const sortedByHeight = [...stakingVersions].sort(
+    (a, b) => b.btcActivationHeight - a.btcActivationHeight,
+  );
+
+  // Verify both sorts produce same order
+  const areEqual = sortedByVersion.every(
+    (param, index) => param === sortedByHeight[index],
+  );
+  if (!areEqual) {
+    throw new Error(
+      "Version numbers and BTC activation heights are not consistently ordered",
+    );
+  }
 
   const latestStakingParam = stakingVersions.reduce((prev, current) =>
     current.version > prev.version ? current : prev,

@@ -1,5 +1,5 @@
 import { GlobalParamsVersion } from "@/app/types/globalParams";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getCurrentGlobalParamsVersion } from "@/utils/params/globalParams";
 
 import { testingNetworks } from "../helper";
 
