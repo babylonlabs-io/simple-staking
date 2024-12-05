@@ -13,7 +13,7 @@ export interface StakingStats {
   totalDelegations: number;
   totalStakers: number;
   unconfirmedTVLSat: number;
-  btcPriceUsd: number;
+  btcPriceUsd?: number;
 }
 
 interface StakingStatsProviderProps {

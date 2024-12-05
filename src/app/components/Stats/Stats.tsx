@@ -137,10 +137,14 @@ export const Stats: React.FC = () => {
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 2)} ${coinName} ($${formatAmount(
-              satoshiToBtc(stakingStats.activeTVLSat) *
-                stakingStats.btcPriceUsd,
-            )})`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 2)} ${coinName}${
+              stakingStats.btcPriceUsd
+                ? ` ($${formatAmount(
+                    satoshiToBtc(stakingStats.activeTVLSat) *
+                      stakingStats.btcPriceUsd,
+                  )})`
+                : ""
+            }`
           : 0,
         icon: confirmedTvl,
       },
