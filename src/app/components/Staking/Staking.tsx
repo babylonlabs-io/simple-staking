@@ -300,15 +300,6 @@ export const Staking = () => {
           errorMsg =
             "Not enough balance to cover staking amount and fees, please lower the staking amount";
         }
-        // fees + staking amount can be more than the balance
-        showError({
-          error: {
-            message: errorMsg,
-            errorState: ErrorState.STAKING,
-          },
-          retryAction: () => setSelectedFeeRate(0),
-        });
-        setSelectedFeeRate(0);
         return 0;
       }
     } else {
