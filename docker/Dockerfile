@@ -40,8 +40,8 @@ FROM node:22-alpine3.19 AS runner
 WORKDIR /app
 
 # Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
 USER nextjs
 
 COPY --from=builder /app/public ./public
