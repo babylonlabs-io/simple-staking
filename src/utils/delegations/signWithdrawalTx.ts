@@ -8,7 +8,7 @@ import { Psbt, Transaction, networks } from "bitcoinjs-lib";
 import { getGlobalParams } from "@/app/api/getGlobalParams";
 import { Delegation as DelegationInterface } from "@/app/types/delegations";
 import { apiDataToStakingScripts } from "@/utils/apiDataToStakingScripts";
-import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
+import { getCurrentGlobalParamsVersion } from "@/utils/params/globalParams";
 
 import { getFeeRateFromMempool } from "../getFeeRateFromMempool";
 import { Fees } from "../wallet/btc_wallet_provider";

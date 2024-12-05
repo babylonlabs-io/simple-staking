@@ -5,6 +5,8 @@ export interface BbnStakingParamsVersion extends StakingParams {
   minCommissionRate: string;
   maxActiveFinalityProviders: number;
   delegationCreationBaseGasFee: number;
+  btcActivationHeight: number;
+  allowListExpirationHeight: number;
 }
 
 export interface BtcEpochCheckParamsVersion {
