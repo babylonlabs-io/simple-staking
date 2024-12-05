@@ -12,6 +12,7 @@ import { useBtcHeight } from "@/app/context/mempool/BtcHeightProvider";
 import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btcConversions";
+import { formatAmount } from "@/utils/formatAmount";
 import {
   ParamsWithContext,
   getCurrentGlobalParamsVersion,
@@ -82,6 +83,7 @@ export const Stats: React.FC = () => {
     totalDelegations: 0,
     totalStakers: 0,
     unconfirmedTVLSat: 0,
+    btcPriceUsd: 0,
   });
   const [stakingCapText, setStakingCapText] = useState<{
     title: string;
@@ -135,7 +137,14 @@ export const Stats: React.FC = () => {
       {
         title: "Confirmed TVL",
         value: stakingStats?.activeTVLSat
-          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 2)} ${coinName}`
+          ? `${maxDecimals(satoshiToBtc(stakingStats.activeTVLSat), 2)} ${coinName}${
+              stakingStats.btcPriceUsd
+                ? ` ($${formatAmount(
+                    satoshiToBtc(stakingStats.activeTVLSat) *
+                      stakingStats.btcPriceUsd,
+                  )})`
+                : ""
+            }`
           : 0,
         icon: confirmedTvl,
       },

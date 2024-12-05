@@ -13,6 +13,7 @@ interface StatsAPI {
   total_delegations: number;
   total_stakers: number;
   unconfirmed_tvl: number;
+  btc_price_usd: number;
 }
 
 export const getStats = async (): Promise<StakingStats> => {
@@ -27,5 +28,6 @@ export const getStats = async (): Promise<StakingStats> => {
     totalDelegations: statsAPI.total_delegations,
     totalStakers: statsAPI.total_stakers,
     unconfirmedTVLSat: statsAPI.unconfirmed_tvl,
+    btcPriceUsd: statsAPI.btc_price_usd,
   };
 };
