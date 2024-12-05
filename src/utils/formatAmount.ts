@@ -1,5 +1,14 @@
-export function formatAmount(amount: number): string {
+export function formatAmount(
+  amount: number,
+  locale: string = "en-US",
+  currency?: string,
+): string {
   let abbreviated: string;
+  const formatter = new Intl.NumberFormat(locale, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    ...(currency && { style: "currency", currency }),
+  });
 
   const trillion = 1_000_000_000_000;
   const billion = 1_000_000_000;
@@ -8,25 +17,19 @@ export function formatAmount(amount: number): string {
 
   if (amount >= trillion) {
     // Trillions
-    abbreviated = (amount / trillion).toFixed(2) + "T";
+    abbreviated = formatter.format(amount / trillion) + "T";
   } else if (amount >= billion) {
     // Billions
-    abbreviated = (amount / billion).toFixed(2) + "B";
+    abbreviated = formatter.format(amount / billion) + "B";
   } else if (amount >= million) {
     // Millions
-    abbreviated = (amount / million).toFixed(2) + "M";
+    abbreviated = formatter.format(amount / million) + "M";
   } else if (amount >= thousand) {
     // Thousands
-    abbreviated = (amount / thousand).toFixed(2) + "k";
+    abbreviated = formatter.format(amount / thousand) + "k";
   } else {
-    abbreviated = amount.toFixed(2);
+    abbreviated = formatter.format(amount);
   }
 
-  const [numberPart, suffix] = abbreviated.split(/([a-zA-Z]+)/);
-  const formattedNumber = parseFloat(numberPart).toLocaleString("en-US", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
-  return suffix ? formattedNumber + suffix : formattedNumber;
+  return abbreviated;
 }
