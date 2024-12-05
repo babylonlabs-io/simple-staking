@@ -35,7 +35,7 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     isRefetchError: isRefetchFinalityProvidersError,
   } = useInfiniteQuery({
     queryKey: ["finality providers"],
-    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam, "random"),
+    queryFn: ({ pageParam = "" }) => getFinalityProviders(pageParam),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key
