@@ -1,10 +1,10 @@
 import { durationTillNow } from "@/utils/time";
 
-interface Inscription {
+interface Inception {
   value: string;
 }
 
-export function Inscription({ value }: Inscription) {
+export function Inception({ value }: Inception) {
   const currentTime = Date.now();
   return (
     <div className="order-3 lg:order-1">

@@ -44,7 +44,7 @@ export function useDelegationStorage(
           unbondingTxHex: "",
           stakingSlashingTxHex: "",
           bbnInceptionHeight: 0,
-          bbnInceptionTime: 0,
+          bbnInceptionTime: "",
           slashingTxHex: "",
           unbondingSlashingTxHex: "",
         }) as DelegationV2,

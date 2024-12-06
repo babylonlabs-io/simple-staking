@@ -33,7 +33,7 @@ interface DelegationV2API {
     start_height: number;
     end_height: number;
     bbn_inception_height: number;
-    bbn_inception_time: number;
+    bbn_inception_time: string;
     slashing_tx_hex: string;
   };
   delegation_unbonding: {

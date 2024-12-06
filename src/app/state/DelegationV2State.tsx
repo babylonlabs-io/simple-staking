@@ -58,13 +58,13 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchMoreDelegations: fetchNextPage,
     }),
     [
-      data?.delegations,
+      delegations,
       isFetchingNextPage,
       hasNextPage,
       addPendingDelegation,
       updateDelegationStatus,
-      fetchNextPage,
       findDelegationByTxHash,
+      fetchNextPage,
     ],
   );
 
