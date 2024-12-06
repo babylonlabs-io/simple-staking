@@ -1,6 +1,5 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
-import type { networks } from "bitcoinjs-lib";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -10,73 +9,30 @@ import {
   MODE_WITHDRAW,
   WithdrawModal,
 } from "@/app/components/Modals/WithdrawModal";
-import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
-import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
+import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
 import { useDelegationState } from "@/app/state/DelegationState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
 import { ErrorState } from "@/app/types/errors";
-import { shouldDisplayPoints } from "@/config";
-import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 import { Delegation } from "./Delegation";
 
-export const Delegations = () => {
-  const { data: delegationsAPI } = useDelegations();
-  const { address, publicKeyNoCoord, connected, network } = useBTCWallet();
-
-  if (!connected || !delegationsAPI || !network) {
-    return;
-  }
-
-  return (
-    <DelegationsPointsProvider
-      publicKeyNoCoord={publicKeyNoCoord}
-      delegationsAPI={delegationsAPI.delegations}
-      isWalletConnected={connected}
-      address={address}
-    >
-      {/* If there are no delegations, don't render the content */}
-      {delegationsAPI.delegations.length > 0 && (
-        <DelegationsContent
-          delegationsAPI={delegationsAPI.delegations}
-          address={address}
-          btcWalletNetwork={network}
-          publicKeyNoCoord={publicKeyNoCoord}
-          isWalletConnected={connected}
-        />
-      )}
-    </DelegationsPointsProvider>
-  );
-};
-
-interface DelegationsContentProps {
-  delegationsAPI: DelegationInterface[];
-  publicKeyNoCoord: string;
-  btcWalletNetwork: networks.Network;
-  address: string;
-  isWalletConnected: boolean;
-}
-
-const DelegationsContent: React.FC<DelegationsContentProps> = ({
-  delegationsAPI,
-  address,
-  btcWalletNetwork,
-  publicKeyNoCoord,
-}) => {
+export const Delegations = ({}) => {
+  const { publicKeyNoCoord, connected, network } = useBTCWallet();
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
-  const { showError, captureError } = useError();
-  const { isApiNormal, isGeoBlocked } = useHealthCheck();
+  const { showError } = useError();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
+  const { data: delegationsAPI } = useDelegations();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -84,16 +40,13 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     isLoading,
   } = useDelegationState();
 
-  const { signPsbt, getNetworkFees, pushTx } = useBTCWallet();
+  const { submitWithdrawalTx } = useV1TransactionService();
+  const { data: networkFees } = useNetworkFees();
 
-  const delegation = useMemo(
-    () =>
-      delegationsAPI.find((delegation) => delegation.stakingTxHashHex === txID),
-    [delegationsAPI, txID],
+  const selectedDelegation = delegationsAPI?.delegations.find(
+    (delegation) => delegation.stakingTxHashHex === txID,
   );
 
-  const shouldShowPoints =
-    isApiNormal && !isGeoBlocked && shouldDisplayPoints();
   // Local storage state for intermediate delegations (transitioning, withdrawing)
   const intermediateDelegationsLocalStorageKey =
     getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
@@ -141,24 +94,37 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   };
 
   // Handles withdrawing requests for delegations that have expired timelocks
-  // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
+  // It constructs a withdrawal transaction, creates a signature for it,
+  // and submits it to the Bitcoin network
   const handleWithdraw = async (id: string) => {
     try {
+      if (!networkFees) {
+        throw new Error("Network fees not found");
+      }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
+
+      if (selectedDelegation?.stakingTxHashHex != id) {
+        throw new Error("Wrong delegation selected for withdrawal");
+      }
       // Sign the withdrawal transaction
-      const { delegation } = await signWithdrawalTx(
-        id,
-        delegationsAPI,
-        publicKeyNoCoord,
-        btcWalletNetwork,
-        signPsbt,
-        address,
-        getNetworkFees,
-        pushTx,
+      const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
+        selectedDelegation;
+      submitWithdrawalTx(
+        {
+          stakingTimelock: stakingTx.timelock,
+          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          stakingAmountSat: stakingValueSat,
+        },
+        stakingTx.startHeight,
+        stakingTx.txHex,
+        unbondingTx?.txHex,
       );
       // Update the local state with the new intermediate delegation
-      updateLocalStorage(delegation, DelegationState.INTERMEDIATE_WITHDRAWAL);
+      updateLocalStorage(
+        selectedDelegation,
+        DelegationState.INTERMEDIATE_WITHDRAWAL,
+      );
     } catch (error: Error | any) {
       showError({
         error: {
@@ -192,7 +158,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
       }
 
       return intermediateDelegations.filter((intermediateDelegation) => {
-        const matchingDelegation = delegationsAPI.find(
+        const matchingDelegation = delegationsAPI.delegations.find(
           (delegation) =>
             delegation?.stakingTxHashHex ===
             intermediateDelegation?.stakingTxHashHex,
@@ -223,7 +189,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
   useEffect(() => {
-    if (modalOpen && !delegation) {
+    if (modalOpen && !selectedDelegation) {
       showError({
         error: {
           message: "Delegation not found",
@@ -235,11 +201,15 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
       setTxID("");
       setModalMode(undefined);
     }
-  }, [modalOpen, delegation, showError]);
+  }, [modalOpen, selectedDelegation, showError]);
+
+  if (!connected || !delegationsAPI || !network) {
+    return;
+  }
 
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-    ? [...delegations, ...delegationsAPI]
+    ? [...delegations, ...delegationsAPI.delegations]
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
@@ -296,7 +266,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
           </InfiniteScroll>
         </div>
       </div>
-      {modalMode && txID && delegation && (
+      {modalMode && txID && selectedDelegation && (
         <WithdrawModal
           isOpen={modalOpen}
           onClose={() => setModalOpen(false)}

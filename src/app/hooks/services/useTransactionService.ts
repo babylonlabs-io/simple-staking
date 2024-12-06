@@ -24,6 +24,7 @@ import {
   clearTxSignatures,
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
+  validateStakingInput,
 } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
@@ -687,13 +688,6 @@ const createBtcDelegationMsg = async (
     typeUrl: BBN_REGISTRY_TYPE_URLS.MsgCreateBTCDelegation,
     value: msg,
   };
-};
-
-const validateStakingInput = (stakingInput: BtcStakingInputs) => {
-  if (!stakingInput.finalityProviderPkNoCoordHex)
-    throw new Error("Finality provider not selected");
-  if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
-  if (!stakingInput.stakingTimelock) throw new Error("Staking time not set");
 };
 
 const checkWalletConnection = (

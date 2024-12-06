@@ -14,7 +14,6 @@ interface StakingTimeProps {
 export const StakingTime: React.FC<StakingTimeProps> = ({
   minStakingTimeBlocks,
   maxStakingTimeBlocks,
-  unbondingTimeBlocks,
   onStakingTimeBlocksChange,
   reset,
 }) => {

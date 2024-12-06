@@ -25,7 +25,7 @@ interface PreviewModalProps {
   finalityProvider: string | undefined;
   finalityProviderAvatar: string | undefined;
   stakingAmountSat: number;
-  stakingTimeBlocks: number;
+  stakingTimelock: number;
   stakingFeeSat: number;
   feeRate: number;
   unbondingFeeSat: number;
@@ -38,7 +38,7 @@ export const PreviewModal = ({
   finalityProvider,
   finalityProviderAvatar,
   stakingAmountSat,
-  stakingTimeBlocks,
+  stakingTimelock,
   onSign,
   stakingFeeSat,
   feeRate,
@@ -99,7 +99,7 @@ export const PreviewModal = ({
     {
       key: "Term",
       value: (
-        <Text variant="body1">{blocksToDisplayTime(stakingTimeBlocks)}</Text>
+        <Text variant="body1">{blocksToDisplayTime(stakingTimelock)}</Text>
       ),
     },
     {

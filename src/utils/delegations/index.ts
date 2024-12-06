@@ -1,5 +1,7 @@
 import { Transaction } from "bitcoinjs-lib";
 
+import { BtcStakingInputs } from "@/app/hooks/services/useTransactionService";
+
 /**
  * Clears the signatures from a transaction.
  * @param tx - The transaction to clear the signatures from.
@@ -43,4 +45,16 @@ export const uint8ArrayToHex = (uint8Array: Uint8Array): string => {
   return Array.from(uint8Array)
     .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
+};
+
+/**
+ * Validates the staking input for a delegation.
+ * @param stakingInput - The staking input to validate.
+ * @throws An error if the staking input is invalid.
+ */
+export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
+  if (!stakingInput.finalityProviderPkNoCoordHex)
+    throw new Error("Finality provider not selected");
+  if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
+  if (!stakingInput.stakingTimelock) throw new Error("Staking time not set");
 };

@@ -542,7 +542,7 @@ export const Staking = () => {
                     finalityProvider?.description.identity
                   }
                   stakingAmountSat={stakingAmountSat}
-                  stakingTimeBlocks={stakingTimeBlocksWithFixed}
+                  stakingTimelock={stakingTimeBlocksWithFixed}
                   stakingFeeSat={stakingFeeSat}
                   feeRate={feeRate}
                   unbondingFeeSat={unbondingFeeSat}
