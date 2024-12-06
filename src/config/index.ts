@@ -17,12 +17,6 @@ export const getNetworkAppUrl = (): string => {
     : "https://btcstaking.babylonlabs.io";
 };
 
-// shouldDisplayPoints function is used to check if the application should
-// display points or not based on the existence of the environment variable.
-export const shouldDisplayPoints = (): boolean => {
-  return Boolean(process.env.NEXT_PUBLIC_POINTS_API_URL);
-};
-
 // getBtcNetwork function is used to get the BTC network based on the environment
 export const getBtcNetwork = (): Network => {
   return network;

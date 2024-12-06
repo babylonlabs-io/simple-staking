@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 
-import { shouldDisplayPoints, shouldDisplayTestingMsg } from "@/config";
+import { shouldDisplayTestingMsg } from "@/config";
 
 export interface Question {
   title: string;
@@ -291,21 +291,6 @@ export const questions = (
       ),
     },
   ];
-  if (shouldDisplayPoints()) {
-    questionList.push({
-      title: "What are the points for?",
-      content: (
-        <p>
-          We use points to track staking activity. Points are not blockchain
-          tokens. Points do not, and may never, convert to, accrue to, be used
-          as a basis to calculate, or become tokens, other digital assets, or
-          distributions thereof. Points are virtual calculations with no
-          monetary value. Points do not constitute any currency or property of
-          any type and are not redeemable, refundable, or transferable.
-        </p>
-      ),
-    });
-  }
   if (shouldDisplayTestingMsg()) {
     questionList.push({
       title: "What is the goal of this testnet?",

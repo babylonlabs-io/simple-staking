@@ -4,23 +4,19 @@ import { Tooltip } from "react-tooltip";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationState } from "@/app/state/DelegationState";
-import { shouldDisplayPoints } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import { LoadingSmall } from "../Loading/Loading";
-import { StakerPoints } from "../Points/StakerPoints";
 
 export const Summary = () => {
-  const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { totalStaked } = useDelegationState();
   const { totalBalance, isLoading: loading } = useAppState();
-  const { address, publicKeyNoCoord } = useBTCWallet();
+  const { address } = useBTCWallet();
 
   const { coinName } = getNetworkConfig();
   const onMainnet = getNetworkConfig().network === Network.MAINNET;
@@ -58,30 +54,6 @@ export const Summary = () => {
                 </p>
               </div>
             </div>
-            {isApiNormal && !isGeoBlocked && shouldDisplayPoints() && (
-              <>
-                <div className="divider xl:divider-horizontal xl:mx-4 my-0" />
-                <div className="flex flex-1 gap-2 text-sm flex-col xl:flex-row xl:items-center justify-start xl:justify-between">
-                  <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">
-                    <p className="dark:text-neutral-content">Total points</p>
-                    <span
-                      className="cursor-pointer text-xs"
-                      data-tooltip-id={"tooltip-total-points"}
-                      data-tooltip-content={`The points measure your staking activities based on your BTC public key. Please check FAQ for further info.`}
-                    >
-                      <AiOutlineInfoCircle />
-                    </span>
-                    <Tooltip
-                      id={"tooltip-total-points"}
-                      className="tooltip-wrap"
-                    />
-                  </div>
-                  <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">
-                    <StakerPoints publicKeyNoCoord={publicKeyNoCoord} />
-                  </div>
-                </div>
-              </>
-            )}
             <div className="divider xl:divider-horizontal xl:mx-4 my-0" />
             <div className="flex flex-1 gap-1 text-sm flex-col xl:flex-row xl:items-center justify-start xl:justify-between">
               <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap">

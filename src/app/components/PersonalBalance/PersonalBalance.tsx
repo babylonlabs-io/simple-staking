@@ -24,17 +24,17 @@ export function PersonalBalance() {
   const { getRewards } = useRewardsService();
   const { claimRewards } = useRewardsService();
 
-  const { data: rewards } = useQuery({
+  const { data: rewards, isLoading: rewardsLoading } = useQuery({
     queryKey: [QUERY_KEYS.REWARDS],
     queryFn: getRewards,
   });
 
-  const { data: btcBalance } = useQuery({
+  const { data: btcBalance, isLoading: btcBalanceLoading } = useQuery({
     queryKey: [QUERY_KEYS.BTC_BALANCE],
     queryFn: getBTCBalance,
   });
 
-  const { data: cosmosBalance } = useQuery({
+  const { data: cosmosBalance, isLoading: cosmosBalanceLoading } = useQuery({
     queryKey: [QUERY_KEYS.COSMOS_BALANCE],
     queryFn: getBalance,
   });
@@ -52,7 +52,7 @@ export function PersonalBalance() {
         {/* TODO: Need to add the staker tvl value for the bitcoin balance 
           as well as remove the filtering on inscription balance*/}
         <StatItem
-          loading={false}
+          loading={btcBalanceLoading}
           title="Bitcoin Balance"
           value={`${satoshiToBtc(btcBalance ?? 0)} BTC`}
         />
@@ -60,7 +60,7 @@ export function PersonalBalance() {
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
-          loading={false}
+          loading={cosmosBalanceLoading}
           title="Stakable Bitcoin"
           value={`${satoshiToBtc(btcBalance ?? 0)} BTC`}
         />
@@ -68,7 +68,7 @@ export function PersonalBalance() {
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
-          loading={false}
+          loading={cosmosBalanceLoading}
           title="Babylon Balance"
           value={`${ubbnToBbn(cosmosBalance ?? 0)} BBN`}
         />
@@ -76,7 +76,7 @@ export function PersonalBalance() {
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
-          loading={false}
+          loading={rewardsLoading}
           title="BBN Rewards"
           value={`${ubbnToBbn(rewards ?? 0)} BBN`}
           actionComponent={{
