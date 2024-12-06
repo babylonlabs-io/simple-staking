@@ -5,6 +5,13 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true,
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "assets.leapwallet.io",
+      },
+    ],
+  },
 };
 
 export default nextConfig;
