@@ -319,7 +319,6 @@ export const Staking = () => {
     defaultFeeRate,
     stakingTimeBlocks,
     estimateStakingFee,
-    showError,
   ]);
 
   // Select the finality provider from the list

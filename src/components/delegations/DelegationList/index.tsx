@@ -7,7 +7,7 @@ import { FinalityProviderMoniker } from "@/components/delegations/DelegationList
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
-import { Inscription } from "./components/Inscription";
+import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
@@ -16,12 +16,10 @@ const columns: TableColumn<
   { handleActionClick: (action: string, txHash: string) => void }
 >[] = [
   {
-    field: "inscription",
-    headerName: "Inscription",
+    field: "Inception",
+    headerName: "Inception",
     width: "max-content",
-    renderCell: (row) => (
-      <Inscription value={row.bbnInceptionHeight.toString()} />
-    ),
+    renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
   },
   {
     field: "finalityProvider",
@@ -39,7 +37,7 @@ const columns: TableColumn<
   },
   {
     field: "stakingTxHashHex",
-    headerName: "Transaction hash",
+    headerName: "Transaction ID",
     renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
   },
   {

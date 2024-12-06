@@ -13,7 +13,7 @@ export interface DelegationV2 extends DelegationLike {
   stakerBtcPkHex: string;
   stakingTime: number;
   bbnInceptionHeight: number;
-  bbnInceptionTime: number;
+  bbnInceptionTime: string;
   startHeight: number;
   endHeight: number;
   unbondingTime: number;
