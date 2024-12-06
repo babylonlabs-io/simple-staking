@@ -70,7 +70,7 @@ export const Delegation: React.FC<DelegationProps> = ({
       {
         finalityProviderPkNoCoordHex: finalityProviderPkHex,
         stakingAmountSat: stakingValueSat,
-        stakingTimeBlocks: stakingTx.timelock,
+        stakingTimelock: stakingTx.timelock,
       },
       transitionCallback,
     );

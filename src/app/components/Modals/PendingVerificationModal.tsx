@@ -56,7 +56,7 @@ export function PendingVerificationModal({
     const {
       finalityProviderBtcPksHex,
       stakingAmount,
-      stakingTime,
+      stakingTimelock,
       paramsVersion,
       stakingTxHashHex,
       stakingTxHex,
@@ -66,7 +66,7 @@ export function PendingVerificationModal({
       {
         finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
         stakingAmountSat: stakingAmount,
-        stakingTimeBlocks: stakingTime,
+        stakingTimelock,
       },
       paramsVersion,
       stakingTxHashHex,

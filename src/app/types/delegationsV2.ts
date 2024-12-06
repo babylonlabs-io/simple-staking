@@ -11,12 +11,12 @@ export interface DelegationV2 extends DelegationLike {
   paramsVersion: number;
   finalityProviderBtcPksHex: string[];
   stakerBtcPkHex: string;
-  stakingTime: number;
+  stakingTimelock: number;
   bbnInceptionHeight: number;
   bbnInceptionTime: number;
   startHeight: number;
   endHeight: number;
-  unbondingTime: number;
+  unbondingTimelock: number;
   unbondingTxHex: string;
   covenantUnbondingSignatures?: {
     covenantBtcPkHex: string;

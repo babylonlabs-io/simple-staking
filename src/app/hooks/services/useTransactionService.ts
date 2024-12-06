@@ -35,7 +35,7 @@ import { useBbnTransaction } from "../client/query/useBbnTransaction";
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
   stakingAmountSat: number;
-  stakingTimeBlocks: number;
+  stakingTimelock: number;
 }
 
 interface BtcSigningFuncs {
@@ -115,7 +115,7 @@ export const useTransactionService = () => {
         },
         latestParam,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
 
       // Create and sign staking transaction
@@ -184,7 +184,7 @@ export const useTransactionService = () => {
         },
         latestParam,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
 
       const { fee: stakingFee } = staking.createStakingTransaction(
@@ -239,7 +239,7 @@ export const useTransactionService = () => {
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
         genesisParam,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
 
       // Get the merkle proof
@@ -313,7 +313,7 @@ export const useTransactionService = () => {
         },
         p,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
       const stakingPsbt = staking.toStakingPsbt(
         Transaction.fromHex(stakingTxHex),
@@ -379,7 +379,7 @@ export const useTransactionService = () => {
         },
         p,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
 
       const unbondingTx = Transaction.fromHex(unbondingTxHex);
@@ -461,7 +461,7 @@ export const useTransactionService = () => {
         },
         p,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
 
       const { psbt: unbondingPsbt } =
@@ -528,7 +528,7 @@ export const useTransactionService = () => {
         },
         p,
         stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimeBlocks,
+        stakingInput.stakingTimelock,
       );
 
       const { psbt } = staking.createWithdrawStakingExpiredTransaction(
@@ -663,7 +663,7 @@ const createBtcDelegationMsg = async (
           Buffer.from(stakingInput.finalityProviderPkNoCoordHex, "hex"),
         ),
       ],
-      stakingTime: stakingInput.stakingTimeBlocks,
+      stakingTime: stakingInput.stakingTimelock,
       stakingValue: stakingInput.stakingAmountSat,
       stakingTx: Uint8Array.from(stakingTx.toBuffer()),
       slashingTx: Uint8Array.from(
@@ -693,7 +693,7 @@ const validateStakingInput = (stakingInput: BtcStakingInputs) => {
   if (!stakingInput.finalityProviderPkNoCoordHex)
     throw new Error("Finality provider not selected");
   if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
-  if (!stakingInput.stakingTimeBlocks) throw new Error("Staking time not set");
+  if (!stakingInput.stakingTimelock) throw new Error("Staking time not set");
 };
 
 const checkWalletConnection = (

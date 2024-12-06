@@ -58,7 +58,7 @@ export const Staking = () => {
 
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
-  const [stakingTimeBlocks, setStakingTimeBlocks] = useState(0);
+  const [stakingTimelock, setStakingTimelock] = useState(0);
   const [finalityProvider, setFinalityProvider] =
     useState<FinalityProviderInterface>();
   const [finalityProviders, setFinalityProviders] =
@@ -163,7 +163,7 @@ export const Staking = () => {
     setAwaitingWalletResponse(false);
     setFinalityProvider(undefined);
     setStakingAmountSat(0);
-    setStakingTimeBlocks(0);
+    setStakingTimelock(0);
     setSelectedFeeRate(0);
     setPreviewModalOpen(false);
     setResetFormInputs(!resetFormInputs);
@@ -220,7 +220,7 @@ export const Staking = () => {
       const eoiInput = {
         finalityProviderPkNoCoordHex: finalityProvider.btcPk,
         stakingAmountSat,
-        stakingTimeBlocks,
+        stakingTimelock,
         feeRate,
       };
       setAwaitingWalletResponse(true);
@@ -285,7 +285,7 @@ export const Staking = () => {
         const eoiInput = {
           finalityProviderPkNoCoordHex: finalityProvider.btcPk,
           stakingAmountSat,
-          stakingTimeBlocks,
+          stakingTimelock,
           feeRate: memoizedFeeRate,
         };
         // Calculate the staking fee
@@ -317,9 +317,8 @@ export const Staking = () => {
     selectedFeeRate,
     minFeeRate,
     defaultFeeRate,
-    stakingTimeBlocks,
+    stakingTimelock,
     estimateStakingFee,
-    showError,
   ]);
 
   // Select the finality provider from the list
@@ -359,7 +358,7 @@ export const Staking = () => {
   };
 
   const handleStakingTimeBlocksChange = (inputTimeBlocks: number) => {
-    setStakingTimeBlocks(inputTimeBlocks);
+    setStakingTimelock(inputTimeBlocks);
   };
 
   // Show feedback modal only once for each type
@@ -436,7 +435,7 @@ export const Staking = () => {
       // Takes into account the fixed staking time
       const stakingTimeBlocksWithFixed = stakingTimeFixed
         ? minStakingTimeBlocks
-        : stakingTimeBlocks;
+        : stakingTimelock;
 
       // Check if the staking transaction is ready to be signed
       const { isReady: signReady, reason: signNotReadyReason } =

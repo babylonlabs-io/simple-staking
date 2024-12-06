@@ -28,7 +28,7 @@ interface DelegationV2API {
   delegation_staking: {
     staking_tx_hex: string;
     staking_tx_hash_hex: string;
-    staking_time: number;
+    staking_timelock: number;
     staking_amount: number;
     start_height: number;
     end_height: number;
@@ -37,7 +37,7 @@ interface DelegationV2API {
     slashing_tx_hex: string;
   };
   delegation_unbonding: {
-    unbonding_time: number;
+    unbonding_timelock: number;
     unbonding_tx: string;
     covenant_unbonding_signatures?: {
       covenant_btc_pk_hex: string;
@@ -76,7 +76,8 @@ export const getDelegationV2 = async (
     paramsVersion: delegationAPIResponse.data.params_version,
     stakerBtcPkHex: delegationAPIResponse.data.staker_btc_pk_hex,
     stakingAmount: delegationAPIResponse.data.delegation_staking.staking_amount,
-    stakingTime: delegationAPIResponse.data.delegation_staking.staking_time,
+    stakingTimelock:
+      delegationAPIResponse.data.delegation_staking.staking_timelock,
     stakingTxHashHex:
       delegationAPIResponse.data.delegation_staking.staking_tx_hash_hex,
     startHeight: delegationAPIResponse.data.delegation_staking.start_height,
@@ -88,8 +89,8 @@ export const getDelegationV2 = async (
     stakingSlashingTxHex:
       delegationAPIResponse.data.delegation_staking.slashing_tx_hex,
     state,
-    unbondingTime:
-      delegationAPIResponse.data.delegation_unbonding.unbonding_time,
+    unbondingTimelock:
+      delegationAPIResponse.data.delegation_unbonding.unbonding_timelock,
     unbondingTxHex:
       delegationAPIResponse.data.delegation_unbonding.unbonding_tx,
     slashingTxHex:
@@ -136,7 +137,7 @@ export const getDelegationsV2 = async (
         paramsVersion: apiDelegation.params_version,
         stakerBtcPkHex: apiDelegation.staker_btc_pk_hex,
         stakingAmount: apiDelegation.delegation_staking.staking_amount,
-        stakingTime: apiDelegation.delegation_staking.staking_time,
+        stakingTimelock: apiDelegation.delegation_staking.staking_timelock,
         stakingTxHashHex: apiDelegation.delegation_staking.staking_tx_hash_hex,
         startHeight: apiDelegation.delegation_staking.start_height,
         endHeight: apiDelegation.delegation_staking.end_height,
@@ -145,7 +146,8 @@ export const getDelegationsV2 = async (
         bbnInceptionTime: apiDelegation.delegation_staking.bbn_inception_time,
         stakingSlashingTxHex: apiDelegation.delegation_staking.slashing_tx_hex,
         state,
-        unbondingTime: apiDelegation.delegation_unbonding.unbonding_time,
+        unbondingTimelock:
+          apiDelegation.delegation_unbonding.unbonding_timelock,
         unbondingTxHex: apiDelegation.delegation_unbonding.unbonding_tx,
         unbondingSlashingTxHex:
           apiDelegation.delegation_unbonding.slashing_tx_hex,
