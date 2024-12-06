@@ -1,11 +1,6 @@
 import { networks } from "bitcoinjs-lib";
 
-import {
-  getPublicKeyNoCoord,
-  isSupportedAddressType,
-  isTaproot,
-  toNetwork,
-} from "@/utils/wallet";
+import { getPublicKeyNoCoord, isTaproot, toNetwork } from "@/utils/wallet";
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import { testingNetworks } from "../../helper";
@@ -33,22 +28,6 @@ describe("toNetwork", () => {
     expect(() => toNetwork("unsupported" as Network)).toThrow(
       "Unsupported network",
     );
-  });
-});
-
-describe("isSupportedAddressType", () => {
-  it("should return true for native SegWit address length", () => {
-    expect(isSupportedAddressType(nativeSegWitAddress)).toBe(true);
-  });
-
-  it("should return true for Taproot address length", () => {
-    expect(isSupportedAddressType(taprootAddress)).toBe(true);
-  });
-
-  it("should return false for unsupported address length", () => {
-    expect(isSupportedAddressType(legacyAddress)).toBe(false);
-    expect(isSupportedAddressType(nestedSegWitAddress)).toBe(false);
-    expect(isSupportedAddressType("a".repeat(40))).toBe(false);
   });
 });
 

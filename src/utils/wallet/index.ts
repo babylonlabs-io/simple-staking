@@ -2,7 +2,6 @@ import { networks } from "bitcoinjs-lib";
 
 import { Network, UTXO } from "./btc_wallet_provider";
 
-const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;
 export const LOW_VALUE_UTXO_THRESHOLD = 10000;
 
@@ -16,13 +15,6 @@ export const toNetwork = (network: Network): networks.Network => {
     default:
       throw new Error("Unsupported network");
   }
-};
-
-export const isSupportedAddressType = (address: string): boolean => {
-  return (
-    address.length === nativeSegwitAddressLength ||
-    address.length === taprootAddressLength
-  );
 };
 
 export const isTaproot = (address: string): boolean => {
