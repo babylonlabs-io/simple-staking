@@ -11,10 +11,7 @@ export type ActionType = keyof typeof ACTIONS;
 interface TxProps {
   stakingTxHashHex: string;
   stakingTxHex: string;
-  finalityProviderPk: string;
-  stakingAmount: number;
   paramsVersion: number;
-  stakingTime: number;
   unbondingTxHex: string;
   covenantUnbondingSignatures?: {
     covenantBtcPkHex: string;
@@ -24,7 +21,7 @@ interface TxProps {
   stakingInput: {
     finalityProviderPkNoCoordHex: string;
     stakingAmountSat: number;
-    stakingTimeBlocks: number;
+    stakingTimelock: number;
   };
   slashingTxHex: string;
   unbondingSlashingTxHex: string;
@@ -202,7 +199,7 @@ export function useDelegationService() {
         finalityProviderBtcPksHex,
         stakingAmount,
         paramsVersion,
-        stakingTime,
+        stakingTimelock,
         unbondingTxHex,
         covenantUnbondingSignatures,
         state,
@@ -214,7 +211,7 @@ export function useDelegationService() {
       const stakingInput = {
         finalityProviderPkNoCoordHex: finalityProviderPk,
         stakingAmountSat: stakingAmount,
-        stakingTimeBlocks: stakingTime,
+        stakingTimelock,
       };
 
       const execute = COMMANDS[action as ActionType];
@@ -222,12 +219,9 @@ export function useDelegationService() {
       await execute?.({
         stakingTxHashHex,
         stakingTxHex,
-        stakingAmount,
         paramsVersion,
-        stakingTime,
         unbondingTxHex,
         covenantUnbondingSignatures,
-        finalityProviderPk,
         state,
         stakingInput,
         slashingTxHex,
