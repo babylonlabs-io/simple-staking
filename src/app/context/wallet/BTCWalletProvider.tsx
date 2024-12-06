@@ -110,20 +110,9 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         ) {
           return;
         }
-        let errorMessage;
-        switch (true) {
-          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
-            error.message,
-          ):
-            errorMessage = supportedNetworkMessage;
-            break;
-          default:
-            errorMessage = error.message;
-            break;
-        }
         showError({
           error: {
-            message: errorMessage,
+            message: error?.message,
             errorState: ErrorState.WALLET,
           },
           retryAction: () => connectBTC(walletProvider),
