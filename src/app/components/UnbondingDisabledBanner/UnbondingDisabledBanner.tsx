@@ -9,7 +9,7 @@ interface UnbondingDisabledBannerProps {}
 
 export const UnbondingDisabledBanner: FC<UnbondingDisabledBannerProps> = () => {
   if (!shouldDisableUnbonding()) return null;
-  const { network, coinName } = getNetworkConfig();
+  const { network } = getNetworkConfig();
 
   return (
     <div className="w-full bg-[#FDF2EC] min-h-[50px] p-2 lg:min-h-[40px] flex items-center justify-center">
@@ -26,7 +26,7 @@ export const UnbondingDisabledBanner: FC<UnbondingDisabledBannerProps> = () => {
           </strong>{" "}
           <span className="block text-xs md:text-sm md:inline">
             To support a smooth transition of the {network} to Phase-2,
-            on-demand unbonding has been disabled until the phase-2 {network}
+            on-demand unbonding has been disabled until the phase-2 {network}{" "}
             launch.
           </span>
         </p>
