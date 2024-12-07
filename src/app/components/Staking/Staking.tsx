@@ -27,6 +27,7 @@ import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
+import { InfoModal } from "../Modals/InfoModal";
 import { PendingVerificationModal } from "../Modals/PendingVerificationModal";
 import { PreviewModal } from "../Modals/PreviewModal";
 
@@ -95,6 +96,8 @@ export const Staking = () => {
     reward: EOIStepStatus.UNSIGNED,
     eoi: EOIStepStatus.UNSIGNED,
   });
+
+  const [infoModalOpen, setInfoModalOpen] = useState(false);
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -478,10 +481,9 @@ export const Staking = () => {
                   unbonding time of 7 days.
                 </Text>
                 <a
-                  href="#"
-                  target="_blank"
                   rel="noopener noreferrer"
                   className="text-secondary-main hover:text-primary-main"
+                  onClick={() => setInfoModalOpen(true)}
                 >
                   Learn More
                 </a>
@@ -592,6 +594,7 @@ export const Staking = () => {
         open={eoiModalOpen}
         onClose={() => setEoiModalOpen(false)}
       />
+      <InfoModal open={infoModalOpen} onClose={() => setInfoModalOpen(false)} />
     </div>
   );
 };
