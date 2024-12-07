@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
-import Link from "next/dist/client/link";
 import Image from "next/image";
 
 import BitcoinBlock from "@/app/assets/bitcoin-block.svg";
@@ -40,11 +39,14 @@ export default function GenericError({
               {message}
             </Text>
           </div>
-          <Link href="/" passHref>
-            <Button variant="outlined" color="primary" className="w-full">
-              Back to homepage
-            </Button>
-          </Link>
+          <Button
+            variant="outlined"
+            color="primary"
+            className="w-full"
+            onClick={() => history.go()}
+          >
+            Back to homepage
+          </Button>
         </div>
       </div>
       <Footer />
