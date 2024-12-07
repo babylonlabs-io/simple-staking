@@ -1,8 +1,8 @@
+import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
-import connectIcon from "./connect-icon.svg";
 import walletIcon from "./wallet-icon.svg";
 
 export const WalletNotConnected = () => {
@@ -10,19 +10,26 @@ export const WalletNotConnected = () => {
 
   return (
     <div className="flex flex-1 flex-col">
-      <div className="flex flex-1 flex-col items-center justify-center gap-2 py-12">
-        <div className="rounded-full bg-base-200 p-4">
-          <Image src={walletIcon} alt="Wallet" width={32} height={32} />
+      <div className="flex flex-1 flex-col items-center justify-center gap-8">
+        <div className="rotate-12">
+          <Image src={walletIcon} alt="Wallet" width={120} height={122} />
         </div>
-        <h3 className="font-bold">Connect wallet</h3>
-        <p className="text-center text-sm font-light dark:text-neutral-content">
-          Please connect wallet to start staking
-        </p>
+        <div className="flex flex-col gap-2 justify-center items-center self-stretch">
+          <Heading variant="h5" className="text-primary-dark text-2xl">
+            Connect wallet to start staking
+          </Heading>
+          <Text
+            variant="body1"
+            className="text-center text-base text-primary-light p-0"
+          >
+            To start staking your BTC first connect wallets then select a
+            Finality Provider
+          </Text>
+        </div>
+        <Button variant="outlined" onClick={open} className="text-primary-dark">
+          Connect wallet
+        </Button>
       </div>
-      <button className="btn-primary btn" onClick={open}>
-        <Image src={connectIcon} alt="Connect wallet" />
-        Connect wallet
-      </button>
     </div>
   );
 };
