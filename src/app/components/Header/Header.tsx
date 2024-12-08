@@ -1,11 +1,9 @@
 import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
-import { twJoin } from "tailwind-merge";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
-import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
@@ -32,21 +30,6 @@ export const Header = () => {
               connected={connected}
               loading={loading}
               onConnect={open}
-              address={address}
-              btcWalletBalanceSat={totalBalance}
-              onDisconnect={disconnect}
-            />
-            {/* <ThemeToggle /> */}
-          </div>
-          <div
-            className={twJoin(
-              address && "justify-end p-6 pt-0",
-              "container mx-auto flex w-full items-center gap-4 md:hidden md:p-0",
-            )}
-          >
-            <ConnectedSmall
-              connected={connected}
-              loading={loading}
               address={address}
               btcWalletBalanceSat={totalBalance}
               onDisconnect={disconnect}
