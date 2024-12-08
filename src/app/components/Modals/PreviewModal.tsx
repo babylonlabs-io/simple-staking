@@ -1,13 +1,11 @@
 import {
   Avatar,
   Button,
-  Dialog,
   DialogBody,
   DialogFooter,
   DialogHeader,
   Heading,
   Loader,
-  MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 
@@ -17,6 +15,8 @@ import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
+
+import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface PreviewModalProps {
   isOpen: boolean;
@@ -52,8 +52,6 @@ export const PreviewModal = ({
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam
       ?.btcConfirmationDepth || 10;
-
-  const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
   const FinalityProviderValue = isMobileView ? (
     <span className="flex gap-2">
@@ -117,7 +115,7 @@ export const PreviewModal = ({
   ];
 
   return (
-    <DialogComponent open={isOpen} onClose={onClose}>
+    <ResponsiveDialog open={isOpen} onClose={onClose}>
       <DialogHeader
         title="Preview"
         onClose={onClose}
@@ -173,6 +171,6 @@ export const PreviewModal = ({
           )}
         </Button>
       </DialogFooter>
-    </DialogComponent>
+    </ResponsiveDialog>
   );
 };

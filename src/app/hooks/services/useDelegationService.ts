@@ -1,8 +1,11 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
+import {
+  DelegationV2,
+  DelegationV2StakingState as State,
+} from "@/app/types/delegationsV2";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -29,13 +32,23 @@ interface TxProps {
 
 type DelegationCommand = (props: TxProps) => Promise<void>;
 
+interface ConfirmationModalState {
+  action: ActionType;
+  delegation: DelegationV2;
+}
+
 export function useDelegationService() {
+  const [confirmationModal, setConfirmationModal] =
+    useState<ConfirmationModalState | null>(null);
+  const [processingDelegations, setProcessingDelegations] = useState<
+    Record<string, boolean>
+  >({});
+
   const {
     delegations = [],
     fetchMoreDelegations,
     hasMoreDelegations,
     isLoading,
-    findDelegationByTxHash,
     updateDelegationStatus,
   } = useDelegationV2State();
 
@@ -45,6 +58,14 @@ export function useDelegationService() {
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
   } = useTransactionService();
+
+  const processing = useMemo(
+    () =>
+      confirmationModal?.delegation
+        ? processingDelegations[confirmationModal.delegation.stakingTxHashHex]
+        : false,
+    [confirmationModal, processingDelegations],
+  );
 
   const COMMANDS: Record<ActionType, DelegationCommand> = useMemo(
     () => ({
@@ -114,11 +135,35 @@ export function useDelegationService() {
         );
       },
 
+      [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING]: async ({
+        stakingTxHashHex,
+        stakingInput,
+        paramsVersion,
+        unbondingSlashingTxHex,
+      }) => {
+        if (!unbondingSlashingTxHex) {
+          throw new Error(
+            "Unbonding slashing tx not found, can't submit withdrawal",
+          );
+        }
+
+        await submitEarlyUnbondedWithdrawalTx(
+          stakingInput,
+          paramsVersion,
+          unbondingSlashingTxHex,
+        );
+
+        updateDelegationStatus(
+          stakingTxHashHex,
+          State.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED,
+        );
+      },
+
       [ACTIONS.WITHDRAW_ON_TIMELOCK]: async ({
         stakingInput,
         paramsVersion,
-        stakingTxHex,
         stakingTxHashHex,
+        stakingTxHex,
       }: TxProps) => {
         await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
@@ -132,39 +177,17 @@ export function useDelegationService() {
         );
       },
 
-      [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING]: async ({
-        stakingInput,
-        paramsVersion,
-        unbondingSlashingTxHex,
-        stakingTxHashHex,
-      }) => {
-        if (!unbondingSlashingTxHex) {
-          throw new Error(
-            "Unbonding slashing tx not found, can't submit withdrawal",
-          );
-        }
-        await submitEarlyUnbondedWithdrawalTx(
-          stakingInput,
-          paramsVersion,
-          unbondingSlashingTxHex,
-        );
-
-        updateDelegationStatus(
-          stakingTxHashHex,
-          State.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED,
-        );
-      },
-
       [ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING]: async ({
         stakingInput,
         paramsVersion,
-        slashingTxHex,
         stakingTxHashHex,
+        slashingTxHex,
       }) => {
         if (!slashingTxHex) {
           throw new Error("Slashing tx not found, can't submit withdrawal");
         }
-        await submitEarlyUnbondedWithdrawalTx(
+
+        await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
           slashingTxHex,
@@ -172,7 +195,7 @@ export function useDelegationService() {
 
         updateDelegationStatus(
           stakingTxHashHex,
-          State.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED,
+          State.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED,
         );
       },
     }),
@@ -185,14 +208,30 @@ export function useDelegationService() {
     ],
   );
 
+  const openConfirmationModal = useCallback(
+    (action: ActionType, delegation: DelegationV2) => {
+      setConfirmationModal({
+        action,
+        delegation,
+      });
+    },
+    [],
+  );
+
+  const closeConfirmationModal = useCallback(
+    () => void setConfirmationModal(null),
+    [],
+  );
+
+  const toggleProcessingDelegation = useCallback(
+    (id: string, processing: boolean) => {
+      setProcessingDelegations((state) => ({ ...state, [id]: processing }));
+    },
+    [],
+  );
+
   const executeDelegationAction = useCallback(
-    async (action: string, txHash: string) => {
-      const d = findDelegationByTxHash(txHash);
-
-      if (!d) {
-        throw new Error("Delegation not found: " + txHash);
-      }
-
+    async (action: string, delegation: DelegationV2) => {
       const {
         stakingTxHashHex,
         stakingTxHex,
@@ -205,7 +244,7 @@ export function useDelegationService() {
         state,
         slashingTxHex,
         unbondingSlashingTxHex,
-      } = d;
+      } = delegation;
 
       const finalityProviderPk = finalityProviderBtcPksHex[0];
       const stakingInput = {
@@ -216,25 +255,37 @@ export function useDelegationService() {
 
       const execute = COMMANDS[action as ActionType];
 
-      await execute?.({
-        stakingTxHashHex,
-        stakingTxHex,
-        paramsVersion,
-        unbondingTxHex,
-        covenantUnbondingSignatures,
-        state,
-        stakingInput,
-        slashingTxHex,
-        unbondingSlashingTxHex,
-      });
+      try {
+        toggleProcessingDelegation(stakingTxHashHex, true);
+
+        await execute?.({
+          stakingTxHashHex,
+          stakingTxHex,
+          paramsVersion,
+          unbondingTxHex,
+          covenantUnbondingSignatures,
+          state,
+          stakingInput,
+          slashingTxHex,
+          unbondingSlashingTxHex,
+        });
+
+        closeConfirmationModal();
+      } finally {
+        toggleProcessingDelegation(stakingTxHashHex, false);
+      }
     },
-    [COMMANDS, findDelegationByTxHash],
+    [COMMANDS, closeConfirmationModal, toggleProcessingDelegation],
   );
 
   return {
+    processing,
     isLoading,
     delegations,
     hasMoreDelegations,
+    confirmationModal,
+    openConfirmationModal,
+    closeConfirmationModal,
     fetchMoreDelegations,
     executeDelegationAction,
   };

@@ -49,7 +49,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   // Context
   const state = useMemo(
     () => ({
-      delegations: delegations,
+      delegations,
       isLoading: isFetchingNextPage,
       hasMoreDelegations: hasNextPage,
       addDelegation: addPendingDelegation,

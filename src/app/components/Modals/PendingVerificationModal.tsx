@@ -4,7 +4,8 @@ import { BiSolidBadgeCheck } from "react-icons/bi";
 
 import { useDelegationV2 } from "@/app/hooks/client/api/useDelegationV2";
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
-import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
+import { useDelegationV2State } from "@/app/state/DelegationV2State";
+import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { GeneralModal } from "./GeneralModal";
@@ -45,6 +46,7 @@ export function PendingVerificationModal({
   stakingTxHash,
 }: PendingVerificationModalProps) {
   const { submitStakingTx } = useTransactionService();
+  const { updateDelegationStatus } = useDelegationV2State();
   const { networkName } = getNetworkConfig();
 
   const { data: delegation = null } = useDelegationV2(stakingTxHash);
@@ -72,10 +74,15 @@ export function PendingVerificationModal({
       stakingTxHashHex,
       stakingTxHex,
     );
-    onClose();
-  }, [delegation, submitStakingTx, onClose]);
 
-  const verified = delegation?.state === state.VERIFIED;
+    updateDelegationStatus(
+      stakingTxHashHex,
+      State.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
+    );
+    onClose();
+  }, [delegation, updateDelegationStatus, submitStakingTx, onClose]);
+
+  const verified = delegation?.state === State.VERIFIED;
 
   return (
     <GeneralModal

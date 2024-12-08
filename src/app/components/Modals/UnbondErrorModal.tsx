@@ -1,16 +1,15 @@
 import {
   Button,
-  Dialog,
   DialogBody,
   DialogFooter,
   Heading,
-  MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
 import warningIcon from "@/app/assets/warning-icon.svg";
-import { useIsMobileView } from "@/app/hooks/useBreakpoint";
+
+import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface UnbondErrorModalProps {
   isOpen: boolean;
@@ -19,12 +18,8 @@ interface UnbondErrorModalProps {
 }
 
 export const UnbondErrorModal = ({ isOpen, onDone }: UnbondErrorModalProps) => {
-  const isMobileView = useIsMobileView();
-
-  const DialogComponent = isMobileView ? MobileDialog : Dialog;
-
   return (
-    <DialogComponent open={isOpen} hasBackdrop={false}>
+    <ResponsiveDialog open={isOpen} hasBackdrop={false}>
       <DialogBody className="pb-8 pt-4 text-primary-dark flex flex-col items-center">
         <Image src={warningIcon} alt="Warning" width={88} height={88} />
         <Heading variant="h5" className="mt-4">
@@ -41,6 +36,6 @@ export const UnbondErrorModal = ({ isOpen, onDone }: UnbondErrorModalProps) => {
           Done
         </Button>
       </DialogFooter>
-    </DialogComponent>
+    </ResponsiveDialog>
   );
 };
