@@ -18,6 +18,7 @@ interface UnbondModalProps {
   onProceed: () => void;
   awaitingWalletResponse: boolean;
 }
+const { networkName, coinName } = getNetworkConfig();
 
 export const UnbondModal = ({
   isOpen,
@@ -25,9 +26,7 @@ export const UnbondModal = ({
   onProceed,
   awaitingWalletResponse,
 }: UnbondModalProps) => {
-  const { networkName, coinName } = getNetworkConfig();
   const isMobileView = useIsMobileView();
-
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
   return (
