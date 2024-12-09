@@ -1,6 +1,10 @@
 import { MdEditNote } from "react-icons/md";
 
+import { getNetworkConfig } from "@/config/network.config";
+
 import { SubmitModal } from "./SubmitModal";
+
+const { networkName } = getNetworkConfig();
 
 interface StakeModalProps {
   processing?: boolean;
@@ -20,7 +24,7 @@ export function StakeModal({
       processing={processing}
       open={open}
       icon={<MdEditNote size={52} />}
-      title="Sign and Send to BTC"
+      title={`Sign and Send to ${networkName}`}
       onClose={onClose}
       onSubmit={onSubmit}
     >
