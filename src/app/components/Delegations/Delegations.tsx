@@ -40,7 +40,7 @@ export const Delegations = ({}) => {
     isLoading,
   } = useDelegationState();
 
-  const { submitWithdrawalTx } = useV1TransactionService();
+  const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
 
   const selectedDelegation = delegationsAPI?.delegations.find(
@@ -93,6 +93,40 @@ export const Delegations = ({}) => {
     });
   };
 
+  // TODO: Hook up with unbonding modal
+  const handleUnbond = async (id: string) => {
+    try {
+      if (selectedDelegation?.stakingTxHashHex != id) {
+        throw new Error("Wrong delegation selected for withdrawal");
+      }
+      // Sign the withdrawal transaction
+      const { stakingTx, finalityProviderPkHex, stakingValueSat } =
+        selectedDelegation;
+
+      await submitUnbondingTx(
+        {
+          stakingTimelock: stakingTx.timelock,
+          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          stakingAmountSat: stakingValueSat,
+        },
+        stakingTx.startHeight,
+        stakingTx.txHex,
+      );
+      // Update the local state with the new intermediate delegation
+      updateLocalStorage(
+        selectedDelegation,
+        DelegationState.INTERMEDIATE_UNBONDING,
+      );
+    } catch (error: Error | any) {
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.UNBONDING,
+        },
+      });
+    }
+  };
+
   // Handles withdrawing requests for delegations that have expired timelocks
   // It constructs a withdrawal transaction, creates a signature for it,
   // and submits it to the Bitcoin network
@@ -110,7 +144,7 @@ export const Delegations = ({}) => {
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
         selectedDelegation;
-      submitWithdrawalTx(
+      await submitWithdrawalTx(
         {
           stakingTimelock: stakingTx.timelock,
           finalityProviderPkNoCoordHex: finalityProviderPkHex,

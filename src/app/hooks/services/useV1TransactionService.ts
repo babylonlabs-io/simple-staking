@@ -2,6 +2,8 @@ import { PsbtResult, Staking } from "@babylonlabs-io/btc-staking-ts";
 import { Psbt, Transaction } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
+import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
+import { postUnbonding } from "@/app/api/postUnbonding";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
 import { validateStakingInput } from "@/utils/delegations";
@@ -19,7 +21,6 @@ export function useV1TransactionService() {
     signPsbt,
     publicKeyNoCoord,
     address,
-    signMessage,
     network: btcNetwork,
     pushTx,
   } = useBTCWallet();
@@ -32,6 +33,93 @@ export function useV1TransactionService() {
   // except for the "tag" field which is only used for staking transactions.
   // The "tag" is not needed for withdrawal or unbonding transactions.
   const bbnStakingParams = networkInfo?.params.bbnStakingParams.versions;
+
+  /**
+   * Submit the unbonding transaction to babylon API for further processing
+   * The system will gather covenant signatures and submit the unbonding
+   * transaction to the Bitcoin network
+   *
+   * @param stakingInput - The staking inputs
+   * @param stakingHeight - The height of the staking transaction
+   * @param stakingTxHex - The staking transaction hex
+   */
+  const submitUnbondingTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      stakingHeight: number,
+      stakingTxHex: string,
+    ) => {
+      // Perform checks
+      if (!bbnStakingParams) {
+        throw new Error("Staking params not loaded");
+      }
+      if (!btcConnected || !btcNetwork)
+        throw new Error("BTC Wallet not connected");
+      validateStakingInput(stakingInput);
+
+      // Get the staking params at the time of the staking transaction
+      const stakingParam = getBbnParamByBtcHeight(
+        stakingHeight,
+        bbnStakingParams,
+      );
+
+      if (!stakingParam) {
+        throw new Error(
+          `Unable to find staking params for height ${stakingHeight}`,
+        );
+      }
+
+      // Warning: We using the "Staking" instead of "ObservableStaking"
+      // because unbonding transactions does not require phase-1 specific tags
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        stakingParam,
+        stakingInput.finalityProviderPkNoCoordHex,
+        stakingInput.stakingTimelock,
+      );
+
+      const stakingTx = Transaction.fromHex(stakingTxHex);
+
+      // Check if this staking transaction is eligible for unbonding
+      const eligibility = await getUnbondingEligibility(stakingTx.getId());
+      if (!eligibility) {
+        throw new Error("Staking transaction is not eligible for unbonding");
+      }
+
+      const txResult = staking.createUnbondingTransaction(stakingTx);
+
+      const psbt = staking.toUnbondingPsbt(txResult.transaction, stakingTx);
+
+      const signedUnbondingPsbtHex = await signPsbt(psbt.toHex());
+      const signedUnbondingTx = Psbt.fromHex(
+        signedUnbondingPsbtHex,
+      ).extractTransaction();
+
+      const stakerSignatureHex = getStakerSignature(signedUnbondingTx);
+      try {
+        await postUnbonding(
+          stakerSignatureHex,
+          stakingTx.getId(),
+          signedUnbondingTx.getId(),
+          signedUnbondingTx.toHex(),
+        );
+      } catch (error) {
+        throw new Error(`Error submitting unbonding transaction: ${error}`);
+      }
+    },
+    [
+      bbnStakingParams,
+      btcConnected,
+      btcNetwork,
+      address,
+      publicKeyNoCoord,
+      signPsbt,
+    ],
+  );
 
   /**
    * Submit the withdrawal transaction
@@ -72,7 +160,7 @@ export function useV1TransactionService() {
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
-      // because we only perform withdraw or unbonding transactions
+      // because withdrawal transactions does not require phase-1 specific tags
       const staking = new Staking(
         btcNetwork!,
         {
@@ -120,6 +208,16 @@ export function useV1TransactionService() {
   );
 
   return {
+    submitUnbondingTx,
     submitWithdrawalTx,
   };
 }
+
+// Get the staker signature from the unbonding transaction
+const getStakerSignature = (unbondingTx: Transaction): string => {
+  try {
+    return unbondingTx.ins[0].witness[0].toString("hex");
+  } catch (error) {
+    throw new Error("Failed to get staker signature");
+  }
+};
