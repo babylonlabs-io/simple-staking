@@ -24,7 +24,6 @@ interface DelegationAPI {
   staking_tx: StakingTxAPI;
   unbonding_tx?: UnbondingTxAPI;
   is_overflow: boolean;
-  transitioned: boolean;
   is_eligible_for_transition: boolean;
 }
 
@@ -49,13 +48,12 @@ export const getDelegations = async (
     throw new Error("No public key provided");
   }
 
-  // const limit = 100;
-  // const reverse = false;
-
   const params = {
     pagination_key: encode(key),
     staker_btc_pk: encode(publicKeyNoCoord),
-    state: ["active", "unbonded"],
+    // We only fetch for states that can have pending actions.
+    // We don't care terminal states such as "withdrawn" or "transitioned".
+    state: ["active", "unbonded", "unbonding", "unbonding_requested"],
   };
 
   const response = await apiWrapper(
