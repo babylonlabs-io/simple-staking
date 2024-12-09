@@ -2,11 +2,13 @@ import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { getNetworkConfig } from "@/config/network.config";
 
 import walletIcon from "./wallet-icon.svg";
 
 export const WalletNotConnected = () => {
   const { open } = useBTCWallet();
+  const { coinName } = getNetworkConfig();
 
   return (
     <div className="flex flex-1 flex-col">
@@ -22,7 +24,7 @@ export const WalletNotConnected = () => {
             variant="body1"
             className="text-center text-base text-primary-light p-0"
           >
-            To start staking your BTC first connect wallets then select a
+            To start staking your {coinName} first connect wallets then select a
             Finality Provider
           </Text>
         </div>
