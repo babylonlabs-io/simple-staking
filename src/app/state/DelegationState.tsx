@@ -4,7 +4,6 @@ import { useLocalStorage } from "usehooks-ts";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import type { Delegation } from "@/app/types/delegations";
-import { DelegationState as DelegationEnum } from "@/app/types/delegations";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
@@ -12,7 +11,6 @@ import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/utils/loca
 interface DelegationState {
   isLoading: boolean;
   hasMoreDelegations: boolean;
-  totalStaked: number;
   delegations: Delegation[];
   addDelegation: (delegation: Delegation) => void;
   fetchMoreDelegations: () => void;
@@ -21,7 +19,6 @@ interface DelegationState {
 const { StateProvider, useState } = createStateUtils<DelegationState>({
   isLoading: false,
   delegations: [],
-  totalStaked: 0,
   hasMoreDelegations: false,
   addDelegation: () => null,
   fetchMoreDelegations: () => null,
@@ -57,18 +54,6 @@ export function DelegationState({ children }: PropsWithChildren) {
     [data?.delegations, setDelegations, delegations],
   );
 
-  // Computed
-  const totalStaked = useMemo(
-    () =>
-      (data?.delegations ?? [])
-        .filter((delegation) => delegation?.state === DelegationEnum.ACTIVE)
-        .reduce(
-          (accumulator: number, item) => accumulator + item?.stakingValueSat,
-          0,
-        ),
-    [data?.delegations],
-  );
-
   // Methods
   const addDelegation = useCallback(
     (newDelegation: Delegation) => {
@@ -92,7 +77,6 @@ export function DelegationState({ children }: PropsWithChildren) {
   const state = useMemo(
     () => ({
       delegations,
-      totalStaked,
       isLoading: isFetchingNextPage,
       hasMoreDelegations: hasNextPage,
       addDelegation,
@@ -100,7 +84,6 @@ export function DelegationState({ children }: PropsWithChildren) {
     }),
     [
       delegations,
-      totalStaked,
       isFetchingNextPage,
       hasNextPage,
       addDelegation,
