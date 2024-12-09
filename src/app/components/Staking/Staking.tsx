@@ -31,7 +31,7 @@ import { InfoModal } from "../Modals/InfoModal";
 import { PendingVerificationModal } from "../Modals/PendingVerificationModal";
 import { PreviewModal } from "../Modals/PreviewModal";
 
-import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
+import { FinalityProviders } from "./FinalityProviders/v1/FinalityProviders";
 import { StakingAmount } from "./Form/StakingAmount";
 import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
