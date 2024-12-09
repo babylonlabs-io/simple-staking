@@ -1,13 +1,20 @@
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
-import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
+import { ActionType } from "@/app/hooks/services/useDelegationService";
+import {
+  DelegationV2,
+  DelegationV2StakingState as State,
+} from "@/app/types/delegationsV2";
 
 interface ActionButtonProps {
-  txHash: string;
+  delegation: DelegationV2;
   state: string;
-  onClick?: (action: string, txHash: string) => void;
+  onClick?: (action: ActionType, delegation: DelegationV2) => void;
 }
 
-const ACTION_BUTTON_PROPS: Record<string, { action: string; title: string }> = {
+const ACTION_BUTTON_PROPS: Record<
+  string,
+  { action: ActionType; title: string }
+> = {
   [State.VERIFIED]: {
     action: ACTIONS.STAKE,
     title: "Stake",
@@ -42,7 +49,7 @@ export function ActionButton(props: ActionButtonProps) {
   return (
     <button
       className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
-      onClick={() => props.onClick?.(buttonProps.action, props.txHash)}
+      onClick={() => props.onClick?.(buttonProps.action, props.delegation)}
     >
       {buttonProps.title}
     </button>
