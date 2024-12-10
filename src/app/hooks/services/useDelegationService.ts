@@ -14,6 +14,7 @@ export type ActionType = keyof typeof ACTIONS;
 interface TxProps {
   stakingTxHashHex: string;
   stakingTxHex: string;
+  stakingHeight: number;
   paramsVersion: number;
   unbondingTxHex: string;
   covenantUnbondingSignatures?: {
@@ -90,7 +91,7 @@ export function useDelegationService() {
 
       [ACTIONS.UNBOUND]: async ({
         stakingInput,
-        paramsVersion,
+        stakingHeight,
         stakingTxHashHex,
         stakingTxHex,
         unbondingTxHex,
@@ -102,7 +103,7 @@ export function useDelegationService() {
 
         await submitUnbondingTx(
           stakingInput,
-          paramsVersion,
+          stakingHeight,
           stakingTxHex,
           unbondingTxHex,
           covenantUnbondingSignatures.map((sig) => ({
@@ -120,12 +121,12 @@ export function useDelegationService() {
       [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING]: async ({
         stakingTxHashHex,
         stakingInput,
-        paramsVersion,
+        stakingHeight,
         unbondingTxHex,
       }: TxProps) => {
         await submitEarlyUnbondedWithdrawalTx(
           stakingInput,
-          paramsVersion,
+          stakingHeight,
           unbondingTxHex,
         );
 
@@ -138,7 +139,7 @@ export function useDelegationService() {
       [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING]: async ({
         stakingTxHashHex,
         stakingInput,
-        paramsVersion,
+        stakingHeight,
         unbondingSlashingTxHex,
       }) => {
         if (!unbondingSlashingTxHex) {
@@ -149,7 +150,7 @@ export function useDelegationService() {
 
         await submitEarlyUnbondedWithdrawalTx(
           stakingInput,
-          paramsVersion,
+          stakingHeight,
           unbondingSlashingTxHex,
         );
 
@@ -161,13 +162,13 @@ export function useDelegationService() {
 
       [ACTIONS.WITHDRAW_ON_TIMELOCK]: async ({
         stakingInput,
-        paramsVersion,
+        stakingHeight,
         stakingTxHashHex,
         stakingTxHex,
       }: TxProps) => {
         await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
-          paramsVersion,
+          stakingHeight,
           stakingTxHex,
         );
 
@@ -179,7 +180,7 @@ export function useDelegationService() {
 
       [ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING]: async ({
         stakingInput,
-        paramsVersion,
+        stakingHeight,
         stakingTxHashHex,
         slashingTxHex,
       }) => {
@@ -189,7 +190,7 @@ export function useDelegationService() {
 
         await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
-          paramsVersion,
+          stakingHeight,
           slashingTxHex,
         );
 
@@ -244,6 +245,7 @@ export function useDelegationService() {
         state,
         slashingTxHex,
         unbondingSlashingTxHex,
+        startHeight,
       } = delegation;
 
       const finalityProviderPk = finalityProviderBtcPksHex[0];
@@ -261,6 +263,7 @@ export function useDelegationService() {
         await execute?.({
           stakingTxHashHex,
           stakingTxHex,
+          stakingHeight: startHeight,
           paramsVersion,
           unbondingTxHex,
           covenantUnbondingSignatures,

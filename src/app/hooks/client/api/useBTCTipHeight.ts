@@ -7,5 +7,6 @@ export function useBTCTipHeight() {
   return useAPIQuery({
     queryKey: [BTC_TIP_HEIGHT_KEY],
     queryFn: getTipHeight,
+    refetchInterval: 60000, // Refetch every 60 seconds
   });
 }

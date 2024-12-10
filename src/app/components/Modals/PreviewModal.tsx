@@ -8,6 +8,7 @@ import {
   Loader,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
+import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
@@ -124,7 +125,7 @@ export const PreviewModal = ({
       <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
         <div className="flex flex-col">
           {previewFields.map((field, index) => (
-            <>
+            <Fragment key={field.key}>
               <div key={field.key} className="flex justify-between">
                 <Text variant="body1">{field.key}</Text>
                 <div className="text-right">{field.value}</div>
@@ -132,7 +133,7 @@ export const PreviewModal = ({
               {index < previewFields.length - 1 && (
                 <div className="divider mx-0 my-2" />
               )}
-            </>
+            </Fragment>
           ))}
         </div>
         <div className="flex flex-col gap-2">
