@@ -1,3 +1,4 @@
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 
 import { BtcStakingInputs } from "@/app/hooks/services/useTransactionService";
@@ -57,4 +58,24 @@ export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
     throw new Error("Finality provider not selected");
   if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
   if (!stakingInput.stakingTimelock) throw new Error("Staking time not set");
+};
+
+/**
+ * Verifies that the transaction inputs are still available from the UTXOs set.
+ * @param tx - The transaction to verify.
+ * @param allUTXOs - The UTXOs set.
+ * @returns True if the transaction inputs are still available, false otherwise.
+ */
+export const isTransactionInputAvailable = (
+  tx: Transaction,
+  allUTXOs: UTXO[],
+) => {
+  return tx.ins.every((input) => {
+    return allUTXOs.find((utxo) => {
+      return (
+        utxo.txid === Buffer.from(input.hash).reverse().toString("hex") &&
+        utxo.vout === input.index
+      );
+    });
+  });
 };
