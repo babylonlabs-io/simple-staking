@@ -206,11 +206,12 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                   checked={noHWWallet}
                 />
                 <span className="label-text text-xs leading-snug md:text-sm md:max-w-[34rem]">
-                  I acknowledge that Keystone via QR code is the only hardware
-                  wallet supporting Bitcoin Staking. Using any other hardware
-                  wallets through any means (such as connection to software /
-                  extension / mobile wallet) can lead to permanent inability to
-                  withdraw the stake.
+                  The following are the only hardware wallets supporting Bitcoin
+                  Staking: (1) Keystone via QR code and (2) OneKey Pro{" "}
+                  <strong>using Taproot only</strong> through the OneKey Chrome
+                  Extension. Using any other hardware wallet through any means
+                  (such as connection to a software/extension/mobile wallet) can
+                  lead to permanent inability to withdraw the stake.
                 </span>
               </label>
             </div>
