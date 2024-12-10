@@ -21,6 +21,7 @@ const STATE_LIST = [DelegationState, DelegationV2State];
 
 export interface AppState {
   availableUTXOs?: UTXO[];
+  allUTXOs?: UTXO[];
   totalBalance: number;
   networkInfo?: NetworkInfo;
   currentHeight?: number;
@@ -116,6 +117,7 @@ export function AppState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       availableUTXOs,
+      allUTXOs: utxos,
       currentHeight: height,
       totalBalance,
       networkInfo,
@@ -127,6 +129,7 @@ export function AppState({ children }: PropsWithChildren) {
     }),
     [
       availableUTXOs,
+      utxos,
       height,
       totalBalance,
       networkInfo,
