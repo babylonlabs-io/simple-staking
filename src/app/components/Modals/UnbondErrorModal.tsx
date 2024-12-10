@@ -7,7 +7,7 @@ import {
 } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
-import warningIcon from "@/app/assets/warning-icon.svg";
+import warningIcon from "@/app/assets/warning-triangle.svg";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
