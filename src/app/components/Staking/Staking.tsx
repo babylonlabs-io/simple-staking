@@ -546,13 +546,9 @@ export const Staking = () => {
       <Heading variant="h4" className="text-primary-dark md:text-4xl">
         Bitcoin Staking
       </Heading>
-      <div className="flex flex-col gap-6 lg:flex-row">
-        <div className="flex flex-col gap-4 lg:basis-3/5 xl:basis-2/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
-          <FinalityProviders
-            onFinalityProvidersLoad={setFinalityProviders}
-            selectedFinalityProvider={finalityProvider}
-            onFinalityProviderChange={handleChooseFinalityProvider}
-          />
+      <div className="flex flex-col gap-4 lg:flex-row">
+        <div className="flex flex-1 flex-col gap-4 lg:basis-3/5 xl:basis-2/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
+          <FinalityProviders />
         </div>
         <div className="flex flex-col gap-4 lg:basis-2/5 xl:basis-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
           {renderStakingForm()}
