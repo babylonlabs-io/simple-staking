@@ -31,6 +31,7 @@ export const apiWrapper = async (
           },
       {
         timeout: timeout || 0, // 0 is no timeout
+        paramsSerializer: { indexes: null },
       },
     );
   } catch (error) {
