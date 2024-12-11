@@ -1,4 +1,7 @@
-import { incentivequery } from "@babylonlabs-io/babylon-proto-ts";
+import {
+  btclightclientquery,
+  incentivequery,
+} from "@babylonlabs-io/babylon-proto-ts";
 import {
   QueryClient,
   createProtobufRpcClient,
@@ -8,7 +11,12 @@ import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { useCallback, useEffect, useState } from "react";
 
 import { BBN_RPC_URL } from "@/app/common/rpc";
+import { ONE_MINUTE } from "@/app/constants";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+
+import { useAPIQuery } from "../api/useApi";
+
+export const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 
 /**
  * Query service for Babylon which contains all the queries for
@@ -58,9 +66,25 @@ export const useBbnQueryClient = () => {
     return Number(balance?.amount ?? 0);
   }, [connected, queryClient, bech32Address]);
 
+  const btcTipQuery = useAPIQuery({
+    queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY],
+    queryFn: async () => {
+      if (!queryClient) {
+        return undefined;
+      }
+      const { btclightQueryClient } = setupBtclightClientExtension(queryClient);
+      const req = btclightclientquery.QueryTipRequest.fromPartial({});
+      const { header } = await btclightQueryClient.Tip(req);
+      return header;
+    },
+    enabled: Boolean(queryClient),
+    staleTime: ONE_MINUTE,
+  });
+
   return {
     getRewards,
     getBalance,
+    btcTipQuery,
   };
 };
 
@@ -73,4 +97,14 @@ const setupIncentiveExtension = (
   const rpc = createProtobufRpcClient(base);
   const incentiveQueryClient = new incentivequery.QueryClientImpl(rpc);
   return { incentive: incentiveQueryClient };
+};
+
+const setupBtclightClientExtension = (
+  base: QueryClient,
+): {
+  btclightQueryClient: btclightclientquery.QueryClientImpl;
+} => {
+  const rpc = createProtobufRpcClient(base);
+  const btclightQueryClient = new btclightclientquery.QueryClientImpl(rpc);
+  return { btclightQueryClient };
 };

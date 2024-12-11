@@ -1,7 +1,6 @@
 import { useInscriptionProvider } from "@babylonlabs-io/bbn-wallet-connect";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
-import { useBTCTipHeight } from "@/app/hooks/client/api/useBTCTipHeight";
 import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { createStateUtils } from "@/utils/createStateUtils";
@@ -23,7 +22,6 @@ export interface AppState {
   availableUTXOs?: UTXO[];
   totalBalance: number;
   networkInfo?: NetworkInfo;
-  currentHeight?: number;
   isError: boolean;
   isLoading: boolean;
   ordinalsExcluded: boolean;
@@ -64,20 +62,9 @@ export function AppState({ children }: PropsWithChildren) {
     isError: isNetworkInfoError,
   } = useNetworkInfo();
 
-  const {
-    data: height,
-    isLoading: isHeightLoading,
-    isError: isHeightError,
-  } = useBTCTipHeight();
-
   // Computed
-  const isLoading =
-    isHeightLoading ||
-    isUTXOLoading ||
-    isOrdinalLoading ||
-    isNetworkInfoLoading;
-  const isError =
-    isHeightError || isUTXOError || isOrdinalError || isNetworkInfoError;
+  const isLoading = isUTXOLoading || isOrdinalLoading || isNetworkInfoLoading;
+  const isError = isUTXOError || isOrdinalError || isNetworkInfoError;
 
   const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
     () =>
@@ -116,7 +103,6 @@ export function AppState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       availableUTXOs,
-      currentHeight: height,
       totalBalance,
       networkInfo,
       isError,
@@ -127,7 +113,6 @@ export function AppState({ children }: PropsWithChildren) {
     }),
     [
       availableUTXOs,
-      height,
       totalBalance,
       networkInfo,
       isError,
