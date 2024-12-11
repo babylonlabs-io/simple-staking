@@ -7,7 +7,10 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { UTXO_KEY } from "@/app/common/constants";
 import { LoadingView } from "@/app/components/Loading/Loading";
-import { EOIModal, EOIStepStatus } from "@/app/components/Modals/EOIModal";
+import {
+  EOIModal,
+  EOIStepStatus,
+} from "@/app/components/Modals/EOIModal/EOIModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import {
@@ -581,11 +584,7 @@ export const Staking = () => {
           awaitingWalletResponse={awaitingWalletResponse}
         />
       )}
-      <EOIModal
-        statuses={eoiStatuses}
-        open={eoiModalOpen}
-        onClose={() => setEoiModalOpen(false)}
-      />
+      <EOIModal title="Staking" statuses={eoiStatuses} open={eoiModalOpen} />
       <InfoModal open={infoModalOpen} onClose={() => setInfoModalOpen(false)} />
     </div>
   );
