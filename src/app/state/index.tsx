@@ -20,7 +20,6 @@ const STATE_LIST = [DelegationState, DelegationV2State];
 
 export interface AppState {
   availableUTXOs?: UTXO[];
-  allUTXOs?: UTXO[];
   totalBalance: number;
   networkInfo?: NetworkInfo;
   isError: boolean;

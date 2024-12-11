@@ -2,6 +2,10 @@ import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 
 import { BtcStakingInputs } from "@/app/hooks/services/useTransactionService";
+import {
+  DelegationV2StakingState as DelegationState,
+  DelegationV2,
+} from "@/app/types/delegationsV2";
 
 /**
  * Clears the signatures from a transaction.
@@ -66,16 +70,40 @@ export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
  * @param allUTXOs - The UTXOs set.
  * @returns True if the transaction inputs are still available, false otherwise.
  */
-export const isTransactionInputAvailable = (
-  tx: Transaction,
-  allUTXOs: UTXO[],
-) => {
-  return tx.ins.every((input) => {
-    return allUTXOs.find((utxo) => {
-      return (
-        utxo.txid === Buffer.from(input.hash).reverse().toString("hex") &&
-        utxo.vout === input.index
-      );
-    });
-  });
+
+type Validator = (
+  delegation: DelegationV2,
+  utxos: UTXO[],
+) => { valid: boolean; error?: string };
+
+const VALIDATORS: Partial<Record<DelegationState, Validator>> = {
+  [DelegationState.VERIFIED]: (delegation, utxos) => {
+    const tx = Transaction.fromHex(delegation.stakingTxHex);
+    const valid = tx.ins.every((input) =>
+      utxos.find(
+        (utxo) =>
+          utxo.txid === Buffer.from(input.hash).reverse().toString("hex") &&
+          utxo.vout === input.index,
+      ),
+    );
+
+    if (!valid) {
+      return {
+        valid: false,
+        error: "Please ensure your UTXOs are still available",
+      };
+    }
+
+    return { valid: true };
+  },
+};
+
+export const validateDelegation = (delegation: DelegationV2, utxos: UTXO[]) => {
+  const validator = VALIDATORS[delegation.state];
+
+  if (validator) {
+    return validator(delegation, utxos);
+  }
+
+  return { valid: true };
 };

@@ -1,11 +1,13 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
+import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
+import { validateDelegation } from "@/utils/delegations";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -44,6 +46,7 @@ export function useDelegationService() {
     Record<string, boolean>
   >({});
 
+  const { availableUTXOs = [] } = useAppState();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -58,6 +61,21 @@ export function useDelegationService() {
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
   } = useTransactionService();
+
+  const validations = useMemo(
+    () =>
+      delegations.reduce(
+        (acc, delegation) => ({
+          ...acc,
+          [delegation.stakingTxHashHex]: validateDelegation(
+            delegation,
+            availableUTXOs,
+          ),
+        }),
+        {} as Record<string, { valid: boolean; error?: string }>,
+      ),
+    [delegations, availableUTXOs],
+  );
 
   const processing = useMemo(
     () =>
@@ -282,6 +300,7 @@ export function useDelegationService() {
     processing,
     isLoading,
     delegations,
+    validations,
     hasMoreDelegations,
     confirmationModal,
     openConfirmationModal,
