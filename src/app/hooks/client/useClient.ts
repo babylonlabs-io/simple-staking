@@ -14,7 +14,7 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 
-export function useAPIQuery<
+export function useClientQuery<
   TQueryFnData = unknown,
   TError = DefaultError,
   TData = TQueryFnData,
@@ -22,7 +22,7 @@ export function useAPIQuery<
 >(
   options: DefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>,
 ): DefinedUseQueryResult<TData, TError>;
-export function useAPIQuery<
+export function useClientQuery<
   TQueryFnData = unknown,
   TError = DefaultError,
   TData = TQueryFnData,
@@ -30,7 +30,7 @@ export function useAPIQuery<
 >(
   options: UndefinedInitialDataOptions<TQueryFnData, TError, TData, TQueryKey>,
 ): UseQueryResult<TData, TError>;
-export function useAPIQuery<
+export function useClientQuery<
   TQueryFnData = unknown,
   TError = DefaultError,
   TData = TQueryFnData,

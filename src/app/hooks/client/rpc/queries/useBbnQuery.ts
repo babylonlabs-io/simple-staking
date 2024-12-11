@@ -12,7 +12,7 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 
-import { useAPIQuery } from "../api/useApi";
+import { useClientQuery } from "../../useClient";
 
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
@@ -22,7 +22,7 @@ const BBN_REWARDS_KEY = "BBN_REWARDS";
  * Query service for Babylon which contains all the queries for
  * interacting with Babylon RPC nodes
  */
-export const useBbnQueryClient = () => {
+export const useBbnQuery = () => {
   const { bech32Address, connected } = useCosmosWallet();
   const { queryClient } = useBbnRpc();
 
@@ -30,7 +30,7 @@ export const useBbnQueryClient = () => {
    * Gets the rewards from the user's account.
    * @returns {Promise<Object>} - The rewards from the user's account.
    */
-  const rewardsQuery = useAPIQuery({
+  const rewardsQuery = useClientQuery({
     queryKey: [BBN_REWARDS_KEY, bech32Address],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
@@ -54,7 +54,7 @@ export const useBbnQueryClient = () => {
    * Gets the balance of the user's account.
    * @returns {Promise<Object>} - The balance of the user's account.
    */
-  const balanceQuery = useAPIQuery({
+  const balanceQuery = useClientQuery({
     queryKey: [BBN_BALANCE_KEY, bech32Address],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
@@ -73,7 +73,7 @@ export const useBbnQueryClient = () => {
    * Gets the tip of the Bitcoin blockchain.
    * @returns {Promise<Object>} - The tip of the Bitcoin blockchain.
    */
-  const btcTipQuery = useAPIQuery({
+  const btcTipQuery = useClientQuery({
     queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY],
     queryFn: async () => {
       if (!queryClient) {

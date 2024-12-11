@@ -1,7 +1,7 @@
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useAPIQuery } from "@/app/hooks/client/api/useApi";
+import { useClientQuery } from "@/app/hooks/client/useClient";
 import { wait } from "@/utils";
 import { filterDust } from "@/utils/wallet";
 import {
@@ -35,7 +35,7 @@ export function useOrdinals(
     return verifiedUTXOs.filter((utxo) => utxo.inscription);
   };
 
-  const data = useAPIQuery({
+  const data = useClientQuery({
     queryKey: [ORDINAL_KEY, utxos, address],
     queryFn: fetchOrdinals,
     enabled: Boolean(address) || enabled,

@@ -32,8 +32,8 @@ import { getBbnParamByBtcHeight, getBbnParamByVersion } from "@/utils/params";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
-import { useBbnQueryClient } from "../client/query/useBbnQueryClient";
-import { useBbnTransaction } from "../client/query/useBbnTransaction";
+import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
@@ -64,7 +64,7 @@ export const useTransactionService = () => {
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const {
     btcTipQuery: { data: tipHeader },
-  } = useBbnQueryClient();
+  } = useBbnQuery();
 
   const {
     connected: cosmosConnected,

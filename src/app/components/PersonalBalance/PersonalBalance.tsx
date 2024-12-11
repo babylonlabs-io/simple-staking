@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
-import { useBbnQueryClient } from "@/app/hooks/client/query/useBbnQueryClient";
+import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { getNetworkConfig } from "@/config/network.config";
 import { ubbnToBbn } from "@/utils/bbn";
@@ -24,7 +24,7 @@ export function PersonalBalance() {
 
   const {
     balanceQuery: { data: cosmosBalance, isLoading: cosmosBalanceLoading },
-  } = useBbnQueryClient();
+  } = useBbnQuery();
   const { getRewards, claimRewards } = useRewardsService();
 
   const { data: rewards, isLoading: rewardsLoading } = useQuery({

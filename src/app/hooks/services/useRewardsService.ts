@@ -4,15 +4,15 @@ import { useCallback } from "react";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
-import { useBbnQueryClient } from "../client/query/useBbnQueryClient";
-import { useBbnTransaction } from "../client/query/useBbnTransaction";
+import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
 
 export const useRewardsService = () => {
   const { bech32Address } = useCosmosWallet();
 
-  const { rewardsQuery } = useBbnQueryClient();
+  const { rewardsQuery } = useBbnQuery();
   const { estimateBbnGasFee, sendBbnTx } = useBbnTransaction();
 
   /**
