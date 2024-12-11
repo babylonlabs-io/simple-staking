@@ -10,6 +10,7 @@ import React from "react";
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorContext";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
+import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
@@ -23,19 +24,21 @@ function Providers({ children }: React.PropsWithChildren) {
       <ThemeProvider defaultTheme="dark" attribute="data-theme">
         <QueryClientProvider client={client}>
           <ErrorProvider>
-            <WalletConnectionProvider>
-              <BTCWalletProvider>
-                <CosmosWalletProvider>
-                  <AppState>
-                    <StakingStatsProvider>
-                      <ReactQueryStreamedHydration>
-                        {children}
-                      </ReactQueryStreamedHydration>
-                    </StakingStatsProvider>
-                  </AppState>
-                </CosmosWalletProvider>
-              </BTCWalletProvider>
-            </WalletConnectionProvider>
+            <BbnRpcProvider>
+              <WalletConnectionProvider>
+                <BTCWalletProvider>
+                  <CosmosWalletProvider>
+                    <AppState>
+                      <StakingStatsProvider>
+                        <ReactQueryStreamedHydration>
+                          {children}
+                        </ReactQueryStreamedHydration>
+                      </StakingStatsProvider>
+                    </AppState>
+                  </CosmosWalletProvider>
+                </BTCWalletProvider>
+              </WalletConnectionProvider>
+            </BbnRpcProvider>
           </ErrorProvider>
           <ReactQueryDevtools
             buttonPosition="bottom-left"

@@ -7,16 +7,16 @@ import {
   createProtobufRpcClient,
   setupBankExtension,
 } from "@cosmjs/stargate";
-import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
-import { useCallback, useEffect, useState } from "react";
 
-import { BBN_RPC_URL } from "@/app/common/rpc";
 import { ONE_MINUTE } from "@/app/constants";
+import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 
 import { useAPIQuery } from "../api/useApi";
 
-export const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
+const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
+const BBN_BALANCE_KEY = "BBN_BALANCE";
+const BBN_REWARDS_KEY = "BBN_REWARDS";
 
 /**
  * Query service for Babylon which contains all the queries for
@@ -24,48 +24,55 @@ export const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
  */
 export const useBbnQueryClient = () => {
   const { bech32Address, connected } = useCosmosWallet();
-  const [queryClient, setQueryClient] = useState<QueryClient>();
-
-  useEffect(() => {
-    const initQueryClient = async () => {
-      const tmClient = await Tendermint34Client.connect(BBN_RPC_URL);
-      const queryClient = QueryClient.withExtensions(tmClient);
-      setQueryClient(queryClient);
-    };
-
-    initQueryClient();
-  }, []);
+  const { queryClient } = useBbnRpc();
 
   /**
    * Gets the rewards from the user's account.
    * @returns {Promise<Object>} - The rewards from the user's account.
    */
-  const getRewards = useCallback(async (): Promise<
-    incentivequery.QueryRewardGaugesResponse | undefined
-  > => {
-    if (!connected || !queryClient || !bech32Address) {
-      return undefined;
-    }
-    const { incentive } = setupIncentiveExtension(queryClient);
+  const rewardsQuery = useAPIQuery({
+    queryKey: [BBN_REWARDS_KEY, bech32Address],
+    queryFn: async () => {
+      if (!connected || !queryClient || !bech32Address) {
+        return undefined;
+      }
+      const { incentive } = setupIncentiveExtension(queryClient);
 
-    const req: incentivequery.QueryRewardGaugesRequest =
-      incentivequery.QueryRewardGaugesRequest.fromPartial({
-        address: bech32Address,
-      });
+      const req: incentivequery.QueryRewardGaugesRequest =
+        incentivequery.QueryRewardGaugesRequest.fromPartial({
+          address: bech32Address,
+        });
 
-    return incentive.RewardGauges(req);
-  }, [connected, queryClient, bech32Address]);
+      return incentive.RewardGauges(req);
+    },
+    enabled: Boolean(queryClient && connected && bech32Address),
+    staleTime: ONE_MINUTE,
+    refetchInterval: ONE_MINUTE,
+  });
 
-  const getBalance = useCallback(async (): Promise<number> => {
-    if (!connected || !queryClient || !bech32Address) {
-      return 0;
-    }
+  /**
+   * Gets the balance of the user's account.
+   * @returns {Promise<Object>} - The balance of the user's account.
+   */
+  const balanceQuery = useAPIQuery({
+    queryKey: [BBN_BALANCE_KEY, bech32Address],
+    queryFn: async () => {
+      if (!connected || !queryClient || !bech32Address) {
+        return 0;
+      }
+      const { bank } = setupBankExtension(queryClient);
+      const balance = await bank.balance(bech32Address, "ubbn");
+      return Number(balance?.amount ?? 0);
+    },
+    enabled: Boolean(queryClient && connected && bech32Address),
+    staleTime: ONE_MINUTE,
+    refetchInterval: ONE_MINUTE,
+  });
 
-    const { bank } = setupBankExtension(queryClient);
-    const balance = await bank.balance(bech32Address, "ubbn");
-    return Number(balance?.amount ?? 0);
-  }, [connected, queryClient, bech32Address]);
-
+  /**
+   * Gets the tip of the Bitcoin blockchain.
+   * @returns {Promise<Object>} - The tip of the Bitcoin blockchain.
+   */
   const btcTipQuery = useAPIQuery({
     queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY],
     queryFn: async () => {
@@ -79,11 +86,12 @@ export const useBbnQueryClient = () => {
     },
     enabled: Boolean(queryClient),
     staleTime: ONE_MINUTE,
+    refetchInterval: false, // Disable automatic periodic refetching
   });
 
   return {
-    getRewards,
-    getBalance,
+    rewardsQuery,
+    balanceQuery,
     btcTipQuery,
   };
 };

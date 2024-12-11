@@ -5,6 +5,7 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQueryClient } from "@/app/hooks/client/query/useBbnQueryClient";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
+import { getNetworkConfig } from "@/config/network.config";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
@@ -17,12 +18,14 @@ const QUERY_KEYS = {
 };
 
 export function PersonalBalance() {
+  const { coinName, coinSymbol } = getNetworkConfig();
   const { getBalance: getBTCBalance, connected: btcConnected } = useBTCWallet();
   const { connected: cosmosConnected } = useCosmosWallet();
 
-  const { getBalance } = useBbnQueryClient();
-  const { getRewards } = useRewardsService();
-  const { claimRewards } = useRewardsService();
+  const {
+    balanceQuery: { data: cosmosBalance, isLoading: cosmosBalanceLoading },
+  } = useBbnQueryClient();
+  const { getRewards, claimRewards } = useRewardsService();
 
   const { data: rewards, isLoading: rewardsLoading } = useQuery({
     queryKey: [QUERY_KEYS.REWARDS],
@@ -32,11 +35,7 @@ export function PersonalBalance() {
   const { data: btcBalance, isLoading: btcBalanceLoading } = useQuery({
     queryKey: [QUERY_KEYS.BTC_BALANCE],
     queryFn: getBTCBalance,
-  });
-
-  const { data: cosmosBalance, isLoading: cosmosBalanceLoading } = useQuery({
-    queryKey: [QUERY_KEYS.COSMOS_BALANCE],
-    queryFn: getBalance,
+    enabled: btcConnected,
   });
 
   if (!btcConnected || !cosmosConnected) {
@@ -53,16 +52,16 @@ export function PersonalBalance() {
           as well as remove the filtering on inscription balance*/}
         <StatItem
           loading={btcBalanceLoading}
-          title="Bitcoin Balance"
-          value={`${satoshiToBtc(btcBalance ?? 0)} BTC`}
+          title={`${coinName} Balance`}
+          value={`${satoshiToBtc(btcBalance ?? 0)} ${coinSymbol}`}
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
           loading={cosmosBalanceLoading}
-          title="Stakable Bitcoin"
-          value={`${satoshiToBtc(btcBalance ?? 0)} BTC`}
+          title={`Stakable ${coinName}`}
+          value={`${satoshiToBtc(btcBalance ?? 0)} ${coinSymbol}`}
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
