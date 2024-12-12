@@ -1,3 +1,5 @@
+"use client";
+
 import { useCallback, useEffect, useState } from "react";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
