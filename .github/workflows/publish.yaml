@@ -3,6 +3,9 @@ name: docker_publish
 on:
   push:
     branches:
+      - "main"
+      - "v0.3.x"
+    tags:
       - "*"
 
 jobs:
