@@ -1,11 +1,11 @@
 import { getNetworkInfo } from "@/app/api/getNetworkInfo";
-import { useAPIQuery } from "@/app/hooks/client/api/useApi";
+import { useClientQuery } from "@/app/hooks/client/useClient";
 import { NetworkInfo } from "@/app/types/networkInfo";
 
 export const NETWORK_INFO_KEY = "NETWORK_INFO";
 
 export function useNetworkInfo({ enabled = true }: { enabled?: boolean } = {}) {
-  return useAPIQuery<NetworkInfo>({
+  return useClientQuery<NetworkInfo>({
     queryKey: [NETWORK_INFO_KEY],
     queryFn: getNetworkInfo,
     enabled,

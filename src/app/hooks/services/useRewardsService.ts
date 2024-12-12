@@ -4,15 +4,15 @@ import { useCallback } from "react";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
-import { useBbnQueryClient } from "../client/query/useBbnQueryClient";
-import { useBbnTransaction } from "../client/query/useBbnTransaction";
+import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
 
 export const useRewardsService = () => {
   const { bech32Address } = useCosmosWallet();
 
-  const { getRewards: getBbnRewards } = useBbnQueryClient();
+  const { rewardsQuery } = useBbnQuery();
   const { estimateBbnGasFee, sendBbnTx } = useBbnTransaction();
 
   /**
@@ -20,7 +20,7 @@ export const useRewardsService = () => {
    * @returns {Promise<number>} The rewards from the user's account.
    */
   const getRewards = useCallback(async (): Promise<number> => {
-    const rewards = await getBbnRewards();
+    const rewards = rewardsQuery.data;
     if (!rewards) {
       return 0;
     }
@@ -38,7 +38,7 @@ export const useRewardsService = () => {
       coins.reduce((acc, coin) => acc + Number(coin.amount), 0) -
       (withdrawnCoins || 0)
     );
-  }, [getBbnRewards]);
+  }, [rewardsQuery.data]);
 
   /**
    * Estimates the gas fee for claiming rewards.
@@ -58,7 +58,8 @@ export const useRewardsService = () => {
     const msg = createWithdrawRewardMsg(bech32Address);
 
     await sendBbnTx(msg);
-  }, [bech32Address, sendBbnTx]);
+    rewardsQuery.refetch();
+  }, [bech32Address, sendBbnTx, rewardsQuery]);
 
   return {
     getRewards,

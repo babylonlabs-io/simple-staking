@@ -1,10 +1,10 @@
-import { useAPIQuery } from "@/app/hooks/client/api/useApi";
+import { useClientQuery } from "@/app/hooks/client/useClient";
 import { getNetworkFees } from "@/utils/mempool_api";
 
 export const NETWORK_FEES_KEY = "NETWORK_FEES";
 
 export function useNetworkFees({ enabled = true }: { enabled?: boolean } = {}) {
-  const data = useAPIQuery({
+  const data = useClientQuery({
     queryKey: [NETWORK_FEES_KEY],
     queryFn: getNetworkFees,
     enabled,

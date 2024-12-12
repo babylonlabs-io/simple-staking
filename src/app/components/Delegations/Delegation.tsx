@@ -64,9 +64,9 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   const onTransition = async () => {
     // TODO: Open the transaction signing modal
-
     await transitionPhase1Delegation(
       stakingTx.txHex,
+      stakingTx.startHeight,
       {
         finalityProviderPkNoCoordHex: finalityProviderPkHex,
         stakingAmountSat: stakingValueSat,
