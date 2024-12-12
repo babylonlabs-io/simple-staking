@@ -92,7 +92,7 @@ export const questions = (
     },
     {
       title: "Are hardware wallets supported?",
-      content: `The only hardware wallets supporting Bitcoin Staking are: <p>(1) Keystone via QR code and (2) OneKey Pro <strong>using Taproot only</strong> through the OneKey Chrome Extension. Using any other hardware wallet through any means (such as connection to a software/extension/mobile wallet) can lead to permanent inability to withdraw the stake.</p>`,
+      content: `The following are the only hardware wallets supporting Bitcoin Staking: (1) Keystone - via QR code, (2) OneKey Pro and (3) OneKey Classic 1s (experimental, <code><strong>3.10.1</strong></code> firmware or higher) <strong>using Taproot only</strong> - via the OneKey Chrome Extension. Using any other hardware wallet through any means (such as connection to a software/extension/mobile wallet) can lead to permanent inability to withdraw the stake.`,
     },
   ];
   if (shouldDisplayPoints()) {
