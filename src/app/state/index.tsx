@@ -35,8 +35,8 @@ const { StateProvider, useState: useApplicationState } =
     isError: false,
     totalBalance: 0,
     ordinalsExcluded: true,
-    includeOrdinals: () => { },
-    excludeOrdinals: () => { },
+    includeOrdinals: () => {},
+    excludeOrdinals: () => {},
   });
 
 export function AppState({ children }: PropsWithChildren) {

@@ -50,13 +50,8 @@ export const Staking = () => {
     isError,
     isLoading,
   } = useAppState();
-  const {
-    connected,
-    address,
-    publicKeyNoCoord,
-    network: btcWalletNetwork,
-    getNetworkFees,
-  } = useBTCWallet();
+  const { connected, address, publicKeyNoCoord, getNetworkFees } =
+    useBTCWallet();
 
   const disabled = isError;
 
@@ -271,18 +266,7 @@ export const Staking = () => {
 
   // Memoize the staking fee calculation
   const stakingFeeSat = useMemo(() => {
-    if (
-      !(
-        btcWalletNetwork &&
-        address &&
-        latestParam &&
-        publicKeyNoCoord &&
-        stakingAmountSat &&
-        finalityProvider &&
-        mempoolFeeRates &&
-        availableUTXOs
-      )
-    ) {
+    if (!(stakingAmountSat && finalityProvider && minFeeRate)) {
       return 0;
     }
 
@@ -305,14 +289,8 @@ export const Staking = () => {
       return 0;
     }
   }, [
-    btcWalletNetwork,
-    address,
-    latestParam,
-    publicKeyNoCoord,
     stakingAmountSat,
     finalityProvider,
-    mempoolFeeRates,
-    availableUTXOs,
     selectedFeeRate,
     minFeeRate,
     defaultFeeRate,
