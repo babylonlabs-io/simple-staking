@@ -14,7 +14,6 @@ export const useFinalityProvidersData = (
   // Initialize with search param if it exists
   useEffect(() => {
     const fpParam = searchParams.get("fp");
-    console.log("[useFinalityProvidersData] Initial fp param:", fpParam);
 
     if (fpParam) {
       handleSearch(fpParam);
@@ -25,12 +24,6 @@ export const useFinalityProvidersData = (
 
   const handleSearch = useCallback(
     (searchTerm: string) => {
-      console.log("[useFinalityProvidersData] Searching for:", searchTerm);
-      console.log(
-        "[useFinalityProvidersData] Initial providers:",
-        initialProviders?.length,
-      );
-
       const filtered = initialProviders?.filter((fp) => {
         const matchesMoniker = fp.description?.moniker
           ?.toLowerCase()
@@ -39,20 +32,9 @@ export const useFinalityProvidersData = (
           .toLowerCase()
           .includes(searchTerm.toLowerCase());
 
-        console.log("[useFinalityProvidersData] Provider:", {
-          moniker: fp.description?.moniker,
-          pk: fp.btcPk,
-          matchesMoniker,
-          matchesPk,
-        });
-
         return matchesMoniker || matchesPk;
       });
 
-      console.log(
-        "[useFinalityProvidersData] Filtered results:",
-        filtered?.length,
-      );
       setFilteredProviders(filtered);
     },
     [initialProviders],
