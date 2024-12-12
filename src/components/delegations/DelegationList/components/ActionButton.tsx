@@ -1,3 +1,6 @@
+import { useId } from "react";
+import { Tooltip } from "react-tooltip";
+
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
 import {
@@ -6,6 +9,8 @@ import {
 } from "@/app/types/delegationsV2";
 
 interface ActionButtonProps {
+  disabled?: boolean;
+  tooltip?: string;
   delegation: DelegationV2;
   state: string;
   onClick?: (action: ActionType, delegation: DelegationV2) => void;
@@ -42,16 +47,27 @@ const ACTION_BUTTON_PROPS: Record<
 };
 
 export function ActionButton(props: ActionButtonProps) {
+  const tooltipId = useId();
   const buttonProps = ACTION_BUTTON_PROPS[props.state];
 
   if (!buttonProps) return null;
 
   return (
-    <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
-      onClick={() => props.onClick?.(buttonProps.action, props.delegation)}
+    <span
+      className="cursor-pointer"
+      data-tooltip-id={tooltipId}
+      data-tooltip-content={props.tooltip}
+      data-tooltip-place="top"
     >
-      {buttonProps.title}
-    </button>
+      <button
+        className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
+        onClick={() => props.onClick?.(buttonProps.action, props.delegation)}
+        disabled={props.disabled}
+      >
+        {buttonProps.title}
+      </button>
+
+      <Tooltip id={tooltipId} className="tooltip-wrap" />
+    </span>
   );
 }

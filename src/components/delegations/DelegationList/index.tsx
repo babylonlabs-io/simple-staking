@@ -15,10 +15,12 @@ import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
-const columns: TableColumn<
-  DelegationV2,
-  { handleActionClick: (action: ActionType, delegation: DelegationV2) => void }
->[] = [
+type TableParams = {
+  validations: Record<string, { valid: boolean; error?: string }>;
+  handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
+};
+
+const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
     field: "Inception",
     headerName: "Inception",
@@ -52,9 +54,13 @@ const columns: TableColumn<
   {
     field: "actions",
     headerName: "Action",
-    renderCell: (row, _, { handleActionClick }) => {
+    renderCell: (row, _, { handleActionClick, validations }) => {
+      const { valid, error } = validations[row.stakingTxHashHex];
+
       return (
         <ActionButton
+          disabled={!valid}
+          tooltip={error}
           delegation={row}
           state={row.state}
           onClick={handleActionClick}
@@ -71,6 +77,7 @@ export function DelegationList() {
     delegations,
     isLoading,
     hasMoreDelegations,
+    validations,
     fetchMoreDelegations,
     executeDelegationAction,
     openConfirmationModal,
@@ -99,7 +106,7 @@ export function DelegationList() {
           cellClassName:
             "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-sm justify-start group-even:bg-[#F9F9F9] text-primary-dark",
         }}
-        params={{ handleActionClick: openConfirmationModal }}
+        params={{ handleActionClick: openConfirmationModal, validations }}
         fallback={<div>No delegations found</div>}
       />
 
