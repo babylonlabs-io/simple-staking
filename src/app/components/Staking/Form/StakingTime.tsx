@@ -9,6 +9,7 @@ interface StakingTimeProps {
   unbondingTimeBlocks: number;
   onStakingTimeBlocksChange: (inputTimeBlocks: number) => void;
   reset: boolean;
+  disabled?: boolean;
 }
 
 export const StakingTime: React.FC<StakingTimeProps> = ({
@@ -16,6 +17,7 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
   maxStakingTimeBlocks,
   onStakingTimeBlocksChange,
   reset,
+  disabled = false,
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -112,11 +114,13 @@ export const StakingTime: React.FC<StakingTimeProps> = ({
         className={twJoin(
           `no-focus input input-bordered w-full`,
           error && "input-error",
+          disabled && "opacity-50 cursor-not-allowed",
         )}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder="Blocks"
+        disabled={disabled}
       />
       <div className="text-left my-2 min-h-5">
         <p className="text-sm text-error-main">{error}</p>
