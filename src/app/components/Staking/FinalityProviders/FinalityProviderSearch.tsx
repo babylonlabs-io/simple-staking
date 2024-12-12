@@ -1,3 +1,5 @@
+"use client";
+
 import { useDebounce } from "@uidotdev/usehooks";
 import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -10,21 +12,12 @@ interface FinalityProviderSearchProps {
 export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
   onSearch,
 }) => {
-  // Get the finality provider from the search params
   const searchParams = useSearchParams();
-  const initialSearchFp = searchParams.get("fp");
+  const initialSearchTerm = searchParams.get("fp") || "";
 
-  const [searchTerm, setSearchTerm] = useState(initialSearchFp || "");
+  const [searchTerm, setSearchTerm] = useState(initialSearchTerm);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Effect for handling initial search
-  useEffect(() => {
-    if (initialSearchFp) {
-      onSearch(initialSearchFp);
-    }
-  }, [initialSearchFp, onSearch]);
-
-  // Effect for handling subsequent searches
   useEffect(() => {
     onSearch(debouncedSearchTerm);
   }, [debouncedSearchTerm, onSearch]);
