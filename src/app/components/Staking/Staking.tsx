@@ -432,7 +432,7 @@ export const Staking = () => {
 
       return (
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col gap-4">
+          <div className="relative flex flex-col gap-4">
             <Heading variant="h5" className="text-primary-dark">
               Step 2
             </Heading>
@@ -464,13 +464,21 @@ export const Staking = () => {
               </div>
             </div>
             <div className="flex flex-1 flex-col">
-              <div className="flex flex-1 flex-col">
+              <div className="relative flex flex-1 flex-col">
+                <div
+                  className={`absolute inset-0 bg-secondary-contrast z-10 transition-opacity duration-300 ${
+                    finalityProvider
+                      ? "opacity-0 pointer-events-none"
+                      : "opacity-75"
+                  }`}
+                />
                 <StakingTime
                   minStakingTimeBlocks={minStakingTimeBlocks}
                   maxStakingTimeBlocks={maxStakingTimeBlocks}
                   unbondingTimeBlocks={unbondingTime}
                   onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
                   reset={resetFormInputs}
+                  disabled={!finalityProvider}
                 />
                 <StakingAmount
                   minStakingAmountSat={minStakingAmountSat}
@@ -478,6 +486,7 @@ export const Staking = () => {
                   btcWalletBalanceSat={btcWalletBalanceSat}
                   onStakingAmountSatChange={handleStakingAmountSatChange}
                   reset={resetFormInputs}
+                  disabled={!finalityProvider}
                 />
                 {signReady && (
                   <StakingFee

@@ -13,6 +13,7 @@ interface StakingAmountProps {
   btcWalletBalanceSat?: number;
   onStakingAmountSatChange: (inputAmountSat: number) => void;
   reset: boolean;
+  disabled?: boolean;
 }
 
 export const StakingAmount: React.FC<StakingAmountProps> = ({
@@ -21,6 +22,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   btcWalletBalanceSat,
   onStakingAmountSatChange,
   reset,
+  disabled = false,
 }) => {
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
@@ -127,13 +129,15 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
       <input
         type="string"
         className={twJoin(
-          "no-focus input input-bordered w-full",
-          error ? "input-error" : "",
+          `no-focus input input-bordered w-full`,
+          error && "input-error",
+          disabled && "opacity-50 cursor-not-allowed",
         )}
         value={value}
         onChange={handleChange}
         onBlur={handleBlur}
         placeholder={coinName}
+        disabled={disabled}
       />
 
       <div className="text-left my-2 min-h-5">
