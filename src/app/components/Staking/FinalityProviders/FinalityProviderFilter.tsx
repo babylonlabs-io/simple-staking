@@ -1,6 +1,6 @@
 import { Select } from "@babylonlabs-io/bbn-core-ui";
 
-import { useFinalityProviderService } from "@/app/hooks/services/useFinalityProviderService";
+import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 
 const options = [
   { value: "active", label: "Active" },
@@ -8,7 +8,7 @@ const options = [
 ];
 
 export const FinalityProviderFilter = () => {
-  const { filterValue, handleFilter } = useFinalityProviderService();
+  const { filterValue, handleFilter } = useFinalityProviderState();
 
   return (
     <Select
