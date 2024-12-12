@@ -1,10 +1,17 @@
 import { useDebounce } from "@uidotdev/usehooks";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  type PropsWithChildren,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
 import { ErrorState } from "@/app/types/errors";
-import { FinalityProvider } from "@/app/types/finalityProviders";
+import type { FinalityProvider } from "@/app/types/finalityProviders";
+import { createStateUtils } from "@/utils/createStateUtils";
 
 interface SortState {
   field?: string;
@@ -17,7 +24,40 @@ const SORT_DIRECTIONS = {
   asc: undefined,
 } as const;
 
-export function useFinalityProviderServiceState() {
+interface FinalityProviderState {
+  searchValue: string;
+  filterValue: string | number;
+  finalityProviders: FinalityProvider[];
+  selectedFinalityProvider: FinalityProvider | null;
+  hasNextPage: boolean;
+  isFetching: boolean;
+  hasError: boolean;
+  handleSearch: (searchTerm: string) => void;
+  handleSort: (sortField: string) => void;
+  handleFilter: (value: string | number) => void;
+  handleRowSelect: (row: FinalityProvider) => void;
+  getFinalityProviderMoniker: (btcPkHex: string) => string;
+  fetchNextPage: () => void;
+}
+
+const { StateProvider, useState: useFpState } =
+  createStateUtils<FinalityProviderState>({
+    searchValue: "",
+    filterValue: "active",
+    finalityProviders: [],
+    selectedFinalityProvider: null,
+    hasNextPage: false,
+    isFetching: false,
+    hasError: false,
+    handleSearch: () => {},
+    handleSort: () => {},
+    handleFilter: () => {},
+    handleRowSelect: () => {},
+    getFinalityProviderMoniker: () => "-",
+    fetchNextPage: () => {},
+  });
+
+export function FinalityProviderState({ children }: PropsWithChildren) {
   const [searchValue, setSearchValue] = useState("");
   const [filterValue, setFilterValue] = useState<string | number>("active");
   const [sortState, setSortState] = useState<SortState>({});
@@ -74,29 +114,49 @@ export function useFinalityProviderServiceState() {
   }, []);
 
   const filteredFinalityProviders = useMemo(() => {
-    if (!data?.finalityProviders) return [];
+    try {
+      if (!data?.finalityProviders) return [];
 
-    return data.finalityProviders.filter((fp: FinalityProvider) => {
-      const statusMatch =
-        filterValue === "active"
-          ? fp.state === "FINALITY_PROVIDER_STATUS_ACTIVE"
-          : filterValue === "inactive"
-            ? fp.state !== "FINALITY_PROVIDER_STATUS_ACTIVE"
-            : true;
+      return data.finalityProviders.filter((fp: FinalityProvider) => {
+        if (!fp) return false;
 
-      if (!statusMatch) return false;
+        const statusMatch =
+          filterValue === "active"
+            ? fp.state === "FINALITY_PROVIDER_STATUS_ACTIVE"
+            : filterValue === "inactive"
+              ? fp.state !== "FINALITY_PROVIDER_STATUS_ACTIVE"
+              : true;
 
-      if (searchValue) {
-        const searchLower = searchValue.toLowerCase();
-        return (
-          fp.description?.moniker?.toLowerCase().includes(searchLower) ||
-          fp.btcPk.toLowerCase().includes(searchLower)
-        );
-      }
+        if (!statusMatch) return false;
 
-      return true;
-    });
-  }, [data?.finalityProviders, filterValue, searchValue]);
+        if (searchValue) {
+          const searchLower = searchValue.toLowerCase();
+          return (
+            (fp.description?.moniker?.toLowerCase() || "").includes(
+              searchLower,
+            ) || (fp.btcPk?.toLowerCase() || "").includes(searchLower)
+          );
+        }
+
+        return true;
+      });
+    } catch (error: any) {
+      showError({
+        error: {
+          message: error.message,
+          errorState: ErrorState.SERVER_ERROR,
+        },
+      });
+      captureError(error);
+      return [];
+    }
+  }, [
+    data?.finalityProviders,
+    filterValue,
+    searchValue,
+    showError,
+    captureError,
+  ]);
 
   const getFinalityProviderMoniker = useCallback(
     (btcPkHex: string) => {
@@ -104,7 +164,7 @@ export function useFinalityProviderServiceState() {
         (fp) => fp.btcPk === btcPkHex,
       )?.description?.moniker;
 
-      if (moniker === undefined || moniker === null || moniker === "") {
+      if (!moniker) {
         return "-";
       }
       return moniker;
@@ -112,7 +172,7 @@ export function useFinalityProviderServiceState() {
     [filteredFinalityProviders],
   );
 
-  return {
+  const state = {
     searchValue,
     filterValue,
     finalityProviders: filteredFinalityProviders,
@@ -127,6 +187,8 @@ export function useFinalityProviderServiceState() {
     getFinalityProviderMoniker,
     fetchNextPage,
   };
+
+  return <StateProvider value={state}>{children}</StateProvider>;
 }
 
-export { useFinalityProviderService } from "@/app/state/FinalityProviderServiceState";
+export { useFpState as useFinalityProviderState };

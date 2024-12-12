@@ -15,13 +15,9 @@ import { NetworkInfo } from "../types/networkInfo";
 
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
-import { FinalityProviderServiceState } from "./FinalityProviderServiceState";
+import { FinalityProviderState } from "./FinalityProviderState";
 
-const STATE_LIST = [
-  DelegationState,
-  DelegationV2State,
-  FinalityProviderServiceState,
-];
+const STATE_LIST = [DelegationState, DelegationV2State, FinalityProviderState];
 
 export interface AppState {
   availableUTXOs?: UTXO[];
