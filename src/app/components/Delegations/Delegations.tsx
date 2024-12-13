@@ -20,12 +20,14 @@ import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 import { Phase2HereModal } from "../Modals/Phase2Here";
+import { UnbondModal } from "../Modals/UnbondModal";
 
 import { Delegation } from "./Delegation";
 
 const MODE_TRANSITION = "transition";
 const MODE_WITHDRAW = "withdraw";
-type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW;
+const MODE_UNBOND = "unbond";
+type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW | typeof MODE_UNBOND;
 
 export const Delegations = ({}) => {
   const { publicKeyNoCoord, connected, network } = useBTCWallet();
@@ -296,6 +298,7 @@ export const Delegations = ({}) => {
                   onWithdraw={() =>
                     handleModal(stakingTxHashHex, MODE_WITHDRAW)
                   }
+                  onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
                   intermediateState={intermediateDelegation?.state}
                 />
               );
@@ -303,6 +306,10 @@ export const Delegations = ({}) => {
           </InfiniteScroll>
         </div>
       </div>
+      <Phase2HereModal
+        open={showPhase2HereModal}
+        onClose={() => setShowPhase2HereModal(false)}
+      />
       {modalMode && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
@@ -313,10 +320,16 @@ export const Delegations = ({}) => {
           processing={awaitingWalletResponse}
         />
       )}
-      <Phase2HereModal
-        open={showPhase2HereModal}
-        onClose={() => setShowPhase2HereModal(false)}
-      />
+      {modalMode === MODE_UNBOND && (
+        <UnbondModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={() => {
+            handleUnbond(txID);
+          }}
+          processing={awaitingWalletResponse}
+        />
+      )}
     </>
   );
 };
