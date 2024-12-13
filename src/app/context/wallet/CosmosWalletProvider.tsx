@@ -16,6 +16,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
+import { BBN_RPC_URL } from "@/app/common/rpc";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
@@ -46,7 +47,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   >();
 
   const { showError, captureError } = useError();
-  const { open = () => {}, connected } = useWalletConnect();
+  const { open = () => {} } = useWalletConnect();
   const bbnConnector = useChainConnector("BBN");
 
   const cosmosDisconnect = useCallback(() => {
@@ -61,9 +62,14 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const address = await provider.getAddress();
-        const client = await provider.getSigningStargateClient({
-          registry: createBbnRegistry(),
-        });
+        const offlineSigner = await provider.getOfflineSigner();
+        const client = await SigningStargateClient.connectWithSigner(
+          BBN_RPC_URL,
+          offlineSigner,
+          {
+            registry: createBbnRegistry(),
+          },
+        );
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
