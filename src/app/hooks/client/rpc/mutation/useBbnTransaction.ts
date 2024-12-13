@@ -2,6 +2,10 @@ import { useCallback } from "react";
 
 import { useSigningStargateClient } from "./useSigningStargateClient";
 
+const GAS_MULTIPLIER = 1.5;
+const GAS_DENOM = "ubbn";
+const GAS_PRICE = 0.002;
+
 export interface BbnGasFee {
   amount: { denom: string; amount: string }[];
   gas: string;
@@ -22,11 +26,11 @@ export const useBbnTransaction = () => {
   const estimateBbnGasFee = useCallback(
     async <T>(msg: { typeUrl: string; value: T }): Promise<BbnGasFee> => {
       const gasEstimate = await simulate(msg);
-      // TODO: The gas calculation need to be improved
-      // https://github.com/babylonlabs-io/simple-staking/issues/320
-      const gasWanted = Math.ceil(gasEstimate * 1.5);
+      const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
       return {
-        amount: [{ denom: "ubbn", amount: (gasWanted * 0.01).toFixed(0) }],
+        amount: [
+          { denom: GAS_DENOM, amount: (gasWanted * GAS_PRICE).toFixed(0) },
+        ],
         gas: gasWanted.toString(),
       };
     },

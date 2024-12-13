@@ -117,7 +117,6 @@ export const useTransactionService = () => {
 
       // Get the param based on the tip height
       // EOI should always be created based on the BTC tip height from BBN chain
-      console.log("tipHeader.height", tipHeader.height);
       const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
 
       const staking = new Staking(
