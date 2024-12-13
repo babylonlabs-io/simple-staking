@@ -1,48 +1,40 @@
 "use client";
 
+import { useDebounce } from "@uidotdev/usehooks";
 import { useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 
 export const useFinalityProvidersData = (
   initialProviders: FinalityProviderInterface[] | undefined,
 ) => {
-  const [filteredProviders, setFilteredProviders] = useState(initialProviders);
   const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("fp") || "");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  // Initialize with search param if it exists
-  useEffect(() => {
-    const fpParam = searchParams.get("fp");
-
-    if (fpParam) {
-      handleSearch(fpParam);
-    } else {
-      setFilteredProviders(initialProviders);
-    }
-  }, [initialProviders]); // Only run on initial load and when providers change
-
-  const handleSearch = useCallback(
-    (searchTerm: string) => {
-      const filtered = initialProviders?.filter((fp) => {
+  const filteredProviders = useMemo(
+    () =>
+      initialProviders?.filter((fp) => {
         const matchesMoniker = fp.description?.moniker
           ?.toLowerCase()
-          .includes(searchTerm.toLowerCase());
+          .includes(debouncedSearchTerm.toLowerCase());
         const matchesPk = fp.btcPk
           .toLowerCase()
-          .includes(searchTerm.toLowerCase());
+          .includes(debouncedSearchTerm.toLowerCase());
 
         return matchesMoniker || matchesPk;
-      });
-
-      setFilteredProviders(filtered);
-    },
-    [initialProviders],
+      }),
+    [initialProviders, debouncedSearchTerm],
   );
+
+  const handleSearch = useCallback((searchValue: string) => {
+    setSearchTerm(searchValue);
+  }, []);
 
   return {
     filteredProviders,
-    setFilteredProviders,
     handleSearch,
+    searchValue: searchTerm,
   };
 };

@@ -92,9 +92,8 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
     handleError,
   ]);
 
-  const { handleSearch, filteredProviders } = useFinalityProvidersData(
-    fps?.finalityProviders,
-  );
+  const { searchValue, handleSearch, filteredProviders } =
+    useFinalityProvidersData(fps?.finalityProviders);
 
   if (!fps?.finalityProviders?.length) {
     return <LoadingView />;
@@ -106,7 +105,10 @@ export const FinalityProviders: React.FC<FinalityProvidersProps> = ({
         <strong>Step-1:</strong> Select a finality provider
       </p>
       <div className="flex gap-3">
-        <FinalityProviderSearch onSearch={handleSearch} />
+        <FinalityProviderSearch
+          searchValue={searchValue}
+          onSearch={handleSearch}
+        />
       </div>
       <div className="hidden gap-2 px-4 lg:grid lg:grid-cols-stakingFinalityProvidersDesktop">
         <p>Finality Provider</p>
