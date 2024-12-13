@@ -1,33 +1,40 @@
-import { useCallback, useEffect, useState } from "react";
+"use client";
+
+import { useDebounce } from "@uidotdev/usehooks";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useMemo, useState } from "react";
 
 import { FinalityProvider as FinalityProviderInterface } from "@/app/types/finalityProviders";
 
 export const useFinalityProvidersData = (
   initialProviders: FinalityProviderInterface[] | undefined,
 ) => {
-  const [filteredProviders, setFilteredProviders] = useState(initialProviders);
+  const searchParams = useSearchParams();
+  const [searchTerm, setSearchTerm] = useState(searchParams.get("fp") || "");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
-  useEffect(() => {
-    setFilteredProviders(initialProviders);
-  }, [initialProviders]);
+  const filteredProviders = useMemo(
+    () =>
+      initialProviders?.filter((fp) => {
+        const matchesMoniker = fp.description?.moniker
+          ?.toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase());
+        const matchesPk = fp.btcPk
+          .toLowerCase()
+          .includes(debouncedSearchTerm.toLowerCase());
 
-  const handleSearch = useCallback(
-    (searchTerm: string) => {
-      const filtered = initialProviders?.filter(
-        (fp) =>
-          fp.description?.moniker
-            ?.toLowerCase()
-            .includes(searchTerm.toLowerCase()) ||
-          fp.btcPk.toLowerCase().includes(searchTerm.toLowerCase()),
-      );
-      setFilteredProviders(filtered);
-    },
-    [initialProviders],
+        return matchesMoniker || matchesPk;
+      }),
+    [initialProviders, debouncedSearchTerm],
   );
+
+  const handleSearch = useCallback((searchValue: string) => {
+    setSearchTerm(searchValue);
+  }, []);
 
   return {
     filteredProviders,
-    setFilteredProviders,
     handleSearch,
+    searchValue: searchTerm,
   };
 };
