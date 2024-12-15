@@ -12,6 +12,7 @@ import { network } from "@/config/network.config";
 import { getCurrentGlobalParamsVersion } from "@/utils/globalParams";
 import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { getTipHeight } from "@/utils/mempool_api";
 import { filterOrdinals } from "@/utils/utxo";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 import {
@@ -70,7 +71,7 @@ const Home: React.FC<HomeProps> = () => {
     queryKey: ["global params"],
     queryFn: async () => {
       const [height, versions] = await Promise.all([
-        btcWallet!.getBTCTipHeight(),
+        getTipHeight(),
         getGlobalParams(),
       ]);
       return {
