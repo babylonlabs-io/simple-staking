@@ -35,21 +35,6 @@ export const Header = () => {
               onDisconnect={disconnect}
             />
           </div>
-          {/* <div
-              className={twJoin(
-                address && "justify-end p-6 pt-0",
-                "container mx-auto flex w-full items-center gap-4 md:hidden md:p-0",
-              )}
-            >
-              <p>This is the shit</p>
-              <ConnectedSmall
-                connected={connected}
-                loading={loading}
-                address={address}
-                btcWalletBalanceSat={totalBalance}
-                onDisconnect={disconnect}
-              />
-            </div> */}
         </div>
       </section>
 
