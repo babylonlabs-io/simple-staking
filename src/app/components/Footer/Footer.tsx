@@ -81,7 +81,7 @@ export const Footer: React.FC = () => {
                   href={url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="transition-colors hover:text-primary"
+                  className="transition-colors hover:text-secondary-main"
                 >
                   <Icon title={name} />
                 </a>
@@ -93,7 +93,7 @@ export const Footer: React.FC = () => {
               href="https://babylonlabs.io/terms-of-use"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-primary"
+              className="transition-colors hover:text-secondary-main"
             >
               Terms of Use
             </a>{" "}
@@ -102,7 +102,7 @@ export const Footer: React.FC = () => {
               href="https://babylonlabs.io/privacy-policy"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-primary"
+              className="transition-colors hover:text-secondary-main"
             >
               Privacy Policy
             </a>{" "}
