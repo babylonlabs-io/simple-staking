@@ -73,11 +73,16 @@ const Home: React.FC<HomeProps> = () => {
         btcWallet!.getBTCTipHeight(),
         getGlobalParams(),
       ]);
+      let h = height;
+      if (!height) {
+        h = await btcWallet!.getBTCTipHeight();
+      }
+
       return {
         // The staking parameters are retrieved based on the current height + 1
         // so this verification should take this into account.
-        currentHeight: height,
-        nextBlockParams: getCurrentGlobalParamsVersion(height + 1, versions),
+        currentHeight: h,
+        nextBlockParams: getCurrentGlobalParamsVersion(h + 1, versions),
       };
     },
     refetchInterval: 60000, // 1 minute
