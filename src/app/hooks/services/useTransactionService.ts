@@ -346,10 +346,11 @@ export const useTransactionService = () => {
         stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimelock,
       );
-      const stakingPsbt = staking.toStakingPsbt(
-        Transaction.fromHex(stakingTxHex),
-        inputUTXOs!,
-      );
+      const stakingPsbt = staking
+        .toStakingPsbt(Transaction.fromHex(stakingTxHex), inputUTXOs!)
+        .finalizeAllInputs();
+
+      console.log("stakingPsbt", stakingPsbt.toHex());
 
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
       const signedStakingTx =
