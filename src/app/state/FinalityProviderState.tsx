@@ -1,16 +1,19 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import {
-  type PropsWithChildren,
   useCallback,
   useEffect,
   useMemo,
   useState,
+  type PropsWithChildren,
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
 import { ErrorState } from "@/app/types/errors";
-import type { FinalityProvider } from "@/app/types/finalityProviders";
+import {
+  FinalityProviderState as FinalityProviderStateEnum,
+  type FinalityProvider,
+} from "@/app/types/finalityProviders";
 import { createStateUtils } from "@/utils/createStateUtils";
 
 interface SortState {
@@ -113,50 +116,42 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     setSelectedFinalityProvider(row);
   }, []);
 
-  const filteredFinalityProviders = useMemo(() => {
-    try {
-      if (!data?.finalityProviders) return [];
-
-      return data.finalityProviders.filter((fp: FinalityProvider) => {
-        if (!fp) return false;
-
-        const statusMatch =
-          filterValue === "active"
-            ? fp.state === "FINALITY_PROVIDER_STATUS_ACTIVE"
-            : filterValue === "inactive"
-              ? fp.state !== "FINALITY_PROVIDER_STATUS_ACTIVE"
-              : true;
-
-        if (!statusMatch) return false;
-
-        if (searchValue) {
-          const searchLower = searchValue.toLowerCase();
-          return (
-            (fp.description?.moniker?.toLowerCase() || "").includes(
-              searchLower,
-            ) || (fp.btcPk?.toLowerCase() || "").includes(searchLower)
-          );
-        }
-
-        return true;
-      });
-    } catch (error: any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.SERVER_ERROR,
-        },
-      });
-      captureError(error);
-      return [];
-    }
-  }, [
-    data?.finalityProviders,
-    filterValue,
-    searchValue,
-    showError,
-    captureError,
+  const inactiveStatuses = new Set([
+    FinalityProviderStateEnum.INACTIVE,
+    FinalityProviderStateEnum.JAILED,
+    FinalityProviderStateEnum.SLASHED,
   ]);
+
+  const filteredFinalityProviders = useMemo(() => {
+    if (!data?.finalityProviders) return [];
+
+    return data.finalityProviders.filter((fp: FinalityProvider) => {
+      if (!fp) return false;
+
+      const isActive = fp.state === FinalityProviderStateEnum.ACTIVE;
+      const isInactive = inactiveStatuses.has(fp.state);
+
+      const statusMatch =
+        filterValue === "active"
+          ? isActive
+          : filterValue === "inactive"
+            ? isInactive
+            : true;
+
+      if (!statusMatch) return false;
+
+      if (searchValue) {
+        const searchLower = searchValue.toLowerCase();
+        return (
+          (fp.description?.moniker?.toLowerCase() || "").includes(
+            searchLower,
+          ) || (fp.btcPk?.toLowerCase() || "").includes(searchLower)
+        );
+      }
+
+      return true;
+    });
+  }, [data?.finalityProviders, filterValue, searchValue]);
 
   const getFinalityProviderMoniker = useCallback(
     (btcPkHex: string) => {
