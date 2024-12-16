@@ -18,9 +18,14 @@ const createProvider = (provider: CosmosProvider): IBBNProvider => {
     connectWallet: async () => void provider.connectWallet(),
     getAddress: () => provider.getAddress(),
     getPublicKeyHex: async () => "",
-    getSigningStargateClient: (options) =>
-      provider.getSigningStargateClient(options),
-    getBalance: (searchDenom) => provider.getBalance(searchDenom),
+    // Not implemented yet
+    // getWalletProviderName: () => provider.getWalletProviderName(),
+    // getWalletProviderIcon: () => provider.getWalletProviderIcon(),
+    // getOfflineSigner: () => provider.getOfflineSigner(),
+    // Fallback
+    getWalletProviderName: async () => "",
+    getWalletProviderIcon: async () => "",
+    getOfflineSigner: async () => null as any,
   };
 };
 
