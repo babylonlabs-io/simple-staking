@@ -213,9 +213,10 @@ export const ConnectModal: React.FC<ConnectModalProps> = ({
                   <code>
                     <strong>3.10.1</strong>
                   </code>{" "}
-                  firmware or higher). Using any other hardware wallet through
-                  any means (such as connection to a software/extension/mobile
-                  wallet) can lead to permanent inability to withdraw the stake.
+                  firmware or higher) using <strong>Taproot only</strong>. Using
+                  any other hardware wallet through any means (such as
+                  connection to a software/extension/mobile wallet) can lead to
+                  permanent inability to withdraw the stake.
                 </span>
               </label>
             </div>
