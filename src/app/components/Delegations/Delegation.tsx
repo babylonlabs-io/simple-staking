@@ -4,12 +4,12 @@ import { FaBitcoin } from "react-icons/fa";
 import { IoIosWarning } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
-import { useFinalityProviderService } from "@/app/hooks/services/useFinalityProviderService";
 import {
   type SigningStep,
   useTransactionService,
 } from "@/app/hooks/services/useTransactionService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
   type Delegation as DelegationInterface,
   DelegationState,
@@ -48,7 +48,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { transitionPhase1Delegation } = useTransactionService();
-  const { getFinalityProviderMoniker } = useFinalityProviderService(); // get the moniker of the finality provider
+  const { getFinalityProviderMoniker } = useFinalityProviderState(); // get the moniker of the finality provider
   useEffect(() => {
     const timerId = setInterval(() => {
       setCurrentTime(Date.now());
