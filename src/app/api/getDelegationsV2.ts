@@ -1,5 +1,3 @@
-import { encode } from "url-safe-base64";
-
 import { Pagination } from "../types/api";
 import {
   DelegationV2,
@@ -62,7 +60,7 @@ export const getDelegationV2 = async (
     "GET",
     "/v2/delegation",
     "Error getting delegation v2",
-    params,
+    { query: params },
   );
 
   const delegationAPIResponse: DelegationV2APIResponse = response.data;
@@ -115,15 +113,15 @@ export const getDelegationsV2 = async (
     throw new Error("No public key provided");
   }
   const params = {
-    staker_pk_hex: encode(publicKeyNoCoord),
-    pagination_key: pageKey ? encode(pageKey) : "",
+    staker_pk_hex: publicKeyNoCoord,
+    pagination_key: pageKey ? pageKey : "",
   };
 
   const response = await apiWrapper(
     "GET",
     "/v2/delegations",
     "Error getting delegations v2",
-    params,
+    { query: params },
   );
 
   const delegationsAPIResponse: DelegationsV2APIResponse = response.data;
