@@ -99,10 +99,7 @@ export abstract class BTCWalletProvider {
    * @param type - The type of the message to sign, defaults to 'ecdsa'
    * @returns A promise that resolves to the signed message
    */
-  abstract signMessage(
-    message: string,
-    type?: "ecdsa" | "bip322-simple",
-  ): Promise<string>;
+  abstract signMessage(message: string, type: "ecdsa"): Promise<string>;
 
   /**
    * Registers an event listener for the specified event.

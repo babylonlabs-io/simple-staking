@@ -151,6 +151,7 @@ export async function getNetworkFees(): Promise<Fees> {
     return await response.json();
   }
 }
+
 // Get the tip height of the BTC chain
 export async function getTipHeight(): Promise<number> {
   const response = await fetch(btcTipHeightUrl());

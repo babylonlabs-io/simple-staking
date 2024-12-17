@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  BBNProvider,
+  IBBNProvider,
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/bbn-wallet-connect";
@@ -39,7 +39,7 @@ const CosmosWalletContext = createContext<CosmosWalletContextProps>({
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const [BBNWalletProvider, setBBNWalletProvider] = useState<
-    BBNProvider | undefined
+    IBBNProvider | undefined
   >();
   const [cosmosBech32Address, setCosmosBech32Address] = useState("");
   const [signingStargateClient, setSigningStargateClient] = useState<
@@ -57,7 +57,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   }, []);
 
   const connectCosmos = useCallback(
-    async (provider: BBNProvider | null) => {
+    async (provider: IBBNProvider | null) => {
       if (!provider) return;
 
       try {

@@ -43,10 +43,7 @@ export interface BtcStakingInputs {
 
 interface BtcSigningFuncs {
   signPsbt: (psbtHex: string) => Promise<string>;
-  signMessage: (
-    message: string,
-    type?: "ecdsa" | "bip322-simple",
-  ) => Promise<string>;
+  signMessage: (message: string, type: "ecdsa") => Promise<string>;
   signingCallback: (step: SigningStep, status: EOIStepStatus) => Promise<void>;
 }
 

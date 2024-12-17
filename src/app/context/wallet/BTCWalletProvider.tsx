@@ -19,6 +19,13 @@ import {
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import {
+  getAddressBalance,
+  getFundingUTXOs,
+  getNetworkFees,
+  getTipHeight,
+  pushTx,
+} from "@/utils/mempool_api";
+import {
   getPublicKeyNoCoord,
   isSupportedAddressType,
   toNetwork,
@@ -42,10 +49,7 @@ interface BTCWalletContextProps {
   signPsbt: (psbtHex: string) => Promise<string>;
   signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
   getNetwork: () => Promise<Network>;
-  signMessage: (
-    message: string,
-    type?: "ecdsa" | "bip322-simple",
-  ) => Promise<string>;
+  signMessage: (message: string, type: "ecdsa") => Promise<string>;
   getBalance: () => Promise<number>;
   getNetworkFees: () => Promise<Fees>;
   pushTx: (txHex: string) => Promise<string>;
@@ -175,21 +179,18 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
-      signMessage: async (
-        message: string,
-        type: "ecdsa" | "bip322-simple" = "bip322-simple",
-      ) => btcWalletProvider?.signMessage(message, type) ?? "",
-      getBalance: async () => btcWalletProvider?.getBalance() ?? 0,
-      getNetworkFees: async () =>
-        btcWalletProvider?.getNetworkFees() ?? ({} as Fees),
-      pushTx: async (txHex: string) => btcWalletProvider?.pushTx(txHex) ?? "",
+      signMessage: async (message: string, type: "ecdsa") =>
+        btcWalletProvider?.signMessage(message, type) ?? "",
+      getBalance: async () => getAddressBalance(address),
+      getNetworkFees: async () => getNetworkFees(),
+      pushTx: async (txHex: string) => pushTx(txHex),
       getUtxos: async (address: string, amount?: number) =>
-        btcWalletProvider?.getUtxos(address, amount) ?? [],
-      getBTCTipHeight: async () => btcWalletProvider?.getBTCTipHeight() ?? 0,
+        getFundingUTXOs(address, amount),
+      getBTCTipHeight: async () => getTipHeight(),
       getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
         btcWalletProvider?.getInscriptions().catch(() => []) ?? [],
     }),
-    [btcWalletProvider],
+    [btcWalletProvider, address],
   );
 
   const btcContextValue = useMemo(
