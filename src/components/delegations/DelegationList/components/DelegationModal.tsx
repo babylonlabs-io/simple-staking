@@ -37,7 +37,6 @@ export function DelegationModal({
       />
       <UnbondModal
         open={action === ACTIONS.UNBOUND}
-        delegation={delegation}
         onSubmit={handleSubmit}
         {...restProps}
       />

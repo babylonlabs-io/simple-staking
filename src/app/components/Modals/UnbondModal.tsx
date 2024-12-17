@@ -1,6 +1,5 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
 
-import { DelegationV2 } from "@/app/types/delegationsV2";
 import { getNetworkConfig } from "@/config/network.config";
 
 import { ConfirmationModal } from "./ConfirmationModal";
@@ -8,7 +7,6 @@ import { ConfirmationModal } from "./ConfirmationModal";
 interface UnbondModalProps {
   processing: boolean;
   open: boolean;
-  delegation: DelegationV2 | null;
   onClose: () => void;
   onSubmit: () => void;
 }
