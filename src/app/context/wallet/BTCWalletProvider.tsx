@@ -50,7 +50,7 @@ interface BTCWalletContextProps {
   signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
   getNetwork: () => Promise<Network>;
   signMessage: (message: string, type: "ecdsa") => Promise<string>;
-  getBalance: () => Promise<number>;
+  getBalance: (address: string) => Promise<number>;
   getNetworkFees: () => Promise<Fees>;
   pushTx: (txHex: string) => Promise<string>;
   getUtxos: (address: string, amount?: number) => Promise<UTXO[]>;
@@ -181,7 +181,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.getNetwork() ?? ({} as Network),
       signMessage: async (message: string, type: "ecdsa") =>
         btcWalletProvider?.signMessage(message, type) ?? "",
-      getBalance: async () => getAddressBalance(address),
+      getBalance: async (address: string) => getAddressBalance(address),
       getNetworkFees: async () => getNetworkFees(),
       pushTx: async (txHex: string) => pushTx(txHex),
       getUtxos: async (address: string, amount?: number) =>
@@ -190,7 +190,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
         btcWalletProvider?.getInscriptions().catch(() => []) ?? [],
     }),
-    [btcWalletProvider, address],
+    [btcWalletProvider],
   );
 
   const btcContextValue = useMemo(
