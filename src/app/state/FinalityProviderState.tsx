@@ -27,6 +27,12 @@ const SORT_DIRECTIONS = {
   asc: undefined,
 } as const;
 
+const inactiveStatuses = new Set([
+  FinalityProviderStateEnum.INACTIVE,
+  FinalityProviderStateEnum.JAILED,
+  FinalityProviderStateEnum.SLASHED,
+]);
+
 interface FinalityProviderState {
   searchValue: string;
   filterValue: string | number;
@@ -38,7 +44,7 @@ interface FinalityProviderState {
   handleSearch: (searchTerm: string) => void;
   handleSort: (sortField: string) => void;
   handleFilter: (value: string | number) => void;
-  handleRowSelect: (row: FinalityProvider) => void;
+  handleRowSelect: (row: FinalityProvider | null) => void;
   getFinalityProviderMoniker: (btcPkHex: string) => string;
   fetchNextPage: () => void;
 }
@@ -112,15 +118,9 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     setFilterValue(value);
   }, []);
 
-  const handleRowSelect = useCallback((row: FinalityProvider) => {
+  const handleRowSelect = useCallback((row: FinalityProvider | null) => {
     setSelectedFinalityProvider(row);
   }, []);
-
-  const inactiveStatuses = new Set([
-    FinalityProviderStateEnum.INACTIVE,
-    FinalityProviderStateEnum.JAILED,
-    FinalityProviderStateEnum.SLASHED,
-  ]);
 
   const filteredFinalityProviders = useMemo(() => {
     if (!data?.finalityProviders) return [];
