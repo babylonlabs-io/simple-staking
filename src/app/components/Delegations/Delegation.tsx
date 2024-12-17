@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { FaBitcoin } from "react-icons/fa";
 
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
+import { ONE_MINUTE } from "@/app/constants";
 import {
   type SigningStep,
   useTransactionService,
@@ -57,7 +58,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { coinName, mempoolApiUrl } = getNetworkConfig();
 
   useEffect(() => {
-    const timerId = setInterval(() => setCurrentTime(Date.now()), 60000); // Update every minute
+    const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE); // Update every minute
     return () => clearInterval(timerId);
   }, []);
 
@@ -84,18 +85,13 @@ export const Delegation: React.FC<DelegationProps> = ({
   const isActive =
     intermediateState === DelegationState.ACTIVE ||
     state === DelegationState.ACTIVE;
-
-  const renderState = () =>
-    // overflow should be shown only on active state
+  const displayState =
     isOverflow && isActive
-      ? getState(DelegationState.OVERFLOW)
-      : getState(intermediateState || state);
+      ? DelegationState.OVERFLOW
+      : intermediateState || state;
 
-  const renderStateTooltip = () =>
-    // overflow should be shown only on active state
-    isOverflow && isActive
-      ? getStateTooltip(DelegationState.OVERFLOW)
-      : getStateTooltip(intermediateState || state);
+  const renderState = () => getState(displayState);
+  const renderStateTooltip = () => getStateTooltip(displayState);
 
   return (
     <div className="relative rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-sm text-primary-dark">
