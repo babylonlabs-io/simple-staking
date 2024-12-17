@@ -1,9 +1,15 @@
-import { IoMdClose } from "react-icons/io";
+import {
+  Dialog,
+  DialogBody,
+  DialogFooter,
+  Heading,
+  MobileDialog,
+  Text,
+} from "@babylonlabs-io/bbn-core-ui";
 
 import { useError } from "@/app/context/Error/ErrorContext";
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { ErrorState, ShowErrorParams } from "@/app/types/errors";
-
-import { GeneralModal } from "./GeneralModal";
 
 interface ErrorModalProps {
   open: boolean;
@@ -22,6 +28,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   errorState,
   noCancel,
 }) => {
+  const isMobileView = useIsMobileView();
+  const DialogComponent = isMobileView ? MobileDialog : Dialog;
   const { error, retryErrorAction } = useError();
 
   const handleRetry = () => {
@@ -77,39 +85,35 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   };
 
   return (
-    <GeneralModal open={open} onClose={onClose}>
-      <div className="mb- flex items-center justify-end">
-        <button
-          className="btn btn-circle btn-ghost btn-sm"
-          onClick={() => onClose()}
-        >
-          <IoMdClose size={24} />
-        </button>
-      </div>
-      <div className="flex flex-col justify-center gap-4">
-        <h3 className="text-center font-bold text-error">{getErrorTitle()}</h3>
+    <DialogComponent open={open} onClose={onClose}>
+      <DialogBody>
+        <Heading variant="h3" className="text-center font-bold text-error">
+          {getErrorTitle()}
+        </Heading>
         <div className="flex flex-col gap-3">
-          <p className="text-center">{getErrorMessage()}</p>
+          <Text variant="body1" className="text-center">
+            {getErrorMessage()}
+          </Text>
         </div>
-        <div className="mt-4 flex justify-around gap-4">
-          {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
-            <button
-              className="btn btn-outline flex-1 rounded-lg px-2"
-              onClick={() => onClose()}
-            >
-              Cancel
-            </button>
-          )}
-          {onRetry && (
-            <button
-              className="btn-primary btn flex-1 rounded-lg px-2 text-white"
-              onClick={handleRetry}
-            >
-              Try Again
-            </button>
-          )}
-        </div>
-      </div>
-    </GeneralModal>
+      </DialogBody>
+      <DialogFooter className="mt-4 flex justify-around gap-4">
+        {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
+          <button
+            className="btn btn-outline flex-1 rounded-lg px-2"
+            onClick={() => onClose()}
+          >
+            Cancel
+          </button>
+        )}
+        {onRetry && (
+          <button
+            className="btn-primary btn flex-1 rounded-lg px-2 text-white"
+            onClick={handleRetry}
+          >
+            Try Again
+          </button>
+        )}
+      </DialogFooter>
+    </DialogComponent>
   );
 };
