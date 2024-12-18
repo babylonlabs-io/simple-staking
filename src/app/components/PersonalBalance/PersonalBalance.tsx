@@ -25,12 +25,8 @@ export function PersonalBalance() {
   const {
     balanceQuery: { data: cosmosBalance, isLoading: cosmosBalanceLoading },
   } = useBbnQuery();
-  const { getRewards, claimRewards } = useRewardsService();
-
-  const { data: rewards, isLoading: rewardsLoading } = useQuery({
-    queryKey: [QUERY_KEYS.REWARDS],
-    queryFn: getRewards,
-  });
+  const { claimRewards } = useRewardsService();
+  const { rewardsQuery } = useBbnQuery();
 
   const { data: btcBalance, isLoading: btcBalanceLoading } = useQuery({
     queryKey: [QUERY_KEYS.BTC_BALANCE],
@@ -75,9 +71,9 @@ export function PersonalBalance() {
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
-          loading={rewardsLoading}
+          loading={rewardsQuery.isLoading}
           title="BBN Rewards"
-          value={`${ubbnToBbn(rewards ?? 0)} BBN`}
+          value={`${ubbnToBbn(rewardsQuery.data ?? 0)} BBN`}
           actionComponent={{
             title: "Claim",
             onAction: claimRewards,
