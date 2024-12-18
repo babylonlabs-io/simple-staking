@@ -1,5 +1,3 @@
-import { encode } from "url-safe-base64";
-
 import { Pagination } from "../types/api";
 import { Delegation } from "../types/delegations";
 
@@ -49,8 +47,8 @@ export const getDelegations = async (
   }
 
   const params = {
-    pagination_key: encode(key),
-    staker_btc_pk: encode(publicKeyNoCoord),
+    pagination_key: key,
+    staker_btc_pk: publicKeyNoCoord,
     // We only fetch for states that can have pending actions.
     // We don't care terminal states such as "withdrawn" or "transitioned".
     state: ["active", "unbonded", "unbonding", "unbonding_requested"],
@@ -60,7 +58,7 @@ export const getDelegations = async (
     "GET",
     "/v1/staker/delegations",
     "Error getting delegations",
-    params,
+    { query: params },
   );
 
   const delegationsAPIResponse: DelegationsAPIResponse = response.data;

@@ -1,5 +1,3 @@
-import { encode } from "url-safe-base64";
-
 import { isValidUrl } from "@/utils/url";
 
 import { Pagination } from "../types/api";
@@ -53,7 +51,7 @@ export const getFinalityProviders = async ({
   pk?: string;
 }): Promise<PaginatedFinalityProviders> => {
   const params = {
-    pagination_key: encode(key),
+    pagination_key: key,
     finality_provider_pk: pk,
     sort_by: sortBy,
     order,
@@ -64,7 +62,7 @@ export const getFinalityProviders = async ({
     "GET",
     "/v2/finality-providers",
     "Error getting finality providers",
-    params,
+    { query: params },
   );
 
   const finalityProvidersAPIResponse: FinalityProvidersAPIResponse =

@@ -24,7 +24,7 @@ export const postUnbonding = async (
     "POST",
     "/v1/unbonding",
     "Error submitting unbonding request",
-    payload,
+    { body: payload },
   );
 
   // If the response status is 202, the request was accepted

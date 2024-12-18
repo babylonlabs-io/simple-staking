@@ -24,11 +24,13 @@ export const postVerifyUtxoOrdinals = async (
         "/v1/ordinals/verify-utxos",
         "Error verifying utxos ordinals",
         {
-          address,
-          utxos: chunk.map((utxo) => ({
-            txid: utxo.txid,
-            vout: utxo.vout,
-          })),
+          body: {
+            address,
+            utxos: chunk.map((utxo) => ({
+              txid: utxo.txid,
+              vout: utxo.vout,
+            })),
+          },
         },
         TIMEOUT_DURATION,
       ),
