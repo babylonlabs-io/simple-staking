@@ -19,6 +19,7 @@ export const FinalityProviderTable = () => {
     filterValue,
     hasError,
     handleRowSelect,
+    isRowSelectable,
   } = useFinalityProviderState();
 
   const tableData = useMemo(() => {
@@ -70,6 +71,7 @@ export const FinalityProviderTable = () => {
         hasMore={hasNextPage}
         onLoadMore={fetchNextPage}
         onRowSelect={handleRowSelect}
+        isRowSelectable={isRowSelectable}
       />
     </div>
   );
