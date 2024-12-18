@@ -98,7 +98,6 @@ export const Delegations = ({}) => {
     });
   };
 
-  // TODO: Hook up with unbonding modal
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
@@ -107,7 +106,7 @@ export const Delegations = ({}) => {
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
         selectedDelegation;
-
+      setAwaitingWalletResponse(true);
       await submitUnbondingTx(
         {
           stakingTimelock: stakingTx.timelock,
@@ -129,6 +128,11 @@ export const Delegations = ({}) => {
           errorState: ErrorState.UNBONDING,
         },
       });
+    } finally {
+      setModalOpen(false);
+      setTxID("");
+      setModalMode(undefined);
+      setAwaitingWalletResponse(false);
     }
   };
 
