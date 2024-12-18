@@ -21,19 +21,12 @@ const createProvider = (provider: BTCProvider): IBTCProvider => {
     signPsbt: (psbtHex: string) => provider.signPsbt(psbtHex),
     signPsbts: (psbtsHexes: string[]) => provider.signPsbts(psbtsHexes),
     getNetwork: () => provider.getNetwork(),
-    signMessageBIP322: (message: string) => provider.signMessageBIP322(message),
     signMessage: (message: string, type: "ecdsa" | "bip322-simple") =>
       provider.signMessage(message, type),
     on: (eventName: string, callBack: () => void) =>
       provider.on(eventName, callBack),
     off: (eventName: string, callBack: () => void) =>
       provider.off(eventName, callBack),
-    getBalance: () => provider.getBalance(),
-    getNetworkFees: () => provider.getNetworkFees(),
-    pushTx: (txHex: string) => provider.pushTx(txHex),
-    getUtxos: (address: string, amount?: number) =>
-      provider.getUtxos(address, amount),
-    getBTCTipHeight: () => provider.getBTCTipHeight(),
     getInscriptions: () =>
       provider
         .getInscriptions()
@@ -44,6 +37,8 @@ const createProvider = (provider: BTCProvider): IBTCProvider => {
           })),
         )
         .catch(() => []),
+    getWalletProviderName: async () => await provider.getWalletProviderName(),
+    getWalletProviderIcon: async () => await provider.getWalletProviderIcon(),
   };
 };
 
