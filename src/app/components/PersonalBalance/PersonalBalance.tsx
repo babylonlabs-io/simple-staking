@@ -19,7 +19,11 @@ const QUERY_KEYS = {
 
 export function PersonalBalance() {
   const { coinName, coinSymbol } = getNetworkConfig();
-  const { getBalance: getBTCBalance, connected: btcConnected } = useBTCWallet();
+  const {
+    getBalance: getBTCBalance,
+    connected: btcConnected,
+    address,
+  } = useBTCWallet();
   const { connected: cosmosConnected } = useCosmosWallet();
 
   const {
@@ -34,7 +38,7 @@ export function PersonalBalance() {
 
   const { data: btcBalance, isLoading: btcBalanceLoading } = useQuery({
     queryKey: [QUERY_KEYS.BTC_BALANCE],
-    queryFn: getBTCBalance,
+    queryFn: () => getBTCBalance(address),
     enabled: btcConnected,
   });
 
