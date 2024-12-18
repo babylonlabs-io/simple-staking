@@ -17,6 +17,7 @@ import { useClientQuery } from "../../useClient";
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
 const BBN_REWARDS_KEY = "BBN_REWARDS";
+const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
 
 /**
  * Query service for Babylon which contains all the queries for
@@ -28,7 +29,7 @@ export const useBbnQuery = () => {
 
   /**
    * Gets the rewards from the user's account.
-   * @returns {Promise<Object>} - The rewards from the user's account.
+   * @returns {Promise<number>} - The rewards from the user's account.
    */
   const rewardsQuery = useClientQuery({
     queryKey: [BBN_REWARDS_KEY, bech32Address],
@@ -37,13 +38,44 @@ export const useBbnQuery = () => {
         return undefined;
       }
       const { incentive } = setupIncentiveExtension(queryClient);
-
       const req: incentivequery.QueryRewardGaugesRequest =
         incentivequery.QueryRewardGaugesRequest.fromPartial({
           address: bech32Address,
         });
 
-      return incentive.RewardGauges(req);
+      let rewards;
+      try {
+        rewards = await incentive.RewardGauges(req);
+      } catch (error) {
+        // If error message contains "reward gauge not found", silently return 0
+        // This is to handle the case where the user has no rewards, meaning
+        // they have not staked
+        if (
+          error instanceof Error &&
+          error.message.includes("reward gauge not found")
+        ) {
+          return 0;
+        }
+        throw error;
+      }
+      if (!rewards) {
+        return 0;
+      }
+
+      const coins =
+        rewards.rewardGauges[REWARD_GAUGE_KEY_BTC_DELEGATION]?.coins;
+      if (!coins) {
+        return 0;
+      }
+
+      const withdrawnCoins = rewards.rewardGauges[
+        REWARD_GAUGE_KEY_BTC_DELEGATION
+      ]?.withdrawnCoins.reduce((acc, coin) => acc + Number(coin.amount), 0);
+
+      return (
+        coins.reduce((acc, coin) => acc + Number(coin.amount), 0) -
+        (withdrawnCoins || 0)
+      );
     },
     enabled: Boolean(queryClient && connected && bech32Address),
     staleTime: ONE_MINUTE,
