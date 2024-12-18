@@ -1,20 +1,26 @@
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  Popover,
+  Text,
+} from "@babylonlabs-io/bbn-core-ui";
+import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
+import Image from "next/image";
 import { useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { FaBitcoin } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
+import { MdKeyboardArrowDown } from "react-icons/md";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
-import { useOnClickOutside } from "usehooks-ts";
+import { useResizeObserver } from "usehooks-ts";
 
+import bitcoin from "@/app/assets/bitcoin.png";
+import bbnIcon from "@/app/assets/icon-black.svg";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
-import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btc";
-import { maxDecimals } from "@/utils/maxDecimals";
-import { trim } from "@/utils/trim";
 
 import { Hash } from "../Hash/Hash";
-import { LoadingSmall } from "../Loading/Loading";
+import { Toggle } from "../Toggle/Toggle";
 
 interface ConnectSmallProps {
   loading?: boolean;
@@ -33,17 +39,19 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   btcWalletBalanceSat,
   onDisconnect,
 }) => {
+  const anchorEl = useRef<HTMLDivElement>(null);
+  const { width = 0 } = useResizeObserver({
+    ref: anchorEl,
+    box: "border-box",
+  });
   const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
+  const { disconnect } = useWalletConnect();
 
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
     setShowMenu(false);
   };
 
-  const ref = useRef(null);
-  useOnClickOutside(ref, handleClickOutside);
-
-  const { coinName } = getNetworkConfig();
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   // Renders the Tooltip describing the reason
@@ -66,91 +74,97 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
     );
   };
 
-  return connected ? (
-    <div className="relative mr-[-10px] text-sm hidden md:flex" ref={ref}>
-      <button
-        className="flex cursor-pointer outline-none items-stretch"
-        onClick={() => setShowMenu(!showMenu)}
-      >
-        {(typeof btcWalletBalanceSat === "number" || loading) && (
-          <div className="flex items-center rounded-lg border border-base-200/75 p-2 pr-4">
-            <div className="flex items-center gap-1">
-              <FaBitcoin className="text-primary" />
-              {typeof btcWalletBalanceSat === "number" && (
-                <p>
-                  <strong>
-                    {maxDecimals(satoshiToBtc(btcWalletBalanceSat), 8)}{" "}
-                    {coinName}
-                  </strong>
-                </p>
-              )}
-              {loading && <LoadingSmall text="Loading..." />}
-            </div>
-          </div>
-        )}
-        <div
-          className="relative right-[10px] flex items-center rounded-lg border border-primary bg-[#fdf2ec] p-2 dark:border-white dark:bg-base-200"
-          data-testid="address"
+  if (!connected) {
+    return (
+      <div className="flex items-center gap-1">
+        <Button
+          size="large"
+          color="secondary"
+          className="h-[2.5rem] min-h-[2.5rem] rounded-full px-6 py-2 text-white text-base md:rounded-lg"
+          onClick={onConnect}
+          // Disable the button if the user is already connected
+          // or: API is not available, geo-blocked, or has an error
+          disabled={connected || !isApiNormal}
         >
-          {trim(address)}
+          <PiWalletBold size={20} className="flex md:hidden" />
+          <span className="hidden md:flex">Connect Wallets</span>
+        </Button>
+        {!isApiNormal && renderApiNotAvailableTooltip()}
+      </div>
+    );
+  }
+
+  return (
+    <div ref={anchorEl} className="relative flex flex-row gap-4">
+      <div className="flex flex-row">
+        <AvatarGroup max={2} variant="circular">
+          <Avatar alt="OKX" url="/OKX.png" />
+          <Avatar alt="Keplr" url="/Keplr.png" />
+        </AvatarGroup>
+      </div>
+      <div className="flex flex-col text-secondary-contrast">
+        <Text variant="body1">Wallet Connected</Text>
+        <div className="flex flex-row text-sm gap-2">
+          <Text variant="body1">bc1pnT</Text>
+          <Text variant="body1">|</Text>
+          <Text variant="body1">bbn170</Text>
         </div>
-      </button>
-      {showMenu && (
-        <div
-          className="absolute right-[10px] top-0 z-10 mt-[4.5rem] flex flex-col gap-4 rounded-lg bg-base-300 p-4 shadow-lg"
-          style={{
-            // margin - border
-            width: "calc(100% - 8px)",
-          }}
+      </div>
+      <div>
+        <button
+          onClick={() => setShowMenu(!showMenu)}
+          className="flex items-center justify-center p-2 border rounded border-secondary-contrast text-secondary-contrast"
         >
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold dark:text-neutral-content">Settings</h3>
-            <button
-              className="btn btn-circle btn-ghost btn-sm"
-              onClick={() => setShowMenu(false)}
-            >
-              <IoMdClose size={24} />
-            </button>
-          </div>
+          <MdKeyboardArrowDown size={24} />
+        </button>
+      </div>
+      <Popover
+        anchorEl={anchorEl.current}
+        open={showMenu}
+        onClickOutside={handleClickOutside}
+        className="flex flex-col gap-4 bg-secondary-contrast rounded p-4 border border-primary-light/20"
+        style={{ width }}
+      >
+        <div className="flex flex-row gap-4">
+          <Image src={bitcoin} alt="bitcoin" width={40} height={40} />
           <div className="flex flex-col">
+            <Text variant="body1" className="text-primary-dark text-base">
+              Bitcoin
+            </Text>
             <Hash value={address} address noFade fullWidth />
           </div>
-          <div className="form-control">
-            <label className="label cursor-pointer">
-              <span className="label-text">Ordinals included</span>
-              <input
-                type="checkbox"
-                className="toggle toggle-primary"
-                checked={!ordinalsExcluded}
-                onChange={ordinalsExcluded ? includeOrdinals : excludeOrdinals}
-              />
-            </label>
+        </div>
+        <div className="flex flex-row items-center justify-between">
+          <Text variant="body2" className="text-sm text-primary-dark">
+            Not using Inscriptions
+          </Text>
+          <div>
+            <Toggle disabled={true} />
           </div>
+        </div>
+        <div className="divider" />
+        <div className="flex flex-row gap-4">
+          <Image src={bbnIcon} alt="bitcoin" width={40} height={40} />
+          <div className="flex flex-col">
+            <Text variant="body1" className="text-primary-dark text-base">
+              Babylon Chain
+            </Text>
+            <Hash value={address} address noFade fullWidth />
+          </div>
+        </div>
+        <div className="divider" />
+        <div className="flex items-center justify-start">
           <button
-            className="btn btn-outline btn-sm"
+            className="text-sm text-secondary-main"
             onClick={() => {
               setShowMenu(false);
-              onDisconnect();
+              disconnect();
             }}
           >
-            Disconnect
+            Disconnect Wallets
           </button>
         </div>
-      )}
-    </div>
-  ) : (
-    <div className="flex items-center gap-1">
-      <button
-        className="btn-primary btn h-[2.5rem] min-h-[2.5rem] rounded-full px-2 text-white md:rounded-lg"
-        onClick={onConnect}
-        // Disable the button if the user is already connected
-        // or: API is not available, geo-blocked, or has an error
-        disabled={connected || !isApiNormal}
-      >
-        <PiWalletBold size={20} className="flex md:hidden" />
-        <span className="hidden md:flex">Connect Wallets</span>
-      </button>
-      {!isApiNormal && renderApiNotAvailableTooltip()}
+      </Popover>
     </div>
   );
 };
