@@ -21,7 +21,11 @@ function Providers({ children }: React.PropsWithChildren) {
 
   return (
     <ScrollLocker>
-      <ThemeProvider defaultTheme="dark" attribute="data-theme">
+      <ThemeProvider
+        defaultTheme="light"
+        enableSystem={false}
+        attribute="data-theme"
+      >
         <QueryClientProvider client={client}>
           <ErrorProvider>
             <BbnRpcProvider>

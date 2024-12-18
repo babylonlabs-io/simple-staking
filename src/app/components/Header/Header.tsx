@@ -9,7 +9,6 @@ import { ConnectedSmall } from "../Connect/ConnectedSmall";
 import { ConnectSmall } from "../Connect/ConnectSmall";
 import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
-import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 export const Header = () => {
   const { connected, disconnect, open } = useWalletConnect();
@@ -37,7 +36,7 @@ export const Header = () => {
               btcWalletBalanceSat={totalBalance}
               onDisconnect={disconnect}
             />
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
           </div>
           <div
             className={twJoin(
