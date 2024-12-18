@@ -20,12 +20,9 @@ import {
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
+import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { DelegationV2StakingState } from "@/app/types/delegationsV2";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
-import {
-  FinalityProvider,
-  FinalityProvider as FinalityProviderInterface,
-} from "@/app/types/finalityProviders";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
@@ -58,10 +55,6 @@ export const Staking = () => {
   // Staking form state
   const [stakingAmountSat, setStakingAmountSat] = useState(0);
   const [stakingTimelock, setStakingTimelock] = useState(0);
-  const [finalityProvider, setFinalityProvider] =
-    useState<FinalityProviderInterface>();
-  const [finalityProviders, setFinalityProviders] =
-    useState<FinalityProvider[]>();
   // Selected fee rate, comes from the user input
   const [selectedFeeRate, setSelectedFeeRate] = useState(0);
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
@@ -96,6 +89,7 @@ export const Staking = () => {
   });
 
   const [infoModalOpen, setInfoModalOpen] = useState(false);
+  const { selectedFinalityProvider } = useFinalityProviderState();
 
   // Mempool fee rates, comes from the network
   // Fetch fee rates, sat/vB
@@ -162,7 +156,6 @@ export const Staking = () => {
       eoi: EOIStepStatus.UNSIGNED,
     });
     setAwaitingWalletResponse(false);
-    setFinalityProvider(undefined);
     setStakingAmountSat(0);
     setStakingTimelock(0);
     setSelectedFeeRate(0);
@@ -215,11 +208,11 @@ export const Staking = () => {
 
   const handleDelegationEoiCreation = async () => {
     try {
-      if (!finalityProvider) {
+      if (!selectedFinalityProvider) {
         throw new Error("Finality provider not selected");
       }
       const eoiInput = {
-        finalityProviderPkNoCoordHex: finalityProvider.btcPk,
+        finalityProviderPkNoCoordHex: selectedFinalityProvider.btcPk,
         stakingAmountSat,
         stakingTimelock,
         feeRate,
@@ -266,7 +259,7 @@ export const Staking = () => {
 
   // Memoize the staking fee calculation
   const stakingFeeSat = useMemo(() => {
-    if (!(stakingAmountSat && finalityProvider && minFeeRate)) {
+    if (!(stakingAmountSat && selectedFinalityProvider && minFeeRate)) {
       return 0;
     }
 
@@ -278,7 +271,7 @@ export const Staking = () => {
       const memoizedFeeRate = selectedFeeRate || defaultFeeRate;
 
       const eoiInput = {
-        finalityProviderPkNoCoordHex: finalityProvider.btcPk,
+        finalityProviderPkNoCoordHex: selectedFinalityProvider.btcPk,
         stakingAmountSat,
         stakingTimelock,
         feeRate: memoizedFeeRate,
@@ -290,45 +283,13 @@ export const Staking = () => {
     }
   }, [
     stakingAmountSat,
-    finalityProvider,
+    selectedFinalityProvider,
     selectedFeeRate,
     minFeeRate,
     defaultFeeRate,
     stakingTimelock,
     estimateStakingFee,
   ]);
-
-  // Select the finality provider from the list
-  const handleChooseFinalityProvider = (btcPkHex: string) => {
-    let found: FinalityProviderInterface | undefined;
-    try {
-      if (!finalityProviders) {
-        throw new Error("Finality providers not loaded");
-      }
-
-      found = finalityProviders.find((fp) => fp?.btcPk === btcPkHex);
-      if (!found) {
-        throw new Error("Finality provider not found");
-      }
-
-      if (found.btcPk === publicKeyNoCoord) {
-        throw new Error(
-          "Cannot select a finality provider with the same public key as the wallet",
-        );
-      }
-    } catch (error: any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.STAKING,
-        },
-        retryAction: () => handleChooseFinalityProvider(btcPkHex),
-      });
-      return;
-    }
-
-    setFinalityProvider(found);
-  };
 
   const handleStakingAmountSatChange = (inputAmountSat: number) => {
     setStakingAmountSat(inputAmountSat);
@@ -423,7 +384,7 @@ export const Staking = () => {
           maxStakingTimeBlocks,
           stakingAmountSat,
           stakingTimeBlocksWithFixed,
-          Boolean(finalityProvider),
+          Boolean(selectedFinalityProvider),
           stakingFeeSat,
         );
 
@@ -467,7 +428,7 @@ export const Staking = () => {
               <div className="relative flex flex-1 flex-col">
                 <div
                   className={`absolute inset-0 bg-secondary-contrast z-10 transition-opacity duration-300 ${
-                    finalityProvider
+                    selectedFinalityProvider
                       ? "opacity-0 pointer-events-none"
                       : "opacity-75"
                   }`}
@@ -478,7 +439,7 @@ export const Staking = () => {
                   unbondingTimeBlocks={unbondingTime}
                   onStakingTimeBlocksChange={handleStakingTimeBlocksChange}
                   reset={resetFormInputs}
-                  disabled={!finalityProvider}
+                  disabled={!selectedFinalityProvider}
                 />
                 <StakingAmount
                   minStakingAmountSat={minStakingAmountSat}
@@ -486,7 +447,7 @@ export const Staking = () => {
                   btcWalletBalanceSat={btcWalletBalanceSat}
                   onStakingAmountSatChange={handleStakingAmountSatChange}
                   reset={resetFormInputs}
-                  disabled={!finalityProvider}
+                  disabled={!selectedFinalityProvider}
                 />
                 {signReady && (
                   <StakingFee
@@ -522,9 +483,11 @@ export const Staking = () => {
                   isOpen={previewModalOpen}
                   onClose={handlePreviewModalClose}
                   onSign={handleDelegationEoiCreation}
-                  finalityProvider={finalityProvider?.description.moniker}
+                  finalityProvider={
+                    selectedFinalityProvider?.description.moniker
+                  }
                   finalityProviderAvatar={
-                    finalityProvider?.description.identity
+                    selectedFinalityProvider?.description.identity
                   }
                   stakingAmountSat={stakingAmountSat}
                   stakingTimelock={stakingTimeBlocksWithFixed}
