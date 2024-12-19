@@ -18,7 +18,7 @@ export const WalletNotConnected = () => {
         </div>
         <div className="flex flex-col gap-2 justify-center items-center self-stretch">
           <Heading variant="h5" className="text-primary-dark text-2xl">
-            Connect wallet to start staking
+            Connect wallets to start staking
           </Heading>
           <Text
             variant="body1"
@@ -29,7 +29,7 @@ export const WalletNotConnected = () => {
           </Text>
         </div>
         <Button variant="outlined" onClick={open} className="text-primary-dark">
-          Connect wallet
+          Connect Wallets
         </Button>
       </div>
     </div>
