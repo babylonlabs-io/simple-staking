@@ -1,19 +1,26 @@
-import { Button, Text } from "@babylonlabs-io/bbn-core-ui";
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  Popover,
+  Text,
+} from "@babylonlabs-io/bbn-core-ui";
+import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
 import Image from "next/image";
 import { useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
-import { useOnClickOutside } from "usehooks-ts";
+import { useResizeObserver } from "usehooks-ts";
 
-import keplr from "@/app/assets/Keplr.png";
-import okx from "@/app/assets/OKX.png";
+import bitcoin from "@/app/assets/bitcoin.png";
+import bbnIcon from "@/app/assets/icon-black.svg";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
-import { getNetworkConfig } from "@/config/network.config";
 
-import { Menu } from "./Menu";
+import { Hash } from "../Hash/Hash";
+import { Toggle } from "../Toggle/Toggle";
 
 interface ConnectSmallProps {
   loading?: boolean;
@@ -32,17 +39,19 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   btcWalletBalanceSat,
   onDisconnect,
 }) => {
+  const anchorEl = useRef<HTMLDivElement>(null);
+  const { width = 0 } = useResizeObserver({
+    ref: anchorEl,
+    box: "border-box",
+  });
   const { ordinalsExcluded, includeOrdinals, excludeOrdinals } = useAppState();
+  const { disconnect } = useWalletConnect();
 
   const [showMenu, setShowMenu] = useState(false);
   const handleClickOutside = () => {
     setShowMenu(false);
   };
 
-  const ref = useRef(null);
-  useOnClickOutside(ref, handleClickOutside);
-
-  const { coinName } = getNetworkConfig();
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
 
   // Renders the Tooltip describing the reason
@@ -86,16 +95,12 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
   }
 
   return (
-    <div className="relative flex flex-row gap-4">
+    <div ref={anchorEl} className="relative flex flex-row gap-4">
       <div className="flex flex-row">
-        <Image src={okx} alt="OKX" width={40} height={40} />
-        <Image
-          src={keplr}
-          alt="Keplr"
-          width={40}
-          height={40}
-          className="-ml-3"
-        />
+        <AvatarGroup max={2} variant="circular">
+          <Avatar alt="OKX" url="/OKX.png" />
+          <Avatar alt="Keplr" url="/Keplr.png" />
+        </AvatarGroup>
       </div>
       <div className="flex flex-col text-secondary-contrast">
         <Text variant="body1">Wallet Connected</Text>
@@ -113,7 +118,53 @@ export const ConnectSmall: React.FC<ConnectSmallProps> = ({
           <MdKeyboardArrowDown size={24} />
         </button>
       </div>
-      <Menu open={showMenu} onClose={() => setShowMenu(false)} />
+      <Popover
+        anchorEl={anchorEl.current}
+        open={showMenu}
+        onClickOutside={handleClickOutside}
+        className="flex flex-col gap-4 bg-secondary-contrast rounded p-4 border border-primary-light/20"
+        style={{ width }}
+      >
+        <div className="flex flex-row gap-4">
+          <Image src={bitcoin} alt="bitcoin" width={40} height={40} />
+          <div className="flex flex-col">
+            <Text variant="body1" className="text-primary-dark text-base">
+              Bitcoin
+            </Text>
+            <Hash value={address} address noFade fullWidth />
+          </div>
+        </div>
+        <div className="flex flex-row items-center justify-between">
+          <Text variant="body2" className="text-sm text-primary-dark">
+            Not using Inscriptions
+          </Text>
+          <div>
+            <Toggle disabled={true} />
+          </div>
+        </div>
+        <div className="divider" />
+        <div className="flex flex-row gap-4">
+          <Image src={bbnIcon} alt="bitcoin" width={40} height={40} />
+          <div className="flex flex-col">
+            <Text variant="body1" className="text-primary-dark text-base">
+              Babylon Chain
+            </Text>
+            <Hash value={address} address noFade fullWidth />
+          </div>
+        </div>
+        <div className="divider" />
+        <div className="flex items-center justify-start">
+          <button
+            className="text-sm text-secondary-main"
+            onClick={() => {
+              setShowMenu(false);
+              disconnect();
+            }}
+          >
+            Disconnect Wallets
+          </button>
+        </div>
+      </Popover>
     </div>
   );
 };
