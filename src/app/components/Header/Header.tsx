@@ -1,17 +1,15 @@
 import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
 
-import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
 import { shouldDisplayTestingMsg } from "@/config";
 
-import { ConnectSmall } from "../Connect/ConnectSmall";
 import { Logo } from "../Logo/Logo";
 import { TestingInfo } from "../TestingInfo/TestingInfo";
+import { Connect } from "../Wallet/Connect";
 
 export const Header = () => {
-  const { connected, disconnect, open } = useWalletConnect();
-  const { address } = useBTCWallet();
-  const { totalBalance, isLoading: loading } = useAppState();
+  const { open } = useWalletConnect();
+  const { isLoading: loading } = useAppState();
 
   return (
     <nav>
@@ -26,14 +24,7 @@ export const Header = () => {
             )}
           </div>
           <div className="flex items-center gap-4">
-            <ConnectSmall
-              connected={connected}
-              loading={loading}
-              onConnect={open}
-              address={address}
-              btcWalletBalanceSat={totalBalance}
-              onDisconnect={disconnect}
-            />
+            <Connect loading={loading} onConnect={open} />
           </div>
         </div>
       </section>
