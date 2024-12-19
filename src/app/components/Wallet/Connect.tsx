@@ -6,7 +6,10 @@ import {
   Popover,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
-import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
+import {
+  useWalletConnect,
+  useWidgetState,
+} from "@babylonlabs-io/bbn-wallet-connect";
 import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
@@ -43,6 +46,9 @@ export const Connect: React.FC<ConnectProps> = ({
   const { address: btcAddress, connected: btcConnected } = useBTCWallet();
   const { bech32Address, connected: bbnConnected } = useCosmosWallet();
   const { disconnect } = useWalletConnect();
+
+  // Widget states
+  const { selectedWallets } = useWidgetState();
 
   const [showMenu, setShowMenu] = useState(false);
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
@@ -168,8 +174,18 @@ export const Connect: React.FC<ConnectProps> = ({
       >
         <div className="flex flex-row">
           <AvatarGroup max={2} variant="circular">
-            <Avatar alt="OKX" url="/OKX.png" />
-            <Avatar alt="Keplr" url="/Keplr.png" />
+            <Avatar
+              alt={selectedWallets["BTC"]?.name}
+              url={selectedWallets["BTC"]?.icon}
+              size="medium"
+              className="object-contain bg-white"
+            />
+            <Avatar
+              alt={selectedWallets["BBN"]?.name}
+              url={selectedWallets["BBN"]?.icon}
+              size="medium"
+              className="object-contain bg-white"
+            />
           </AvatarGroup>
         </div>
         <div className="hidden md:flex flex-col text-secondary-contrast">
