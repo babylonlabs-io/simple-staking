@@ -22,23 +22,22 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
   return (
     <DialogComponent open={open} onClose={onClose}>
       <DialogHeader
-        title="Info"
+        title="Stake Timelock and On-Demand Unbonding"
         onClose={onClose}
         className="text-primary-dark"
       />
       <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
         <div className="py-4 flex flex-col items-start gap-4">
           <Text variant="body1">
-            You can unbond and withdraw your stake anytime with an unbonding
-            time of 7 days.
+            Stakes made through this dashboard are locked for up to 65 weeks.
+            You can on-demand unbond at any time, with withdrawal available
+            after a 7-day unbonding period. If the maximum staking period
+            expires, your stake becomes withdrawable automatically, with no need
+            for prior unbonding.
           </Text>
-          <Text variant="body1">
-            There is also a build-in maximum staking period of 65 weeks.
-          </Text>
-          <Text variant="body1">
-            If the stake is not unbonded before the end of this period, it will
-            automatically become withdrawable by you anytime afterwards. The
-            above times are approximates based on average BTC block time.
+          <Text variant="body1" className="text-gray-500 italic">
+            Note: Timeframes are approximate, based on an average Bitcoin block
+            time of 10 minutes.
           </Text>
         </div>
       </DialogBody>

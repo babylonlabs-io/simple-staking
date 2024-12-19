@@ -33,7 +33,7 @@ export const Stats = memo(() => {
         <StatItem
           loading={isLoading}
           title="Confirmed TVL"
-          value={`${maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinName}`}
+          value={`${satoshiToBtc(activeTvl) >= 1 ? maxDecimals(satoshiToBtc(activeTvl), 2) : maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinName}`}
           tooltip="Total number of active bitcoins staked"
         />
 

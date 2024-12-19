@@ -60,7 +60,7 @@ export function PersonalBalance() {
 
         <StatItem
           loading={cosmosBalanceLoading}
-          title={`Stakable ${coinName}`}
+          title={"Stakable Balance"}
           value={`${satoshiToBtc(btcBalance ?? 0)} ${coinSymbol}`}
         />
 
@@ -68,7 +68,7 @@ export function PersonalBalance() {
 
         <StatItem
           loading={cosmosBalanceLoading}
-          title="Babylon Balance"
+          title="Babylon Chain Balance"
           value={`${ubbnToBbn(cosmosBalance ?? 0)} BBN`}
         />
 

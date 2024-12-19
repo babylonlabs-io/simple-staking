@@ -10,7 +10,7 @@ import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
-const { coinName } = getNetworkConfig();
+const { coinSymbol } = getNetworkConfig();
 
 const mapStatus = (value: FinalityProviderState): string => {
   return FinalityProviderStateLabels[value] || "Unknown";
@@ -44,6 +44,14 @@ export const finalityProviderColumns = [
     },
   },
   {
+    key: "state",
+    header: "Status",
+    render: (value: unknown) => {
+      if (value == null) return "Unknown";
+      return mapStatus(value as FinalityProviderState);
+    },
+  },
+  {
     key: "btcPk",
     header: "BTC PK",
     render: (_: unknown, row?: FinalityProvider) => {
@@ -57,7 +65,7 @@ export const finalityProviderColumns = [
     render: (value: unknown) => {
       const amount = Number(value);
       if (isNaN(amount)) return "-";
-      return `${maxDecimals(satoshiToBtc(amount), 8)} ${coinName}`;
+      return `${maxDecimals(satoshiToBtc(amount), 8)} ${coinSymbol}`;
     },
     sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
       const valueA = a?.activeTVLSat ?? 0;
@@ -77,14 +85,6 @@ export const finalityProviderColumns = [
       const commissionA = Number(a?.commission) || 0;
       const commissionB = Number(b?.commission) || 0;
       return commissionA - commissionB;
-    },
-  },
-  {
-    key: "state",
-    header: "Status",
-    render: (value: unknown) => {
-      if (value == null) return "Unknown";
-      return mapStatus(value as FinalityProviderState);
     },
   },
 ];
