@@ -16,7 +16,7 @@ export interface BbnGasFee {
  * interacting with Babylon RPC nodes
  */
 export const useBbnTransaction = () => {
-  const { simulate, signAndBroadcast } = useSigningStargateClient();
+  const { simulate, signTx, broadcastTx } = useSigningStargateClient();
 
   /**
    * Estimates the gas fee for a transaction.
@@ -38,21 +38,37 @@ export const useBbnTransaction = () => {
   );
 
   /**
-   * Sends a transaction to the Babylon network.
+   * Sign a transaction
    * @param {Object} msg - The transaction message.
-   * @returns {Promise<Object>} - The transaction hash and gas used.
+   * @returns The signed transaction in bytes
    */
-  const sendBbnTx = useCallback(
-    async <T extends object>(msg: { typeUrl: string; value: T }) => {
+  const signBbnTx = useCallback(
+    async <T extends object>(msg: {
+      typeUrl: string;
+      value: T;
+    }): Promise<Uint8Array> => {
       // estimate gas
       const fee = await estimateBbnGasFee(msg);
       // sign it
-      await signAndBroadcast(msg, fee);
+      return signTx(msg, fee);
     },
-    [estimateBbnGasFee, signAndBroadcast],
+    [estimateBbnGasFee, signTx],
+  );
+
+  /**
+   * Sends a transaction to the Babylon network.
+   * @param {Uint8Array} tx - The transaction in bytes.
+   * @returns {Promise<{txHash: string; gasUsed: string;}>} - The transaction hash and gas used.
+   */
+  const sendBbnTx = useCallback(
+    async (tx: Uint8Array) => {
+      return broadcastTx(tx);
+    },
+    [broadcastTx],
   );
 
   return {
+    signBbnTx,
     sendBbnTx,
     estimateBbnGasFee,
   };

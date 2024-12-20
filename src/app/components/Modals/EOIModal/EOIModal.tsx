@@ -15,6 +15,7 @@ export enum EOIStepStatus {
   UNSIGNED = "UNSIGNED",
   SIGNED = "SIGNED",
   PROCESSING = "PROCESSING",
+  SENT = "SENT",
 }
 
 interface EOIModalProps {
@@ -35,6 +36,7 @@ const STEP_STATES = {
   [EOIStepStatus.UNSIGNED]: "upcoming",
   [EOIStepStatus.SIGNED]: "completed",
   [EOIStepStatus.PROCESSING]: "processing",
+  [EOIStepStatus.SENT]: "completed",
 } as const;
 
 export function EOIModal({

@@ -1,4 +1,5 @@
 import { StdFee } from "@cosmjs/stargate";
+import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { useCallback } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
@@ -70,5 +71,65 @@ export const useSigningStargateClient = () => {
     [signingStargateClient, bech32Address],
   );
 
-  return { simulate, signAndBroadcast };
+  /**
+   * Signs a transaction
+   * @param msg - The transaction message
+   * @param fee - The gas fee
+   * @returns The signed transaction in bytes
+   */
+  const signTx = useCallback(
+    async <T>(
+      msg: {
+        typeUrl: string;
+        value: T;
+      },
+      fee: StdFee,
+    ): Promise<Uint8Array> => {
+      if (!signingStargateClient || !bech32Address) {
+        throw new Error("Wallet not connected");
+      }
+
+      const res = await signingStargateClient.sign(
+        bech32Address,
+        [msg],
+        fee,
+        "",
+      );
+      return TxRaw.encode(res).finish();
+    },
+
+    [signingStargateClient, bech32Address],
+  );
+
+  /**
+   * Broadcasts a transaction
+   * @param tx - The transaction in bytes
+   * @returns The transaction hash
+   */
+  const broadcastTx = useCallback(
+    async (
+      tx: Uint8Array,
+    ): Promise<{
+      txHash: string;
+      gasUsed: string;
+    }> => {
+      if (!signingStargateClient || !bech32Address) {
+        throw new Error("Wallet not connected");
+      }
+
+      const res = await signingStargateClient.broadcastTx(tx);
+      if (res.code !== 0) {
+        throw new Error(
+          `Failed to send transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
+        );
+      }
+      return {
+        gasUsed: res.gasUsed.toString(),
+        txHash: res.transactionHash,
+      };
+    },
+    [signingStargateClient, bech32Address],
+  );
+
+  return { simulate, signAndBroadcast, signTx, broadcastTx };
 };
