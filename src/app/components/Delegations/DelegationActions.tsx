@@ -33,7 +33,10 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   }
 
   // Unbonded
-  if (state === DelegationState.UNBONDED) {
+  if (
+    state === DelegationState.UNBONDED &&
+    intermediateState !== DelegationState.INTERMEDIATE_WITHDRAWAL
+  ) {
     return (
       <div className="flex justify-end lg:justify-start">
         <Button
