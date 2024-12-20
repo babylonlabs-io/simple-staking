@@ -14,7 +14,16 @@ import {
   ShowErrorParams,
 } from "@/app/types/errors";
 
-const ErrorContext = createContext<ErrorContextType | undefined>(undefined);
+const ErrorContext = createContext<ErrorContextType>({
+  isErrorOpen: false,
+  error: {
+    message: "",
+  },
+  showError: () => {},
+  hideError: () => {},
+  handleError: () => {},
+  captureError: () => {},
+});
 
 interface ErrorProviderProps {
   children: ReactNode;
@@ -118,8 +127,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
 export const useError = () => {
   const context = useContext(ErrorContext);
-  if (context === undefined) {
-    throw new Error("useError must be used within an ErrorProvider");
-  }
+
   return context;
 };

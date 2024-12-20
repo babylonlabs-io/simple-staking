@@ -1,4 +1,4 @@
-import { MdEditNote } from "react-icons/md";
+import { BiSolidBadgeCheck } from "react-icons/bi";
 
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -9,28 +9,18 @@ const { networkName } = getNetworkConfigBTC();
 interface StakeModalProps {
   processing?: boolean;
   open: boolean;
-  onClose: () => void;
-  onSubmit: () => void;
+  onSubmit?: () => void;
 }
 
-export function StakeModal({
-  processing,
-  open,
-  onClose,
-  onSubmit,
-}: StakeModalProps) {
-  return (
-    <SubmitModal
-      processing={processing}
-      open={open}
-      icon={<MdEditNote size={52} />}
-      title={`Sign and Send to ${networkName}`}
-      onClose={onClose}
-      onSubmit={onSubmit}
-    >
-      Lorem ipsum dolor sit amet consectetur. Eget ut sagittis vitae hendrerit
-      tempus non pellentesque. Amet enim justo vel quam pharetra sem. Id in arcu
-      dignissim.
-    </SubmitModal>
-  );
-}
+export const StakeModal = ({ processing, open, onSubmit }: StakeModalProps) => (
+  <SubmitModal
+    processing={processing}
+    open={open}
+    icon={<BiSolidBadgeCheck size={52} />}
+    title="Verified"
+    submitButton={`Stake on ${networkName}`}
+    onSubmit={onSubmit}
+  >
+    Your request has been verified by the babylon blockchain. You can now stake
+  </SubmitModal>
+);

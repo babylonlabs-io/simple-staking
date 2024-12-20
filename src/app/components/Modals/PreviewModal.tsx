@@ -21,7 +21,7 @@ import { blocksToDisplayTime } from "@/utils/time";
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface PreviewModalProps {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
   onSign: () => void;
   finalityProvider: string | undefined;
@@ -31,13 +31,13 @@ interface PreviewModalProps {
   stakingFeeSat: number;
   feeRate: number;
   unbondingFeeSat: number;
-  awaitingWalletResponse: boolean;
+  processing: boolean;
 }
 
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 export const PreviewModal = ({
-  isOpen,
+  open,
   onClose,
   finalityProvider,
   finalityProviderAvatar,
@@ -47,7 +47,7 @@ export const PreviewModal = ({
   stakingFeeSat,
   feeRate,
   unbondingFeeSat,
-  awaitingWalletResponse,
+  processing,
 }: PreviewModalProps) => {
   const isMobileView = useIsMobileView();
   const { coinSymbol, networkName } = getNetworkConfigBTC();
@@ -130,7 +130,7 @@ export const PreviewModal = ({
   ];
 
   return (
-    <ResponsiveDialog open={isOpen} onClose={onClose}>
+    <ResponsiveDialog open={open} onClose={onClose}>
       <DialogHeader
         title="Preview"
         onClose={onClose}
@@ -179,9 +179,9 @@ export const PreviewModal = ({
           variant="contained"
           onClick={onSign}
           className="flex-1 text-xs sm:text-base"
-          disabled={awaitingWalletResponse}
+          disabled={processing}
         >
-          {awaitingWalletResponse ? (
+          {processing ? (
             <Loader size={16} className="text-white" />
           ) : (
             "Proceed to Signing"

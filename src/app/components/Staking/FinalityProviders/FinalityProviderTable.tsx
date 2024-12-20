@@ -9,7 +9,13 @@ import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { finalityProviderColumns } from "./FinalityProviderColumns";
 import { StatusView } from "./FinalityProviderTableStatusView";
 
-export const FinalityProviderTable = () => {
+interface FinalityProviderTable {
+  onSelectRow?: (fpPK: string) => void;
+}
+
+export const FinalityProviderTable = ({
+  onSelectRow,
+}: FinalityProviderTable) => {
   const {
     isFetching,
     finalityProviders,
@@ -61,21 +67,6 @@ export const FinalityProviderTable = () => {
     />
   );
 
-  const tableView = (
-    <div className="h-[21rem] overflow-y-auto ">
-      <Table
-        key={`${searchValue}-${filterValue}`}
-        data={tableData}
-        columns={finalityProviderColumns}
-        loading={isFetching}
-        hasMore={hasNextPage}
-        onLoadMore={fetchNextPage}
-        onRowSelect={handleRowSelect}
-        isRowSelectable={isRowSelectable}
-      />
-    </div>
-  );
-
   if (hasError) {
     return errorView;
   }
@@ -88,5 +79,23 @@ export const FinalityProviderTable = () => {
     return noMatchesView;
   }
 
-  return tableView;
+  return (
+    <div className="h-[21rem] overflow-y-auto ">
+      <Table
+        key={`${searchValue}-${filterValue}`}
+        data={tableData}
+        columns={finalityProviderColumns}
+        loading={isFetching}
+        hasMore={hasNextPage}
+        onLoadMore={fetchNextPage}
+        onRowSelect={(row) => {
+          if (row) {
+            handleRowSelect(row);
+            onSelectRow?.(row.btcPk);
+          }
+        }}
+        isRowSelectable={isRowSelectable}
+      />
+    </div>
+  );
 };

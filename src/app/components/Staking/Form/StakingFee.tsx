@@ -107,13 +107,15 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
           />
           <div className="w-full flex justify-between text-xs px-0 items-center">
             <span className="opacity-50">{minFeeRate} sat/vB</span>
-            {showLowFeesWarning ? (
-              <p className="text-center text-error">
-                Fees are low, inclusion is not guaranteed
-              </p>
-            ) : null}
+
             <span className="opacity-50">{maxFeeRate} sat/vB</span>
           </div>
+
+          {showLowFeesWarning ? (
+            <p className="text-error mt-2">
+              Fees are low, inclusion is not guaranteed
+            </p>
+          ) : null}
         </div>
       </div>
     );

@@ -13,7 +13,7 @@ import { ErrorState } from "../types/errors";
 export const useHealthCheck = () => {
   const { showError, captureError } = useError();
 
-  const { data, error, isError, refetch } = useQuery({
+  const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: ["api available"],
     queryFn: getHealthCheck,
     refetchOnMount: false,
@@ -43,6 +43,7 @@ export const useHealthCheck = () => {
     apiMessage,
     isError,
     error,
+    isLoading,
     refetch,
   };
 };

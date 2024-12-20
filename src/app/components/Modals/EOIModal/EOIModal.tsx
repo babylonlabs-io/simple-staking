@@ -13,23 +13,11 @@ import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { Step } from "./Step";
 
-export enum EOIStepStatus {
-  UNSIGNED = "UNSIGNED",
-  SIGNED = "SIGNED",
-  PROCESSING = "PROCESSING",
-  SENT = "SENT",
-}
-
 interface EOIModalProps {
   processing?: boolean;
   open: boolean;
   title: string;
-  statuses: {
-    slashing: EOIStepStatus;
-    unbonding: EOIStepStatus;
-    reward: EOIStepStatus;
-    eoi: EOIStepStatus;
-  };
+  step: number;
   onClose?: () => void;
   onSubmit?: () => void;
 }
@@ -37,80 +25,65 @@ interface EOIModalProps {
 const { coinSymbol } = getNetworkConfigBTC();
 const { coinSymbol: bbnCoinSymbol } = getNetworkConfigBBN();
 
-const STEP_STATES = {
-  [EOIStepStatus.UNSIGNED]: "upcoming",
-  [EOIStepStatus.SIGNED]: "completed",
-  [EOIStepStatus.PROCESSING]: "processing",
-  [EOIStepStatus.SENT]: "completed",
-} as const;
-
-export function EOIModal({
+export const EOIModal = ({
   processing = false,
   open,
   title,
-  statuses,
+  step,
   onClose,
   onSubmit,
-}: EOIModalProps) {
-  return (
-    <ResponsiveDialog
-      className="z-[150]"
-      backdropClassName="z-[100]"
-      open={open}
+}: EOIModalProps) => (
+  <ResponsiveDialog open={open} onClose={onClose} hasBackdrop>
+    <DialogHeader
+      title={title}
       onClose={onClose}
-      hasBackdrop
-    >
-      <DialogHeader
-        title={title}
-        onClose={onClose}
-        className="text-primary-dark"
-      />
+      className="text-primary-dark"
+    />
 
-      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
-        <Text variant="body1" className="text-primary-main">
-          Please sign the following messages
-        </Text>
+    <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
+      <Text variant="body1" className="text-primary-main">
+        Please sign the following messages
+      </Text>
 
-        <div className="py-4 flex flex-col items-start gap-6">
-          <Step index={1} state={STEP_STATES[statuses.slashing]}>
-            Consent to slashing
-          </Step>
-          <Step index={2} state={STEP_STATES[statuses.unbonding]}>
-            Consent to slashing during unbonding
-          </Step>
-          <Step index={3} state={STEP_STATES[statuses.reward]}>
-            {coinSymbol}-{bbnCoinSymbol} address binding for receiving staking
-            rewards
-          </Step>
-          <Step index={4} state={STEP_STATES[statuses.eoi]}>
-            Staking transaction registration
-          </Step>
-        </div>
-      </DialogBody>
+      <div className="py-4 flex flex-col items-start gap-6">
+        <Step step={1} currentStep={step}>
+          Consent to slashing
+        </Step>
+        <Step step={2} currentStep={step}>
+          Consent to slashing during unbonding
+        </Step>
+        <Step step={3} currentStep={step}>
+          {coinSymbol}-{bbnCoinSymbol} address binding for receiving staking
+          rewards
+        </Step>
+        <Step step={4} currentStep={step}>
+          Staking transaction registration
+        </Step>
+      </div>
+    </DialogBody>
 
-      <DialogFooter className="flex gap-4">
-        {onClose && (
-          <Button
-            variant="outlined"
-            color="primary"
-            onClick={onClose}
-            className="flex-1 text-xs sm:text-base"
-          >
-            Cancel
-          </Button>
-        )}
+    <DialogFooter className="flex gap-4">
+      {onClose && (
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={onClose}
+          className="flex-1 text-xs sm:text-base"
+        >
+          Cancel
+        </Button>
+      )}
 
-        {onSubmit && (
-          <Button
-            disabled={processing}
-            variant="contained"
-            className="flex-1 text-xs sm:text-base"
-            onClick={onSubmit}
-          >
-            {processing ? <Loader size={16} className="text-white" /> : "Sign"}
-          </Button>
-        )}
-      </DialogFooter>
-    </ResponsiveDialog>
-  );
-}
+      {onSubmit && (
+        <Button
+          disabled={processing}
+          variant="contained"
+          className="flex-1 text-xs sm:text-base"
+          onClick={onSubmit}
+        >
+          {processing ? <Loader size={16} className="text-white" /> : "Sign"}
+        </Button>
+      )}
+    </DialogFooter>
+  </ResponsiveDialog>
+);

@@ -9,9 +9,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { useError } from "@/app/context/Error/ErrorContext";
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
-import { ErrorState } from "@/app/types/errors";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
   type FinalityProvider,
@@ -83,11 +81,10 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const [selectedFinalityProvider, setSelectedFinalityProvider] =
     useState<FinalityProvider | null>(null);
-  const { showError, captureError } = useError();
 
   const debouncedSearch = useDebounce(searchValue, 300);
 
-  const { data, hasNextPage, fetchNextPage, isFetching, isError, error } =
+  const { data, hasNextPage, fetchNextPage, isFetching, isError } =
     useFinalityProviders({
       sortBy: sortState.field,
       order: sortState.direction,
@@ -159,11 +156,8 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
   }, [data?.finalityProviders, filterValue, searchValue]);
 
   const getFinalityProvider = useCallback(
-    (btcPkHex: string) => {
-      return (
-        data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null
-      );
-    },
+    (btcPkHex: string) =>
+      data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
     [data?.finalityProviders],
   );
 
@@ -173,35 +167,40 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
     }
   }, [fpParam, data?.finalityProviders, handleSearch]);
 
-  useEffect(() => {
-    if (isError && error) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.SERVER_ERROR,
-        },
-        retryAction: fetchNextPage,
-      });
-      captureError(error);
-    }
-  }, [isError, error, showError, captureError, fetchNextPage]);
-
-  const state = {
-    searchValue,
-    filterValue,
-    finalityProviders: filteredFinalityProviders,
-    selectedFinalityProvider,
-    isFetching,
-    hasNextPage,
-    hasError: isError,
-    handleSearch,
-    handleSort,
-    handleFilter,
-    handleRowSelect,
-    isRowSelectable,
-    getFinalityProvider,
-    fetchNextPage,
-  };
+  const state = useMemo(
+    () => ({
+      searchValue,
+      filterValue,
+      finalityProviders: filteredFinalityProviders,
+      selectedFinalityProvider,
+      isFetching,
+      hasNextPage,
+      hasError: isError,
+      handleSearch,
+      handleSort,
+      handleFilter,
+      handleRowSelect,
+      isRowSelectable,
+      getFinalityProvider,
+      fetchNextPage,
+    }),
+    [
+      searchValue,
+      filterValue,
+      filteredFinalityProviders,
+      selectedFinalityProvider,
+      isFetching,
+      hasNextPage,
+      isError,
+      handleSearch,
+      handleSort,
+      handleFilter,
+      handleRowSelect,
+      isRowSelectable,
+      getFinalityProvider,
+      fetchNextPage,
+    ],
+  );
 
   return <StateProvider value={state}>{children}</StateProvider>;
 }

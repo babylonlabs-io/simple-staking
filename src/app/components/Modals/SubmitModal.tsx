@@ -17,12 +17,10 @@ interface SubmitModalProps {
   open: boolean;
   icon: JSX.Element;
   title: string;
-  buttons?: {
-    cancel?: string;
-    submit?: string;
-  };
-  onClose: () => void;
-  onSubmit: () => void;
+  cancelButton?: string;
+  submitButton?: string;
+  onClose?: () => void;
+  onSubmit?: () => void;
 }
 
 const DEFAULT_BUTTONS = {
@@ -37,7 +35,8 @@ export const SubmitModal = ({
   title,
   children,
   open,
-  buttons,
+  cancelButton = "Cancel",
+  submitButton = "Submit",
   onClose,
   onSubmit,
 }: PropsWithChildren<SubmitModalProps>) => (
@@ -59,22 +58,26 @@ export const SubmitModal = ({
     </DialogBody>
 
     <DialogFooter className="flex gap-4">
-      <Button variant="outlined" className="flex-1" onClick={onClose}>
-        {buttons?.cancel ?? DEFAULT_BUTTONS.cancel}
-      </Button>
+      {onClose && (
+        <Button variant="outlined" className="flex-1" onClick={onClose}>
+          {cancelButton}
+        </Button>
+      )}
 
-      <Button
-        disabled={processing}
-        variant="contained"
-        className="flex-1"
-        onClick={onSubmit}
-      >
-        {processing ? (
-          <Loader size={16} className="text-white" />
-        ) : (
-          (buttons?.submit ?? DEFAULT_BUTTONS.submit)
-        )}
-      </Button>
+      {onSubmit && (
+        <Button
+          disabled={processing}
+          variant="contained"
+          className="flex-1"
+          onClick={onSubmit}
+        >
+          {processing ? (
+            <Loader size={16} className="text-white" />
+          ) : (
+            submitButton
+          )}
+        </Button>
+      )}
     </DialogFooter>
   </ResponsiveDialog>
 );

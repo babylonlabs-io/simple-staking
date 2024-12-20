@@ -1,11 +1,13 @@
 import { nextPowerOfTwo } from "./nextPowerOfTwo";
 import { Fees } from "./wallet/btc_wallet_provider";
 
+const LEAST_MAX_FEE_RATE = 128;
+
 // Returns min, default and max fee rate from mempool
 export const getFeeRateFromMempool = (mempoolFeeRates?: Fees) => {
   if (mempoolFeeRates) {
     // The maximum fee rate is at least 128 sat/vB
-    const LEAST_MAX_FEE_RATE = 128;
+
     return {
       minFeeRate: mempoolFeeRates.hourFee,
       defaultFeeRate: mempoolFeeRates.fastestFee,
