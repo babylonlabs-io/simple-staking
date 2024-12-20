@@ -7,7 +7,6 @@ export interface DelegationLike {
 
 export interface DelegationV2 extends DelegationLike {
   stakingTxHex: string;
-  stakingSlashingTxHex: string;
   paramsVersion: number;
   finalityProviderBtcPksHex: string[];
   stakerBtcPkHex: string;
@@ -22,8 +21,11 @@ export interface DelegationV2 extends DelegationLike {
     covenantBtcPkHex: string;
     signatureHex: string;
   }[];
-  slashingTxHex: string;
-  unbondingSlashingTxHex: string;
+  slashing: {
+    stakingSlashingTxHex: string;
+    unbondingSlashingTxHex: string;
+    spendingHeight: number;
+  };
 }
 
 export enum DelegationV2StakingState {
