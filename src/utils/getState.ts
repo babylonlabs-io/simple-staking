@@ -38,6 +38,8 @@ export const getStateTooltip = (state: string) => {
   switch (state) {
     case DelegationState.ACTIVE: // active state is shwon
       return "Stake is active";
+    case DelegationState.UNBONDING_REQUESTED:
+      return "Stake is requesting unbonding";
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:
