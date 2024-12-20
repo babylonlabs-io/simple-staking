@@ -27,6 +27,11 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
+  // We no longer show the transition button when the unbonding transaction is pending
+  if (intermediateState === DelegationState.INTERMEDIATE_UNBONDING) {
+    return null;
+  }
+
   // Unbonded
   if (state === DelegationState.UNBONDED) {
     return (
@@ -48,11 +53,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   }
 
   // Active, eligible for transition
-  if (
-    state === DelegationState.ACTIVE ||
-    isEligibleForTransition ||
-    state === DelegationState.WITHDRAWN
-  ) {
+  if (state === DelegationState.ACTIVE || isEligibleForTransition) {
     return (
       <div
         className="flex justify-end lg:justify-start"
