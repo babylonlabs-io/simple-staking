@@ -1,3 +1,4 @@
+import { Text } from "@babylonlabs-io/bbn-core-ui";
 import { useEffect, useState } from "react";
 import { FiCopy } from "react-icons/fi";
 import { IoIosCheckmarkCircle } from "react-icons/io";
@@ -11,6 +12,7 @@ interface HashProps {
   address?: boolean;
   small?: boolean;
   fullWidth?: boolean;
+  symbols?: number;
 }
 
 export const Hash: React.FC<HashProps> = ({
@@ -19,6 +21,7 @@ export const Hash: React.FC<HashProps> = ({
   address,
   small,
   fullWidth,
+  symbols = 8,
 }) => {
   const [_value, copy] = useCopyToClipboard();
   const [copiedText, setCopiedText] = useState("");
@@ -42,11 +45,12 @@ export const Hash: React.FC<HashProps> = ({
       } hover:opacity-100 pointer-events-auto`}
       onClick={handleCopy}
     >
-      <p
+      <Text
+        variant="body2"
         style={{
           minWidth: small ? "3.5rem" : "5.5rem",
         }}
-        className={`${fullWidth ? "w-full" : ""}`}
+        className={`${fullWidth ? "w-full" : ""} text-primary-main`}
       >
         {copiedText || (
           <>
@@ -56,10 +60,10 @@ export const Hash: React.FC<HashProps> = ({
                 <span className="font-mono">x</span>
               </>
             )}
-            <span>{trim(value)}</span>
+            <span>{trim(value, symbols)}</span>
           </>
         )}
-      </p>
+      </Text>
       {copiedText ? (
         <IoIosCheckmarkCircle className="ml-1" />
       ) : (
