@@ -28,8 +28,11 @@ interface TxProps {
     stakingAmountSat: number;
     stakingTimelock: number;
   };
-  slashingTxHex: string;
-  unbondingSlashingTxHex: string;
+  slashing: {
+    stakingSlashingTxHex: string;
+    unbondingSlashingTxHex: string;
+    spendingHeight: number;
+  };
 }
 
 type DelegationCommand = (props: TxProps) => Promise<void>;
@@ -157,9 +160,9 @@ export function useDelegationService() {
         stakingTxHashHex,
         stakingInput,
         paramsVersion,
-        unbondingSlashingTxHex,
+        slashing,
       }) => {
-        if (!unbondingSlashingTxHex) {
+        if (!slashing.unbondingSlashingTxHex) {
           throw new Error(
             "Unbonding slashing tx not found, can't submit withdrawal",
           );
@@ -168,7 +171,7 @@ export function useDelegationService() {
         await submitEarlyUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
-          unbondingSlashingTxHex,
+          slashing.unbondingSlashingTxHex,
         );
 
         updateDelegationStatus(
@@ -199,16 +202,16 @@ export function useDelegationService() {
         stakingInput,
         paramsVersion,
         stakingTxHashHex,
-        slashingTxHex,
+        slashing,
       }) => {
-        if (!slashingTxHex) {
+        if (!slashing.stakingSlashingTxHex) {
           throw new Error("Slashing tx not found, can't submit withdrawal");
         }
 
         await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
-          slashingTxHex,
+          slashing.stakingSlashingTxHex,
         );
 
         updateDelegationStatus(
@@ -260,8 +263,7 @@ export function useDelegationService() {
         unbondingTxHex,
         covenantUnbondingSignatures,
         state,
-        slashingTxHex,
-        unbondingSlashingTxHex,
+        slashing,
       } = delegation;
 
       const finalityProviderPk = finalityProviderBtcPksHex[0];
@@ -284,8 +286,7 @@ export function useDelegationService() {
           covenantUnbondingSignatures,
           state,
           stakingInput,
-          slashingTxHex,
-          unbondingSlashingTxHex,
+          slashing,
         });
 
         closeConfirmationModal();
