@@ -1,16 +1,34 @@
+import Link from "next/link";
+import { ReactNode } from "react";
+
 import { useAppState } from "@/app/state";
-import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
+import {
+  DelegationV2,
+  DelegationV2StakingState as State,
+} from "@/app/types/delegationsV2";
 import { Params } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
+import { satoshiToBtc } from "@/utils/btc";
 import { blocksToDisplayTime } from "@/utils/time";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 interface StatusProps {
-  value: string;
+  delegation: DelegationV2;
+}
+
+interface StatusTooltipProps {
+  params?: Params;
+  amount?: number;
+  coinName?: string;
 }
 
 const STATUSES: Record<
   string,
-  (param?: Params) => { label: string; tooltip: string }
+  (param: StatusTooltipProps) => {
+    label: string;
+    tooltip: ReactNode;
+    status?: "warning" | "error";
+  }
 > = {
   [State.PENDING]: () => ({
     label: "Pending",
@@ -29,11 +47,9 @@ const STATUSES: Record<
     tooltip:
       "Stake is about to be unbonded as it's reaching the timelock period",
   }),
-  [State.EARLY_UNBONDING]: (param) => ({
+  [State.EARLY_UNBONDING]: ({params}) => ({
     label: "Unbonding",
-    tooltip: `Unbonding process of ${blocksToDisplayTime(
-      param?.bbnStakingParams.latestParam.unbondingTime,
-    )} has started`,
+    tooltip: `Unbonding process of ${blocksToDisplayTime(params?.bbnStakingParams.latestParam.unbondingTime)} has started`,
   }),
   [State.TIMELOCK_WITHDRAWABLE]: () => ({
     label: "Withdrawable",
@@ -43,17 +59,24 @@ const STATUSES: Record<
     label: "Withdrawable",
     tooltip: "Stake is withdrawable after the unbonding period",
   }),
-  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: () => ({
+  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: ({amount, coinName}) => ({
     label: "Withdrawable",
-    tooltip: "Slashed Stake is now withdrawable",
+    tooltip: <SlashedTooltip amount={amount} coinName={coinName} />,
+    status: "error",
   }),
-  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: () => ({
+  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: ({ amount, coinName }) => ({
     label: "Withdrawable",
-    tooltip: "Slashed Stake is now withdrawable",
+    tooltip: (
+      <span>
+        <SlashedTooltip amount={amount} coinName={coinName} />
+      </span>
+    ),
+    status: "error",
   }),
-  [State.SLASHED]: () => ({
+  [State.SLASHED]: ({ amount, coinName }) => ({
     label: "Slashed",
-    tooltip: "Stake has been slashed",
+    tooltip: <SlashedTooltip amount={amount} coinName={coinName} />,
+    status: "error",
   }),
   [State.TIMELOCK_WITHDRAWN]: () => ({
     label: "Withdrawn",
@@ -75,11 +98,11 @@ const STATUSES: Record<
     label: "Pending",
     tooltip: "Stake is pending verification",
   }),
-  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: (param) => ({
+  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({params}) => ({
     label: "Pending",
     tooltip:
       `Stake is pending` +
-      ` ${param?.btcEpochCheckParams.latestParam.btcConfirmationDepth}` +
+      ` ${params?.btcEpochCheckParams.latestParam.btcConfirmationDepth}` +
       ` BTC confirmations`,
   }),
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
@@ -104,10 +127,42 @@ const STATUSES: Record<
   }),
 };
 
-export function Status({ value }: StatusProps) {
-  const { networkInfo } = useAppState();
-  const { label = "unknown", tooltip = "unknown" } =
-    STATUSES[value](networkInfo?.params) ?? {};
+const SlashedTooltip = ({
+  amount,
+  coinName,
+}: {
+  amount?: number;
+  coinName?: string;
+}) => {
+  return (
+    <span>
+      <b>
+        {satoshiToBtc(amount ?? 0)} {coinName}
+      </b>{" "}
+      was slashed from your stake due to the finality provider you selected
+      double voting. {/* TODO: add link */}
+      <Link className="text-secondary-main" target="_blank" href="">
+        Learn more
+      </Link>
+    </span>
+  );
+};
 
-  return <Hint tooltip={tooltip}>{label}</Hint>;
+export function Status({ delegation }: StatusProps) {
+  const { networkInfo } = useAppState();
+  const { coinName } = getNetworkConfigBTC();
+  const {
+    label = "unknown",
+    tooltip = "unknown",
+    status,
+  } = STATUSES[delegation.state]({
+    params: networkInfo?.params,
+    amount: delegation.stakingAmount,
+    coinName,
+  }) ?? {};
+  return (
+    <Hint tooltip={tooltip} status={status}>
+      {label}
+    </Hint>
+  );
 }
