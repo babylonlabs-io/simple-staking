@@ -13,6 +13,7 @@ import {
 } from "@/app/components/Modals/EOIModal/EOIModal";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import {
   SigningStep,
   useTransactionService,
@@ -49,6 +50,9 @@ export const Staking = () => {
   } = useAppState();
   const { connected, address, publicKeyNoCoord, getNetworkFees } =
     useBTCWallet();
+  const {
+    balanceQuery: { data: bbnBalance, isLoading: bbnBalanceLoading },
+  } = useBbnQuery();
 
   const disabled = isError;
 
@@ -386,6 +390,7 @@ export const Staking = () => {
           stakingTimeBlocksWithFixed,
           Boolean(selectedFinalityProvider),
           stakingFeeSat,
+          bbnBalanceLoading ? 0 : (bbnBalance ?? 0),
         );
 
       const previewReady =
