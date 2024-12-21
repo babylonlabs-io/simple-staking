@@ -11,7 +11,7 @@ export const useRewardsService = () => {
   const { bech32Address } = useCosmosWallet();
 
   const { rewardsQuery } = useBbnQuery();
-  const { estimateBbnGasFee, sendBbnTx } = useBbnTransaction();
+  const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
 
   /**
    * Estimates the gas fee for claiming rewards.
@@ -30,9 +30,10 @@ export const useRewardsService = () => {
   const claimRewards = useCallback(async () => {
     const msg = createWithdrawRewardMsg(bech32Address);
 
-    await sendBbnTx(msg);
+    const signedTx = await signBbnTx(msg);
+    await sendBbnTx(signedTx);
     rewardsQuery.refetch();
-  }, [bech32Address, sendBbnTx, rewardsQuery]);
+  }, [bech32Address, signBbnTx, sendBbnTx, rewardsQuery]);
 
   return {
     claimRewards,

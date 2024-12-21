@@ -51,12 +51,13 @@ export enum SigningStep {
   STAKING_SLASHING = "staking_slashing",
   UNBONDING_SLASHING = "unbonding_slashing",
   PROOF_OF_POSSESSION = "proof_of_possession",
+  SIGN_BBN = "sign_bbn",
   SEND_BBN = "send_bbn",
 }
 
 export const useTransactionService = () => {
   const { availableUTXOs: inputUTXOs, networkInfo } = useAppState();
-  const { sendBbnTx } = useBbnTransaction();
+  const { signBbnTx, sendBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const {
@@ -143,9 +144,14 @@ export const useTransactionService = () => {
         p,
         { signPsbt, signMessage, signingCallback },
       );
+      // Sign the transaction
+      await signingCallback(SigningStep.SIGN_BBN, EOIStepStatus.PROCESSING);
+      const signedTx = await signBbnTx(delegationMsg);
+      await signingCallback(SigningStep.SIGN_BBN, EOIStepStatus.SIGNED);
+      // Send the transaction
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
-      await sendBbnTx(delegationMsg);
-      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
+      await sendBbnTx(signedTx);
+      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SENT);
 
       return transaction.getId();
     },
@@ -162,6 +168,7 @@ export const useTransactionService = () => {
       bech32Address,
       signPsbt,
       signMessage,
+      signBbnTx,
       sendBbnTx,
     ],
   );
@@ -287,9 +294,14 @@ export const useTransactionService = () => {
         },
         inclusionProof,
       );
+      // Sign the transaction
+      await signingCallback(SigningStep.SIGN_BBN, EOIStepStatus.PROCESSING);
+      const signedTx = await signBbnTx(delegationMsg);
+      await signingCallback(SigningStep.SIGN_BBN, EOIStepStatus.SIGNED);
+      // Send the transaction
       await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.PROCESSING);
-      await sendBbnTx(delegationMsg);
-      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SIGNED);
+      await sendBbnTx(signedTx);
+      await signingCallback(SigningStep.SEND_BBN, EOIStepStatus.SENT);
     },
     [
       cosmosConnected,
@@ -302,6 +314,7 @@ export const useTransactionService = () => {
       bech32Address,
       signPsbt,
       signMessage,
+      signBbnTx,
       sendBbnTx,
     ],
   );

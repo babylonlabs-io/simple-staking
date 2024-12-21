@@ -7,6 +7,7 @@ export enum EOIStepStatus {
   UNSIGNED = "UNSIGNED",
   SIGNED = "SIGNED",
   PROCESSING = "PROCESSING",
+  SENT = "SENT",
 }
 
 interface EOIModalProps {
@@ -26,6 +27,7 @@ const STATUS_ICON = {
   [EOIStepStatus.PROCESSING]: (
     <span className="loading loading-spinner loading-xs text-primary" />
   ),
+  [EOIStepStatus.SENT]: <IoMdCheckmark className="text-success" size={20} />,
 } as const;
 
 export function EOIModal({ open, statuses, onClose }: EOIModalProps) {
