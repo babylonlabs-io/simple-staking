@@ -48,7 +48,7 @@ interface FinalityProviderState {
   handleFilter: (value: string | number) => void;
   handleRowSelect: (row: FinalityProvider | null) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
-  getFinalityProviderMoniker: (btcPkHex: string) => string;
+  getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
 }
 
@@ -65,7 +65,7 @@ const defaultState: FinalityProviderState = {
   handleSort: () => {},
   handleFilter: () => {},
   handleRowSelect: () => {},
-  getFinalityProviderMoniker: () => "-",
+  getFinalityProvider: () => null,
   fetchNextPage: () => {},
 };
 
@@ -155,18 +155,13 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
     });
   }, [data?.finalityProviders, filterValue, searchValue]);
 
-  const getFinalityProviderMoniker = useCallback(
+  const getFinalityProvider = useCallback(
     (btcPkHex: string) => {
-      const moniker = filteredFinalityProviders.find(
-        (fp) => fp.btcPk === btcPkHex,
-      )?.description?.moniker;
-
-      if (!moniker) {
-        return "-";
-      }
-      return moniker;
+      return (
+        data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null
+      );
     },
-    [filteredFinalityProviders],
+    [data?.finalityProviders],
   );
 
   useEffect(() => {
@@ -201,7 +196,7 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
     handleFilter,
     handleRowSelect,
     isRowSelectable,
-    getFinalityProviderMoniker,
+    getFinalityProvider,
     fetchNextPage,
   };
 
