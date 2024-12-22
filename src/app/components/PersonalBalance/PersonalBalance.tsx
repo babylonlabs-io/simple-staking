@@ -1,14 +1,17 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
+import { notifySuccess } from "@/app/hooks/useNotification";
 import { getNetworkConfig } from "@/config/network.config";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
+import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { StatItem } from "../Stats/StatItem";
 
 const QUERY_KEYS = {
@@ -31,6 +34,14 @@ export function PersonalBalance() {
   } = useBbnQuery();
   const { claimRewards } = useRewardsService();
   const { rewardsQuery } = useBbnQuery();
+  const [showClaimRewardModal, setShowClaimRewardModal] = useState(false);
+
+  const claimAction = async () => {
+    setShowClaimRewardModal(false);
+    notifySuccess("Claim Processing", "more info");
+    await claimRewards();
+    notifySuccess("Successfully Claimed tBABY", "more info");
+  };
 
   const { data: btcBalance, isLoading: btcBalanceLoading } = useQuery({
     queryKey: [QUERY_KEYS.BTC_BALANCE],
@@ -80,10 +91,18 @@ export function PersonalBalance() {
           value={`${ubbnToBbn(rewardsQuery.data ?? 0)} BBN`}
           actionComponent={{
             title: "Claim",
-            onAction: claimRewards,
+            onAction: () => setShowClaimRewardModal(true),
           }}
         />
       </div>
+      <ClaimRewardModal
+        open={showClaimRewardModal}
+        onClose={() => setShowClaimRewardModal(false)}
+        onSubmit={claimAction}
+        receivingValue={`${ubbnToBbn(rewardsQuery.data ?? 0)}`}
+        address="(placeholder)bbn170...e9m94d"
+        transactionFee="(placeholder)0.050"
+      />
     </div>
   );
 }

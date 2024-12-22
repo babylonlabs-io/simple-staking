@@ -28,7 +28,7 @@ export const NotificationContainer = () => {
       closeButton={false}
       icon={false}
       hideProgressBar={true}
-      position={isMobileView ? "top-center" : "top-right"}
+      position={isMobileView ? "top-center" : "bottom-center"}
     />
   );
 };
