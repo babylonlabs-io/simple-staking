@@ -19,7 +19,6 @@ import { ErrorState } from "@/app/types/errors";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
-import { Phase2HereModal } from "../Modals/Phase2Here";
 import { UnbondModal } from "../Modals/UnbondModal";
 
 import { Delegation } from "./Delegation";
@@ -32,7 +31,6 @@ type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW | typeof MODE_UNBOND;
 export const Delegations = ({}) => {
   const { publicKeyNoCoord, connected, network } = useBTCWallet();
   const [modalOpen, setModalOpen] = useState(false);
-  const [showPhase2HereModal, setShowPhase2HereModal] = useState(true);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
   const { showError } = useError();
@@ -310,10 +308,6 @@ export const Delegations = ({}) => {
           </InfiniteScroll>
         </div>
       </div>
-      <Phase2HereModal
-        open={showPhase2HereModal}
-        onClose={() => setShowPhase2HereModal(false)}
-      />
       {modalMode && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
