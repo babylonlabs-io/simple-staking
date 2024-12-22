@@ -6,6 +6,7 @@ import {
   MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
+import { MdOutlineSwapHoriz } from "react-icons/md";
 
 import { useError } from "@/app/context/Error/ErrorContext";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
@@ -86,7 +87,10 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
 
   return (
     <DialogComponent open={open} onClose={onClose}>
-      <DialogBody>
+      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4 items-center justify-center">
+        <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
+          <MdOutlineSwapHoriz className="text-5xl" />
+        </div>
         <Heading variant="h3" className="text-center font-bold text-error">
           {getErrorTitle()}
         </Heading>
