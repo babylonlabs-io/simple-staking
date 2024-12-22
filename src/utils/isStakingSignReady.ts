@@ -51,7 +51,7 @@ export const isStakingSignReady = (
   } else if (bbnBalance === 0) {
     return {
       isReady: false,
-      reason: "Insufficient Wallet Balance",
+      reason: "Insufficient BABY Balance in Babylon Wallet",
     };
   }
   return {
