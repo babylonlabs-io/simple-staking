@@ -35,10 +35,11 @@ import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 import { StakingAmount } from "./Form/StakingAmount";
 import { StakingFee } from "./Form/StakingFee";
 import { StakingTime } from "./Form/StakingTime";
-import { Message } from "./Form/States/Message";
-import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 import apiNotAvailable from "./Form/States/api-not-available.svg";
 import geoRestricted from "./Form/States/geo-restricted.svg";
+import { Message } from "./Form/States/Message";
+import { StakingNotAvailable } from "./Form/States/StakingNotAvailable";
+import { WalletNotConnected } from "./Form/States/WalletNotConnected";
 
 export const Staking = () => {
   const {
@@ -331,19 +332,16 @@ export const Staking = () => {
   const renderStakingForm = () => {
     // States of the staking form:
     // Health check failed
-    if (
-      !isApiNormal ||
-      isGeoBlocked ||
-      hasError ||
-      !stakingStatus?.isStakingOpen
-    ) {
+    if (!isApiNormal || isGeoBlocked || hasError) {
       return (
         <Message
           title="Staking is not available"
-          messages={!hasError ? [apiMessage || ""] : [""]}
+          message={!hasError ? (apiMessage ?? "") : ""}
           icon={isGeoBlocked ? geoRestricted : apiNotAvailable}
         />
       );
+    } else if (!stakingStatus?.isStakingOpen) {
+      return <StakingNotAvailable />;
     }
     // Wallet is not connected
     else if (!connected) {
