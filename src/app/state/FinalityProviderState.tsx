@@ -121,7 +121,10 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
   }, []);
 
   const isRowSelectable = useCallback((row: FinalityProvider) => {
-    return row.state === FinalityProviderStateEnum.ACTIVE;
+    return (
+      row.state === FinalityProviderStateEnum.ACTIVE ||
+      row.state === FinalityProviderStateEnum.INACTIVE
+    );
   }, []);
 
   const filteredFinalityProviders = useMemo(() => {
