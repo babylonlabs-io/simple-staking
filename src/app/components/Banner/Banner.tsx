@@ -1,14 +1,12 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
-import { useState } from "react";
-import { IoMdClose } from "react-icons/io";
 import { PiWarningOctagonFill } from "react-icons/pi";
+
+import { shouldDisplayTestingMsg } from "@/config";
 
 interface Props {}
 
 export const Banner = ({}: Props) => {
-  const [show, setShow] = useState(true);
-
-  if (!show) {
+  if (!shouldDisplayTestingMsg()) {
     return null;
   }
 
@@ -17,17 +15,13 @@ export const Banner = ({}: Props) => {
       <div className="flex flex-row gap-2 items-center">
         <PiWarningOctagonFill />
         <Text variant="body1">
-          Phase 2 is here! The second phase of Babylon mainnet has been
-          launched.
-          <a className="text-secondary-main"> Learn more</a>
+          <strong>This is a testing app</strong>
+          <br />
+          The app may contain bugs. Use it after conducting your own research
+          and making an informed decision. Tokens are for testing only and do
+          not carry any monetary value.
         </Text>
       </div>
-      <button
-        className="border border-primary-light rounded-sm text-primary-light"
-        onClick={() => setShow(false)}
-      >
-        <IoMdClose size={24} />
-      </button>
     </div>
   );
 };
