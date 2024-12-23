@@ -12,7 +12,7 @@ export const getBbnParamByBtcHeight = (
 ) => {
   // Sort by btcActivationHeight in ascending order
   const sortedParams = [...bbnParams].sort(
-    (a, b) => a.btcActivationHeight - b.btcActivationHeight,
+    (a, b) => b.btcActivationHeight - a.btcActivationHeight,
   );
 
   // Find first param where height is >= btcActivationHeight
