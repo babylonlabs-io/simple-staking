@@ -23,12 +23,14 @@ export const UnbondModal = ({
   processing,
 }: UnbondModalProps) => {
   const { data: networkInfo } = useNetworkInfo();
+  if (!networkInfo) throw new Error("Network info not found");
+
   const unbondingTime = blocksToDisplayTime(
-    networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
+    networkInfo.params.bbnStakingParams.latestParam.unbondingTime,
   );
   const unbondingFeeBtc = maxDecimals(
     satoshiToBtc(
-      networkInfo?.params.bbnStakingParams?.latestParam?.unbondingFeeSat ?? 0,
+      networkInfo.params.bbnStakingParams.latestParam.unbondingFeeSat,
     ),
     8,
   );
