@@ -14,9 +14,10 @@ import { ResponsiveDialog } from "./ResponsiveDialog";
 interface SubmitModalProps {
   className?: string;
   processing?: boolean;
+  disabled?: boolean;
   open: boolean;
   icon: JSX.Element;
-  title: string;
+  title: string | JSX.Element;
   cancelButton?: string;
   submitButton?: string;
   onClose?: () => void;
@@ -31,6 +32,7 @@ const DEFAULT_BUTTONS = {
 export const SubmitModal = ({
   className,
   processing = false,
+  disabled = false,
   icon,
   title,
   children,
@@ -41,7 +43,7 @@ export const SubmitModal = ({
   onSubmit,
 }: PropsWithChildren<SubmitModalProps>) => (
   <ResponsiveDialog
-    className={twMerge("max-w-[660px]", className)}
+    className={twMerge("w-[660px] max-w-full", className)}
     open={open}
     onClose={onClose}
   >
@@ -66,7 +68,7 @@ export const SubmitModal = ({
 
       {onSubmit && (
         <Button
-          disabled={processing}
+          disabled={processing || disabled}
           variant="contained"
           className="flex-1"
           onClick={onSubmit}

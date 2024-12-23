@@ -7,23 +7,44 @@ import { SubmitModal } from "./SubmitModal";
 interface VerificationModalProps {
   processing: boolean;
   open: boolean;
+  step: 1 | 2;
 }
 
 const { networkName } = getNetworkConfigBTC();
 
+const VERIFICATION_STEPS = {
+  1: {
+    title: (
+      <>
+        1/2 <br /> Processing Confirmation
+      </>
+    ),
+    description:
+      "Waiting for the staking confirmation to be confirmed on Babylon chain.",
+  },
+  2: {
+    title: (
+      <>
+        2/2 <br /> Pending Verification
+      </>
+    ),
+    description: "The Babylon chain is verifying your staking transaction.",
+  },
+} as const;
+
 export const VerificationModal = ({
   processing,
   open,
+  step,
 }: VerificationModalProps) => (
   <SubmitModal
-    processing={processing}
+    disabled={processing}
     open={open}
     icon={<Loader size={48} />}
-    title="Pending Verification"
+    title={VERIFICATION_STEPS[step].title}
     submitButton={`Stake on ${networkName}`}
     onSubmit={() => {}}
   >
-    The babylon blockchain has received your request. Please wait while we
-    confirm the neseccary amount of signatures
+    {VERIFICATION_STEPS[step].description}
   </SubmitModal>
 );

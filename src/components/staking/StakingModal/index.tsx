@@ -16,7 +16,11 @@ const EOI_INDEXES: Record<string, number> = {
   "eoi-unbonding-slashing": 2,
   "eoi-proof-of-possession": 3,
   "eoi-sign-bbn": 4,
-  "eoi-send-bbn": 5,
+};
+
+const VERIFICATION_STEPS: Record<string, 1 | 2> = {
+  "eoi-send-bbn": 1,
+  verifying: 2,
 };
 
 export function StakingModal() {
@@ -61,13 +65,21 @@ export function StakingModal() {
           }}
         />
       )}
-      <EOIModal
-        open={step.startsWith("eoi")}
-        processing={processing}
-        title="Staking"
-        step={EOI_INDEXES[step] ?? 0}
-      />
-      <VerificationModal processing={processing} open={step === "verifying"} />
+      {Boolean(EOI_INDEXES[step]) && (
+        <EOIModal
+          open
+          processing={processing}
+          step={EOI_INDEXES[step]}
+          title="Staking"
+        />
+      )}
+      {Boolean(VERIFICATION_STEPS[step]) && (
+        <VerificationModal
+          open
+          processing={processing}
+          step={VERIFICATION_STEPS[step]}
+        />
+      )}
       {verifiedDelegation && (
         <StakeModal
           open={step === "verified"}
