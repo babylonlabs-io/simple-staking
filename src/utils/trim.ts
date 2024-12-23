@@ -13,17 +13,12 @@
  * trim("abc", 4) // returns "abc"
  * trim(undefined) // returns undefined
  */
-export const trim = (
-  str: string | undefined,
-  symbols: number = 8,
-): string | undefined => {
-  if (str === undefined) return undefined;
-  if (symbols < 0) throw new Error("Symbols count cannot be negative");
-  if (str.length <= symbols) return str;
-
-  const halfLength = Math.floor(symbols / 2);
-  const firstHalf = str.slice(0, halfLength);
-  const secondHalf = str.slice(-halfLength);
-
-  return `${firstHalf}...${secondHalf}`;
+export const trim = (str?: string, symbols: number = 8) => {
+  if (!str) return "-";
+  if (str.length <= symbols) {
+    return str;
+  } else if (symbols === 0) {
+    return "...";
+  }
+  return `${str.slice(0, symbols / 2)}...${str.slice(-symbols / 2)}`;
 };

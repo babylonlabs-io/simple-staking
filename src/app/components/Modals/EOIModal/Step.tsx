@@ -1,4 +1,4 @@
-import { Text } from "@babylonlabs-io/bbn-core-ui";
+import { Loader, Text } from "@babylonlabs-io/bbn-core-ui";
 import type { PropsWithChildren, ReactNode } from "react";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";
@@ -14,6 +14,14 @@ const renderIcon = (step: number, currentStep: number) => {
     return (
       <div className="rounded-full bg-primary-light flex h-10 w-10 items-center justify-center">
         <IoCheckmarkSharp size={24} className="text-secondary-contrast" />
+      </div>
+    );
+  }
+
+  if (currentStep === step) {
+    return (
+      <div className="rounded-full bg-secondary-main flex h-10 w-10 items-center justify-center">
+        <Loader size={24} className="text-secondary-contrast" />
       </div>
     );
   }
