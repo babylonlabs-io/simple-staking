@@ -9,7 +9,6 @@ import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
-import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
@@ -23,7 +22,6 @@ const Home = () => {
 
   return (
     <>
-      <NetworkBadge />
       <Banner />
       <Header />
       <div className="container mx-auto flex justify-center p-6">
