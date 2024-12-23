@@ -13,6 +13,7 @@ interface StatItemProps {
   actionComponent?: {
     title: string;
     onAction: () => void;
+    isDisabled?: boolean;
   };
 }
 
@@ -60,6 +61,7 @@ export const StatItem = ({
       <ActionComponent
         title={actionComponent.title}
         onAction={actionComponent.onAction}
+        isDisabled={actionComponent.isDisabled}
       />
     ) : null}
   </div>

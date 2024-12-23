@@ -27,12 +27,12 @@ export function PersonalBalance() {
     connected: btcConnected,
     address,
   } = useBTCWallet();
-  const { connected: cosmosConnected } = useCosmosWallet();
+  const { connected: cosmosConnected, bech32Address } = useCosmosWallet();
 
   const {
     balanceQuery: { data: cosmosBalance, isLoading: cosmosBalanceLoading },
   } = useBbnQuery();
-  const { claimRewards } = useRewardsService();
+  const { claimRewards, estimateClaimRewardsGas } = useRewardsService();
   const { rewardsQuery } = useBbnQuery();
   const [showClaimRewardModal, setShowClaimRewardModal] = useState(false);
 
@@ -52,6 +52,8 @@ export function PersonalBalance() {
   if (!btcConnected || !cosmosConnected) {
     return null;
   }
+
+  const rewardBalance = ubbnToBbn(rewardsQuery.data ?? 0);
 
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
@@ -88,21 +90,24 @@ export function PersonalBalance() {
         <StatItem
           loading={rewardsQuery.isLoading}
           title="BBN Rewards"
-          value={`${ubbnToBbn(rewardsQuery.data ?? 0)} BBN`}
+          value={`${rewardBalance} BBN`}
           actionComponent={{
             title: "Claim",
             onAction: () => setShowClaimRewardModal(true),
+            isDisabled: rewardBalance === 0,
           }}
         />
       </div>
-      <ClaimRewardModal
-        open={showClaimRewardModal}
-        onClose={() => setShowClaimRewardModal(false)}
-        onSubmit={claimAction}
-        receivingValue={`${ubbnToBbn(rewardsQuery.data ?? 0)}`}
-        address="(placeholder)bbn170...e9m94d"
-        transactionFee="(placeholder)0.050"
-      />
+      {showClaimRewardModal && (
+        <ClaimRewardModal
+          open={showClaimRewardModal}
+          onClose={() => setShowClaimRewardModal(false)}
+          onSubmit={claimAction}
+          receivingValue={`${rewardBalance}`}
+          address={bech32Address}
+          getTransactionFee={estimateClaimRewardsGas}
+        />
+      )}
     </div>
   );
 }

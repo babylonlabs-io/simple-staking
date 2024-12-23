@@ -1,5 +1,7 @@
 import { Heading, Text } from "@babylonlabs-io/bbn-core-ui";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect, useState } from "react";
+
+import { LoadingSmall } from "../Loading/Loading";
 
 import { ConfirmationModal } from "./ConfirmationModal";
 
@@ -9,7 +11,7 @@ interface ConfirmationModalProps {
   onSubmit: () => void;
   receivingValue: string;
   address: string;
-  transactionFee: string;
+  getTransactionFee: () => Promise<number>;
 }
 
 export const ClaimRewardModal = ({
@@ -18,8 +20,18 @@ export const ClaimRewardModal = ({
   onSubmit,
   receivingValue,
   address,
-  transactionFee,
+  getTransactionFee,
 }: PropsWithChildren<ConfirmationModalProps>) => {
+  const [transactionFee, setTransactionFee] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTransactionFee = async () => {
+      const fee = await getTransactionFee();
+      setTransactionFee(fee);
+    };
+    fetchTransactionFee();
+  }, [getTransactionFee]);
+
   return (
     <ConfirmationModal
       open={open}
@@ -43,11 +55,15 @@ export const ClaimRewardModal = ({
           </div>
           <div className="flex flex-row items-center justify-between pt-4">
             <Text variant="body1">Transaction Fees</Text>
-            <Text variant="body1">{transactionFee} tBABY</Text>
+            {transactionFee === 0 ? (
+              <LoadingSmall />
+            ) : (
+              <Text variant="body1">{transactionFee} tBABY</Text>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-4 mb-10">
-          <Heading variant="h6">Attension!</Heading>
+          <Heading variant="h6">Attention!</Heading>
           <Text variant="body2">
             Processing your claim will take approximately 2 blocks to complete.
           </Text>
