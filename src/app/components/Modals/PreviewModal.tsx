@@ -53,6 +53,10 @@ export const PreviewModal = ({
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam
       ?.btcConfirmationDepth || 10;
+  const unbondingTime =
+    blocksToDisplayTime(
+      networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
+    ) || "7 days";
 
   const FinalityProviderValue = isMobileView ? (
     <span className="flex gap-2">
@@ -103,7 +107,9 @@ export const PreviewModal = ({
     },
     {
       key: "On Demand Unbonding",
-      value: <Text variant="body1">Enabled (7 days unbonding time)</Text>,
+      value: (
+        <Text variant="body1">Enabled ({unbondingTime} unbonding time)</Text>
+      ),
     },
     {
       key: "Unbonding fee",

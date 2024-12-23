@@ -1,6 +1,6 @@
 import { useAppState } from "@/app/state";
 import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
-import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
+import { Params } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
 import { blocksToDisplayTime } from "@/utils/time";
 
@@ -10,7 +10,7 @@ interface StatusProps {
 
 const STATUSES: Record<
   string,
-  (param?: BbnStakingParamsVersion) => { label: string; tooltip: string }
+  (param?: Params) => { label: string; tooltip: string }
 > = {
   [State.PENDING]: () => ({
     label: "Pending",
@@ -24,14 +24,16 @@ const STATUSES: Record<
     label: "Active",
     tooltip: "Stake is active",
   }),
-  [State.TIMELOCK_UNBONDING]: (param) => ({
+  [State.TIMELOCK_UNBONDING]: () => ({
     label: "Unbonding",
     tooltip:
       "Stake is about to be unbonded as it's reaching the timelock period",
   }),
   [State.EARLY_UNBONDING]: (param) => ({
     label: "Unbonding",
-    tooltip: `Unbonding process of ${blocksToDisplayTime(param?.unbondingTime)} has started`,
+    tooltip: `Unbonding process of ${blocksToDisplayTime(
+      param?.bbnStakingParams.latestParam.unbondingTime,
+    )} has started`,
   }),
   [State.TIMELOCK_WITHDRAWABLE]: () => ({
     label: "Withdrawable",
@@ -73,9 +75,12 @@ const STATUSES: Record<
     label: "Pending",
     tooltip: "Stake is pending verification",
   }),
-  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: () => ({
+  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: (param) => ({
     label: "Pending",
-    tooltip: "Stake is pending 10 BTC confirmations",
+    tooltip:
+      `Stake is pending` +
+      ` ${param?.btcEpochCheckParams.latestParam.btcConfirmationDepth}` +
+      ` BTC confirmations`,
   }),
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
     label: "Unbonding",
@@ -102,7 +107,7 @@ const STATUSES: Record<
 export function Status({ value }: StatusProps) {
   const { networkInfo } = useAppState();
   const { label = "unknown", tooltip = "unknown" } =
-    STATUSES[value](networkInfo?.params.bbnStakingParams?.latestParam) ?? {};
+    STATUSES[value](networkInfo?.params) ?? {};
 
   return <Hint tooltip={tooltip}>{label}</Hint>;
 }

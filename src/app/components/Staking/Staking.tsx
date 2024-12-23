@@ -26,6 +26,7 @@ import { DelegationV2StakingState } from "@/app/types/delegationsV2";
 import { ErrorHandlerParam, ErrorState } from "@/app/types/errors";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { isStakingSignReady } from "@/utils/isStakingSignReady";
+import { blocksToDisplayTime } from "@/utils/time";
 
 import { FeedbackModal } from "../Modals/FeedbackModal";
 import { InfoModal } from "../Modals/InfoModal";
@@ -418,7 +419,8 @@ export const Staking = () => {
                 </Text>
                 <Text variant="body1">
                   You can unbond and withdraw your stake anytime with an
-                  unbonding time of 7 days.
+                  unbonding time of{" "}
+                  {blocksToDisplayTime(latestParam.unbondingTime)}.
                 </Text>
                 <a
                   rel="noopener noreferrer"
