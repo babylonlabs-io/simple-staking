@@ -15,15 +15,15 @@ const mainnetConfig: BBNConfig = {
 };
 
 const signetConfig: BBNConfig = {
-  chainId: bbnTestnet.chainId,
-  rpc: bbnTestnet.rpc,
-  chainData: bbnTestnet,
-};
-
-const testnetConfig: BBNConfig = {
   chainId: bbnDevnet.chainId,
   rpc: bbnDevnet.rpc,
   chainData: bbnDevnet,
+};
+
+const testnetConfig: BBNConfig = {
+  chainId: bbnTestnet.chainId,
+  rpc: bbnTestnet.rpc,
+  chainData: bbnTestnet,
 };
 
 const config: Record<string, BBNConfig> = {
