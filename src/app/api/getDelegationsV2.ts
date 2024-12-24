@@ -15,10 +15,6 @@ interface DelegationV2APIResponse {
   data: DelegationV2API;
 }
 
-interface DelegationsV2APIResponse {
-  data: DelegationV2API[];
-  pagination: Pagination;
-}
 interface DelegationV2API {
   finality_provider_btc_pks_hex: string[];
   params_version: number;
@@ -53,7 +49,7 @@ interface DelegationV2API {
 }
 
 export const getDelegationV2 = async (
-  stakingTxHashHex: string,
+  stakingTxHashHex?: string,
 ): Promise<DelegationV2 | null> => {
   if (!stakingTxHashHex) {
     throw new Error("No staking tx hash provided");
