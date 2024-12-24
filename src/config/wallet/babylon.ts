@@ -4,8 +4,8 @@ import { BBN_LCD_URL, BBN_RPC_URL } from "@/app/common/rpc";
 
 // The values here shall match from https://rpc.devnet.babylonlabs.io/genesis?
 export const bbnDevnet = {
-  chainId: "devnet-7",
-  chainName: "Babylon Devnet 7",
+  chainId: "devnet-9",
+  chainName: "Babylon Devnet 9",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
   rpc: BBN_RPC_URL,
