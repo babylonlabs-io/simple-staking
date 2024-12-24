@@ -2,6 +2,7 @@ import { Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import { PropsWithChildren, useEffect, useState } from "react";
 
 import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { LoadingSmall } from "../Loading/Loading";
 
@@ -16,7 +17,7 @@ interface ConfirmationModalProps {
   getTransactionFee: () => Promise<number>;
 }
 
-const bbnTokenName = shouldDisplayTestingMsg() ? "tBABY" : "BABY";
+const { coinSymbol } = getNetworkConfigBBN();
 
 export const ClaimRewardModal = ({
   open,
@@ -51,7 +52,7 @@ export const ClaimRewardModal = ({
               Receiving
             </Text>
             <Text variant="body1">
-              {receivingValue} {bbnTokenName}
+              {receivingValue} {coinSymbol}
             </Text>
           </div>
 
@@ -67,7 +68,7 @@ export const ClaimRewardModal = ({
               <LoadingSmall />
             ) : (
               <Text variant="body1">
-                {transactionFee} {bbnTokenName}
+                {transactionFee} {coinSymbol}
               </Text>
             )}
           </div>
@@ -79,7 +80,7 @@ export const ClaimRewardModal = ({
           </Text>
           {shouldDisplayTestingMsg() && (
             <Text variant="body2">
-              {bbnTokenName} is a test token without any real world value.
+              {coinSymbol} is a test token without any real world value.
             </Text>
           )}
         </div>

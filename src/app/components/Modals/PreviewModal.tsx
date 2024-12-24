@@ -12,8 +12,8 @@ import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
@@ -33,6 +33,8 @@ interface PreviewModalProps {
   unbondingFeeSat: number;
   awaitingWalletResponse: boolean;
 }
+
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 export const PreviewModal = ({
   isOpen,
@@ -156,11 +158,10 @@ export const PreviewModal = ({
             only one who can unbond and withdraw your stake.
           </Text>
           <Text variant="body2">
-            2. Your stake will first be sent to Babylon {""}
-            {shouldDisplayTestingMsg() ? "Testnet" : ""} Chain for verification
-            (~20 seconds), then you will be prompted to submit it to the{" "}
-            {networkName} ledger. It will be marked as &quot;Pending&quot; until
-            it receives {confirmationDepth} Bitcoin confirmations.
+            2. Your stake will first be sent to {bbnNetworkFullName} for
+            verification (~20 seconds), then you will be prompted to submit
+            it to the {networkName} ledger. It will be marked as &quot;Pending&quot;
+            until it receives {confirmationDepth} Bitcoin confirmations.
           </Text>
         </div>
       </DialogBody>

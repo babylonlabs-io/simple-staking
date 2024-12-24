@@ -8,7 +8,7 @@ import { maxDecimals } from "@/utils/maxDecimals";
 
 import { StatItem } from "./StatItem";
 
-const { coinName } = getNetworkConfigBTC();
+const { coinName, coinSymbol } = getNetworkConfigBTC();
 
 const formatter = Intl.NumberFormat("en", {
   notation: "compact",
@@ -27,13 +27,13 @@ export const Stats = memo(() => {
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
       <Heading variant="h4" className="text-primary-contrast md:text-4xl">
-        Babylon Stats
+        Babylon Bitcoin Staking Stats
       </Heading>
       <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">
         <StatItem
           loading={isLoading}
-          title="Confirmed TVL"
-          value={`${satoshiToBtc(activeTvl) >= 1 ? maxDecimals(satoshiToBtc(activeTvl), 2) : maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinName}`}
+          title={`Confirmed ${coinSymbol} TVL`}
+          value={`${satoshiToBtc(activeTvl) >= 1 ? maxDecimals(satoshiToBtc(activeTvl), 2) : maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinSymbol}`}
           tooltip="Total number of active bitcoins staked"
         />
 
