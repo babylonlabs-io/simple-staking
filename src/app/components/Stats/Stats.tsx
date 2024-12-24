@@ -47,21 +47,19 @@ export const Stats = memo(() => {
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
-
-        <StatItem
-          loading={isLoading}
-          title="Finality Providers"
-          value={`${activeFinalityProviders}/${totalFinalityProviders}`}
-          tooltip="Active and total number of finality providers"
-        />
-
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
-
         <StatItem
           loading={isLoading}
           title="Delegations"
           value={formatter.format(activeDelegations)}
           tooltip="Total number of active bitcoin staking delegations"
+        />
+
+        <div className="divider mx-0 my-2 md:divider-horizontal" />
+        <StatItem
+          loading={isLoading}
+          title="Finality Providers"
+          value={`${activeFinalityProviders}/${totalFinalityProviders}`}
+          tooltip="Active and total number of finality providers"
         />
       </div>
     </div>

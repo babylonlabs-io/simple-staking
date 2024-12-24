@@ -109,7 +109,7 @@ export function useDelegationService() {
         );
       },
 
-      [ACTIONS.UNBOUND]: async ({
+      [ACTIONS.UNBOND]: async ({
         stakingInput,
         paramsVersion,
         stakingTxHashHex,
@@ -138,7 +138,7 @@ export function useDelegationService() {
         );
       },
 
-      [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING]: async ({
+      [ACTIONS.WITHDRAW_ON_EARLY_UNBONDING]: async ({
         stakingTxHashHex,
         stakingInput,
         paramsVersion,
@@ -156,7 +156,7 @@ export function useDelegationService() {
         );
       },
 
-      [ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING]: async ({
+      [ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING]: async ({
         stakingTxHashHex,
         stakingInput,
         paramsVersion,

@@ -13,7 +13,7 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
-import { EOIStepStatus } from "@/app/components/Modals/EOIModal";
+import { EOIStepStatus } from "@/app/components/Modals/EOIModal/EOIModal";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";

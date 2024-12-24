@@ -12,6 +12,7 @@ import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
+import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -47,7 +48,7 @@ export const PreviewModal = ({
   awaitingWalletResponse,
 }: PreviewModalProps) => {
   const isMobileView = useIsMobileView();
-  const { coinName } = getNetworkConfig();
+  const { coinSymbol, networkName } = getNetworkConfig();
 
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
@@ -83,7 +84,7 @@ export const PreviewModal = ({
       key: "Stake Amount",
       value: (
         <Text variant="body1">
-          {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinName}
+          {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
         </Text>
       ),
     },
@@ -95,27 +96,32 @@ export const PreviewModal = ({
       key: "Transaction fee",
       value: (
         <Text variant="body1">
-          {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinName}
+          {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
         </Text>
       ),
     },
     {
       key: "Term",
       value: (
-        <Text variant="body1">{blocksToDisplayTime(stakingTimelock)}</Text>
+        <Text variant="body1">
+          {stakingTimelock} blocks
+          <Text variant="body2" className="text-gray-500">
+            ~ {blocksToDisplayTime(stakingTimelock)}
+          </Text>
+        </Text>
       ),
     },
     {
       key: "On Demand Unbonding",
       value: (
-        <Text variant="body1">Enabled ({unbondingTime} unbonding time)</Text>
+        <Text variant="body1">Enabled (~ {unbondingTime} unbonding time)</Text>
       ),
     },
     {
       key: "Unbonding fee",
       value: (
         <Text variant="body1">
-          {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinName}
+          {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
         </Text>
       ),
     },
@@ -142,17 +148,19 @@ export const PreviewModal = ({
             </Fragment>
           ))}
         </div>
+        <br />
         <div className="flex flex-col gap-2">
           <Heading variant="h6">Attention!</Heading>
           <Text variant="body2">
-            1. No third party possesses your staked {coinName}. You are the only
-            one who can unbond and withdraw your stake.
+            1. No third party possesses your staked {coinSymbol}. You are the
+            only one who can unbond and withdraw your stake.
           </Text>
           <Text variant="body2">
-            2. Your stake will initially have the status of &quot;Pending&quot;
-            until it receives {confirmationDepth} Bitcoin confirmations.
-            &quot;Pending&quot; stake is only accessible through the device it
-            was created.
+            2. Your stake will first be sent to Babylon {""}
+            {shouldDisplayTestingMsg() ? "Testnet" : ""} Chain for verification
+            (~20 seconds), then you will be prompted to submit it to the{" "}
+            {networkName} ledger. It will be marked as &quot;Pending&quot; until
+            it receives {confirmationDepth} Bitcoin confirmations.
           </Text>
         </div>
       </DialogBody>

@@ -8,6 +8,8 @@ import {
 } from "@babylonlabs-io/bbn-core-ui";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
+import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfig } from "@/config/network.config";
 
 import { Step } from "./Step";
 
@@ -31,6 +33,9 @@ interface EOIModalProps {
   onClose?: () => void;
   onSubmit?: () => void;
 }
+
+const { coinSymbol } = getNetworkConfig();
+const bbnTokenName = shouldDisplayTestingMsg() ? "tBABY" : "BABY";
 
 const STEP_STATES = {
   [EOIStepStatus.UNSIGNED]: "upcoming",
@@ -74,7 +79,8 @@ export function EOIModal({
             Consent to slashing during unbonding
           </Step>
           <Step index={3} state={STEP_STATES[statuses.reward]}>
-            BTC-BBN address binding for receiving staking rewards
+            {coinSymbol}-{bbnTokenName} address binding for receiving staking
+            rewards
           </Step>
           <Step index={4} state={STEP_STATES[statuses.eoi]}>
             Staking transaction registration

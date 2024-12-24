@@ -80,7 +80,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             }
             className="text-sm font-normal border-primary-main/20 bg-white"
           >
-            Transition
+            Register
           </Button>
           <Tooltip id="tooltip-transition" className="tooltip-wrap" />
         </div>
