@@ -3,7 +3,7 @@ export const BBN_DEVNET_LCD_URL = "https://babylon-testnet-api.nodes.guru";
 
 export const bbnTestnet = {
   chainId: "bbn-test-5",
-  chainName: "Babylon Testnet",
+  chainName: "Babylon Phase-2 Testnet",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
   rpc: BBN_DEVNET_RPC_URL,
