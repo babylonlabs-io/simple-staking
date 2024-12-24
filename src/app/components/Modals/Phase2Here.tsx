@@ -9,7 +9,7 @@ import { MdLooksTwo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -19,7 +19,7 @@ interface Phase2HereModalProps {
   onClose: () => void;
 }
 
-const { networkName } = getNetworkConfig();
+const { networkName } = getNetworkConfigBTC();
 
 export const Phase2HereModal = ({
   className,

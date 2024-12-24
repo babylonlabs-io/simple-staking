@@ -6,11 +6,11 @@ import {
   FinalityProviderState,
   FinalityProviderStateLabels,
 } from "@/app/types/finalityProviders";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
-const { coinSymbol } = getNetworkConfig();
+const { coinSymbol } = getNetworkConfigBTC();
 
 const mapStatus = (value: FinalityProviderState): string => {
   return FinalityProviderStateLabels[value] || "Unknown";

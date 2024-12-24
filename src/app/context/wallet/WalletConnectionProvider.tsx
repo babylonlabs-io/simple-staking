@@ -2,7 +2,6 @@
 
 import {
   ChainConfigArr,
-  Network,
   WalletProvider,
 } from "@babylonlabs-io/bbn-wallet-connect";
 import { type PropsWithChildren } from "react";
@@ -10,7 +9,8 @@ import { type PropsWithChildren } from "react";
 import { ConnectButton } from "@/app/context/tomo/ConnectButton";
 import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
 import { ErrorState } from "@/app/types/errors";
-import { bbnDevnet } from "@/config/wallet/babylon";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { useError } from "../Error/ErrorContext";
 import { TomoBBNConnector } from "../tomo/BBNConnector";
@@ -26,13 +26,7 @@ const config: ChainConfigArr = [
         widget: () => <ConnectButton chainName="bitcoin" />,
       },
     ],
-    config: {
-      coinName: "Signet BTC",
-      coinSymbol: "sBTC",
-      networkName: "BTC signet",
-      mempoolApiUrl: "https://mempool.space/signet",
-      network: Network.SIGNET,
-    },
+    config: getNetworkConfigBTC(),
   },
   {
     chain: "BBN",
@@ -42,11 +36,7 @@ const config: ChainConfigArr = [
         widget: () => <ConnectButton chainName="cosmos" />,
       },
     ],
-    config: {
-      chainId: bbnDevnet.chainId,
-      rpc: bbnDevnet.rpc,
-      chainData: bbnDevnet,
-    },
+    config: getNetworkConfigBBN(),
   },
 ] as const;
 

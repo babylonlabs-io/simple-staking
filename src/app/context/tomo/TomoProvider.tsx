@@ -3,8 +3,8 @@ import "@tomo-inc/wallet-connect-sdk/style.css";
 import { useTheme } from "next-themes";
 import { type PropsWithChildren } from "react";
 
-import { getNetworkConfig } from "@/config/network.config";
-import { bbnDevnet } from "@/config/wallet/babylon";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 type ChainType = "bitcoin" | "cosmos";
 type ThemeType = "dark" | "light";
@@ -12,7 +12,8 @@ type ThemeType = "dark" | "light";
 export const TomoConnectionProvider = ({ children }: PropsWithChildren) => {
   const { resolvedTheme } = useTheme();
 
-  const { mempoolApiUrl, network, networkName } = getNetworkConfig();
+  const { mempoolApiUrl, network, networkName } = getNetworkConfigBTC();
+  const { rpc, chainId, chainData } = getNetworkConfigBBN();
 
   const bitcoinChain = {
     id: 1,
@@ -26,14 +27,14 @@ export const TomoConnectionProvider = ({ children }: PropsWithChildren) => {
 
   const cosmosChain = {
     id: 2,
-    name: bbnDevnet.chainName,
+    name: chainData.chainName,
     type: "cosmos" as ChainType,
-    network: bbnDevnet.chainId,
-    modularData: bbnDevnet,
+    network: chainId,
+    modularData: chainData,
     backendUrls: {
-      rpcUrl: bbnDevnet.rpc,
+      rpcUrl: rpc,
     },
-    logo: bbnDevnet.chainSymbolImageUrl,
+    logo: chainData.chainSymbolImageUrl,
   };
 
   return (

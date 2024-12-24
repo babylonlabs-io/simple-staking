@@ -13,7 +13,7 @@ import { Fragment } from "react";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
@@ -48,7 +48,7 @@ export const PreviewModal = ({
   awaitingWalletResponse,
 }: PreviewModalProps) => {
   const isMobileView = useIsMobileView();
-  const { coinSymbol, networkName } = getNetworkConfig();
+  const { coinSymbol, networkName } = getNetworkConfigBTC();
 
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =

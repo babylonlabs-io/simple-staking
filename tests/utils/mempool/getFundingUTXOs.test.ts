@@ -4,8 +4,8 @@ import { getFundingUTXOs } from "@/utils/mempool_api";
 global.fetch = jest.fn() as jest.Mock;
 
 // Mocking getNetworkConfig to return a specific mempoolApiUrl
-jest.mock("@/config/network.config", () => ({
-  getNetworkConfig: jest.fn(() => ({
+jest.mock("@/config/network/btc", () => ({
+  getNetworkConfigBTC: jest.fn(() => ({
     mempoolApiUrl: "https://mempool.space",
   })),
 }));

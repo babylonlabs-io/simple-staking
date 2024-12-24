@@ -12,7 +12,7 @@ import { MdFeedback } from "react-icons/md";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 interface FeedbackModalProps {
   open: boolean;
@@ -21,7 +21,7 @@ interface FeedbackModalProps {
 }
 
 interface ContentProps {}
-const { networkName, coinName } = getNetworkConfig();
+const { networkName, coinName } = getNetworkConfigBTC();
 
 const SuccessContent: React.FC<ContentProps> = () => {
   const { data: networkInfo } = useNetworkInfo();

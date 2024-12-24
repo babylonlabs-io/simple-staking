@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import { useEffect } from "react";
 import { twJoin } from "tailwind-merge";
 
-import { network } from "@/config/network.config";
+import { network } from "@/config/network/btc";
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import GenericError from "./components/Error/GenericError";

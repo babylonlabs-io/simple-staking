@@ -1,6 +1,6 @@
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
-import { network } from "./network.config";
+import { network } from "./network/btc";
 
 // shouldDisplayTestingMsg function is used to check if the application is running in testing mode or not.
 // Default to true if the environment variable is not set.

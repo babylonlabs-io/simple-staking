@@ -13,7 +13,7 @@ import {
   type Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -55,7 +55,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { transitionPhase1Delegation } = useTransactionService();
   const { getFinalityProviderMoniker } = useFinalityProviderState();
-  const { coinName, mempoolApiUrl } = getNetworkConfig();
+  const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
   useEffect(() => {
     const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE); // Update every minute

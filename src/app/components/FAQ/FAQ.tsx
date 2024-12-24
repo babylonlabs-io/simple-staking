@@ -1,14 +1,14 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { questions } from "./data/questions";
 import { Section } from "./Section";
 interface FAQProps {}
 
 export const FAQ: React.FC<FAQProps> = () => {
-  const { coinName, networkName } = getNetworkConfig();
+  const { coinName, networkName } = getNetworkConfigBTC();
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam

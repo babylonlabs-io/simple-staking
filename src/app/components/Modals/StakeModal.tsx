@@ -1,10 +1,10 @@
 import { MdEditNote } from "react-icons/md";
 
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { SubmitModal } from "./SubmitModal";
 
-const { networkName } = getNetworkConfig();
+const { networkName } = getNetworkConfigBTC();
 
 interface StakeModalProps {
   processing?: boolean;

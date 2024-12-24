@@ -1,5 +1,5 @@
 import { Hint } from "@/components/common/Hint";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
@@ -7,7 +7,7 @@ interface DelegationProps {
   totalValue: number;
 }
 
-const { coinName } = getNetworkConfig();
+const { coinName } = getNetworkConfigBTC();
 
 export function Delegations({ totalValue }: DelegationProps) {
   return (

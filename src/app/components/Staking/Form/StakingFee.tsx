@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { Fees } from "@/utils/wallet/btc_wallet_provider";
@@ -31,7 +31,7 @@ export const StakingFee: React.FC<StakingFeeProps> = ({
     setCustomMode(false);
   }, [reset]);
 
-  const { coinName } = getNetworkConfig();
+  const { coinName } = getNetworkConfigBTC();
 
   const { minFeeRate, defaultFeeRate, maxFeeRate } =
     getFeeRateFromMempool(mempoolFeeRates);

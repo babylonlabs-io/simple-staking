@@ -9,7 +9,7 @@ import {
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { Step } from "./Step";
 
@@ -34,7 +34,7 @@ interface EOIModalProps {
   onSubmit?: () => void;
 }
 
-const { coinSymbol } = getNetworkConfig();
+const { coinSymbol } = getNetworkConfigBTC();
 const bbnTokenName = shouldDisplayTestingMsg() ? "tBABY" : "BABY";
 
 const STEP_STATES = {

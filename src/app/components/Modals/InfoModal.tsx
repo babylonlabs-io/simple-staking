@@ -10,7 +10,7 @@ import {
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { blocksToDisplayTime } from "@/utils/time";
 
 interface InfoModalProps {
@@ -18,7 +18,7 @@ interface InfoModalProps {
   onClose: () => void;
 }
 
-const { coinName } = getNetworkConfig();
+const { coinName } = getNetworkConfigBTC();
 
 export function InfoModal({ open, onClose }: InfoModalProps) {
   const { data: networkInfo } = useNetworkInfo();
