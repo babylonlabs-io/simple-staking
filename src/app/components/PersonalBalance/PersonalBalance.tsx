@@ -6,7 +6,7 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
-import { notifySuccess } from "@/app/hooks/useNotification";
+import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfig } from "@/config/network.config";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
@@ -20,8 +20,10 @@ const QUERY_KEYS = {
   COSMOS_BALANCE: ["COSMOS_BALANCE"],
 };
 
+const bbnTokenName = shouldDisplayTestingMsg() ? "tBABY" : "BABY";
+const { coinName, coinSymbol } = getNetworkConfig();
+
 export function PersonalBalance() {
-  const { coinName, coinSymbol } = getNetworkConfig();
   const {
     getBalance: getBTCBalance,
     connected: btcConnected,
@@ -38,9 +40,7 @@ export function PersonalBalance() {
 
   const claimAction = async () => {
     setShowClaimRewardModal(false);
-    notifySuccess("Claim Processing", "more info");
     await claimRewards();
-    notifySuccess("Successfully Claimed tBABY", "more info");
   };
 
   const { data: btcBalance, isLoading: btcBalanceLoading } = useQuery({
@@ -81,16 +81,16 @@ export function PersonalBalance() {
 
         <StatItem
           loading={cosmosBalanceLoading}
-          title="Babylon Chain Balance"
-          value={`${ubbnToBbn(cosmosBalance ?? 0)} BBN`}
+          title={`Babylon ${shouldDisplayTestingMsg() ? "Test" : ""} Chain Balance`}
+          value={`${ubbnToBbn(cosmosBalance ?? 0)} ${bbnTokenName}`}
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
           loading={rewardsQuery.isLoading}
-          title="BBN Rewards"
-          value={`${rewardBalance} BBN`}
+          title={`${shouldDisplayTestingMsg() ? "Test" : ""} BABY Rewards`}
+          value={`${rewardBalance} ${bbnTokenName}`}
           actionComponent={{
             title: "Claim",
             onAction: () => setShowClaimRewardModal(true),

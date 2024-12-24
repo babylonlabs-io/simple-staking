@@ -14,7 +14,7 @@ interface UnbondModalProps {
   onClose: () => void;
   onSubmit: () => void;
 }
-const { networkName, coinName } = getNetworkConfig();
+const { networkName, coinSymbol } = getNetworkConfig();
 
 export const UnbondModal = ({
   open,
@@ -37,7 +37,7 @@ export const UnbondModal = ({
 
   return (
     <ConfirmationModal
-      title="Unbonding"
+      title="Unbond"
       processing={processing}
       open={open}
       onClose={onClose}
@@ -45,9 +45,8 @@ export const UnbondModal = ({
     >
       <Text variant="body1" className="pb-8 pt-4">
         You are about to unbond your stake before its expiration. A transaction
-        fee of {unbondingFeeBtc} {coinName} will be deduced from your stake by
+        fee of {unbondingFeeBtc} {coinSymbol} will be deduced from your stake by
         the {networkName} network.
-        <br />
         <br />
         The expected unbonding time will be about {unbondingTime}. After
         unbonded, you will need to use this dashboard to withdraw your stake for

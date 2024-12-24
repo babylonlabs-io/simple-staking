@@ -18,7 +18,7 @@ export const WithdrawModal = (props: WithdrawModalProps) => {
     <ConfirmationModal title="Withdraw" {...props}>
       <Text variant="body1" className="pt-8 pb-10">
         You are about to withdraw your stake. <br /> A transaction fee will be
-        deduced from your stake by the {networkName} network
+        deduced from your stake by the {networkName} network.
       </Text>
     </ConfirmationModal>
   );

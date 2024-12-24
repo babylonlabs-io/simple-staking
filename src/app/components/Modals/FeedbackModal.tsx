@@ -9,7 +9,10 @@ import {
 import { LuPartyPopper } from "react-icons/lu";
 import { MdFeedback } from "react-icons/md";
 
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
+import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfig } from "@/config/network.config";
 
 interface FeedbackModalProps {
   open: boolean;
@@ -18,16 +21,27 @@ interface FeedbackModalProps {
 }
 
 interface ContentProps {}
+const { networkName, coinName } = getNetworkConfig();
 
 const SuccessContent: React.FC<ContentProps> = () => {
+  const { data: networkInfo } = useNetworkInfo();
+  const confirmationDepth =
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 10;
+
   return (
     <div className="py-4 flex flex-col items-center gap-4">
       <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
         <LuPartyPopper className="text-5xl" />
       </div>
-      <Heading variant="h4">Conratulations</Heading>
+      <Heading variant="h4">Staking Submitted on {networkName}</Heading>
       <p className="text-base text-center">
-        Share feedback or report issues on our{" "}
+        Congratulations! Your stake has been successfully submitted to
+        {networkName}. When it receives {confirmationDepth} {coinName} {""}
+        transaction confirmations your stake will become active on the Babylon
+        {shouldDisplayTestingMsg() ? "Test" : ""} Chain.
+        <br />
+        Your opinion matters! Share feedback or report issues on our{" "}
         <a
           href="https://forum.babylonlabs.io/"
           target="_blank"

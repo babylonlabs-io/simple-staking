@@ -8,6 +8,9 @@ import { PropsWithChildren } from "react";
 import { MdLooksTwo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
+import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfig } from "@/config/network.config";
+
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface Phase2HereModalProps {
@@ -15,6 +18,8 @@ interface Phase2HereModalProps {
   open: boolean;
   onClose: () => void;
 }
+
+const { networkName } = getNetworkConfig();
 
 export const Phase2HereModal = ({
   className,
@@ -30,29 +35,28 @@ export const Phase2HereModal = ({
       <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
         <MdLooksTwo className="text-5xl" />
       </div>
-      <Heading variant="h4">Transition to Phase 2</Heading>
+      <Heading variant="h4">
+        Babylon {shouldDisplayTestingMsg() ? "Test" : ""} Chain is here!
+      </Heading>
       <p className="text-base text-center">
-        The second phase of the Babylon mainnet has been launched, enabling the
-        Bitcoin stakes to provide security and liquidity to a Babylon PoS
-        blockchain. If you staked during the first phase, you will need to
-        transition your stakes. Head over to the activity tab to identify all
-        your stakes that can transition. Criteria for your transitioning:
+        The Babylon blockchain has launched, signalling the start of the new
+        phase of the Babylon {shouldDisplayTestingMsg() ? "testnet" : ""}.{" "}
+        {networkName} stakers can now register on the
+        {shouldDisplayTestingMsg() ? "test" : ""} Babylon blockchain to enhance
+        security and earn {shouldDisplayTestingMsg() ? "test" : ""} tokens.
       </p>
-      <ul className="list-disc pl-4 text-base">
-        <li>
-          <p>
-            The finality provider you delegated to during phase-1 has
-            transitioned to the phase-2 Babylon chain.
-          </p>
-        </li>
-        <li>
-          <p>
-            Your stake was created on the first cap of the phase-1 mainnet.
-            Currently only cap-1 stakes are allowed to transition to slowly
-            onboard the stakes to the phase-2 system in a secure manner.
-          </p>
-        </li>
-      </ul>
+      <p className="text-base text-center">
+        During the initial phase of the Babylon chain launch, eligibility
+        criteria will be in place for stake registration. Over time, access will
+        gradually expand to allow the registration of all existing stakers and
+        the creation of new ones. Learn more here
+      </p>
+      {shouldDisplayTestingMsg() && (
+        <p className="text-base text-center">
+          <br />
+          Note: This testnet is not incentivized.
+        </p>
+      )}
     </DialogBody>
 
     <DialogFooter className="flex gap-4">

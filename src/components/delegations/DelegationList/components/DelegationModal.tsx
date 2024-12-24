@@ -36,12 +36,12 @@ export function DelegationModal({
         {...restProps}
       />
       <UnbondModal
-        open={action === ACTIONS.UNBOUND}
+        open={action === ACTIONS.UNBOND}
         onSubmit={handleSubmit}
         {...restProps}
       />
       <WithdrawModal
-        open={action === ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING}
+        open={action === ACTIONS.WITHDRAW_ON_EARLY_UNBONDING}
         onSubmit={handleSubmit}
         {...restProps}
       />
@@ -51,7 +51,7 @@ export function DelegationModal({
         {...restProps}
       />
       <SlashingModal
-        open={action === ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING}
+        open={action === ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING}
         onSubmit={handleSubmit}
         {...restProps}
       />

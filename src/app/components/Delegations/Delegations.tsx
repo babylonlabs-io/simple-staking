@@ -262,7 +262,7 @@ export const Delegations = ({}) => {
     <>
       <div className="bg-secondary-contrast p-6">
         <Heading variant="h6" className="text-primary-light py-2 mb-6">
-          Pending Transitions / Withdrawal (Phase 1)
+          Pending Registration
         </Heading>
 
         <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-primary-light text-xs">

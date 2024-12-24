@@ -25,11 +25,11 @@ const ACTION_BUTTON_PROPS: Record<
     title: "Stake",
   },
   [State.ACTIVE]: {
-    action: ACTIONS.UNBOUND,
-    title: "Unbound",
+    action: ACTIONS.UNBOND,
+    title: "Unbond",
   },
   [State.EARLY_UNBONDING_WITHDRAWABLE]: {
-    action: ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING,
+    action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
     title: "Withdraw",
   },
   [State.TIMELOCK_WITHDRAWABLE]: {
@@ -41,7 +41,7 @@ const ACTION_BUTTON_PROPS: Record<
     title: "Withdraw",
   },
   [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
-    action: ACTIONS.WITHDRAW_ON_EARLY_UNBOUNDING_SLASHING,
+    action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
     title: "Withdraw",
   },
 };
