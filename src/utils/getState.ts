@@ -1,4 +1,7 @@
 import { DelegationState } from "@/app/types/delegations";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 // Convert state to human readable format
 export const getState = (state: string) => {
@@ -54,9 +57,9 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal transaction pending confirmation on Bitcoin";
     case DelegationState.INTERMEDIATE_TRANSITIONING:
-      return "Stake is transitioning to the Babylon chain network";
+      return `Stake is transitioning to the ${bbnNetworkFullName} network`;
     case DelegationState.TRANSITIONED:
-      return "Stake has been transitioned to the Babylon chain network";
+      return `Stake has been transitioned to the ${bbnNetworkFullName} network`;
     default:
       return "Unknown";
   }

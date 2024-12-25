@@ -11,8 +11,8 @@ import { MdFeedback } from "react-icons/md";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 interface FeedbackModalProps {
   open: boolean;
@@ -20,7 +20,7 @@ interface FeedbackModalProps {
   type: "success" | "cancel" | null;
 }
 
-interface ContentProps { }
+interface ContentProps {}
 const { networkName, coinName } = getNetworkConfigBTC();
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
@@ -39,8 +39,8 @@ const SuccessContent: React.FC<ContentProps> = () => {
       <p className="text-base text-center">
         Congratulations! Your stake has been successfully submitted to
         {networkName}. When it receives {confirmationDepth} {coinName} {""}
-        transaction confirmations your stake will become active on
-        the {bbnNetworkFullName}.
+        transaction confirmations your stake will become active on the{" "}
+        {bbnNetworkFullName}.
         <br />
         Your opinion matters! Share feedback or report issues on our{" "}
         <a

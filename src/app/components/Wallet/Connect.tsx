@@ -24,6 +24,7 @@ import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { Hash } from "../Hash/Hash";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
@@ -33,6 +34,8 @@ interface ConnectProps {
   loading?: boolean;
   onConnect: () => void;
 }
+
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 export const Connect: React.FC<ConnectProps> = ({
   loading = false,
@@ -151,7 +154,7 @@ export const Connect: React.FC<ConnectProps> = ({
         </div>
         <div className="flex flex-col">
           <Text variant="body1" className="text-primary-dark text-base">
-            Babylon Chain
+            {bbnNetworkFullName}
           </Text>
           <Hash value={bech32Address} address noFade fullWidth symbols={12} />
         </div>

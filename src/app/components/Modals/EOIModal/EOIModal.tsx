@@ -8,8 +8,8 @@ import {
 } from "@babylonlabs-io/bbn-core-ui";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { Step } from "./Step";
 

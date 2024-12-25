@@ -12,8 +12,8 @@ import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
@@ -159,9 +159,10 @@ export const PreviewModal = ({
           </Text>
           <Text variant="body2">
             2. Your stake will first be sent to {bbnNetworkFullName} for
-            verification (~20 seconds), then you will be prompted to submit
-            it to the {networkName} ledger. It will be marked as &quot;Pending&quot;
-            until it receives {confirmationDepth} Bitcoin confirmations.
+            verification (~20 seconds), then you will be prompted to submit it
+            to the {networkName} ledger. It will be marked as
+            &quot;Pending&quot; until it receives {confirmationDepth} Bitcoin
+            confirmations.
           </Text>
         </div>
       </DialogBody>

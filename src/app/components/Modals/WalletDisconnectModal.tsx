@@ -8,8 +8,8 @@ import {
 import Image from "next/image";
 
 import cancelCircle from "@/app/assets/cancel-circle.svg";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 

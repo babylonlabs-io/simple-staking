@@ -9,8 +9,8 @@ import { MdLooksTwo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -21,10 +21,8 @@ interface Phase2HereModalProps {
 }
 
 const { networkName } = getNetworkConfigBTC();
-const {
-  networkFullName: bbnNetworkFullName,
-  coinSymbol: bbnCoinSymbol,
-} = getNetworkConfigBBN();
+const { networkFullName: bbnNetworkFullName, coinSymbol: bbnCoinSymbol } =
+  getNetworkConfigBBN();
 
 export const Phase2HereModal = ({
   className,
@@ -42,10 +40,11 @@ export const Phase2HereModal = ({
       </div>
       <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
       <p className="text-base text-center">
-        The {bbnNetworkFullName} blockchain has launched, signalling the start of
-        the new phase of the Babylon.
+        The {bbnNetworkFullName} blockchain has launched, signalling the start
+        of the new phase of the Babylon.
         {networkName} stakers can now register on the
-        {bbnNetworkFullName} blockchain to enhance security and earn {bbnCoinSymbol}.
+        {bbnNetworkFullName} blockchain to enhance security and earn{" "}
+        {bbnCoinSymbol}.
       </p>
       <p className="text-base text-center">
         During the initial phase of the {bbnNetworkFullName} launch, eligibility

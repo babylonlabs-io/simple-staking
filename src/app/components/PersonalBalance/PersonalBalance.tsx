@@ -6,8 +6,8 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
@@ -19,10 +19,8 @@ const QUERY_KEYS = {
   BTC_BALANCE: ["BTC_BALANCE"],
   COSMOS_BALANCE: ["COSMOS_BALANCE"],
 };
-const {
-  networkName: bbnNetworkName,
-  coinSymbol: bbnCoinSymbol,
-} = getNetworkConfigBBN();
+const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
+  getNetworkConfigBBN();
 const { coinName, coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {

@@ -18,6 +18,8 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { deriveMerkleProof } from "@/utils/btc";
 import { reverseBuffer } from "@/utils/buffer";
 import {
@@ -54,6 +56,9 @@ export enum SigningStep {
   SIGN_BBN = "sign_bbn",
   SEND_BBN = "send_bbn",
 }
+
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+const { coinSymbol } = getNetworkConfigBTC();
 
 export const useTransactionService = () => {
   const { availableUTXOs: inputUTXOs, networkInfo } = useAppState();
@@ -108,7 +113,10 @@ export const useTransactionService = () => {
 
       validateStakingInput(stakingInput);
 
-      if (!tipHeader) throw new Error("BTC tip not loaded from Babylon chain");
+      if (!tipHeader)
+        throw new Error(
+          `${coinSymbol} tip not loaded from ${bbnNetworkFullName}`,
+        );
 
       if (!versionedParams || versionedParams.length == 0)
         throw new Error("Staking params not loaded");
@@ -189,7 +197,10 @@ export const useTransactionService = () => {
         btcNetwork,
         signingStargateClient,
       );
-      if (!tipHeader) throw new Error("BTC tip not loaded from Babylon chain");
+      if (!tipHeader)
+        throw new Error(
+          `${coinSymbol} tip not loaded from ${bbnNetworkFullName}`,
+        );
 
       validateStakingInput(stakingInput);
 
