@@ -23,13 +23,18 @@ export const Section: React.FC<SectionProps> = ({ title, content }) => {
       </div>
       <AnimatePresence>
         {isOpen && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="mt-4"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="overflow-hidden"
+          >
+            <motion.p
+              className="mt-4"
+              dangerouslySetInnerHTML={{ __html: content }}
+            />
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
