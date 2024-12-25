@@ -1,8 +1,8 @@
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { Fees, UTXO } from "./wallet/btc_wallet_provider";
 
-const { mempoolApiUrl } = getNetworkConfig();
+const { mempoolApiUrl } = getNetworkConfigBTC();
 
 export interface MerkleProof {
   blockHeight: number;

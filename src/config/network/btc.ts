@@ -1,17 +1,11 @@
+import { BTCConfig } from "@babylonlabs-io/bbn-wallet-connect";
+
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 export const network =
   (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.SIGNET;
 
-interface NetworkConfig {
-  coinName: string;
-  coinSymbol: string;
-  networkName: string;
-  mempoolApiUrl: string;
-  network: Network;
-}
-
-const mainnetConfig: NetworkConfig = {
+const mainnetConfig: BTCConfig = {
   coinName: "BTC",
   coinSymbol: "BTC",
   networkName: "BTC",
@@ -19,7 +13,7 @@ const mainnetConfig: NetworkConfig = {
   network: Network.MAINNET,
 };
 
-const signetConfig: NetworkConfig = {
+const signetConfig: BTCConfig = {
   coinName: "Signet BTC",
   coinSymbol: "sBTC",
   networkName: "BTC signet",
@@ -27,7 +21,7 @@ const signetConfig: NetworkConfig = {
   network: Network.SIGNET,
 };
 
-const testnetConfig: NetworkConfig = {
+const testnetConfig: BTCConfig = {
   coinName: "Testnet BTC",
   coinSymbol: "tBTC",
   networkName: "BTC testnet",
@@ -35,13 +29,13 @@ const testnetConfig: NetworkConfig = {
   network: Network.TESTNET,
 };
 
-const config: Record<string, NetworkConfig> = {
+const config: Record<string, BTCConfig> = {
   mainnet: mainnetConfig,
   signet: signetConfig,
   testnet: testnetConfig,
 };
 
-export function getNetworkConfig(): NetworkConfig {
+export function getNetworkConfigBTC(): BTCConfig {
   switch (network) {
     case Network.MAINNET:
       return config.mainnet;

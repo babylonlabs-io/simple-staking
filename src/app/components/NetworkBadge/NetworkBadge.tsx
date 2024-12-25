@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { twJoin } from "tailwind-merge";
 
-import { network } from "@/config/network.config";
+import { network } from "@/config/network/btc";
 import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import testnetIcon from "./testnet-icon.png";

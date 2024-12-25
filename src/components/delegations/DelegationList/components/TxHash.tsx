@@ -1,7 +1,7 @@
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { trim } from "@/utils/trim";
 
-const { mempoolApiUrl } = getNetworkConfig();
+const { mempoolApiUrl } = getNetworkConfigBTC();
 
 interface TxHashProps {
   value: string;

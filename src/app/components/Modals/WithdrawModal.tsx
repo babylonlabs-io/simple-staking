@@ -1,6 +1,6 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
 
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ConfirmationModal } from "./ConfirmationModal";
 
@@ -11,7 +11,7 @@ interface WithdrawModalProps {
   onSubmit: () => void;
 }
 
-const { networkName } = getNetworkConfig();
+const { networkName } = getNetworkConfigBTC();
 
 export const WithdrawModal = (props: WithdrawModalProps) => {
   return (

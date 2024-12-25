@@ -9,7 +9,7 @@ import Image from "next/image";
 
 import cancelCircle from "@/app/assets/cancel-circle.svg";
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -19,7 +19,7 @@ interface WalletDisconnectModalProps {
   onDisconnect: () => void;
 }
 
-const { networkName } = getNetworkConfig();
+const { networkName } = getNetworkConfigBTC();
 
 export const WalletDisconnectModal = ({
   isOpen,

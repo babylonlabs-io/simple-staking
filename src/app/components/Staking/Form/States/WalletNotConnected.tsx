@@ -2,13 +2,13 @@ import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import walletIcon from "./wallet-icon.svg";
 
 export const WalletNotConnected = () => {
   const { open } = useBTCWallet();
-  const { coinName } = getNetworkConfig();
+  const { coinName } = getNetworkConfigBTC();
 
   return (
     <div className="flex flex-1 flex-col">

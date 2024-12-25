@@ -1,7 +1,7 @@
 import { ChangeEvent, FocusEvent, useEffect, useState } from "react";
 import { twJoin } from "tailwind-merge";
 
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
@@ -33,7 +33,7 @@ export const StakingAmount: React.FC<StakingAmountProps> = ({
   const errorLabel = "Staking amount";
   const generalErrorMessage = "You should input staking amount";
 
-  const { coinName } = getNetworkConfig();
+  const { coinName } = getNetworkConfigBTC();
 
   // Use effect to reset the state when reset prop changes
   useEffect(() => {

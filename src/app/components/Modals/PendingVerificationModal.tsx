@@ -6,7 +6,7 @@ import { useDelegationV2 } from "@/app/hooks/client/api/useDelegationV2";
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as State } from "@/app/types/delegationsV2";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { GeneralModal } from "./GeneralModal";
 
@@ -47,7 +47,7 @@ export function PendingVerificationModal({
 }: PendingVerificationModalProps) {
   const { submitStakingTx } = useTransactionService();
   const { updateDelegationStatus } = useDelegationV2State();
-  const { networkName } = getNetworkConfig();
+  const { networkName } = getNetworkConfigBTC();
 
   const { data: delegation = null } = useDelegationV2(stakingTxHash);
 

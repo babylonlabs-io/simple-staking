@@ -2,13 +2,13 @@ import { Heading } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
 import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { StatItem } from "./StatItem";
 
-const { coinName } = getNetworkConfig();
+const { coinName } = getNetworkConfigBTC();
 
 const formatter = Intl.NumberFormat("en", {
   notation: "compact",

@@ -7,7 +7,7 @@ import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { shouldDisplayTestingMsg } from "@/config";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
@@ -21,7 +21,7 @@ const QUERY_KEYS = {
 };
 
 const bbnTokenName = shouldDisplayTestingMsg() ? "tBABY" : "BABY";
-const { coinName, coinSymbol } = getNetworkConfig();
+const { coinName, coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
   const {

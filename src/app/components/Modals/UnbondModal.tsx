@@ -1,7 +1,7 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
@@ -14,7 +14,7 @@ interface UnbondModalProps {
   onClose: () => void;
   onSubmit: () => void;
 }
-const { networkName, coinSymbol } = getNetworkConfig();
+const { networkName, coinSymbol } = getNetworkConfigBTC();
 
 export const UnbondModal = ({
   open,

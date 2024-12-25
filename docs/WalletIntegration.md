@@ -402,7 +402,7 @@ import { Fees, UTXO } from "./wallet/btc_wallet_provider";
 // The base URL for the signet API
 // Utilises an environment variable specifying the mempool API we intend to
 // utilise
-const mempoolAPI = `${getNetworkConfig().mempoolApiUrl}/api/`;
+const mempoolAPI = `${getNetworkConfigBTC().mempoolApiUrl}/api/`;
 
 // URL for the address info endpoint
 function addressInfoUrl(address: string): URL {
