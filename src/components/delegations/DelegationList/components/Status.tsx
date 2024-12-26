@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 
+import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useAppState } from "@/app/state";
 import {
   DelegationV2,
@@ -8,9 +9,9 @@ import {
 } from "@/app/types/delegationsV2";
 import { Params } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { blocksToDisplayTime } from "@/utils/time";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 
 interface StatusProps {
   delegation: DelegationV2;
@@ -22,6 +23,52 @@ interface StatusTooltipProps {
   coinName?: string;
 }
 
+const STATUS_LABELS = {
+  PENDING: "Pending",
+  VERIFIED: "Verified",
+  ACTIVE: "Active",
+  UNBONDING: "Unbonding",
+  WITHDRAWABLE: "Withdrawable",
+  SLASHED: "Slashed",
+  WITHDRAWN: "Withdrawn",
+  WITHDRAWAL: "Withdrawal",
+} as const;
+
+const STATUS_MESSAGES = {
+  PENDING: "Stake is pending verification",
+  VERIFIED: "Stake is verified, you can start staking",
+  ACTIVE: "Stake is active",
+  TIMELOCK_UNBONDING:
+    "Stake is about to be unbonded as it's reaching the timelock period",
+  TIMELOCK_WITHDRAWABLE:
+    "Stake is withdrawable as it's reached the timelock period",
+  EARLY_UNBONDING_WITHDRAWABLE:
+    "Stake is withdrawable after the unbonding period",
+  WITHDRAWN: "Stake has been withdrawn",
+  SLASHED_WITHDRAWN: "Slashed Stake has been withdrawn",
+  PENDING_BTC_CONFIRMATION: (btcConfirmationDepth: number) =>
+    `Stake is pending ${btcConfirmationDepth} BTC confirmations`,
+  UNBONDING_SUBMITTED: "Stake is requesting unbonding",
+  WITHDRAWAL_PENDING: "Withdrawal transaction pending confirmation on Bitcoin",
+  UNBONDING: (unbondingTime: number) =>
+    `It will take ${blocksToDisplayTime(unbondingTime)} before you can withdraw your stake.`,
+  SLASHED: (amount: number, coinName: string) => (
+    <>
+      <b>
+        {satoshiToBtc(amount)} {coinName}
+      </b>{" "}
+      was slashed from your stake due to the finality provider double voting.{" "}
+      <Link
+        className="text-secondary-main"
+        target="_blank"
+        href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+      >
+        Learn more
+      </Link>
+    </>
+  ),
+} as const;
+
 const STATUSES: Record<
   string,
   (param: StatusTooltipProps) => {
@@ -31,121 +78,97 @@ const STATUSES: Record<
   }
 > = {
   [State.PENDING]: () => ({
-    label: "Pending",
-    tooltip: "Stake is pending verification",
+    label: STATUS_LABELS.PENDING,
+    tooltip: STATUS_MESSAGES.PENDING,
   }),
   [State.VERIFIED]: () => ({
-    label: "Verified",
-    tooltip: "Stake is verified, you can start staking",
+    label: STATUS_LABELS.VERIFIED,
+    tooltip: STATUS_MESSAGES.VERIFIED,
   }),
   [State.ACTIVE]: () => ({
-    label: "Active",
-    tooltip: "Stake is active",
+    label: STATUS_LABELS.ACTIVE,
+    tooltip: STATUS_MESSAGES.ACTIVE,
   }),
   [State.TIMELOCK_UNBONDING]: () => ({
-    label: "Unbonding",
-    tooltip:
-      "Stake is about to be unbonded as it's reaching the timelock period",
+    label: STATUS_LABELS.UNBONDING,
+    tooltip: STATUS_MESSAGES.TIMELOCK_UNBONDING,
   }),
-  [State.EARLY_UNBONDING]: ({params}) => ({
-    label: "Unbonding",
-    tooltip: `Unbonding process of ${blocksToDisplayTime(params?.bbnStakingParams.latestParam.unbondingTime)} has started`,
+  [State.EARLY_UNBONDING]: ({ params }) => ({
+    label: STATUS_LABELS.UNBONDING,
+    tooltip: STATUS_MESSAGES.UNBONDING(
+      params?.bbnStakingParams.latestParam.unbondingTime ?? 0,
+    ),
   }),
   [State.TIMELOCK_WITHDRAWABLE]: () => ({
-    label: "Withdrawable",
-    tooltip: "Stake is withdrawable as it's reached the timelock period",
+    label: STATUS_LABELS.WITHDRAWABLE,
+    tooltip: STATUS_MESSAGES.TIMELOCK_WITHDRAWABLE,
   }),
   [State.EARLY_UNBONDING_WITHDRAWABLE]: () => ({
-    label: "Withdrawable",
-    tooltip: "Stake is withdrawable after the unbonding period",
+    label: STATUS_LABELS.WITHDRAWABLE,
+    tooltip: STATUS_MESSAGES.EARLY_UNBONDING_WITHDRAWABLE,
   }),
-  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: ({amount, coinName}) => ({
-    label: "Withdrawable",
-    tooltip: <SlashedTooltip amount={amount} coinName={coinName} />,
+  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: ({ amount, coinName }) => ({
+    label: STATUS_LABELS.WITHDRAWABLE,
+    tooltip: STATUS_MESSAGES.SLASHED(amount ?? 0, coinName ?? ""),
     status: "error",
   }),
   [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: ({ amount, coinName }) => ({
-    label: "Withdrawable",
-    tooltip: (
-      <span>
-        <SlashedTooltip amount={amount} coinName={coinName} />
-      </span>
-    ),
+    label: STATUS_LABELS.WITHDRAWABLE,
+    tooltip: STATUS_MESSAGES.SLASHED(amount ?? 0, coinName ?? ""),
     status: "error",
   }),
   [State.SLASHED]: ({ amount, coinName }) => ({
-    label: "Slashed",
-    tooltip: <SlashedTooltip amount={amount} coinName={coinName} />,
+    label: STATUS_LABELS.SLASHED,
+    tooltip: STATUS_MESSAGES.SLASHED(amount ?? 0, coinName ?? ""),
     status: "error",
   }),
   [State.TIMELOCK_WITHDRAWN]: () => ({
-    label: "Withdrawn",
-    tooltip: "Stake has been withdrawn",
+    label: STATUS_LABELS.WITHDRAWN,
+    tooltip: STATUS_MESSAGES.WITHDRAWN,
   }),
   [State.EARLY_UNBONDING_WITHDRAWN]: () => ({
-    label: "Withdrawn",
-    tooltip: "Stake has been withdrawn",
+    label: STATUS_LABELS.WITHDRAWN,
+    tooltip: STATUS_MESSAGES.WITHDRAWN,
   }),
   [State.EARLY_UNBONDING_SLASHING_WITHDRAWN]: () => ({
-    label: "Withdrawn",
-    tooltip: "Slashed Stake has been withdrawn",
+    label: STATUS_LABELS.WITHDRAWN,
+    tooltip: STATUS_MESSAGES.SLASHED_WITHDRAWN,
   }),
   [State.TIMELOCK_SLASHING_WITHDRAWN]: () => ({
-    label: "Withdrawn",
-    tooltip: "Slashed Stake has been withdrawn",
+    label: STATUS_LABELS.WITHDRAWN,
+    tooltip: STATUS_MESSAGES.SLASHED_WITHDRAWN,
   }),
+  // Intermediate States
   [State.INTERMEDIATE_PENDING_VERIFICATION]: () => ({
-    label: "Pending",
-    tooltip: "Stake is pending verification",
+    label: STATUS_LABELS.PENDING,
+    tooltip: STATUS_MESSAGES.PENDING,
   }),
-  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({params}) => ({
-    label: "Pending",
-    tooltip:
-      `Stake is pending` +
-      ` ${params?.btcEpochCheckParams.latestParam.btcConfirmationDepth}` +
-      ` BTC confirmations`,
+  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({ params }) => ({
+    label: STATUS_LABELS.PENDING,
+    tooltip: STATUS_MESSAGES.PENDING_BTC_CONFIRMATION(
+      params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0,
+    ),
   }),
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
-    label: "Unbonding",
-    tooltip: "Stake is requesting unbonding",
+    label: STATUS_LABELS.UNBONDING,
+    tooltip: STATUS_MESSAGES.UNBONDING_SUBMITTED,
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
-    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+    label: STATUS_LABELS.WITHDRAWAL,
+    tooltip: STATUS_MESSAGES.WITHDRAWAL_PENDING,
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
-    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+    label: STATUS_LABELS.WITHDRAWAL,
+    tooltip: STATUS_MESSAGES.WITHDRAWAL_PENDING,
   }),
   [State.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
-    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+    label: STATUS_LABELS.WITHDRAWAL,
+    tooltip: STATUS_MESSAGES.WITHDRAWAL_PENDING,
   }),
   [State.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
-    tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
+    label: STATUS_LABELS.WITHDRAWAL,
+    tooltip: STATUS_MESSAGES.WITHDRAWAL_PENDING,
   }),
-};
-
-const SlashedTooltip = ({
-  amount,
-  coinName,
-}: {
-  amount?: number;
-  coinName?: string;
-}) => {
-  return (
-    <span>
-      <b>
-        {satoshiToBtc(amount ?? 0)} {coinName}
-      </b>{" "}
-      was slashed from your stake due to the finality provider you selected
-      double voting. {/* TODO: add link */}
-      <Link className="text-secondary-main" target="_blank" href="">
-        Learn more
-      </Link>
-    </span>
-  );
 };
 
 export function Status({ delegation }: StatusProps) {
@@ -160,6 +183,7 @@ export function Status({ delegation }: StatusProps) {
     amount: delegation.stakingAmount,
     coinName,
   }) ?? {};
+
   return (
     <Hint tooltip={tooltip} status={status}>
       {label}

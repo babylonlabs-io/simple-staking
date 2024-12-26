@@ -9,3 +9,8 @@ export const DELEGATION_ACTIONS = {
   WITHDRAW_ON_TIMELOCK_SLASHING: "WITHDRAW_ON_TIMELOCK_SLASHING",
   WITHDRAW_ON_EARLY_UNBONDING_SLASHING: "WITHDRAW_ON_EARLY_UNBONDING_SLASHING",
 } as const;
+
+export const DOCUMENTATION_LINKS = {
+  TECHNICAL_PRELIMINARIES:
+    "https://babylonlabs.io/blog/technical-preliminaries-of-bitcoin-staking",
+} as const;

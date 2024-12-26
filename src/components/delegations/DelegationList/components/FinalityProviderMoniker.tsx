@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
@@ -20,8 +21,12 @@ const STATUSES: Record<
   [FinalityProviderState.JAILED]: {
     tooltip: (
       <span>
-        This finality provider has been jailed. {/* TODO: add link */}
-        <Link className="text-secondary-main" target="_blank" href="">
+        This finality provider has been jailed.
+        <Link
+          className="text-secondary-main"
+          target="_blank"
+          href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+        >
           Learn more
         </Link>
       </span>
@@ -31,8 +36,12 @@ const STATUSES: Record<
   [FinalityProviderState.SLASHED]: {
     tooltip: (
       <span>
-        This finality provider has been slashed. {/* TODO: add link */}
-        <Link className="text-secondary-main" target="_blank" href="">
+        This finality provider has been slashed.
+        <Link
+          className="text-secondary-main"
+          target="_blank"
+          href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+        >
           Learn more
         </Link>
       </span>
