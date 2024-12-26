@@ -94,7 +94,7 @@ export function PersonalBalance() {
           actionComponent={{
             title: "Claim",
             onAction: () => setShowClaimRewardModal(true),
-            isDisabled: rewardBalance === 0,
+            isDisabled: !rewardBalance,
           }}
         />
       </div>

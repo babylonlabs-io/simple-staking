@@ -43,7 +43,7 @@ export const useBbnQuery = () => {
           address: bech32Address,
         });
 
-      let rewards;
+      let rewards: incentivequery.QueryRewardGaugesResponse;
       try {
         rewards = await incentive.RewardGauges(req);
       } catch (error) {

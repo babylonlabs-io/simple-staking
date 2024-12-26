@@ -41,9 +41,8 @@ export const Phase2HereModal = ({
       <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
       <p className="text-base text-center">
         The {bbnNetworkFullName} blockchain has launched, signalling the start
-        of the new phase of the Babylon.
-        {networkName} stakers can now register on the
-        {bbnNetworkFullName} blockchain to enhance security and earn{" "}
+        of the new phase of the Babylon. {networkName} stakers can now register
+        on the {bbnNetworkFullName} blockchain to enhance security and earn{" "}
         {bbnCoinSymbol}.
       </p>
       <p className="text-base text-center">
