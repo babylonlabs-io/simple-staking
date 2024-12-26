@@ -7,6 +7,7 @@ import {
 import { type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -19,6 +20,8 @@ type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
 };
+
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
@@ -87,7 +90,7 @@ export function DelegationList() {
   return (
     <div className="bg-secondary-contrast p-6">
       <Heading variant="h6" className="text-primary-light py-2 mb-6">
-        Babylon Chain Stakes (Phase 2)
+        {bbnNetworkFullName} Stakes
       </Heading>
 
       <GridTable

@@ -12,18 +12,27 @@ const mainnetConfig: BBNConfig = {
   chainId: bbnTestnet.chainId,
   rpc: bbnTestnet.rpc,
   chainData: bbnTestnet,
+  networkName: "BABY",
+  networkFullName: "Babylon Chain",
+  coinSymbol: "BABY",
 };
 
 const signetConfig: BBNConfig = {
   chainId: bbnDevnet.chainId,
   rpc: bbnDevnet.rpc,
   chainData: bbnDevnet,
+  networkName: "Testnet BABY",
+  networkFullName: "Testnet Babylon Chain",
+  coinSymbol: "tBABY",
 };
 
 const testnetConfig: BBNConfig = {
   chainId: bbnTestnet.chainId,
   rpc: bbnTestnet.rpc,
   chainData: bbnTestnet,
+  networkName: "Testnet BABY",
+  networkFullName: "Testnet Babylon Chain",
+  coinSymbol: "tBABY",
 };
 
 const config: Record<string, BBNConfig> = {

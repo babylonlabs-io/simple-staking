@@ -8,7 +8,7 @@ import {
 import Image from "next/image";
 
 import cancelCircle from "@/app/assets/cancel-circle.svg";
-import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
@@ -20,6 +20,7 @@ interface WalletDisconnectModalProps {
 }
 
 const { networkName } = getNetworkConfigBTC();
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 export const WalletDisconnectModal = ({
   isOpen,
@@ -38,10 +39,9 @@ export const WalletDisconnectModal = ({
           Disconnect Wallets
         </Heading>
         <Text variant="body1" className="text-center">
-          Disconnecting will log you out of both your Babylon
-          {shouldDisplayTestingMsg() ? "Test" : ""} Chain and {networkName} {""}
-          wallets. You&apos;ll need to reconnect them to access your staking
-          account.
+          Disconnecting will log you out of both your {bbnNetworkFullName} Chain
+          and {networkName} wallets. You&apos;ll need to reconnect them to
+          access your staking account.
         </Text>
       </DialogBody>
 

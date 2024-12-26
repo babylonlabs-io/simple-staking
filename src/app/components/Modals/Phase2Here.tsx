@@ -9,6 +9,7 @@ import { MdLooksTwo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
 import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
@@ -20,6 +21,8 @@ interface Phase2HereModalProps {
 }
 
 const { networkName } = getNetworkConfigBTC();
+const { networkFullName: bbnNetworkFullName, coinSymbol: bbnCoinSymbol } =
+  getNetworkConfigBBN();
 
 export const Phase2HereModal = ({
   className,
@@ -35,18 +38,15 @@ export const Phase2HereModal = ({
       <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
         <MdLooksTwo className="text-5xl" />
       </div>
-      <Heading variant="h4">
-        Babylon {shouldDisplayTestingMsg() ? "Test" : ""} Chain is here!
-      </Heading>
+      <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
       <p className="text-base text-center">
-        The Babylon blockchain has launched, signalling the start of the new
-        phase of the Babylon {shouldDisplayTestingMsg() ? "testnet" : ""}.{" "}
-        {networkName} stakers can now register on the
-        {shouldDisplayTestingMsg() ? "test" : ""} Babylon blockchain to enhance
-        security and earn {shouldDisplayTestingMsg() ? "test" : ""} tokens.
+        The {bbnNetworkFullName} blockchain has launched, signalling the start
+        of the new phase of the Babylon. {networkName} stakers can now register
+        on the {bbnNetworkFullName} blockchain to enhance security and earn{" "}
+        {bbnCoinSymbol}.
       </p>
       <p className="text-base text-center">
-        During the initial phase of the Babylon chain launch, eligibility
+        During the initial phase of the {bbnNetworkFullName} launch, eligibility
         criteria will be in place for stake registration. Over time, access will
         gradually expand to allow the registration of all existing stakers and
         the creation of new ones. Learn more here

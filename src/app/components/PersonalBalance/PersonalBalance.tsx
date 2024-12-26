@@ -6,7 +6,7 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
-import { shouldDisplayTestingMsg } from "@/config";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
@@ -19,8 +19,8 @@ const QUERY_KEYS = {
   BTC_BALANCE: ["BTC_BALANCE"],
   COSMOS_BALANCE: ["COSMOS_BALANCE"],
 };
-
-const bbnTokenName = shouldDisplayTestingMsg() ? "tBABY" : "BABY";
+const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
+  getNetworkConfigBBN();
 const { coinName, coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
@@ -81,20 +81,20 @@ export function PersonalBalance() {
 
         <StatItem
           loading={cosmosBalanceLoading}
-          title={`Babylon ${shouldDisplayTestingMsg() ? "Test" : ""} Chain Balance`}
-          value={`${ubbnToBbn(cosmosBalance ?? 0)} ${bbnTokenName}`}
+          title={`${bbnNetworkName} Balance`}
+          value={`${ubbnToBbn(cosmosBalance ?? 0)} ${bbnCoinSymbol}`}
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
           loading={rewardsQuery.isLoading}
-          title={`${shouldDisplayTestingMsg() ? "Test" : ""} BABY Rewards`}
-          value={`${rewardBalance} ${bbnTokenName}`}
+          title={`${bbnNetworkName} Rewards`}
+          value={`${rewardBalance} ${bbnCoinSymbol}`}
           actionComponent={{
             title: "Claim",
             onAction: () => setShowClaimRewardModal(true),
-            isDisabled: rewardBalance === 0,
+            isDisabled: !rewardBalance,
           }}
         />
       </div>
