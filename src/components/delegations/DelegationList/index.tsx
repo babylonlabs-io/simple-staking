@@ -52,7 +52,7 @@ const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
     field: "state",
     headerName: "Status",
-    renderCell: (row) => <Status value={row.state} />,
+    renderCell: (row) => <Status delegation={row} />,
   },
   {
     field: "actions",

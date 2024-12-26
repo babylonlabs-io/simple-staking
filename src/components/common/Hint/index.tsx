@@ -1,26 +1,52 @@
-import { type PropsWithChildren, useId } from "react";
+import { useId, type PropsWithChildren, type ReactNode } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
+import { twJoin } from "tailwind-merge";
+
+type HintStatus = "default" | "warning" | "error";
 
 interface HintProps {
-  tooltip: string;
+  tooltip: ReactNode;
+  status?: HintStatus;
 }
 
-export function Hint({ children, tooltip }: PropsWithChildren<HintProps>) {
+const STATUS_COLORS = {
+  default: "text-primary-main",
+  warning: "text-warning-main",
+  error: "text-error-main",
+} as const;
+
+export function Hint({
+  children,
+  tooltip,
+  status = "default",
+}: PropsWithChildren<HintProps>) {
   const id = useId();
 
   return (
-    <div className="inline-flex items-center gap-1">
+    <div
+      className={twJoin(
+        "inline-flex items-center gap-1",
+        STATUS_COLORS[status],
+      )}
+    >
       {children && <p>{children}</p>}
       <span
-        className="cursor-pointer text-xs"
+        className={twJoin("cursor-pointer text-xs", STATUS_COLORS[status])}
         data-tooltip-id={id}
-        data-tooltip-content={tooltip}
+        data-tooltip-content={typeof tooltip === "string" ? tooltip : undefined}
         data-tooltip-place="top"
       >
         <AiOutlineInfoCircle />
       </span>
-      <Tooltip id={id} className="tooltip-wrap" />
+      <Tooltip
+        id={id}
+        className="tooltip-wrap"
+        openOnClick={false}
+        clickable={true}
+      >
+        {typeof tooltip !== "string" && tooltip}
+      </Tooltip>
     </div>
   );
 }

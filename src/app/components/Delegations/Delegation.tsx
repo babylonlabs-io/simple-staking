@@ -54,7 +54,7 @@ export const Delegation: React.FC<DelegationProps> = ({
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const { transitionPhase1Delegation } = useTransactionService();
-  const { getFinalityProviderMoniker } = useFinalityProviderState();
+  const { getFinalityProvider } = useFinalityProviderState();
   const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
   useEffect(() => {
@@ -102,7 +102,8 @@ export const Delegation: React.FC<DelegationProps> = ({
         </DelegationCell>
 
         <DelegationCell order="order-4 lg:order-2 text-right lg:text-left">
-          {getFinalityProviderMoniker(finalityProviderPkHex)}
+          {getFinalityProvider(finalityProviderPkHex)?.description?.moniker ??
+            "-"}
         </DelegationCell>
 
         <DelegationCell
