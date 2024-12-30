@@ -108,6 +108,22 @@ body.modal-open {
   word-wrap: break-word;
 }
 
+.tooltip-wrap[data-popper-placement*="top"] .tooltip-arrow {
+  @apply border-t-neutral-800;
+}
+
+.tooltip-wrap[data-popper-placement*="bottom"] .tooltip-arrow {
+  @apply border-b-neutral-800;
+}
+
+.tooltip-wrap[data-popper-placement*="left"] .tooltip-arrow {
+  @apply border-l-neutral-800;
+}
+
+.tooltip-wrap[data-popper-placement*="right"] .tooltip-arrow {
+  @apply border-r-neutral-800;
+}
+
 body > .tomo-social {
   z-index: 100 !important;
 }
