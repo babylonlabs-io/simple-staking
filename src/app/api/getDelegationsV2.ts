@@ -54,22 +54,27 @@ interface DelegationV2API {
 
 export const getDelegationV2 = async (
   stakingTxHashHex: string,
-): Promise<DelegationV2> => {
+): Promise<DelegationV2 | null> => {
   if (!stakingTxHashHex) {
     throw new Error("No staking tx hash provided");
   }
-  const params = {
-    staking_tx_hash_hex: stakingTxHashHex,
-  };
 
-  const { data: delegationAPIResponse } = await apiWrapper(
-    "GET",
-    "/v2/delegation",
-    "Error getting delegation v2",
-    { query: params },
-  );
+  try {
+    const params = {
+      staking_tx_hash_hex: stakingTxHashHex,
+    };
 
-  return apiToDelegationV2(delegationAPIResponse);
+    const { data: delegationAPIResponse } = await apiWrapper(
+      "GET",
+      "/v2/delegation",
+      "Error getting delegation v2",
+      { query: params },
+    );
+
+    return apiToDelegationV2(delegationAPIResponse.data);
+  } catch {
+    return null;
+  }
 };
 
 export const getDelegationsV2 = async (

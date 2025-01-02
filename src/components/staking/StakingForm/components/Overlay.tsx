@@ -10,7 +10,7 @@ export function FormOverlay({
   className,
   children,
 }: PropsWithChildren<OverlayProps>) {
-  const { isValid } = useFormState({
+  const { errors } = useFormState({
     name: "finalityProvider",
   });
 
@@ -19,7 +19,9 @@ export function FormOverlay({
       <div
         className={twJoin(
           `absolute inset-0 bg-secondary-contrast z-10 transition-opacity duration-300`,
-          isValid ? "opacity-0 pointer-events-none" : "opacity-75",
+          !errors.finalityProvider
+            ? "opacity-0 pointer-events-none"
+            : "opacity-75",
         )}
       />
       {children}

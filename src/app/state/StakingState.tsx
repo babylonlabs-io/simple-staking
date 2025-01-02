@@ -34,6 +34,7 @@ export type StakingStep =
   | "eoi-staking-slashing"
   | "eoi-unbonding-slashing"
   | "eoi-proof-of-possession"
+  | "eoi-sign-bbn"
   | "eoi-send-bbn"
   | "verifying"
   | "verified"
@@ -237,7 +238,7 @@ export function StakingState({ children }: PropsWithChildren) {
               stakingInfo?.maxFeeRate ?? 0,
               "Selected fee rate is higher than the hour fee",
             )
-            .moreThan(
+            .min(
               stakingInfo?.defaultFeeRate ?? 0,
               "Fees are low, inclusion is not guaranteed",
             ),

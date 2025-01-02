@@ -80,11 +80,11 @@ export function useStakingService() {
 
         const delegation = await retry(
           () => getDelegationV2(stakingTxHashHex),
-          (delegation) => delegation.state === DelegationState.VERIFIED,
+          (delegation) => delegation?.state === DelegationState.VERIFIED,
           5 * ONE_SECOND,
         );
 
-        setVerifiedDelegation(delegation);
+        setVerifiedDelegation(delegation as DelegationV2);
         goToStep("verified");
         setProcessing(false);
       } catch (error: any) {

@@ -1,7 +1,7 @@
-import { Heading, Text, useFormState } from "@babylonlabs-io/bbn-core-ui";
+import { Heading, Loader, Text } from "@babylonlabs-io/bbn-core-ui";
 import { useState } from "react";
 
-import { LoadingView } from "@/app/components/Loading/Loading";
+import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
 import { Message } from "@/app/components/Staking/Form/States/Message";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
@@ -11,6 +11,7 @@ import { AmountField } from "./components/AmountField";
 import { FeeAmountField } from "./components/FeeAmountField";
 import { FeeInfo } from "./components/FeeInfo";
 import { FeeRateField } from "./components/FeeRateField";
+import { FeeSection } from "./components/FeeSection";
 import { InfoAlert } from "./components/InfoAlert";
 import { FormOverlay } from "./components/Overlay";
 import { SubmitButton } from "./components/SubmitButton";
@@ -38,12 +39,11 @@ export function DelegationForm({
   stakingInfo,
 }: DelegationFormProps) {
   const [isCustomFee, setIsCustomFee] = useState(false);
-  const { isValid } = useFormState({
-    name: ["finalityProvider", "term", "amount"],
-  });
 
   if (loading) {
-    return <LoadingView />;
+    return (
+      <StatusView className="flex-1" icon={<Loader />} title="Please wait..." />
+    );
   }
 
   if (disabled) {
@@ -79,21 +79,19 @@ export function DelegationForm({
               max={stakingInfo?.maxStakingAmountSat}
             />
 
-            {isValid && (
-              <>
-                <FeeInfo custom={isCustomFee} />
+            <FeeSection>
+              <FeeInfo custom={isCustomFee} />
 
-                <FeeRateField
-                  expanded={isCustomFee}
-                  defaultRate={stakingInfo?.defaultFeeRate}
-                  min={stakingInfo?.minFeeRate}
-                  max={stakingInfo?.maxFeeRate}
-                  onExpand={() => void setIsCustomFee(true)}
-                />
+              <FeeRateField
+                expanded={isCustomFee}
+                defaultRate={stakingInfo?.defaultFeeRate}
+                min={stakingInfo?.minFeeRate}
+                max={stakingInfo?.maxFeeRate}
+                onExpand={() => void setIsCustomFee(true)}
+              />
 
-                <FeeAmountField />
-              </>
-            )}
+              <FeeAmountField />
+            </FeeSection>
           </FormOverlay>
 
           <SubmitButton />

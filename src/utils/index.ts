@@ -7,14 +7,15 @@ export function wait(ms: number): Promise<undefined> {
 export async function retry<R>(
   fn: () => Promise<R>,
   finished: (value: R) => boolean,
-  every: number | ((index: number, value: R) => number),
+  delay: number | ((index: number, value: R) => number),
+  attempts = Infinity,
 ) {
-  const delay = typeof every === "number" ? () => every : every;
-
+  const getDelay = typeof delay === "number" ? () => delay : delay;
   let value = await fn();
   let index = 1;
-  while (!finished(value)) {
-    await wait(delay(index, value));
+
+  while (!finished(value) && index <= attempts) {
+    await wait(getDelay(index, value));
     value = await fn();
     index++;
   }
