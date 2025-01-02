@@ -19,7 +19,7 @@ interface Params {
 }
 
 export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
-  const { isErrorOpen, handleError } = useError();
+  const { isErrorOpen, handleError, captureError } = useError();
 
   const query = useInfiniteQuery({
     queryKey: [FINALITY_PROVIDERS_KEY],
@@ -55,7 +55,8 @@ export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
       errorState: ErrorState.SERVER_ERROR,
       refetchFunction: query.refetch,
     });
-  }, [query.isError, query.error, query.refetch, handleError]);
+    captureError(query.error);
+  }, [query.isError, query.error, query.refetch, handleError, captureError]);
 
   return query;
 }

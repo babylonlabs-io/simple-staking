@@ -8,6 +8,8 @@ interface TxHashProps {
 }
 
 export function TxHash({ value }: TxHashProps) {
+  if (!value) return <span>-</span>;
+
   return (
     <a
       href={`${mempoolApiUrl}/tx/${value}`}
@@ -15,7 +17,7 @@ export function TxHash({ value }: TxHashProps) {
       rel="noopener noreferrer"
       className="text-primary-dark hover:underline"
     >
-      {trim(value)}
+      {trim(value) ?? value}
     </a>
   );
 }
