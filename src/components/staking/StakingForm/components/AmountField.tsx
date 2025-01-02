@@ -25,7 +25,7 @@ export function AmountField({ min = 0, max = 0 }: AmountFieldProps) {
       name="amount"
       controlClassName="mb-4"
       label={label}
-      placeholder="BTC"
+      placeholder={coinSymbol}
     />
   );
 }

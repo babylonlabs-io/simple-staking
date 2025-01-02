@@ -1,3 +1,4 @@
+import { useFormContext } from "@babylonlabs-io/bbn-core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/app/components/Modals/CancelFeedbackModal";
@@ -19,10 +20,17 @@ const EOI_INDEXES: Record<string, number> = {
 };
 
 export function StakingModal() {
-  const { processing, step, formData, stakingInfo, verifiedDelegation, reset } =
-    useStakingState();
+  const {
+    processing,
+    step,
+    formData,
+    stakingInfo,
+    verifiedDelegation,
+    reset: resetState,
+  } = useStakingState();
   const { getFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
+  const { reset: resetForm } = useFormContext();
 
   const fp = useMemo(
     () => getFinalityProvider(formData?.finalityProvider ?? ""),
@@ -46,8 +54,11 @@ export function StakingModal() {
           stakingFeeSat={formData.feeAmount}
           feeRate={formData.feeRate}
           unbondingFeeSat={stakingInfo.unbondingFeeSat}
-          onClose={reset}
-          onSign={() => createEOI(formData)}
+          onClose={resetState}
+          onSign={async () => {
+            await createEOI(formData);
+            resetForm();
+          }}
         />
       )}
       <EOIModal
@@ -66,9 +77,12 @@ export function StakingModal() {
       )}
       <SuccessFeedbackModal
         open={step === "feedback-success"}
-        onClose={reset}
+        onClose={resetState}
       />
-      <CancelFeedbackModal open={step === "feedback-cancel"} onClose={reset} />
+      <CancelFeedbackModal
+        open={step === "feedback-cancel"}
+        onClose={resetState}
+      />
     </>
   );
 }
