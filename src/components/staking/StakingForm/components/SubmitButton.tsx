@@ -18,6 +18,7 @@ export function SubmitButton() {
       data-tooltip-place="top"
     >
       <Button
+        //@ts-ignore - fix type issue in core-ui
         type="submit"
         disabled={!isValid || bbnBalance === 0}
         size="large"

@@ -224,6 +224,9 @@ export const useTransactionService = () => {
       return stakingFee;
     },
     [
+      btcConnected,
+      cosmosConnected,
+      signingStargateClient,
       btcNetwork,
       tipHeader,
       versionedParams,
