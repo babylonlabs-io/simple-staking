@@ -58,7 +58,7 @@ export const Stats = memo(() => {
         <StatItem
           loading={isLoading}
           title="Finality Providers"
-          value={`${activeFinalityProviders}/${totalFinalityProviders}`}
+          value={`${activeFinalityProviders} Active (${totalFinalityProviders} Total)`}
           tooltip="Active and total number of finality providers"
         />
       </div>
