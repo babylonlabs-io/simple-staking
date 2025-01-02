@@ -27,6 +27,7 @@ export const Hash: React.FC<HashProps> = ({
   const [copiedText, setCopiedText] = useState("");
 
   const handleCopy = () => {
+    if (!value) return;
     setCopiedText("Copied!");
     copy(value);
   };
@@ -37,6 +38,10 @@ export const Hash: React.FC<HashProps> = ({
     }, 2000);
     return () => clearTimeout(timer);
   }, [copiedText]);
+
+  if (!value) {
+    return <Text variant="body2">-</Text>;
+  }
 
   return (
     <div
@@ -60,7 +65,7 @@ export const Hash: React.FC<HashProps> = ({
                 <span className="font-mono">x</span>
               </>
             )}
-            <span>{trim(value, symbols)}</span>
+            <span>{trim(value, symbols) ?? value}</span>
           </>
         )}
       </Text>
