@@ -91,7 +91,7 @@ export const useTransactionService = () => {
    * @param stakingInput - The staking inputs
    * @param feeRate - The fee rate
    * @param signingCallback - The signing callback
-   * @returns The signed transaction and the staking transaction hash
+   * @returns The staking transaction hash
    */
   const createDelegationEoi = useCallback(
     async (
@@ -171,6 +171,7 @@ export const useTransactionService = () => {
       signPsbt,
       signMessage,
       signBbnTx,
+      sendBbnTx,
     ],
   );
 
