@@ -59,7 +59,7 @@ export function DelegationForm({
 
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
-      <div className="relative flex flex-col gap-4">
+      <div className="relative flex flex-1 flex-col gap-4">
         <Heading variant="h5" className="text-primary-dark">
           Step 2
         </Heading>
@@ -72,7 +72,10 @@ export function DelegationForm({
 
         <div className="flex flex-1 flex-col">
           <FormOverlay>
-            <TermField min={stakingInfo?.minStakingTimeBlocks} />
+            <TermField
+              min={stakingInfo?.minStakingTimeBlocks}
+              max={stakingInfo?.maxStakingTimeBlocks}
+            />
 
             <AmountField
               min={stakingInfo?.minStakingAmountSat}
