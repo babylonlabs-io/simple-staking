@@ -16,7 +16,7 @@ export const StakeModal = ({ processing, open, onSubmit }: StakeModalProps) => (
   <SubmitModal
     processing={processing}
     open={open}
-    icon={<BiSolidBadgeCheck size={52} />}
+    icon={<BiSolidBadgeCheck className="text-5xl" />}
     title="Verified"
     submitButton={`Stake on ${networkName}`}
     onSubmit={onSubmit}
