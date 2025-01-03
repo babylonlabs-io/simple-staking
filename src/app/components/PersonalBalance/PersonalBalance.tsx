@@ -1,6 +1,6 @@
 import { Heading } from "@babylonlabs-io/bbn-core-ui";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
@@ -10,7 +10,6 @@ import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
-import { calculateTotalBalance } from "@/utils/balance";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
@@ -55,14 +54,16 @@ export function PersonalBalance() {
     enabled: btcConnected,
   });
 
+  const totalBalance = useMemo(
+    () => (btcBalance ?? 0) + getStakedBalance(),
+    [btcBalance, getStakedBalance],
+  );
+
   if (!btcConnected || !cosmosConnected) {
     return null;
   }
 
   const rewardBalance = ubbnToBbn(rewardsQuery.data ?? 0);
-
-  const stakerStakedBalance = getStakedBalance();
-  const totalBalance = calculateTotalBalance(btcBalance, stakerStakedBalance);
 
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
