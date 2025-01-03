@@ -1,4 +1,4 @@
-import { Loader, Table } from "@babylonlabs-io/bbn-core-ui";
+import { Loader, Table, useWatch } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 import { useMemo } from "react";
 
@@ -24,7 +24,6 @@ export const FinalityProviderTable = ({
     searchValue,
     filterValue,
     hasError,
-    handleRowSelect,
     isRowSelectable,
   } = useFinalityProviderState();
 
@@ -35,6 +34,8 @@ export const FinalityProviderTable = ({
       id: fp.btcPk,
     }));
   }, [finalityProviders]);
+
+  const selectedFP = useWatch({ name: "finalityProvider" });
 
   const errorView = (
     <StatusView
@@ -88,9 +89,9 @@ export const FinalityProviderTable = ({
         loading={isFetching}
         hasMore={hasNextPage}
         onLoadMore={fetchNextPage}
+        selectedRow={selectedFP}
         onRowSelect={(row) => {
           if (row) {
-            handleRowSelect(row);
             onSelectRow?.(row.btcPk);
           }
         }}
