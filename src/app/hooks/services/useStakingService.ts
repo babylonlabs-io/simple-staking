@@ -132,7 +132,6 @@ export function useStakingService() {
           stakingTxHashHex,
           stakingTxHex,
         );
-
         updateDelegationStatus(
           stakingTxHashHex,
           DelegationState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,

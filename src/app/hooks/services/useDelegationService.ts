@@ -102,7 +102,6 @@ export function useDelegationService() {
           stakingTxHashHex,
           stakingTxHex,
         );
-
         updateDelegationStatus(
           stakingTxHashHex,
           State.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
@@ -221,8 +220,8 @@ export function useDelegationService() {
       },
     }),
     [
-      updateDelegationStatus,
       submitStakingTx,
+      updateDelegationStatus,
       submitUnbondingTx,
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,

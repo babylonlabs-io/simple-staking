@@ -7,7 +7,9 @@ import { satoshiToBtc } from "@/utils/btc";
 const { coinName } = getNetworkConfigBTC();
 
 export function FeeInfo({ custom = false }: { custom?: boolean }) {
-  const [feeRate, feeAmount] = useWatch({ name: ["feeRate", "feeAmount"] });
+  const [feeRate, feeAmount] = useWatch({
+    name: ["feeRate", "feeAmount"],
+  });
   const deferredFeeRate = useDeferredValue(feeRate);
   const deferredFeeAmount = useDeferredValue(feeAmount);
 
