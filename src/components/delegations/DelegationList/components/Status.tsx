@@ -26,6 +26,7 @@ interface StatusTooltipProps {
 const STATUS_LABELS = {
   PENDING: "Pending",
   VERIFIED: "Verified",
+  PENDING_BTC_CONFIRMATION: "Pending BTC Confirmation",
   ACTIVE: "Active",
   UNBONDING: "Unbonding",
   WITHDRAWABLE: "Withdrawable",
@@ -144,7 +145,7 @@ const STATUSES: Record<
     tooltip: STATUS_MESSAGES.PENDING,
   }),
   [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({ params }) => ({
-    label: STATUS_LABELS.PENDING,
+    label: STATUS_LABELS.PENDING_BTC_CONFIRMATION,
     tooltip: STATUS_MESSAGES.PENDING_BTC_CONFIRMATION(
       params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0,
     ),
