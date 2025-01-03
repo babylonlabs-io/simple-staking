@@ -50,6 +50,11 @@ export const finalityProviderColumns = [
       if (value == null) return "Unknown";
       return mapStatus(value as FinalityProviderState);
     },
+    sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
+      const stateA = a?.state || "unknown";
+      const stateB = b?.state || "unknown";
+      return stateA.localeCompare(stateB);
+    },
   },
   {
     key: "btcPk",
