@@ -1,12 +1,16 @@
-import { useFormState } from "@babylonlabs-io/bbn-core-ui";
+import { useFormContext, useFormState } from "@babylonlabs-io/bbn-core-ui";
 import { PropsWithChildren } from "react";
 
-export const FeeSection = ({ children }: PropsWithChildren) => {
-  const { errors } = useFormState({
-    name: ["finalityProvider", "term", "amount"],
-  });
+const FILEDS = ["finalityProvider", "term", "amount"];
 
-  if (errors.finalityProvider || errors.term || errors.amount) {
+export const FeeSection = ({ children }: PropsWithChildren) => {
+  const { getFieldState } = useFormContext();
+  const formState = useFormState({ name: FILEDS });
+  const fieldStates = FILEDS.map((fieldName) =>
+    getFieldState(fieldName, formState),
+  );
+
+  if (fieldStates.some((field) => field.invalid || !field.isDirty)) {
     return null;
   }
 
