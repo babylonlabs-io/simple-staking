@@ -3,40 +3,54 @@ import {
   DialogBody,
   DialogFooter,
   Heading,
+  Text,
 } from "@babylonlabs-io/bbn-core-ui";
-import { MdLooksTwo } from "react-icons/md";
+import Image from "next/image";
+
+import editIcon from "@/app/assets/edit.svg";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 interface StageStartProps {
   onClose: () => void;
+  onProceed?: () => void;
 }
 
-export function StageStart({ onClose }: StageStartProps) {
+const { networkName } = getNetworkConfigBTC();
+const { networkFullName } = getNetworkConfigBBN();
+
+export function StageStart({ onClose, onProceed }: StageStartProps) {
   return (
     <>
-      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
-        <div className="py-4 flex flex-col items-center gap-4">
-          <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
-            <MdLooksTwo className="text-5xl" />
+      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark items-center">
+        <div className="bg-primary-contrast relative w-[5.5rem] h-[5.5rem]">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <Image src={editIcon} alt="Register" width={44} height={49} />
           </div>
-          <Heading variant="h4">Transition to Phase 2</Heading>
-          <p className="text-base text-center">
-            You are about to transition your phase-1 stake delegation to secure
-            the phase-2 Babylon PoS blockchain. The transition requires the
-            association of your Babylon testnet rewards account with your BTC
-            key as well as your consent to slashing in the case of equivocation.
-          </p>
         </div>
+
+        <Heading variant="h4" className="mt-6 mb-4">
+          Register to {networkFullName}
+        </Heading>
+
+        <Text variant="body1" className="text-center">
+          You are about to register your {networkName} stake to the{" "}
+          {networkFullName}. The registration requires consenting to slashing
+          and the association of your {networkFullName} testnet account with
+          your {networkName} address.
+        </Text>
       </DialogBody>
+
       <DialogFooter className="flex gap-4">
         <Button
           variant="outlined"
           color="primary"
           onClick={onClose}
-          className="flex-1 text-xs sm:text-base"
+          className="flex-1"
         >
           Cancel
         </Button>
-        <Button variant="contained" className="flex-1 text-xs sm:text-base">
+        <Button variant="contained" onClick={onProceed} className="flex-1">
           Proceed
         </Button>
       </DialogFooter>

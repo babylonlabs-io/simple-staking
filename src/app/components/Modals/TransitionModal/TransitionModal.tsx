@@ -6,22 +6,26 @@ import { StageEnd } from "./StageEnd";
 import { StageStart } from "./StageStart";
 import { StageStepping } from "./StageStepping";
 
-interface TransitionModalProps {
+export type TransitionStage =
+  | "start"
+  | "step-1"
+  | "step-2"
+  | "step-3"
+  | "step-4"
+  | "pre-end"
+  | "end";
+
+export interface TransitionModalProps {
   open: boolean;
   onClose: () => void;
   onSign: () => void;
-  stage:
-    | "start"
-    | "step-1"
-    | "step-2"
-    | "step-3"
-    | "step-4"
-    | "pre-end"
-    | "end";
+  onProceed?: () => void;
+  stage: TransitionStage;
 }
+
 const stageUIMapping = {
-  start: ({ onClose }: TransitionModalProps) => (
-    <StageStart onClose={onClose} />
+  start: ({ onClose, onProceed }: TransitionModalProps) => (
+    <StageStart onClose={onClose} onProceed={onProceed} />
   ),
   "step-1": ({ onClose, onSign }: TransitionModalProps) => (
     <StageStepping step={1} onClose={onClose} onSign={onSign} />
@@ -60,6 +64,7 @@ const stageUIMapping = {
   ),
   end: ({ onClose }: TransitionModalProps) => <StageEnd onClose={onClose} />,
 } as const;
+
 export function TransitionModal(props: TransitionModalProps) {
   const { open, onClose, stage } = props;
   const isMobileView = useIsMobileView();
