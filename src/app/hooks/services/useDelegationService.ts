@@ -49,7 +49,7 @@ export function useDelegationService() {
     Record<string, boolean>
   >({});
 
-  const { availableUTXOs = [] } = useAppState();
+  const { availableUTXOs = [], refetchUTXOs } = useAppState();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -107,6 +107,8 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
         );
+
+        refetchUTXOs();
       },
 
       [ACTIONS.UNBOND]: async ({

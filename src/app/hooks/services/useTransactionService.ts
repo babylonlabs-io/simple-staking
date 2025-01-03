@@ -60,11 +60,7 @@ const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 const { coinSymbol } = getNetworkConfigBTC();
 
 export const useTransactionService = () => {
-  const {
-    availableUTXOs: inputUTXOs,
-    networkInfo,
-    refetchUTXOs,
-  } = useAppState();
+  const { availableUTXOs: inputUTXOs, networkInfo } = useAppState();
 
   const { signBbnTx, sendBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
@@ -375,7 +371,6 @@ export const useTransactionService = () => {
         );
       }
       await pushTx(signedStakingTx.toHex());
-      refetchUTXOs();
     },
     [
       versionedParams,
@@ -386,7 +381,6 @@ export const useTransactionService = () => {
       inputUTXOs,
       signPsbt,
       pushTx,
-      refetchUTXOs,
     ],
   );
 
