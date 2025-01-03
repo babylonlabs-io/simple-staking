@@ -10,6 +10,7 @@ import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { calculateTotalBalance } from "@/utils/balance";
 import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
@@ -61,7 +62,7 @@ export function PersonalBalance() {
   const rewardBalance = ubbnToBbn(rewardsQuery.data ?? 0);
 
   const stakerStakedBalance = getStakedBalance();
-  const totalBalance = (btcBalance ?? 0) + stakerStakedBalance;
+  const totalBalance = calculateTotalBalance(btcBalance, stakerStakedBalance);
 
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
