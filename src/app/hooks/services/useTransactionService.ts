@@ -65,7 +65,6 @@ export const useTransactionService = () => {
     networkInfo,
     refetchUTXOs,
   } = useAppState();
-  // const queryUtxos = useUTXOs();
 
   const { signBbnTx, sendBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();

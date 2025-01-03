@@ -12,8 +12,8 @@ const CALCULATION_DELAY = 50;
 
 export function FeeAmountField() {
   const { calculateFeeAmount } = useStakingService();
-  const { setValue, getValues } = useFormContext();
-  const feeRate = useWatch({ name: "feeRate" });
+  const { setValue, getValues, control } = useFormContext();
+  const feeRate = useWatch({ name: "feeRate", control });
   const throttledFeeRate = useThrottle(feeRate, CALCULATION_DELAY);
 
   useEffect(() => {
