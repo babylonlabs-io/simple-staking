@@ -6,6 +6,8 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
+import { useAppState } from "@/app/state";
+import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ubbnToBbn } from "@/utils/bbn";
@@ -31,6 +33,9 @@ export function PersonalBalance() {
   } = useBTCWallet();
   const { connected: cosmosConnected, bech32Address } = useCosmosWallet();
 
+  const { totalBalance: availableBalance } = useAppState();
+  const { getStakedBalance } = useDelegationV2State();
+
   const {
     balanceQuery: { data: cosmosBalance, isLoading: cosmosBalanceLoading },
   } = useBbnQuery();
@@ -55,18 +60,19 @@ export function PersonalBalance() {
 
   const rewardBalance = ubbnToBbn(rewardsQuery.data ?? 0);
 
+  const stakerStakedBalance = getStakedBalance();
+  const totalBalance = (btcBalance ?? 0) + stakerStakedBalance;
+
   return (
     <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
       <Heading variant="h4" className="text-primary-dark md:text-4xl">
         Wallet Balance
       </Heading>
       <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">
-        {/* TODO: Need to add the staker tvl value for the bitcoin balance 
-          as well as remove the filtering on inscription balance*/}
         <StatItem
           loading={btcBalanceLoading}
-          title={`${coinName} Balance`}
-          value={`${satoshiToBtc(btcBalance ?? 0)} ${coinSymbol}`}
+          title={`Total ${coinName} Balance`}
+          value={`${satoshiToBtc(totalBalance)} ${coinSymbol}`}
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
@@ -74,7 +80,7 @@ export function PersonalBalance() {
         <StatItem
           loading={cosmosBalanceLoading}
           title={"Stakable Balance"}
-          value={`${satoshiToBtc(btcBalance ?? 0)} ${coinSymbol}`}
+          value={`${satoshiToBtc(availableBalance)} ${coinSymbol}`}
         />
 
         <div className="divider mx-0 my-2 md:divider-horizontal" />
