@@ -4,8 +4,11 @@ import { useStakingService } from "@/app/hooks/services/useStakingService";
 import { useStakingState } from "@/app/state/StakingState";
 import { DelegationForm } from "@/components/staking/StakingForm";
 import { StakingModal } from "@/components/staking/StakingModal";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
+
+const { networkName } = getNetworkConfigBTC();
 
 export function StakingForm() {
   const {
@@ -21,7 +24,7 @@ export function StakingForm() {
   return (
     <div className="card flex flex-col gap-2 py-4 lg:flex-1">
       <Heading variant="h4" className="text-primary-dark md:text-4xl">
-        Bitcoin Staking
+        {networkName} Staking
       </Heading>
 
       <Form

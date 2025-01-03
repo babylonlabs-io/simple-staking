@@ -34,6 +34,7 @@ export interface AppState {
   ordinalsExcluded: boolean;
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
+  refetchUTXOs: () => void;
 }
 
 const { StateProvider, useState: useApplicationState } =
@@ -44,6 +45,7 @@ const { StateProvider, useState: useApplicationState } =
     ordinalsExcluded: true,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
+    refetchUTXOs: () => {},
   });
 
 export function AppState({ children }: PropsWithChildren) {
@@ -55,6 +57,7 @@ export function AppState({ children }: PropsWithChildren) {
     data: utxos = [],
     isLoading: isUTXOLoading,
     isError: isUTXOError,
+    refetch: refetchUTXOs,
   } = useUTXOs();
   const {
     data: ordinals = [],
@@ -117,6 +120,7 @@ export function AppState({ children }: PropsWithChildren) {
       ordinalsExcluded,
       includeOrdinals,
       excludeOrdinals,
+      refetchUTXOs,
     }),
     [
       availableUTXOs,
@@ -127,6 +131,7 @@ export function AppState({ children }: PropsWithChildren) {
       ordinalsExcluded,
       includeOrdinals,
       excludeOrdinals,
+      refetchUTXOs,
     ],
   );
 
