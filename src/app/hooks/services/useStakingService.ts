@@ -3,7 +3,6 @@ import { useCallback } from "react";
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorContext";
-import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { type FormFields, useStakingState } from "@/app/state/StakingState";
 import {
@@ -23,7 +22,6 @@ export function useStakingService() {
   const { estimateStakingFee, createDelegationEoi, submitStakingTx } =
     useTransactionService();
   const { showError } = useError();
-  const { refetchUTXOs } = useAppState();
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -111,23 +109,18 @@ export function useStakingService() {
   );
 
   const stakeDelegation = useCallback(
-    async ({
-      finalityProviderBtcPksHex,
-      stakingAmount,
-      stakingTimelock,
-      paramsVersion,
-      stakingTxHashHex,
-      stakingTxHex,
-    }: {
-      finalityProviderBtcPksHex: string[];
-      stakingAmount: number;
-      stakingTimelock: number;
-      paramsVersion: number;
-      stakingTxHashHex: string;
-      stakingTxHex: string;
-    }) => {
+    async (delegation: DelegationV2) => {
       try {
         setProcessing(true);
+
+        const {
+          finalityProviderBtcPksHex,
+          stakingAmount,
+          stakingTimelock,
+          paramsVersion,
+          stakingTxHashHex,
+          stakingTxHex,
+        } = delegation;
 
         await submitStakingTx(
           {
@@ -139,7 +132,6 @@ export function useStakingService() {
           stakingTxHashHex,
           stakingTxHex,
         );
-
         updateDelegationStatus(
           stakingTxHashHex,
           DelegationState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
@@ -155,8 +147,6 @@ export function useStakingService() {
             errorState: ErrorState.STAKING,
           },
         });
-      } finally {
-        refetchUTXOs();
       }
     },
     [
@@ -166,7 +156,6 @@ export function useStakingService() {
       setProcessing,
       reset,
       showError,
-      refetchUTXOs,
     ],
   );
 
