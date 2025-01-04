@@ -11,14 +11,8 @@ import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 const { networkName } = getNetworkConfigBTC();
 
 export function StakingForm() {
-  const {
-    loading,
-    validationSchema,
-    stakingInfo,
-    hasError,
-    errorMessage,
-    formData,
-  } = useStakingState();
+  const { loading, validationSchema, stakingInfo, hasError, errorMessage } =
+    useStakingState();
   const { displayPreview } = useStakingService();
 
   return (
@@ -31,7 +25,6 @@ export function StakingForm() {
         className="flex flex-col gap-6 lg:flex-row"
         schema={validationSchema}
         onSubmit={displayPreview}
-        defaultValues={formData}
         reValidateMode="onChange"
       >
         <div className="flex flex-col gap-4 lg:basis-3/5 xl:basis-2/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
