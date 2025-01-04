@@ -37,14 +37,12 @@ interface FinalityProviderState {
   searchValue: string;
   filterValue: string | number;
   finalityProviders: FinalityProvider[];
-  selectedFinalityProvider: FinalityProvider | null;
   hasNextPage: boolean;
   isFetching: boolean;
   hasError: boolean;
   handleSearch: (searchTerm: string) => void;
   handleSort: (sortField: string) => void;
   handleFilter: (value: string | number) => void;
-  handleRowSelect: (row: FinalityProvider | null) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
   getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
@@ -54,7 +52,6 @@ const defaultState: FinalityProviderState = {
   searchValue: "",
   filterValue: "",
   finalityProviders: [],
-  selectedFinalityProvider: null,
   hasNextPage: false,
   isFetching: false,
   hasError: false,
@@ -62,7 +59,6 @@ const defaultState: FinalityProviderState = {
   handleSearch: () => {},
   handleSort: () => {},
   handleFilter: () => {},
-  handleRowSelect: () => {},
   getFinalityProvider: () => null,
   fetchNextPage: () => {},
 };
@@ -79,8 +75,6 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
     fpParam ? "" : "active",
   );
   const [sortState, setSortState] = useState<SortState>({});
-  const [selectedFinalityProvider, setSelectedFinalityProvider] =
-    useState<FinalityProvider | null>(null);
 
   const debouncedSearch = useDebounce(searchValue, 300);
 
@@ -111,10 +105,6 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
 
   const handleFilter = useCallback((value: string | number) => {
     setFilterValue(value);
-  }, []);
-
-  const handleRowSelect = useCallback((row: FinalityProvider | null) => {
-    setSelectedFinalityProvider(row);
   }, []);
 
   const isRowSelectable = useCallback((row: FinalityProvider) => {
@@ -172,14 +162,12 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       searchValue,
       filterValue,
       finalityProviders: filteredFinalityProviders,
-      selectedFinalityProvider,
       isFetching,
       hasNextPage,
       hasError: isError,
       handleSearch,
       handleSort,
       handleFilter,
-      handleRowSelect,
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
@@ -188,14 +176,12 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       searchValue,
       filterValue,
       filteredFinalityProviders,
-      selectedFinalityProvider,
       isFetching,
       hasNextPage,
       isError,
       handleSearch,
       handleSort,
       handleFilter,
-      handleRowSelect,
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
