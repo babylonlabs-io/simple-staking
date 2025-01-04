@@ -91,9 +91,7 @@ export const FinalityProviderTable = ({
         onLoadMore={fetchNextPage}
         selectedRow={selectedFP}
         onRowSelect={(row) => {
-          if (row) {
-            onSelectRow?.(row.btcPk);
-          }
+          onSelectRow?.(row?.btcPk ?? "");
         }}
         isRowSelectable={isRowSelectable}
       />
