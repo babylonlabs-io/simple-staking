@@ -12,4 +12,4 @@ export enum HealthCheckStatus {
 export const API_ERROR_MESSAGE =
   "Error occurred while fetching API. Please try again later";
 export const GEO_BLOCK_MESSAGE =
-  "The Bitcoin Staking functionality is not available in your region";
+  "We're sorry, but this page isn't accessible in your location at the moment due to the regional restrictions";
