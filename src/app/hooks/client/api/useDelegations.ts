@@ -25,7 +25,17 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
         ? lastPage?.pagination?.next_key
         : null,
     initialPageParam: "",
-    refetchInterval: ONE_MINUTE,
+    refetchInterval: (query) => {
+      const totalPages = query.state.data?.pages.length ?? 0;
+      if (
+        totalPages > 0 &&
+        query.state.data?.pages[totalPages - 1].delegations.length === 0
+      ) {
+        // Stop refetching is there is no data available
+        return false;
+      }
+      return ONE_MINUTE;
+    },
     enabled: Boolean(publicKeyNoCoord) && enabled,
     select: (data) => {
       const flattenedData = data.pages.reduce<PaginatedDelegations>(
