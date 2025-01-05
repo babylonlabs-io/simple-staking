@@ -260,7 +260,7 @@ export const Delegations = ({}) => {
 
   return (
     <>
-      <div className="bg-secondary-contrast p-6">
+      <div className="bg-secondary-contrast p-6 border border-primary-dark/20">
         <Heading variant="h6" className="text-primary-light py-2 mb-6">
           Pending Registration
         </Heading>

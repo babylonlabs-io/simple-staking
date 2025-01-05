@@ -70,7 +70,7 @@ export function PersonalBalance() {
       <Heading variant="h4" className="text-primary-dark md:text-4xl">
         Wallet Balance
       </Heading>
-      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">
+      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row border border-primary-dark/20">
         <StatItem
           loading={btcBalanceLoading}
           title={`Total ${coinName} Balance`}
