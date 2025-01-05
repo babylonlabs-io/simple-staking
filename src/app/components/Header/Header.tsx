@@ -11,7 +11,7 @@ export const Header = () => {
 
   return (
     <nav>
-      <section className="bg-primary-main h-[300px] -mb-[250px] md:-mb-[188px]">
+      <section className="bg-primary-main h-[300px] -mb-[208px] md:-mb-[128px]">
         <div className="container h-20 py-6 px-6 mx-auto flex items-center justify-between">
           <Logo />
           <div className="flex items-center gap-4">
