@@ -8,9 +8,9 @@ import { DelegationState } from "@/app/types/delegations";
 interface DelegationActionsProps {
   state: string;
   intermediateState?: string;
-  isEligibleForTransition: boolean;
+  isEligibleForRegistration: boolean;
   stakingTxHashHex: string;
-  onTransition: () => Promise<void>;
+  onRegistration: () => Promise<void>;
   onUnbond: (id: string) => void;
   onWithdraw: (id: string) => void;
 }
@@ -18,16 +18,16 @@ interface DelegationActionsProps {
 export const DelegationActions: React.FC<DelegationActionsProps> = ({
   state,
   intermediateState,
-  isEligibleForTransition,
+  isEligibleForRegistration,
   stakingTxHashHex,
-  onTransition,
+  onRegistration,
   onUnbond,
   onWithdraw,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
-  // We no longer show the transition button when the unbonding transaction is pending
+  // We no longer show the registration button when the unbonding transaction is pending
   if (intermediateState === DelegationState.INTERMEDIATE_UNBONDING) {
     return null;
   }
@@ -55,15 +55,15 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     );
   }
 
-  // Active, eligible for transition
-  if (state === DelegationState.ACTIVE || isEligibleForTransition) {
+  // Active, eligible for registration
+  if (state === DelegationState.ACTIVE || isEligibleForRegistration) {
     return (
       <div
         className="flex justify-end lg:justify-start"
-        data-tooltip-id="tooltip-transition"
+        data-tooltip-id="tooltip-registration"
         data-tooltip-content={
-          state === DelegationState.ACTIVE && !isEligibleForTransition
-            ? "Staking transition is not available yet, come back later"
+          state === DelegationState.ACTIVE && !isEligibleForRegistration
+            ? "Staking registration is not available yet, come back later"
             : ""
         }
       >
@@ -72,17 +72,17 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             variant="outlined"
             size="small"
             color="primary"
-            onClick={onTransition}
+            onClick={onRegistration}
             disabled={
               intermediateState ===
                 DelegationState.INTERMEDIATE_TRANSITIONING ||
-              (state === DelegationState.ACTIVE && !isEligibleForTransition)
+              (state === DelegationState.ACTIVE && !isEligibleForRegistration)
             }
             className="text-sm font-normal border-primary-main/20 bg-white"
           >
             Register
           </Button>
-          <Tooltip id="tooltip-transition" className="tooltip-wrap" />
+          <Tooltip id="tooltip-registration" className="tooltip-wrap" />
         </div>
 
         <button

@@ -16,6 +16,7 @@ import { NetworkInfo } from "../types/networkInfo";
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
 import { FinalityProviderState } from "./FinalityProviderState";
+import { RegistrationState } from "./RegistrationState";
 import { StakingState } from "./StakingState";
 
 const STATE_LIST = [
@@ -23,6 +24,7 @@ const STATE_LIST = [
   DelegationV2State,
   FinalityProviderState,
   StakingState,
+  RegistrationState,
 ];
 
 export interface AppState {

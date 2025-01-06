@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import { FaBitcoin } from "react-icons/fa";
 
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
+import { RegistrationEndModal } from "@/app/components/Modals/RegistrationModal/RegistrationEndModal";
+import { RegistrationStartModal } from "@/app/components/Modals/RegistrationModal/RegistrationStartModal";
+import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { ONE_MINUTE } from "@/app/constants";
-import {
-  type SigningStep,
-  useTransactionService,
-} from "@/app/hooks/services/useTransactionService";
+import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
+import {
+  RegistrationStep,
+  useRegistrationState,
+} from "@/app/state/RegistrationState";
 import {
   type Delegation as DelegationInterface,
   DelegationState,
@@ -19,11 +23,6 @@ import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { durationTillNow } from "@/utils/time";
 import { trim } from "@/utils/trim";
-
-import {
-  TransitionModal,
-  TransitionStage,
-} from "../Modals/TransitionModal/TransitionModal";
 
 import { DelegationCell } from "./components/DelegationCell";
 import { DelegationStatus } from "./components/DelegationStatus";
@@ -38,6 +37,17 @@ interface DelegationProps {
   // has not had time to reflect this change yet
   intermediateState?: string;
 }
+
+// step index
+const STEP_INDEXES: Record<RegistrationStep, number> = {
+  start: 0,
+  "staking-slashing": 1,
+  "unbonding-slashing": 2,
+  "proof-of-possession": 3,
+  "sign-bbn": 4,
+  "send-bbn": 5,
+  complete: 6,
+};
 
 export const Delegation: React.FC<DelegationProps> = ({
   delegation,
@@ -58,58 +68,38 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
-  const { transitionPhase1Delegation } = useTransactionService();
+  const { processing, step, setStep, reset } = useRegistrationState();
+  const { registerPhase1Delegation, startPhase1Registration } =
+    useRegistrationService();
   const { getFinalityProvider } = useFinalityProviderState();
   const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
-  const [isTransactionSigningModalOpen, setIsTransactionSigningModalOpen] =
-    useState(false);
-  const [transitionStage, setTransitionStage] =
-    useState<TransitionStage>("start");
 
   useEffect(() => {
-    const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE); // Update every minute
+    const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE);
     return () => clearInterval(timerId);
   }, []);
 
-  // TODO: Hook up with the transaction signing modal
-  const transitionCallback = async (step: SigningStep) => {
-    console.log(step);
+  const onRegistration = async () => {
+    setStep("start");
   };
 
-  const onTransition = async () => {
-    setIsTransactionSigningModalOpen(true);
-  };
+  const handleProceed = async () => {
+    const registrationData = {
+      stakingTxHex: stakingTx.txHex,
+      startHeight: stakingTx.startHeight,
+      stakingInput: {
+        finalityProviderPkNoCoordHex: finalityProviderPkHex,
+        stakingAmountSat: stakingValueSat,
+        stakingTimelock: stakingTx.timelock,
+      },
+    };
 
-  const handleProceedRegistration = () => {
-    setTransitionStage("step-1");
+    startPhase1Registration(registrationData);
+    // await registerPhase1Delegation(registrationData);
   };
 
   const handleCloseRegistration = () => {
-    setIsTransactionSigningModalOpen(false);
-  };
-
-  useEffect(() => {
-    if (isTransactionSigningModalOpen) {
-      setTransitionStage("start");
-    }
-  }, [isTransactionSigningModalOpen]);
-
-  const handleSign = async () => {
-    try {
-      // Your existing signing logic
-      await transitionPhase1Delegation(
-        stakingTx.txHex,
-        stakingTx.startHeight,
-        {
-          finalityProviderPkNoCoordHex: finalityProviderPkHex,
-          stakingAmountSat: stakingValueSat,
-          stakingTimelock: stakingTx.timelock,
-        },
-        transitionCallback,
-      );
-    } catch (error) {
-      console.error("Failed to process registration:", error);
-    }
+    reset();
   };
 
   const isActive =
@@ -179,9 +169,9 @@ export const Delegation: React.FC<DelegationProps> = ({
             <DelegationActions
               state={state}
               intermediateState={intermediateState}
-              isEligibleForTransition={isEligibleForTransition}
+              isEligibleForRegistration={isEligibleForTransition}
               stakingTxHashHex={stakingTxHashHex}
-              onTransition={onTransition}
+              onRegistration={onRegistration}
               onUnbond={onUnbond}
               onWithdraw={onWithdraw}
             />
@@ -189,12 +179,24 @@ export const Delegation: React.FC<DelegationProps> = ({
         </div>
       </div>
 
-      <TransitionModal
-        open={isTransactionSigningModalOpen}
+      <RegistrationStartModal
+        open={step === "start"}
         onClose={handleCloseRegistration}
-        onSign={handleSign}
-        onProceed={handleProceedRegistration}
-        stage={transitionStage}
+        onProceed={handleProceed}
+      />
+
+      {step && !["start", "complete"].includes(step) && (
+        <SignModal
+          open
+          title="Transition to Phase 2"
+          step={STEP_INDEXES[step]}
+          processing={processing}
+        />
+      )}
+
+      <RegistrationEndModal
+        open={step === "complete"}
+        onClose={handleCloseRegistration}
       />
     </>
   );

@@ -5,13 +5,19 @@ import {
   Heading,
 } from "@babylonlabs-io/bbn-core-ui";
 
-interface StageEndProps {
+import { ResponsiveDialog } from "../ResponsiveDialog";
+
+interface RegistrationEndModalProps {
+  open: boolean;
   onClose: () => void;
 }
 
-export function StageEnd({ onClose }: StageEndProps) {
+export function RegistrationEndModal({
+  open,
+  onClose,
+}: RegistrationEndModalProps) {
   return (
-    <>
+    <ResponsiveDialog open={open} onClose={onClose}>
       <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark items-center">
         <div className="py-4 flex flex-col items-center gap-4">
           <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
@@ -47,6 +53,6 @@ export function StageEnd({ onClose }: StageEndProps) {
           Done
         </Button>
       </DialogFooter>
-    </>
+    </ResponsiveDialog>
   );
 }

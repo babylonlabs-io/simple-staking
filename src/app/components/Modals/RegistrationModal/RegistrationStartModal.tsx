@@ -11,7 +11,10 @@ import editIcon from "@/app/assets/edit.svg";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
-interface StageStartProps {
+import { ResponsiveDialog } from "../ResponsiveDialog";
+
+interface RegistrationStartModalProps {
+  open: boolean;
   onClose: () => void;
   onProceed?: () => void;
 }
@@ -19,9 +22,13 @@ interface StageStartProps {
 const { networkName } = getNetworkConfigBTC();
 const { networkFullName } = getNetworkConfigBBN();
 
-export function StageStart({ onClose, onProceed }: StageStartProps) {
+export function RegistrationStartModal({
+  open,
+  onClose,
+  onProceed,
+}: RegistrationStartModalProps) {
   return (
-    <>
+    <ResponsiveDialog open={open} onClose={onClose}>
       <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark items-center">
         <div className="bg-primary-contrast relative w-[5.5rem] h-[5.5rem]">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
@@ -46,14 +53,18 @@ export function StageStart({ onClose, onProceed }: StageStartProps) {
           variant="outlined"
           color="primary"
           onClick={onClose}
-          className="flex-1"
+          className="flex-1 text-xs sm:text-base"
         >
           Cancel
         </Button>
-        <Button variant="contained" onClick={onProceed} className="flex-1">
+        <Button
+          variant="contained"
+          onClick={onProceed}
+          className="flex-1 text-xs sm:text-base"
+        >
           Proceed
         </Button>
       </DialogFooter>
-    </>
+    </ResponsiveDialog>
   );
 }
