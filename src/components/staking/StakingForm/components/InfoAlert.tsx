@@ -23,7 +23,7 @@ export function InfoAlert() {
         <Text variant="body1">
           You can unbond and withdraw your stake anytime with an unbonding time
           of {blocksToDisplayTime(stakingInfo?.unbondingTime)}.
-        </Text>
+        </Text>{" "}
         <a
           rel="noopener noreferrer"
           className="text-secondary-main hover:text-primary-main"
