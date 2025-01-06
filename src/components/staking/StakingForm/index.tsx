@@ -4,7 +4,9 @@ import { useState } from "react";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
 import { Message } from "@/app/components/Staking/Form/States/Message";
+import walletIcon from "@/app/components/Staking/Form/States/wallet-icon.svg";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { AuthGuard } from "@/components/common/AuthGuard";
 
 import { AmountField } from "./components/AmountField";
@@ -39,6 +41,7 @@ export function DelegationForm({
   stakingInfo,
 }: DelegationFormProps) {
   const [isCustomFee, setIsCustomFee] = useState(false);
+  const { isGeoBlocked } = useHealthCheck();
 
   if (loading) {
     return (
@@ -47,6 +50,15 @@ export function DelegationForm({
   }
 
   if (disabled) {
+    if (isGeoBlocked) {
+      return (
+        <Message
+          icon={walletIcon}
+          title="Unavailable in Your Region"
+          message={error ?? ""}
+        />
+      );
+    }
     // TODO: display error properly https://github.com/babylonlabs-io/simple-staking/commit/6b61dc95e6b86ffa35f274c5dae01c0a5e594b2a
     return (
       <Message
