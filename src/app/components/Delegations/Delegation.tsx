@@ -8,11 +8,8 @@ import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { ONE_MINUTE } from "@/app/constants";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useDelegationState } from "@/app/state/DelegationState";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
-import {
-  RegistrationStep,
-  useRegistrationState,
-} from "@/app/state/RegistrationState";
 import {
   type Delegation as DelegationInterface,
   DelegationState,
@@ -23,6 +20,8 @@ import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { durationTillNow } from "@/utils/time";
 import { trim } from "@/utils/trim";
+
+import { VerificationModal } from "../Modals/VerificationModal";
 
 import { DelegationCell } from "./components/DelegationCell";
 import { DelegationStatus } from "./components/DelegationStatus";
@@ -39,14 +38,16 @@ interface DelegationProps {
 }
 
 // step index
-const STEP_INDEXES: Record<RegistrationStep, number> = {
-  start: 0,
-  "staking-slashing": 1,
-  "unbonding-slashing": 2,
-  "proof-of-possession": 3,
-  "sign-bbn": 4,
-  "send-bbn": 5,
-  complete: 6,
+const REGISTRATION_INDEXES: Record<string, number> = {
+  "registration-staking-slashing": 1,
+  "registration-unbonding-slashing": 2,
+  "registration-proof-of-possession": 3,
+  "registration-sign-bbn": 4,
+};
+
+const VERIFICATION_STEPS: Record<string, 1 | 2> = {
+  "registration-send-bbn": 1,
+  "registration-verifying": 2,
 };
 
 export const Delegation: React.FC<DelegationProps> = ({
@@ -68,9 +69,14 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
   const { isApiNormal, isGeoBlocked } = useHealthCheck();
-  const { processing, step, setStep, reset } = useRegistrationState();
-  const { registerPhase1Delegation, startPhase1Registration } =
-    useRegistrationService();
+  const {
+    processing,
+    registrationStep: step,
+    setRegistrationStep: setStep,
+    setSelectedDelegation,
+    resetRegistration: handleCloseRegistration,
+  } = useDelegationState();
+  const { registerPhase1Delegation } = useRegistrationService();
   const { getFinalityProvider } = useFinalityProviderState();
   const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
@@ -79,27 +85,17 @@ export const Delegation: React.FC<DelegationProps> = ({
     return () => clearInterval(timerId);
   }, []);
 
+  if (!step) {
+    return null;
+  }
+
   const onRegistration = async () => {
-    setStep("start");
+    setSelectedDelegation(delegation);
+    setStep("registration-start");
   };
 
   const handleProceed = async () => {
-    const registrationData = {
-      stakingTxHex: stakingTx.txHex,
-      startHeight: stakingTx.startHeight,
-      stakingInput: {
-        finalityProviderPkNoCoordHex: finalityProviderPkHex,
-        stakingAmountSat: stakingValueSat,
-        stakingTimelock: stakingTx.timelock,
-      },
-    };
-
-    startPhase1Registration(registrationData);
-    // await registerPhase1Delegation(registrationData);
-  };
-
-  const handleCloseRegistration = () => {
-    reset();
+    await registerPhase1Delegation();
   };
 
   const isActive =
@@ -180,22 +176,30 @@ export const Delegation: React.FC<DelegationProps> = ({
       </div>
 
       <RegistrationStartModal
-        open={step === "start"}
+        open={step === "registration-start"}
         onClose={handleCloseRegistration}
         onProceed={handleProceed}
       />
 
-      {step && !["start", "complete"].includes(step) && (
+      {Boolean(REGISTRATION_INDEXES[step]) && (
         <SignModal
           open
           title="Transition to Phase 2"
-          step={STEP_INDEXES[step]}
+          step={REGISTRATION_INDEXES[step]}
           processing={processing}
         />
       )}
 
+      {Boolean(VERIFICATION_STEPS[step]) && (
+        <VerificationModal
+          open={step === "registration-verifying"}
+          processing={processing}
+          step={VERIFICATION_STEPS[step]}
+        />
+      )}
+
       <RegistrationEndModal
-        open={step === "complete"}
+        open={step === "registration-verified"}
         onClose={handleCloseRegistration}
       />
     </>
