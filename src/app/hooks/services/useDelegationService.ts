@@ -7,7 +7,9 @@ import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
+import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { validateDelegation } from "@/utils/delegations";
+import { getBbnParamByVersion } from "@/utils/params";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -40,6 +42,7 @@ type DelegationCommand = (props: TxProps) => Promise<void>;
 interface ConfirmationModalState {
   action: ActionType;
   delegation: DelegationV2;
+  param: BbnStakingParamsVersion;
 }
 
 export function useDelegationService() {
@@ -49,7 +52,7 @@ export function useDelegationService() {
     Record<string, boolean>
   >({});
 
-  const { availableUTXOs = [] } = useAppState();
+  const { availableUTXOs = [], networkInfo } = useAppState();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -230,12 +233,18 @@ export function useDelegationService() {
 
   const openConfirmationModal = useCallback(
     (action: ActionType, delegation: DelegationV2) => {
+      const param = getBbnParamByVersion(
+        delegation.paramsVersion,
+        networkInfo?.params.bbnStakingParams.versions || [],
+      );
+
       setConfirmationModal({
         action,
         delegation,
+        param,
       });
     },
-    [],
+    [networkInfo],
   );
 
   const closeConfirmationModal = useCallback(

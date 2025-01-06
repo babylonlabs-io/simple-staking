@@ -7,7 +7,7 @@ import {
 import { type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfig } from "@/config/network";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -21,7 +21,7 @@ type TableParams = {
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
 };
 
-const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+const networkConfig = getNetworkConfig();
 
 const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
@@ -90,7 +90,7 @@ export function DelegationList() {
   return (
     <div className="bg-secondary-contrast p-6 border border-primary-dark/20">
       <Heading variant="h6" className="text-primary-light py-2 mb-6">
-        {bbnNetworkFullName} Stakes
+        {networkConfig.bbn.networkFullName} Stakes
       </Heading>
 
       <GridTable
@@ -116,9 +116,11 @@ export function DelegationList() {
       <DelegationModal
         action={confirmationModal?.action}
         delegation={confirmationModal?.delegation ?? null}
+        param={confirmationModal?.param ?? null}
         processing={processing}
         onSubmit={executeDelegationAction}
         onClose={closeConfirmationModal}
+        networkConfig={networkConfig}
       />
     </div>
   );
