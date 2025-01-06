@@ -29,7 +29,7 @@ export const Stats = memo(() => {
       <Heading variant="h4" className="text-primary-contrast md:text-4xl">
         Babylon Bitcoin Staking Stats
       </Heading>
-      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row">
+      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row border border-primary-dark/20">
         <StatItem
           loading={isLoading}
           title={`Confirmed ${coinSymbol} TVL`}
