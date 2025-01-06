@@ -2,7 +2,7 @@ import { QueryClient } from "@cosmjs/stargate";
 import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
 import { createContext, useContext, useEffect, useState } from "react";
 
-import { BBN_RPC_URL } from "@/app/common/rpc";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 interface BbnRpcContextType {
   queryClient: QueryClient | undefined;
@@ -20,13 +20,14 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
   const [queryClient, setQueryClient] = useState<QueryClient>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const { rpc } = getNetworkConfigBBN();
 
   useEffect(() => {
     let mounted = true;
 
     const init = async () => {
       try {
-        const tmClient = await Tendermint34Client.connect(BBN_RPC_URL);
+        const tmClient = await Tendermint34Client.connect(rpc);
         const client = QueryClient.withExtensions(tmClient);
 
         if (mounted) {
@@ -46,7 +47,7 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [rpc]);
 
   return (
     <BbnRpcContext.Provider value={{ queryClient, isLoading, error }}>
