@@ -59,7 +59,7 @@ export function DelegationForm({
         />
       );
     }
-    // TODO: display error properly https://github.com/babylonlabs-io/simple-staking/commit/6b61dc95e6b86ffa35f274c5dae01c0a5e594b2a
+
     return (
       <Message
         icon={apiNotAvailable}

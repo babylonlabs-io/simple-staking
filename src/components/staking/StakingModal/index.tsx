@@ -34,7 +34,7 @@ export function StakingModal() {
   } = useStakingState();
   const { getFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
-  const { reset: resetForm } = useFormContext();
+  const { reset: resetForm, trigger: revalidateForm } = useFormContext();
 
   const fp = useMemo(
     () => getFinalityProvider(formData?.finalityProvider ?? ""),
@@ -61,7 +61,14 @@ export function StakingModal() {
           onClose={resetState}
           onSign={async () => {
             await createEOI(formData);
-            resetForm();
+            resetForm({
+              finalityProvider: "",
+              term: "",
+              amount: "",
+              feeRate: stakingInfo?.defaultFeeRate ?? 0,
+              feeAmount: 0,
+            });
+            revalidateForm();
           }}
         />
       )}

@@ -17,15 +17,19 @@ export function StakingForm() {
 
   return (
     <div className="card flex flex-col gap-2 py-4 lg:flex-1">
-      <Heading variant="h4" className="text-primary-dark md:text-4xl">
+      <Heading
+        variant="h4"
+        className="text-primary-dark md:text-4xl capitalize"
+      >
         {networkName} Staking
       </Heading>
 
       <Form
         className="flex flex-col gap-6 lg:flex-row"
         schema={validationSchema}
-        onSubmit={displayPreview}
+        mode="onChange"
         reValidateMode="onChange"
+        onSubmit={displayPreview}
       >
         <div className="flex flex-col gap-4 lg:basis-3/5 xl:basis-2/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
           <FinalityProviders />
