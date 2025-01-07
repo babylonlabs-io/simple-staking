@@ -21,7 +21,7 @@ const STATUSES: Record<
   [FinalityProviderState.JAILED]: {
     tooltip: (
       <span>
-        This finality provider has been jailed.
+        This finality provider has been jailed.{" "}
         <Link
           className="text-secondary-main"
           target="_blank"
@@ -36,7 +36,7 @@ const STATUSES: Record<
   [FinalityProviderState.SLASHED]: {
     tooltip: (
       <span>
-        This finality provider has been slashed.
+        This finality provider has been slashed.{" "}
         <Link
           className="text-secondary-main"
           target="_blank"
@@ -58,8 +58,7 @@ export function FinalityProviderMoniker({
   const finalProvider = getFinalityProvider(value);
   const moniker = finalProvider?.description?.moniker ?? "-";
   const state = finalProvider?.state ?? FinalityProviderState.ACTIVE;
-  const { tooltip = "unknown", status } =
-    STATUSES[state as FinalityProviderState] ?? {};
+  const { tooltip, status } = STATUSES[state as FinalityProviderState] ?? {};
 
   return (
     <Hint tooltip={tooltip} status={status}>

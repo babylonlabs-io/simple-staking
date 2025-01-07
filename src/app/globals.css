@@ -103,7 +103,7 @@ body.modal-open {
 }
 
 .tooltip-wrap {
-  max-width: 20rem;
+  max-width: 25rem;
   white-space: normal;
   word-wrap: break-word;
 }

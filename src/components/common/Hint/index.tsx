@@ -6,7 +6,7 @@ import { twJoin } from "tailwind-merge";
 type HintStatus = "default" | "warning" | "error";
 
 interface HintProps {
-  tooltip: ReactNode;
+  tooltip?: ReactNode;
   status?: HintStatus;
 }
 
@@ -31,22 +31,28 @@ export function Hint({
       )}
     >
       {children && <p>{children}</p>}
-      <span
-        className={twJoin("cursor-pointer text-xs", STATUS_COLORS[status])}
-        data-tooltip-id={id}
-        data-tooltip-content={typeof tooltip === "string" ? tooltip : undefined}
-        data-tooltip-place="top"
-      >
-        <AiOutlineInfoCircle />
-      </span>
-      <Tooltip
-        id={id}
-        className="tooltip-wrap"
-        openOnClick={false}
-        clickable={true}
-      >
-        {typeof tooltip !== "string" && tooltip}
-      </Tooltip>
+      {tooltip && (
+        <>
+          <span
+            className={twJoin("cursor-pointer text-xs", STATUS_COLORS[status])}
+            data-tooltip-id={id}
+            data-tooltip-content={
+              typeof tooltip === "string" ? tooltip : undefined
+            }
+            data-tooltip-place="top"
+          >
+            <AiOutlineInfoCircle />
+          </span>
+          <Tooltip
+            id={id}
+            className="tooltip-wrap"
+            openOnClick={false}
+            clickable={true}
+          >
+            {typeof tooltip !== "string" && tooltip}
+          </Tooltip>
+        </>
+      )}
     </div>
   );
 }
