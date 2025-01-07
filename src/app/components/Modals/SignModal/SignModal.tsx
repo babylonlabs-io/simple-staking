@@ -13,7 +13,7 @@ import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { Step } from "./Step";
 
-interface EOIModalProps {
+interface SignModalProps {
   processing?: boolean;
   open: boolean;
   title: string;
@@ -25,14 +25,14 @@ interface EOIModalProps {
 const { coinSymbol } = getNetworkConfigBTC();
 const { coinSymbol: bbnCoinSymbol } = getNetworkConfigBBN();
 
-export const EOIModal = ({
+export const SignModal = ({
   processing = false,
   open,
   title,
   step,
   onClose,
   onSubmit,
-}: EOIModalProps) => (
+}: SignModalProps) => (
   <ResponsiveDialog open={open} onClose={onClose} hasBackdrop>
     <DialogHeader
       title={title}

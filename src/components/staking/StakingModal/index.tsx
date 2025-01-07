@@ -2,8 +2,8 @@ import { useFormContext } from "@babylonlabs-io/bbn-core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/app/components/Modals/CancelFeedbackModal";
-import { EOIModal } from "@/app/components/Modals/EOIModal/EOIModal";
 import { PreviewModal } from "@/app/components/Modals/PreviewModal";
+import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/app/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/app/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/app/components/Modals/VerificationModal";
@@ -73,7 +73,7 @@ export function StakingModal() {
         />
       )}
       {Boolean(EOI_INDEXES[step]) && (
-        <EOIModal
+        <SignModal
           open
           processing={processing}
           step={EOI_INDEXES[step]}
