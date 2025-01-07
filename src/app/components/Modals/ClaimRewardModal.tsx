@@ -3,6 +3,7 @@ import { PropsWithChildren, useEffect, useState } from "react";
 
 import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { trim } from "@/utils/trim";
 
 import { LoadingSmall } from "../Loading/Loading";
 
@@ -39,6 +40,7 @@ export const ClaimRewardModal = ({
 
   return (
     <ConfirmationModal
+      className="w-[660px] max-w-full"
       open={open}
       processing={false}
       title="Claim tBABY"
@@ -60,7 +62,7 @@ export const ClaimRewardModal = ({
             <Text variant="body1">
               Babylon {shouldDisplayTestingMsg() ? "Test" : ""} Chain Address
             </Text>
-            <Text variant="body1">{address}</Text>
+            <Text variant="body1">{trim(address, 14)}</Text>
           </div>
           <div className="flex flex-row items-center justify-between pt-4">
             <Text variant="body1">Transaction Fees</Text>
