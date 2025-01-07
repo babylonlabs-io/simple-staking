@@ -1,17 +1,17 @@
-export const BBN_DEVNET_RPC_URL = "https://babylon-testnet-rpc.nodes.guru";
-export const BBN_DEVNET_LCD_URL = "https://babylon-testnet-api.nodes.guru";
+export const BBN_TESTNET_RPC_URL = "https://rpc-dapp.testnet.babylonlabs.io/";
+export const BBN_TESTNET_LCD_URL = "https://lcd-dapp.testnet.babylonlabs.io/";
 
 export const bbnTestnet = {
   chainId: "bbn-test-5",
   chainName: "Babylon Phase-2 Testnet",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
-  rpc: BBN_DEVNET_RPC_URL,
-  rest: BBN_DEVNET_LCD_URL,
+  rpc: BBN_TESTNET_RPC_URL,
+  rest: BBN_TESTNET_LCD_URL,
   nodeProvider: {
-    name: "NodesGuru",
-    email: "security@nodes.guru",
-    website: "https://nodes.guru/",
+    name: "Babylonlabs",
+    email: "contact@babylonlabs.io",
+    website: "https://babylonlabs.io/",
   },
   bip44: {
     coinType: 118,
