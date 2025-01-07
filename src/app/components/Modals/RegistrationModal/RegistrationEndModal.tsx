@@ -1,5 +1,7 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
 
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+
 import { SubmitModal } from "../SubmitModal";
 
 interface RegistrationEndModalProps {
@@ -22,6 +24,8 @@ const SuccessIcon = () => (
   </svg>
 );
 
+const { networkFullName } = getNetworkConfigBBN();
+
 export function RegistrationEndModal({
   open,
   onClose,
@@ -37,9 +41,9 @@ export function RegistrationEndModal({
       cancelButton={undefined}
     >
       <Text variant="body1" className="text-center">
-        Your staking transaction has been successfully registered to the Babylon
-        test chain. It will be activated and receive voting power in a few
-        blocks. You can monitor the Activity tab for the activation status.
+        Your staking transaction has been successfully registered to the
+        {networkFullName}. It will be activated and receive voting power in a
+        few blocks. You can monitor the Activity tab for the activation status.
       </Text>
     </SubmitModal>
   );

@@ -39,7 +39,7 @@ export function RegistrationStartModal({
       <Text variant="body1" className="text-center">
         You are about to register your {networkName} stake to the{" "}
         {networkFullName}. The registration requires consenting to slashing and
-        the association of your {networkFullName} testnet account with your{" "}
+        the association of your {networkFullName} account with your{" "}
         {networkName} address.
       </Text>
     </SubmitModal>
