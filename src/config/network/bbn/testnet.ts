@@ -9,9 +9,9 @@ export const bbnTestnet = {
   rpc: BBN_TESTNET_RPC_URL,
   rest: BBN_TESTNET_LCD_URL,
   nodeProvider: {
-    name: "NodesGuru",
-    email: "security@nodes.guru",
-    website: "https://nodes.guru/",
+    name: "Babylonlabs",
+    email: "contact@babylonlabs.io",
+    website: "https://babylonlabs.io/",
   },
   bip44: {
     coinType: 118,
