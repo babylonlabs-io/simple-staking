@@ -1,5 +1,5 @@
 import { Heading, Text } from "@babylonlabs-io/bbn-core-ui";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { PropsWithChildren } from "react";
 
 import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -10,39 +10,31 @@ import { LoadingSmall } from "../Loading/Loading";
 import { ConfirmationModal } from "./ConfirmationModal";
 
 interface ConfirmationModalProps {
+  processing: boolean;
   open: boolean;
+  address: string;
+  receivingValue: string;
+  transactionFee: number;
   onClose: () => void;
   onSubmit: () => void;
-  receivingValue: string;
-  address: string;
-  getTransactionFee: () => Promise<number>;
 }
 
 const { coinSymbol } = getNetworkConfigBBN();
 
 export const ClaimRewardModal = ({
   open,
-  onClose,
-  onSubmit,
+  processing,
   receivingValue,
   address,
-  getTransactionFee,
+  transactionFee,
+  onClose,
+  onSubmit,
 }: PropsWithChildren<ConfirmationModalProps>) => {
-  const [transactionFee, setTransactionFee] = useState<number>(0);
-
-  useEffect(() => {
-    const fetchTransactionFee = async () => {
-      const fee = await getTransactionFee();
-      setTransactionFee(fee);
-    };
-    fetchTransactionFee();
-  }, [getTransactionFee]);
-
   return (
     <ConfirmationModal
       className="w-[660px] max-w-full"
       open={open}
-      processing={false}
+      processing={processing}
       title="Claim tBABY"
       onClose={onClose}
       onSubmit={onSubmit}
