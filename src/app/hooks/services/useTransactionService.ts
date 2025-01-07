@@ -606,6 +606,68 @@ export const useTransactionService = () => {
     ],
   );
 
+  /**
+   * Submit the withdrawal transaction for a slashed staking
+   *
+   * @param stakingInput - The staking inputs
+   * @param paramVersion - The param version of the EOI
+   * @param slashingTxHex - The slashing transaction hex that to be withdrawn
+   */
+  const submitSlashingWithdrawalTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      paramVersion: number,
+      slashingTxHex: string,
+    ) => {
+      // Perform checks
+      if (!versionedParams || versionedParams?.length === 0) {
+        throw new Error("Params not loaded");
+      }
+      if (!btcConnected || !btcNetwork)
+        throw new Error("BTC Wallet not connected");
+
+      validateStakingInput(stakingInput);
+
+      const p = getBbnParamByVersion(paramVersion, versionedParams);
+      if (!p)
+        throw new Error(
+          `Unable to find staking params for version ${paramVersion}`,
+        );
+
+      const staking = new Staking(
+        btcNetwork!,
+        {
+          address,
+          publicKeyNoCoordHex: publicKeyNoCoord,
+        },
+        p,
+        stakingInput.finalityProviderPkNoCoordHex,
+        stakingInput.stakingTimelock,
+      );
+
+      const { psbt } = staking.createWithdrawSlashingTransaction(
+        Transaction.fromHex(slashingTxHex),
+        defaultFeeRate,
+      );
+
+      const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
+      const signedWithdrawalTx = Psbt.fromHex(
+        signedWithdrawalPsbtHex,
+      ).extractTransaction();
+      await pushTx(signedWithdrawalTx.toHex());
+    },
+    [
+      versionedParams,
+      btcConnected,
+      btcNetwork,
+      address,
+      publicKeyNoCoord,
+      signPsbt,
+      pushTx,
+      defaultFeeRate,
+    ],
+  );
+
   return {
     createDelegationEoi,
     estimateStakingFee,
@@ -614,6 +676,7 @@ export const useTransactionService = () => {
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
+    submitSlashingWithdrawalTx,
   };
 };
 

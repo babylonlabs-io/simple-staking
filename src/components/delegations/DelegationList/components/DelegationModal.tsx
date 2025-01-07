@@ -7,6 +7,8 @@ import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
 import { DelegationV2 } from "@/app/types/delegationsV2";
+import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
+import { NetworkConfig } from "@/config/network";
 
 interface ConfirmationModalProps {
   processing: boolean;
@@ -14,6 +16,8 @@ interface ConfirmationModalProps {
   delegation: DelegationV2 | null;
   onSubmit: (action: ActionType, delegation: DelegationV2) => void;
   onClose: () => void;
+  networkConfig: NetworkConfig;
+  param: BbnStakingParamsVersion | null;
 }
 
 export function DelegationModal({
