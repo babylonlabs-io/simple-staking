@@ -28,7 +28,7 @@
     "@babylonlabs-io/babylon-proto-ts": "0.0.3-canary.5",
     "@babylonlabs-io/bbn-core-ui": "0.6.10",
     "@babylonlabs-io/bbn-wallet-connect": "0.1.31",
-    "@babylonlabs-io/btc-staking-ts": "0.4.0-canary.5",
+    "@babylonlabs-io/btc-staking-ts": "0.4.0-canary.5-test-1",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cosmjs/proto-signing": "^0.32.4",

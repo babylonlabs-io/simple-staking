@@ -66,6 +66,7 @@ export function useDelegationService() {
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
+    submitSlashingWithdrawalTx,
   } = useTransactionService();
 
   const validations = useMemo(
@@ -170,7 +171,7 @@ export function useDelegationService() {
           );
         }
 
-        await submitEarlyUnbondedWithdrawalTx(
+        await submitSlashingWithdrawalTx(
           stakingInput,
           paramsVersion,
           slashing.unbondingSlashingTxHex,
@@ -210,7 +211,7 @@ export function useDelegationService() {
           throw new Error("Slashing tx not found, can't submit withdrawal");
         }
 
-        await submitTimelockUnbondedWithdrawalTx(
+        await submitSlashingWithdrawalTx(
           stakingInput,
           paramsVersion,
           slashing.stakingSlashingTxHex,
@@ -228,6 +229,7 @@ export function useDelegationService() {
       submitUnbondingTx,
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,
+      submitSlashingWithdrawalTx,
     ],
   );
 
