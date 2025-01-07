@@ -645,7 +645,7 @@ export const useTransactionService = () => {
         stakingInput.stakingTimelock,
       );
 
-      const { psbt } = staking.createWithdrawSlashedStakingTransaction(
+      const { psbt } = staking.createWithdrawSlashingTransaction(
         Transaction.fromHex(slashingTxHex),
         defaultFeeRate,
       );
