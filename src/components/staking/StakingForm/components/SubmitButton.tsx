@@ -4,30 +4,39 @@ import { Tooltip } from "react-tooltip";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 
 export function SubmitButton() {
-  const { isValid } = useFormState();
+  const { isValid, errors } = useFormState();
   // TODO: improve later
   const {
     balanceQuery: { data: bbnBalance = 0 },
   } = useBbnQuery();
 
+  const [errorMessage] = Object.keys(errors).map(
+    (fieldName) => (errors[fieldName]?.message as string) ?? "",
+  );
+
+  const invalid = !isValid || bbnBalance === 0;
+  const tooltip =
+    errorMessage ??
+    (bbnBalance === 0 ? "Insufficient BABY Balance in Babylon Wallet" : "");
+
   return (
     <span
       className="cursor-pointer text-xs mt-4"
       data-tooltip-id="tooltip-staking-preview"
-      data-tooltip-content=""
+      data-tooltip-content={invalid ? tooltip : ""}
       data-tooltip-place="top"
     >
       <Button
         //@ts-ignore - fix type issue in core-ui
         type="submit"
-        disabled={!isValid || bbnBalance === 0}
+        disabled={invalid}
         size="large"
         fluid
       >
         Preview
       </Button>
 
-      <Tooltip id="tooltip-staking-preview" className="tooltip-wrap" />
+      <Tooltip id="tooltip-staking-preview" className="tooltip-wrap z-50" />
     </span>
   );
 }

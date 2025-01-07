@@ -105,12 +105,12 @@ export const PreviewModal = ({
     {
       key: "Term",
       value: (
-        <Text variant="body1">
-          {stakingTimelock} blocks
+        <>
+          <Text variant="body1">{stakingTimelock} blocks</Text>
           <Text variant="body2" className="text-gray-500">
             ~ {blocksToDisplayTime(stakingTimelock)}
           </Text>
-        </Text>
+        </>
       ),
     },
     {

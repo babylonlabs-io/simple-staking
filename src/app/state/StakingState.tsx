@@ -195,11 +195,11 @@ export function StakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking term must be greater than 0.")
             .min(
               stakingInfo?.minStakingTimeBlocks ?? 0,
-              `Staking amount must be at least ${stakingInfo?.minStakingTimeBlocks ?? 0} blocks.`,
+              `Staking term must be at least ${stakingInfo?.minStakingTimeBlocks ?? 0} blocks.`,
             )
             .max(
               stakingInfo?.maxStakingTimeBlocks ?? 0,
-              `Staking amount must be no more than ${stakingInfo?.maxStakingTimeBlocks ?? 0} blocks.`,
+              `Staking term must be no more than ${stakingInfo?.maxStakingTimeBlocks ?? 0} blocks.`,
             ),
 
           amount: number()

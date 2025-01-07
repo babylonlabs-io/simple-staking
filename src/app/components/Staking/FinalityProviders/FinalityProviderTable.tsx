@@ -35,7 +35,7 @@ export const FinalityProviderTable = ({
     }));
   }, [finalityProviders]);
 
-  const selectedFP = useWatch({ name: "finalityProvider" });
+  const selectedFP = useWatch({ name: "finalityProvider", defaultValue: "" });
 
   const errorView = (
     <StatusView

@@ -33,5 +33,5 @@ export function FeeAmountField() {
     });
   }, [throttledFeeRate, getValues, setValue, calculateFeeAmount]);
 
-  return <HiddenField name="feeAmount" defaultValue="0" />;
+  return <HiddenField displayError name="feeAmount" defaultValue="0" />;
 }

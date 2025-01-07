@@ -20,18 +20,19 @@ export function FeeRateField({
   if (!expanded) {
     return (
       <div>
-        <HiddenField
-          key={defaultRate}
-          name="feeRate"
-          defaultValue={defaultRate?.toString()}
-        />
-
         <button
           className="btn btn-sm btn-link w-full no-underline"
           onClick={onExpand}
         >
           Use Custom
         </button>
+
+        <HiddenField
+          displayError
+          key={defaultRate}
+          name="feeRate"
+          defaultValue={defaultRate?.toString()}
+        />
       </div>
     );
   }
