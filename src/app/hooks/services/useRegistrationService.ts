@@ -80,10 +80,9 @@ export function useRegistrationService() {
 
       const delegation = await retry(
         () => getDelegationV2(selectedDelegation.stakingTxHashHex),
-        (delegation) => delegation?.state === DelegationState.VERIFIED,
+        (delegation) => delegation?.state === DelegationState.ACTIVE,
         5 * ONE_SECOND,
       );
-
       if (delegation) {
         setStep("registration-verified");
       }
