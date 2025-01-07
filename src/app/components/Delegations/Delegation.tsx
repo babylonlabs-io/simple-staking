@@ -85,10 +85,6 @@ export const Delegation: React.FC<DelegationProps> = ({
     return () => clearInterval(timerId);
   }, []);
 
-  if (!step) {
-    return null;
-  }
-
   const onRegistration = async () => {
     setSelectedDelegation(delegation);
     setStep("registration-start");
@@ -181,7 +177,7 @@ export const Delegation: React.FC<DelegationProps> = ({
         onProceed={handleProceed}
       />
 
-      {Boolean(REGISTRATION_INDEXES[step]) && (
+      {step && Boolean(REGISTRATION_INDEXES[step]) && (
         <SignModal
           open
           title="Transition to Phase 2"
@@ -190,9 +186,9 @@ export const Delegation: React.FC<DelegationProps> = ({
         />
       )}
 
-      {Boolean(VERIFICATION_STEPS[step]) && (
+      {step && Boolean(VERIFICATION_STEPS[step]) && (
         <VerificationModal
-          open={step === "registration-verifying"}
+          open
           processing={processing}
           step={VERIFICATION_STEPS[step]}
         />
