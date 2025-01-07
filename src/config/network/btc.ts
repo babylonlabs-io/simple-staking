@@ -41,8 +41,9 @@ export function getNetworkConfigBTC(): BTCConfig {
       return config.mainnet;
     case Network.SIGNET:
       return config.signet;
+    // we do not use Testnet
     case Network.TESTNET:
-      return config.testnet;
+      return config.signet;
     default:
       return config.signet;
   }
