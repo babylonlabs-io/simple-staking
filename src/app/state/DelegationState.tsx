@@ -40,6 +40,7 @@ interface DelegationState {
   setProcessing: (value: boolean) => void;
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
+  refetch: () => void;
 }
 
 const { StateProvider, useState: useDelegationState } =
@@ -56,11 +57,12 @@ const { StateProvider, useState: useDelegationState } =
     setProcessing: () => null,
     setSelectedDelegation: () => null,
     resetRegistration: () => null,
+    refetch: () => null,
   });
 
 export function DelegationState({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
-  const { data, fetchNextPage, isFetchingNextPage, hasNextPage } =
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
     useDelegations();
 
   // States
@@ -130,6 +132,7 @@ export function DelegationState({ children }: PropsWithChildren) {
       setProcessing,
       setSelectedDelegation,
       resetRegistration,
+      refetch,
     }),
     [
       delegations,
@@ -144,6 +147,7 @@ export function DelegationState({ children }: PropsWithChildren) {
       setProcessing,
       setSelectedDelegation,
       resetRegistration,
+      refetch,
     ],
   );
 
