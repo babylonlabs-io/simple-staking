@@ -11,6 +11,9 @@ import { Params } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
+import { getSlashingAmount } from "@/utils/delegations/slashing";
+import { maxDecimals } from "@/utils/maxDecimals";
+import { getBbnParamByVersion } from "@/utils/params";
 import { blocksToDisplayTime } from "@/utils/time";
 
 interface StatusProps {
@@ -21,6 +24,7 @@ interface StatusTooltipProps {
   params?: Params;
   amount?: number;
   coinName?: string;
+  slashingAmount?: number;
 }
 
 const STATUS_LABELS = {
@@ -53,12 +57,14 @@ const STATUS_MESSAGES = {
   WITHDRAWAL_PENDING: "Withdrawal transaction pending confirmation on Bitcoin",
   UNBONDING: (unbondingTime: number) =>
     `It will take ${blocksToDisplayTime(unbondingTime)} before you can withdraw your stake.`,
-  SLASHED: (amount: number, coinName: string) => (
+  SLASHED: (amount: number, coinName: string, slashingAmount: number) => (
     <>
+      The Finality Provider you selected has been slashed, result in{" "}
       <b>
-        {satoshiToBtc(amount)} {coinName}
+        {maxDecimals(satoshiToBtc(slashingAmount), 8)} {coinName}
       </b>{" "}
-      was slashed from your stake due to the finality provider double voting.{" "}
+      being deducted from your delegation. It will take was slashed from your
+      stake due to the finality provider double voting.{" "}
       <Link
         className="text-secondary-main"
         target="_blank"
@@ -108,19 +114,39 @@ const STATUSES: Record<
     label: STATUS_LABELS.WITHDRAWABLE,
     tooltip: STATUS_MESSAGES.EARLY_UNBONDING_WITHDRAWABLE,
   }),
-  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: ({ amount, coinName }) => ({
+  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: ({
+    amount,
+    coinName,
+    slashingAmount,
+  }) => ({
     label: STATUS_LABELS.WITHDRAWABLE,
-    tooltip: STATUS_MESSAGES.SLASHED(amount ?? 0, coinName ?? ""),
+    tooltip: STATUS_MESSAGES.SLASHED(
+      amount ?? 0,
+      coinName ?? "",
+      slashingAmount ?? 0,
+    ),
     status: "error",
   }),
-  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: ({ amount, coinName }) => ({
+  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: ({
+    amount,
+    coinName,
+    slashingAmount,
+  }) => ({
     label: STATUS_LABELS.WITHDRAWABLE,
-    tooltip: STATUS_MESSAGES.SLASHED(amount ?? 0, coinName ?? ""),
+    tooltip: STATUS_MESSAGES.SLASHED(
+      amount ?? 0,
+      coinName ?? "",
+      slashingAmount ?? 0,
+    ),
     status: "error",
   }),
-  [State.SLASHED]: ({ amount, coinName }) => ({
+  [State.SLASHED]: ({ amount, coinName, slashingAmount }) => ({
     label: STATUS_LABELS.SLASHED,
-    tooltip: STATUS_MESSAGES.SLASHED(amount ?? 0, coinName ?? ""),
+    tooltip: STATUS_MESSAGES.SLASHED(
+      amount ?? 0,
+      coinName ?? "",
+      slashingAmount ?? 0,
+    ),
     status: "error",
   }),
   [State.TIMELOCK_WITHDRAWN]: () => ({
@@ -175,6 +201,13 @@ const STATUSES: Record<
 export function Status({ delegation }: StatusProps) {
   const { networkInfo } = useAppState();
   const { coinName } = getNetworkConfigBTC();
+
+  const param = getBbnParamByVersion(
+    delegation.paramsVersion,
+    networkInfo?.params.bbnStakingParams.versions || [],
+  );
+  const slashingAmount = getSlashingAmount(delegation.stakingAmount, param);
+
   const {
     label = "unknown",
     tooltip = "unknown",
@@ -183,6 +216,7 @@ export function Status({ delegation }: StatusProps) {
     params: networkInfo?.params,
     amount: delegation.stakingAmount,
     coinName,
+    slashingAmount,
   }) ?? {};
 
   return (
