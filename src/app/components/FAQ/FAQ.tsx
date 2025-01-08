@@ -1,19 +1,16 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
-
+import { Section as SectionContainer } from "@/app/components/Section/Section";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { questions } from "./data/questions";
 import { Section } from "./Section";
+
 interface FAQProps {}
 
 export const FAQ: React.FC<FAQProps> = () => {
   const { coinName } = getNetworkConfigBTC();
 
   return (
-    <div className="container mx-auto flex flex-col gap-2 p-6">
-      <Heading as="h3" variant="h4" className="mb-8 text-primary-dark">
-        FAQ’s
-      </Heading>
+    <SectionContainer title="FAQ’s">
       <div className="flex flex-col gap-4 bg-warning-contrast border border-primary-light/20 rounded divide-y p-6">
         {questions(coinName).map((question) => (
           <Section
@@ -23,6 +20,6 @@ export const FAQ: React.FC<FAQProps> = () => {
           />
         ))}
       </div>
-    </div>
+    </SectionContainer>
   );
 };

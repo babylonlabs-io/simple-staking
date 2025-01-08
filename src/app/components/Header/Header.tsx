@@ -1,5 +1,6 @@
 import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
 
+import { Container } from "@/app/components/Container/Container";
 import { useAppState } from "@/app/state";
 
 import { Logo } from "../Logo/Logo";
@@ -10,15 +11,13 @@ export const Header = () => {
   const { isLoading: loading } = useAppState();
 
   return (
-    <nav>
-      <section className="bg-primary-main h-[300px] -mb-[208px] md:-mb-[128px]">
-        <div className="container h-20 py-6 px-6 mx-auto flex items-center justify-between">
-          <Logo />
-          <div className="flex items-center gap-4">
-            <Connect loading={loading} onConnect={open} />
-          </div>
+    <header className="bg-primary-main h-[18.75rem]">
+      <Container className="h-20 flex items-center justify-between">
+        <Logo />
+        <div className="flex items-center gap-4">
+          <Connect loading={loading} onConnect={open} />
         </div>
-      </section>
-    </nav>
+      </Container>
+    </header>
   );
 };

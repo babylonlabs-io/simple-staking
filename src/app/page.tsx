@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { StakingForm } from "@/app/components/Staking/StakingForm";
 
 import { Banner } from "./components/Banner/Banner";
+import { Container } from "./components/Container/Container";
 import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
@@ -25,15 +26,18 @@ const Home = () => {
     <>
       <Banner />
       <Header />
-      <div className="container mx-auto flex justify-center p-6">
-        <div className="container flex flex-col gap-6">
-          <Stats />
-          <PersonalBalance />
-          <StakingForm />
-          <Activity />
-        </div>
-      </div>
-      <FAQ />
+
+      <Container
+        as="main"
+        className="-mt-[10rem] md:-mt-[6.25rem] flex flex-col gap-12 md:gap-16 pb-16"
+      >
+        <Stats />
+        <PersonalBalance />
+        <StakingForm />
+        <Activity />
+        <FAQ />
+      </Container>
+
       <Footer />
       <Phase2HereModal
         open={showPhase2HereModal}

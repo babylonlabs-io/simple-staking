@@ -4,6 +4,7 @@ import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
 import BitcoinBlock from "@/app/assets/bitcoin-block.svg";
+import { Container } from "@/app/components/Container/Container";
 
 import { Footer } from "../Footer/Footer";
 import { SimplifiedHeader } from "../Header/SimplifiedHeader";
@@ -24,7 +25,8 @@ export default function GenericError({
   return (
     <div className="h-full min-h-svh w-full flex flex-col justify-between">
       <SimplifiedHeader isMinimal />
-      <div className="container mx-auto py-12 px-6">
+
+      <Container className="py-12 px-6">
         <div className="flex flex-col items-center justify-center gap-8">
           <Image
             src={image}
@@ -48,7 +50,8 @@ export default function GenericError({
             Back to homepage
           </Button>
         </div>
-      </div>
+      </Container>
+
       <Footer />
     </div>
   );

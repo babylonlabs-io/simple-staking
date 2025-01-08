@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <Providers>
-          <main
+          <div
             className={twJoin(
               `relative h-full min-h-svh w-full`,
               network === Network.MAINNET
@@ -35,7 +35,7 @@ export default function RootLayout({
             )}
           >
             {children}
-          </main>
+          </div>
         </Providers>
       </body>
     </html>
