@@ -41,9 +41,9 @@ export const bbnDevnet = {
       coinImageUrl:
         "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
       gasPriceStep: {
-        low: 0.007,
-        average: 0.007,
-        high: 0.01,
+        low: 0.002,
+        average: 0.004,
+        high: 0.006,
       },
     },
   ],
