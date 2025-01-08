@@ -50,6 +50,7 @@ jobs:
             NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}
             NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
             NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+            NEXT_PUBLIC_COMMIT_HASH=${{ github.sha }}
       - name: Upload Docker image to workspace
         uses: actions/upload-artifact@v4
         with:
