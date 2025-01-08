@@ -51,7 +51,7 @@ export const getDelegations = async (
     staker_btc_pk: publicKeyNoCoord,
     // We only fetch for states that can have pending actions.
     // We don't care terminal states such as "withdrawn" or "transitioned".
-    state: ["active", "unbonded", "unbonding", "unbonding_requested"],
+    pending_action: true,
   };
 
   const response = await apiWrapper(
