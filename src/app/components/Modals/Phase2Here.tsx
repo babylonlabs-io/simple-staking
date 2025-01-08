@@ -51,7 +51,7 @@ export const Phase2HereModal = ({
         gradually expand to allow the registration of all existing stakers and
         the creation of new ones.{" "}
         <a href="https://babylonlabs.io/blog/babylon-phase-2-testnet-launch">
-          Learn more here
+          Learn more here.
         </a>
       </p>
       {shouldDisplayTestingMsg() && (
