@@ -16,6 +16,7 @@ export const SuccessFeedbackModal: React.FC<FeedbackModalProps> = ({
     title="Conratulations"
     open={open}
     submitButton="Done"
+    cancelButton=""
     onSubmit={onClose}
   >
     <p className="text-base text-center">

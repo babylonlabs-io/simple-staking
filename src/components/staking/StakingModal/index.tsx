@@ -92,6 +92,7 @@ export function StakingModal() {
           open={step === "verified"}
           processing={processing}
           onSubmit={() => stakeDelegation(verifiedDelegation)}
+          onClose={resetState}
         />
       )}
       <SuccessFeedbackModal

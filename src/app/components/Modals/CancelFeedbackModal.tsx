@@ -16,6 +16,7 @@ export const CancelFeedbackModal: React.FC<FeedbackModalProps> = ({
     title="We Value Your Feedback"
     open={open}
     submitButton="Done"
+    cancelButton=""
     onSubmit={onClose}
   >
     <p className="text-base">
