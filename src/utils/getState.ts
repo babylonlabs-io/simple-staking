@@ -7,7 +7,7 @@ const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 export const getState = (state: string) => {
   switch (state) {
     case DelegationState.ACTIVE:
-      return "Active";
+      return "Pending Registration";
     case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding Requested";
     case DelegationState.UNBONDING:
@@ -39,8 +39,8 @@ export const getState = (state: string) => {
 // Create state tooltips for the additional information
 export const getStateTooltip = (state: string) => {
   switch (state) {
-    case DelegationState.ACTIVE: // active state is shwon
-      return "Stake is active";
+    case DelegationState.ACTIVE:
+      return "Stake is pending registration to the Babylon chain";
     case DelegationState.UNBONDING_REQUESTED:
       return "Stake is requesting unbonding";
     case DelegationState.UNBONDED:
