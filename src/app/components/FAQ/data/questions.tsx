@@ -79,7 +79,7 @@ export const questions = (coinName: string): Question[] => {
         <p>
           Hands-on stakers can operate the{" "}
           <a
-            href="https://github.com/babylonlabs-io/btc-staker/blob/dev/docs/create-phase1-staking.md"
+            href="https://github.com/babylonlabs-io/btc-staker/blob/main/README.md"
             target="_blank"
             rel="noopener noreferrer"
             className="text-primary"
