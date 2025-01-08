@@ -10,7 +10,7 @@ export const FAQ: React.FC<FAQProps> = () => {
   const { coinName } = getNetworkConfigBTC();
 
   return (
-    <div className="container mx-auto flex flex-col gap-2 p-6">
+    <div className="container mx-auto flex flex-col gap-2 py-6 px-4 md:px-6">
       <Heading as="h3" variant="h4" className="mb-8 text-primary-dark">
         FAQ’s
       </Heading>

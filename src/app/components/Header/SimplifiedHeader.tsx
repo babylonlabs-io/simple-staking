@@ -15,7 +15,7 @@ export const SimplifiedHeader = ({
           isMinimal ? "h-[84px]" : "h-[300px]",
         )}
       >
-        <div className="container h-20 py-6 px-6 mx-auto flex items-center justify-between">
+        <div className="container h-20 py-6 px-4 md:px-6 mx-auto flex items-center justify-between">
           <Logo />
         </div>
       </section>

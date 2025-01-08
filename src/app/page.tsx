@@ -24,7 +24,7 @@ const Home = () => {
     <>
       <Banner />
       <Header />
-      <div className="container mx-auto flex justify-center p-6">
+      <div className="container mx-auto flex justify-center py-6 px-4 md:px-6">
         <div className="container flex flex-col gap-6">
           <Stats />
           <PersonalBalance />

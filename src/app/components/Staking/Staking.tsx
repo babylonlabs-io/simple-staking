@@ -510,7 +510,7 @@ export const Staking = () => {
   };
 
   return (
-    <div className="card flex flex-col gap-2 p-4 lg:flex-1">
+    <div className="card flex flex-col gap-2 lg:flex-1">
       <Heading variant="h4" className="text-primary-dark md:text-4xl">
         Bitcoin Staking
       </Heading>
