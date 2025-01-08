@@ -21,6 +21,7 @@ interface DelegationV2State {
   fetchMoreDelegations: () => void;
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   getStakedBalance: () => number;
+  refetch: () => void;
 }
 
 const STAKED_BALANCE_STATUSES = [
@@ -45,11 +46,12 @@ const { StateProvider, useState } = createStateUtils<DelegationV2State>({
   fetchMoreDelegations: () => {},
   findDelegationByTxHash: () => undefined,
   getStakedBalance: () => 0,
+  refetch: () => {},
 });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
-  const { data, fetchNextPage, isFetchingNextPage, hasNextPage } =
+  const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
     useDelegationsV2();
 
   // States
@@ -101,6 +103,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       findDelegationByTxHash,
       fetchMoreDelegations: fetchNextPage,
       getStakedBalance,
+      refetch,
     }),
     [
       delegations,
@@ -111,6 +114,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       findDelegationByTxHash,
       fetchNextPage,
       getStakedBalance,
+      refetch,
     ],
   );
 

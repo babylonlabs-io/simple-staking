@@ -7,7 +7,6 @@ import { RegistrationStartModal } from "@/app/components/Modals/RegistrationModa
 import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { ONE_MINUTE } from "@/app/constants";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
-import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useDelegationState } from "@/app/state/DelegationState";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
@@ -68,7 +67,6 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   const { startTimestamp } = stakingTx;
   const [currentTime, setCurrentTime] = useState(Date.now());
-  const { isApiNormal, isGeoBlocked } = useHealthCheck();
   const {
     processing,
     registrationStep: step,

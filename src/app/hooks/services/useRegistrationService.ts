@@ -27,9 +27,11 @@ export function useRegistrationService() {
     setProcessing,
     selectedDelegation,
     resetRegistration: reset,
+    refetch: refetchV1Delegations,
   } = useDelegationState();
   const { transitionPhase1Delegation } = useTransactionService();
-  const { addDelegation } = useDelegationV2State();
+  const { addDelegation, refetch: refetchV2Delegations } =
+    useDelegationV2State();
   const { showError } = useError();
 
   const registerPhase1Delegation = useCallback(async () => {
@@ -85,6 +87,9 @@ export function useRegistrationService() {
       );
       if (delegation) {
         setStep("registration-verified");
+        // Refetch both v1 and v2 delegations to reflect the latest state
+        refetchV1Delegations();
+        refetchV2Delegations();
       }
       setProcessing(false);
     } catch (error: any) {
@@ -104,6 +109,8 @@ export function useRegistrationService() {
     showError,
     selectedDelegation,
     addDelegation,
+    refetchV1Delegations,
+    refetchV2Delegations,
   ]);
 
   return { registerPhase1Delegation };
