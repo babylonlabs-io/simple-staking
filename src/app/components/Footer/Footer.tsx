@@ -68,10 +68,10 @@ const iconLinks = [
 
 export const Footer: React.FC = () => {
   return (
-    <div className="relative md:flex h-[238px] text-white bg-primary-main before:absolute before:h-3 before:w-2/3 before:bg-primary-main before:left-1/4 before:-top-2 text-primary-contrast">
-      <div className="container mx-auto flex flex-row items-center justify-around">
+    <div className="relative md:flex md:h-[238px] pb-10 md:pb-0 text-white bg-primary-main before:absolute before:h-3 before:w-2/3 before:bg-primary-main before:left-1/4 before:-top-2 text-primary-contrast">
+      <div className="container mx-auto flex flex-row flex-wrap items-center justify-around">
         <div className="flex flex-col">
-          <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
+          <div className="flex flex-wrap justify-center gap-8 p-4 pt-10 md:flex-row md:p-6 md:pt-2">
             {iconLinks.map(({ name, url, Icon }) => (
               <div
                 key={name}
@@ -88,7 +88,7 @@ export const Footer: React.FC = () => {
               </div>
             ))}
           </div>
-          <div>
+          <div className="text-center p-4 sm:p-0">
             <a
               href="https://babylonlabs.io/terms-of-use"
               target="_blank"
