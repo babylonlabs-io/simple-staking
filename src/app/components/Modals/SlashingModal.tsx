@@ -21,7 +21,7 @@ export const SlashingModal = (props: UnbondModalProps) => {
   return (
     <ConfirmationModal title="Withdraw Balance" {...props}>
       <Text variant="body1" className="pt-8 pb-10">
-        Your finality provider equivocated(double-voted) leading to{" "}
+        Your finality provider equivocated (double-voted) leading to{" "}
         {slashingRate}% of your stake getting slashed. You are about to withdraw
         the remaining balance. A transaction fee will be deducted from your
         stake by the {networkConfig.btc.networkName} network.
