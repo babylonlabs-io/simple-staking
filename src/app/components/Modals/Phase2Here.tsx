@@ -49,7 +49,10 @@ export const Phase2HereModal = ({
         During the initial phase of the {bbnNetworkFullName} launch, eligibility
         criteria will be in place for stake registration. Over time, access will
         gradually expand to allow the registration of all existing stakers and
-        the creation of new ones. Learn more here
+        the creation of new ones.{" "}
+        <a href="https://babylonlabs.io/blog/babylon-phase-2-testnet-launch">
+          Learn more here
+        </a>
       </p>
       {shouldDisplayTestingMsg() && (
         <p className="text-base text-center">
