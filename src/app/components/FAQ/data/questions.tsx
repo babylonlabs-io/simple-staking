@@ -11,11 +11,11 @@ export const questions = (coinName: string): Question[] => {
       title: "What is Babylon?",
       content: (
         <p>
-          Babylon is a suite of security-sharing protocols that bring Bitcoin\’s
-          unparalleled security to the decentralized world. The latest protocol,
-          Bitcoin Staking, enables Bitcoin holders to stake their Bitcoin to
-          provide crypto-economic security to PoS (proof-of-stake) systems in a
-          trustless and self-custodial way.
+          Babylon is a suite of security-sharing protocols that bring
+          Bitcoin&apos;s unparalleled security to the decentralized world. The
+          latest protocol, Bitcoin Staking, enables Bitcoin holders to stake
+          their Bitcoin to provide crypto-economic security to PoS
+          (proof-of-stake) systems in a trustless and self-custodial way.
         </p>
       ),
     },
