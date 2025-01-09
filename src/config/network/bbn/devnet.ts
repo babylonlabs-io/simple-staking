@@ -26,7 +26,7 @@ export const bbnDevnet = {
   },
   currencies: [
     {
-      coinDenom: "BBN",
+      coinDenom: "BABY",
       coinMinimalDenom: "ubbn",
       coinDecimals: 6,
       coinImageUrl:
@@ -35,7 +35,7 @@ export const bbnDevnet = {
   ],
   feeCurrencies: [
     {
-      coinDenom: "BBN",
+      coinDenom: "BABY",
       coinMinimalDenom: "ubbn",
       coinDecimals: 6,
       coinImageUrl:
@@ -48,7 +48,7 @@ export const bbnDevnet = {
     },
   ],
   stakeCurrency: {
-    coinDenom: "BBN",
+    coinDenom: "BABY",
     coinMinimalDenom: "ubbn",
     coinDecimals: 6,
     coinImageUrl:
