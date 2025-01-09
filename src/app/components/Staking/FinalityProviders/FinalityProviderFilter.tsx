@@ -8,14 +8,15 @@ const options = [
 ];
 
 export const FinalityProviderFilter = () => {
-  const { filterValue, handleFilter } = useFinalityProviderState();
+  const { filterValue, handleFilter, searchValue } = useFinalityProviderState();
 
   return (
     <Select
       options={options}
       onSelect={handleFilter}
       placeholder="Select Status"
-      defaultValue={filterValue}
+      value={searchValue ? "" : filterValue}
+      disabled={Boolean(searchValue)}
       renderSelectedOption={(option) => `Showing ${option.label}`}
     />
   );

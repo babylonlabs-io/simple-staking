@@ -3,7 +3,6 @@ import { useSearchParams } from "next/navigation";
 import {
   Suspense,
   useCallback,
-  useEffect,
   useMemo,
   useState,
   type PropsWithChildren,
@@ -70,11 +69,15 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
   const searchParams = useSearchParams();
   const fpParam = searchParams.get("fp");
 
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState(fpParam || "");
   const [filterValue, setFilterValue] = useState<string | number>(
     fpParam ? "" : "active",
   );
   const [sortState, setSortState] = useState<SortState>({});
+  const [previousFilterValue, setPreviousFilterValue] = useState<
+    string | number
+  >("active");
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   const debouncedSearch = useDebounce(searchValue, 300);
 
@@ -85,9 +88,26 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       name: debouncedSearch,
     });
 
-  const handleSearch = useCallback((searchTerm: string) => {
-    setSearchValue(searchTerm);
-  }, []);
+  const handleSearch = useCallback(
+    (searchTerm: string) => {
+      if (!searchValue && searchTerm) {
+        setPreviousFilterValue(filterValue);
+      }
+
+      setSearchValue(searchTerm);
+
+      if (!(isInitialLoad && fpParam && searchTerm === fpParam)) {
+        if (searchTerm) {
+          setFilterValue("");
+        } else {
+          setFilterValue(previousFilterValue);
+        }
+      } else {
+        setIsInitialLoad(false);
+      }
+    },
+    [searchValue, filterValue, previousFilterValue, isInitialLoad, fpParam],
+  );
 
   const handleSort = useCallback((sortField: string) => {
     setSortState(({ field, direction }) =>
@@ -105,6 +125,7 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
 
   const handleFilter = useCallback((value: string | number) => {
     setFilterValue(value);
+    setPreviousFilterValue(value);
   }, []);
 
   const isRowSelectable = useCallback((row: FinalityProvider) => {
@@ -120,18 +141,6 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
     return data.finalityProviders.filter((fp: FinalityProvider) => {
       if (!fp) return false;
 
-      const isActive = fp.state === FinalityProviderStateEnum.ACTIVE;
-      const isInactive = inactiveStatuses.has(fp.state);
-
-      const statusMatch =
-        filterValue === "active"
-          ? isActive
-          : filterValue === "inactive"
-            ? isInactive
-            : true;
-
-      if (!statusMatch) return false;
-
       if (searchValue) {
         const searchLower = searchValue.toLowerCase();
         return (
@@ -141,7 +150,14 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
         );
       }
 
-      return true;
+      const isActive = fp.state === FinalityProviderStateEnum.ACTIVE;
+      const isInactive = inactiveStatuses.has(fp.state);
+
+      return filterValue === "active"
+        ? isActive
+        : filterValue === "inactive"
+          ? isInactive
+          : true;
     });
   }, [data?.finalityProviders, filterValue, searchValue]);
 
@@ -150,12 +166,6 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
     [data?.finalityProviders],
   );
-
-  useEffect(() => {
-    if (fpParam && data?.finalityProviders) {
-      handleSearch(fpParam);
-    }
-  }, [fpParam, data?.finalityProviders, handleSearch]);
 
   const state = useMemo(
     () => ({
