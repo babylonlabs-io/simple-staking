@@ -42,7 +42,7 @@ export const VerificationModal = ({
     icon={<Loader size={48} />}
     title={VERIFICATION_STEPS[step].title}
     submitButton={`Stake ${btc.coinName}`}
-    onSubmit={() => {}}
+    cancelButton=""
   >
     {VERIFICATION_STEPS[step].description}
   </SubmitModal>

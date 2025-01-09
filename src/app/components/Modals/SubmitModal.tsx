@@ -60,13 +60,13 @@ export const SubmitModal = ({
     </DialogBody>
 
     <DialogFooter className="flex gap-4">
-      {onClose && (
+      {cancelButton && (
         <Button variant="outlined" className="flex-1" onClick={onClose}>
           {cancelButton}
         </Button>
       )}
 
-      {onSubmit && (
+      {submitButton && (
         <Button
           disabled={processing || disabled}
           variant="contained"

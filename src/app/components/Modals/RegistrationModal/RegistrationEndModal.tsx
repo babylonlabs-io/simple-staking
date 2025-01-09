@@ -38,7 +38,7 @@ export function RegistrationEndModal({
       icon={<SuccessIcon />}
       title="Registration Submitted"
       submitButton="Done"
-      cancelButton={undefined}
+      cancelButton=""
     >
       <Text variant="body1" className="text-center">
         Your staking transaction has been successfully registered to the{" "}
