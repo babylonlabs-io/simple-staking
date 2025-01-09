@@ -105,7 +105,7 @@ export const Connect: React.FC<ConnectProps> = ({
         <Button
           size="large"
           color="secondary"
-          className="h-[2.5rem] min-h-[2.5rem] rounded-full px-6 py-2 text-white text-base md:rounded-lg"
+          className="h-[2.5rem] min-h-[2.5rem] rounded-full px-6 py-2 text-white text-base md:rounded"
           onClick={onConnect}
           disabled={isConnected || !isApiNormal || loading}
         >

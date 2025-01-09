@@ -1,5 +1,6 @@
 import { twJoin } from "tailwind-merge";
 
+import { Container } from "../Container/Container";
 import { Logo } from "../Logo/Logo";
 
 export const SimplifiedHeader = ({
@@ -15,9 +16,9 @@ export const SimplifiedHeader = ({
           isMinimal ? "h-[84px]" : "h-[300px]",
         )}
       >
-        <div className="container h-20 py-6 px-6 mx-auto flex items-center justify-between">
+        <Container className="h-20 p-6 flex items-center justify-between">
           <Logo />
-        </div>
+        </Container>
       </section>
     </nav>
   );

@@ -1,4 +1,3 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
 import { useMemo } from "react";
 
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
@@ -11,6 +10,7 @@ import { ubbnToBbn } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
+import { Section } from "../Section/Section";
 import { StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
@@ -41,10 +41,7 @@ export function PersonalBalance() {
 
   return (
     <AuthGuard>
-      <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
-        <Heading variant="h4" className="text-primary-dark md:text-4xl">
-          Wallet Balance
-        </Heading>
+      <Section title="Wallet Balance">
         <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row border border-primary-dark/20">
           <StatItem
             loading={loading}
@@ -91,7 +88,7 @@ export function PersonalBalance() {
           address={bbnAddress}
           transactionFee={transactionFee}
         />
-      </div>
+      </Section>
     </AuthGuard>
   );
 }
