@@ -21,3 +21,12 @@ export const getNetworkAppUrl = (): string => {
 export const getBtcNetwork = (): Network => {
   return network;
 };
+
+export const getDefaultTermValue = (): number | undefined => {
+  const termDefaultValue = parseInt(
+    process.env.NEXT_PUBLIC_DEFAULT_TERM_VALUE ?? "",
+    10,
+  );
+
+  return !Number.isNaN(termDefaultValue) ? termDefaultValue : undefined;
+};

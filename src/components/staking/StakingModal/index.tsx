@@ -63,10 +63,10 @@ export function StakingModal() {
             await createEOI(formData);
             resetForm({
               finalityProvider: "",
-              term: "",
+              term: stakingInfo?.defaultStakingTimeBlocks?.toString() ?? "",
               amount: "",
-              feeRate: stakingInfo?.defaultFeeRate ?? 0,
-              feeAmount: 0,
+              feeRate: stakingInfo?.defaultFeeRate?.toString() ?? "0",
+              feeAmount: "0",
             });
             revalidateForm();
           }}

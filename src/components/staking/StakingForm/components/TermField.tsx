@@ -3,11 +3,12 @@ import { HiddenField, NumberField } from "@babylonlabs-io/bbn-core-ui";
 interface TermFieldProps {
   min?: number;
   max?: number;
+  defaultValue?: number;
 }
 
-export function TermField({ min = 0, max = 0 }: TermFieldProps) {
-  if (min === max) {
-    return <HiddenField name="term" defaultValue={max.toString()} />;
+export function TermField({ min = 0, defaultValue }: TermFieldProps) {
+  if (defaultValue) {
+    return <HiddenField name="term" defaultValue={defaultValue.toString()} />;
   }
 
   const label = (
