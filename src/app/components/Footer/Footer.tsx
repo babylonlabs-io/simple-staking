@@ -1,4 +1,3 @@
-import Image from "next/image";
 import {
   BsDiscord,
   BsGithub,
@@ -11,8 +10,9 @@ import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail, MdForum } from "react-icons/md";
 
-import babylonIcon from "@/app/assets/logo-white.svg";
 import { Container } from "@/app/components/Container/Container";
+
+import { Logo } from "../Logo/Logo";
 
 const iconLinks = [
   {
@@ -111,7 +111,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
         <div>
-          <Image src={babylonIcon} alt="babylon" />
+          <Logo width={372} height={86} />
         </div>
       </Container>
     </footer>
