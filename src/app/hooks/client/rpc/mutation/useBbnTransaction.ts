@@ -1,10 +1,11 @@
 import { useCallback } from "react";
 
+import { BBN_GAS_PRICE } from "@/config";
+
 import { useSigningStargateClient } from "./useSigningStargateClient";
 
 const GAS_MULTIPLIER = 1.5;
 const GAS_DENOM = "ubbn";
-const GAS_PRICE = 0.002;
 
 export interface BbnGasFee {
   amount: { denom: string; amount: string }[];
@@ -29,7 +30,7 @@ export const useBbnTransaction = () => {
       const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
       return {
         amount: [
-          { denom: GAS_DENOM, amount: (gasWanted * GAS_PRICE).toFixed(0) },
+          { denom: GAS_DENOM, amount: (gasWanted * BBN_GAS_PRICE).toFixed(0) },
         ],
         gas: gasWanted.toString(),
       };

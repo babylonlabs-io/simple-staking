@@ -24,3 +24,11 @@ export const getBtcNetwork = (): Network => {
 
 export const IS_FIXED_TERM_FIELD =
   process.env.NEXT_PUBLIC_FIXED_STAKING_TERM === "true";
+
+export const BBN_GAS_PRICE = (() => {
+  const price = Number(process.env.NEXT_PUBLIC_BBN_GAS_PRICE) || 0.002;
+  if (isNaN(price) || price <= 0 || price >= 1) {
+    return 0.002; // fallback to default if invalid
+  }
+  return price;
+})();
