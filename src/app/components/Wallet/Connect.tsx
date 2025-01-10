@@ -180,14 +180,14 @@ export const Connect: React.FC<ConnectProps> = ({
             <Avatar
               alt={selectedWallets["BTC"]?.name}
               url={selectedWallets["BTC"]?.icon}
-              size="medium"
-              className="object-contain bg-white"
+              size="large"
+              className="object-contain bg-primary-contrast box-content border-[3px] border-primary-main"
             />
             <Avatar
               alt={selectedWallets["BBN"]?.name}
               url={selectedWallets["BBN"]?.icon}
-              size="medium"
-              className="object-contain bg-white"
+              size="large"
+              className="object-contain bg-primary-contrast box-content border-[3px] border-primary-main"
             />
           </AvatarGroup>
         </div>
