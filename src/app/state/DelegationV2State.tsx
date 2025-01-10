@@ -46,7 +46,7 @@ const { StateProvider, useState } = createStateUtils<DelegationV2State>({
   fetchMoreDelegations: () => {},
   findDelegationByTxHash: () => undefined,
   getStakedBalance: () => 0,
-  refetch: () => {},
+  refetch: () => Promise.resolve(),
 });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
@@ -103,7 +103,9 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       findDelegationByTxHash,
       fetchMoreDelegations: fetchNextPage,
       getStakedBalance,
-      refetch,
+      refetch: async () => {
+        await refetch();
+      },
     }),
     [
       delegations,
