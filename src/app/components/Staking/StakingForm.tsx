@@ -29,7 +29,7 @@ export function StakingForm() {
             <FinalityProviders />
           </div>
 
-          <div className="flex items-center justify-center lg:w-2/5 xl:w-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
+          <div className="flex lg:w-2/5 xl:w-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
             <DelegationForm
               loading={loading}
               disabled={hasError}

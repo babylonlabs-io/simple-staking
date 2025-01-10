@@ -34,7 +34,11 @@ export function StakingModal() {
   } = useStakingState();
   const { getFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
-  const { reset: resetForm, trigger: revalidateForm } = useFormContext();
+  const {
+    reset: resetForm,
+    trigger: revalidateForm,
+    setValue: setFieldValue,
+  } = useFormContext();
 
   const fp = useMemo(
     () => getFinalityProvider(formData?.finalityProvider ?? ""),
@@ -65,9 +69,15 @@ export function StakingModal() {
               finalityProvider: "",
               term: "",
               amount: "",
-              feeRate: stakingInfo?.defaultFeeRate ?? 0,
-              feeAmount: 0,
+              feeRate: stakingInfo?.defaultFeeRate?.toString() ?? "0",
+              feeAmount: "0",
             });
+            if (stakingInfo?.defaultStakingTimeBlocks) {
+              setFieldValue("term", stakingInfo?.defaultStakingTimeBlocks, {
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }
             revalidateForm();
           }}
         />

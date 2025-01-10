@@ -21,3 +21,6 @@ export const getNetworkAppUrl = (): string => {
 export const getBtcNetwork = (): Network => {
   return network;
 };
+
+export const IS_FIXED_TERM_FIELD =
+  process.env.NEXT_PUBLIC_FIXED_STAKING_TERM === "true";

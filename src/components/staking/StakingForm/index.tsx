@@ -31,6 +31,7 @@ interface DelegationFormProps {
     maxStakingTimeBlocks: number;
     minStakingAmountSat: number;
     maxStakingAmountSat: number;
+    defaultStakingTimeBlocks?: number;
   };
 }
 
@@ -45,7 +46,11 @@ export function DelegationForm({
 
   if (loading) {
     return (
-      <StatusView className="flex-1" icon={<Loader />} title="Please wait..." />
+      <StatusView
+        className="flex-1 h-auto"
+        icon={<Loader />}
+        title="Please wait..."
+      />
     );
   }
 
@@ -85,6 +90,7 @@ export function DelegationForm({
         <div className="flex flex-1 flex-col">
           <FormOverlay>
             <TermField
+              defaultValue={stakingInfo?.defaultStakingTimeBlocks}
               min={stakingInfo?.minStakingTimeBlocks}
               max={stakingInfo?.maxStakingTimeBlocks}
             />
