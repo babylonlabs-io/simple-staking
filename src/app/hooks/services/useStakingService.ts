@@ -18,6 +18,7 @@ import { useTransactionService } from "./useTransactionService";
 export function useStakingService() {
   const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingState();
+  const { refetch: refetchDelegations } = useDelegationV2State();
   const { addDelegation, updateDelegationStatus } = useDelegationV2State();
   const { estimateStakingFee, createDelegationEoi, submitStakingTx } =
     useTransactionService();
@@ -85,6 +86,7 @@ export function useStakingService() {
         );
 
         setVerifiedDelegation(delegation as DelegationV2);
+        await refetchDelegations();
         goToStep("verified");
         setProcessing(false);
       } catch (error: any) {
@@ -105,6 +107,7 @@ export function useStakingService() {
       setVerifiedDelegation,
       showError,
       reset,
+      refetchDelegations,
     ],
   );
 
