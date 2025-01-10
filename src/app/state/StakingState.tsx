@@ -8,7 +8,7 @@ import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
-import { getDefaultTermValue } from "@/config";
+import { IS_FIXED_TERM_FIELD } from "@/config";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { createStateUtils } from "@/utils/createStateUtils";
@@ -164,10 +164,9 @@ export function StakingState({ children }: PropsWithChildren) {
     const { minFeeRate, defaultFeeRate, maxFeeRate } =
       getFeeRateFromMempool(mempoolFeeRates);
     const defaultStakingTimeBlocks =
-      getDefaultTermValue() ??
-      (minStakingTimeBlocks === maxStakingTimeBlocks
+      IS_FIXED_TERM_FIELD || minStakingTimeBlocks === maxStakingTimeBlocks
         ? maxStakingTimeBlocks
-        : undefined);
+        : undefined;
 
     return {
       defaultFeeRate,

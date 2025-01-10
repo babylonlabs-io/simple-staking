@@ -29,7 +29,7 @@ const Home = () => {
 
       <Container
         as="main"
-        className="-mt-[10rem] md:-mt-[6.25rem] flex flex-col gap-12 md:gap-16 pb-16"
+        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
       >
         <Stats />
         <PersonalBalance />

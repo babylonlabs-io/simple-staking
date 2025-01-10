@@ -22,11 +22,5 @@ export const getBtcNetwork = (): Network => {
   return network;
 };
 
-export const getDefaultTermValue = (): number | undefined => {
-  const termDefaultValue = parseInt(
-    process.env.NEXT_PUBLIC_DEFAULT_TERM_VALUE ?? "",
-    10,
-  );
-
-  return !Number.isNaN(termDefaultValue) ? termDefaultValue : undefined;
-};
+export const IS_FIXED_TERM_FIELD =
+  process.env.NEXT_PUBLIC_FIXED_STAKING_TERM === "true";
