@@ -25,7 +25,11 @@ export const Logo: React.FC<LogoProps> = () => {
 
   return (
     <div className="flex">
-      <Image src={lightSelected ? darkLogo : lightLogo} alt="Babylon" />
+      <Image
+        className="h-[40px] w-[159px]"
+        src={lightSelected ? darkLogo : lightLogo}
+        alt="Babylon"
+      />
     </div>
   );
 };
