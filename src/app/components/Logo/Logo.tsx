@@ -3,12 +3,32 @@ import Link from "next/link";
 
 import logo from "@/app/assets/logo-white.svg";
 
-interface LogoProps {}
+interface LogoProps {
+  className?: string;
+  width?: number;
+  height?: number;
+}
 
-export const Logo: React.FC<LogoProps> = () => {
+export const Logo: React.FC<LogoProps> = ({
+  className,
+  width = 159,
+  height = 40,
+}) => {
+  const dimensions = {
+    width: width,
+    height: height,
+  };
+
   return (
     <Link href="/">
-      <Image src={logo} alt="Babylon" />
+      <Image
+        className={className}
+        style={dimensions}
+        src={logo}
+        alt="Babylon"
+        width={dimensions.width}
+        height={dimensions.height}
+      />
     </Link>
   );
 };
