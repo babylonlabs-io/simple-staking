@@ -25,12 +25,15 @@ interface StatusTooltipProps {
   amount?: number;
   coinName?: string;
   slashingAmount?: number;
+  startHeight?: number;
 }
+
+const { coinName } = getNetworkConfigBTC();
 
 const STATUS_LABELS = {
   PENDING: "Pending",
   VERIFIED: "Verified",
-  PENDING_BTC_CONFIRMATION: "Pending BTC Confirmation",
+  PENDING_BTC_CONFIRMATION: `Pending ${coinName} Confirmation`,
   ACTIVE: "Active",
   UNBONDING: "Unbonding",
   WITHDRAWABLE: "Withdrawable",
@@ -52,28 +55,49 @@ const STATUS_MESSAGES = {
   WITHDRAWN: "Stake has been withdrawn",
   SLASHED_WITHDRAWN: "Slashed Stake has been withdrawn",
   PENDING_BTC_CONFIRMATION: (btcConfirmationDepth: number) =>
-    `Stake is pending ${btcConfirmationDepth} BTC confirmations`,
+    `Stake is pending ${btcConfirmationDepth} ${coinName} confirmations`,
   UNBONDING_SUBMITTED: "Stake is requesting unbonding",
   WITHDRAWAL_PENDING: "Withdrawal transaction pending confirmation on Bitcoin",
   UNBONDING: (unbondingTime: number) =>
     `It will take ${blocksToDisplayTime(unbondingTime)} before you can withdraw your stake.`,
-  SLASHED: (amount: number, coinName: string, slashingAmount: number) => (
-    <>
-      The Finality Provider you selected has been slashed, result in{" "}
-      <b>
-        {maxDecimals(satoshiToBtc(slashingAmount), 8)} {coinName}
-      </b>{" "}
-      being deducted from your delegation. It will take was slashed from your
-      stake due to the finality provider double voting.{" "}
-      <Link
-        className="text-secondary-main"
-        target="_blank"
-        href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
-      >
-        Learn more
-      </Link>
-    </>
-  ),
+  SLASHED: (
+    startHeight?: number,
+    slashingAmount?: number,
+    coinName?: string,
+  ) => {
+    if (startHeight === undefined) {
+      return (
+        <>
+          This Finality Provider has been slashed due to double voting.{" "}
+          <Link
+            className="text-secondary-main"
+            target="_blank"
+            href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+          >
+            Learn more
+          </Link>
+        </>
+      );
+    }
+
+    return (
+      <>
+        The Finality Provider you selected has been slashed, resulting in{" "}
+        <b>
+          {maxDecimals(satoshiToBtc(slashingAmount ?? 0), 8)} {coinName}
+        </b>{" "}
+        being deducted from your delegation due to the finality provider double
+        voting.{" "}
+        <Link
+          className="text-secondary-main"
+          target="_blank"
+          href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+        >
+          Learn more
+        </Link>
+      </>
+    );
+  },
 } as const;
 
 const STATUSES: Record<
@@ -115,38 +139,26 @@ const STATUSES: Record<
     tooltip: STATUS_MESSAGES.EARLY_UNBONDING_WITHDRAWABLE,
   }),
   [State.TIMELOCK_SLASHING_WITHDRAWABLE]: ({
-    amount,
     coinName,
     slashingAmount,
+    startHeight,
   }) => ({
     label: STATUS_LABELS.WITHDRAWABLE,
-    tooltip: STATUS_MESSAGES.SLASHED(
-      amount ?? 0,
-      coinName ?? "",
-      slashingAmount ?? 0,
-    ),
+    tooltip: STATUS_MESSAGES.SLASHED(startHeight, slashingAmount, coinName),
     status: "error",
   }),
   [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: ({
-    amount,
     coinName,
     slashingAmount,
+    startHeight,
   }) => ({
     label: STATUS_LABELS.WITHDRAWABLE,
-    tooltip: STATUS_MESSAGES.SLASHED(
-      amount ?? 0,
-      coinName ?? "",
-      slashingAmount ?? 0,
-    ),
+    tooltip: STATUS_MESSAGES.SLASHED(startHeight, slashingAmount, coinName),
     status: "error",
   }),
-  [State.SLASHED]: ({ amount, coinName, slashingAmount }) => ({
-    label: STATUS_LABELS.SLASHED,
-    tooltip: STATUS_MESSAGES.SLASHED(
-      amount ?? 0,
-      coinName ?? "",
-      slashingAmount ?? 0,
-    ),
+  [State.SLASHED]: ({ startHeight, slashingAmount, coinName }) => ({
+    label: startHeight === undefined ? "Invalid" : STATUS_LABELS.SLASHED,
+    tooltip: STATUS_MESSAGES.SLASHED(startHeight, slashingAmount, coinName),
     status: "error",
   }),
   [State.TIMELOCK_WITHDRAWN]: () => ({
@@ -217,6 +229,7 @@ export function Status({ delegation }: StatusProps) {
     amount: delegation.stakingAmount,
     coinName,
     slashingAmount,
+    startHeight: delegation.startHeight,
   }) ?? {};
 
   return (
