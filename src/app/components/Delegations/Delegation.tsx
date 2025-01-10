@@ -24,7 +24,6 @@ import { VerificationModal } from "../Modals/VerificationModal";
 
 import { DelegationCell } from "./components/DelegationCell";
 import { DelegationStatus } from "./components/DelegationStatus";
-import { OverflowBadge } from "./components/OverflowBadge";
 
 interface DelegationProps {
   delegation: DelegationInterface;
@@ -101,18 +100,26 @@ export const Delegation: React.FC<DelegationProps> = ({
       : intermediateState || state;
 
   const renderState = () => getState(displayState);
-  const renderStateTooltip = () => getStateTooltip(displayState);
+  const renderStateTooltip = () => {
+    // overflow state to override the tooltip
+    if (isOverflow) {
+      return "Stake is over the staking cap";
+    }
+    return getStateTooltip(displayState);
+  };
 
   return (
     <>
-      <div className="relative rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-sm text-primary-dark">
-        {isOverflow && <OverflowBadge />}
-        <div className="grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1">
-          <DelegationCell order="order-3 lg:order-1">
+      <div className="relative h-[120px] lg:h-[72px] rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-sm text-primary-dark">
+        <div className="h-full grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1">
+          <DelegationCell order="order-3 lg:order-1" className="pt-6 lg:pt-0">
             {durationTillNow(startTimestamp, currentTime)}
           </DelegationCell>
 
-          <DelegationCell order="order-4 lg:order-2 text-right lg:text-left">
+          <DelegationCell
+            order="order-4 lg:order-2"
+            className="pt-6 lg:pt-0 text-right lg:text-left"
+          >
             {getFinalityProvider(finalityProviderPkHex)?.description?.moniker ??
               "-"}
           </DelegationCell>
@@ -152,6 +159,7 @@ export const Delegation: React.FC<DelegationProps> = ({
               state={renderState()}
               tooltip={renderStateTooltip()}
               stakingTxHashHex={stakingTxHashHex}
+              isOverflow={isOverflow && isActive}
             />
           </DelegationCell>
 

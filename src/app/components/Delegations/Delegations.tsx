@@ -278,7 +278,7 @@ export const Delegations = ({}) => {
           className="no-scrollbar max-h-[21rem] overflow-y-auto"
         >
           <InfiniteScroll
-            className="flex flex-col gap-4 pt-3"
+            className="flex flex-col pt-3"
             dataLength={combinedDelegationsData.length}
             next={fetchMoreDelegations}
             hasMore={hasMoreDelegations}
