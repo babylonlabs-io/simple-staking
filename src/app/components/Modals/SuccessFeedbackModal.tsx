@@ -13,7 +13,7 @@ export const SuccessFeedbackModal: React.FC<FeedbackModalProps> = ({
 }) => (
   <SubmitModal
     icon={<LuPartyPopper className="text-5xl" />}
-    title="Conratulations"
+    title="Congratulations"
     open={open}
     submitButton="Done"
     cancelButton=""
