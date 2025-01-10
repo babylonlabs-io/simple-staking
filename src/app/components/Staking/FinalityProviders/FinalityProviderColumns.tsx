@@ -1,4 +1,4 @@
-import { Avatar } from "@babylonlabs-io/bbn-core-ui";
+// import { Avatar } from "@babylonlabs-io/bbn-core-ui";
 
 import { Hash } from "@/app/components/Hash/Hash";
 import {
@@ -24,13 +24,13 @@ export const finalityProviderColumns = [
       if (!row) return null;
       return (
         <div className="flex items-center gap-2">
-          {row.description?.identity && (
+          {/* {row.description?.identity && (
             <Avatar
               size="small"
               url={row.description.identity}
               alt={row.description.moniker || ""}
             />
-          )}
+          )} */}
           <span className="text-primary-dark">
             {row.description?.moniker || "No name provided"}
           </span>
