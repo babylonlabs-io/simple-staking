@@ -23,6 +23,7 @@ where,
 - `NEXT_PUBLIC_NETWORK` specifies the BTC network environment
 - `NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES` boolean value to indicate whether display 
 testing network related message. Default to true
+- `NEXT_PUBLIC_FIXED_STAKING_TERM` boolean value to indicate whether the staking term is fixed. Default to false
 
 Then, to start a development server:
 
