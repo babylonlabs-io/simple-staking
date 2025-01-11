@@ -9,7 +9,7 @@ export const notifySuccess = (title: string, text: string) => {
   toast.success(<Notification title={title} text={text} reactIcon={FaCheck} />);
 };
 
-export const notifyWraning = (title: string, text: string) => {
+export const notifyWarning = (title: string, text: string) => {
   toast.warning(
     <Notification title={title} text={text} reactIcon={PiWarningCircleBold} />,
   );
