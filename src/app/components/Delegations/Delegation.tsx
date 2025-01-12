@@ -13,6 +13,7 @@ import {
   type Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
+import { Hint } from "@/components/common/Hint";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { getState, getStateTooltip } from "@/utils/getState";
@@ -23,7 +24,6 @@ import { trim } from "@/utils/trim";
 import { VerificationModal } from "../Modals/VerificationModal";
 
 import { DelegationCell } from "./components/DelegationCell";
-import { DelegationStatus } from "./components/DelegationStatus";
 import { OverflowBadge } from "./components/OverflowBadge";
 
 interface DelegationProps {
@@ -148,11 +148,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             order="order-5"
             className="relative flex justify-end lg:justify-start"
           >
-            <DelegationStatus
-              state={renderState()}
-              tooltip={renderStateTooltip()}
-              stakingTxHashHex={stakingTxHashHex}
-            />
+            <Hint tooltip={renderStateTooltip()}>{renderState()}</Hint>
           </DelegationCell>
 
           <DelegationCell order="order-6">
