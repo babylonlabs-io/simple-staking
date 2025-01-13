@@ -3,6 +3,7 @@ import { PropsWithChildren } from "react";
 
 import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { ubbnToBaby } from "@/utils/bbn";
 import { trim } from "@/utils/trim";
 
 import { LoadingSmall } from "../Loading/Loading";
@@ -62,7 +63,7 @@ export const ClaimRewardModal = ({
               <LoadingSmall />
             ) : (
               <Text variant="body1">
-                {transactionFee} {coinSymbol}
+                {ubbnToBaby(transactionFee)} {coinSymbol}
               </Text>
             )}
           </div>

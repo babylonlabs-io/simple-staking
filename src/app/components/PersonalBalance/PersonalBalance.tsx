@@ -6,7 +6,7 @@ import { useRewardsState } from "@/app/state/RewardState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
-import { ubbnToBbn } from "@/utils/bbn";
+import { ubbnToBaby } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
@@ -37,7 +37,7 @@ export function PersonalBalance() {
     [btcBalance, getStakedBalance],
   );
 
-  const formattedRewardBalance = ubbnToBbn(rewardBalance);
+  const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
   return (
     <AuthGuard>
@@ -62,7 +62,7 @@ export function PersonalBalance() {
           <StatItem
             loading={loading}
             title={`${bbnNetworkName} Balance`}
-            value={`${ubbnToBbn(bbnBalance)} ${bbnCoinSymbol}`}
+            value={`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
           />
 
           <div className="divider mx-0 my-2 md:divider-horizontal" />
