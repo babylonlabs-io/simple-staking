@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
-import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
-import { FinalityProviderState } from "@/app/types/finalityProviders";
+import { useFinalityProviderV2State } from "@/app/state/FinalityProviderV2State";
+import { FinalityProviderState } from "@/app/types/finalityProvidersV2";
 import { Hint } from "@/components/common/Hint";
 
 interface FinalityProviderMonikerProps {
@@ -53,7 +53,7 @@ const STATUSES: Record<
 export function FinalityProviderMoniker({
   value,
 }: FinalityProviderMonikerProps) {
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getFinalityProvider } = useFinalityProviderV2State();
 
   const finalProvider = getFinalityProvider(value);
   const moniker = finalProvider?.description?.moniker ?? "-";

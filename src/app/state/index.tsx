@@ -16,6 +16,7 @@ import { NetworkInfo } from "../types/networkInfo";
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
 import { FinalityProviderState } from "./FinalityProviderState";
+import { FinalityProviderV2State } from "./FinalityProviderV2State";
 import { RewardsState } from "./RewardState";
 import { StakingState } from "./StakingState";
 
@@ -23,6 +24,7 @@ const STATE_LIST = [
   DelegationState,
   DelegationV2State,
   FinalityProviderState,
+  FinalityProviderV2State,
   StakingState,
   RewardsState,
 ];

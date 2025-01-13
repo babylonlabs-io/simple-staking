@@ -2,10 +2,10 @@
 
 import { Hash } from "@/app/components/Hash/Hash";
 import {
-  FinalityProvider,
   FinalityProviderState,
   FinalityProviderStateLabels,
-} from "@/app/types/finalityProviders";
+  FinalityProviderV2,
+} from "@/app/types/finalityProvidersV2";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -20,7 +20,7 @@ export const finalityProviderColumns = [
   {
     key: "moniker",
     header: "Finality Provider",
-    render: (_: unknown, row?: FinalityProvider) => {
+    render: (_: unknown, row?: FinalityProviderV2) => {
       if (!row) return null;
       return (
         <div className="flex items-center gap-2">
@@ -37,7 +37,7 @@ export const finalityProviderColumns = [
         </div>
       );
     },
-    sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
+    sorter: (a?: FinalityProviderV2, b?: FinalityProviderV2) => {
       const monikerA = a?.description?.moniker || "";
       const monikerB = b?.description?.moniker || "";
       return monikerA.localeCompare(monikerB);
@@ -50,7 +50,7 @@ export const finalityProviderColumns = [
       if (value == null) return "Unknown";
       return mapStatus(value as FinalityProviderState);
     },
-    sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
+    sorter: (a?: FinalityProviderV2, b?: FinalityProviderV2) => {
       const stateA = a?.state || "unknown";
       const stateB = b?.state || "unknown";
       return stateA.localeCompare(stateB);
@@ -59,7 +59,7 @@ export const finalityProviderColumns = [
   {
     key: "btcPk",
     header: `${coinSymbol} PK`,
-    render: (_: unknown, row?: FinalityProvider) => {
+    render: (_: unknown, row?: FinalityProviderV2) => {
       if (!row?.btcPk) return null;
       return <Hash value={row.btcPk} address small noFade />;
     },
@@ -72,7 +72,7 @@ export const finalityProviderColumns = [
       if (isNaN(amount)) return "-";
       return `${maxDecimals(satoshiToBtc(amount), 8)} ${coinSymbol}`;
     },
-    sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
+    sorter: (a?: FinalityProviderV2, b?: FinalityProviderV2) => {
       const valueA = a?.activeTVLSat ?? 0;
       const valueB = b?.activeTVLSat ?? 0;
       return valueA - valueB;
@@ -86,7 +86,7 @@ export const finalityProviderColumns = [
       if (isNaN(commission)) return "-";
       return `${maxDecimals(commission * 100, 2)}%`;
     },
-    sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
+    sorter: (a?: FinalityProviderV2, b?: FinalityProviderV2) => {
       const commissionA = Number(a?.commission) || 0;
       const commissionB = Number(b?.commission) || 0;
       return commissionA - commissionB;

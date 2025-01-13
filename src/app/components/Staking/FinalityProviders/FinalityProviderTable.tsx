@@ -4,7 +4,7 @@ import { useMemo } from "react";
 
 import warningOctagon from "@/app/assets/warning-octagon.svg";
 import warningTriangle from "@/app/assets/warning-triangle.svg";
-import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
+import { useFinalityProviderV2State } from "@/app/state/FinalityProviderV2State";
 
 import { finalityProviderColumns } from "./FinalityProviderColumns";
 import { StatusView } from "./FinalityProviderTableStatusView";
@@ -25,7 +25,7 @@ export const FinalityProviderTable = ({
     filterValue,
     hasError,
     isRowSelectable,
-  } = useFinalityProviderState();
+  } = useFinalityProviderV2State();
 
   const tableData = useMemo(() => {
     if (!finalityProviders) return [];

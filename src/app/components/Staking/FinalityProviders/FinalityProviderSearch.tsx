@@ -2,10 +2,10 @@ import { Input } from "@babylonlabs-io/bbn-core-ui";
 import { useCallback } from "react";
 import { RiSearchLine } from "react-icons/ri";
 
-import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
+import { useFinalityProviderV2State } from "@/app/state/FinalityProviderV2State";
 
 export const FinalityProviderSearch = () => {
-  const { handleSearch, searchValue } = useFinalityProviderState();
+  const { handleSearch, searchValue } = useFinalityProviderV2State();
 
   const onSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
