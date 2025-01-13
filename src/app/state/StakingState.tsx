@@ -44,6 +44,8 @@ export type StakingStep =
 
 export interface StakingState {
   hasError: boolean;
+  blocked: boolean;
+  available: boolean;
   loading: boolean;
   processing: boolean;
   errorMessage?: string;
@@ -73,6 +75,8 @@ export interface StakingState {
 const { StateProvider, useState: useStakingState } =
   createStateUtils<StakingState>({
     hasError: false,
+    blocked: false,
+    available: false,
     loading: false,
     processing: false,
     errorMessage: "",
@@ -137,13 +141,10 @@ export function StakingState({ children }: PropsWithChildren) {
 
   const { publicKeyNoCoord } = useBTCWallet();
 
-  const hasError =
-    isStateError ||
-    isNetworkFeeError ||
-    !isApiNormal ||
-    isGeoBlocked ||
-    !networkInfo?.stakingStatus.isStakingOpen;
   const loading = isStateLoading || isCheckLoading || isFeeLoading;
+  const hasError = isStateError || isNetworkFeeError || !isApiNormal;
+  const blocked = isGeoBlocked;
+  const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
   const errorMessage = apiMessage;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
@@ -299,6 +300,8 @@ export function StakingState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       hasError,
+      blocked,
+      available,
       loading,
       processing,
       errorMessage,
@@ -315,6 +318,8 @@ export function StakingState({ children }: PropsWithChildren) {
     }),
     [
       hasError,
+      blocked,
+      available,
       loading,
       processing,
       errorMessage,

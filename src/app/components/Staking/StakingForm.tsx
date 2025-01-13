@@ -12,8 +12,15 @@ import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 const { networkName } = getNetworkConfigBTC();
 
 export function StakingForm() {
-  const { loading, validationSchema, stakingInfo, hasError, errorMessage } =
-    useStakingState();
+  const {
+    loading,
+    validationSchema,
+    stakingInfo,
+    hasError,
+    blocked,
+    available,
+    errorMessage,
+  } = useStakingState();
   const { displayPreview } = useStakingService();
 
   return (
@@ -32,9 +39,11 @@ export function StakingForm() {
           <div className="flex lg:w-2/5 xl:w-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
             <DelegationForm
               loading={loading}
-              disabled={hasError}
-              stakingInfo={stakingInfo}
+              available={available}
+              blocked={blocked}
+              hasError={hasError}
               error={errorMessage}
+              stakingInfo={stakingInfo}
             />
           </div>
         </div>
