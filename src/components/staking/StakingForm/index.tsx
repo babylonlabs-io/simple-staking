@@ -4,9 +4,9 @@ import { useState } from "react";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
 import { Message } from "@/app/components/Staking/Form/States/Message";
+import stakingNotStartedIcon from "@/app/components/Staking/Form/States/staking-not-started.svg";
 import walletIcon from "@/app/components/Staking/Form/States/wallet-icon.svg";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
-import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { AuthGuard } from "@/components/common/AuthGuard";
 
 import { AmountField } from "./components/AmountField";
@@ -21,7 +21,9 @@ import { TermField } from "./components/TermField";
 
 interface DelegationFormProps {
   loading?: boolean;
-  disabled?: boolean;
+  blocked?: boolean;
+  available?: boolean;
+  hasError?: boolean;
   error?: string;
   stakingInfo?: {
     minFeeRate: number;
@@ -37,12 +39,13 @@ interface DelegationFormProps {
 
 export function DelegationForm({
   loading,
-  disabled,
+  blocked,
+  available,
+  hasError,
   error,
   stakingInfo,
 }: DelegationFormProps) {
   const [isCustomFee, setIsCustomFee] = useState(false);
-  const { isGeoBlocked } = useHealthCheck();
 
   if (loading) {
     return (
@@ -54,17 +57,27 @@ export function DelegationForm({
     );
   }
 
-  if (disabled) {
-    if (isGeoBlocked) {
-      return (
-        <Message
-          icon={walletIcon}
-          title="Unavailable in Your Region"
-          message={error ?? ""}
-        />
-      );
-    }
+  if (blocked) {
+    return (
+      <Message
+        icon={walletIcon}
+        title="Unavailable in Your Region"
+        message={error ?? ""}
+      />
+    );
+  }
 
+  if (!available) {
+    return (
+      <Message
+        title="Staking Temporarily Unavailable"
+        message="Staking is not enabled at this time. Please check back later."
+        icon={stakingNotStartedIcon}
+      />
+    );
+  }
+
+  if (hasError) {
     return (
       <Message
         icon={apiNotAvailable}
