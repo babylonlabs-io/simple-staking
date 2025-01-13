@@ -142,7 +142,7 @@ export function StakingState({ children }: PropsWithChildren) {
     isNetworkFeeError ||
     !isApiNormal ||
     isGeoBlocked ||
-    !networkInfo?.stakingStatus;
+    !networkInfo?.stakingStatus.isStakingOpen;
   const loading = isStateLoading || isCheckLoading || isFeeLoading;
   const errorMessage = apiMessage;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
