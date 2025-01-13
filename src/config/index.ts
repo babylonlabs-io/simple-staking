@@ -2,6 +2,9 @@ import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import { network } from "./network/btc";
 
+// Default gas price for BABY
+const DEFAULT_BBN_GAS_PRICE = 0.002;
+
 // shouldDisplayTestingMsg function is used to check if the application is running in testing mode or not.
 // Default to true if the environment variable is not set.
 export const shouldDisplayTestingMsg = (): boolean => {
@@ -24,3 +27,12 @@ export const getBtcNetwork = (): Network => {
 
 export const IS_FIXED_TERM_FIELD =
   process.env.NEXT_PUBLIC_FIXED_STAKING_TERM === "true";
+
+// BBN_GAS_PRICE is used to get the gas price for BABY
+export const BBN_GAS_PRICE = (() => {
+  const price = parseFloat(process.env.NEXT_PUBLIC_BBN_GAS_PRICE || "");
+  if (isNaN(price) || price <= 0 || price >= 1) {
+    return DEFAULT_BBN_GAS_PRICE; // fallback to default if invalid
+  }
+  return price;
+})();
