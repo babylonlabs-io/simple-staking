@@ -1,21 +1,39 @@
 import Link from "next/link";
+import { useMemo } from "react";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
+import { DelegationV2 } from "@/app/types/delegationsV2";
+import { NetworkInfo } from "@/app/types/networkInfo";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
+import { getSlashingAmount } from "@/utils/delegations/slashing";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { getBbnParamByVersion } from "@/utils/params";
 
 interface SlashingContentProps {
-  startHeight?: number;
-  slashingAmount?: number;
-  coinName?: string;
+  delegation: DelegationV2;
+  networkInfo?: NetworkInfo;
 }
 
+const { coinName } = getNetworkConfigBTC();
+
 export const SlashingContent = ({
-  startHeight,
-  slashingAmount,
-  coinName,
+  delegation,
+  networkInfo,
 }: SlashingContentProps) => {
-  if (startHeight === undefined) {
+  const slashingAmount = useMemo(
+    () =>
+      getSlashingAmount(
+        delegation.stakingAmount,
+        getBbnParamByVersion(
+          delegation.paramsVersion,
+          networkInfo?.params.bbnStakingParams.versions || [],
+        ),
+      ),
+    [delegation, networkInfo],
+  );
+
+  if (delegation.startHeight === undefined) {
     return (
       <>
         This Finality Provider has been slashed due to double voting.{" "}
