@@ -24,6 +24,7 @@ where,
 - `NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES` boolean value to indicate whether display 
 testing network related message. Default to true
 - `NEXT_PUBLIC_FIXED_STAKING_TERM` boolean value to indicate whether the staking term is fixed. Default to false
+- `NEXT_PUBLIC_BBN_GAS_PRICE` specifies the gas price for BABY. Default to 0.002
 
 Then, to start a development server:
 
