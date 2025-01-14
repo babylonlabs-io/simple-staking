@@ -7,20 +7,20 @@ import cancelCircle from "@/app/assets/cancel-circle.svg";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 
 export const FinalityProviderSearch = () => {
-  const { handleSearch, searchValue } = useFinalityProviderState();
+  const { filter, handleFilter } = useFinalityProviderState();
 
   const onSearchChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
-      handleSearch(e.target.value);
+      handleFilter("search", e.target.value);
     },
-    [handleSearch],
+    [handleFilter],
   );
 
   const onClearSearch = useCallback(() => {
-    handleSearch("");
-  }, [handleSearch]);
+    handleFilter("search", "");
+  }, [handleFilter]);
 
-  const searchSuffix = searchValue ? (
+  const searchSuffix = filter.search ? (
     <button
       onClick={onClearSearch}
       className="flex items-center hover:opacity-80 transition-opacity"
@@ -43,7 +43,7 @@ export const FinalityProviderSearch = () => {
     <Input
       placeholder="Search by Name or Public Key"
       suffix={searchSuffix}
-      value={searchValue}
+      value={filter.search}
       onChange={onSearchChange}
     />
   );
