@@ -1,5 +1,6 @@
+import { Fees } from "@/app/types/fee";
+
 import { nextPowerOfTwo } from "./nextPowerOfTwo";
-import { Fees } from "./wallet/btc_wallet_provider";
 
 const LEAST_MAX_FEE_RATE = 128;
 

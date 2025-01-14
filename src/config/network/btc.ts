@@ -1,7 +1,6 @@
-import { BTCConfig } from "@babylonlabs-io/bbn-wallet-connect";
+import type { BTCConfig } from "@babylonlabs-io/bbn-wallet-connect";
 
-import { Network } from "@/utils/wallet/btc_wallet_provider";
-
+import { Network } from "@/app/types/network";
 export const network =
   (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.SIGNET;
 

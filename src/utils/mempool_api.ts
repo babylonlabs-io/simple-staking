@@ -1,6 +1,7 @@
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 
-import { Fees, UTXO } from "./wallet/btc_wallet_provider";
+import { Fees } from "@/app/types/fee";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 const { mempoolApiUrl } = getNetworkConfigBTC();
 
@@ -25,6 +26,10 @@ interface TxInfo {
     blockHash: string;
     blockTime: number;
   };
+}
+
+interface MempoolUTXO extends UTXO {
+  confirmed: boolean;
 }
 
 export class ServerError extends Error {
@@ -168,19 +173,20 @@ export async function getTipHeight(): Promise<number> {
 
 /**
  * Retrieve a set of UTXOs that are available to an address
- * and satisfy the `amount` requirement if provided. Otherwise, fetch all UTXOs.
- * The UTXOs are chosen based on descending amount order.
+ * The response including unconfirmed UTXOs
  * @param address - The Bitcoin address in string format.
- * @param amount - The amount we expect the resulting UTXOs to satisfy.
  * @returns A promise that resolves into a list of UTXOs.
  */
-export async function getFundingUTXOs(
-  address: string,
-  amount?: number,
-): Promise<UTXO[]> {
+export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
   // Get all UTXOs for the given address
-
-  let utxos = null;
+  let utxos: {
+    txid: string;
+    vout: number;
+    value: number;
+    status: {
+      confirmed: boolean;
+    };
+  }[] = [];
   try {
     const response = await fetch(utxosInfoUrl(address));
     utxos = await response.json();
@@ -188,31 +194,7 @@ export async function getFundingUTXOs(
     throw new Error(error?.message || error);
   }
 
-  // Remove unconfirmed UTXOs as they are not yet available for spending
-  // and sort them in descending order according to their value.
-  // We want them in descending order, as we prefer to find the least number
-  // of inputs that will satisfy the `amount` requirement,
-  // as less inputs lead to a smaller transaction and therefore smaller fees.
-  const confirmedUTXOs = utxos
-    .filter((utxo: any) => utxo.status.confirmed)
-    .sort((a: any, b: any) => b.value - a.value);
-
-  // If amount is provided, reduce the list of UTXOs into a list that
-  // contains just enough UTXOs to satisfy the `amount` requirement.
-  let sliced = confirmedUTXOs;
-  if (amount) {
-    var sum = 0;
-    for (var i = 0; i < confirmedUTXOs.length; ++i) {
-      sum += confirmedUTXOs[i].value;
-      if (sum > amount) {
-        break;
-      }
-    }
-    if (sum < amount) {
-      return [];
-    }
-    sliced = confirmedUTXOs.slice(0, i + 1);
-  }
+  const sortedUTXOs = utxos.sort((a: any, b: any) => b.value - a.value);
 
   const response = await fetch(validateAddressUrl(address));
   const addressInfo = await response.json();
@@ -223,12 +205,13 @@ export async function getFundingUTXOs(
 
   // Iterate through the final list of UTXOs to construct the result list.
   // The result contains some extra information,
-  return sliced.map((s: any) => {
+  return sortedUTXOs.map((s) => {
     return {
       txid: s.txid,
       vout: s.vout,
       value: s.value,
       scriptPubKey,
+      confirmed: s.status.confirmed,
     };
   });
 }

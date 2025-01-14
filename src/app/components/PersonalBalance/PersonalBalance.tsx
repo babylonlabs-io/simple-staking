@@ -1,7 +1,4 @@
-import { useMemo } from "react";
-
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
-import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { useRewardsState } from "@/app/state/RewardState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -23,19 +20,14 @@ export function PersonalBalance() {
     processing,
     showRewardModal,
     bbnAddress,
-    btcBalance,
+    stakableBtcBalance,
+    totalBtcBalance,
     bbnBalance,
     rewardBalance,
     transactionFee,
     closeRewardModal,
   } = useRewardsState();
-  const { getStakedBalance } = useDelegationV2State();
   const { claimRewards, showPreview } = useRewardsService();
-
-  const totalBTCBalance = useMemo(
-    () => (btcBalance ?? 0) + getStakedBalance(),
-    [btcBalance, getStakedBalance],
-  );
 
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
@@ -46,7 +38,7 @@ export function PersonalBalance() {
           <StatItem
             loading={loading}
             title={`Total ${coinName} Balance`}
-            value={`${satoshiToBtc(totalBTCBalance)} ${coinSymbol}`}
+            value={`${satoshiToBtc(totalBtcBalance)} ${coinSymbol}`}
           />
 
           <div className="divider mx-0 my-2 md:divider-horizontal" />
@@ -54,7 +46,7 @@ export function PersonalBalance() {
           <StatItem
             loading={loading}
             title={"Stakable Balance"}
-            value={`${satoshiToBtc(btcBalance)} ${coinSymbol}`}
+            value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 
           <div className="divider mx-0 my-2 md:divider-horizontal" />
