@@ -1,13 +1,12 @@
+import { InscriptionIdentifier } from "@babylonlabs-io/bbn-wallet-connect";
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useClientQuery } from "@/app/hooks/client/useClient";
 import { wait } from "@/utils";
 import { filterDust } from "@/utils/wallet";
-import {
-  InscriptionIdentifier,
-  UTXO,
-} from "@/utils/wallet/btc_wallet_provider";
 
 export const ORDINAL_KEY = "ORDINALS";
 export const WALLET_FETCH_INSRIPTIONS_TIMEOUT = 3_000;

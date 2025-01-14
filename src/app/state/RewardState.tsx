@@ -11,7 +11,8 @@ interface RewardsStateProps {
   showRewardModal: boolean;
   processing: boolean;
   bbnAddress: string;
-  btcBalance: number;
+  stakableBtcBalance: number;
+  totalBtcBalance: number;
   bbnBalance: number;
   rewardBalance: number;
   transactionFee: number;
@@ -27,7 +28,8 @@ const defaultState: RewardsStateProps = {
   showRewardModal: false,
   processing: false,
   bbnAddress: "",
-  btcBalance: 0,
+  stakableBtcBalance: 0,
+  totalBtcBalance: 0,
   bbnBalance: 0,
   rewardBalance: 0,
   transactionFee: 0,
@@ -47,8 +49,11 @@ export function RewardsState({ children }: PropsWithChildren) {
   const [transactionFee, setTransactionFee] = useState(0);
 
   const { bech32Address: bbnAddress } = useCosmosWallet();
-  const { totalBalance: btcBalance, isLoading: isBTCBalanceLoading } =
-    useAppState();
+  const {
+    stakableBtcBalance,
+    totalBtcBalance,
+    isLoading: isBTCBalanceLoading,
+  } = useAppState();
   const {
     balanceQuery: { data: bbnBalance = 0, isLoading: isCosmosBalanceLoading },
     rewardsQuery: {
@@ -75,7 +80,8 @@ export function RewardsState({ children }: PropsWithChildren) {
       showRewardModal,
       processing,
       bbnAddress,
-      btcBalance,
+      stakableBtcBalance,
+      totalBtcBalance,
       bbnBalance,
       rewardBalance,
       transactionFee,
@@ -92,7 +98,8 @@ export function RewardsState({ children }: PropsWithChildren) {
       showRewardModal,
       processing,
       bbnAddress,
-      btcBalance,
+      stakableBtcBalance,
+      totalBtcBalance,
       bbnBalance,
       rewardBalance,
       transactionFee,

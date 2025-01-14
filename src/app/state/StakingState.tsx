@@ -123,7 +123,7 @@ export function StakingState({ children }: PropsWithChildren) {
 
   const {
     networkInfo,
-    totalBalance,
+    stakableBtcBalance,
     isError: isStateError,
     isLoading: isStateLoading,
   } = useAppState();
@@ -224,8 +224,8 @@ export function StakingState({ children }: PropsWithChildren) {
               `Staking amount must be no more than ${satoshiToBtc(stakingInfo?.maxStakingAmountSat ?? 0)} ${coinName}.`,
             )
             .max(
-              totalBalance,
-              `Staking amount exceeds your balance (${satoshiToBtc(totalBalance)} ${coinName})!`,
+              stakableBtcBalance,
+              `Staking amount exceeds your balance (${satoshiToBtc(stakableBtcBalance)} ${coinName})!`,
             )
             .test(
               "decimal-points",
@@ -258,7 +258,7 @@ export function StakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking fee amount must be greater than 0."),
         })
         .required(),
-    [publicKeyNoCoord, stakingInfo, totalBalance],
+    [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
   );
 
   const goToStep = useCallback(

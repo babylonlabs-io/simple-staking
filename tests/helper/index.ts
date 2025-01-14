@@ -1,10 +1,9 @@
-import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
+import { initBTCCurve, UTXO } from "@babylonlabs-io/btc-staking-ts";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
 import { getPublicKeyNoCoord } from "@/utils/wallet";
-import { UTXO } from "@/utils/wallet/btc_wallet_provider";
 
 // Initialize the ECC library
 initBTCCurve();

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { twJoin } from "tailwind-merge";
 
+import { Network } from "@/app/types/network";
 import { network } from "@/config/network/btc";
-import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import MetaTags from "./components/Meta/MetaTags";
 import "./globals.css";

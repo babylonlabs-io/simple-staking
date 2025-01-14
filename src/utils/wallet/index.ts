@@ -1,6 +1,7 @@
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { networks } from "bitcoinjs-lib";
 
-import { Network, UTXO } from "./btc_wallet_provider";
+import { Network } from "@/app/types/network";
 
 const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;

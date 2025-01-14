@@ -1,6 +1,6 @@
-import { BBNConfig } from "@babylonlabs-io/bbn-wallet-connect";
+import type { BBNConfig } from "@babylonlabs-io/bbn-wallet-connect";
 
-import { Network } from "@/utils/wallet/btc_wallet_provider";
+import { Network } from "@/app/types/network";
 
 import { bbnDevnet } from "./bbn/devnet";
 import { bbnTestnet } from "./bbn/testnet";

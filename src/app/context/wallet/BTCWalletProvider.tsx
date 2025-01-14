@@ -1,9 +1,10 @@
 "use client";
 import {
   IBTCProvider,
+  InscriptionIdentifier,
+  Network,
   useChainConnector,
   useWalletConnect,
-  UTXO,
 } from "@babylonlabs-io/bbn-wallet-connect";
 import type { networks } from "bitcoinjs-lib";
 import {
@@ -18,9 +19,9 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
+import { Fees } from "@/app/types/fee";
 import {
   getAddressBalance,
-  getFundingUTXOs,
   getNetworkFees,
   getTipHeight,
   pushTx,
@@ -30,11 +31,6 @@ import {
   isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet";
-import {
-  Fees,
-  InscriptionIdentifier,
-  Network,
-} from "@/utils/wallet/btc_wallet_provider";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 
 interface BTCWalletContextProps {
@@ -53,7 +49,6 @@ interface BTCWalletContextProps {
   getBalance: (address: string) => Promise<number>;
   getNetworkFees: () => Promise<Fees>;
   pushTx: (txHex: string) => Promise<string>;
-  getUtxos: (address: string, amount?: number) => Promise<UTXO[]>;
   getBTCTipHeight: () => Promise<number>;
   getInscriptions: () => Promise<InscriptionIdentifier[]>;
 }
@@ -74,7 +69,6 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
   getBalance: async () => 0,
   getNetworkFees: async () => ({}) as Fees,
   pushTx: async () => "",
-  getUtxos: async () => [],
   getBTCTipHeight: async () => 0,
   getInscriptions: async () => [],
 });
@@ -184,8 +178,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       getBalance: async (address: string) => getAddressBalance(address),
       getNetworkFees: async () => getNetworkFees(),
       pushTx: async (txHex: string) => pushTx(txHex),
-      getUtxos: async (address: string, amount?: number) =>
-        getFundingUTXOs(address, amount),
       getBTCTipHeight: async () => getTipHeight(),
       getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
         btcWalletProvider?.getInscriptions().catch(() => []) ?? [],
