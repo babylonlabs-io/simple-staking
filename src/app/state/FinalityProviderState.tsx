@@ -10,8 +10,10 @@ import {
 } from "react";
 
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
+import { useFinalityProvidersV2 } from "@/app/hooks/client/api/useFinalityProvidersV2";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
+  FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
 import { createStateUtils } from "@/utils/createStateUtils";
@@ -46,6 +48,13 @@ interface FinalityProviderState {
   isRowSelectable: (row: FinalityProvider) => boolean;
   getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
+  // V1
+  finalityProvidersV1: FinalityProviderV1[];
+  hasNextPageV1: boolean;
+  isFetchingV1: boolean;
+  hasErrorV1: boolean;
+  getFinalityProviderV1: (btcPkHex: string) => FinalityProviderV1 | null;
+  fetchNextPageV1: () => void;
 }
 
 const defaultState: FinalityProviderState = {
@@ -61,12 +70,19 @@ const defaultState: FinalityProviderState = {
   handleFilter: () => {},
   getFinalityProvider: () => null,
   fetchNextPage: () => {},
+  // V1
+  finalityProvidersV1: [],
+  hasNextPageV1: false,
+  isFetchingV1: false,
+  hasErrorV1: false,
+  getFinalityProviderV1: () => null,
+  fetchNextPageV1: () => {},
 };
 
 const { StateProvider, useState: useFpState } =
   createStateUtils<FinalityProviderState>(defaultState);
 
-function FinalityProviderStateInner({ children }: PropsWithChildren) {
+const FinalityProviderStateInner = ({ children }: PropsWithChildren) => {
   const searchParams = useSearchParams();
   const fpParam = searchParams.get("fp");
 
@@ -79,11 +95,23 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
   const debouncedSearch = useDebounce(searchValue, 300);
 
   const { data, hasNextPage, fetchNextPage, isFetching, isError } =
-    useFinalityProviders({
+    useFinalityProvidersV2({
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
     });
+
+  const {
+    data: dataV1,
+    hasNextPage: hasNextPageV1,
+    fetchNextPage: fetchNextPageV1,
+    isFetching: isFetchingV1,
+    isError: isErrorV1,
+  } = useFinalityProviders({
+    sortBy: sortState.field,
+    order: sortState.direction,
+    name: debouncedSearch,
+  });
 
   const handleSearch = useCallback((searchTerm: string) => {
     setSearchValue(searchTerm);
@@ -147,8 +175,18 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
 
   const getFinalityProvider = useCallback(
     (btcPkHex: string) =>
-      data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
+      data?.finalityProviders.find(
+        (fp: FinalityProvider) => fp.btcPk === btcPkHex,
+      ) || null,
     [data?.finalityProviders],
+  );
+
+  const getFinalityProviderV1 = useCallback(
+    (btcPkHex: string) =>
+      dataV1?.finalityProviders.find(
+        (fp: FinalityProviderV1) => fp.btcPk === btcPkHex,
+      ) || null,
+    [dataV1?.finalityProviders],
   );
 
   useEffect(() => {
@@ -171,6 +209,12 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
+      finalityProvidersV1: dataV1?.finalityProviders || [],
+      hasNextPageV1,
+      isFetchingV1,
+      hasErrorV1: isErrorV1,
+      getFinalityProviderV1,
+      fetchNextPageV1,
     }),
     [
       searchValue,
@@ -185,11 +229,17 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
+      dataV1?.finalityProviders,
+      hasNextPageV1,
+      isFetchingV1,
+      isErrorV1,
+      getFinalityProviderV1,
+      fetchNextPageV1,
     ],
   );
 
   return <StateProvider value={state}>{children}</StateProvider>;
-}
+};
 
 export function FinalityProviderState({ children }: PropsWithChildren) {
   return (
