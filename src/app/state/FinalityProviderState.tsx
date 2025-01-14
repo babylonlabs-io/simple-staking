@@ -153,11 +153,10 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       const isActive = fp.state === FinalityProviderStateEnum.ACTIVE;
       const isInactive = inactiveStatuses.has(fp.state);
 
-      return filterValue === "active"
-        ? isActive
-        : filterValue === "inactive"
-          ? isInactive
-          : true;
+      if (filterValue === "active") return isActive;
+      if (filterValue === "inactive") return isInactive;
+      // default to active
+      return true;
     });
   }, [data?.finalityProviders, filterValue, searchValue]);
 
