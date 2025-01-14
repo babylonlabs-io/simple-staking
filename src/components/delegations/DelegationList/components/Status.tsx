@@ -1,12 +1,13 @@
-import { type JSX } from "react";
+import { useMemo, type JSX } from "react";
 
 import { useAppState } from "@/app/state";
 import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
-import { Params } from "@/app/types/networkInfo";
+import { NetworkInfo, Params } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
+import { getNetworkConfig, NetworkConfig } from "@/config/network";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { getSlashingAmount } from "@/utils/delegations/slashing";
 import { getBbnParamByVersion } from "@/utils/params";
@@ -24,6 +25,12 @@ interface StatusTooltipProps {
   coinName?: string;
   slashingAmount?: number;
   startHeight?: number;
+}
+
+interface StatusParams {
+  delegation: DelegationV2;
+  networkInfo?: NetworkInfo;
+  config: NetworkConfig;
 }
 
 const { coinName } = getNetworkConfigBTC();
@@ -153,27 +160,61 @@ const STATUSES: Record<
   }),
 };
 
+/**
+ * Determines the delegation status and tooltip based on its current state
+ * @param delegation - The delegation object containing state and other properties
+ * @param networkInfo - Network parameters and configuration
+ * @param config - Network-specific configuration (BTC, BBN)
+ * @returns Status object containing label, tooltip and optional status indicator
+ */
+const getDelegationStatus = ({
+  delegation,
+  networkInfo,
+  config,
+}: StatusParams) => {
+  const slashingAmount = getSlashingAmount(
+    delegation.stakingAmount,
+    getBbnParamByVersion(
+      delegation.paramsVersion,
+      networkInfo?.params.bbnStakingParams.versions || [],
+    ),
+  );
+
+  return STATUSES[delegation.state]({
+    params: networkInfo?.params,
+    amount: delegation.stakingAmount,
+    coinName: config.btc.coinName,
+    slashingAmount,
+    startHeight: delegation.startHeight,
+  });
+};
+
 export function Status({ delegation }: StatusProps) {
   const { networkInfo } = useAppState();
-  const { coinName } = getNetworkConfigBTC();
+  const networkConfig = getNetworkConfig();
 
-  const param = getBbnParamByVersion(
-    delegation.paramsVersion,
-    networkInfo?.params.bbnStakingParams.versions || [],
+  const delegationStatus = useMemo(
+    () =>
+      getDelegationStatus({
+        delegation,
+        networkInfo,
+        config: networkConfig,
+      }),
+    [
+      delegation.stakingAmount,
+      delegation.paramsVersion,
+      delegation.state,
+      delegation.startHeight,
+      networkInfo?.params,
+      networkConfig.btc.coinName,
+    ],
   );
-  const slashingAmount = getSlashingAmount(delegation.stakingAmount, param);
 
   const {
     label = "unknown",
     tooltip = "unknown",
     status,
-  } = STATUSES[delegation.state]({
-    params: networkInfo?.params,
-    amount: delegation.stakingAmount,
-    coinName,
-    slashingAmount,
-    startHeight: delegation.startHeight,
-  }) ?? {};
+  } = delegationStatus ?? {};
 
   return (
     <Hint tooltip={tooltip} status={status}>

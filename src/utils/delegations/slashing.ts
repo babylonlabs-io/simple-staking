@@ -12,7 +12,8 @@ export const getSlashingAmount = (
   param: BbnStakingParamsVersion,
 ) => {
   if (!param.slashing) {
-    throw new Error("Slashing param not found");
+    // Slashing param not found
+    return 0;
   }
 
   // Round the slashing rate to two decimal places
