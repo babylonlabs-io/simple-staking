@@ -29,7 +29,7 @@ export const StakeModal = ({
     onSubmit={onSubmit}
     onClose={onClose}
   >
-    Your request has been verified by the ${bbn.networkFullName}. You can now
+    Your request has been verified by the {bbn.networkFullName}. You can now
     stake!
   </SubmitModal>
 );
