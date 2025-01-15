@@ -20,10 +20,9 @@ export const FinalityProviderTable = ({
     isFetching,
     finalityProviders,
     hasNextPage,
-    fetchNextPage,
-    searchValue,
-    filterValue,
     hasError,
+    filter,
+    fetchNextPage,
     isRowSelectable,
   } = useFinalityProviderState();
 
@@ -83,7 +82,6 @@ export const FinalityProviderTable = ({
   return (
     <div className="h-[21rem] overflow-y-auto ">
       <Table
-        key={`${searchValue}-${filterValue}`}
         data={tableData}
         columns={finalityProviderColumns}
         loading={isFetching}
