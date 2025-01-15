@@ -1,7 +1,8 @@
+"use client";
+
 import { useDebounce } from "@uidotdev/usehooks";
 import { useSearchParams } from "next/navigation";
 import {
-  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -10,8 +11,10 @@ import {
 } from "react";
 
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
+import { useFinalityProvidersV2 } from "@/app/hooks/client/api/useFinalityProvidersV2";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
+  FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
 import { createStateUtils } from "@/utils/createStateUtils";
@@ -33,6 +36,11 @@ const inactiveStatuses = new Set([
   FinalityProviderStateEnum.SLASHED,
 ]);
 
+interface FinalityProviderMaps {
+  providersMap: Map<string, FinalityProvider>;
+  providersV1Map: Map<string, FinalityProviderV1>;
+}
+
 interface FinalityProviderState {
   searchValue: string;
   filterValue: string | number;
@@ -46,6 +54,8 @@ interface FinalityProviderState {
   isRowSelectable: (row: FinalityProvider) => boolean;
   getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
+  finalityProvidersV1: FinalityProviderV1[];
+  getFinalityProviderV1: (btcPkHex: string) => FinalityProviderV1 | null;
 }
 
 const defaultState: FinalityProviderState = {
@@ -61,12 +71,14 @@ const defaultState: FinalityProviderState = {
   handleFilter: () => {},
   getFinalityProvider: () => null,
   fetchNextPage: () => {},
+  finalityProvidersV1: [],
+  getFinalityProviderV1: () => null,
 };
 
 const { StateProvider, useState: useFpState } =
   createStateUtils<FinalityProviderState>(defaultState);
 
-function FinalityProviderStateInner({ children }: PropsWithChildren) {
+function FinalityProviderState({ children }: PropsWithChildren) {
   const searchParams = useSearchParams();
   const fpParam = searchParams.get("fp");
 
@@ -79,11 +91,72 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
   const debouncedSearch = useDebounce(searchValue, 300);
 
   const { data, hasNextPage, fetchNextPage, isFetching, isError } =
-    useFinalityProviders({
+    useFinalityProvidersV2({
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
     });
+
+  const { data: dataV1 } = useFinalityProviders();
+
+  const providersMap = useMemo(() => {
+    const map = new Map<string, FinalityProvider>();
+    data?.finalityProviders?.forEach((fp) => {
+      if (fp.btcPk) {
+        map.set(fp.btcPk, fp);
+      }
+    });
+    return map;
+  }, [data?.finalityProviders]);
+
+  const providersV1Map = useMemo(() => {
+    const map = new Map<string, FinalityProviderV1>();
+    dataV1?.finalityProviders?.forEach((fp) => {
+      if (fp.btcPk) {
+        map.set(fp.btcPk, fp);
+      }
+    });
+    return map;
+  }, [dataV1?.finalityProviders]);
+
+  const getFinalityProvider = useCallback(
+    (btcPkHex: string) => providersMap.get(btcPkHex) || null,
+    [providersMap],
+  );
+
+  const getFinalityProviderV1 = useCallback(
+    (btcPkHex: string) => providersV1Map.get(btcPkHex) || null,
+    [providersV1Map],
+  );
+
+  const filterFinalityProvider = useCallback(
+    (fp: FinalityProvider) => {
+      if (!fp) return false;
+
+      if (searchValue) {
+        const searchLower = searchValue.toLowerCase();
+        return (
+          (fp.description?.moniker?.toLowerCase() || "").includes(
+            searchLower,
+          ) || (fp.btcPk?.toLowerCase() || "").includes(searchLower)
+        );
+      }
+
+      const isActive = fp.state === FinalityProviderStateEnum.ACTIVE;
+      const isInactive = inactiveStatuses.has(fp.state);
+
+      if (filterValue === "active") return isActive;
+      if (filterValue === "inactive") return isInactive;
+      // default to active
+      return true;
+    },
+    [filterValue, searchValue],
+  );
+
+  const filteredFinalityProviders = useMemo(() => {
+    if (!data?.finalityProviders) return [];
+    return data.finalityProviders.filter(filterFinalityProvider);
+  }, [data?.finalityProviders, filterFinalityProvider]);
 
   const handleSearch = useCallback((searchTerm: string) => {
     setSearchValue(searchTerm);
@@ -114,43 +187,6 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
     );
   }, []);
 
-  const filteredFinalityProviders = useMemo(() => {
-    if (!data?.finalityProviders) return [];
-
-    return data.finalityProviders.filter((fp: FinalityProvider) => {
-      if (!fp) return false;
-
-      const isActive = fp.state === FinalityProviderStateEnum.ACTIVE;
-      const isInactive = inactiveStatuses.has(fp.state);
-
-      const statusMatch =
-        filterValue === "active"
-          ? isActive
-          : filterValue === "inactive"
-            ? isInactive
-            : true;
-
-      if (!statusMatch) return false;
-
-      if (searchValue) {
-        const searchLower = searchValue.toLowerCase();
-        return (
-          (fp.description?.moniker?.toLowerCase() || "").includes(
-            searchLower,
-          ) || (fp.btcPk?.toLowerCase() || "").includes(searchLower)
-        );
-      }
-
-      return true;
-    });
-  }, [data?.finalityProviders, filterValue, searchValue]);
-
-  const getFinalityProvider = useCallback(
-    (btcPkHex: string) =>
-      data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
-    [data?.finalityProviders],
-  );
-
   useEffect(() => {
     if (fpParam && data?.finalityProviders) {
       handleSearch(fpParam);
@@ -171,6 +207,8 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
+      finalityProvidersV1: dataV1?.finalityProviders || [],
+      getFinalityProviderV1,
     }),
     [
       searchValue,
@@ -185,20 +223,12 @@ function FinalityProviderStateInner({ children }: PropsWithChildren) {
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
+      dataV1?.finalityProviders,
+      getFinalityProviderV1,
     ],
   );
 
   return <StateProvider value={state}>{children}</StateProvider>;
 }
 
-export function FinalityProviderState({ children }: PropsWithChildren) {
-  return (
-    <Suspense
-      fallback={<StateProvider value={defaultState}>{children}</StateProvider>}
-    >
-      <FinalityProviderStateInner>{children}</FinalityProviderStateInner>
-    </Suspense>
-  );
-}
-
-export { useFpState as useFinalityProviderState };
+export { FinalityProviderState, useFpState as useFinalityProviderState };

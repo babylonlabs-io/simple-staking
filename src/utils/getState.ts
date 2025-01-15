@@ -28,7 +28,7 @@ export const getState = (state: string) => {
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal Submitted";
     case DelegationState.INTERMEDIATE_TRANSITIONING:
-      return "Transitioning";
+      return "Active/Pending Registration";
     case DelegationState.TRANSITIONED:
       return "Transitioned";
     default:
@@ -57,7 +57,7 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal transaction pending confirmation on Bitcoin";
     case DelegationState.INTERMEDIATE_TRANSITIONING:
-      return `Stake is transitioning to the ${bbnNetworkFullName} network`;
+      return `Stake is pending registration to the ${bbnNetworkFullName} network`;
     case DelegationState.TRANSITIONED:
       return `Stake has been transitioned to the ${bbnNetworkFullName} network`;
     default:
