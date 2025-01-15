@@ -99,33 +99,34 @@ function FinalityProviderState({ children }: PropsWithChildren) {
 
   const { data: dataV1 } = useFinalityProviders();
 
-  const providerMaps = useMemo<FinalityProviderMaps>(() => {
-    const providersMap = new Map<string, FinalityProvider>();
-    const providersV1Map = new Map<string, FinalityProviderV1>();
-
+  const providersMap = useMemo(() => {
+    const map = new Map<string, FinalityProvider>();
     data?.finalityProviders?.forEach((fp) => {
       if (fp.btcPk) {
-        providersMap.set(fp.btcPk, fp);
+        map.set(fp.btcPk, fp);
       }
     });
+    return map;
+  }, [data?.finalityProviders]);
 
+  const providersV1Map = useMemo(() => {
+    const map = new Map<string, FinalityProviderV1>();
     dataV1?.finalityProviders?.forEach((fp) => {
       if (fp.btcPk) {
-        providersV1Map.set(fp.btcPk, fp);
+        map.set(fp.btcPk, fp);
       }
     });
-
-    return { providersMap, providersV1Map };
-  }, [data?.finalityProviders, dataV1?.finalityProviders]);
+    return map;
+  }, [dataV1?.finalityProviders]);
 
   const getFinalityProvider = useCallback(
-    (btcPkHex: string) => providerMaps.providersMap.get(btcPkHex) || null,
-    [providerMaps.providersMap],
+    (btcPkHex: string) => providersMap.get(btcPkHex) || null,
+    [providersMap],
   );
 
   const getFinalityProviderV1 = useCallback(
-    (btcPkHex: string) => providerMaps.providersV1Map.get(btcPkHex) || null,
-    [providerMaps.providersV1Map],
+    (btcPkHex: string) => providersV1Map.get(btcPkHex) || null,
+    [providersV1Map],
   );
 
   const filterFinalityProvider = useCallback(
