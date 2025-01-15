@@ -82,7 +82,6 @@ export const FinalityProviderTable = ({
   return (
     <div className="h-[21rem] overflow-y-auto ">
       <Table
-        key={`${filter.search}-${filter.status}`}
         data={tableData}
         columns={finalityProviderColumns}
         loading={isFetching}
