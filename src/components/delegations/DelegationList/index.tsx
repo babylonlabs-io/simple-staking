@@ -1,4 +1,4 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
 
 import {
   ActionType,
@@ -88,7 +88,7 @@ export function DelegationList() {
   } = useDelegationService();
 
   return (
-    <div className="bg-secondary-contrast p-6 border border-primary-dark/20">
+    <Card>
       <Heading variant="h6" className="text-primary-light py-2 mb-6">
         {networkConfig.bbn.networkFullName} Stakes
       </Heading>
@@ -122,6 +122,6 @@ export function DelegationList() {
         onClose={closeConfirmationModal}
         networkConfig={networkConfig}
       />
-    </div>
+    </Card>
   );
 }

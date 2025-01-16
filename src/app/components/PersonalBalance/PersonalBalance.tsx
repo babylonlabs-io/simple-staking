@@ -1,3 +1,5 @@
+import { Card } from "@babylonlabs-io/bbn-core-ui";
+
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useRewardsState } from "@/app/state/RewardState";
 import { AuthGuard } from "@/components/common/AuthGuard";
@@ -34,7 +36,7 @@ export function PersonalBalance() {
   return (
     <AuthGuard>
       <Section title="Wallet Balance">
-        <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row border border-primary-dark/20">
+        <Card className="flex flex-col justify-between text-base md:flex-row">
           <StatItem
             loading={loading}
             title={`Total ${coinName} Balance`}
@@ -69,7 +71,7 @@ export function PersonalBalance() {
               isDisabled: !rewardBalance || processing,
             }}
           />
-        </div>
+        </Card>
 
         <ClaimRewardModal
           processing={processing}

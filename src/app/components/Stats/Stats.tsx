@@ -1,3 +1,4 @@
+import { Card } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";
@@ -29,7 +30,7 @@ export const Stats = memo(() => {
       title="Babylon Bitcoin Staking Stats"
       titleClassName="text-primary-contrast"
     >
-      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row border border-primary-dark/20">
+      <Card className="flex flex-col justify-between  text-base md:flex-row">
         <StatItem
           loading={isLoading}
           title={`Confirmed ${coinSymbol} TVL`}
@@ -61,7 +62,7 @@ export const Stats = memo(() => {
           value={`${activeFinalityProviders} Active (${totalFinalityProviders} Total)`}
           tooltip="Active and total number of finality providers"
         />
-      </div>
+      </Card>
     </Section>
   );
 });
