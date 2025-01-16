@@ -74,7 +74,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     resetRegistration: handleCloseRegistration,
   } = useDelegationState();
   const { registerPhase1Delegation } = useRegistrationService();
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getFinalityProviderName } = useFinalityProviderState();
   const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
   useEffect(() => {
@@ -118,10 +118,9 @@ export const Delegation: React.FC<DelegationProps> = ({
 
           <DelegationCell
             order="order-4 lg:order-2"
-            className="pt-6 lg:pt-0 text-right lg:text-left"
+            className="text-right lg:text-left"
           >
-            {getFinalityProvider(finalityProviderPkHex)?.description?.moniker ??
-              "-"}
+            {getFinalityProviderName(finalityProviderPkHex) ?? "-"}
           </DelegationCell>
 
           <DelegationCell
