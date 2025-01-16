@@ -3,8 +3,10 @@ import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
+import { useFinalityProvidersV2 } from "@/app/hooks/client/api/useFinalityProvidersV2";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
+  FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
 import { createStateUtils } from "@/utils/createStateUtils";
@@ -30,6 +32,7 @@ interface FinalityProviderState {
   isRowSelectable: (row: FinalityProvider) => boolean;
   getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
+  getFinalityProviderName: (btcPkHex: string) => string | undefined;
 }
 
 const SORT_DIRECTIONS = {
@@ -68,6 +71,7 @@ const defaultState: FinalityProviderState = {
   handleFilter: () => {},
   getFinalityProvider: () => null,
   fetchNextPage: () => {},
+  getFinalityProviderName: () => undefined,
 };
 
 const { StateProvider, useState: useFpState } =
@@ -85,11 +89,44 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const debouncedSearch = useDebounce(filter.search, 300);
 
   const { data, hasNextPage, fetchNextPage, isFetching, isError } =
-    useFinalityProviders({
+    useFinalityProvidersV2({
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
     });
+
+  const { data: dataV1 } = useFinalityProviders();
+
+  const providersMap = useMemo(
+    () =>
+      (data?.finalityProviders ?? []).reduce((acc, fp) => {
+        if (fp.btcPk) {
+          acc.set(fp.btcPk, fp);
+        }
+
+        return acc;
+      }, new Map<string, FinalityProvider>()),
+    [data?.finalityProviders],
+  );
+
+  const providersV1Map = useMemo(
+    () =>
+      (dataV1?.finalityProviders ?? []).reduce((acc, fp) => {
+        if (fp.btcPk) {
+          acc.set(fp.btcPk, fp);
+        }
+
+        return acc;
+      }, new Map<string, FinalityProviderV1>()),
+    [dataV1?.finalityProviders],
+  );
+
+  const getFinalityProviderName = useCallback(
+    (btcPkHex: string) =>
+      providersMap.get(btcPkHex)?.description?.moniker ??
+      providersV1Map.get(btcPkHex)?.description?.moniker,
+    [providersMap, providersV1Map],
+  );
 
   const handleFilter = useCallback((key: keyof FilterState, value: string) => {
     setFilter((state) => ({ ...state, [key]: value }));
@@ -142,6 +179,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
+      getFinalityProviderName,
     }),
     [
       filter,
@@ -154,6 +192,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
+      getFinalityProviderName,
     ],
   );
 

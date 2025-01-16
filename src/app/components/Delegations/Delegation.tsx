@@ -13,6 +13,7 @@ import {
   type Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
+import { Hint } from "@/components/common/Hint";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { getState, getStateTooltip } from "@/utils/getState";
@@ -23,7 +24,6 @@ import { trim } from "@/utils/trim";
 import { VerificationModal } from "../Modals/VerificationModal";
 
 import { DelegationCell } from "./components/DelegationCell";
-import { DelegationStatus } from "./components/DelegationStatus";
 
 interface DelegationProps {
   delegation: DelegationInterface;
@@ -74,7 +74,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     resetRegistration: handleCloseRegistration,
   } = useDelegationState();
   const { registerPhase1Delegation } = useRegistrationService();
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getFinalityProviderName } = useFinalityProviderState();
   const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
   useEffect(() => {
@@ -118,10 +118,9 @@ export const Delegation: React.FC<DelegationProps> = ({
 
           <DelegationCell
             order="order-4 lg:order-2"
-            className="pt-6 lg:pt-0 text-right lg:text-left"
+            className="text-right lg:text-left"
           >
-            {getFinalityProvider(finalityProviderPkHex)?.description?.moniker ??
-              "-"}
+            {getFinalityProviderName(finalityProviderPkHex) ?? "-"}
           </DelegationCell>
 
           <DelegationCell
@@ -155,12 +154,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             order="order-5"
             className="relative flex justify-end lg:justify-start"
           >
-            <DelegationStatus
-              state={renderState()}
-              tooltip={renderStateTooltip()}
-              stakingTxHashHex={stakingTxHashHex}
-              isOverflow={isOverflow && isActive}
-            />
+            <Hint tooltip={renderStateTooltip()}>{renderState()}</Hint>
           </DelegationCell>
 
           <DelegationCell order="order-6">
