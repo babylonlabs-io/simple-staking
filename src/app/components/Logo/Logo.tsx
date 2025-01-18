@@ -7,11 +7,7 @@ interface LogoProps {
   height?: number;
 }
 
-export const Logo: React.FC<LogoProps> = ({
-  className,
-  width = 159,
-  height = 40,
-}) => (
+export const Logo: React.FC<LogoProps> = ({ className, width, height }) => (
   <Link href="/">
     <svg
       xmlns="http://www.w3.org/2000/svg"

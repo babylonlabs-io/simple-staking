@@ -111,7 +111,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
         <div>
-          <Logo className="w-full h-auto" />
+          <Logo className="w-[250px] md:w-full h-auto" />
         </div>
       </Container>
     </footer>

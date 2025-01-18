@@ -13,7 +13,7 @@ export const Header = () => {
   return (
     <header className="bg-primary-main h-[18.75rem]">
       <Container className="h-20 flex items-center justify-between">
-        <Logo />
+        <Logo width={159} height={40} />
         <div className="flex items-center gap-4">
           <Connect loading={loading} onConnect={open} />
         </div>
