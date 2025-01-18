@@ -13,6 +13,6 @@ export const Container = ({
 }: PropsWithChildren<ContainerProps>) =>
   createElement(
     as,
-    { className: twMerge("container px-4 mx-auto sm:px-0", className) },
+    { className: twMerge("container px-4 mx-auto", className) },
     children,
   );
