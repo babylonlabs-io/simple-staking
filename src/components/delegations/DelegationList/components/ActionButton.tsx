@@ -1,6 +1,5 @@
 import { Button } from "@babylonlabs-io/bbn-core-ui";
-import { useId } from "react";
-import { Tooltip } from "react-tooltip";
+import { type ReactNode } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
@@ -8,10 +7,11 @@ import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
+import { Hint } from "@/components/common/Hint";
 
 interface ActionButtonProps {
   disabled?: boolean;
-  tooltip?: string;
+  tooltip?: string | ReactNode;
   delegation: DelegationV2;
   state: string;
   onClick?: (action: ActionType, delegation: DelegationV2) => void;
@@ -48,18 +48,12 @@ const ACTION_BUTTON_PROPS: Record<
 };
 
 export function ActionButton(props: ActionButtonProps) {
-  const tooltipId = useId();
   const buttonProps = ACTION_BUTTON_PROPS[props.state];
 
   if (!buttonProps) return null;
 
   return (
-    <span
-      className="cursor-pointer"
-      data-tooltip-id={tooltipId}
-      data-tooltip-content={props.tooltip}
-      data-tooltip-place="top"
-    >
+    <Hint tooltip={props.tooltip} hasIcon={false}>
       <Button
         variant="outlined"
         size="small"
@@ -68,8 +62,6 @@ export function ActionButton(props: ActionButtonProps) {
       >
         {buttonProps.title}
       </Button>
-
-      <Tooltip id={tooltipId} className="tooltip-wrap" />
-    </span>
+    </Hint>
   );
 }

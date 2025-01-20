@@ -8,6 +8,7 @@ type HintStatus = "default" | "warning" | "error";
 interface HintProps {
   tooltip?: ReactNode;
   status?: HintStatus;
+  hasIcon?: boolean;
 }
 
 const STATUS_COLORS = {
@@ -26,6 +27,7 @@ export function Hint({
   children,
   tooltip,
   status = "default",
+  hasIcon = true,
 }: PropsWithChildren<HintProps>) {
   const id = useId();
 
@@ -36,7 +38,7 @@ export function Hint({
         STATUS_COLORS[status],
       )}
     >
-      {children && <p>{children}</p>}
+      {(!tooltip || hasIcon) && children && <p>{children}</p>}
       {tooltip && (
         <>
           <span
@@ -47,7 +49,11 @@ export function Hint({
             }
             data-tooltip-place="top"
           >
-            <AiOutlineInfoCircle size={16} className={ICON_COLOR[status]} />
+            {hasIcon ? (
+              <AiOutlineInfoCircle size={16} className={ICON_COLOR[status]} />
+            ) : (
+              children
+            )}
           </span>
           <Tooltip
             id={id}
