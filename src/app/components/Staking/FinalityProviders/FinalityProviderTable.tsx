@@ -81,7 +81,7 @@ export const FinalityProviderTable = ({
 
   return (
     <Table
-      wrapperClassName="h-[21rem]"
+      wrapperClassName="h-[28.5rem]"
       data={tableData}
       columns={finalityProviderColumns}
       loading={isFetching}

@@ -14,3 +14,5 @@ export const DOCUMENTATION_LINKS = {
   TECHNICAL_PRELIMINARIES:
     "https://babylonlabs.io/blog/technical-preliminaries-of-bitcoin-staking",
 } as const;
+
+export const BBN_FEE_AMOUNT = process.env.NEXT_PUBLIC_BBN_FEE_AMOUNT;
