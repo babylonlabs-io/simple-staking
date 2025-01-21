@@ -83,6 +83,7 @@ export const useTransactionService = () => {
     connected: btcConnected,
     signPsbt,
     publicKeyNoCoord,
+    getPublicKeyHex,
     address,
     signMessage,
     network: btcNetwork,
@@ -131,7 +132,11 @@ export const useTransactionService = () => {
       // EOI should always be created based on the BTC tip height from BBN chain
       const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
 
-      const enrichedUtxos = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+      const fullPK = await getPublicKeyHex();
+      const enrichedUtxos = await populateRawTxHexForLegacyUtxos(
+        inputUTXOs!,
+        Buffer.from(fullPK, "hex"),
+      );
       console.log("[createDelegationEoi] enriched UTXOs:", enrichedUtxos);
 
       const staking = new Staking(
@@ -211,6 +216,7 @@ export const useTransactionService = () => {
       signMessage,
       signBbnTx,
       sendBbnTx,
+      getPublicKeyHex,
     ],
   );
 
@@ -406,9 +412,14 @@ export const useTransactionService = () => {
         stakingInput.stakingTimelock,
       );
 
+      const fullPK = await getPublicKeyHex();
+
       // Enrich the UTXOs
       console.log("[submitStakingTx] inputUTXOs (raw):", inputUTXOs);
-      const enrichedUtxos = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+      const enrichedUtxos = await populateRawTxHexForLegacyUtxos(
+        inputUTXOs!,
+        Buffer.from(fullPK, "hex"),
+      );
       console.log("[submitStakingTx] enrichedUtxos:", enrichedUtxos);
 
       const stakingPsbt = staking.toStakingPsbt(
