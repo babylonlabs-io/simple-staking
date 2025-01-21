@@ -30,6 +30,7 @@ import {
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
 import { getBbnParamByBtcHeight, getBbnParamByVersion } from "@/utils/params";
+import { populateRawTxHexForLegacyUtxos } from "@/utils/populateRawTxHex";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
@@ -126,6 +127,8 @@ export const useTransactionService = () => {
       // EOI should always be created based on the BTC tip height from BBN chain
       const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
 
+      const enriched = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+
       const staking = new Staking(
         btcNetwork!,
         {
@@ -140,7 +143,7 @@ export const useTransactionService = () => {
       // Create and sign staking transaction
       const { transaction } = staking.createStakingTransaction(
         stakingInput.stakingAmountSat,
-        inputUTXOs!,
+        enriched,
         feeRate,
       );
 
@@ -361,9 +364,12 @@ export const useTransactionService = () => {
         stakingInput.finalityProviderPkNoCoordHex,
         stakingInput.stakingTimelock,
       );
+
+      const enrichedUtxos = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+
       const stakingPsbt = staking.toStakingPsbt(
         Transaction.fromHex(stakingTxHex),
-        inputUTXOs!,
+        enrichedUtxos,
       );
       console.log("stakingPsbt", stakingPsbt.toHex());
 
