@@ -105,6 +105,10 @@ export const useTransactionService = () => {
       feeRate: number,
       signingCallback: (step: SigningStep) => Promise<void>,
     ) => {
+      console.log("[createDelegationEoi] inputUTXOs (raw):", inputUTXOs);
+      console.log("[createDelegationEoi] feeRate:", feeRate);
+      console.log("[createDelegationEoi] stakingInput:", stakingInput);
+
       // Perform checks
       checkWalletConnection(
         cosmosConnected,
@@ -128,6 +132,7 @@ export const useTransactionService = () => {
       const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
 
       const enriched = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+      console.log("[createDelegationEoi] enriched UTXOs:", enriched);
 
       const staking = new Staking(
         btcNetwork!,
@@ -145,6 +150,15 @@ export const useTransactionService = () => {
         stakingInput.stakingAmountSat,
         enriched,
         feeRate,
+      );
+
+      console.log(
+        "[createDelegationEoi] built stakingTx hex:",
+        transaction.toHex(),
+      );
+      console.log(
+        "[createDelegationEoi] built stakingTx id:",
+        transaction.getId(),
       );
 
       const delegationMsg = await createBtcDelegationMsg(
@@ -343,6 +357,9 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       stakingTxHex: string,
     ) => {
+      console.log("[submitStakingTx] expectedTxHashHex:", expectedTxHashHex);
+      console.log("[submitStakingTx] stakingTxHex (given):", stakingTxHex);
+
       // Perform checks
       if (!versionedParams || versionedParams?.length === 0) {
         throw new Error("Staking parameters not loaded");
@@ -350,6 +367,13 @@ export const useTransactionService = () => {
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
       validateStakingInput(stakingInput);
+
+      // Just to see what .getId() says about your provided hex:
+      const providedTx = Transaction.fromHex(stakingTxHex);
+      console.log(
+        "[submitStakingTx] TxID if we parse stakingTxHex ourselves:",
+        providedTx.getId(),
+      );
 
       // Get the param based on version from the EOI
       const p = getBbnParamByVersion(paramVersion, versionedParams);
@@ -365,17 +389,37 @@ export const useTransactionService = () => {
         stakingInput.stakingTimelock,
       );
 
+      // Enrich the UTXOs
+      console.log("[submitStakingTx] inputUTXOs (raw):", inputUTXOs);
       const enrichedUtxos = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+      console.log("[submitStakingTx] enrichedUtxos:", enrichedUtxos);
 
       const stakingPsbt = staking.toStakingPsbt(
         Transaction.fromHex(stakingTxHex),
         enrichedUtxos,
       );
-      console.log("stakingPsbt", stakingPsbt.toHex());
+      console.log(
+        "[submitStakingTx] stakingPsbt (before sign):",
+        stakingPsbt.toHex(),
+      );
 
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
+      console.log(
+        "[submitStakingTx] signedStakingPsbtHex:",
+        signedStakingPsbtHex,
+      );
+
       const signedStakingTx =
         Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
+      console.log(
+        "[submitStakingTx] final signedStakingTx hex:",
+        signedStakingTx.toHex(),
+      );
+      console.log(
+        "[submitStakingTx] final signedStakingTx id:",
+        signedStakingTx.getId(),
+      );
+
       if (signedStakingTx.getId() !== expectedTxHashHex) {
         throw new Error(
           `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
