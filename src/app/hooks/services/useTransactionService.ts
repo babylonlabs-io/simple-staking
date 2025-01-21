@@ -131,8 +131,8 @@ export const useTransactionService = () => {
       // EOI should always be created based on the BTC tip height from BBN chain
       const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
 
-      const enriched = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
-      console.log("[createDelegationEoi] enriched UTXOs:", enriched);
+      const enrichedUtxos = await populateRawTxHexForLegacyUtxos(inputUTXOs!);
+      console.log("[createDelegationEoi] enriched UTXOs:", enrichedUtxos);
 
       const staking = new Staking(
         btcNetwork!,
@@ -146,25 +146,42 @@ export const useTransactionService = () => {
       );
 
       // Create and sign staking transaction
-      const { transaction } = staking.createStakingTransaction(
+      const { transaction: unsignedTx } = staking.createStakingTransaction(
         stakingInput.stakingAmountSat,
-        enriched,
+        enrichedUtxos,
         feeRate,
       );
 
+      // 2) Convert it to a PSBT
+      const stakingPsbt = staking.toStakingPsbt(unsignedTx, enrichedUtxos);
+
+      // 3) Let the user sign the PSBT
+      const signedPsbtHex = await signPsbt(stakingPsbt.toHex());
+      // 4) Extract the final signed transaction
+      const finalSignedTx = Psbt.fromHex(signedPsbtHex).extractTransaction();
+
       console.log(
-        "[createDelegationEoi] built stakingTx hex:",
-        transaction.toHex(),
+        "[createDelegationEoi] built unsignedTx stakingTx hex:",
+        unsignedTx.toHex(),
       );
       console.log(
-        "[createDelegationEoi] built stakingTx id:",
-        transaction.getId(),
+        "[createDelegationEoi] built unsignedTx stakingTx id:",
+        unsignedTx.getId(),
+      );
+
+      console.log(
+        "[createDelegationEoi] built finalSignedTx stakingTx hex:",
+        finalSignedTx.toHex(),
+      );
+      console.log(
+        "[createDelegationEoi] built finalSignedTx stakingTx id:",
+        finalSignedTx.getId(),
       );
 
       const delegationMsg = await createBtcDelegationMsg(
         staking,
         stakingInput,
-        transaction,
+        finalSignedTx,
         bech32Address,
         { address, publicKeyNoCoordHex: publicKeyNoCoord },
         p,
@@ -177,7 +194,7 @@ export const useTransactionService = () => {
       await signingCallback(SigningStep.SEND_BBN);
       await sendBbnTx(signedTx);
 
-      return transaction.getId();
+      return finalSignedTx.getId();
     },
     [
       cosmosConnected,
