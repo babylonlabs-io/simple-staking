@@ -254,8 +254,8 @@ export function StakingState({ children }: PropsWithChildren) {
           feeAmount: number()
             .transform(formatNumber)
             .typeError("Staking fee amount must be a valid number.")
-            .required("Staking fee amount is the required field.")
-            .moreThan(0, "Staking fee amount must be greater than 0."),
+            .required("Staking fee amount is the required field."),
+          // .moreThan(0, "Staking fee amount must be greater than 0."),
         })
         .required(),
     [publicKeyNoCoord, stakingInfo, stakableBtcBalance],

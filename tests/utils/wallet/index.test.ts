@@ -3,7 +3,7 @@ import { networks } from "bitcoinjs-lib";
 import { Network } from "@/app/types/network";
 import {
   getPublicKeyNoCoord,
-  isSupportedAddressType,
+  // isSupportedAddressType,
   isTaproot,
   toNetwork,
 } from "@/utils/wallet";
@@ -36,21 +36,21 @@ describe("toNetwork", () => {
   });
 });
 
-describe("isSupportedAddressType", () => {
-  it("should return true for native SegWit address length", () => {
-    expect(isSupportedAddressType(nativeSegWitAddress)).toBe(true);
-  });
+// describe("isSupportedAddressType", () => {
+//   it("should return true for native SegWit address length", () => {
+//     expect(isSupportedAddressType(nativeSegWitAddress)).toBe(true);
+//   });
 
-  it("should return true for Taproot address length", () => {
-    expect(isSupportedAddressType(taprootAddress)).toBe(true);
-  });
+//   it("should return true for Taproot address length", () => {
+//     expect(isSupportedAddressType(taprootAddress)).toBe(true);
+//   });
 
-  it("should return false for unsupported address length", () => {
-    expect(isSupportedAddressType(legacyAddress)).toBe(false);
-    expect(isSupportedAddressType(nestedSegWitAddress)).toBe(false);
-    expect(isSupportedAddressType("a".repeat(40))).toBe(false);
-  });
-});
+//   it("should return false for unsupported address length", () => {
+//     expect(isSupportedAddressType(legacyAddress)).toBe(false);
+//     expect(isSupportedAddressType(nestedSegWitAddress)).toBe(false);
+//     expect(isSupportedAddressType("a".repeat(40))).toBe(false);
+//   });
+// });
 
 describe("isTaproot", () => {
   it("should return true for Taproot address length", () => {

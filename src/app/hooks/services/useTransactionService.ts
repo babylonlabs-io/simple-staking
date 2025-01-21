@@ -365,6 +365,7 @@ export const useTransactionService = () => {
         Transaction.fromHex(stakingTxHex),
         inputUTXOs!,
       );
+      console.log("stakingPsbt", stakingPsbt.toHex());
 
       const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
       const signedStakingTx =
@@ -441,6 +442,7 @@ export const useTransactionService = () => {
 
       const unbondingTx = Transaction.fromHex(unbondingTxHex);
       const unbondingPsbt = staking.toUnbondingPsbt(unbondingTx, stakingTx);
+      console.log("unbondingPsbt", unbondingPsbt.toHex());
       const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
 
       // Compare the unbonding tx hash with the one from API
@@ -525,7 +527,7 @@ export const useTransactionService = () => {
           Transaction.fromHex(earlyUnbondingTxHex),
           defaultFeeRate,
         );
-
+      console.log("withdraw early unbonding", unbondingPsbt.toHex());
       const signedWithdrawalPsbtHex = await signPsbt(unbondingPsbt.toHex());
       const signedWithdrawalTx = Psbt.fromHex(
         signedWithdrawalPsbtHex,
@@ -587,7 +589,7 @@ export const useTransactionService = () => {
         Transaction.fromHex(stakingTxHex),
         defaultFeeRate,
       );
-
+      console.log("withdraw timelock unbonded", psbt.toHex());
       const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
       const signedWithdrawalTx = Psbt.fromHex(
         signedWithdrawalPsbtHex,
@@ -649,7 +651,7 @@ export const useTransactionService = () => {
         Transaction.fromHex(slashingTxHex),
         defaultFeeRate,
       );
-
+      console.log("withdraw slashing", psbt.toHex());
       const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
       const signedWithdrawalTx = Psbt.fromHex(
         signedWithdrawalPsbtHex,
@@ -700,6 +702,7 @@ const createBtcDelegationMsg = async (
   await btcSigningFuncs.signingCallback(SigningStep.STAKING_SLASHING);
   const { psbt: slashingPsbt } =
     stakingInstance.createStakingOutputSlashingTransaction(stakingTx);
+  console.log("slashingPsbt", slashingPsbt.toHex());
   const signedSlashingPsbtHex = await btcSigningFuncs.signPsbt(
     slashingPsbt.toHex(),
   );
@@ -714,6 +717,7 @@ const createBtcDelegationMsg = async (
   await btcSigningFuncs.signingCallback(SigningStep.UNBONDING_SLASHING);
   const { psbt: unbondingSlashingPsbt } =
     stakingInstance.createUnbondingOutputSlashingTransaction(unbondingTx);
+  console.log("unbondingSlashingPsbt", unbondingSlashingPsbt.toHex());
   const signedUnbondingSlashingPsbtHex = await btcSigningFuncs.signPsbt(
     unbondingSlashingPsbt.toHex(),
   );

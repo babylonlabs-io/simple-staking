@@ -28,7 +28,7 @@ import {
 } from "@/utils/mempool_api";
 import {
   getPublicKeyNoCoord,
-  isSupportedAddressType,
+  // isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
@@ -94,15 +94,15 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     async (walletProvider: IBTCProvider | null) => {
       if (!walletProvider) return;
 
-      const supportedNetworkMessage =
-        "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
+      // const supportedNetworkMessage =
+      //   "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
 
       try {
         const address = await walletProvider.getAddress();
-        const supported = isSupportedAddressType(address);
-        if (!supported) {
-          throw new Error(supportedNetworkMessage);
-        }
+        // const supported = isSupportedAddressType(address);
+        // if (!supported) {
+        //   throw new Error(supportedNetworkMessage);
+        // }
 
         const publicKeyNoCoord = getPublicKeyNoCoord(
           await walletProvider.getPublicKeyHex(),
@@ -119,20 +119,20 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         ) {
           return;
         }
-        let errorMessage;
-        switch (true) {
-          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
-            error.message,
-          ):
-            errorMessage = supportedNetworkMessage;
-            break;
-          default:
-            errorMessage = error.message;
-            break;
-        }
+        // let errorMessage;
+        // switch (true) {
+        //   case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
+        //     error.message,
+        //   ):
+        //     errorMessage = supportedNetworkMessage;
+        //     break;
+        //   default:
+        //     errorMessage = error.message;
+        //     break;
+        // }
         showError({
           error: {
-            message: errorMessage,
+            message: error?.message,
             errorState: ErrorState.WALLET,
           },
           retryAction: () => connectBTC(walletProvider),
