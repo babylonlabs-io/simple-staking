@@ -463,6 +463,7 @@ export const useTransactionService = () => {
       address,
       publicKeyNoCoord,
       inputUTXOs,
+      getPublicKeyHex,
       signPsbt,
       pushTx,
       refetchUTXOs,
