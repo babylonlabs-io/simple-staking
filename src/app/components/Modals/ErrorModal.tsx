@@ -96,7 +96,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
           <MdOutlineSwapHoriz className="text-5xl" />
         </div>
-        <Heading variant="h3" className="text-center font-bold text-error">
+        <Heading variant="h3" className="text-center font-bold text-error-main">
           {getErrorTitle()}
         </Heading>
         <div className="flex flex-col gap-3">

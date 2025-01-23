@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaBitcoin } from "react-icons/fa";
 
@@ -5,14 +6,15 @@ import { DelegationActions } from "@/app/components/Delegations/DelegationAction
 import { RegistrationEndModal } from "@/app/components/Modals/RegistrationModal/RegistrationEndModal";
 import { RegistrationStartModal } from "@/app/components/Modals/RegistrationModal/RegistrationStartModal";
 import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
-import { ONE_MINUTE } from "@/app/constants";
+import { DOCUMENTATION_LINKS, ONE_MINUTE } from "@/app/constants";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useDelegationState } from "@/app/state/DelegationState";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
   type Delegation as DelegationInterface,
-  DelegationState,
+  DelegationState as DelegationStateEnum,
 } from "@/app/types/delegations";
+import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
@@ -48,6 +50,107 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   "registration-verifying": 2,
 };
 
+interface FinalityProviderDisplayProps {
+  fpName: string;
+  isSlashed: boolean;
+  isJailed: boolean;
+}
+
+const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
+  fpName,
+  isSlashed,
+  isJailed,
+}) => {
+  if (isSlashed) {
+    return (
+      <Hint
+        tooltip={
+          <span>
+            This finality provider has been slashed.{" "}
+            <Link
+              className="text-error-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </Link>
+          </span>
+        }
+        status="error"
+      >
+        <span className="text-error-main">{fpName}</span>
+      </Hint>
+    );
+  }
+
+  if (isJailed) {
+    return (
+      <Hint
+        tooltip={
+          <span>
+            This finality provider has been jailed.{" "}
+            <Link
+              className="text-secondary-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </Link>
+          </span>
+        }
+        status="error"
+      >
+        <span className="text-error-main">{fpName}</span>
+      </Hint>
+    );
+  }
+
+  return <>{fpName}</>;
+};
+
+const DelegationState: React.FC<{
+  displayState: string;
+  isSlashed: boolean;
+}> = ({ displayState, isSlashed }) => {
+  const renderStateTooltip = () => {
+    if (isSlashed) {
+      return (
+        <span>
+          This finality provider has been slashed.{" "}
+          <Link
+            className="text-secondary-main"
+            target="_blank"
+            href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+          >
+            Learn more
+          </Link>
+        </span>
+      );
+    }
+
+    if (displayState === DelegationStateEnum.OVERFLOW) {
+      return "Stake is over the staking cap";
+    }
+    return getStateTooltip(displayState);
+  };
+
+  const renderState = () => {
+    if (isSlashed) {
+      return <span className="text-error-main">Slashed</span>;
+    }
+    return getState(displayState);
+  };
+
+  return (
+    <Hint
+      tooltip={renderStateTooltip()}
+      status={isSlashed ? "warning" : "default"}
+    >
+      {renderState()}
+    </Hint>
+  );
+};
+
 export const Delegation: React.FC<DelegationProps> = ({
   delegation,
   onWithdraw,
@@ -74,8 +177,22 @@ export const Delegation: React.FC<DelegationProps> = ({
     resetRegistration: handleCloseRegistration,
   } = useDelegationState();
   const { registerPhase1Delegation } = useRegistrationService();
-  const { getFinalityProviderName } = useFinalityProviderState();
+  const { getFinalityProvider, getFinalityProviderName } =
+    useFinalityProviderState();
   const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
+
+  const finalityProvider = getFinalityProvider(finalityProviderPkHex);
+  const fpState = finalityProvider?.state;
+  const fpName = getFinalityProviderName(finalityProviderPkHex) ?? "-";
+
+  const isActive = state === DelegationStateEnum.ACTIVE;
+  const isSlashed = fpState === FinalityProviderState.SLASHED;
+  const isJailed = fpState === FinalityProviderState.JAILED;
+
+  const displayState =
+    isOverflow && isActive
+      ? DelegationStateEnum.OVERFLOW
+      : intermediateState || state;
 
   useEffect(() => {
     const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE);
@@ -91,23 +208,6 @@ export const Delegation: React.FC<DelegationProps> = ({
     await registerPhase1Delegation();
   };
 
-  const isActive =
-    intermediateState === DelegationState.ACTIVE ||
-    state === DelegationState.ACTIVE;
-  const displayState =
-    isOverflow && isActive
-      ? DelegationState.OVERFLOW
-      : intermediateState || state;
-
-  const renderState = () => getState(displayState);
-  const renderStateTooltip = () => {
-    // overflow state to override the tooltip
-    if (isOverflow) {
-      return "Stake is over the staking cap";
-    }
-    return getStateTooltip(displayState);
-  };
-
   return (
     <>
       <div className="relative h-[120px] lg:h-[72px] rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-sm text-primary-dark">
@@ -120,7 +220,11 @@ export const Delegation: React.FC<DelegationProps> = ({
             order="order-4 lg:order-2"
             className="text-right lg:text-left"
           >
-            {getFinalityProviderName(finalityProviderPkHex) ?? "-"}
+            <FinalityProviderDisplay
+              fpName={fpName}
+              isSlashed={isSlashed}
+              isJailed={isJailed}
+            />
           </DelegationCell>
 
           <DelegationCell
@@ -154,7 +258,10 @@ export const Delegation: React.FC<DelegationProps> = ({
             order="order-5"
             className="relative flex justify-end lg:justify-start"
           >
-            <Hint tooltip={renderStateTooltip()}>{renderState()}</Hint>
+            <DelegationState
+              displayState={displayState}
+              isSlashed={isSlashed}
+            />
           </DelegationCell>
 
           <DelegationCell order="order-6">
@@ -163,6 +270,7 @@ export const Delegation: React.FC<DelegationProps> = ({
               intermediateState={intermediateState}
               isEligibleForRegistration={isEligibleForTransition}
               stakingTxHashHex={stakingTxHashHex}
+              finalityProviderPkHex={finalityProviderPkHex}
               onRegistration={onRegistration}
               onUnbond={onUnbond}
               onWithdraw={onWithdraw}
