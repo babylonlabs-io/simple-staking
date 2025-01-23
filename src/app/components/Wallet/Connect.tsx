@@ -136,7 +136,7 @@ export const Connect: React.FC<ConnectProps> = ({
       </div>
       <div className="flex flex-row items-center justify-between">
         <Text variant="body2" className="text-sm text-primary-main">
-          {ordinalsExcluded ? "Not using Inscriptions" : "Using Inscriptions"}
+          {ordinalsExcluded ? "Inscription Safety: Enabled" : "Inscription Safety: Disabled"}
         </Text>
         <div className="flex flex-col items-center justify-center">
           <Toggle
