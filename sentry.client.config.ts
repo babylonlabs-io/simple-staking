@@ -41,4 +41,12 @@ Sentry.init({
       blockAllMedia: true,
     }),
   ],
+
+  beforeSend(event) {
+    event.extra = {
+      ...event.extra,
+      version: process.env.NEXT_PUBLIC_COMMIT_HASH ?? "development",
+    };
+    return event;
+  },
 });

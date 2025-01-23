@@ -8,7 +8,7 @@ import { twJoin } from "tailwind-merge";
 
 import { ErrorState } from "@/app/types/errors";
 
-import { useError } from "../Error/ErrorContext";
+import { useError } from "../Error/ErrorProvider";
 
 interface TomoWidgetProps {
   chainName: "bitcoin" | "cosmos";
