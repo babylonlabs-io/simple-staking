@@ -7,7 +7,7 @@ import {
 } from "@/app/services/healthCheckService";
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
 
-import { useError } from "../context/Error/ErrorContext";
+import { useError } from "../context/Error/ErrorProvider";
 import { ErrorState } from "../types/errors";
 
 export const useHealthCheck = () => {

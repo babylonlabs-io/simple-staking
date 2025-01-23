@@ -5,7 +5,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";

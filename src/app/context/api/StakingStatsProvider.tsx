@@ -4,7 +4,7 @@ import React, { ReactNode, createContext, useContext, useEffect } from "react";
 import { getStats } from "@/app/api/getStats";
 import { ErrorState } from "@/app/types/errors";
 
-import { useError } from "../Error/ErrorContext";
+import { useError } from "../Error/ErrorProvider";
 
 export interface StakingStats {
   activeTVLSat: number;

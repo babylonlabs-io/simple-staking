@@ -16,7 +16,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { ErrorState } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";

@@ -14,6 +14,8 @@ import {
   ShowErrorParams,
 } from "@/app/types/errors";
 
+import { ClientError, ServerError } from "./errors";
+
 const ErrorContext = createContext<ErrorContextType>({
   isErrorOpen: false,
   error: {
@@ -81,13 +83,35 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   const handleError = useCallback(
     ({ error, hasError, errorState, refetchFunction }: ErrorHandlerParam) => {
       if (hasError && error) {
-        showError({
-          error: {
-            message: error.message,
-            errorState: errorState,
-          },
-          retryAction: refetchFunction,
-        });
+        if (error instanceof ClientError) {
+          showError({
+            error: {
+              message: error.message,
+              displayMessage: error.displayMessage,
+              errorState: error.errorType,
+            },
+            retryAction: refetchFunction,
+          });
+        } else if (error instanceof ServerError) {
+          showError({
+            error: {
+              message: error.message,
+              endpoint: error.endpoint,
+              errorState: error.errorType,
+            },
+            retryAction: refetchFunction,
+          });
+        } else {
+          showError({
+            error: {
+              message: error.message,
+              errorState: errorState,
+            },
+            retryAction: refetchFunction,
+          });
+        }
+
+        captureError(error);
       }
     },
     [showError],
@@ -95,6 +119,14 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
   const captureError = useCallback((error: Error | null) => {
     if (error) {
+      if (error instanceof ClientError || error instanceof ServerError) {
+        Sentry.setExtra("errorType", error.errorType);
+      }
+
+      if (error instanceof ServerError) {
+        Sentry.setExtra("endpoint", error.endpoint);
+      }
+
       Sentry.captureException(error);
     }
   }, []);

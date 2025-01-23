@@ -1,6 +1,10 @@
 import axios, { AxiosRequestConfig } from "axios";
 import qs from "qs";
 
+import { getErrorCodeFromStatus } from "../constants/errorCodes";
+import { getErrorMessage } from "../constants/errorMessages";
+import { ServerError } from "../context/Error/errors/serverError";
+
 type QueryParamValue =
   | string
   | number
@@ -37,8 +41,15 @@ export const apiWrapper = async (
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error?.response?.data?.message || generalErrorMessage);
+      const status = error.response?.status || 500;
+      const errorCode = getErrorCodeFromStatus(status);
+      const errorMessage = getErrorMessage(
+        errorCode,
+        error.response?.data?.message,
+      );
+
+      throw new ServerError(errorMessage, path);
     }
-    throw new Error(generalErrorMessage);
+    throw new ServerError(generalErrorMessage, path);
   }
 };

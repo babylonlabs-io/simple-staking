@@ -6,7 +6,7 @@ import {
   getFinalityProviders,
 } from "@/app/api/getFinalityProviders";
 import { ONE_MINUTE } from "@/app/constants";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { ErrorState } from "@/app/types/errors";
 
 const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V1_KEY";

@@ -17,7 +17,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { ErrorState } from "@/app/types/errors";
 import { Fees } from "@/app/types/fee";
 import {

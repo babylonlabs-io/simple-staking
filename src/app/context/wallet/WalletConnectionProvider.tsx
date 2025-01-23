@@ -12,7 +12,7 @@ import { ErrorState } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
-import { useError } from "../Error/ErrorContext";
+import { useError } from "../Error/ErrorProvider";
 import { TomoBBNConnector } from "../tomo/BBNConnector";
 import { TomoBTCConnector } from "../tomo/BTCConnector";
 

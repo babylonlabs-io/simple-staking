@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { type FormFields, useStakingState } from "@/app/state/StakingState";
 import {

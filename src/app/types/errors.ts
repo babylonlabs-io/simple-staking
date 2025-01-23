@@ -10,6 +10,8 @@ export enum ErrorState {
 export interface ErrorType {
   message: string;
   errorState?: ErrorState;
+  displayMessage?: string;
+  endpoint?: string;
 }
 
 export interface ErrorHandlerParam {

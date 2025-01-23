@@ -9,7 +9,7 @@ import {
 } from "@babylonlabs-io/bbn-core-ui";
 import { MdOutlineSwapHoriz } from "react-icons/md";
 
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { ErrorState, ShowErrorParams } from "@/app/types/errors";
 
