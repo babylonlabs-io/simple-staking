@@ -3,13 +3,16 @@ import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
+import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { DelegationState } from "@/app/types/delegations";
+import { FinalityProviderState } from "@/app/types/finalityProviders";
 
 interface DelegationActionsProps {
   state: string;
   intermediateState?: string;
   isEligibleForRegistration: boolean;
   stakingTxHashHex: string;
+  finalityProviderPkHex: string;
   onRegistration: () => Promise<void>;
   onUnbond: (id: string) => void;
   onWithdraw: (id: string) => void;
@@ -20,12 +23,18 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   intermediateState,
   isEligibleForRegistration,
   stakingTxHashHex,
+  finalityProviderPkHex,
   onRegistration,
   onUnbond,
   onWithdraw,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const { getFinalityProvider } = useFinalityProviderState();
+
+  const finalityProvider = getFinalityProvider(finalityProviderPkHex);
+  const fpState = finalityProvider?.state;
+  const isSlashed = fpState === FinalityProviderState.SLASHED;
 
   // We no longer show the registration button when the unbonding transaction is pending
   if (intermediateState === DelegationState.INTERMEDIATE_UNBONDING) {
@@ -50,6 +59,23 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           className="text-sm font-normal"
         >
           Withdraw
+        </Button>
+      </div>
+    );
+  }
+
+  // If FP is slashed, only show unbond button
+  if (isSlashed) {
+    return (
+      <div className="flex justify-end lg:justify-start">
+        <Button
+          variant="outlined"
+          size="small"
+          color="primary"
+          onClick={() => onUnbond(stakingTxHashHex)}
+          className="text-sm font-normal border-primary-main/20 bg-white"
+        >
+          Unbond
         </Button>
       </div>
     );
