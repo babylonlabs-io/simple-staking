@@ -118,7 +118,6 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
     if (selectedOption && !Number.isNaN(selectedOption.value)) {
       onSubmit?.(selectedOption.value);
       onClose?.();
-      console.log(selectedOption.value);
     }
   }
 
@@ -158,7 +157,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
                 )}
                 checked={selectedValue === option.key}
                 value={option.key}
-                onChange={() => setSelectedValue(option.key)}
+                onChange={() => void setSelectedValue(option.key)}
               />
             ))}
           </>

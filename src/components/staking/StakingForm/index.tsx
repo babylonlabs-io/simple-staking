@@ -125,7 +125,7 @@ export function DelegationForm({
               <div className="flex flex-col gap-4 mt-4">
                 <BTCFeeRate defaultRate={stakingInfo?.defaultFeeRate} />
                 <BTCFeeAmount />
-                <BBNFeeAmount amount={BBN_FEE_AMOUNT} />
+                {BBN_FEE_AMOUNT && <BBNFeeAmount amount={BBN_FEE_AMOUNT} />}
               </div>
 
               <div className="divider my-2" />

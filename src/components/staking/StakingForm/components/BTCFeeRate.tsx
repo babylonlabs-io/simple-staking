@@ -34,7 +34,6 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
       term,
       feeRate,
     });
-    console.log(feeAmount);
 
     setValue("feeAmount", feeAmount.toString(), {
       shouldValidate: true,
