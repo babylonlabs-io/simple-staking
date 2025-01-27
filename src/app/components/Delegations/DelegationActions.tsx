@@ -3,9 +3,11 @@ import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 
+import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { DelegationState } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 interface DelegationActionsProps {
   state: string;
@@ -32,9 +34,20 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { getFinalityProvider } = useFinalityProviderState();
 
+  const {
+    balanceQuery: { data: bbnBalance = 0 },
+  } = useBbnQuery();
+
+  const { networkFullName, coinSymbol } = getNetworkConfigBBN();
+
   const finalityProvider = getFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
+
+  const hasInsufficientBalance = bbnBalance === 0;
+  const insufficientBalanceMessage = hasInsufficientBalance
+    ? `Insufficient ${coinSymbol} Balance in ${networkFullName} Wallet`
+    : "";
 
   // We no longer show the registration button when the unbonding transaction is pending
   if (intermediateState === DelegationState.INTERMEDIATE_UNBONDING) {
@@ -90,7 +103,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
         data-tooltip-content={
           state === DelegationState.ACTIVE && !isEligibleForRegistration
             ? "Staking registration is not available yet, come back later"
-            : ""
+            : insufficientBalanceMessage
         }
       >
         <div className="flex items-center gap-1">
@@ -102,7 +115,9 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             disabled={
               intermediateState ===
                 DelegationState.INTERMEDIATE_TRANSITIONING ||
-              (state === DelegationState.ACTIVE && !isEligibleForRegistration)
+              (state === DelegationState.ACTIVE &&
+                !isEligibleForRegistration) ||
+              hasInsufficientBalance
             }
             className="text-sm font-normal border-primary-main/20 bg-white"
           >
