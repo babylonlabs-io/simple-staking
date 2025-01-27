@@ -35,6 +35,7 @@ export interface AppState {
   isError: boolean;
   isLoading: boolean;
   ordinalsExcluded: boolean;
+  hasOrdinals: boolean;
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
   refetchUTXOs: () => void;
@@ -47,6 +48,7 @@ const { StateProvider, useState: useApplicationState } =
     stakableBtcBalance: 0,
     totalBtcBalance: 0,
     ordinalsExcluded: true,
+    hasOrdinals: false,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
     refetchUTXOs: () => {},
@@ -132,6 +134,7 @@ export function AppState({ children }: PropsWithChildren) {
       isError,
       isLoading,
       ordinalsExcluded,
+      hasOrdinals: totalBtcBalance > stakableBtcBalance,
       includeOrdinals,
       excludeOrdinals,
       refetchUTXOs,

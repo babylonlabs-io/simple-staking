@@ -31,10 +31,7 @@ export function PersonalBalance() {
     closeRewardModal,
   } = useRewardsState();
   const { claimRewards, showPreview } = useRewardsService();
-  const { ordinalsExcluded } = useAppState();
-
-  // Calculate filtered amount (total - stakable)
-  const filteredAmount = totalBtcBalance - stakableBtcBalance;
+  const { ordinalsExcluded, hasOrdinals } = useAppState();
 
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
@@ -47,8 +44,8 @@ export function PersonalBalance() {
             title={`Total ${coinName} Balance`}
             value={`${satoshiToBtc(totalBtcBalance)} ${coinSymbol}`}
             tooltip={
-              filteredAmount > 0 && ordinalsExcluded
-                ? `You have ${satoshiToBtc(filteredAmount)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+              hasOrdinals && ordinalsExcluded
+                ? `You have ${satoshiToBtc(totalBtcBalance - stakableBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
                 : undefined
             }
           />
