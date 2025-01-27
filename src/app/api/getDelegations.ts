@@ -1,5 +1,8 @@
+import { ClientErrorCodes } from "../constants/errorCodes";
+import { ClientError } from "../context/Error/errors/clientError";
 import { Pagination } from "../types/api";
 import { Delegation } from "../types/delegations";
+import { ErrorState } from "../types/errors";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -43,7 +46,11 @@ export const getDelegations = async (
   publicKeyNoCoord?: string,
 ): Promise<PaginatedDelegations> => {
   if (!publicKeyNoCoord) {
-    throw new Error("No public key provided");
+    throw new ClientError(
+      "No public key provided",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.DELEGATIONS,
+    );
   }
 
   const params = {

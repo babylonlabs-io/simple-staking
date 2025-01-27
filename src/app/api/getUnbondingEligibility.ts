@@ -1,8 +1,16 @@
+import { ClientErrorCodes } from "../constants/errorCodes";
+import { ClientError } from "../context/Error/errors/clientError";
+import { ErrorState } from "../types/errors";
+
 import { apiWrapper } from "./apiWrapper";
 
 export const getUnbondingEligibility = async (txID: string) => {
   if (!txID) {
-    throw new Error("No transaction ID provided");
+    throw new ClientError(
+      "No transaction ID provided",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.UNBONDING,
+    );
   }
 
   const params = {

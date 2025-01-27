@@ -4,161 +4,124 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useMemo,
   useState,
 } from "react";
 
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
-import {
-  ErrorHandlerParam,
-  ErrorType,
-  ShowErrorParams,
-} from "@/app/types/errors";
+import { Error, ErrorHandlerParam } from "@/app/types/errors";
 
 import { ClientError, ServerError } from "./errors";
 
 const ErrorContext = createContext<ErrorContextType>({
-  isErrorOpen: false,
+  isOpen: false,
   error: {
     message: "",
   },
-  showError: () => {},
-  hideError: () => {},
+  modalOptions: {},
+  dismissError: () => {},
   handleError: () => {},
-  captureError: () => {},
 });
 
 interface ErrorProviderProps {
   children: ReactNode;
 }
 
-interface ErrorContextType {
-  isErrorOpen: boolean;
-  error: ErrorType;
-  retryErrorAction?: () => void;
-  showError: (showErrorParams: ShowErrorParams) => void;
-  hideError: () => void;
-  noCancel?: boolean;
-  handleError: ({
-    error,
-    hasError,
-    errorState,
-    refetchFunction,
-  }: ErrorHandlerParam) => void;
-  captureError: (error: Error | null) => void;
-}
+type ErrorState = {
+  isOpen: boolean;
+  error: Error;
+  modalOptions: {
+    retryAction?: () => void;
+    noCancel?: boolean;
+  };
+};
+
+type ErrorContextType = {
+  dismissError: () => void;
+  handleError: (params: ErrorHandlerParam) => void;
+} & ErrorState;
 
 export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
-  const [isErrorOpen, setIsErrorOpen] = useState(false);
-  const [isNoCancel, setIsNoCancel] = useState(false);
-  const [error, setError] = useState<ErrorType>({
-    message: "",
-    errorState: undefined,
+  const [state, setState] = useState<ErrorState>({
+    isOpen: false,
+    error: { message: "" },
+    modalOptions: {},
   });
-  const [retryErrorAction, setRetryErrorAction] = useState<
-    (() => void) | undefined
-  >();
 
-  const showError = useCallback(
-    ({ error, retryAction, noCancel }: ShowErrorParams) => {
-      setError(error);
-      setIsErrorOpen(true);
-      setIsNoCancel(noCancel ?? false);
-      setRetryErrorAction(() => retryAction);
-    },
-    [],
-  );
-
-  const hideError = useCallback(() => {
-    setIsErrorOpen(false);
+  const dismissError = useCallback(() => {
+    setState((prev) => ({ ...prev, isOpen: false }));
     setTimeout(() => {
-      setError({
-        message: "",
-        errorState: undefined,
-      });
-      setRetryErrorAction(undefined);
-      setIsNoCancel(false);
+      setState({ isOpen: false, error: { message: "" }, modalOptions: {} });
     }, 300);
   }, []);
 
   const handleError = useCallback(
-    ({ error, hasError, errorState, refetchFunction }: ErrorHandlerParam) => {
-      if (hasError && error) {
-        if (error instanceof ClientError) {
-          showError({
-            error: {
-              message: error.message,
-              displayMessage: error.displayMessage,
-              errorState: error.errorType,
-            },
-            retryAction: refetchFunction,
+    ({ error, displayError }: ErrorHandlerParam) => {
+      if (!error) return;
+
+      const eventId = Sentry.withScope((scope) => {
+        if (error instanceof ServerError) {
+          scope.setExtras({
+            errorType: "SERVER_ERROR",
+            endpoint: error.endpoint,
+            status: error.status,
           });
-        } else if (error instanceof ServerError) {
-          showError({
-            error: {
-              message: error.message,
-              endpoint: error.endpoint,
-              errorState: error.errorType,
-            },
-            retryAction: refetchFunction,
-          });
-        } else {
-          showError({
-            error: {
-              message: error.message,
-              errorState: errorState,
-            },
-            retryAction: refetchFunction,
+        } else if (error instanceof ClientError) {
+          scope.setExtras({
+            errorCode: error.errorCode,
+            errorType: error.errorType,
           });
         }
+        return Sentry.captureException(error);
+      });
 
-        captureError(error);
-      }
+      const errorData = {
+        message: error.message,
+        sentryEventId: eventId,
+        ...(error instanceof ClientError && {
+          displayMessage: error.displayMessage,
+        }),
+        ...(error instanceof ServerError && {
+          endpoint: error.endpoint,
+          displayMessage: error.displayMessage,
+        }),
+        errorState: displayError.errorState,
+      };
+
+      setState({
+        isOpen: true,
+        error: errorData,
+        modalOptions: {
+          retryAction: displayError.retryAction,
+          noCancel: displayError.noCancel ?? false,
+        },
+      });
     },
-    [showError],
+    [],
   );
 
-  const captureError = useCallback((error: Error | null) => {
-    if (error) {
-      if (error instanceof ClientError || error instanceof ServerError) {
-        Sentry.setExtra("errorType", error.errorType);
-      }
-
-      if (error instanceof ServerError) {
-        Sentry.setExtra("endpoint", error.endpoint);
-      }
-
-      Sentry.captureException(error);
-    }
-  }, []);
-
-  const value: ErrorContextType = {
-    isErrorOpen: isErrorOpen,
-    error,
-    showError,
-    hideError,
-    retryErrorAction,
-    noCancel: isNoCancel,
-    handleError,
-    captureError,
-  };
+  const contextValue = useMemo(
+    () => ({
+      ...state,
+      dismissError,
+      handleError,
+    }),
+    [state, dismissError, handleError],
+  );
 
   return (
-    <ErrorContext.Provider value={value}>
+    <ErrorContext.Provider value={contextValue}>
       {children}
       <ErrorModal
-        open={isErrorOpen}
-        errorMessage={error.message}
-        errorState={error.errorState}
-        onClose={hideError}
-        onRetry={retryErrorAction}
-        noCancel={isNoCancel}
+        open={state.isOpen}
+        errorMessage={state.error.message}
+        errorState={state.error.errorState}
+        onClose={dismissError}
+        onRetry={state.modalOptions.retryAction}
+        noCancel={state.modalOptions.noCancel}
       />
     </ErrorContext.Provider>
   );
 };
 
-export const useError = () => {
-  const context = useContext(ErrorContext);
-
-  return context;
-};
+export const useError = () => useContext(ErrorContext);

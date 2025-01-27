@@ -2,7 +2,9 @@ import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
+import { ClientErrorCodes } from "@/app/constants/errorCodes";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError } from "@/app/context/Error/errors";
 import { useDelegationState } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
@@ -32,16 +34,20 @@ export function useRegistrationService() {
   const { transitionPhase1Delegation } = useTransactionService();
   const { addDelegation, refetch: refetchV2Delegations } =
     useDelegationV2State();
-  const { showError } = useError();
+  const { handleError } = useError();
 
   const registerPhase1Delegation = useCallback(async () => {
     // set the step to staking-slashing
     setStep("registration-staking-slashing");
 
     if (!selectedDelegation) {
-      showError({
-        error: {
-          message: "No delegation selected for registration",
+      handleError({
+        error: new ClientError(
+          "No delegation selected for registration",
+          ClientErrorCodes.CLIENT_VALIDATION,
+          ErrorState.TRANSITION,
+        ),
+        displayError: {
           errorState: ErrorState.TRANSITION,
         },
       });
@@ -93,20 +99,20 @@ export function useRegistrationService() {
       }
       setProcessing(false);
     } catch (error: any) {
-      reset();
-      showError({
-        error: {
-          message: error.message,
+      handleError({
+        error,
+        displayError: {
           errorState: ErrorState.TRANSITION,
         },
       });
+      reset();
     }
   }, [
     transitionPhase1Delegation,
     setProcessing,
     setStep,
     reset,
-    showError,
+    handleError,
     selectedDelegation,
     addDelegation,
     refetchV1Delegations,

@@ -5,7 +5,9 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
+import { ClientErrorCodes } from "@/app/constants/errorCodes";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
@@ -33,7 +35,7 @@ export const Delegations = ({}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
-  const { showError } = useError();
+  const { handleError } = useError();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
   const { data: delegationsAPI } = useDelegations();
   const {
@@ -99,7 +101,11 @@ export const Delegations = ({}) => {
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new Error("Wrong delegation selected for withdrawal");
+        throw new ClientError(
+          "Wrong delegation selected for withdrawal",
+          ClientErrorCodes.CLIENT_VALIDATION,
+          ErrorState.UNBONDING,
+        );
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
@@ -120,9 +126,9 @@ export const Delegations = ({}) => {
         DelegationState.INTERMEDIATE_UNBONDING,
       );
     } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
+      handleError({
+        error,
+        displayError: {
           errorState: ErrorState.UNBONDING,
         },
       });
@@ -140,13 +146,21 @@ export const Delegations = ({}) => {
   const handleWithdraw = async (id: string) => {
     try {
       if (!networkFees) {
-        throw new Error("Network fees not found");
+        throw new ClientError(
+          "Network fees not found",
+          ClientErrorCodes.CLIENT_VALIDATION,
+          ErrorState.WITHDRAW,
+        );
       }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
 
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new Error("Wrong delegation selected for withdrawal");
+        throw new ClientError(
+          "Wrong delegation selected for withdrawal",
+          ClientErrorCodes.CLIENT_VALIDATION,
+          ErrorState.WITHDRAW,
+        );
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
@@ -167,12 +181,12 @@ export const Delegations = ({}) => {
         DelegationState.INTERMEDIATE_WITHDRAWAL,
       );
     } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
+      handleError({
+        error,
+        displayError: {
           errorState: ErrorState.WITHDRAW,
+          retryAction: () => handleModal(id, MODE_WITHDRAW),
         },
-        retryAction: () => handleModal(id, MODE_WITHDRAW),
       });
     } finally {
       setModalOpen(false);
@@ -231,18 +245,18 @@ export const Delegations = ({}) => {
 
   useEffect(() => {
     if (modalOpen && !selectedDelegation) {
-      showError({
-        error: {
-          message: "Delegation not found",
+      handleError({
+        error: new Error("Delegation not found"),
+        displayError: {
           errorState: ErrorState.SERVER_ERROR,
+          noCancel: false,
         },
-        noCancel: false,
       });
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
     }
-  }, [modalOpen, selectedDelegation, showError]);
+  }, [modalOpen, selectedDelegation, handleError]);
 
   if (!connected || !delegationsAPI || !network) {
     return;

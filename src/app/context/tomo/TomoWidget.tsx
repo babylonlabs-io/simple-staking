@@ -15,7 +15,7 @@ interface TomoWidgetProps {
 }
 
 export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
   const selectWallet = useClickWallet();
   const wallets = useWalletListWithIsInstall();
 
@@ -29,13 +29,12 @@ export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
     try {
       await selectWallet(wallet);
     } catch (e: any) {
-      showError({
-        error: {
-          message: e.message,
+      handleError({
+        error: new Error(e.message),
+        displayError: {
           errorState: ErrorState.WALLET,
         },
       });
-      captureError(e);
     }
   };
 

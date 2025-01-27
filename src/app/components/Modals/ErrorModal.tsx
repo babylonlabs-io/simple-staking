@@ -7,6 +7,8 @@ import {
   MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
+import { useEffect, useState } from "react";
+import { FiCheck, FiCopy } from "react-icons/fi";
 import { MdOutlineSwapHoriz } from "react-icons/md";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
@@ -32,7 +34,10 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
 }) => {
   const isMobileView = useIsMobileView();
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
-  const { error, retryErrorAction } = useError();
+  const { error, modalOptions } = useError();
+  const { retryAction, noCancel: noCancelOption } = modalOptions;
+  const [copied, setCopied] = useState(false);
+  const version = process.env.NEXT_PUBLIC_COMMIT_HASH ?? "development";
 
   const handleRetry = () => {
     const retryErrorParam: ShowErrorParams = {
@@ -40,7 +45,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
         message: error.message,
         errorState: error.errorState,
       },
-      retryAction: retryErrorAction,
+      retryAction: retryAction,
     };
 
     onClose();
@@ -86,6 +91,33 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     }
   };
 
+  const copyErrorDetails = () => {
+    const errorDetails = JSON.stringify(
+      {
+        message: errorMessage,
+        errorState,
+        version,
+        sentry: {
+          // eventId: error?.sentryEventId,
+          release: version,
+          environment: process.env.NODE_ENV,
+        },
+      },
+      null,
+      2,
+    );
+
+    navigator.clipboard.writeText(errorDetails);
+    setCopied(true);
+  };
+
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => setCopied(false), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
+
   return (
     <DialogComponent
       backdropClassName="z-[100]"
@@ -104,6 +136,19 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
           <Text variant="body1" className="text-center">
             {getErrorMessage()}
           </Text>
+          <div className="flex items-center justify-center gap-2 mt-2">
+            <button
+              className="flex items-center gap-1 text-sm text-primary-dark hover:opacity-70"
+              onClick={copyErrorDetails}
+            >
+              {copied ? (
+                <FiCheck className="w-4 h-4" />
+              ) : (
+                <FiCopy className="w-4 h-4" />
+              )}
+              <span>{copied ? "Copied!" : "Copy error details"}</span>
+            </button>
+          </div>
         </div>
       </DialogBody>
       <DialogFooter className="mt-4 flex justify-around gap-4">

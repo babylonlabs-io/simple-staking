@@ -79,7 +79,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
   const [address, setAddress] = useState("");
 
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
   const btcConnector = useChainConnector("BTC");
   const { open = () => {}, connected } = useWalletConnect();
 
@@ -130,17 +130,16 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             errorMessage = error.message;
             break;
         }
-        showError({
-          error: {
-            message: errorMessage,
+        handleError({
+          error: new Error(errorMessage),
+          displayError: {
             errorState: ErrorState.WALLET,
+            retryAction: () => connectBTC(walletProvider),
           },
-          retryAction: () => connectBTC(walletProvider),
         });
-        captureError(error);
       }
     },
-    [showError, captureError],
+    [handleError],
   );
 
   useEffect(() => {

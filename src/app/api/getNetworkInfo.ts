@@ -1,6 +1,9 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 import { AxiosResponse } from "axios";
 
+import { ClientErrorCodes } from "../constants/errorCodes";
+import { ClientError } from "../context/Error/errors";
+import { ErrorState } from "../types/errors";
 import { NetworkInfo } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
@@ -95,8 +98,10 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     (param, index) => param === sortedByHeight[index],
   );
   if (!areEqual) {
-    throw new Error(
+    throw new ClientError(
       "Version numbers and BTC activation heights are not consistently ordered",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.NETWORK,
     );
   }
 
@@ -119,7 +124,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
 
   const genesisStakingParam = stakingVersions.find((v) => v.version === 0);
   if (!genesisStakingParam) {
-    throw new Error("Genesis staking params not found");
+    throw new ClientError(
+      "Genesis staking params not found",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.NETWORK,
+    );
   }
 
   // Find the genesis epoch check param (version 0)
@@ -127,7 +136,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     (v) => v.version === 0,
   );
   if (!genesisEpochCheckParam) {
-    throw new Error("Genesis epoch check params not found");
+    throw new ClientError(
+      "Genesis epoch check params not found",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.NETWORK,
+    );
   }
 
   return {

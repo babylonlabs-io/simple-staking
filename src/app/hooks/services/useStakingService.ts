@@ -22,7 +22,7 @@ export function useStakingService() {
   const { addDelegation, updateDelegationStatus } = useDelegationV2State();
   const { estimateStakingFee, createDelegationEoi, submitStakingTx } =
     useTransactionService();
-  const { showError } = useError();
+  const { handleError } = useError();
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -86,17 +86,17 @@ export function useStakingService() {
         );
 
         setVerifiedDelegation(delegation as DelegationV2);
-        await refetchDelegations();
+        refetchDelegations();
         goToStep("verified");
         setProcessing(false);
       } catch (error: any) {
-        reset();
-        showError({
-          error: {
-            message: error.message,
+        handleError({
+          error,
+          displayError: {
             errorState: ErrorState.STAKING,
           },
         });
+        reset();
       }
     },
     [
@@ -105,7 +105,7 @@ export function useStakingService() {
       addDelegation,
       goToStep,
       setVerifiedDelegation,
-      showError,
+      handleError,
       reset,
       refetchDelegations,
     ],
@@ -144,10 +144,11 @@ export function useStakingService() {
         goToStep("feedback-success");
       } catch (error: any) {
         reset();
-        showError({
-          error: {
-            message: error.message,
+        handleError({
+          error,
+          displayError: {
             errorState: ErrorState.STAKING,
+            retryAction: () => stakeDelegation(delegation),
           },
         });
       }
@@ -158,7 +159,7 @@ export function useStakingService() {
       goToStep,
       setProcessing,
       reset,
-      showError,
+      handleError,
     ],
   );
 

@@ -24,7 +24,7 @@ export function useFinalityProvidersV2({
   order,
   name,
 }: Params = {}) {
-  const { isErrorOpen, handleError, captureError } = useError();
+  const { isOpen, handleError } = useError();
 
   const query = useInfiniteQuery({
     queryKey: [FINALITY_PROVIDERS_KEY],
@@ -49,19 +49,21 @@ export function useFinalityProvidersV2({
       return flattenedData;
     },
     retry: (failureCount) => {
-      return !isErrorOpen && failureCount <= 3;
+      return !isOpen && failureCount <= 3;
     },
   });
 
   useEffect(() => {
-    handleError({
-      error: query.error,
-      hasError: query.isError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: query.refetch,
-    });
-    captureError(query.error);
-  }, [query.isError, query.error, query.refetch, handleError, captureError]);
+    if (query.isError) {
+      handleError({
+        error: query.error,
+        displayError: {
+          errorState: ErrorState.SERVER_ERROR,
+          retryAction: query.refetch,
+        },
+      });
+    }
+  }, [query.isError, query.error, query.refetch, handleError]);
 
   return query;
 }

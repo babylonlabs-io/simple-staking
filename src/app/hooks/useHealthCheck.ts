@@ -11,7 +11,7 @@ import { useError } from "../context/Error/ErrorProvider";
 import { ErrorState } from "../types/errors";
 
 export const useHealthCheck = () => {
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
 
   const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: ["api available"],
@@ -22,16 +22,15 @@ export const useHealthCheck = () => {
 
   useEffect(() => {
     if (isError) {
-      showError({
-        error: {
-          message: error.message,
+      handleError({
+        error,
+        displayError: {
           errorState: ErrorState.SERVER_ERROR,
+          retryAction: refetch,
         },
-        retryAction: refetch,
       });
-      captureError(error);
     }
-  }, [isError, error, showError, refetch, captureError]);
+  }, [isError, error, refetch, handleError]);
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
   const isGeoBlocked = data ? isGeoBlockedResult(data) : false;

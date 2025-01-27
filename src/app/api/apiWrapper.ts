@@ -48,8 +48,8 @@ export const apiWrapper = async (
         error.response?.data?.message,
       );
 
-      throw new ServerError(errorMessage, path);
+      throw new ServerError(errorMessage, status, path);
     }
-    throw new ServerError(generalErrorMessage, path);
+    throw new ServerError(generalErrorMessage, 500, path);
   }
 };

@@ -4,7 +4,7 @@ import {
   ChainConfigArr,
   WalletProvider,
 } from "@babylonlabs-io/bbn-wallet-connect";
-import { useCallback, type PropsWithChildren } from "react";
+import { type PropsWithChildren } from "react";
 
 import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
 import { TomoWidget } from "@/app/context/tomo/TomoWidget";
@@ -42,24 +42,20 @@ const config: ChainConfigArr = [
 ] as const;
 
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
 
-  const handleError = useCallback(
-    (e: Error) => {
-      showError({
-        error: {
-          message: e.message,
-          errorState: ErrorState.WALLET,
-        },
-      });
-      captureError(e);
-    },
-    [showError, captureError],
-  );
+  const onError = (error: Error) => {
+    handleError({
+      error,
+      displayError: {
+        errorState: ErrorState.WALLET,
+      },
+    });
+  };
 
   return (
     <TomoConnectionProvider>
-      <WalletProvider config={config} context={context} onError={handleError}>
+      <WalletProvider config={config} context={context} onError={onError}>
         <TomoBTCConnector />
         <TomoBBNConnector />
         {children}

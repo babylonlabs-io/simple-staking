@@ -1,6 +1,9 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
 
+import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
+import { ErrorState } from "@/app/types/errors";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -23,7 +26,12 @@ export const UnbondModal = ({
   processing,
 }: UnbondModalProps) => {
   const { data: networkInfo } = useNetworkInfo();
-  if (!networkInfo) throw new Error("Network info not found");
+  if (!networkInfo)
+    throw new ClientError(
+      "Network info not found",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.UNBONDING,
+    );
 
   const unbondingTime = blocksToDisplayTime(
     networkInfo.params.bbnStakingParams.latestParam.unbondingTime,

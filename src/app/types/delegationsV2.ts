@@ -1,3 +1,8 @@
+import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientError } from "@/app/context/Error/errors";
+
+import { ErrorState } from "./errors";
+
 export interface DelegationLike {
   stakingAmount: number;
   stakingTxHashHex: string;
@@ -99,7 +104,11 @@ export const getDelegationV2StakingState = (
   );
 
   if (!validState) {
-    throw new Error(`Invalid delegation state: ${state}`);
+    throw new ClientError(
+      `Invalid delegation state: ${state}`,
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.DELEGATIONS,
+    );
   }
 
   return validState;

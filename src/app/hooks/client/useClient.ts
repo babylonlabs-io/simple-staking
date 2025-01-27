@@ -38,25 +38,27 @@ export function useClientQuery<
 >(
   options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
 ): UseQueryResult<TData, TError> {
-  const { isErrorOpen, handleError, captureError } = useError();
+  const { isOpen, handleError } = useError();
 
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
     retry: (failureCount) => {
-      return !isErrorOpen && failureCount <= 3;
+      return !isOpen && failureCount <= 3;
     },
     ...options,
   });
 
   useEffect(() => {
-    handleError({
-      error: data.error as Error,
-      hasError: data.isError,
-      errorState: ErrorState.SERVER_ERROR,
-      refetchFunction: data.refetch,
-    });
-    captureError(data.error as Error);
-  }, [handleError, data.error, data.isError, data.refetch, captureError]);
+    if (data.isError) {
+      handleError({
+        error: data.error as Error,
+        displayError: {
+          errorState: ErrorState.SERVER_ERROR,
+          retryAction: data.refetch,
+        },
+      });
+    }
+  }, [handleError, data.error, data.isError, data.refetch]);
 
   return data;
 }

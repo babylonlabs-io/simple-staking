@@ -1,28 +1,25 @@
-import { ErrorCodes, ErrorCodeType } from "../../../constants/errorCodes";
-import { getErrorMessage } from "../../../constants/errorMessages";
+import {
+  ClientErrorCodeType,
+  getClientErrorMessage,
+} from "../../../constants/errorCodes";
 import { ErrorState } from "../../../types/errors";
 
 export class ClientError extends Error {
-  public displayMessage: string;
-  public errorType: ErrorState;
-  public errorCode: ErrorCodeType;
+  readonly name = "ClientError";
+  readonly displayMessage: string;
 
   /**
    * @param message        Technical message for debugging
-   * @param errorCode      Error code
+   * @param errorCode      Client error code
    * @param errorType      Classification of error
    */
   constructor(
-    message: string,
-    errorCode: ErrorCodeType = ErrorCodes.CLIENT_GENERIC,
-    errorType: ErrorState = ErrorState.WALLET,
+    public readonly message: string,
+    public readonly errorCode: ClientErrorCodeType = "CLIENT_GENERIC",
+    public readonly errorType: ErrorState = ErrorState.WALLET,
   ) {
     super(message);
-    this.name = "ClientError";
-    this.errorCode = errorCode;
-    this.errorType = errorType;
-    this.displayMessage = getErrorMessage(errorCode, message);
-
+    this.displayMessage = getClientErrorMessage(errorCode, message);
     Object.setPrototypeOf(this, ClientError.prototype);
   }
 
@@ -30,7 +27,7 @@ export class ClientError extends Error {
     return this.displayMessage;
   }
 
-  public getErrorCode(): ErrorCodeType {
+  public getErrorCode(): ClientErrorCodeType {
     return this.errorCode;
   }
 }

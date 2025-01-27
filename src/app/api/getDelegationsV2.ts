@@ -1,8 +1,11 @@
+import { ClientErrorCodes } from "../constants/errorCodes";
+import { ClientError } from "../context/Error/errors/clientError";
 import { Pagination } from "../types/api";
 import {
   DelegationV2,
   getDelegationV2StakingState,
 } from "../types/delegationsV2";
+import { ErrorState } from "../types/errors";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -52,7 +55,11 @@ export const getDelegationV2 = async (
   stakingTxHashHex?: string,
 ): Promise<DelegationV2 | null> => {
   if (!stakingTxHashHex) {
-    throw new Error("No staking tx hash provided");
+    throw new ClientError(
+      "No staking tx hash provided",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.DELEGATIONS,
+    );
   }
 
   try {
@@ -78,7 +85,11 @@ export const getDelegationsV2 = async (
   pageKey?: string,
 ): Promise<PaginatedDelegations> => {
   if (!publicKeyNoCoord) {
-    throw new Error("No public key provided");
+    throw new ClientError(
+      "No public key provided",
+      ClientErrorCodes.CLIENT_VALIDATION,
+      ErrorState.DELEGATIONS,
+    );
   }
   const params = {
     staker_pk_hex: publicKeyNoCoord,
