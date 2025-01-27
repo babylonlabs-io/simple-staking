@@ -1,6 +1,7 @@
 import { Card } from "@babylonlabs-io/bbn-core-ui";
 
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
+import { useAppState } from "@/app/state";
 import { useRewardsState } from "@/app/state/RewardState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -30,6 +31,10 @@ export function PersonalBalance() {
     closeRewardModal,
   } = useRewardsState();
   const { claimRewards, showPreview } = useRewardsService();
+  const { ordinalsExcluded } = useAppState();
+
+  // Calculate filtered amount (total - stakable)
+  const filteredAmount = totalBtcBalance - stakableBtcBalance;
 
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
@@ -41,6 +46,11 @@ export function PersonalBalance() {
             loading={loading}
             title={`Total ${coinName} Balance`}
             value={`${satoshiToBtc(totalBtcBalance)} ${coinSymbol}`}
+            tooltip={
+              filteredAmount > 0 && ordinalsExcluded
+                ? `You have ${satoshiToBtc(filteredAmount)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+                : undefined
+            }
           />
 
           <div className="divider mx-0 my-2 md:divider-horizontal" />
