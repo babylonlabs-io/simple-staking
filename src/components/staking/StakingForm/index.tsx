@@ -1,5 +1,9 @@
-import { Heading, Loader, Text } from "@babylonlabs-io/bbn-core-ui";
-import { useState } from "react";
+import {
+  Heading,
+  HiddenField,
+  Loader,
+  Text,
+} from "@babylonlabs-io/bbn-core-ui";
 
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
@@ -7,17 +11,19 @@ import { Message } from "@/app/components/Staking/Form/States/Message";
 import stakingNotStartedIcon from "@/app/components/Staking/Form/States/staking-not-started.svg";
 import walletIcon from "@/app/components/Staking/Form/States/wallet-icon.svg";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
+import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { AuthGuard } from "@/components/common/AuthGuard";
 
 import { AmountField } from "./components/AmountField";
-import { FeeAmountField } from "./components/FeeAmountField";
-import { FeeInfo } from "./components/FeeInfo";
-import { FeeRateField } from "./components/FeeRateField";
+import { BBNFeeAmount } from "./components/BBNFeeAmount";
+import { BTCFeeAmount } from "./components/BTCFeeAmount";
+import { BTCFeeRate } from "./components/BTCFeeRate";
 import { FeeSection } from "./components/FeeSection";
 import { InfoAlert } from "./components/InfoAlert";
 import { FormOverlay } from "./components/Overlay";
 import { SubmitButton } from "./components/SubmitButton";
 import { TermField } from "./components/TermField";
+import { Total } from "./components/Total";
 
 interface DelegationFormProps {
   loading?: boolean;
@@ -45,8 +51,6 @@ export function DelegationForm({
   error,
   stakingInfo,
 }: DelegationFormProps) {
-  const [isCustomFee, setIsCustomFee] = useState(false);
-
   if (loading) {
     return (
       <StatusView
@@ -89,7 +93,7 @@ export function DelegationForm({
 
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
-      <div className="relative flex flex-1 flex-col gap-4">
+      <div className="relative flex flex-1 flex-col gap-6">
         <Heading variant="h5" className="text-primary-dark">
           Step 2
         </Heading>
@@ -113,18 +117,20 @@ export function DelegationForm({
               max={stakingInfo?.maxStakingAmountSat}
             />
 
+            <HiddenField name="feeRate" defaultValue="0" />
+
+            <HiddenField name="feeAmount" defaultValue="0" />
+
             <FeeSection>
-              <FeeInfo custom={isCustomFee} />
+              <div className="flex flex-col gap-4 mt-4">
+                <BTCFeeRate defaultRate={stakingInfo?.defaultFeeRate} />
+                <BTCFeeAmount />
+                {BBN_FEE_AMOUNT && <BBNFeeAmount amount={BBN_FEE_AMOUNT} />}
+              </div>
 
-              <FeeRateField
-                expanded={isCustomFee}
-                defaultRate={stakingInfo?.defaultFeeRate}
-                min={stakingInfo?.minFeeRate}
-                max={stakingInfo?.maxFeeRate}
-                onExpand={() => void setIsCustomFee(true)}
-              />
+              <div className="divider my-2" />
 
-              <FeeAmountField />
+              <Total />
             </FeeSection>
           </FormOverlay>
 

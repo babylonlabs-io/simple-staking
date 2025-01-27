@@ -1,3 +1,5 @@
+import { Card } from "@babylonlabs-io/bbn-core-ui";
+
 import { Section as SectionContainer } from "@/app/components/Section/Section";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -11,7 +13,7 @@ export const FAQ: React.FC<FAQProps> = () => {
 
   return (
     <SectionContainer title="FAQ’s">
-      <div className="flex flex-col gap-4 bg-warning-contrast border border-primary-light/20 rounded divide-y p-6">
+      <Card className="flex flex-col gap-4 divide-y">
         {questions(coinName).map((question) => (
           <Section
             key={question.title}
@@ -19,7 +21,7 @@ export const FAQ: React.FC<FAQProps> = () => {
             content={question.content}
           />
         ))}
-      </div>
+      </Card>
     </SectionContainer>
   );
 };

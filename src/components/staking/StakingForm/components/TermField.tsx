@@ -1,4 +1,4 @@
-import { HiddenField, NumberField } from "@babylonlabs-io/bbn-core-ui";
+import { HiddenField, NumberField, Text } from "@babylonlabs-io/bbn-core-ui";
 
 interface TermFieldProps {
   min?: number;
@@ -13,15 +13,19 @@ export function TermField({ min = 0, defaultValue }: TermFieldProps) {
 
   const label = (
     <div className="flex flex-1 justify-between items-center">
-      <span>Term</span>
-      <span>min term is {min} blocks</span>
+      <Text as="span" variant="body1">
+        Term
+      </Text>
+      <Text as="span" variant="body2">
+        min term is {min} blocks
+      </Text>
     </div>
   );
 
   return (
     <NumberField
       name="term"
-      controlClassName="mb-4"
+      controlClassName="mb-6 [&_.bbn-input]:py-2.5 [&_.bbn-form-control-title]:mb-1 [&_.bbn-input-field]:text-base"
       label={label}
       placeholder="Blocks"
     />

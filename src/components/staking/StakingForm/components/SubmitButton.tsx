@@ -5,7 +5,6 @@ import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 
 export function SubmitButton() {
   const { isValid, errors } = useFormState();
-  // TODO: improve later
   const {
     balanceQuery: { data: bbnBalance = 0 },
   } = useBbnQuery();
@@ -21,7 +20,7 @@ export function SubmitButton() {
 
   return (
     <span
-      className="cursor-pointer text-xs mt-4"
+      className="cursor-pointer text-xs mt-8"
       data-tooltip-id="tooltip-staking-preview"
       data-tooltip-content={invalid ? tooltip : ""}
       data-tooltip-place="top"

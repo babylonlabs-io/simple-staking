@@ -20,21 +20,14 @@ export const finalityProviderColumns = [
   {
     key: "moniker",
     header: "Finality Provider",
+    cellClassName: "text-primary-dark",
     render: (_: unknown, row?: FinalityProvider) => {
       if (!row) return null;
+
       return (
-        <div className="flex items-center gap-2">
-          {/* {row.description?.identity && (
-            <Avatar
-              size="small"
-              url={row.description.identity}
-              alt={row.description.moniker || ""}
-            />
-          )} */}
-          <span className="text-primary-dark">
-            {row.description?.moniker || "No name provided"}
-          </span>
-        </div>
+        <span title={row.description?.moniker}>
+          {row.description?.moniker || "No name provided"}
+        </span>
       );
     },
     sorter: (a?: FinalityProvider, b?: FinalityProvider) => {

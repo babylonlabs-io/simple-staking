@@ -80,19 +80,18 @@ export const FinalityProviderTable = ({
   }
 
   return (
-    <div className="h-[21rem] overflow-y-auto ">
-      <Table
-        data={tableData}
-        columns={finalityProviderColumns}
-        loading={isFetching}
-        hasMore={hasNextPage}
-        onLoadMore={fetchNextPage}
-        selectedRow={selectedFP}
-        onRowSelect={(row) => {
-          onSelectRow?.(row?.btcPk ?? "");
-        }}
-        isRowSelectable={isRowSelectable}
-      />
-    </div>
+    <Table
+      wrapperClassName="h-[28.5rem]"
+      data={tableData}
+      columns={finalityProviderColumns}
+      loading={isFetching}
+      hasMore={hasNextPage}
+      onLoadMore={fetchNextPage}
+      selectedRow={selectedFP}
+      onRowSelect={(row) => {
+        onSelectRow?.(row?.btcPk ?? "");
+      }}
+      isRowSelectable={isRowSelectable}
+    />
   );
 };

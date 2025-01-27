@@ -1,4 +1,4 @@
-import { useFormContext, useFormState } from "@babylonlabs-io/bbn-core-ui";
+import { useFieldState } from "@babylonlabs-io/bbn-core-ui";
 import { type PropsWithChildren } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 
@@ -10,9 +10,7 @@ export function FormOverlay({
   className,
   children,
 }: PropsWithChildren<OverlayProps>) {
-  const { getFieldState } = useFormContext();
-  const formState = useFormState({ name: "finalityProvider" });
-  const fpState = getFieldState("finalityProvider", formState);
+  const fpState = useFieldState("finalityProvider");
 
   return (
     <div className={twMerge("relative flex flex-1 flex-col", className)}>
