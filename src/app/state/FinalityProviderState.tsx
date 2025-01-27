@@ -99,13 +99,15 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const providersMap = useMemo(
     () =>
-      (data?.finalityProviders ?? []).reduce((acc, fp) => {
-        if (fp.btcPk) {
-          acc.set(fp.btcPk, fp);
-        }
+      (data?.finalityProviders ?? [])
+        .sort((a, b) => b.activeDelegations - a.activeDelegations)
+        .reduce((acc, fp) => {
+          if (fp.btcPk) {
+            acc.set(fp.btcPk, fp);
+          }
 
-        return acc;
-      }, new Map<string, FinalityProvider>()),
+          return acc;
+        }, new Map<string, FinalityProvider>()),
     [data?.finalityProviders],
   );
 
