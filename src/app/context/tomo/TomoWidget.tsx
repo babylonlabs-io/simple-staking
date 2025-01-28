@@ -40,10 +40,10 @@ export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
   };
 
   return (
-    <div className="pt-10">
+    <div className="pt-10 text-accent-primary">
       <Text className="mb-4">More wallets with Tomo Connect</Text>
 
-      <div className="grid grid-cols-7 gap-6 items-center justify-between border border-primary-light/20 rounded p-6">
+      <div className="grid grid-cols-7 gap-6 items-center justify-between border border-secondary-strokeLight rounded p-6">
         {walletList.map((wallet: any) => (
           <button
             disabled={!wallet.isInstall}
@@ -60,10 +60,7 @@ export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
               alt={wallet.name}
             />
 
-            <Text
-              className="text-primary-dark leading-none whitespace-nowrap"
-              variant="body2"
-            >
+            <Text className="leading-none whitespace-nowrap" variant="body2">
               {wallet.name}
             </Text>
           </button>

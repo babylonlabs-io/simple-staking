@@ -55,7 +55,7 @@ export function DelegationForm({
     return (
       <StatusView
         className="flex-1 h-auto"
-        icon={<Loader />}
+        icon={<Loader className="text-primary-light" />}
         title="Please wait..."
       />
     );
@@ -94,11 +94,11 @@ export function DelegationForm({
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
       <div className="relative flex flex-1 flex-col gap-6">
-        <Heading variant="h5" className="text-primary-dark">
+        <Heading variant="h5" className="text-accent-primary">
           Step 2
         </Heading>
 
-        <Text variant="body1" className="text-primary-light">
+        <Text variant="body1" className="text-accent-secondary">
           Set Staking Amount
         </Text>
 
@@ -128,7 +128,7 @@ export function DelegationForm({
                 {BBN_FEE_AMOUNT && <BBNFeeAmount amount={BBN_FEE_AMOUNT} />}
               </div>
 
-              <div className="divider my-2" />
+              <div className="divider my-4" />
 
               <Total />
             </FeeSection>

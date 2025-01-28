@@ -37,11 +37,11 @@ export const SignModal = ({
     <DialogHeader
       title={title}
       onClose={onClose}
-      className="text-primary-dark"
+      className="text-accent-primary"
     />
 
-    <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
-      <Text variant="body1" className="text-primary-main">
+    <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
+      <Text variant="body1" className="text-accent-secondary">
         Please sign the following messages
       </Text>
 
@@ -81,7 +81,11 @@ export const SignModal = ({
           className="flex-1 text-xs sm:text-base"
           onClick={onSubmit}
         >
-          {processing ? <Loader size={16} className="text-white" /> : "Sign"}
+          {processing ? (
+            <Loader size={16} className="text-accent-contrast" />
+          ) : (
+            "Sign"
+          )}
         </Button>
       )}
     </DialogFooter>

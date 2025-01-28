@@ -14,10 +14,10 @@ export const FinalityProviders = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <Heading variant="h5" className="text-primary-dark">
+      <Heading variant="h5" className="text-accent-primary">
         Step 1
       </Heading>
-      <Text variant="body1" className="text-primary-dark">
+      <Text variant="body1" className="text-accent-secondary">
         Select a Finality Provider
       </Text>
 

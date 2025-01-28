@@ -254,18 +254,18 @@ export const Delegations = ({}) => {
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
-  if (combinedDelegationsData.length === 0) {
-    return null;
-  }
+  // if (combinedDelegationsData.length === 0) {
+  //   return null;
+  // }
 
   return (
     <>
       <Card className="mb-6">
-        <Heading variant="h6" className="text-primary-light py-2 mb-6">
+        <Heading variant="h6" className="text-accent-primary py-2 mb-6">
           Pending Registration
         </Heading>
 
-        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-primary-light text-xs">
+        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-accent-primary text-xs">
           <p className="text-left">Inception</p>
           <p className="text-left">Finality Provider</p>
           <p className="text-left">Amount</p>

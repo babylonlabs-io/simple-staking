@@ -12,7 +12,7 @@ export const CancelFeedbackModal: React.FC<FeedbackModalProps> = ({
   onClose,
 }) => (
   <SubmitModal
-    icon={<LuPartyPopper className="text-5xl" />}
+    icon={<LuPartyPopper className="text-5xl text-primary-light" />}
     title="We Value Your Feedback"
     open={open}
     submitButton="Done"

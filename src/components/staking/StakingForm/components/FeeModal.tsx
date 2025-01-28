@@ -82,21 +82,21 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
   const feeOptions = [
     {
       labelRenderer: renderLabel,
-      className: "border border-primary-light/20 rounded p-4",
+      className: "border border-secondary-strokeLight rounded p-4",
       key: "fast",
       value: fastestFee,
       hint: "Next Block",
     },
     {
       labelRenderer: renderLabel,
-      className: "border border-primary-light/20 rounded p-4",
+      className: "border border-secondary-strokeLight rounded p-4",
       key: "medium",
       value: mediumFee,
       hint: "Estimated 30mins",
     },
     {
       labelRenderer: renderLabel,
-      className: "border border-primary-light/20 rounded p-4",
+      className: "border border-secondary-strokeLight rounded p-4",
       key: "slow",
       value: lowestFee,
       hint: "Estimated 60mins",
@@ -124,11 +124,11 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
   return (
     <ResponsiveDialog
       open={open}
-      className="w-[41.25rem] max-w-full text-primary-dark"
+      className="w-[41.25rem] max-w-full text-accent-primary"
       onClose={onClose}
     >
       <DialogHeader title="Advanced Fee Settings" onClose={onClose}>
-        <Text variant="body1" className="mt-2 text-primary-light">
+        <Text variant="body1" className="mt-2 text-accent-secondary">
           Adjusting the fee rate lets you control how quickly your Bitcoin
           transaction is confirmed, with higher fees resulting in faster
           confirmations and lower fees potentially causing delays.
@@ -139,7 +139,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
         {isLoading ? (
           <StatusView
             className="flex-1 h-auto"
-            icon={<Loader />}
+            icon={<Loader className="text-accent-primary" />}
             title="Please wait..."
           />
         ) : (

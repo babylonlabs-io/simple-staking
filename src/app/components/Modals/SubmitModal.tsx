@@ -47,7 +47,7 @@ export const SubmitModal = ({
     open={open}
     onClose={onClose}
   >
-    <DialogBody className="text-primary-dark py-16 text-center">
+    <DialogBody className="text-accent-primary py-16 text-center">
       <div className="inline-flex bg-primary-contrast h-20 w-20 items-center justify-center mb-6">
         {icon}
       </div>

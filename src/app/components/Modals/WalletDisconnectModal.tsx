@@ -5,9 +5,8 @@ import {
   Heading,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
-import Image from "next/image";
+import { MdCancel } from "react-icons/md";
 
-import cancelCircle from "@/app/assets/cancel-circle.svg";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -29,10 +28,10 @@ export const WalletDisconnectModal = ({
 }: WalletDisconnectModalProps) => {
   return (
     <ResponsiveDialog open={isOpen} onClose={onClose}>
-      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark items-center">
+      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary items-center">
         <div className="bg-primary-contrast relative w-[5.5rem] h-[5.5rem]">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <Image src={cancelCircle} alt="Disconnect" width={52} height={52} />
+            <MdCancel className="text-primary-light" size={52} />
           </div>
         </div>
         <Heading variant="h4" className="mt-6 mb-4">
@@ -54,7 +53,12 @@ export const WalletDisconnectModal = ({
         >
           Cancel
         </Button>
-        <Button variant="contained" onClick={onDisconnect} className="flex-1">
+        <Button
+          variant="contained"
+          color="secondary"
+          onClick={onDisconnect}
+          className="flex-1"
+        >
           Disconnect
         </Button>
       </DialogFooter>

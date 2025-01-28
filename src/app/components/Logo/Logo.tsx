@@ -18,7 +18,7 @@ export const Logo: React.FC<LogoProps> = ({
       width={width}
       height={height}
       viewBox="0 0 800 240"
-      className={twMerge("text-primary-contrast", className)}
+      className={twMerge("text-accent-contrast", className)}
     >
       <path
         className="fill-current"

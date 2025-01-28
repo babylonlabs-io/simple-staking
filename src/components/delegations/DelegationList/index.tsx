@@ -89,7 +89,7 @@ export function DelegationList() {
 
   return (
     <Card>
-      <Heading variant="h6" className="text-primary-light py-2 mb-6">
+      <Heading variant="h6" className="text-accent-primary py-2 mb-6">
         {networkConfig.bbn.networkFullName} Stakes
       </Heading>
 
@@ -101,13 +101,13 @@ export function DelegationList() {
         infiniteScroll={hasMoreDelegations}
         onInfiniteScroll={fetchMoreDelegations}
         classNames={{
-          headerRowClassName: "text-primary-light text-xs",
+          headerRowClassName: "text-accent-primary text-xs",
           headerCellClassName: "p-4 text-align-left",
           rowClassName: "group",
           wrapperClassName: "max-h-[21rem] overflow-x-auto",
           bodyClassName: "gap-y-4 min-w-[1000px]",
           cellClassName:
-            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-sm justify-start group-even:bg-[#F9F9F9] text-primary-dark",
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
         }}
         params={{ handleActionClick: openConfirmationModal, validations }}
         fallback={<div>No delegations found</div>}

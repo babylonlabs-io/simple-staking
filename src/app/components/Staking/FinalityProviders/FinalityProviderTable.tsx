@@ -21,7 +21,6 @@ export const FinalityProviderTable = ({
     finalityProviders,
     hasNextPage,
     hasError,
-    filter,
     fetchNextPage,
     isRowSelectable,
   } = useFinalityProviderState();
@@ -53,7 +52,7 @@ export const FinalityProviderTable = ({
 
   const loadingView = (
     <StatusView
-      icon={<Loader className="text-primary-dark" />}
+      icon={<Loader className="text-primary-light" />}
       title="Loading Finality Providers"
     />
   );
@@ -82,6 +81,7 @@ export const FinalityProviderTable = ({
   return (
     <Table
       wrapperClassName="h-[28.5rem]"
+      className="min-w-full"
       data={tableData}
       columns={finalityProviderColumns}
       loading={isFetching}

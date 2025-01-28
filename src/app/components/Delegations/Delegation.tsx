@@ -210,7 +210,7 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   return (
     <>
-      <div className="relative h-[120px] lg:h-[72px] rounded bg-secondary-contrast odd:bg-[#F9F9F9] p-4 text-sm text-primary-dark">
+      <div className="relative h-[120px] lg:h-[72px] rounded bg-surface odd:bg-secondary-highlight p-4 text-sm text-accent-primary">
         <div className="h-full grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1">
           <DelegationCell order="order-3 lg:order-1" className="pt-6 lg:pt-0">
             {durationTillNow(startTimestamp, currentTime)}

@@ -12,7 +12,7 @@ export function FeeItem({ title, children, className, hint }: FeeItemProps) {
   return (
     <div
       className={twMerge(
-        "flex flex-row items-center justify-between text-primary-light",
+        "flex flex-row items-center justify-between text-accent-primary",
         hint && "items-start",
         className,
       )}
@@ -30,7 +30,7 @@ export function FeeItem({ title, children, className, hint }: FeeItemProps) {
           <Text as="div" className="flex gap-2 items-center">
             {children}
           </Text>
-          <Text as="div" variant="body2" className="text-primary-light">
+          <Text as="div" variant="body2" className="text-accent-secondary">
             {hint}
           </Text>
         </div>

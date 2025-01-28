@@ -34,9 +34,9 @@ export const Phase2HereModal = ({
     open={open}
     onClose={onClose}
   >
-    <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4 items-center justify-center">
+    <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 items-center justify-center">
       <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
-        <MdLooksTwo className="text-5xl" />
+        <MdLooksTwo className="text-5xl text-primary-light" />
       </div>
       <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
       <p className="text-base text-center">

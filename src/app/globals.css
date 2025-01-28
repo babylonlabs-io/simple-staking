@@ -82,6 +82,10 @@ input[type="number"] {
   border-color: #ff7c2a;
 }
 
+.divider {
+  @apply border-t border-secondary-strokeLight;
+}
+
 .divider:after,
 .divider:before {
   height: 1px !important;
@@ -103,6 +107,8 @@ body.modal-open {
 }
 
 .tooltip-wrap {
+  @apply rounded !bg-surface p-3 !text-accent-secondary !opacity-100 shadow-lg !shadow-[#000000]/20;
+
   max-width: 25rem;
   white-space: pre-wrap;
   word-wrap: break-word;
@@ -111,19 +117,19 @@ body.modal-open {
 }
 
 .tooltip-wrap[data-popper-placement*="top"] .tooltip-arrow {
-  @apply border-t-neutral-800;
+  @apply border-t-surface;
 }
 
 .tooltip-wrap[data-popper-placement*="bottom"] .tooltip-arrow {
-  @apply border-b-neutral-800;
+  @apply border-b-surface;
 }
 
 .tooltip-wrap[data-popper-placement*="left"] .tooltip-arrow {
-  @apply border-l-neutral-800;
+  @apply border-l-surface;
 }
 
 .tooltip-wrap[data-popper-placement*="right"] .tooltip-arrow {
-  @apply border-r-neutral-800;
+  @apply border-r-surface;
 }
 
 body > .tomo-social {
