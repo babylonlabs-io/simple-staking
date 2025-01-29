@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
-import { ClientErrorCategory } from "@/app/constants/errorMessage";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors";
 import { useDelegationState } from "@/app/state/DelegationState";

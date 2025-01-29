@@ -1,7 +1,7 @@
 import {
   ClientErrorCategory,
   getClientErrorMessage,
-} from "../../../constants/errorMessage";
+} from "../../../constants/errorMessages";
 import { ErrorState } from "../../../types/errors";
 
 export class ClientError extends Error {

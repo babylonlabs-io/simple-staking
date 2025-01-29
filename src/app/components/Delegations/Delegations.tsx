@@ -5,7 +5,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
-import { ClientErrorCategory } from "@/app/constants/errorMessage";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";

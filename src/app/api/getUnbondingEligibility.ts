@@ -1,4 +1,4 @@
-import { ClientErrorCategory } from "../constants/errorMessage";
+import { ClientErrorCategory } from "../constants/errorMessages";
 import { ClientError } from "../context/Error/errors/clientError";
 import { ErrorState } from "../types/errors";
 

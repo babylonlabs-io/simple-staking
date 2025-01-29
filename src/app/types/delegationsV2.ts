@@ -1,4 +1,4 @@
-import { ClientErrorCodes } from "@/app/constants/errorMessage";
+import { ClientErrorCodes } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
 
 import { ErrorState } from "./errors";

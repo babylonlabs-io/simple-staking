@@ -1,6 +1,6 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
 
-import { ClientErrorCategory } from "@/app/constants/errorMessage";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { ErrorState } from "@/app/types/errors";
