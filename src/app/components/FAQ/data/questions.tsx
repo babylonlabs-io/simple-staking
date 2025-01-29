@@ -39,8 +39,8 @@ export const questions = (coinName: string): Question[] => {
           <p>
             If a finality provider attacks the PoS system, the {coinName}s
             behind the voting powers delegated to it will be subject to protocol
-            slashing. This deters ${coinName} stakers and finality providers
-            from attacking the PoS system.
+            slashing. This deters {coinName} stakers and finality providers from
+            attacking the PoS system.
           </p>
         </>
       ),
@@ -50,9 +50,9 @@ export const questions = (coinName: string): Question[] => {
       content: (
         <p>
           The staking dApp is an interface to the Babylon Bitcoin Staking
-          protocol. The Babylon Bitcoin Staking protocol allows ${coinName}{" "}
-          holders to stake their ${coinName} and delegate their voting power to
-          a finality provider they select. Stakers can view their past staking
+          protocol. The Babylon Bitcoin Staking protocol allows {coinName}{" "}
+          holders to stake their {coinName} and delegate their voting power to a
+          finality provider they select. Stakers can view their past staking
           history and send a request to unlock their stake for early withdrawal.
         </p>
       ),
@@ -62,14 +62,14 @@ export const questions = (coinName: string): Question[] => {
       content: (
         <p>
           Technically, your {coinName} has not left your custody. However, your
-          wallet will not show the ${coinName} you staked in your available
-          balance once that ${coinName} is locked. Current wallet
-          implementations do not yet know how to display staked ${coinName} that
-          is still in your custody. When staking, you do not send the $
-          {coinName} to a third party. It is locked in a self-custodial Bitcoin
-          Staking script that you control. This means that any subsequent
-          movement of the ${coinName} will need your approval. You are the only
-          one who can unbond the stake and withdraw.
+          wallet will not show the {coinName} you staked in your available
+          balance once that {coinName} is locked. Current wallet implementations
+          do not yet know how to display staked {coinName} that is still in your
+          custody. When staking, you do not send the {coinName} to a third
+          party. It is locked in a self-custodial Bitcoin Staking script that
+          you control. This means that any subsequent movement of the {coinName}{" "}
+          will need your approval. You are the only one who can unbond the stake
+          and withdraw.
         </p>
       ),
     },
@@ -86,7 +86,7 @@ export const questions = (coinName: string): Question[] => {
           >
             <u>btc-staker CLI program</u>
           </a>{" "}
-          that allows for the creation of ${coinName} staking transactions from
+          that allows for the creation of {coinName} staking transactions from
           the CLI.
         </p>
       ),
@@ -98,10 +98,10 @@ export const questions = (coinName: string): Question[] => {
         <p>
           No, this should be avoided. Please do not connect or use a Bitcoin
           wallet holding BRC-20, ARC-20, Runes, or other NFTs or Bitcoin-native
-          assets (other than ${coinName}). They are still in their infancy and
-          in an experimental phase. Software built for the detection of such
-          tokens to avoid their misspending may not work, and you may lose all
-          such tokens.
+          assets (other than {coinName}). They are still in their infancy and in
+          an experimental phase. Software built for the detection of such tokens
+          to avoid their misspending may not work, and you may lose all such
+          tokens.
         </p>
       ),
     },
