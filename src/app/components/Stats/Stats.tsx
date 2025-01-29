@@ -28,7 +28,7 @@ export const Stats = memo(() => {
   return (
     <Section
       title="Babylon Bitcoin Staking Stats"
-      titleClassName="text-primary-contrast"
+      titleClassName="text-accent-contrast"
     >
       <Card className="flex flex-col justify-between  text-base md:flex-row">
         <StatItem

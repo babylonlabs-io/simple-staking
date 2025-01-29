@@ -5,6 +5,7 @@ import {
   MobileDialog,
   Popover,
   Text,
+  Toggle,
 } from "@babylonlabs-io/bbn-core-ui";
 import {
   useWalletConnect,
@@ -13,6 +14,8 @@ import {
 import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
+import { FaLock, FaLockOpen } from "react-icons/fa6";
+import { IoIosMoon, IoIosSunny } from "react-icons/io";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
@@ -28,7 +31,6 @@ import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { Hash } from "../Hash/Hash";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
-import { Toggle } from "../Toggle/Toggle";
 
 interface ConnectProps {
   loading?: boolean;
@@ -43,7 +45,13 @@ export const Connect: React.FC<ConnectProps> = ({
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobileView = useIsMobileView();
-  const { includeOrdinals, excludeOrdinals, ordinalsExcluded } = useAppState();
+  const {
+    includeOrdinals,
+    excludeOrdinals,
+    ordinalsExcluded,
+    theme,
+    setTheme,
+  } = useAppState();
 
   // Wallet states
   const { address: btcAddress, connected: btcConnected } = useBTCWallet();
@@ -128,22 +136,31 @@ export const Connect: React.FC<ConnectProps> = ({
           />
         </div>
         <div className="flex flex-col">
-          <Text variant="body1" className="text-primary-main text-base">
+          <Text variant="body1" className="text-accent-primary text-base">
             Bitcoin
           </Text>
-          <Hash value={btcAddress} address noFade fullWidth symbols={12} />
+          <Hash
+            className="text-accent-secondary"
+            value={btcAddress}
+            address
+            noFade
+            fullWidth
+            symbols={12}
+          />
         </div>
       </div>
       <div className="flex flex-row items-center justify-between">
-        <Text variant="body2" className="text-sm text-primary-main">
+        <Text variant="body2" className="text-sm text-accent-primary">
           {ordinalsExcluded ? "Not using Inscriptions" : "Using Inscriptions"}
         </Text>
         <div className="flex flex-col items-center justify-center">
           <Toggle
-            defaultChecked={ordinalsExcluded}
-            onChange={() => {
-              ordinalsExcluded ? includeOrdinals() : excludeOrdinals();
-            }}
+            defaultValue={ordinalsExcluded}
+            onChange={(value) =>
+              value ? includeOrdinals() : excludeOrdinals()
+            }
+            inactiveIcon={<FaLock size={10} />}
+            activeIcon={<FaLockOpen size={10} />}
           />
         </div>
       </div>
@@ -153,10 +170,17 @@ export const Connect: React.FC<ConnectProps> = ({
           <Image src={bbnIcon} alt="babylon" width={40} height={40} />
         </div>
         <div className="flex flex-col">
-          <Text variant="body1" className="text-primary-dark text-base">
+          <Text variant="body1" className="text-accent-primary text-base">
             {bbnNetworkFullName}
           </Text>
-          <Hash value={bech32Address} address noFade fullWidth symbols={12} />
+          <Hash
+            className="text-accent-secondary"
+            value={bech32Address}
+            address
+            noFade
+            fullWidth
+            symbols={12}
+          />
         </div>
       </div>
       <div className="divider my-0" />
@@ -165,6 +189,25 @@ export const Connect: React.FC<ConnectProps> = ({
         onClick={handleDisconnectClick}
       >
         <button className="text-sm w-full text-left">Disconnect Wallets</button>
+      </div>
+      <div className="divider my-0" />
+      <div className="flex flex-row items-center justify-between">
+        <Text
+          variant="body2"
+          className="text-sm text-accent-primary capitalize"
+        >
+          {theme} Mode
+        </Text>
+        <div className="flex flex-col items-center justify-center">
+          <Toggle
+            defaultValue={theme === "dark"}
+            onChange={(value) => {
+              setTheme(value ? "dark" : "light");
+            }}
+            inactiveIcon={<IoIosSunny size={12} />}
+            activeIcon={<IoIosMoon size={10} />}
+          />
+        </div>
       </div>
     </div>
   );
@@ -181,13 +224,13 @@ export const Connect: React.FC<ConnectProps> = ({
               alt={selectedWallets["BTC"]?.name}
               url={selectedWallets["BTC"]?.icon}
               size="large"
-              className="object-contain bg-primary-contrast box-content border-[3px] border-primary-main"
+              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
             />
             <Avatar
               alt={selectedWallets["BBN"]?.name}
               url={selectedWallets["BBN"]?.icon}
               size="large"
-              className="object-contain bg-primary-contrast box-content border-[3px] border-primary-main"
+              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
             />
           </AvatarGroup>
         </div>
@@ -221,7 +264,7 @@ export const Connect: React.FC<ConnectProps> = ({
             offset={[0, 11]}
             placement="bottom-end"
             onClickOutside={handleClickOutside}
-            className="flex flex-col gap-2 bg-secondary-contrast rounded p-4 border border-primary-light/20"
+            className="flex flex-col gap-2 bg-surface rounded p-4 border border-secondary-strokeLight"
           >
             {walletContent}
           </Popover>

@@ -16,7 +16,7 @@ export function Total() {
   );
 
   return (
-    <div className="flex flex-row items-start justify-between text-primary-dark">
+    <div className="flex flex-row items-start justify-between text-accent-primary">
       <Text variant="body1" className="font-bold">
         Total
       </Text>
@@ -25,7 +25,7 @@ export function Total() {
         <Text variant="body1" className="font-bold">
           {total} {coinSymbol}
         </Text>
-        {/* <Text variant="body1" className="text-primary-light text-sm">
+        {/* <Text variant="body1" className="text-accent-secondary text-sm">
           $370.03
         </Text> */}
       </div>

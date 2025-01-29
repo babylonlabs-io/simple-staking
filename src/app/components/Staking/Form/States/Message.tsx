@@ -15,12 +15,12 @@ export const Message: React.FC<MessageProps> = ({ title, message, icon }) => {
           <Image src={icon} alt="Wallet" width={120} height={122} />
         </div>
         <div className="flex flex-col gap-2 justify-center items-center self-stretch">
-          <Heading variant="h5" className="text-primary-dark text-2xl">
+          <Heading variant="h5" className="text-accent-primary text-2xl">
             {title}
           </Heading>
           <Text
             variant="body1"
-            className="text-center text-base text-primary-light p-0 whitespace-pre-line"
+            className="text-center text-base text-accent-secondary p-0 whitespace-pre-line"
           >
             {message}
           </Text>

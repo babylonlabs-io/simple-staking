@@ -1,7 +1,6 @@
 import { Text } from "@babylonlabs-io/bbn-core-ui";
-import Image from "next/image";
+import { BiSolidEditAlt } from "react-icons/bi";
 
-import editIcon from "@/app/assets/edit.svg";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -21,18 +20,12 @@ export function RegistrationStartModal({
   onClose,
   onProceed,
 }: RegistrationStartModalProps) {
-  const icon = (
-    <div className="relative w-11 h-12">
-      <Image src={editIcon} alt="Register" fill />
-    </div>
-  );
-
   return (
     <SubmitModal
       open={open}
       onClose={onClose}
       onSubmit={onProceed}
-      icon={icon}
+      icon={<BiSolidEditAlt size={52} className="text-primary-light" />}
       title={`Register to ${networkFullName}`}
       submitButton="Proceed"
     >

@@ -1,3 +1,4 @@
+import { Button } from "@babylonlabs-io/bbn-core-ui";
 import { useId } from "react";
 import { Tooltip } from "react-tooltip";
 
@@ -59,13 +60,14 @@ export function ActionButton(props: ActionButtonProps) {
       data-tooltip-content={props.tooltip}
       data-tooltip-place="top"
     >
-      <button
-        className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary-dark"
+      <Button
+        variant="outlined"
+        size="small"
         onClick={() => props.onClick?.(buttonProps.action, props.delegation)}
         disabled={props.disabled}
       >
         {buttonProps.title}
-      </button>
+      </Button>
 
       <Tooltip id={tooltipId} className="tooltip-wrap" />
     </span>

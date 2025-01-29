@@ -11,7 +11,13 @@ interface HintProps {
 }
 
 const STATUS_COLORS = {
-  default: "text-primary-main",
+  default: "text-accent-primary",
+  warning: "text-warning-main",
+  error: "text-error-main",
+} as const;
+
+const ICON_COLOR = {
+  default: "text-secondary-strokeDark",
   warning: "text-warning-main",
   error: "text-error-main",
 } as const;
@@ -34,14 +40,14 @@ export function Hint({
       {tooltip && (
         <>
           <span
-            className={twJoin("cursor-pointer text-xs", STATUS_COLORS[status])}
+            className={twJoin("cursor-pointer text-xs")}
             data-tooltip-id={id}
             data-tooltip-content={
               typeof tooltip === "string" ? tooltip : undefined
             }
             data-tooltip-place="top"
           >
-            <AiOutlineInfoCircle />
+            <AiOutlineInfoCircle size={16} className={ICON_COLOR[status]} />
           </span>
           <Tooltip
             id={id}

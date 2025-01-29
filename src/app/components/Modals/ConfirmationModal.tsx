@@ -35,11 +35,11 @@ export const ConfirmationModal = ({
   >
     <DialogHeader
       title={title}
-      className="text-primary-dark"
+      className="text-accent-primary"
       onClose={onClose}
     />
 
-    <DialogBody className="text-primary-dark">{children}</DialogBody>
+    <DialogBody className="text-accent-primary">{children}</DialogBody>
 
     <DialogFooter className="flex gap-4">
       <Button
@@ -57,7 +57,11 @@ export const ConfirmationModal = ({
         onClick={onSubmit}
         className="flex-1"
       >
-        {processing ? <Loader size={16} className="text-white" /> : "Proceed"}
+        {processing ? (
+          <Loader size={16} className="text-accent-contrast" />
+        ) : (
+          "Proceed"
+        )}
       </Button>
     </DialogFooter>
   </ResponsiveDialog>

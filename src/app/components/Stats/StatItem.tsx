@@ -1,3 +1,4 @@
+import { Loader } from "@babylonlabs-io/bbn-core-ui";
 import { type JSX } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
@@ -26,7 +27,7 @@ export const StatItem = ({
   actionComponent,
 }: StatItemProps) => (
   <div className="flex gap-2 justify-between md:flex-col md:items-center lg:flex-row lg:items-center">
-    <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-between md:justify-start text-primary-light text-base">
+    <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-between md:justify-start text-accent-secondary text-base">
       <div className="flex items-center gap-2">
         {icon}
         <div className="flex items-center gap-1">
@@ -48,12 +49,8 @@ export const StatItem = ({
       </div>
 
       <div>
-        <p className="flex-1 text-right">
-          {loading ? (
-            <span className="loading loading-spinner text-primary-dark" />
-          ) : (
-            <span className="text-primary-dark">{value}</span>
-          )}
+        <p className="flex-1 text-right text-accent-primary">
+          {loading ? <Loader size={20} /> : value}
         </p>
       </div>
     </div>

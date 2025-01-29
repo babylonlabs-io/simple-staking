@@ -69,7 +69,6 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           disabled={
             intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
           }
-          className="text-sm font-normal"
         >
           Withdraw
         </Button>
@@ -86,7 +85,6 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           size="small"
           color="primary"
           onClick={() => onUnbond(stakingTxHashHex)}
-          className="text-sm font-normal border-primary-main/20 bg-white"
         >
           Unbond
         </Button>
@@ -119,7 +117,6 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
                 !isEligibleForRegistration) ||
               hasInsufficientBalance
             }
-            className="text-sm font-normal border-primary-main/20 bg-white"
           >
             Register
           </Button>
@@ -129,7 +126,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
         <button
           ref={setAnchorEl}
           onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-          className="pl-1 pt-2 pr-0 pb-3 hover:bg-gray-100 rounded"
+          className="ml-1 py-2 px-0 hover:bg-secondary-highlight rounded"
         >
           <IoMdMore className="h-6 w-6" />
         </button>
@@ -140,20 +137,18 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           placement="bottom-end"
           onClickOutside={() => setIsPopoverOpen(false)}
         >
-          <div className="py-1 px-2">
-            <Button
-              variant="outlined"
-              size="small"
-              color="primary"
-              onClick={() => {
-                onUnbond(stakingTxHashHex);
-                setIsPopoverOpen(false);
-              }}
-              className="text-sm font-normal border-primary-main/20 bg-white w-32"
-            >
-              Unbond
-            </Button>
-          </div>
+          <Button
+            className="bg-surface"
+            variant="outlined"
+            size="small"
+            color="primary"
+            onClick={() => {
+              onUnbond(stakingTxHashHex);
+              setIsPopoverOpen(false);
+            }}
+          >
+            Unbond
+          </Button>
         </Popover>
       </div>
     );

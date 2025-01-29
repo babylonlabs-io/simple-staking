@@ -22,7 +22,7 @@ export const StakeModal = ({
   <SubmitModal
     processing={processing}
     open={open}
-    icon={<BiSolidBadgeCheck className="text-5xl" />}
+    icon={<BiSolidBadgeCheck className="text-5xl text-primary-light" />}
     title="Verified"
     submitButton={`Stake ${btc.coinName}`}
     cancelButton="Close"

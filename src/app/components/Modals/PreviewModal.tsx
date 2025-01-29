@@ -107,7 +107,7 @@ export const PreviewModal = ({
       value: (
         <>
           <Text variant="body1">{stakingTimelock} blocks</Text>
-          <Text variant="body2" className="text-gray-500">
+          <Text variant="body2" className="text-accent-secondary">
             ~ {blocksToDisplayTime(stakingTimelock)}
           </Text>
         </>
@@ -134,9 +134,9 @@ export const PreviewModal = ({
       <DialogHeader
         title="Preview"
         onClose={onClose}
-        className="text-primary-dark"
+        className="text-accent-primary"
       />
-      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
+      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
         <div className="flex flex-col">
           {previewFields.map((field, index) => (
             <Fragment key={field.key}>

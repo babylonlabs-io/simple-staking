@@ -3,7 +3,13 @@ import {
   useInscriptionProvider,
 } from "@babylonlabs-io/bbn-wallet-connect";
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
-import { useCallback, useMemo, type PropsWithChildren } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
 import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
@@ -28,6 +34,7 @@ const STATE_LIST = [
 ];
 
 export interface AppState {
+  theme: "dark" | "light";
   availableUTXOs?: UTXO[];
   stakableBtcBalance: number;
   totalBtcBalance: number;
@@ -39,10 +46,12 @@ export interface AppState {
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
   refetchUTXOs: () => void;
+  setTheme: (theme: "dark" | "light") => void;
 }
 
 const { StateProvider, useState: useApplicationState } =
   createStateUtils<AppState>({
+    theme: "light",
     isLoading: false,
     isError: false,
     stakableBtcBalance: 0,
@@ -52,12 +61,20 @@ const { StateProvider, useState: useApplicationState } =
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
     refetchUTXOs: () => {},
+    setTheme: () => {},
   });
 
 export function AppState({ children }: PropsWithChildren) {
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
     useInscriptionProvider();
   const { getStakedBalance } = useDelegationV2State();
+
+  useEffect(() => {
+    document.body.classList.add(theme);
+
+    return () => document.body.classList.remove(theme);
+  }, [theme]);
 
   // States
   const {
@@ -127,6 +144,7 @@ export function AppState({ children }: PropsWithChildren) {
   // Context
   const context = useMemo(
     () => ({
+      theme,
       availableUTXOs,
       stakableBtcBalance,
       totalBtcBalance,
@@ -138,8 +156,10 @@ export function AppState({ children }: PropsWithChildren) {
       includeOrdinals,
       excludeOrdinals,
       refetchUTXOs,
+      setTheme,
     }),
     [
+      theme,
       availableUTXOs,
       stakableBtcBalance,
       totalBtcBalance,
@@ -150,6 +170,7 @@ export function AppState({ children }: PropsWithChildren) {
       includeOrdinals,
       excludeOrdinals,
       refetchUTXOs,
+      setTheme,
     ],
   );
 
