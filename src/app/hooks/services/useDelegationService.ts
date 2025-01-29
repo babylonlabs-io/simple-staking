@@ -3,10 +3,12 @@ import { useCallback, useMemo, useState } from "react";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
+import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
+import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { validateDelegation } from "@/utils/delegations";
 import { getBbnParamByVersion } from "@/utils/params";
@@ -69,6 +71,8 @@ export function useDelegationService() {
     submitSlashingWithdrawalTx,
   } = useTransactionService();
 
+  const { getFinalityProvider } = useFinalityProviderState();
+
   const validations = useMemo(
     () =>
       delegations.reduce(
@@ -90,6 +94,22 @@ export function useDelegationService() {
         ? processingDelegations[confirmationModal.delegation.stakingTxHashHex]
         : false,
     [confirmationModal, processingDelegations],
+  );
+
+  const slashedStatuses = useMemo(
+    () =>
+      delegations.reduce(
+        (acc, delegation) => ({
+          ...acc,
+          [delegation.stakingTxHashHex]: {
+            isSlashed:
+              getFinalityProvider(delegation.finalityProviderBtcPksHex[0])
+                ?.state === FinalityProviderState.SLASHED,
+          },
+        }),
+        {} as Record<string, { isSlashed: boolean }>,
+      ),
+    [delegations, getFinalityProvider],
   );
 
   const COMMANDS: Record<ActionType, DelegationCommand> = useMemo(
@@ -318,5 +338,6 @@ export function useDelegationService() {
     closeConfirmationModal,
     fetchMoreDelegations,
     executeDelegationAction,
+    slashedStatuses,
   };
 }

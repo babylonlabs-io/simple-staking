@@ -8,7 +8,6 @@ import {
 } from "@/app/hooks/services/useDelegationService";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { type DelegationV2 } from "@/app/types/delegationsV2";
-import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/config/network";
@@ -23,6 +22,7 @@ import { TxHash } from "./components/TxHash";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
+  slashedStatuses: Record<string, { isSlashed: boolean }>;
 };
 
 const networkConfig = getNetworkConfig();
@@ -39,6 +39,7 @@ export function DelegationList() {
     executeDelegationAction,
     openConfirmationModal,
     closeConfirmationModal,
+    slashedStatuses,
   } = useDelegationService();
 
   const { getFinalityProvider } = useFinalityProviderState();
@@ -77,15 +78,14 @@ export function DelegationList() {
     {
       field: "actions",
       headerName: "Action",
-      renderCell: (row, _, { handleActionClick, validations }) => {
+      renderCell: (
+        row,
+        _,
+        { handleActionClick, validations, slashedStatuses },
+      ) => {
         const { valid, error } = validations[row.stakingTxHashHex];
-        const finalProvider = getFinalityProvider(
-          row.finalityProviderBtcPksHex[0],
-        );
-        const isSlashed =
-          finalProvider?.state === FinalityProviderState.SLASHED;
-
-        const slashedTooltip = (
+        const { isSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
+        const tooltip = isSlashed ? (
           <>
             <span>
               This finality provider has been slashed.{" "}
@@ -98,13 +98,13 @@ export function DelegationList() {
               </Link>
             </span>
           </>
+        ) : (
+          error
         );
-        const tooltip = isSlashed ? slashedTooltip : error;
-        const disabled = !valid || isSlashed;
 
         return (
           <ActionButton
-            disabled={disabled}
+            disabled={!valid || isSlashed}
             tooltip={tooltip}
             delegation={row}
             state={row.state}
@@ -137,7 +137,11 @@ export function DelegationList() {
           cellClassName:
             "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
         }}
-        params={{ handleActionClick: openConfirmationModal, validations }}
+        params={{
+          handleActionClick: openConfirmationModal,
+          validations,
+          slashedStatuses,
+        }}
         fallback={<div>No delegations found</div>}
       />
 
