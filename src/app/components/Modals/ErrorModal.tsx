@@ -14,6 +14,7 @@ import { MdOutlineSwapHoriz } from "react-icons/md";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { ErrorState, ShowErrorParams } from "@/app/types/errors";
+import { getCommitHash } from "@/utils/version";
 
 interface ErrorModalProps {
   open: boolean;
@@ -37,7 +38,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   const { error, modalOptions } = useError();
   const { retryAction, noCancel: noCancelOption } = modalOptions;
   const [copied, setCopied] = useState(false);
-  const version = process.env.NEXT_PUBLIC_COMMIT_HASH ?? "development";
+  const version = getCommitHash();
 
   const handleRetry = () => {
     const retryErrorParam: ShowErrorParams = {

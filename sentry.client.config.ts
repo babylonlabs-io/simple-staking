@@ -11,6 +11,8 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+import { getCommitHash } from "@/utils/version";
+
 Sentry.init({
   // This is pointing to the DSN (Data Source Name) for my local instance.
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
@@ -45,7 +47,7 @@ Sentry.init({
   beforeSend(event) {
     event.extra = {
       ...event.extra,
-      version: process.env.NEXT_PUBLIC_COMMIT_HASH ?? "development",
+      version: getCommitHash(),
     };
     return event;
   },

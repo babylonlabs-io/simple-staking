@@ -4,7 +4,7 @@ import { useCallback } from "react";
 
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
-import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientErrorCategory } from "@/app/constants/errorMessage";
 import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
@@ -54,11 +54,11 @@ export function useV1TransactionService() {
     ) => {
       // Perform checks
       if (!bbnStakingParams) {
-        throw new ClientError(
-          "Staking params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Staking params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -71,11 +71,11 @@ export function useV1TransactionService() {
       );
 
       if (!stakingParam) {
-        throw new ClientError(
-          `Params for height ${stakingHeight} not found`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.TRANSITION,
-        );
+        throw new ClientError({
+          message: `Params for height ${stakingHeight} not found`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.TRANSITION,
+        });
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
@@ -96,11 +96,11 @@ export function useV1TransactionService() {
       // Check if this staking transaction is eligible for unbonding
       const eligibility = await getUnbondingEligibility(stakingTx.getId());
       if (!eligibility) {
-        throw new ClientError(
-          "Transaction not eligible",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.UNBONDING,
-        );
+        throw new ClientError({
+          message: "Transaction not eligible",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.UNBONDING,
+        });
       }
 
       const txResult = staking.createUnbondingTransaction(stakingTx);
@@ -154,18 +154,18 @@ export function useV1TransactionService() {
     ) => {
       // Perform checks
       if (!bbnStakingParams) {
-        throw new ClientError(
-          "Staking params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.TRANSITION,
-        );
+        throw new ClientError({
+          message: "Staking params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.TRANSITION,
+        });
       }
       if (!btcConnected || !btcNetwork) {
-        throw new ClientError(
-          "BTC Wallet not connected",
-          ClientErrorCodes.CLIENT_GENERIC,
-          ErrorState.WALLET,
-        );
+        throw new ClientError({
+          message: "BTC Wallet not connected",
+          category: ClientErrorCategory.CLIENT_NETWORK,
+          state: ErrorState.WALLET,
+        });
       }
       validateStakingInput(stakingInput);
 
@@ -176,11 +176,11 @@ export function useV1TransactionService() {
       );
 
       if (!stakingParam) {
-        throw new ClientError(
-          `Params for height ${stakingHeight} not found`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.TRANSITION,
-        );
+        throw new ClientError({
+          message: `Params for height ${stakingHeight} not found`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.TRANSITION,
+        });
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
@@ -242,10 +242,10 @@ const getStakerSignature = (unbondingTx: Transaction): string => {
   try {
     return unbondingTx.ins[0].witness[0].toString("hex");
   } catch (error) {
-    throw new ClientError(
-      "Invalid transaction signature",
-      ClientErrorCodes.CLIENT_TRANSACTION,
-      ErrorState.WITHDRAW,
-    );
+    throw new ClientError({
+      message: "Invalid transaction signature",
+      category: ClientErrorCategory.CLIENT_TRANSACTION,
+      state: ErrorState.WITHDRAW,
+    });
   }
 };

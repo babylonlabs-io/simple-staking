@@ -1,24 +1,29 @@
-import {
-  getHttpErrorMessage,
-  HttpStatusCode,
-} from "../../../constants/httpStatusCodes";
+import { HttpStatusCode } from "axios";
 
 export class ServerError extends Error {
   readonly name = "ServerError";
   readonly displayMessage: string;
+  readonly status: HttpStatusCode;
+  readonly endpoint?: string;
 
   /**
    * @param message       Technical message for debugging
    * @param status        HTTP status code
    * @param endpoint      Endpoint, resource name, or server location
    */
-  constructor(
-    public readonly message: string,
-    public readonly status: number = HttpStatusCode.INTERNAL_SERVER_ERROR,
-    public readonly endpoint?: string,
-  ) {
+  constructor({
+    message,
+    status = HttpStatusCode.InternalServerError,
+    endpoint,
+  }: {
+    message: string;
+    status?: HttpStatusCode;
+    endpoint?: string;
+  }) {
     super(message);
-    this.displayMessage = getHttpErrorMessage(status, message);
+    this.status = status;
+    this.endpoint = endpoint;
+    this.displayMessage = message;
     Object.setPrototypeOf(this, ServerError.prototype);
   }
 

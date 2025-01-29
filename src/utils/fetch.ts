@@ -1,3 +1,5 @@
+import { HttpStatusCode } from "axios";
+
 import { ServerError } from "@/app/context/Error/errors";
 
 type FetchOptions = {
@@ -29,7 +31,11 @@ export const fetchApi = async <T>(
       const errorText =
         (await response.text()) || JSON.stringify(await response.json());
       const message = options.formatErrorResponse?.(errorText) || errorText;
-      throw new ServerError(message, response.status, url.toString());
+      throw new ServerError({
+        message,
+        status: response.status,
+        endpoint: url.toString(),
+      });
     }
 
     const data =
@@ -42,6 +48,10 @@ export const fetchApi = async <T>(
     const message =
       error instanceof Error ? error.message : "Network request failed";
 
-    throw new ServerError(message, 500, url.toString());
+    throw new ServerError({
+      message,
+      status: HttpStatusCode.InternalServerError,
+      endpoint: url.toString(),
+    });
   }
 };

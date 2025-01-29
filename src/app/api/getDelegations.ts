@@ -1,8 +1,8 @@
-import { ClientErrorCodes } from "../constants/errorCodes";
-import { ClientError } from "../context/Error/errors/clientError";
+import { HttpStatusCode } from "axios";
+
+import { ServerError } from "../context/Error/errors/serverError";
 import { Pagination } from "../types/api";
 import { Delegation } from "../types/delegations";
-import { ErrorState } from "../types/errors";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -46,13 +46,12 @@ export const getDelegations = async (
   publicKeyNoCoord?: string,
 ): Promise<PaginatedDelegations> => {
   if (!publicKeyNoCoord) {
-    throw new ClientError(
-      "No public key provided",
-      ClientErrorCodes.CLIENT_VALIDATION,
-      ErrorState.DELEGATIONS,
-    );
+    throw new ServerError({
+      message: "No public key provided",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: "/v1/staker/delegations",
+    });
   }
-
   const params = {
     pagination_key: key,
     staker_btc_pk: publicKeyNoCoord,

@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
-import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientErrorCategory } from "@/app/constants/errorMessage";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors";
 import { useDelegationState } from "@/app/state/DelegationState";
@@ -42,11 +42,11 @@ export function useRegistrationService() {
 
     if (!selectedDelegation) {
       handleError({
-        error: new ClientError(
-          "No delegation selected for registration",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.TRANSITION,
-        ),
+        error: new ClientError({
+          message: "No delegation selected for registration",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.TRANSITION,
+        }),
         displayError: {
           errorState: ErrorState.TRANSITION,
         },

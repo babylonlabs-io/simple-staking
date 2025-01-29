@@ -1,9 +1,7 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
-import { AxiosResponse } from "axios";
+import { AxiosResponse, HttpStatusCode } from "axios";
 
-import { ClientErrorCodes } from "../constants/errorCodes";
-import { ClientError } from "../context/Error/errors";
-import { ErrorState } from "../types/errors";
+import { ServerError } from "../context/Error/errors";
 import { NetworkInfo } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
@@ -98,11 +96,12 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     (param, index) => param === sortedByHeight[index],
   );
   if (!areEqual) {
-    throw new ClientError(
-      "Version numbers and BTC activation heights are not consistently ordered",
-      ClientErrorCodes.CLIENT_VALIDATION,
-      ErrorState.NETWORK,
-    );
+    throw new ServerError({
+      message:
+        "Version numbers and BTC activation heights are not consistently ordered",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: "/v2/network-info",
+    });
   }
 
   const latestStakingParam = stakingVersions.reduce((prev, current) =>
@@ -124,11 +123,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
 
   const genesisStakingParam = stakingVersions.find((v) => v.version === 0);
   if (!genesisStakingParam) {
-    throw new ClientError(
-      "Genesis staking params not found",
-      ClientErrorCodes.CLIENT_VALIDATION,
-      ErrorState.NETWORK,
-    );
+    throw new ServerError({
+      message: "Genesis staking params not found",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: "/v2/network-info",
+    });
   }
 
   // Find the genesis epoch check param (version 0)
@@ -136,11 +135,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     (v) => v.version === 0,
   );
   if (!genesisEpochCheckParam) {
-    throw new ClientError(
-      "Genesis epoch check params not found",
-      ClientErrorCodes.CLIENT_VALIDATION,
-      ErrorState.NETWORK,
-    );
+    throw new ServerError({
+      message: "Genesis epoch check params not found",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: "/v2/network-info",
+    });
   }
 
   return {

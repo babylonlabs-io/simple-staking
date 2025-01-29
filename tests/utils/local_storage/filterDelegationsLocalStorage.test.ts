@@ -1,3 +1,5 @@
+import { HttpStatusCode } from "axios";
+
 import { ServerError } from "@/app/context/Error/errors";
 import { Delegation } from "@/app/types/delegations";
 import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDelegationsLocalStorage";
@@ -37,11 +39,11 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
 
   it("should return valid delegations not present in the API and not exceeding the max duration", async () => {
     (getTxInfo as jest.Mock).mockRejectedValue(
-      new ServerError(
-        "Transaction not found in the mempool",
-        404,
-        "mempool/tx/info",
-      ),
+      new ServerError({
+        message: "Transaction not found in the mempool",
+        status: HttpStatusCode.NotFound,
+        endpoint: "mempool/tx/info",
+      }),
     );
 
     const result = await filterDelegationsLocalStorage(
@@ -55,11 +57,11 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
 
   it("should remove delegations that exceed max duration and are not in the mempool", async () => {
     (getTxInfo as jest.Mock).mockRejectedValue(
-      new ServerError(
-        "Transaction not found in the mempool",
-        404,
-        "mempool/tx/info",
-      ),
+      new ServerError({
+        message: "Transaction not found in the mempool",
+        status: HttpStatusCode.NotFound,
+        endpoint: "mempool/tx/info",
+      }),
     );
 
     const result = await filterDelegationsLocalStorage(
@@ -143,11 +145,11 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
 
   it("should handle no API data but local storage items are present", async () => {
     (getTxInfo as jest.Mock).mockRejectedValue(
-      new ServerError(
-        "Transaction not found in the mempool",
-        404,
-        "mempool/tx/info",
-      ),
+      new ServerError({
+        message: "Transaction not found in the mempool",
+        status: HttpStatusCode.NotFound,
+        endpoint: "mempool/tx/info",
+      }),
     );
 
     const result = await filterDelegationsLocalStorage(

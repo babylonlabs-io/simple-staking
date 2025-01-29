@@ -5,7 +5,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
-import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientErrorCategory } from "@/app/constants/errorMessage";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -101,11 +101,11 @@ export const Delegations = ({}) => {
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new ClientError(
-          "Wrong delegation selected for withdrawal",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.UNBONDING,
-        );
+        throw new ClientError({
+          message: "Wrong delegation selected for unbonding",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.UNBONDING,
+        });
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
@@ -146,21 +146,21 @@ export const Delegations = ({}) => {
   const handleWithdraw = async (id: string) => {
     try {
       if (!networkFees) {
-        throw new ClientError(
-          "Network fees not found",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.WITHDRAW,
-        );
+        throw new ClientError({
+          message: "Network fees not found",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.WITHDRAW,
+        });
       }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
 
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new ClientError(
-          "Wrong delegation selected for withdrawal",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.WITHDRAW,
-        );
+        throw new ClientError({
+          message: "Wrong delegation selected for withdrawal",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.WITHDRAW,
+        });
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =

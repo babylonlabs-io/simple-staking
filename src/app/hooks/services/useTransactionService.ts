@@ -13,7 +13,7 @@ import { SigningStargateClient } from "@cosmjs/stargate";
 import { Network, Psbt, Transaction } from "bitcoinjs-lib";
 import { useCallback } from "react";
 
-import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientErrorCategory } from "@/app/constants/errorMessage";
 import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
@@ -118,19 +118,19 @@ export const useTransactionService = () => {
       validateStakingInput(stakingInput);
 
       if (!tipHeader) {
-        throw new ClientError(
-          `${coinSymbol} tip not loaded from ${bbnNetworkFullName}`,
-          ClientErrorCodes.CLIENT_NETWORK,
-          ErrorState.NETWORK,
-        );
+        throw new ClientError({
+          message: `${coinSymbol} tip not loaded from ${bbnNetworkFullName}`,
+          category: ClientErrorCategory.CLIENT_NETWORK,
+          state: ErrorState.NETWORK,
+        });
       }
 
       if (!versionedParams || versionedParams.length == 0) {
-        throw new ClientError(
-          "Staking params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Staking params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
 
       // Get the param based on the tip height
@@ -208,21 +208,21 @@ export const useTransactionService = () => {
         signingStargateClient,
       );
       if (!tipHeader) {
-        throw new ClientError(
-          `${coinSymbol} tip not loaded`,
-          ClientErrorCodes.CLIENT_NETWORK,
-          ErrorState.NETWORK,
-        );
+        throw new ClientError({
+          message: `${coinSymbol} tip not loaded`,
+          category: ClientErrorCategory.CLIENT_NETWORK,
+          state: ErrorState.NETWORK,
+        });
       }
 
       validateStakingInput(stakingInput);
 
       if (!versionedParams || versionedParams.length == 0) {
-        throw new ClientError(
-          "Staking params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Staking params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
 
       // Get the param based on the tip height
@@ -283,21 +283,21 @@ export const useTransactionService = () => {
         signingStargateClient,
       );
       if (!versionedParams || versionedParams?.length === 0) {
-        throw new ClientError(
-          "Params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
 
       // Get the staking params at the time of the staking transaction
       const p = getBbnParamByBtcHeight(stakingHeight, versionedParams);
       if (!p) {
-        throw new ClientError(
-          `Params for height ${stakingHeight} not found`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Params for height ${stakingHeight} not found`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
 
       validateStakingInput(stakingInput);
@@ -368,11 +368,11 @@ export const useTransactionService = () => {
     ) => {
       // Perform checks
       if (!versionedParams || versionedParams?.length === 0) {
-        throw new ClientError(
-          `Params version ${paramVersion} not found`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Params version ${paramVersion} not found`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -400,11 +400,11 @@ export const useTransactionService = () => {
       const signedStakingTx =
         Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
       if (signedStakingTx.getId() !== expectedTxHashHex) {
-        throw new ClientError(
-          `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
-          ClientErrorCodes.CLIENT_TRANSACTION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
+          category: ClientErrorCategory.CLIENT_TRANSACTION,
+          state: ErrorState.STAKING,
+        });
       }
       await pushTx(signedStakingTx.toHex());
       refetchUTXOs();
@@ -444,11 +444,11 @@ export const useTransactionService = () => {
     ) => {
       // Perform checks
       if (!versionedParams || versionedParams?.length === 0) {
-        throw new ClientError(
-          "Params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -460,11 +460,11 @@ export const useTransactionService = () => {
       // Get the staking params at the time of the staking transaction
       const p = getBbnParamByVersion(paramVersion, versionedParams);
       if (!p)
-        throw new ClientError(
-          `Unable to find staking params for version ${paramVersion}`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Unable to find staking params for version ${paramVersion}`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
 
       const staking = new Staking(
         btcNetwork!,
@@ -502,11 +502,11 @@ export const useTransactionService = () => {
       // Perform the final check on the unbonding tx hash
       const unbondingTxId = unbondingTx.getId();
       if (signedUnbondingTx.getId() !== unbondingTxId) {
-        throw new ClientError(
-          `Unbonding transaction hash mismatch, expected ${unbondingTxId} but got ${signedUnbondingTx.getId()}`,
-          ClientErrorCodes.CLIENT_TRANSACTION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Unbonding transaction hash mismatch, expected ${unbondingTxId} but got ${signedUnbondingTx.getId()}`,
+          category: ClientErrorCategory.CLIENT_TRANSACTION,
+          state: ErrorState.STAKING,
+        });
       }
       await pushTx(signedUnbondingTx.toHex());
     },
@@ -536,11 +536,11 @@ export const useTransactionService = () => {
     ) => {
       // Perform checks
       if (!versionedParams || versionedParams?.length === 0) {
-        throw new ClientError(
-          "Params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -549,11 +549,11 @@ export const useTransactionService = () => {
 
       const p = getBbnParamByVersion(paramVersion, versionedParams);
       if (!p)
-        throw new ClientError(
-          `Unable to find staking params for version ${paramVersion}`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Unable to find staking params for version ${paramVersion}`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
 
       const staking = new Staking(
         btcNetwork!,
@@ -605,11 +605,11 @@ export const useTransactionService = () => {
     ) => {
       // Perform checks
       if (!versionedParams || versionedParams?.length === 0) {
-        throw new ClientError(
-          "Params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -618,11 +618,11 @@ export const useTransactionService = () => {
 
       const p = getBbnParamByVersion(paramVersion, versionedParams);
       if (!p)
-        throw new ClientError(
-          `Unable to find staking params for version ${paramVersion}`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Unable to find staking params for version ${paramVersion}`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
 
       const staking = new Staking(
         btcNetwork!,
@@ -673,11 +673,11 @@ export const useTransactionService = () => {
     ) => {
       // Perform checks
       if (!versionedParams || versionedParams?.length === 0) {
-        throw new ClientError(
-          "Params not loaded",
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: "Params not loaded",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
       }
       if (!btcConnected || !btcNetwork)
         throw new Error("BTC Wallet not connected");
@@ -686,11 +686,11 @@ export const useTransactionService = () => {
 
       const p = getBbnParamByVersion(paramVersion, versionedParams);
       if (!p)
-        throw new ClientError(
-          `Unable to find staking params for version ${paramVersion}`,
-          ClientErrorCodes.CLIENT_VALIDATION,
-          ErrorState.STAKING,
-        );
+        throw new ClientError({
+          message: `Unable to find staking params for version ${paramVersion}`,
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          state: ErrorState.STAKING,
+        });
 
       const staking = new Staking(
         btcNetwork!,
@@ -766,11 +766,11 @@ const createBtcDelegationMsg = async (
   ).extractTransaction();
   const slashingSig = extractSchnorrSignaturesFromTransaction(signedSlashingTx);
   if (!slashingSig) {
-    throw new ClientError(
-      "No signature found in the staking output slashing PSBT",
-      ClientErrorCodes.CLIENT_TRANSACTION,
-      ErrorState.STAKING,
-    );
+    throw new ClientError({
+      message: "No signature found in the staking output slashing PSBT",
+      category: ClientErrorCategory.CLIENT_TRANSACTION,
+      state: ErrorState.STAKING,
+    });
   }
 
   await btcSigningFuncs.signingCallback(SigningStep.UNBONDING_SLASHING);
@@ -786,11 +786,11 @@ const createBtcDelegationMsg = async (
     signedUnbondingSlashingTx,
   );
   if (!unbondingSignatures) {
-    throw new ClientError(
-      "No signature found in the unbonding output slashing PSBT",
-      ClientErrorCodes.CLIENT_TRANSACTION,
-      ErrorState.STAKING,
-    );
+    throw new ClientError({
+      message: "No signature found in the unbonding output slashing PSBT",
+      category: ClientErrorCategory.CLIENT_TRANSACTION,
+      state: ErrorState.STAKING,
+    });
   }
 
   await btcSigningFuncs.signingCallback(SigningStep.PROOF_OF_POSSESSION);

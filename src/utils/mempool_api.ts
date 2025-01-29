@@ -1,4 +1,5 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+import { HttpStatusCode } from "axios";
 
 import { ServerError } from "@/app/context/Error/errors";
 import { Fees } from "@/app/types/fee";
@@ -158,11 +159,11 @@ export async function getTipHeight(): Promise<number> {
 
   const height = Number(result);
   if (Number.isNaN(height)) {
-    throw new ServerError(
-      "Invalid result returned",
-      400,
-      btcTipHeightUrl().toString(),
-    );
+    throw new ServerError({
+      message: "Invalid result returned",
+      status: HttpStatusCode.BadRequest,
+      endpoint: btcTipHeightUrl().toString(),
+    });
   }
   return height;
 }
@@ -195,11 +196,11 @@ export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
   const { isvalid, scriptPubKey } = addressInfo;
 
   if (!isvalid) {
-    throw new ServerError(
-      "Invalid address",
-      400,
-      validateAddressUrl(address).toString(),
-    );
+    throw new ServerError({
+      message: "Invalid address",
+      status: HttpStatusCode.BadRequest,
+      endpoint: validateAddressUrl(address).toString(),
+    });
   }
 
   return sortedUTXOs.map((s) => ({
@@ -258,11 +259,11 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
 
   const { block_height, merkle, pos } = response;
   if (!block_height || !merkle.length || !pos) {
-    throw new ServerError(
-      "Invalid transaction merkle proof result returned",
-      500,
-      txMerkleProofUrl(txId).toString(),
-    );
+    throw new ServerError({
+      message: "Invalid transaction merkle proof result returned",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: txMerkleProofUrl(txId).toString(),
+    });
   }
 
   return {

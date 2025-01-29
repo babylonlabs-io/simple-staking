@@ -1,7 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
-import { ClientErrorCodes } from "@/app/constants/errorCodes";
+import { ClientErrorCategory } from "@/app/constants/errorMessage";
 import { ClientError } from "@/app/context/Error/errors";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
@@ -145,11 +145,11 @@ export function useDelegationService() {
         covenantUnbondingSignatures,
       }: TxProps) => {
         if (!covenantUnbondingSignatures) {
-          throw new ClientError(
-            "Covenant unbonding signatures not found",
-            ClientErrorCodes.CLIENT_VALIDATION,
-            ErrorState.UNBONDING,
-          );
+          throw new ClientError({
+            message: "Covenant unbonding signatures not found",
+            category: ClientErrorCategory.CLIENT_VALIDATION,
+            state: ErrorState.UNBONDING,
+          });
         }
 
         await submitUnbondingTx(
@@ -194,11 +194,11 @@ export function useDelegationService() {
         slashing,
       }) => {
         if (!slashing.unbondingSlashingTxHex) {
-          throw new ClientError(
-            "Unbonding slashing tx not found, can't submit withdrawal",
-            ClientErrorCodes.CLIENT_VALIDATION,
-            ErrorState.UNBONDING,
-          );
+          throw new ClientError({
+            message: "Unbonding slashing tx not found, can't submit withdrawal",
+            category: ClientErrorCategory.CLIENT_VALIDATION,
+            state: ErrorState.UNBONDING,
+          });
         }
 
         await submitSlashingWithdrawalTx(
@@ -238,11 +238,11 @@ export function useDelegationService() {
         slashing,
       }) => {
         if (!slashing.stakingSlashingTxHex) {
-          throw new ClientError(
-            "Slashing tx not found, can't submit withdrawal",
-            ClientErrorCodes.CLIENT_VALIDATION,
-            ErrorState.WITHDRAW,
-          );
+          throw new ClientError({
+            message: "Slashing tx not found, can't submit withdrawal",
+            category: ClientErrorCategory.CLIENT_VALIDATION,
+            state: ErrorState.WITHDRAW,
+          });
         }
 
         await submitSlashingWithdrawalTx(
