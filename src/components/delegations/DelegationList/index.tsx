@@ -6,7 +6,6 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
@@ -27,6 +26,77 @@ type TableParams = {
 
 const networkConfig = getNetworkConfig();
 
+const columns: TableColumn<DelegationV2, TableParams>[] = [
+  {
+    field: "Inception",
+    headerName: "Inception",
+    width: "max-content",
+    renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
+  },
+  {
+    field: "finalityProvider",
+    headerName: "Finality Provider",
+    width: "max-content",
+    renderCell: (row) => (
+      <FinalityProviderMoniker value={row.finalityProviderBtcPksHex[0]} />
+    ),
+  },
+  {
+    field: "stakingAmount",
+    headerName: "Amount",
+    width: "max-content",
+    renderCell: (row) => <Amount value={row.stakingAmount} />,
+  },
+  {
+    field: "stakingTxHashHex",
+    headerName: "Transaction ID",
+    renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
+  },
+  {
+    field: "state",
+    headerName: "Status",
+    renderCell: (row) => <Status delegation={row} />,
+  },
+  {
+    field: "actions",
+    headerName: "Action",
+    renderCell: (
+      row,
+      _,
+      { handleActionClick, validations, slashedStatuses },
+    ) => {
+      const { valid, error } = validations[row.stakingTxHashHex];
+      const { isSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
+      const tooltip = isSlashed ? (
+        <>
+          <span>
+            This finality provider has been slashed.{" "}
+            <Link
+              className="text-secondary-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </Link>
+          </span>
+        </>
+      ) : (
+        error
+      );
+
+      return (
+        <ActionButton
+          disabled={!valid || isSlashed}
+          tooltip={tooltip}
+          delegation={row}
+          state={row.state}
+          onClick={handleActionClick}
+        />
+      );
+    },
+  },
+];
+
 export function DelegationList() {
   const {
     processing,
@@ -41,79 +111,6 @@ export function DelegationList() {
     closeConfirmationModal,
     slashedStatuses,
   } = useDelegationService();
-
-  const { getFinalityProvider } = useFinalityProviderState();
-
-  const columns: TableColumn<DelegationV2, TableParams>[] = [
-    {
-      field: "Inception",
-      headerName: "Inception",
-      width: "max-content",
-      renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
-    },
-    {
-      field: "finalityProvider",
-      headerName: "Finality Provider",
-      width: "max-content",
-      renderCell: (row) => (
-        <FinalityProviderMoniker value={row.finalityProviderBtcPksHex[0]} />
-      ),
-    },
-    {
-      field: "stakingAmount",
-      headerName: "Amount",
-      width: "max-content",
-      renderCell: (row) => <Amount value={row.stakingAmount} />,
-    },
-    {
-      field: "stakingTxHashHex",
-      headerName: "Transaction ID",
-      renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
-    },
-    {
-      field: "state",
-      headerName: "Status",
-      renderCell: (row) => <Status delegation={row} />,
-    },
-    {
-      field: "actions",
-      headerName: "Action",
-      renderCell: (
-        row,
-        _,
-        { handleActionClick, validations, slashedStatuses },
-      ) => {
-        const { valid, error } = validations[row.stakingTxHashHex];
-        const { isSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
-        const tooltip = isSlashed ? (
-          <>
-            <span>
-              This finality provider has been slashed.{" "}
-              <Link
-                className="text-secondary-main"
-                target="_blank"
-                href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
-              >
-                Learn more
-              </Link>
-            </span>
-          </>
-        ) : (
-          error
-        );
-
-        return (
-          <ActionButton
-            disabled={!valid || isSlashed}
-            tooltip={tooltip}
-            delegation={row}
-            state={row.state}
-            onClick={handleActionClick}
-          />
-        );
-      },
-    },
-  ];
 
   return (
     <Card>

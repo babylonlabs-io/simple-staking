@@ -1,5 +1,4 @@
 import { Button } from "@babylonlabs-io/bbn-core-ui";
-import { type ReactNode } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
@@ -11,7 +10,7 @@ import { Hint } from "@/components/common/Hint";
 
 interface ActionButtonProps {
   disabled?: boolean;
-  tooltip?: string | ReactNode;
+  tooltip?: string | JSX.Element;
   delegation: DelegationV2;
   state: string;
   onClick?: (action: ActionType, delegation: DelegationV2) => void;
@@ -53,7 +52,7 @@ export function ActionButton(props: ActionButtonProps) {
   if (!buttonProps) return null;
 
   return (
-    <Hint tooltip={props.tooltip} hasIcon={false}>
+    <Hint tooltip={props.tooltip} attachToChildren={true}>
       <Button
         variant="outlined"
         size="small"
