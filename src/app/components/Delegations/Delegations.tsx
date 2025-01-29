@@ -254,9 +254,9 @@ export const Delegations = ({}) => {
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
-  // if (combinedDelegationsData.length === 0) {
-  //   return null;
-  // }
+  if (combinedDelegationsData.length === 0) {
+    return null;
+  }
 
   return (
     <>

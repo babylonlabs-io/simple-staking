@@ -49,7 +49,7 @@ const ACTION_BUTTON_PROPS: Record<
 
 export function ActionButton(props: ActionButtonProps) {
   const tooltipId = useId();
-  const buttonProps = ACTION_BUTTON_PROPS[State.VERIFIED]; // ACTION_BUTTON_PROPS[props.state];
+  const buttonProps = ACTION_BUTTON_PROPS[props.state];
 
   if (!buttonProps) return null;
 
