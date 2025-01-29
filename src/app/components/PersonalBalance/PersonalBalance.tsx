@@ -1,7 +1,8 @@
 import { Card } from "@babylonlabs-io/bbn-core-ui";
+import { useMemo } from "react";
 
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
-import { useAppState } from "@/app/state";
+import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -18,22 +19,33 @@ const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
 const { coinName, coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
+  // Load reward state
   const {
     loading,
     processing,
     showRewardModal,
     bbnAddress,
-    stakableBtcBalance,
-    totalBtcBalance,
-    bbnBalance,
     rewardBalance,
     transactionFee,
     closeRewardModal,
   } = useRewardsState();
+
+  // Load balance state
+  const {
+    bbnBalance,
+    stakableBtcBalance,
+    totalBtcBalance,
+    stakedBtcBalance,
+    inscriptionsBtcBalance,
+  } = useBalanceState();
+
   const { claimRewards, showPreview } = useRewardsService();
-  const { ordinalsExcluded, hasOrdinals } = useAppState();
 
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
+
+  const combinedTotalBtcBalance = useMemo(() => {
+    return totalBtcBalance + stakedBtcBalance;
+  }, [totalBtcBalance, stakedBtcBalance]);
 
   return (
     <AuthGuard>
@@ -42,10 +54,10 @@ export function PersonalBalance() {
           <StatItem
             loading={loading}
             title={`Total ${coinName} Balance`}
-            value={`${satoshiToBtc(totalBtcBalance)} ${coinSymbol}`}
+            value={`${satoshiToBtc(combinedTotalBtcBalance)} ${coinSymbol}`}
             tooltip={
-              hasOrdinals && ordinalsExcluded
-                ? `You have ${satoshiToBtc(totalBtcBalance - stakableBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+              inscriptionsBtcBalance
+                ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
                 : undefined
             }
           />

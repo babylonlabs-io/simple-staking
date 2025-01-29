@@ -14,6 +14,8 @@ import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 
+import { useBalanceState } from "./BalanceState";
+
 const formatStakingAmount = (value: number) =>
   !Number.isNaN(value) ? btcToSatoshi(value) : undefined;
 const formatNumber = (value: number) =>
@@ -123,7 +125,6 @@ export function StakingState({ children }: PropsWithChildren) {
 
   const {
     networkInfo,
-    stakableBtcBalance,
     isError: isStateError,
     isLoading: isStateLoading,
   } = useAppState();
@@ -138,10 +139,12 @@ export function StakingState({ children }: PropsWithChildren) {
     isError: isNetworkFeeError,
     isLoading: isFeeLoading,
   } = useNetworkFees();
+  const { stakableBtcBalance, loading: isBalanceLoading } = useBalanceState();
 
   const { publicKeyNoCoord } = useBTCWallet();
 
-  const loading = isStateLoading || isCheckLoading || isFeeLoading;
+  const loading =
+    isStateLoading || isCheckLoading || isFeeLoading || isBalanceLoading;
   const hasError = isStateError || isNetworkFeeError || !isApiNormal;
   const blocked = isGeoBlocked;
   const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
