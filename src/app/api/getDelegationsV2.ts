@@ -45,7 +45,7 @@ interface DelegationV2API {
 }
 
 export const getDelegationV2 = async (
-  stakingTxHashHex?: string,
+  stakingTxHashHex: string,
 ): Promise<DelegationV2 | null> => {
   try {
     const params = {

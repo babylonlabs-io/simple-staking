@@ -68,8 +68,8 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           });
         } else if (error instanceof ClientError) {
           scope.setExtras({
-            errorCode: error.errorCode,
-            errorType: error.errorType,
+            errorCategory: error.category,
+            errorState: error.state,
           });
         }
         return Sentry.captureException(error);

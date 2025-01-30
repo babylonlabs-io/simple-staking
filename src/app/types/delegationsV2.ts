@@ -1,4 +1,4 @@
-import { ClientErrorCodes } from "@/app/constants/errorMessages";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
 
 import { ErrorState } from "./errors";
@@ -104,11 +104,11 @@ export const getDelegationV2StakingState = (
   );
 
   if (!validState) {
-    throw new ClientError(
-      `Invalid delegation state: ${state}`,
-      ClientErrorCodes.CLIENT_VALIDATION,
-      ErrorState.DELEGATIONS,
-    );
+    throw new ClientError({
+      message: `Invalid delegation state: ${state}`,
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      state: ErrorState.DELEGATIONS,
+    });
   }
 
   return validState;
