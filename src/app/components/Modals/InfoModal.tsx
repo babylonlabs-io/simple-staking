@@ -1,17 +1,16 @@
 import {
   Button,
-  Dialog,
   DialogBody,
   DialogFooter,
   DialogHeader,
-  MobileDialog,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { blocksToDisplayTime } from "@/utils/time";
+
+import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface InfoModalProps {
   open: boolean;
@@ -22,8 +21,6 @@ const { coinName } = getNetworkConfigBTC();
 
 export function InfoModal({ open, onClose }: InfoModalProps) {
   const { data: networkInfo } = useNetworkInfo();
-  const isMobileView = useIsMobileView();
-  const DialogComponent = isMobileView ? MobileDialog : Dialog;
 
   const unbondingTime = blocksToDisplayTime(
     networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
@@ -33,13 +30,13 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
   );
 
   return (
-    <DialogComponent open={open} onClose={onClose}>
+    <ResponsiveDialog open={open} onClose={onClose}>
       <DialogHeader
         title="Stake Timelock and On-Demand Unbonding"
         onClose={onClose}
-        className="text-primary-dark"
+        className="text-accent-primary"
       />
-      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
+      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
         <div className="py-4 flex flex-col items-start gap-4">
           <Text variant="body1">
             Stakes made through this dashboard are locked for up to{" "}
@@ -48,7 +45,7 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
             the maximum staking period expires, your stake becomes withdrawable
             automatically, with no need for prior unbonding.
           </Text>
-          <Text variant="body1" className="text-gray-500 italic">
+          <Text variant="body1" className="text-accent-secondary italic">
             Note: Timeframes are approximate, based on an average {coinName}{" "}
             block time of 10 minutes.
           </Text>
@@ -63,6 +60,6 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
           Done
         </Button>
       </DialogFooter>
-    </DialogComponent>
+    </ResponsiveDialog>
   );
 }

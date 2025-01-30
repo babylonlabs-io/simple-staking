@@ -6,12 +6,18 @@ import { twJoin } from "tailwind-merge";
 type HintStatus = "default" | "warning" | "error";
 
 interface HintProps {
-  tooltip: ReactNode;
+  tooltip?: ReactNode;
   status?: HintStatus;
 }
 
 const STATUS_COLORS = {
-  default: "text-primary-main",
+  default: "text-accent-primary",
+  warning: "text-warning-main",
+  error: "text-error-main",
+} as const;
+
+const ICON_COLOR = {
+  default: "text-secondary-strokeDark",
   warning: "text-warning-main",
   error: "text-error-main",
 } as const;
@@ -31,22 +37,28 @@ export function Hint({
       )}
     >
       {children && <p>{children}</p>}
-      <span
-        className={twJoin("cursor-pointer text-xs", STATUS_COLORS[status])}
-        data-tooltip-id={id}
-        data-tooltip-content={typeof tooltip === "string" ? tooltip : undefined}
-        data-tooltip-place="top"
-      >
-        <AiOutlineInfoCircle />
-      </span>
-      <Tooltip
-        id={id}
-        className="tooltip-wrap"
-        openOnClick={false}
-        clickable={true}
-      >
-        {typeof tooltip !== "string" && tooltip}
-      </Tooltip>
+      {tooltip && (
+        <>
+          <span
+            className={twJoin("cursor-pointer text-xs")}
+            data-tooltip-id={id}
+            data-tooltip-content={
+              typeof tooltip === "string" ? tooltip : undefined
+            }
+            data-tooltip-place="top"
+          >
+            <AiOutlineInfoCircle size={16} className={ICON_COLOR[status]} />
+          </span>
+          <Tooltip
+            id={id}
+            className="tooltip-wrap"
+            openOnClick={false}
+            clickable={true}
+          >
+            {typeof tooltip !== "string" && tooltip}
+          </Tooltip>
+        </>
+      )}
     </div>
   );
 }

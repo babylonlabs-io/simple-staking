@@ -1,6 +1,7 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
+import { Section } from "@/app/components/Section/Section";
 import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
@@ -25,11 +26,11 @@ export const Stats = memo(() => {
   const activeFinalityProviders = data?.active_finality_providers ?? 0;
 
   return (
-    <div className="flex flex-col gap-4 p-1 xl:justify-between mb-12">
-      <Heading variant="h4" className="text-primary-contrast md:text-4xl">
-        Babylon Bitcoin Staking Stats
-      </Heading>
-      <div className="flex flex-col justify-between bg-secondary-contrast rounded p-6 text-base md:flex-row border border-primary-dark/20">
+    <Section
+      title="Babylon Bitcoin Staking Stats"
+      titleClassName="text-accent-contrast"
+    >
+      <Card className="flex flex-col justify-between  text-base md:flex-row">
         <StatItem
           loading={isLoading}
           title={`Confirmed ${coinSymbol} TVL`}
@@ -61,8 +62,8 @@ export const Stats = memo(() => {
           value={`${activeFinalityProviders} Active (${totalFinalityProviders} Total)`}
           tooltip="Active and total number of finality providers"
         />
-      </div>
-    </div>
+      </Card>
+    </Section>
   );
 });
 

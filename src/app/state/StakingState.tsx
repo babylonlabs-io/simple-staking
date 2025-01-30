@@ -8,10 +8,13 @@ import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
+import { IS_FIXED_TERM_FIELD } from "@/config";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
+
+import { useBalanceState } from "./BalanceState";
 
 const formatStakingAmount = (value: number) =>
   !Number.isNaN(value) ? btcToSatoshi(value) : undefined;
@@ -43,6 +46,8 @@ export type StakingStep =
 
 export interface StakingState {
   hasError: boolean;
+  blocked: boolean;
+  available: boolean;
   loading: boolean;
   processing: boolean;
   errorMessage?: string;
@@ -53,6 +58,7 @@ export interface StakingState {
     defaultFeeRate: number;
     minStakingTimeBlocks: number;
     maxStakingTimeBlocks: number;
+    defaultStakingTimeBlocks?: number;
     minStakingAmountSat: number;
     maxStakingAmountSat: number;
     unbondingFeeSat: number;
@@ -71,6 +77,8 @@ export interface StakingState {
 const { StateProvider, useState: useStakingState } =
   createStateUtils<StakingState>({
     hasError: false,
+    blocked: false,
+    available: false,
     loading: false,
     processing: false,
     errorMessage: "",
@@ -117,7 +125,6 @@ export function StakingState({ children }: PropsWithChildren) {
 
   const {
     networkInfo,
-    totalBalance,
     isError: isStateError,
     isLoading: isStateLoading,
   } = useAppState();
@@ -132,16 +139,15 @@ export function StakingState({ children }: PropsWithChildren) {
     isError: isNetworkFeeError,
     isLoading: isFeeLoading,
   } = useNetworkFees();
+  const { stakableBtcBalance, loading: isBalanceLoading } = useBalanceState();
 
   const { publicKeyNoCoord } = useBTCWallet();
 
-  const hasError =
-    isStateError ||
-    isNetworkFeeError ||
-    !isApiNormal ||
-    isGeoBlocked ||
-    !networkInfo?.stakingStatus;
-  const loading = isStateLoading || isCheckLoading || isFeeLoading;
+  const loading =
+    isStateLoading || isCheckLoading || isFeeLoading || isBalanceLoading;
+  const hasError = isStateError || isNetworkFeeError || !isApiNormal;
+  const blocked = isGeoBlocked;
+  const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
   const errorMessage = apiMessage;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
@@ -161,6 +167,10 @@ export function StakingState({ children }: PropsWithChildren) {
 
     const { minFeeRate, defaultFeeRate, maxFeeRate } =
       getFeeRateFromMempool(mempoolFeeRates);
+    const defaultStakingTimeBlocks =
+      IS_FIXED_TERM_FIELD || minStakingTimeBlocks === maxStakingTimeBlocks
+        ? maxStakingTimeBlocks
+        : undefined;
 
     return {
       defaultFeeRate,
@@ -170,6 +180,7 @@ export function StakingState({ children }: PropsWithChildren) {
       maxStakingAmountSat,
       minStakingTimeBlocks,
       maxStakingTimeBlocks,
+      defaultStakingTimeBlocks,
       unbondingFeeSat,
       unbondingTime,
     };
@@ -216,8 +227,8 @@ export function StakingState({ children }: PropsWithChildren) {
               `Staking amount must be no more than ${satoshiToBtc(stakingInfo?.maxStakingAmountSat ?? 0)} ${coinName}.`,
             )
             .max(
-              totalBalance,
-              `Staking amount exceeds your balance (${satoshiToBtc(totalBalance)} ${coinName})!`,
+              stakableBtcBalance,
+              `Staking amount exceeds your balance (${satoshiToBtc(stakableBtcBalance)} ${coinName})!`,
             )
             .test(
               "decimal-points",
@@ -250,7 +261,7 @@ export function StakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking fee amount must be greater than 0."),
         })
         .required(),
-    [publicKeyNoCoord, stakingInfo, totalBalance],
+    [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
   );
 
   const goToStep = useCallback(
@@ -292,6 +303,8 @@ export function StakingState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       hasError,
+      blocked,
+      available,
       loading,
       processing,
       errorMessage,
@@ -308,6 +321,8 @@ export function StakingState({ children }: PropsWithChildren) {
     }),
     [
       hasError,
+      blocked,
+      available,
       loading,
       processing,
       errorMessage,

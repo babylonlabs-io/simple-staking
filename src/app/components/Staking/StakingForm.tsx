@@ -1,5 +1,6 @@
-import { Form, Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Form } from "@babylonlabs-io/bbn-core-ui";
 
+import { Section } from "@/app/components/Section/Section";
 import { useStakingService } from "@/app/hooks/services/useStakingService";
 import { useStakingState } from "@/app/state/StakingState";
 import { DelegationForm } from "@/components/staking/StakingForm";
@@ -11,41 +12,44 @@ import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 const { networkName } = getNetworkConfigBTC();
 
 export function StakingForm() {
-  const { loading, validationSchema, stakingInfo, hasError, errorMessage } =
-    useStakingState();
+  const {
+    loading,
+    validationSchema,
+    stakingInfo,
+    hasError,
+    blocked,
+    available,
+    errorMessage,
+  } = useStakingState();
   const { displayPreview } = useStakingService();
 
   return (
-    <div className="card flex flex-col gap-2 py-4 lg:flex-1">
-      <Heading
-        variant="h4"
-        className="text-primary-dark md:text-4xl capitalize"
-      >
-        {networkName} Staking
-      </Heading>
-
+    <Section title={`${networkName} Staking`}>
       <Form
-        className="flex flex-col gap-6 lg:flex-row"
         schema={validationSchema}
         mode="onChange"
         reValidateMode="onChange"
         onSubmit={displayPreview}
       >
-        <div className="flex flex-col gap-4 lg:basis-3/5 xl:basis-2/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
-          <FinalityProviders />
-        </div>
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <Card className="flex-1 min-w-0">
+            <FinalityProviders />
+          </Card>
 
-        <div className="flex flex-col gap-4 lg:basis-2/5 xl:basis-1/3 p-6 rounded border bg-secondary-contrast border-primary-light/20">
-          <DelegationForm
-            loading={loading}
-            disabled={hasError}
-            stakingInfo={stakingInfo}
-            error={errorMessage}
-          />
+          <Card className="flex lg:w-2/5 xl:w-1/3">
+            <DelegationForm
+              loading={loading}
+              available={available}
+              blocked={blocked}
+              hasError={hasError}
+              error={errorMessage}
+              stakingInfo={stakingInfo}
+            />
+          </Card>
         </div>
 
         <StakingModal />
       </Form>
-    </div>
+    </Section>
   );
 }

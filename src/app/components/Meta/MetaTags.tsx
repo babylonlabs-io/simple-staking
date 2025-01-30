@@ -1,6 +1,9 @@
 import { getNetworkAppUrl } from "@/config";
+import { getCommitHash } from "@/utils/version";
 
 export default function MetaTags() {
+  const commitHash = getCommitHash();
+
   return (
     <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -18,6 +21,7 @@ export default function MetaTags() {
       <meta name="twitter:image:type" content="image/png" />
       <meta name="twitter:image:width" content="2048" />
       <meta name="twitter:image:height" content="1170" />
+      <meta name="version" content={commitHash} />
     </>
   );
 }

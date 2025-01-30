@@ -1,21 +1,29 @@
-import { useInscriptionProvider } from "@babylonlabs-io/bbn-wallet-connect";
-import { useCallback, useMemo, type PropsWithChildren } from "react";
+import {
+  InscriptionIdentifier,
+  useInscriptionProvider,
+} from "@babylonlabs-io/bbn-wallet-connect";
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
 import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { filterDust } from "@/utils/wallet";
-import type {
-  InscriptionIdentifier,
-  UTXO,
-} from "@/utils/wallet/btc_wallet_provider";
 
 import { useNetworkInfo } from "../hooks/client/api/useNetworkInfo";
 import { NetworkInfo } from "../types/networkInfo";
 
+import { BalanceState } from "./BalanceState";
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
 import { FinalityProviderState } from "./FinalityProviderState";
+import { RewardsState } from "./RewardState";
 import { StakingState } from "./StakingState";
 
 const STATE_LIST = [
@@ -23,11 +31,15 @@ const STATE_LIST = [
   DelegationV2State,
   FinalityProviderState,
   StakingState,
+  RewardsState,
+  BalanceState,
 ];
 
 export interface AppState {
+  theme: "dark" | "light";
   availableUTXOs?: UTXO[];
-  totalBalance: number;
+  allUTXOs?: UTXO[];
+  inscriptionsUTXOs?: UTXO[];
   networkInfo?: NetworkInfo;
   isError: boolean;
   isLoading: boolean;
@@ -35,26 +47,36 @@ export interface AppState {
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
   refetchUTXOs: () => void;
+  setTheme: (theme: "dark" | "light") => void;
 }
 
 const { StateProvider, useState: useApplicationState } =
   createStateUtils<AppState>({
+    theme: "light",
     isLoading: false,
     isError: false,
-    totalBalance: 0,
     ordinalsExcluded: true,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
     refetchUTXOs: () => {},
+    setTheme: () => {},
   });
 
 export function AppState({ children }: PropsWithChildren) {
+  const [theme, setTheme] = useState<"dark" | "light">("light");
   const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
     useInscriptionProvider();
 
+  useEffect(() => {
+    document.body.classList.add(theme);
+
+    return () => document.body.classList.remove(theme);
+  }, [theme]);
+
   // States
   const {
-    data: utxos = [],
+    allUTXOs = [],
+    confirmedUTXOs = [],
     isLoading: isUTXOLoading,
     isError: isUTXOError,
     refetch: refetchUTXOs,
@@ -63,7 +85,7 @@ export function AppState({ children }: PropsWithChildren) {
     data: ordinals = [],
     isLoading: isOrdinalLoading,
     isError: isOrdinalError,
-  } = useOrdinals(utxos, {
+  } = useOrdinals(confirmedUTXOs, {
     enabled: !isUTXOLoading,
   });
   const {
@@ -85,19 +107,17 @@ export function AppState({ children }: PropsWithChildren) {
     [ordinals],
   );
 
+  const inscriptionsUTXOs = useMemo(() => {
+    return confirmedUTXOs.filter((utxo) => ordinalMap[utxo.txid]);
+  }, [confirmedUTXOs, ordinalMap]);
+
   const availableUTXOs = useMemo(() => {
     if (isLoading) return [];
 
     return ordinalsExcluded
-      ? filterDust(utxos).filter((utxo) => !ordinalMap[utxo.txid])
-      : utxos;
-  }, [isLoading, ordinalsExcluded, utxos, ordinalMap]);
-
-  const totalBalance = useMemo(
-    () =>
-      availableUTXOs.reduce((accumulator, item) => accumulator + item.value, 0),
-    [availableUTXOs],
-  );
+      ? filterDust(confirmedUTXOs).filter((utxo) => !ordinalMap[utxo.txid])
+      : confirmedUTXOs;
+  }, [isLoading, ordinalsExcluded, confirmedUTXOs, ordinalMap]);
 
   // Handlers
   const includeOrdinals = useCallback(
@@ -112,8 +132,10 @@ export function AppState({ children }: PropsWithChildren) {
   // Context
   const context = useMemo(
     () => ({
+      theme,
+      allUTXOs,
       availableUTXOs,
-      totalBalance,
+      inscriptionsUTXOs,
       networkInfo,
       isError,
       isLoading,
@@ -121,10 +143,13 @@ export function AppState({ children }: PropsWithChildren) {
       includeOrdinals,
       excludeOrdinals,
       refetchUTXOs,
+      setTheme,
     }),
     [
+      theme,
+      allUTXOs,
       availableUTXOs,
-      totalBalance,
+      inscriptionsUTXOs,
       networkInfo,
       isError,
       isLoading,
@@ -132,6 +157,7 @@ export function AppState({ children }: PropsWithChildren) {
       includeOrdinals,
       excludeOrdinals,
       refetchUTXOs,
+      setTheme,
     ],
   );
 

@@ -20,10 +20,8 @@ export const FinalityProviderTable = ({
     isFetching,
     finalityProviders,
     hasNextPage,
-    fetchNextPage,
-    searchValue,
-    filterValue,
     hasError,
+    fetchNextPage,
     isRowSelectable,
   } = useFinalityProviderState();
 
@@ -54,7 +52,7 @@ export const FinalityProviderTable = ({
 
   const loadingView = (
     <StatusView
-      icon={<Loader className="text-primary-dark" />}
+      icon={<Loader className="text-primary-light" />}
       title="Loading Finality Providers"
     />
   );
@@ -81,20 +79,19 @@ export const FinalityProviderTable = ({
   }
 
   return (
-    <div className="h-[21rem] overflow-y-auto ">
-      <Table
-        key={`${searchValue}-${filterValue}`}
-        data={tableData}
-        columns={finalityProviderColumns}
-        loading={isFetching}
-        hasMore={hasNextPage}
-        onLoadMore={fetchNextPage}
-        selectedRow={selectedFP}
-        onRowSelect={(row) => {
-          onSelectRow?.(row?.btcPk ?? "");
-        }}
-        isRowSelectable={isRowSelectable}
-      />
-    </div>
+    <Table
+      wrapperClassName="h-[28.5rem]"
+      className="min-w-full"
+      data={tableData}
+      columns={finalityProviderColumns}
+      loading={isFetching}
+      hasMore={hasNextPage}
+      onLoadMore={fetchNextPage}
+      selectedRow={selectedFP}
+      onRowSelect={(row) => {
+        onSelectRow?.(row?.btcPk ?? "");
+      }}
+      isRowSelectable={isRowSelectable}
+    />
   );
 };

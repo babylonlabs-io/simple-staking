@@ -1,6 +1,6 @@
 import { Loader } from "@babylonlabs-io/bbn-core-ui";
 
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfig } from "@/config/network";
 
 import { SubmitModal } from "./SubmitModal";
 
@@ -10,7 +10,7 @@ interface VerificationModalProps {
   step: 1 | 2;
 }
 
-const { networkName } = getNetworkConfigBTC();
+const { btc, bbn } = getNetworkConfig();
 
 const VERIFICATION_STEPS = {
   1: {
@@ -19,8 +19,7 @@ const VERIFICATION_STEPS = {
         1/2 <br /> Processing Confirmation
       </>
     ),
-    description:
-      "Waiting for the staking confirmation to be confirmed on Babylon chain.",
+    description: `Waiting for the staking confirmation to be confirmed on ${bbn.networkFullName}.`,
   },
   2: {
     title: (
@@ -28,7 +27,7 @@ const VERIFICATION_STEPS = {
         2/2 <br /> Pending Verification
       </>
     ),
-    description: "The Babylon chain is verifying your staking transaction.",
+    description: `The ${bbn.networkFullName} is verifying your staking transaction.`,
   },
 } as const;
 
@@ -40,10 +39,10 @@ export const VerificationModal = ({
   <SubmitModal
     disabled={processing}
     open={open}
-    icon={<Loader size={48} />}
+    icon={<Loader size={48} className="text-primary-light" />}
     title={VERIFICATION_STEPS[step].title}
-    submitButton={`Stake on ${networkName}`}
-    onSubmit={() => {}}
+    submitButton={`Stake ${btc.coinName}`}
+    cancelButton=""
   >
     {VERIFICATION_STEPS[step].description}
   </SubmitModal>

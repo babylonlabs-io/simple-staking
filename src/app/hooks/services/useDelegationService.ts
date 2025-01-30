@@ -7,7 +7,9 @@ import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
+import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { validateDelegation } from "@/utils/delegations";
+import { getBbnParamByVersion } from "@/utils/params";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -40,6 +42,7 @@ type DelegationCommand = (props: TxProps) => Promise<void>;
 interface ConfirmationModalState {
   action: ActionType;
   delegation: DelegationV2;
+  param: BbnStakingParamsVersion;
 }
 
 export function useDelegationService() {
@@ -49,7 +52,7 @@ export function useDelegationService() {
     Record<string, boolean>
   >({});
 
-  const { availableUTXOs = [] } = useAppState();
+  const { availableUTXOs = [], networkInfo } = useAppState();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -63,6 +66,7 @@ export function useDelegationService() {
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
+    submitSlashingWithdrawalTx,
   } = useTransactionService();
 
   const validations = useMemo(
@@ -167,7 +171,7 @@ export function useDelegationService() {
           );
         }
 
-        await submitEarlyUnbondedWithdrawalTx(
+        await submitSlashingWithdrawalTx(
           stakingInput,
           paramsVersion,
           slashing.unbondingSlashingTxHex,
@@ -207,7 +211,7 @@ export function useDelegationService() {
           throw new Error("Slashing tx not found, can't submit withdrawal");
         }
 
-        await submitTimelockUnbondedWithdrawalTx(
+        await submitSlashingWithdrawalTx(
           stakingInput,
           paramsVersion,
           slashing.stakingSlashingTxHex,
@@ -225,17 +229,24 @@ export function useDelegationService() {
       submitUnbondingTx,
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,
+      submitSlashingWithdrawalTx,
     ],
   );
 
   const openConfirmationModal = useCallback(
     (action: ActionType, delegation: DelegationV2) => {
+      const param = getBbnParamByVersion(
+        delegation.paramsVersion,
+        networkInfo?.params.bbnStakingParams.versions || [],
+      );
+
       setConfirmationModal({
         action,
         delegation,
+        param,
       });
     },
-    [],
+    [networkInfo],
   );
 
   const closeConfirmationModal = useCallback(

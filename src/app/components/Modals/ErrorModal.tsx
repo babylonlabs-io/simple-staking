@@ -1,4 +1,5 @@
 import {
+  Button,
   Dialog,
   DialogBody,
   DialogFooter,
@@ -86,12 +87,17 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   };
 
   return (
-    <DialogComponent open={open} onClose={onClose}>
-      <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4 items-center justify-center">
+    <DialogComponent
+      backdropClassName="z-[100]"
+      className="z-[150]"
+      open={open}
+      onClose={onClose}
+    >
+      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 items-center justify-center">
         <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
-          <MdOutlineSwapHoriz className="text-5xl" />
+          <MdOutlineSwapHoriz className="text-5xl text-primary-light" />
         </div>
-        <Heading variant="h3" className="text-center font-bold text-error">
+        <Heading variant="h3" className="text-center font-bold text-error-main">
           {getErrorTitle()}
         </Heading>
         <div className="flex flex-col gap-3">
@@ -102,20 +108,19 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       </DialogBody>
       <DialogFooter className="mt-4 flex justify-around gap-4">
         {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
-          <button
-            className="btn btn-outline flex-1 rounded-lg px-2"
+          <Button
+            variant="outlined"
+            fluid
+            className="px-2"
             onClick={() => onClose()}
           >
             Cancel
-          </button>
+          </Button>
         )}
         {onRetry && (
-          <button
-            className="btn-primary btn flex-1 rounded-lg px-2 text-white"
-            onClick={handleRetry}
-          >
+          <Button className="px-2" onClick={handleRetry}>
             Try Again
-          </button>
+          </Button>
         )}
       </DialogFooter>
     </DialogComponent>

@@ -9,7 +9,7 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 
-const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V2_KEY";
+const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V1_KEY";
 
 interface Params {
   pk?: string;

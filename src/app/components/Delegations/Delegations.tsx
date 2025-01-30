@@ -1,4 +1,4 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
@@ -260,12 +260,12 @@ export const Delegations = ({}) => {
 
   return (
     <>
-      <div className="bg-secondary-contrast p-6 border border-primary-dark/20">
-        <Heading variant="h6" className="text-primary-light py-2 mb-6">
+      <Card className="mb-6">
+        <Heading variant="h6" className="text-accent-primary py-2 mb-6">
           Pending Registration
         </Heading>
 
-        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-primary-light text-xs">
+        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-accent-primary text-xs">
           <p className="text-left">Inception</p>
           <p className="text-left">Finality Provider</p>
           <p className="text-left">Amount</p>
@@ -278,7 +278,7 @@ export const Delegations = ({}) => {
           className="no-scrollbar max-h-[21rem] overflow-y-auto"
         >
           <InfiniteScroll
-            className="flex flex-col gap-4 pt-3"
+            className="flex flex-col pt-3"
             dataLength={combinedDelegationsData.length}
             next={fetchMoreDelegations}
             hasMore={hasMoreDelegations}
@@ -307,7 +307,7 @@ export const Delegations = ({}) => {
             })}
           </InfiniteScroll>
         </div>
-      </div>
+      </Card>
       {modalMode && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}

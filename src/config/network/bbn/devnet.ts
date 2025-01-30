@@ -26,7 +26,7 @@ export const bbnDevnet = {
   },
   currencies: [
     {
-      coinDenom: "BBN",
+      coinDenom: "BABY",
       coinMinimalDenom: "ubbn",
       coinDecimals: 6,
       coinImageUrl:
@@ -35,20 +35,20 @@ export const bbnDevnet = {
   ],
   feeCurrencies: [
     {
-      coinDenom: "BBN",
+      coinDenom: "BABY",
       coinMinimalDenom: "ubbn",
       coinDecimals: 6,
       coinImageUrl:
         "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
       gasPriceStep: {
-        low: 0.007,
+        low: 0.005,
         average: 0.007,
         high: 0.01,
       },
     },
   ],
   stakeCurrency: {
-    coinDenom: "BBN",
+    coinDenom: "BABY",
     coinMinimalDenom: "ubbn",
     coinDecimals: 6,
     coinImageUrl:

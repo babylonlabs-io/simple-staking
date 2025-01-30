@@ -13,7 +13,7 @@ import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { Step } from "./Step";
 
-interface EOIModalProps {
+interface SignModalProps {
   processing?: boolean;
   open: boolean;
   title: string;
@@ -25,23 +25,23 @@ interface EOIModalProps {
 const { coinSymbol } = getNetworkConfigBTC();
 const { coinSymbol: bbnCoinSymbol } = getNetworkConfigBBN();
 
-export const EOIModal = ({
+export const SignModal = ({
   processing = false,
   open,
   title,
   step,
   onClose,
   onSubmit,
-}: EOIModalProps) => (
+}: SignModalProps) => (
   <ResponsiveDialog open={open} onClose={onClose} hasBackdrop>
     <DialogHeader
       title={title}
       onClose={onClose}
-      className="text-primary-dark"
+      className="text-accent-primary"
     />
 
-    <DialogBody className="flex flex-col pb-8 pt-4 text-primary-dark gap-4">
-      <Text variant="body1" className="text-primary-main">
+    <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
+      <Text variant="body1" className="text-accent-secondary">
         Please sign the following messages
       </Text>
 
@@ -81,7 +81,11 @@ export const EOIModal = ({
           className="flex-1 text-xs sm:text-base"
           onClick={onSubmit}
         >
-          {processing ? <Loader size={16} className="text-white" /> : "Sign"}
+          {processing ? (
+            <Loader size={16} className="text-accent-contrast" />
+          ) : (
+            "Sign"
+          )}
         </Button>
       )}
     </DialogFooter>

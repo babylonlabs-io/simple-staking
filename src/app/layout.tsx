@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { twJoin } from "tailwind-merge";
 
+import { Network } from "@/app/types/network";
 import { network } from "@/config/network/btc";
-import { Network } from "@/utils/wallet/btc_wallet_provider";
 
 import MetaTags from "./components/Meta/MetaTags";
 import "./globals.css";
@@ -25,7 +25,7 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <Providers>
-          <main
+          <div
             className={twJoin(
               `relative h-full min-h-svh w-full`,
               network === Network.MAINNET
@@ -35,7 +35,7 @@ export default function RootLayout({
             )}
           >
             {children}
-          </main>
+          </div>
         </Providers>
       </body>
     </html>

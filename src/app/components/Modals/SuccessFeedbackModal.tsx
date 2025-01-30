@@ -12,10 +12,11 @@ export const SuccessFeedbackModal: React.FC<FeedbackModalProps> = ({
   onClose,
 }) => (
   <SubmitModal
-    icon={<LuPartyPopper className="text-5xl" />}
-    title="Conratulations"
+    icon={<LuPartyPopper className="text-5xl text-primary-light" />}
+    title="Congratulations"
     open={open}
     submitButton="Done"
+    cancelButton=""
     onSubmit={onClose}
   >
     <p className="text-base text-center">

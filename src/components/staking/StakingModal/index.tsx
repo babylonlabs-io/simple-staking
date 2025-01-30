@@ -2,8 +2,8 @@ import { useFormContext } from "@babylonlabs-io/bbn-core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/app/components/Modals/CancelFeedbackModal";
-import { EOIModal } from "@/app/components/Modals/EOIModal/EOIModal";
 import { PreviewModal } from "@/app/components/Modals/PreviewModal";
+import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/app/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/app/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/app/components/Modals/VerificationModal";
@@ -34,7 +34,11 @@ export function StakingModal() {
   } = useStakingState();
   const { getFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
-  const { reset: resetForm, trigger: revalidateForm } = useFormContext();
+  const {
+    reset: resetForm,
+    trigger: revalidateForm,
+    setValue: setFieldValue,
+  } = useFormContext();
 
   const fp = useMemo(
     () => getFinalityProvider(formData?.finalityProvider ?? ""),
@@ -65,15 +69,21 @@ export function StakingModal() {
               finalityProvider: "",
               term: "",
               amount: "",
-              feeRate: stakingInfo?.defaultFeeRate ?? 0,
-              feeAmount: 0,
+              feeRate: stakingInfo?.defaultFeeRate?.toString() ?? "0",
+              feeAmount: "0",
             });
+            if (stakingInfo?.defaultStakingTimeBlocks) {
+              setFieldValue("term", stakingInfo?.defaultStakingTimeBlocks, {
+                shouldDirty: true,
+                shouldTouch: true,
+              });
+            }
             revalidateForm();
           }}
         />
       )}
       {Boolean(EOI_INDEXES[step]) && (
-        <EOIModal
+        <SignModal
           open
           processing={processing}
           step={EOI_INDEXES[step]}
@@ -92,6 +102,7 @@ export function StakingModal() {
           open={step === "verified"}
           processing={processing}
           onSubmit={() => stakeDelegation(verifiedDelegation)}
+          onClose={resetState}
         />
       )}
       <SuccessFeedbackModal

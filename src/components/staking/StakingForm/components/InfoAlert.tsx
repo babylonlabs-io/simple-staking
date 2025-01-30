@@ -11,22 +11,22 @@ export function InfoAlert() {
   const { stakingInfo } = useStakingState();
 
   return (
-    <div className="rounded bg-[#F9F9F9] flex flex-row items-start justify-between py-2 px-4 text-primary-light">
+    <div className="rounded bg-secondary-highlight flex flex-row items-start justify-between py-2 px-4">
       <div className="py-2 pr-3">
-        <MdErrorOutline size={22} />
+        <MdErrorOutline size={22} className="text-secondary-strokeDark" />
       </div>
 
       <div className="flex flex-col gap-1 grow">
-        <Text variant="subtitle1" className="font-medium text-primary-dark">
+        <Text variant="subtitle1" className="font-medium text-accent-primary">
           Info
         </Text>
-        <Text variant="body1">
+        <Text variant="body1" className="text-accent-secondary">
           You can unbond and withdraw your stake anytime with an unbonding time
           of {blocksToDisplayTime(stakingInfo?.unbondingTime)}.
-        </Text>
+        </Text>{" "}
         <a
           rel="noopener noreferrer"
-          className="text-secondary-main hover:text-primary-main"
+          className="cursor-pointer text-secondary-main/90 hover:text-secondary-main"
           onClick={() => setShowMore(true)}
         >
           Learn More

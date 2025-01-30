@@ -1,15 +1,12 @@
 import { isValidUrl } from "@/utils/url";
 
 import { Pagination } from "../types/api";
-import {
-  FinalityProvider,
-  FinalityProviderState,
-} from "../types/finalityProviders";
+import { FinalityProviderV1 } from "../types/finalityProviders";
 
 import { apiWrapper } from "./apiWrapper";
 
 export interface PaginatedFinalityProviders {
-  finalityProviders: FinalityProvider[];
+  finalityProviders: FinalityProviderV1[];
   pagination: Pagination;
 }
 
@@ -20,7 +17,7 @@ interface FinalityProvidersAPIResponse {
 
 interface FinalityProviderAPI {
   description: DescriptionAPI;
-  state: FinalityProviderState;
+  state: "active" | "standby";
   commission: string;
   btc_pk: string;
   active_tvl: number;
@@ -60,7 +57,7 @@ export const getFinalityProviders = async ({
 
   const response = await apiWrapper(
     "GET",
-    "/v2/finality-providers",
+    "/v1/finality-providers",
     "Error getting finality providers",
     { query: params },
   );
@@ -71,7 +68,7 @@ export const getFinalityProviders = async ({
     finalityProvidersAPIResponse.data;
 
   const finalityProviders = finalityProvidersAPI.map(
-    (fp: FinalityProviderAPI): FinalityProvider => ({
+    (fp: FinalityProviderAPI): FinalityProviderV1 => ({
       description: {
         moniker: fp.description.moniker,
         identity: fp.description.identity,

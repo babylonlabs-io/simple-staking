@@ -1,4 +1,4 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
 
 import {
   ActionType,
@@ -7,7 +7,7 @@ import {
 import { type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfig } from "@/config/network";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -21,7 +21,7 @@ type TableParams = {
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
 };
 
-const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+const networkConfig = getNetworkConfig();
 
 const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
@@ -88,9 +88,9 @@ export function DelegationList() {
   } = useDelegationService();
 
   return (
-    <div className="bg-secondary-contrast p-6 border border-primary-dark/20">
-      <Heading variant="h6" className="text-primary-light py-2 mb-6">
-        {bbnNetworkFullName} Stakes
+    <Card>
+      <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+        {networkConfig.bbn.networkFullName} Stakes
       </Heading>
 
       <GridTable
@@ -101,13 +101,13 @@ export function DelegationList() {
         infiniteScroll={hasMoreDelegations}
         onInfiniteScroll={fetchMoreDelegations}
         classNames={{
-          headerRowClassName: "text-primary-light text-xs",
+          headerRowClassName: "text-accent-primary text-xs",
           headerCellClassName: "p-4 text-align-left",
           rowClassName: "group",
           wrapperClassName: "max-h-[21rem] overflow-x-auto",
           bodyClassName: "gap-y-4 min-w-[1000px]",
           cellClassName:
-            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-secondary-contrast flex items-center text-sm justify-start group-even:bg-[#F9F9F9] text-primary-dark",
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
         }}
         params={{ handleActionClick: openConfirmationModal, validations }}
         fallback={<div>No delegations found</div>}
@@ -116,10 +116,12 @@ export function DelegationList() {
       <DelegationModal
         action={confirmationModal?.action}
         delegation={confirmationModal?.delegation ?? null}
+        param={confirmationModal?.param ?? null}
         processing={processing}
         onSubmit={executeDelegationAction}
         onClose={closeConfirmationModal}
+        networkConfig={networkConfig}
       />
-    </div>
+    </Card>
   );
 }
