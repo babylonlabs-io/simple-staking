@@ -1,5 +1,4 @@
 import { Card } from "@babylonlabs-io/bbn-core-ui";
-import { useMemo } from "react";
 
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useBalanceState } from "@/app/state/BalanceState";
@@ -34,18 +33,13 @@ export function PersonalBalance() {
   const {
     bbnBalance,
     stakableBtcBalance,
-    totalBtcBalance,
-    stakedBtcBalance,
     inscriptionsBtcBalance,
+    combinedTotalBtcBalance,
   } = useBalanceState();
 
   const { claimRewards, showPreview } = useRewardsService();
 
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
-
-  const combinedTotalBtcBalance = useMemo(() => {
-    return totalBtcBalance + stakedBtcBalance;
-  }, [totalBtcBalance, stakedBtcBalance]);
 
   return (
     <AuthGuard>

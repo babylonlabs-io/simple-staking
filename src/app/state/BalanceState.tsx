@@ -15,6 +15,7 @@ interface BalanceStateProps {
   stakedBtcBalance: number;
   bbnBalance: number;
   inscriptionsBtcBalance: number;
+  combinedTotalBtcBalance: number;
 }
 
 const STAKED_BALANCE_STATUSES = [
@@ -35,6 +36,7 @@ const defaultState: BalanceStateProps = {
   stakedBtcBalance: 0,
   bbnBalance: 0,
   inscriptionsBtcBalance: 0,
+  combinedTotalBtcBalance: 0,
 };
 
 const { StateProvider, useState: useBalanceState } =
@@ -74,7 +76,12 @@ export function BalanceState({ children }: PropsWithChildren) {
   }, [allUTXOs]);
 
   const inscriptionsBtcBalance = useMemo(() => {
-    return inscriptionsUTXOs?.reduce((accumulator, item) => accumulator + item.value, 0) ?? 0;
+    return (
+      inscriptionsUTXOs?.reduce(
+        (accumulator, item) => accumulator + item.value,
+        0,
+      ) ?? 0
+    );
   }, [inscriptionsUTXOs]);
 
   // The amount of balance that is staked in the babylon system.
@@ -102,6 +109,13 @@ export function BalanceState({ children }: PropsWithChildren) {
       .reduce((total, amount) => total + amount, 0);
   }, [delegations]);
 
+  // Combined total BTC balance regardless of inscriptions and all staked balance
+  // which include active, unbonding, withdrawable delegations etc. But excluding
+  // the slashed ones.
+  const combinedTotalBtcBalance = useMemo(() => {
+    return totalBtcBalance + stakedBtcBalance;
+  }, [totalBtcBalance, stakedBtcBalance]);
+
   const context = useMemo(
     () => ({
       loading,
@@ -110,6 +124,7 @@ export function BalanceState({ children }: PropsWithChildren) {
       bbnBalance,
       stakedBtcBalance,
       inscriptionsBtcBalance,
+      combinedTotalBtcBalance,
     }),
     [
       loading,
@@ -118,6 +133,7 @@ export function BalanceState({ children }: PropsWithChildren) {
       bbnBalance,
       stakedBtcBalance,
       inscriptionsBtcBalance,
+      combinedTotalBtcBalance,
     ],
   );
 

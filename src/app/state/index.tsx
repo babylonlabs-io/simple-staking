@@ -56,10 +56,10 @@ const { StateProvider, useState: useApplicationState } =
     isLoading: false,
     isError: false,
     ordinalsExcluded: true,
-    includeOrdinals: () => { },
-    excludeOrdinals: () => { },
-    refetchUTXOs: () => { },
-    setTheme: () => { },
+    includeOrdinals: () => {},
+    excludeOrdinals: () => {},
+    refetchUTXOs: () => {},
+    setTheme: () => {},
   });
 
 export function AppState({ children }: PropsWithChildren) {
