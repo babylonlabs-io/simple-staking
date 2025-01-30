@@ -226,10 +226,12 @@ export function StakingState({ children }: PropsWithChildren) {
               stakingInfo?.maxStakingAmountSat ?? 0,
               `Staking amount must be no more than ${satoshiToBtc(stakingInfo?.maxStakingAmountSat ?? 0)} ${coinName}.`,
             )
-            .max(
-              stakableBtcBalance,
-              `Staking amount exceeds your balance (${satoshiToBtc(stakableBtcBalance)} ${coinName})!`,
-            )
+            // .max(
+            //   stakableBtcBalance,
+            //   `Staking amount exceeds your balance (${satoshiToBtc(stakableBtcBalance)} ${coinName})!`,
+            // )
+            // TODO revert
+            .max(9999999)
             .test(
               "decimal-points",
               "Staking amount must have no more than 8 decimal points.",

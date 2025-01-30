@@ -19,6 +19,7 @@ import {
 import { useError } from "@/app/context/Error/ErrorContext";
 import { ErrorState } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { createBbnAminoTypes } from "@/utils/wallet/bbnAmino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 interface CosmosWalletContextProps {
@@ -64,13 +65,19 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       try {
         const address = await provider.getAddress();
         const offlineSigner = await provider.getOfflineSigner();
+        const aminoTypes = createBbnAminoTypes();
+        // const offlineSigner = window.getOfflineSignerOnlyAmino("bbn-test-5");
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
           offlineSigner,
           {
             registry: createBbnRegistry(),
+            aminoTypes,
           },
         );
+        // console.log("client", client);
+        console.log("offlineSigner", offlineSigner);
+        console.log("offlineSigner.getAccounts", offlineSigner.getAccounts);
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
