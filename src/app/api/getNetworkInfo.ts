@@ -1,6 +1,8 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 import { AxiosResponse, HttpStatusCode } from "axios";
 
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
+
 import { ServerError } from "../context/Error/errors";
 import { NetworkInfo } from "../types/networkInfo";
 
@@ -100,7 +102,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
       message:
         "Version numbers and BTC activation heights are not consistently ordered",
       status: HttpStatusCode.InternalServerError,
-      endpoint: "/v2/network-info",
+      endpoint: API_ENDPOINTS.NETWORK_INFO,
     });
   }
 
@@ -126,7 +128,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     throw new ServerError({
       message: "Genesis staking params not found",
       status: HttpStatusCode.InternalServerError,
-      endpoint: "/v2/network-info",
+      endpoint: API_ENDPOINTS.NETWORK_INFO,
     });
   }
 
@@ -138,7 +140,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     throw new ServerError({
       message: "Genesis epoch check params not found",
       status: HttpStatusCode.InternalServerError,
-      endpoint: "/v2/network-info",
+      endpoint: API_ENDPOINTS.NETWORK_INFO,
     });
   }
 

@@ -1,6 +1,3 @@
-import { HttpStatusCode } from "axios";
-
-import { ServerError } from "../context/Error/errors/serverError";
 import { Pagination } from "../types/api";
 import { Delegation } from "../types/delegations";
 
@@ -43,15 +40,8 @@ interface UnbondingTxAPI {
 
 export const getDelegations = async (
   key: string,
-  publicKeyNoCoord?: string,
+  publicKeyNoCoord: string,
 ): Promise<PaginatedDelegations> => {
-  if (!publicKeyNoCoord) {
-    throw new ServerError({
-      message: "No public key provided",
-      status: HttpStatusCode.InternalServerError,
-      endpoint: "/v1/staker/delegations",
-    });
-  }
   const params = {
     pagination_key: key,
     staker_btc_pk: publicKeyNoCoord,

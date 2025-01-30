@@ -1,6 +1,7 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { HttpStatusCode } from "axios";
 
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ServerError } from "@/app/context/Error/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -77,7 +78,7 @@ function utxosInfoUrl(address: string): URL {
 
 // URL for retrieving information about the recommended network fees
 function networkFeesUrl(): URL {
-  return new URL(mempoolAPI + "v1/fees/recommended");
+  return new URL(mempoolAPI + API_ENDPOINTS.MEMPOOL.FEES_RECOMMENDED);
 }
 
 // URL for retrieving the tip height of the BTC chain
@@ -93,12 +94,19 @@ function validateAddressUrl(address: string): URL {
 
 // URL for the transaction info endpoint
 function txInfoUrl(txId: string): URL {
-  return new URL(mempoolAPI + "tx/" + txId);
+  return new URL(mempoolAPI + API_ENDPOINTS.MEMPOOL.TX + "/" + txId);
 }
 
 // URL for the transaction merkle proof endpoint
 function txMerkleProofUrl(txId: string): URL {
-  return new URL(mempoolAPI + "tx/" + txId + "/merkle-proof");
+  return new URL(
+    mempoolAPI +
+      API_ENDPOINTS.MEMPOOL.TX +
+      "/" +
+      txId +
+      "/" +
+      API_ENDPOINTS.MEMPOOL.MERKLE_PROOF,
+  );
 }
 
 // URL for the transaction hex endpoint

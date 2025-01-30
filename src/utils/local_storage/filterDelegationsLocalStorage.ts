@@ -1,5 +1,6 @@
 import { HttpStatusCode } from "axios";
 
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ServerError } from "@/app/context/Error/errors";
 import { Delegation } from "@/app/types/delegations";
 
@@ -50,7 +51,7 @@ export const filterDelegationsLocalStorage = async (
           throw new ServerError({
             message: "Transaction not found in the mempool",
             status: HttpStatusCode.NotFound,
-            endpoint: "getTxInfo",
+            endpoint: API_ENDPOINTS.MEMPOOL.TX,
           });
         }
       } catch (err) {

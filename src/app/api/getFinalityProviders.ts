@@ -1,3 +1,4 @@
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { isValidUrl } from "@/utils/url";
 
 import { Pagination } from "../types/api";
@@ -57,7 +58,7 @@ export const getFinalityProviders = async ({
 
   const response = await apiWrapper(
     "GET",
-    "/v1/finality-providers",
+    API_ENDPOINTS.FINALITY_PROVIDERS,
     "Error getting finality providers",
     { query: params },
   );
