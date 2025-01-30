@@ -100,7 +100,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const providersMap = useMemo(
     () =>
       (data?.finalityProviders ?? [])
-        .sort((a, b) => b.activeDelegations - a.activeDelegations)
+        .sort((a, b) => (b.activeTVLSat ?? 0) - (a.activeTVLSat ?? 0))
         .reduce((acc, fp) => {
           if (fp.btcPk) {
             acc.set(fp.btcPk, fp);
