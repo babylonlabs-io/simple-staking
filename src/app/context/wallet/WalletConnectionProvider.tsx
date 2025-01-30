@@ -8,7 +8,6 @@ import { type PropsWithChildren } from "react";
 
 import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
 import { TomoWidget } from "@/app/context/tomo/TomoWidget";
-import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -47,9 +46,6 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const onError = (error: Error) => {
     handleError({
       error,
-      displayOptions: {
-        errorType: ErrorType.WALLET,
-      },
     });
   };
 

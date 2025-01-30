@@ -17,7 +17,6 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
@@ -78,7 +77,6 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         handleError({
           error,
           displayOptions: {
-            errorType: ErrorType.WALLET,
             retryAction: () => connectCosmos(provider),
           },
         });

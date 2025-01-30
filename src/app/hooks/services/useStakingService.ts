@@ -9,7 +9,6 @@ import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
-import { ErrorType } from "@/app/types/errors";
 import { retry } from "@/utils";
 import { btcToSatoshi } from "@/utils/btc";
 
@@ -92,9 +91,6 @@ export function useStakingService() {
       } catch (error: any) {
         handleError({
           error,
-          displayOptions: {
-            errorType: ErrorType.STAKING,
-          },
         });
         reset();
       }
@@ -147,7 +143,6 @@ export function useStakingService() {
         handleError({
           error,
           displayOptions: {
-            errorType: ErrorType.STAKING,
             retryAction: () => stakeDelegation(delegation),
           },
         });

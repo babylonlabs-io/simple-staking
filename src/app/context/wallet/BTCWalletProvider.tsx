@@ -18,7 +18,6 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
 import { Fees } from "@/app/types/fee";
 import {
   getAddressBalance,
@@ -135,7 +134,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           // wallet error
           error: new Error(errorMessage),
           displayOptions: {
-            errorType: ErrorType.WALLET,
             retryAction: () => connectBTC(walletProvider),
           },
         });
