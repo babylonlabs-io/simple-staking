@@ -4,7 +4,6 @@ import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
-import { ErrorType } from "@/app/types/errors";
 
 import { useError } from "../Error/ErrorProvider";
 import { ServerError } from "../Error/errors/serverError";
@@ -56,8 +55,7 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
           status: HttpStatusCode.InternalServerError,
           endpoint: API_ENDPOINTS.NETWORK_INFO,
         }),
-        displayError: {
-          errorType: ErrorType.SERVER,
+        displayOptions: {
           retryAction: refetch,
         },
       });

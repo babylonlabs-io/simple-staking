@@ -12,7 +12,7 @@ import { useEffect } from "react";
 
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
+import { Error } from "@/app/types/errors";
 
 export function useClientQuery<
   TQueryFnData = unknown,
@@ -50,10 +50,10 @@ export function useClientQuery<
 
   useEffect(() => {
     if (data.isError) {
+      const error = data.error as Error;
       handleError({
-        error: data.error as Error,
-        displayError: {
-          errorType: ErrorType.SERVER,
+        error,
+        displayOptions: {
           retryAction: data.refetch,
         },
       });

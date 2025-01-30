@@ -7,7 +7,6 @@ import {
 } from "@/app/api/getFinalityProvidersV2";
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
 
 const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V2_KEY";
 
@@ -57,8 +56,7 @@ export function useFinalityProvidersV2({
     if (query.isError) {
       handleError({
         error: query.error,
-        displayError: {
-          errorType: ErrorType.SERVER,
+        displayOptions: {
           retryAction: query.refetch,
         },
       });

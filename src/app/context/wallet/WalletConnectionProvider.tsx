@@ -47,7 +47,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const onError = (error: Error) => {
     handleError({
       error,
-      displayError: {
+      displayOptions: {
         errorType: ErrorType.WALLET,
       },
     });

@@ -131,9 +131,6 @@ export const Delegations = ({}) => {
     } catch (error: Error | any) {
       handleError({
         error,
-        displayError: {
-          errorType: ErrorType.UNBONDING,
-        },
       });
     } finally {
       setModalOpen(false);
@@ -183,8 +180,7 @@ export const Delegations = ({}) => {
     } catch (error: Error | any) {
       handleError({
         error,
-        displayError: {
-          errorType: ErrorType.WITHDRAW,
+        displayOptions: {
           retryAction: () => handleModal(id, MODE_WITHDRAW),
         },
       });
@@ -251,8 +247,7 @@ export const Delegations = ({}) => {
           status: HttpStatusCode.NotFound,
           endpoint: API_ENDPOINTS.STAKER_DELEGATIONS,
         }),
-        displayError: {
-          errorType: ErrorType.SERVER,
+        displayOptions: {
           noCancel: false,
         },
       });

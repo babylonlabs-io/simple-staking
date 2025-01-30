@@ -22,17 +22,17 @@ export interface Error {
   message: string;
   type?: ErrorType;
   displayMessage?: string;
+  sentryEventId?: string;
 }
 
 export interface ErrorDisplayOptions {
-  errorType: ErrorType;
   retryAction?: () => void;
   noCancel?: boolean;
 }
 
 export interface ErrorHandlerParam {
   error: Error | null;
-  displayError: ErrorDisplayOptions;
+  displayOptions?: ErrorDisplayOptions;
 }
 
 export interface ShowErrorParams {

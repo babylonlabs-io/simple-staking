@@ -77,7 +77,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       } catch (error: any) {
         handleError({
           error,
-          displayError: {
+          displayOptions: {
             errorType: ErrorType.WALLET,
             retryAction: () => connectCosmos(provider),
           },

@@ -134,7 +134,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         handleError({
           // wallet error
           error: new Error(errorMessage),
-          displayError: {
+          displayOptions: {
             errorType: ErrorType.WALLET,
             retryAction: () => connectBTC(walletProvider),
           },

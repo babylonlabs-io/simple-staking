@@ -9,7 +9,7 @@ import React, {
 } from "react";
 
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
-import { Error, ErrorHandlerParam } from "@/app/types/errors";
+import { Error, ErrorHandlerParam, ErrorType } from "@/app/types/errors";
 
 import { ClientError, ServerError } from "./errors";
 
@@ -56,20 +56,20 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   }, []);
 
   const handleError = useCallback(
-    ({ error, displayError }: ErrorHandlerParam) => {
+    ({ error, displayOptions }: ErrorHandlerParam) => {
       if (!error) return;
 
       const eventId = Sentry.withScope((scope) => {
         if (error instanceof ServerError) {
           scope.setExtras({
-            errorType: "SERVER_ERROR",
+            errorType: ErrorType.SERVER,
             endpoint: error.endpoint,
             status: error.status,
           });
         } else if (error instanceof ClientError) {
           scope.setExtras({
             errorCategory: error.category,
-            errorType: error.type,
+            errorType: error.type ?? ErrorType.UNKNOWN,
           });
         }
         return Sentry.captureException(error);
@@ -85,15 +85,15 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           endpoint: error.endpoint,
           displayMessage: error.displayMessage,
         }),
-        errorType: displayError.errorType,
+        type: error.type ?? ErrorType.UNKNOWN,
       };
 
       setState({
         isOpen: true,
         error: errorData,
         modalOptions: {
-          retryAction: displayError.retryAction,
-          noCancel: displayError.noCancel ?? false,
+          retryAction: displayOptions?.retryAction,
+          noCancel: displayOptions?.noCancel ?? false,
         },
       });
     },
@@ -112,14 +112,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   return (
     <ErrorContext.Provider value={contextValue}>
       {children}
-      <ErrorModal
-        open={state.isOpen}
-        errorMessage={state.error.message}
-        errorType={state.error.type}
-        onClose={dismissError}
-        onRetry={state.modalOptions.retryAction}
-        noCancel={state.modalOptions.noCancel}
-      />
+      <ErrorModal />
     </ErrorContext.Provider>
   );
 };

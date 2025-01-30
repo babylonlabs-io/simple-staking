@@ -92,7 +92,7 @@ export function useStakingService() {
       } catch (error: any) {
         handleError({
           error,
-          displayError: {
+          displayOptions: {
             errorType: ErrorType.STAKING,
           },
         });
@@ -146,7 +146,7 @@ export function useStakingService() {
         reset();
         handleError({
           error,
-          displayError: {
+          displayOptions: {
             errorType: ErrorType.STAKING,
             retryAction: () => stakeDelegation(delegation),
           },

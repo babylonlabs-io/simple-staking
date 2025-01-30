@@ -8,7 +8,6 @@ import {
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { ErrorType } from "@/app/types/errors";
 
 export const DELEGATIONS_V2_KEY = "DELEGATIONS_V2";
 
@@ -52,8 +51,7 @@ export function useDelegationsV2({
     if (query.isError) {
       handleError({
         error: query.error,
-        displayError: {
-          errorType: ErrorType.SERVER,
+        displayOptions: {
           retryAction: query.refetch,
         },
       });

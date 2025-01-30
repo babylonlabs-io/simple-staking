@@ -16,27 +16,11 @@ import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { ErrorType, ShowErrorParams } from "@/app/types/errors";
 import { getCommitHash } from "@/utils/version";
 
-interface ErrorModalProps {
-  open: boolean;
-  onClose: () => void;
-  onRetry?: () => void;
-  errorMessage: string;
-  errorType?: ErrorType;
-  noCancel?: boolean;
-}
-
-export const ErrorModal: React.FC<ErrorModalProps> = ({
-  open,
-  onClose,
-  onRetry,
-  errorMessage,
-  errorType,
-  noCancel,
-}) => {
+export const ErrorModal: React.FC = () => {
   const isMobileView = useIsMobileView();
   const DialogComponent = isMobileView ? MobileDialog : Dialog;
-  const { error, modalOptions } = useError();
-  const { retryAction, noCancel: noCancelOption } = modalOptions;
+  const { error, modalOptions, dismissError, isOpen } = useError();
+  const { retryAction, noCancel } = modalOptions;
   const [copied, setCopied] = useState(false);
   const version = getCommitHash();
 
@@ -49,7 +33,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
       retryAction: retryAction,
     };
 
-    onClose();
+    dismissError();
 
     setTimeout(() => {
       if (retryErrorParam.retryAction) {
@@ -66,7 +50,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     [ErrorType.REGISTRATION]: "Transition Error",
     [ErrorType.DELEGATIONS]: "Delegations Error",
     [ErrorType.WALLET]: "Wallet Error",
-    [ErrorType.UNKNOWN]: "System Error",
+    [ErrorType.UNKNOWN]: "Unknown Error",
   };
 
   const ERROR_MESSAGES = {
@@ -77,28 +61,29 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     [ErrorType.DELEGATIONS]: "Failed to fetch delegations due to:",
     [ErrorType.REGISTRATION]: "Failed to transition due to:",
     [ErrorType.WALLET]: "Failed to perform wallet action due to:",
-    [ErrorType.UNKNOWN]: "An system error occurred:",
+    [ErrorType.UNKNOWN]: "An unknown error occurred:",
   };
 
   const getErrorTitle = () => {
-    return ERROR_TITLES[errorType ?? ErrorType.UNKNOWN];
+    return ERROR_TITLES[error.type ?? ErrorType.UNKNOWN];
   };
 
   const getErrorMessage = () => {
-    const prefix = ERROR_MESSAGES[errorType ?? ErrorType.UNKNOWN];
-    return `${prefix} ${errorMessage}`;
+    const prefix = ERROR_MESSAGES[error.type ?? ErrorType.UNKNOWN];
+    return `${prefix} ${error.message}`;
   };
 
   const copyErrorDetails = () => {
     const errorDetails = JSON.stringify(
       {
-        message: errorMessage,
-        type: errorType,
+        date: new Date().toISOString(),
+        device: navigator.userAgent,
+        message: error.message,
+        type: error.type,
         version,
-        sentry: {
-          release: version,
-          environment: process.env.NODE_ENV,
-        },
+        eventId: error.sentryEventId,
+        release: version,
+        environment: process.env.NODE_ENV,
       },
       null,
       2,
@@ -119,8 +104,8 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     <DialogComponent
       backdropClassName="z-[100]"
       className="z-[150]"
-      open={open}
-      onClose={onClose}
+      open={isOpen}
+      onClose={dismissError}
     >
       <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 items-center justify-center">
         <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
@@ -154,13 +139,13 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
             variant="outlined"
             fluid
             className="px-2"
-            onClick={() => onClose()}
+            onClick={dismissError}
           >
             Cancel
           </Button>
         )}
-        {onRetry && (
-          <Button className="px-2" onClick={handleRetry}>
+        {retryAction && (
+          <Button className="px-2" fluid onClick={handleRetry}>
             Try Again
           </Button>
         )}

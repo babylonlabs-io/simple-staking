@@ -47,9 +47,6 @@ export function useRegistrationService() {
           category: ClientErrorCategory.CLIENT_VALIDATION,
           type: ErrorType.REGISTRATION,
         }),
-        displayError: {
-          errorType: ErrorType.REGISTRATION,
-        },
       });
       return;
     }
@@ -101,9 +98,6 @@ export function useRegistrationService() {
     } catch (error: any) {
       handleError({
         error,
-        displayError: {
-          errorType: ErrorType.REGISTRATION,
-        },
       });
       reset();
     }
