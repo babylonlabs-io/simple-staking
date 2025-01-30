@@ -8,7 +8,7 @@ import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 import { validateStakingInput } from "@/utils/delegations";
 import { txFeeSafetyCheck } from "@/utils/delegations/fee";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
@@ -54,14 +54,13 @@ export function useV1TransactionService() {
     ) => {
       // Perform checks
       if (!bbnStakingParams) {
-        throw new ClientError({
-          message: "Staking params not loaded",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.STAKING,
-        });
+        // system error
+        throw new Error("Staking params not loaded");
       }
-      if (!btcConnected || !btcNetwork)
+      if (!btcConnected || !btcNetwork) {
+        // wallet error
         throw new Error("BTC Wallet not connected");
+      }
       validateStakingInput(stakingInput);
 
       // Get the staking params at the time of the staking transaction
@@ -71,11 +70,8 @@ export function useV1TransactionService() {
       );
 
       if (!stakingParam) {
-        throw new ClientError({
-          message: `Params for height ${stakingHeight} not found`,
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.TRANSITION,
-        });
+        // system error
+        throw new Error(`Params for height ${stakingHeight} not found`);
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
@@ -98,8 +94,8 @@ export function useV1TransactionService() {
       if (!eligibility) {
         throw new ClientError({
           message: "Transaction not eligible",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.UNBONDING,
+          category: ClientErrorCategory.CLIENT_TRANSACTION,
+          type: ErrorType.UNBONDING,
         });
       }
 
@@ -154,18 +150,12 @@ export function useV1TransactionService() {
     ) => {
       // Perform checks
       if (!bbnStakingParams) {
-        throw new ClientError({
-          message: "Staking params not loaded",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.TRANSITION,
-        });
+        // system error
+        throw new Error("Staking params not loaded");
       }
       if (!btcConnected || !btcNetwork) {
-        throw new ClientError({
-          message: "BTC Wallet not connected",
-          category: ClientErrorCategory.CLIENT_NETWORK,
-          state: ErrorState.WALLET,
-        });
+        // wallet error
+        throw new Error("BTC Wallet not connected");
       }
       validateStakingInput(stakingInput);
 
@@ -176,11 +166,8 @@ export function useV1TransactionService() {
       );
 
       if (!stakingParam) {
-        throw new ClientError({
-          message: `Params for height ${stakingHeight} not found`,
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.TRANSITION,
-        });
+        // system error
+        throw new Error(`Params for height ${stakingHeight} not found`);
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
@@ -245,7 +232,7 @@ const getStakerSignature = (unbondingTx: Transaction): string => {
     throw new ClientError({
       message: "Invalid transaction signature",
       category: ClientErrorCategory.CLIENT_TRANSACTION,
-      state: ErrorState.WITHDRAW,
+      type: ErrorType.WITHDRAW,
     });
   }
 };

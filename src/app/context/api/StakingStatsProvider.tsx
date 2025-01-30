@@ -1,10 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
+import { HttpStatusCode } from "axios";
 import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
-import { ErrorState } from "@/app/types/errors";
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ErrorType } from "@/app/types/errors";
 
 import { useError } from "../Error/ErrorProvider";
+import { ServerError } from "../Error/errors/serverError";
 
 export interface StakingStats {
   activeTVLSat: number;
@@ -48,9 +51,13 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
   useEffect(() => {
     if (isError && error) {
       handleError({
-        error: new Error(error.message),
+        error: new ServerError({
+          message: error.message,
+          status: HttpStatusCode.InternalServerError,
+          endpoint: API_ENDPOINTS.NETWORK_INFO,
+        }),
         displayError: {
-          errorState: ErrorState.SERVER_ERROR,
+          errorType: ErrorType.SERVER,
           retryAction: refetch,
         },
       });

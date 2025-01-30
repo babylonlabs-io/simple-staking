@@ -13,7 +13,7 @@ import { MdOutlineSwapHoriz } from "react-icons/md";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { ErrorState, ShowErrorParams } from "@/app/types/errors";
+import { ErrorType, ShowErrorParams } from "@/app/types/errors";
 import { getCommitHash } from "@/utils/version";
 
 interface ErrorModalProps {
@@ -21,7 +21,7 @@ interface ErrorModalProps {
   onClose: () => void;
   onRetry?: () => void;
   errorMessage: string;
-  errorState?: ErrorState;
+  errorType?: ErrorType;
   noCancel?: boolean;
 }
 
@@ -30,7 +30,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
   onClose,
   onRetry,
   errorMessage,
-  errorState,
+  errorType,
   noCancel,
 }) => {
   const isMobileView = useIsMobileView();
@@ -44,7 +44,7 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     const retryErrorParam: ShowErrorParams = {
       error: {
         message: error.message,
-        errorState: error.errorState,
+        type: error.type,
       },
       retryAction: retryAction,
     };
@@ -58,48 +58,44 @@ export const ErrorModal: React.FC<ErrorModalProps> = ({
     }, 300);
   };
 
+  const ERROR_TITLES = {
+    [ErrorType.SERVER]: "Server Error",
+    [ErrorType.WITHDRAW]: "Withdraw Error",
+    [ErrorType.STAKING]: "Stake Error",
+    [ErrorType.UNBONDING]: "Unbonding Error",
+    [ErrorType.REGISTRATION]: "Transition Error",
+    [ErrorType.DELEGATIONS]: "Delegations Error",
+    [ErrorType.WALLET]: "Wallet Error",
+    [ErrorType.UNKNOWN]: "System Error",
+  };
+
+  const ERROR_MESSAGES = {
+    [ErrorType.SERVER]: "Error fetching data due to:",
+    [ErrorType.UNBONDING]: "Your request to unbond failed due to:",
+    [ErrorType.WITHDRAW]: "Failed to withdraw due to:",
+    [ErrorType.STAKING]: "Failed to stake due to:",
+    [ErrorType.DELEGATIONS]: "Failed to fetch delegations due to:",
+    [ErrorType.REGISTRATION]: "Failed to transition due to:",
+    [ErrorType.WALLET]: "Failed to perform wallet action due to:",
+    [ErrorType.UNKNOWN]: "An system error occurred:",
+  };
+
   const getErrorTitle = () => {
-    switch (errorState) {
-      case ErrorState.SERVER_ERROR:
-        return "Server Error";
-      case ErrorState.WALLET:
-        return "Network Error";
-      case ErrorState.WITHDRAW:
-        return "Withdraw Error";
-      case ErrorState.STAKING:
-        return "Stake Error";
-      case ErrorState.UNBONDING:
-        return "Unbonding Error";
-      default:
-        return "Unknown Error";
-    }
+    return ERROR_TITLES[errorType ?? ErrorType.UNKNOWN];
   };
 
   const getErrorMessage = () => {
-    switch (errorState) {
-      case ErrorState.SERVER_ERROR:
-        return `Error fetching data due to: ${errorMessage}`;
-      case ErrorState.UNBONDING:
-        return `Your request to unbond failed due to: ${errorMessage}`;
-      case ErrorState.WITHDRAW:
-        return `Failed to withdraw due to: ${errorMessage}`;
-      case ErrorState.STAKING:
-        return `Failed to stake due to: ${errorMessage}`;
-      case ErrorState.WALLET:
-        return `Failed to switch network due to: ${errorMessage}`;
-      default:
-        return errorMessage;
-    }
+    const prefix = ERROR_MESSAGES[errorType ?? ErrorType.UNKNOWN];
+    return `${prefix} ${errorMessage}`;
   };
 
   const copyErrorDetails = () => {
     const errorDetails = JSON.stringify(
       {
         message: errorMessage,
-        errorState,
+        type: errorType,
         version,
         sentry: {
-          // eventId: error?.sentryEventId,
           release: version,
           environment: process.env.NODE_ENV,
         },

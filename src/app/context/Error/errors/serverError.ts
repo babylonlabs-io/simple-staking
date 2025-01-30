@@ -1,13 +1,16 @@
 import { HttpStatusCode } from "axios";
 
+import { ErrorType } from "@/app/types/errors";
+
 export class ServerError extends Error {
   readonly name = "ServerError";
   readonly displayMessage: string;
   readonly status: HttpStatusCode;
   readonly endpoint?: string;
+  readonly type: ErrorType;
 
   /**
-   * @param message       Technical message for debugging
+   * @param message       Error message
    * @param status        HTTP status code
    * @param endpoint      Endpoint, resource name, or server location
    */
@@ -24,6 +27,7 @@ export class ServerError extends Error {
     this.status = status;
     this.endpoint = endpoint;
     this.displayMessage = message;
+    this.type = ErrorType.SERVER;
     Object.setPrototypeOf(this, ServerError.prototype);
   }
 

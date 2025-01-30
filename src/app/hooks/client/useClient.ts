@@ -12,7 +12,7 @@ import { useEffect } from "react";
 
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 
 export function useClientQuery<
   TQueryFnData = unknown,
@@ -53,7 +53,7 @@ export function useClientQuery<
       handleError({
         error: data.error as Error,
         displayError: {
-          errorState: ErrorState.SERVER_ERROR,
+          errorType: ErrorType.SERVER,
           retryAction: data.refetch,
         },
       });

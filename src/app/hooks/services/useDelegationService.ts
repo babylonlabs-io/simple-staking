@@ -10,7 +10,7 @@ import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { validateDelegation } from "@/utils/delegations";
 import { getBbnParamByVersion } from "@/utils/params";
@@ -147,8 +147,8 @@ export function useDelegationService() {
         if (!covenantUnbondingSignatures) {
           throw new ClientError({
             message: "Covenant unbonding signatures not found",
-            category: ClientErrorCategory.CLIENT_VALIDATION,
-            state: ErrorState.UNBONDING,
+            category: ClientErrorCategory.CLIENT_TRANSACTION,
+            type: ErrorType.UNBONDING,
           });
         }
 
@@ -196,8 +196,8 @@ export function useDelegationService() {
         if (!slashing.unbondingSlashingTxHex) {
           throw new ClientError({
             message: "Unbonding slashing tx not found, can't submit withdrawal",
-            category: ClientErrorCategory.CLIENT_VALIDATION,
-            state: ErrorState.UNBONDING,
+            category: ClientErrorCategory.CLIENT_TRANSACTION,
+            type: ErrorType.UNBONDING,
           });
         }
 
@@ -240,8 +240,8 @@ export function useDelegationService() {
         if (!slashing.stakingSlashingTxHex) {
           throw new ClientError({
             message: "Slashing tx not found, can't submit withdrawal",
-            category: ClientErrorCategory.CLIENT_VALIDATION,
-            state: ErrorState.WITHDRAW,
+            category: ClientErrorCategory.CLIENT_TRANSACTION,
+            type: ErrorType.WITHDRAW,
           });
         }
 

@@ -1,13 +1,16 @@
 import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
+import { HttpStatusCode } from "axios";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors/clientError";
+import { ServerError } from "@/app/context/Error/errors/serverError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
@@ -17,7 +20,7 @@ import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
@@ -104,7 +107,7 @@ export const Delegations = ({}) => {
         throw new ClientError({
           message: "Wrong delegation selected for unbonding",
           category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.UNBONDING,
+          type: ErrorType.UNBONDING,
         });
       }
       // Sign the withdrawal transaction
@@ -129,7 +132,7 @@ export const Delegations = ({}) => {
       handleError({
         error,
         displayError: {
-          errorState: ErrorState.UNBONDING,
+          errorType: ErrorType.UNBONDING,
         },
       });
     } finally {
@@ -146,11 +149,8 @@ export const Delegations = ({}) => {
   const handleWithdraw = async (id: string) => {
     try {
       if (!networkFees) {
-        throw new ClientError({
-          message: "Network fees not found",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.WITHDRAW,
-        });
+        // system error
+        throw new Error("Network fees not found");
       }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
@@ -159,7 +159,7 @@ export const Delegations = ({}) => {
         throw new ClientError({
           message: "Wrong delegation selected for withdrawal",
           category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.WITHDRAW,
+          type: ErrorType.WITHDRAW,
         });
       }
       // Sign the withdrawal transaction
@@ -184,7 +184,7 @@ export const Delegations = ({}) => {
       handleError({
         error,
         displayError: {
-          errorState: ErrorState.WITHDRAW,
+          errorType: ErrorType.WITHDRAW,
           retryAction: () => handleModal(id, MODE_WITHDRAW),
         },
       });
@@ -246,9 +246,13 @@ export const Delegations = ({}) => {
   useEffect(() => {
     if (modalOpen && !selectedDelegation) {
       handleError({
-        error: new Error("Delegation not found"),
+        error: new ServerError({
+          message: "Delegation not found",
+          status: HttpStatusCode.NotFound,
+          endpoint: API_ENDPOINTS.STAKER_DELEGATIONS,
+        }),
         displayError: {
-          errorState: ErrorState.SERVER_ERROR,
+          errorType: ErrorType.SERVER,
           noCancel: false,
         },
       });

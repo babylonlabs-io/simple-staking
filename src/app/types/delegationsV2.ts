@@ -1,7 +1,7 @@
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
 
-import { ErrorState } from "./errors";
+import { ErrorType } from "./errors";
 
 export interface DelegationLike {
   stakingAmount: number;
@@ -107,7 +107,7 @@ export const getDelegationV2StakingState = (
     throw new ClientError({
       message: `Invalid delegation state: ${state}`,
       category: ClientErrorCategory.CLIENT_VALIDATION,
-      state: ErrorState.DELEGATIONS,
+      type: ErrorType.DELEGATIONS,
     });
   }
 

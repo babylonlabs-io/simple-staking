@@ -8,7 +8,7 @@ import { ClientError } from "@/app/context/Error/errors";
 import { useDelegationState } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 import { retry } from "@/utils";
 
 import { SigningStep, useTransactionService } from "./useTransactionService";
@@ -45,10 +45,10 @@ export function useRegistrationService() {
         error: new ClientError({
           message: "No delegation selected for registration",
           category: ClientErrorCategory.CLIENT_VALIDATION,
-          state: ErrorState.TRANSITION,
+          type: ErrorType.REGISTRATION,
         }),
         displayError: {
-          errorState: ErrorState.TRANSITION,
+          errorType: ErrorType.REGISTRATION,
         },
       });
       return;
@@ -102,7 +102,7 @@ export function useRegistrationService() {
       handleError({
         error,
         displayError: {
-          errorState: ErrorState.TRANSITION,
+          errorType: ErrorType.REGISTRATION,
         },
       });
       reset();

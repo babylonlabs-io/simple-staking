@@ -18,6 +18,7 @@ export const useSigningStargateClient = () => {
   const simulate = useCallback(
     <T>(msg: { typeUrl: string; value: T }): Promise<number> => {
       if (!signingStargateClient || !bech32Address) {
+        // wallet error
         throw new Error("Wallet not connected");
       }
 
@@ -49,6 +50,7 @@ export const useSigningStargateClient = () => {
       gasUsed: string;
     }> => {
       if (!signingStargateClient || !bech32Address) {
+        // wallet error
         throw new Error("Wallet not connected");
       }
 
@@ -59,6 +61,7 @@ export const useSigningStargateClient = () => {
       );
 
       if (res.code !== 0) {
+        // wallet error
         throw new Error(
           `Failed to send ${msg.typeUrl} transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
         );
@@ -86,6 +89,7 @@ export const useSigningStargateClient = () => {
       fee: StdFee,
     ): Promise<Uint8Array> => {
       if (!signingStargateClient || !bech32Address) {
+        // wallet error
         throw new Error("Wallet not connected");
       }
 
@@ -114,11 +118,13 @@ export const useSigningStargateClient = () => {
       gasUsed: string;
     }> => {
       if (!signingStargateClient || !bech32Address) {
+        // wallet error
         throw new Error("Wallet not connected");
       }
 
       const res = await signingStargateClient.broadcastTx(tx);
       if (res.code !== 0) {
+        // wallet error
         throw new Error(
           `Failed to send transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
         );

@@ -1,21 +1,18 @@
-export enum ErrorState {
+export enum ErrorType {
   // Server-related errors
-  SERVER_ERROR = "SERVER_ERROR",
+  SERVER = "SERVER",
 
   // Staking lifecycle errors
   STAKING = "STAKING",
   UNBONDING = "UNBONDING",
   WITHDRAW = "WITHDRAW",
-  TRANSITION = "TRANSITION",
-  SLASHING = "SLASHING",
+  REGISTRATION = "REGISTRATION",
 
-  // Wallet/network errors
+  // Wallet errors
   WALLET = "WALLET",
-  NETWORK = "NETWORK",
 
   // Data errors
   DELEGATIONS = "DELEGATIONS",
-  VALIDATION = "VALIDATION",
 
   // Fallback
   UNKNOWN = "UNKNOWN",
@@ -23,14 +20,12 @@ export enum ErrorState {
 
 export interface Error {
   message: string;
-  errorState?: ErrorState;
+  type?: ErrorType;
   displayMessage?: string;
-  // Only for server errors
-  endpoint?: string;
 }
 
 export interface ErrorDisplayOptions {
-  errorState: ErrorState;
+  errorType: ErrorType;
   retryAction?: () => void;
   noCancel?: boolean;
 }

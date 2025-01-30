@@ -6,7 +6,7 @@ import {
 import { useMemo } from "react";
 import { twJoin } from "tailwind-merge";
 
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 
 import { useError } from "../Error/ErrorProvider";
 
@@ -30,9 +30,10 @@ export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
       await selectWallet(wallet);
     } catch (e: any) {
       handleError({
+        // wallet error
         error: new Error(e.message),
         displayError: {
-          errorState: ErrorState.WALLET,
+          errorType: ErrorType.WALLET,
         },
       });
     }

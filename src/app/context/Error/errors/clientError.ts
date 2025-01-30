@@ -2,31 +2,31 @@ import {
   ClientErrorCategory,
   getClientErrorMessage,
 } from "../../../constants/errorMessages";
-import { ErrorState } from "../../../types/errors";
+import { ErrorType } from "../../../types/errors";
 
 export class ClientError extends Error {
   readonly name = "ClientError";
   readonly displayMessage: string;
   readonly category?: ClientErrorCategory;
-  readonly state?: ErrorState;
+  readonly type?: ErrorType;
 
   /**
-   * @param message        Technical message for debugging
-   * @param errorCode      Client error code
-   * @param errorType      Classification of error
+   * @param message        Error message
+   * @param category       Error category
+   * @param type           Error type
    */
   constructor({
     message,
     category = ClientErrorCategory.CLIENT_UNKNOWN,
-    state = ErrorState.WALLET,
+    type = ErrorType.UNKNOWN,
   }: {
     message: string;
     category?: ClientErrorCategory;
-    state?: ErrorState;
+    type?: ErrorType;
   }) {
     super(message);
     this.category = category;
-    this.state = state;
+    this.type = type;
     this.displayMessage = getClientErrorMessage(category, message);
     Object.setPrototypeOf(this, ClientError.prototype);
   }

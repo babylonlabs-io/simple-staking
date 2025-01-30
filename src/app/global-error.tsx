@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 import GenericError from "@/app/components/Error/GenericError";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 
 export default function GlobalError({
   error,
@@ -17,7 +17,7 @@ export default function GlobalError({
     handleError({
       error,
       displayError: {
-        errorState: ErrorState.UNKNOWN,
+        errorType: ErrorType.UNKNOWN,
       },
     });
   }, [error, handleError]);

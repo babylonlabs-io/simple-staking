@@ -1,5 +1,6 @@
 export const API_ENDPOINTS = {
   NETWORK_INFO: "/v2/network-info",
+
   DELEGATION_V2: "/v2/delegation",
   DELEGATIONS_V2: "/v2/delegations",
   HEALTHCHECK: "/healthcheck",

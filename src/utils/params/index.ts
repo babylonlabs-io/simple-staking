@@ -19,6 +19,7 @@ export const getBbnParamByBtcHeight = (
   const param = sortedParams.find(
     (param) => height >= param.btcActivationHeight,
   );
+  // system error
   if (!param) throw new Error(`BBN param not found for height ${height}`);
   return param;
 };

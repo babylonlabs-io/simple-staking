@@ -69,7 +69,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         } else if (error instanceof ClientError) {
           scope.setExtras({
             errorCategory: error.category,
-            errorState: error.state,
+            errorType: error.type,
           });
         }
         return Sentry.captureException(error);
@@ -85,7 +85,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           endpoint: error.endpoint,
           displayMessage: error.displayMessage,
         }),
-        errorState: displayError.errorState,
+        errorType: displayError.errorType,
       };
 
       setState({
@@ -115,7 +115,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       <ErrorModal
         open={state.isOpen}
         errorMessage={state.error.message}
-        errorState={state.error.errorState}
+        errorType={state.error.type}
         onClose={dismissError}
         onRetry={state.modalOptions.retryAction}
         noCancel={state.modalOptions.noCancel}

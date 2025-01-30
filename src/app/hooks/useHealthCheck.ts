@@ -8,7 +8,7 @@ import {
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
 
 import { useError } from "../context/Error/ErrorProvider";
-import { ErrorState } from "../types/errors";
+import { ErrorType } from "../types/errors";
 
 export const useHealthCheck = () => {
   const { handleError } = useError();
@@ -25,7 +25,7 @@ export const useHealthCheck = () => {
       handleError({
         error,
         displayError: {
-          errorState: ErrorState.SERVER_ERROR,
+          errorType: ErrorType.SERVER,
           retryAction: refetch,
         },
       });

@@ -18,7 +18,7 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 import { Fees } from "@/app/types/fee";
 import {
   getAddressBalance,
@@ -101,6 +101,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
+          // wallet error
           throw new Error(supportedNetworkMessage);
         }
 
@@ -131,9 +132,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             break;
         }
         handleError({
+          // wallet error
           error: new Error(errorMessage),
           displayError: {
-            errorState: ErrorState.WALLET,
+            errorType: ErrorType.WALLET,
             retryAction: () => connectBTC(walletProvider),
           },
         });

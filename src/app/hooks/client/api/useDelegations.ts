@@ -8,7 +8,7 @@ import {
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 
 export const DELEGATIONS_KEY = "DELEGATIONS";
 
@@ -59,7 +59,7 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       handleError({
         error: query.error,
         displayError: {
-          errorState: ErrorState.SERVER_ERROR,
+          errorType: ErrorType.SERVER,
           retryAction: query.refetch,
         },
       });
