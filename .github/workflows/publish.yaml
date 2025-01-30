@@ -28,6 +28,7 @@ jobs:
             testnet,
             phase-2-testnet,
             mainnet-private,
+            phase-2-private-mainnet,
             mainnet,
           ]
     environment: ${{ matrix.environment }}
@@ -71,6 +72,7 @@ jobs:
             testnet,
             phase-2-testnet,
             mainnet-private,
+            phase-2-private-mainnet,
             mainnet,
           ]
     needs: ["docker_build"]
@@ -113,6 +115,7 @@ jobs:
             testnet,
             phase-2-testnet,
             mainnet-private,
+            phase-2-private-mainnet,
             mainnet,
           ]
     needs: ["docker_build"]
