@@ -19,8 +19,9 @@ import { filterDust } from "@/utils/wallet";
 import { useNetworkInfo } from "../hooks/client/api/useNetworkInfo";
 import { NetworkInfo } from "../types/networkInfo";
 
+import { BalanceState } from "./BalanceState";
 import { DelegationState } from "./DelegationState";
-import { DelegationV2State, useDelegationV2State } from "./DelegationV2State";
+import { DelegationV2State } from "./DelegationV2State";
 import { FinalityProviderState } from "./FinalityProviderState";
 import { RewardsState } from "./RewardState";
 import { StakingState } from "./StakingState";
@@ -31,18 +32,18 @@ const STATE_LIST = [
   FinalityProviderState,
   StakingState,
   RewardsState,
+  BalanceState,
 ];
 
 export interface AppState {
   theme: "dark" | "light";
   availableUTXOs?: UTXO[];
-  stakableBtcBalance: number;
-  totalBtcBalance: number;
+  allUTXOs?: UTXO[];
+  inscriptionsUTXOs?: UTXO[];
   networkInfo?: NetworkInfo;
   isError: boolean;
   isLoading: boolean;
   ordinalsExcluded: boolean;
-  hasOrdinals: boolean;
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
   refetchUTXOs: () => void;
@@ -54,10 +55,7 @@ const { StateProvider, useState: useApplicationState } =
     theme: "light",
     isLoading: false,
     isError: false,
-    stakableBtcBalance: 0,
-    totalBtcBalance: 0,
     ordinalsExcluded: true,
-    hasOrdinals: false,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
     refetchUTXOs: () => {},
@@ -68,7 +66,6 @@ export function AppState({ children }: PropsWithChildren) {
   const [theme, setTheme] = useState<"dark" | "light">("light");
   const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
     useInscriptionProvider();
-  const { getStakedBalance } = useDelegationV2State();
 
   useEffect(() => {
     document.body.classList.add(theme);
@@ -110,6 +107,10 @@ export function AppState({ children }: PropsWithChildren) {
     [ordinals],
   );
 
+  const inscriptionsUTXOs = useMemo(() => {
+    return confirmedUTXOs.filter((utxo) => ordinalMap[utxo.txid]);
+  }, [confirmedUTXOs, ordinalMap]);
+
   const availableUTXOs = useMemo(() => {
     if (isLoading) return [];
 
@@ -117,19 +118,6 @@ export function AppState({ children }: PropsWithChildren) {
       ? filterDust(confirmedUTXOs).filter((utxo) => !ordinalMap[utxo.txid])
       : confirmedUTXOs;
   }, [isLoading, ordinalsExcluded, confirmedUTXOs, ordinalMap]);
-
-  const stakableBtcBalance = useMemo(
-    () =>
-      availableUTXOs.reduce((accumulator, item) => accumulator + item.value, 0),
-    [availableUTXOs],
-  );
-
-  const totalBtcBalance = useMemo(
-    () =>
-      allUTXOs.reduce((accumulator, item) => accumulator + item.value, 0) +
-      getStakedBalance(),
-    [allUTXOs, getStakedBalance],
-  );
 
   // Handlers
   const includeOrdinals = useCallback(
@@ -145,14 +133,13 @@ export function AppState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       theme,
+      allUTXOs,
       availableUTXOs,
-      stakableBtcBalance,
-      totalBtcBalance,
+      inscriptionsUTXOs,
       networkInfo,
       isError,
       isLoading,
       ordinalsExcluded,
-      hasOrdinals: totalBtcBalance > stakableBtcBalance,
       includeOrdinals,
       excludeOrdinals,
       refetchUTXOs,
@@ -160,9 +147,9 @@ export function AppState({ children }: PropsWithChildren) {
     }),
     [
       theme,
+      allUTXOs,
       availableUTXOs,
-      stakableBtcBalance,
-      totalBtcBalance,
+      inscriptionsUTXOs,
       networkInfo,
       isError,
       isLoading,

@@ -23,7 +23,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
       shouldDirty: true,
       shouldTouch: true,
     });
-  }, []);
+  }, [defaultRate, setValue]);
 
   useEffect(() => {
     const { finalityProvider, amount, term } = getValues();

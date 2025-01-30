@@ -4,16 +4,11 @@ import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { createStateUtils } from "@/utils/createStateUtils";
 
-import { useAppState } from ".";
-
 interface RewardsStateProps {
   loading: boolean;
   showRewardModal: boolean;
   processing: boolean;
   bbnAddress: string;
-  stakableBtcBalance: number;
-  totalBtcBalance: number;
-  bbnBalance: number;
   rewardBalance: number;
   transactionFee: number;
   setTransactionFee: (value: number) => void;
@@ -28,9 +23,6 @@ const defaultState: RewardsStateProps = {
   showRewardModal: false,
   processing: false,
   bbnAddress: "",
-  stakableBtcBalance: 0,
-  totalBtcBalance: 0,
-  bbnBalance: 0,
   rewardBalance: 0,
   transactionFee: 0,
   openRewardModal: () => {},
@@ -49,22 +41,14 @@ export function RewardsState({ children }: PropsWithChildren) {
   const [transactionFee, setTransactionFee] = useState(0);
 
   const { bech32Address: bbnAddress } = useCosmosWallet();
+
   const {
-    stakableBtcBalance,
-    totalBtcBalance,
-    isLoading: isBTCBalanceLoading,
-  } = useAppState();
-  const {
-    balanceQuery: { data: bbnBalance = 0, isLoading: isCosmosBalanceLoading },
     rewardsQuery: {
       data: rewardBalance = 0,
       isLoading: isRewardBalanceLoading,
       refetch: refetchRewardBalance,
     },
   } = useBbnQuery();
-
-  const loading =
-    isBTCBalanceLoading || isCosmosBalanceLoading || isRewardBalanceLoading;
 
   const openRewardModal = useCallback(() => {
     setRewardModal(true);
@@ -76,13 +60,10 @@ export function RewardsState({ children }: PropsWithChildren) {
 
   const context = useMemo(
     () => ({
-      loading,
+      loading: isRewardBalanceLoading,
       showRewardModal,
       processing,
       bbnAddress,
-      stakableBtcBalance,
-      totalBtcBalance,
-      bbnBalance,
       rewardBalance,
       transactionFee,
       setTransactionFee,
@@ -94,17 +75,12 @@ export function RewardsState({ children }: PropsWithChildren) {
       },
     }),
     [
-      loading,
+      isRewardBalanceLoading,
       showRewardModal,
       processing,
       bbnAddress,
-      stakableBtcBalance,
-      totalBtcBalance,
-      bbnBalance,
       rewardBalance,
       transactionFee,
-      setTransactionFee,
-      setProcessing,
       openRewardModal,
       closeRewardModal,
       refetchRewardBalance,
