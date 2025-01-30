@@ -8,7 +8,6 @@ import {
   DelegationV2,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
-import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { validateDelegation } from "@/utils/delegations";
 import { getBbnParamByVersion } from "@/utils/params";
@@ -71,7 +70,8 @@ export function useDelegationService() {
     submitSlashingWithdrawalTx,
   } = useTransactionService();
 
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getFinalityProvider, getSlashedFinalityProvider } =
+    useFinalityProviderState();
 
   const validations = useMemo(
     () =>
@@ -103,8 +103,9 @@ export function useDelegationService() {
           ...acc,
           [delegation.stakingTxHashHex]: {
             isSlashed:
-              getFinalityProvider(delegation.finalityProviderBtcPksHex[0])
-                ?.state === FinalityProviderState.SLASHED,
+              getSlashedFinalityProvider(
+                delegation.finalityProviderBtcPksHex[0],
+              ) !== null,
           },
         }),
         {} as Record<string, { isSlashed: boolean }>,
