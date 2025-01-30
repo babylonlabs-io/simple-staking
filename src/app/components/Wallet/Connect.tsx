@@ -204,8 +204,8 @@ export const Connect: React.FC<ConnectProps> = ({
             onChange={(value) => {
               setTheme(value ? "dark" : "light");
             }}
-            inactiveIcon={<IoIosSunny size={12} />}
-            activeIcon={<IoIosMoon size={10} />}
+            inactiveIcon={<IoIosMoon size={10} />}
+            activeIcon={<IoIosSunny size={12} />}
           />
         </div>
       </div>

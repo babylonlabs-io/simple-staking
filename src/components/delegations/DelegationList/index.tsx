@@ -127,10 +127,10 @@ export function DelegationList() {
         onInfiniteScroll={fetchMoreDelegations}
         classNames={{
           headerRowClassName: "text-accent-primary text-xs",
-          headerCellClassName: "p-4 text-align-left",
+          headerCellClassName: "p-4 text-align-left text-accent-secondary",
           rowClassName: "group",
-          wrapperClassName: "max-h-[21rem] overflow-x-auto",
-          bodyClassName: "gap-y-4 min-w-[1000px]",
+          wrapperClassName: "max-h-[25rem] overflow-x-auto",
+          bodyClassName: "min-w-[1000px]",
           cellClassName:
             "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
         }}

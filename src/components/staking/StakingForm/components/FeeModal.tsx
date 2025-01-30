@@ -103,7 +103,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
     },
     {
       labelRenderer: renderCustomLabel,
-      className: "items-center border border-transparent p-2",
+      className: "items-center border border-transparent px-4 py-2",
       key: "custom",
       value: parseFloat(customFee),
       hint: "Next Block",
@@ -124,7 +124,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
   return (
     <ResponsiveDialog
       open={open}
-      className="w-[41.25rem] max-w-full text-accent-primary"
+      className="text-accent-primary"
       onClose={onClose}
     >
       <DialogHeader title="Advanced Fee Settings" onClose={onClose}>
@@ -135,7 +135,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
         </Text>
       </DialogHeader>
 
-      <DialogBody className="mt-6 min-h-96 flex flex-col gap-6">
+      <DialogBody className="mt-6 md:min-h-96 flex flex-col gap-6">
         {isLoading ? (
           <StatusView
             className="flex-1 h-auto"

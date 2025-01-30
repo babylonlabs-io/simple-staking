@@ -278,48 +278,61 @@ export const Delegations = ({}) => {
           Pending Registration
         </Heading>
 
-        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] gap-2 p-4 text-accent-primary text-xs">
-          <p className="text-left">Inception</p>
-          <p className="text-left">Finality Provider</p>
-          <p className="text-left">Amount</p>
-          <p className="text-left">Transaction ID</p>
-          <p className="text-left">Status</p>
-          <p className="text-left">Action</p>
-        </div>
-        <div
-          id="staking-history"
-          className="no-scrollbar max-h-[21rem] overflow-y-auto"
+        <InfiniteScroll
+          className="no-scrollbar max-h-[25rem] overflow-auto"
+          dataLength={combinedDelegationsData.length}
+          next={fetchMoreDelegations}
+          hasMore={hasMoreDelegations}
+          loader={isLoading ? <LoadingTableList /> : null}
         >
-          <InfiniteScroll
-            className="flex flex-col pt-3"
-            dataLength={combinedDelegationsData.length}
-            next={fetchMoreDelegations}
-            hasMore={hasMoreDelegations}
-            loader={isLoading ? <LoadingTableList /> : null}
-            scrollableTarget="staking-history"
-          >
-            {combinedDelegationsData?.map((delegation) => {
-              if (!delegation) return null;
-              const { stakingTx, stakingTxHashHex } = delegation;
-              const intermediateDelegation =
-                intermediateDelegationsLocalStorage.find(
-                  (item) => item.stakingTxHashHex === stakingTxHashHex,
-                );
+          <table className="w-full min-w-[1000px]">
+            <thead className="sticky top-0 bg-surface">
+              <tr className="text-accent-secondary text-xs">
+                <th className="text-left h-[52px] md:min-w-52 px-4 whitespace-nowrap font-normal">
+                  Inception
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Finality Provider
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Amount
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Transaction ID
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Status
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Action
+                </th>
+              </tr>
+            </thead>
 
-              return (
-                <Delegation
-                  key={stakingTxHashHex + stakingTx.startHeight}
-                  delegation={delegation}
-                  onWithdraw={() =>
-                    handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                  }
-                  onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
-                  intermediateState={intermediateDelegation?.state}
-                />
-              );
-            })}
-          </InfiniteScroll>
-        </div>
+            <tbody>
+              {combinedDelegationsData?.map((delegation) => {
+                if (!delegation) return null;
+                const { stakingTx, stakingTxHashHex } = delegation;
+                const intermediateDelegation =
+                  intermediateDelegationsLocalStorage.find(
+                    (item) => item.stakingTxHashHex === stakingTxHashHex,
+                  );
+
+                return (
+                  <Delegation
+                    key={stakingTxHashHex + stakingTx.startHeight}
+                    delegation={delegation}
+                    onWithdraw={() =>
+                      handleModal(stakingTxHashHex, MODE_WITHDRAW)
+                    }
+                    onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
+                    intermediateState={intermediateDelegation?.state}
+                  />
+                );
+              })}
+            </tbody>
+          </table>
+        </InfiniteScroll>
       </Card>
       {modalMode && txID && selectedDelegation && (
         <WithdrawModal

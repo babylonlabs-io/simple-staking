@@ -12,7 +12,7 @@ interface StepProps {
 const renderIcon = (step: number, currentStep: number) => {
   if (currentStep > step) {
     return (
-      <div className="rounded-full bg-primary-light flex h-10 w-10 items-center justify-center">
+      <div className="rounded-full shrink-0 bg-primary-light flex h-10 w-10 items-center justify-center">
         <IoCheckmarkSharp size={24} className="text-accent-contrast" />
       </div>
     );
@@ -20,14 +20,14 @@ const renderIcon = (step: number, currentStep: number) => {
 
   if (currentStep === step) {
     return (
-      <div className="rounded-full bg-secondary-main flex h-10 w-10 items-center justify-center">
+      <div className="rounded-full shrink-0 bg-secondary-main flex h-10 w-10 items-center justify-center">
         <Loader size={24} className="text-accent-contrast" />
       </div>
     );
   }
 
   return (
-    <div className="rounded-full bg-secondary-main flex h-10 w-10 items-center justify-center">
+    <div className="rounded-full shrink-0 bg-secondary-main flex h-10 w-10 items-center justify-center">
       <Text variant="body1" className="text-accent-contrast">
         {step}
       </Text>

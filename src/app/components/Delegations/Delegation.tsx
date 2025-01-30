@@ -210,74 +210,59 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   return (
     <>
-      <div className="relative h-[120px] lg:h-[72px] rounded bg-surface odd:bg-secondary-highlight p-4 text-sm text-accent-primary">
-        <div className="h-full grid grid-flow-col grid-cols-2 grid-rows-3 items-center gap-2 lg:grid-flow-row lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr] lg:grid-rows-1">
-          <DelegationCell order="order-3 lg:order-1" className="pt-6 lg:pt-0">
-            {durationTillNow(startTimestamp, currentTime)}
-          </DelegationCell>
+      <tr className="bg-surface odd:bg-secondary-highlight text-sm text-accent-primary">
+        <DelegationCell>
+          {durationTillNow(startTimestamp, currentTime)}
+        </DelegationCell>
 
-          <DelegationCell
-            order="order-4 lg:order-2"
-            className="text-right lg:text-left"
-          >
-            <FinalityProviderDisplay
-              fpName={fpName}
-              isSlashed={isSlashed}
-              isJailed={isJailed}
-            />
-          </DelegationCell>
+        <DelegationCell>
+          <FinalityProviderDisplay
+            fpName={fpName}
+            isSlashed={isSlashed}
+            isJailed={isJailed}
+          />
+        </DelegationCell>
 
-          <DelegationCell
-            order="order-1 lg:order-3"
-            className="flex gap-1 items-center"
-          >
+        <DelegationCell>
+          <div className="flex gap-1 items-center">
             <FaBitcoin className="text-primary" />
             <p>
               {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}
             </p>
-          </DelegationCell>
+          </div>
+        </DelegationCell>
 
-          <DelegationCell
-            order="order-2 lg:order-4"
-            className="justify-start lg:flex"
+        <DelegationCell>
+          <a
+            href={`${mempoolApiUrl}/tx/${stakingTxHashHex}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:underline"
           >
-            <a
-              href={`${mempoolApiUrl}/tx/${stakingTxHashHex}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:underline"
-            >
-              {trim(stakingTxHashHex)}
-            </a>
-          </DelegationCell>
-          {/*
+            {trim(stakingTxHashHex)}
+          </a>
+        </DelegationCell>
+        {/*
           we need to center the text without the tooltip
           add its size 12px and gap 4px, 16/2 = 8px
           */}
-          <DelegationCell
-            order="order-5"
-            className="relative flex justify-end lg:justify-start"
-          >
-            <DelegationState
-              displayState={displayState}
-              isSlashed={isSlashed}
-            />
-          </DelegationCell>
+        <DelegationCell>
+          <DelegationState displayState={displayState} isSlashed={isSlashed} />
+        </DelegationCell>
 
-          <DelegationCell order="order-6">
-            <DelegationActions
-              state={state}
-              intermediateState={intermediateState}
-              isEligibleForRegistration={isEligibleForTransition}
-              stakingTxHashHex={stakingTxHashHex}
-              finalityProviderPkHex={finalityProviderPkHex}
-              onRegistration={onRegistration}
-              onUnbond={onUnbond}
-              onWithdraw={onWithdraw}
-            />
-          </DelegationCell>
-        </div>
-      </div>
+        <DelegationCell>
+          <DelegationActions
+            state={state}
+            intermediateState={intermediateState}
+            isEligibleForRegistration={isEligibleForTransition}
+            stakingTxHashHex={stakingTxHashHex}
+            finalityProviderPkHex={finalityProviderPkHex}
+            onRegistration={onRegistration}
+            onUnbond={onUnbond}
+            onWithdraw={onWithdraw}
+          />
+        </DelegationCell>
+      </tr>
 
       <RegistrationStartModal
         open={step === "registration-start"}
