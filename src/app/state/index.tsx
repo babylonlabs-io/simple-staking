@@ -26,13 +26,14 @@ import { FinalityProviderState } from "./FinalityProviderState";
 import { RewardsState } from "./RewardState";
 import { StakingState } from "./StakingState";
 
+// The order of the states is important for the state provider
 const STATE_LIST = [
   DelegationState,
   DelegationV2State,
   FinalityProviderState,
+  BalanceState,
   StakingState,
   RewardsState,
-  BalanceState,
 ];
 
 export interface AppState {
