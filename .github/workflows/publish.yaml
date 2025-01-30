@@ -21,7 +21,7 @@ jobs:
     strategy:
       matrix:
         environment:
-          [devnet, phase-2-devnet, staging, testnet, phase-2-testnet, mainnet-private, mainnet]
+          [devnet, phase-2-devnet, staging, testnet, phase-2-testnet, mainnet-private, phase-2-private-mainnet, mainnet]
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
@@ -53,7 +53,7 @@ jobs:
     strategy:
       matrix:
         environment:
-          [devnet, phase-2-devnet, staging, testnet, phase-2-testnet, mainnet-private, mainnet]
+          [devnet, phase-2-devnet, staging, testnet, phase-2-testnet, mainnet-private, phase-2-private-mainnet, mainnet]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace
@@ -87,7 +87,7 @@ jobs:
     strategy:
       matrix:
         environment:
-          [devnet, phase-2-devnet, staging, testnet, phase-2-testnet, mainnet-private, mainnet]
+          [devnet, phase-2-devnet, staging, testnet, phase-2-testnet, mainnet-private, phase-2-private-mainnet, mainnet]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace
