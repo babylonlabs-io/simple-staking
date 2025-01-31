@@ -33,6 +33,7 @@ interface FinalityProviderState {
   getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
+  getSlashedFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
 }
 
 const SORT_DIRECTIONS = {
@@ -72,6 +73,7 @@ const defaultState: FinalityProviderState = {
   getFinalityProvider: () => null,
   fetchNextPage: () => {},
   getFinalityProviderName: () => undefined,
+  getSlashedFinalityProvider: () => null,
 };
 
 const { StateProvider, useState: useFpState } =
@@ -169,6 +171,12 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     [data?.finalityProviders],
   );
 
+  const getSlashedFinalityProvider = useCallback(
+    (btcPkHex: string) =>
+      data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
+    [data?.finalityProviders],
+  );
+
   const state = useMemo(
     () => ({
       filter,
@@ -182,6 +190,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       getFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
+      getSlashedFinalityProvider,
     }),
     [
       filter,
@@ -195,6 +204,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       getFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
+      getSlashedFinalityProvider,
     ],
   );
 

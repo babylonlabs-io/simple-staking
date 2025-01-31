@@ -1,5 +1,7 @@
 import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
+import Link from "next/link";
 
+import { DOCUMENTATION_LINKS } from "@/app/constants";
 import {
   ActionType,
   useDelegationService,
@@ -19,6 +21,7 @@ import { TxHash } from "./components/TxHash";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
+  slashedStatuses: Record<string, { isSlashed: boolean }>;
 };
 
 const networkConfig = getNetworkConfig();
@@ -57,13 +60,34 @@ const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
     field: "actions",
     headerName: "Action",
-    renderCell: (row, _, { handleActionClick, validations }) => {
+    renderCell: (
+      row,
+      _,
+      { handleActionClick, validations, slashedStatuses },
+    ) => {
       const { valid, error } = validations[row.stakingTxHashHex];
+      const { isSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
+      const tooltip = isSlashed ? (
+        <>
+          <span>
+            This finality provider has been slashed.{" "}
+            <Link
+              className="text-secondary-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </Link>
+          </span>
+        </>
+      ) : (
+        error
+      );
 
       return (
         <ActionButton
-          disabled={!valid}
-          tooltip={error}
+          disabled={!valid || isSlashed}
+          tooltip={tooltip}
           delegation={row}
           state={row.state}
           onClick={handleActionClick}
@@ -85,6 +109,7 @@ export function DelegationList() {
     executeDelegationAction,
     openConfirmationModal,
     closeConfirmationModal,
+    slashedStatuses,
   } = useDelegationService();
 
   return (
@@ -109,7 +134,11 @@ export function DelegationList() {
           cellClassName:
             "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
         }}
-        params={{ handleActionClick: openConfirmationModal, validations }}
+        params={{
+          handleActionClick: openConfirmationModal,
+          validations,
+          slashedStatuses,
+        }}
         fallback={<div>No delegations found</div>}
       />
 
