@@ -11,10 +11,6 @@ export interface PaginatedDelegations {
   pagination: Pagination;
 }
 
-interface DelegationV2APIResponse {
-  data: DelegationV2API;
-}
-
 interface DelegationV2API {
   finality_provider_btc_pks_hex: string[];
   params_version: number;
@@ -49,12 +45,8 @@ interface DelegationV2API {
 }
 
 export const getDelegationV2 = async (
-  stakingTxHashHex?: string,
+  stakingTxHashHex: string,
 ): Promise<DelegationV2 | null> => {
-  if (!stakingTxHashHex) {
-    throw new Error("No staking tx hash provided");
-  }
-
   try {
     const params = {
       staking_tx_hash_hex: stakingTxHashHex,
@@ -77,9 +69,6 @@ export const getDelegationsV2 = async (
   publicKeyNoCoord: string,
   pageKey?: string,
 ): Promise<PaginatedDelegations> => {
-  if (!publicKeyNoCoord) {
-    throw new Error("No public key provided");
-  }
   const params = {
     staker_pk_hex: publicKeyNoCoord,
     pagination_key: pageKey ? pageKey : "",

@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
+import { HttpStatusCode } from "axios";
 import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
-import { ErrorState } from "@/app/types/errors";
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
 
-import { useError } from "../Error/ErrorContext";
+import { useError } from "../Error/ErrorProvider";
+import { ServerError } from "../Error/errors/serverError";
 
 export interface StakingStats {
   activeTVLSat: number;
@@ -35,28 +37,30 @@ const StakingStatsContext =
 export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
   children,
 }) => {
-  const { isErrorOpen, showError, captureError } = useError();
+  const { isOpen, handleError } = useError();
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["API_STATS"],
     queryFn: async () => getStats(),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
-      return !isErrorOpen && failureCount <= 3;
+      return !isOpen && failureCount <= 3;
     },
   });
 
   useEffect(() => {
     if (isError && error) {
-      showError({
-        error: {
+      handleError({
+        error: new ServerError({
           message: error.message,
-          errorState: ErrorState.SERVER_ERROR,
+          status: HttpStatusCode.InternalServerError,
+          endpoint: API_ENDPOINTS.NETWORK_INFO,
+        }),
+        displayOptions: {
+          retryAction: refetch,
         },
-        retryAction: refetch,
       });
-      captureError(error);
     }
-  }, [isError, error, showError, refetch, captureError]);
+  }, [isError, error, handleError, refetch]);
 
   return (
     <StakingStatsContext.Provider value={{ data, isLoading }}>

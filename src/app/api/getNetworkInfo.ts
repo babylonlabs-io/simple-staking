@@ -1,6 +1,9 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
-import { AxiosResponse } from "axios";
+import { AxiosResponse, HttpStatusCode } from "axios";
 
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
+
+import { ServerError } from "../context/Error/errors";
 import { NetworkInfo } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
@@ -95,9 +98,12 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     (param, index) => param === sortedByHeight[index],
   );
   if (!areEqual) {
-    throw new Error(
-      "Version numbers and BTC activation heights are not consistently ordered",
-    );
+    throw new ServerError({
+      message:
+        "Version numbers and BTC activation heights are not consistently ordered",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: API_ENDPOINTS.NETWORK_INFO,
+    });
   }
 
   const latestStakingParam = stakingVersions.reduce((prev, current) =>
@@ -119,7 +125,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
 
   const genesisStakingParam = stakingVersions.find((v) => v.version === 0);
   if (!genesisStakingParam) {
-    throw new Error("Genesis staking params not found");
+    throw new ServerError({
+      message: "Genesis staking params not found",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: API_ENDPOINTS.NETWORK_INFO,
+    });
   }
 
   // Find the genesis epoch check param (version 0)
@@ -127,7 +137,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     (v) => v.version === 0,
   );
   if (!genesisEpochCheckParam) {
-    throw new Error("Genesis epoch check params not found");
+    throw new ServerError({
+      message: "Genesis epoch check params not found",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: API_ENDPOINTS.NETWORK_INFO,
+    });
   }
 
   return {

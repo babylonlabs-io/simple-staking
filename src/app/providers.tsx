@@ -8,7 +8,7 @@ import { ThemeProvider } from "next-themes";
 import React, { Suspense } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
-import { ErrorProvider } from "./context/Error/ErrorContext";
+import { ErrorProvider } from "./context/Error/ErrorProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";

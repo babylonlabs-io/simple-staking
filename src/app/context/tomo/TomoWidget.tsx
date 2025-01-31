@@ -6,16 +6,14 @@ import {
 import { useMemo } from "react";
 import { twJoin } from "tailwind-merge";
 
-import { ErrorState } from "@/app/types/errors";
-
-import { useError } from "../Error/ErrorContext";
+import { useError } from "../Error/ErrorProvider";
 
 interface TomoWidgetProps {
   chainName: "bitcoin" | "cosmos";
 }
 
 export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
   const selectWallet = useClickWallet();
   const wallets = useWalletListWithIsInstall();
 
@@ -29,13 +27,10 @@ export const TomoWidget = ({ chainName }: TomoWidgetProps) => {
     try {
       await selectWallet(wallet);
     } catch (e: any) {
-      showError({
-        error: {
-          message: e.message,
-          errorState: ErrorState.WALLET,
-        },
+      handleError({
+        // wallet error
+        error: new Error(e.message),
       });
-      captureError(e);
     }
   };
 

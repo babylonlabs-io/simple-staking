@@ -69,6 +69,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
+            ok: true,
             json: async () => mockUTXOs,
           });
         }
@@ -79,6 +80,7 @@ describe("getFundingUTXOs", () => {
           "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
+            ok: true,
             json: async () => mockAddressInfo,
           });
         }
@@ -116,6 +118,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
+            ok: true,
             json: async () => mockUTXOs,
           });
         }
@@ -126,6 +129,7 @@ describe("getFundingUTXOs", () => {
           "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
+            ok: true,
             json: async () => mockInvalidAddressInfo,
           });
         }

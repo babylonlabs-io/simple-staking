@@ -50,6 +50,7 @@ export function getNetworkConfigBTC(): BTCConfig {
 
 export function validateAddress(network: Network, address: string): void {
   if (network === Network.MAINNET && !address.startsWith("bc1")) {
+    // wallet error
     throw new Error(
       "Incorrect address prefix for Mainnet. Expected address to start with 'bc1'.",
     );
@@ -57,12 +58,14 @@ export function validateAddress(network: Network, address: string): void {
     [Network.SIGNET, Network.TESTNET].includes(network) &&
     !address.startsWith("tb1")
   ) {
+    // wallet error
     throw new Error(
       "Incorrect address prefix for Testnet / Signet. Expected address to start with 'tb1'.",
     );
   } else if (
     ![Network.MAINNET, Network.SIGNET, Network.TESTNET].includes(network)
   ) {
+    // wallet error
     throw new Error(
       `Unsupported network: ${network}. Please provide a valid network.`,
     );

@@ -15,6 +15,7 @@ export const toNetwork = (network: Network): networks.Network => {
     case Network.SIGNET:
       return networks.testnet;
     default:
+      // wallet error
       throw new Error("Unsupported network");
   }
 };

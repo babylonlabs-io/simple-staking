@@ -1,11 +1,16 @@
 import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
+import { HttpStatusCode } from "axios";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
+import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError } from "@/app/context/Error/errors/clientError";
+import { ServerError } from "@/app/context/Error/errors/serverError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
@@ -15,7 +20,7 @@ import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ErrorState } from "@/app/types/errors";
+import { ErrorType } from "@/app/types/errors";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
@@ -33,7 +38,7 @@ export const Delegations = ({}) => {
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
-  const { showError } = useError();
+  const { handleError } = useError();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
   const { data: delegationsAPI } = useDelegations();
   const {
@@ -99,7 +104,11 @@ export const Delegations = ({}) => {
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new Error("Wrong delegation selected for withdrawal");
+        throw new ClientError({
+          message: "Wrong delegation selected for unbonding",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.UNBONDING,
+        });
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
@@ -120,11 +129,8 @@ export const Delegations = ({}) => {
         DelegationState.INTERMEDIATE_UNBONDING,
       );
     } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.UNBONDING,
-        },
+      handleError({
+        error,
       });
     } finally {
       setModalOpen(false);
@@ -140,13 +146,18 @@ export const Delegations = ({}) => {
   const handleWithdraw = async (id: string) => {
     try {
       if (!networkFees) {
+        // system error
         throw new Error("Network fees not found");
       }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
 
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new Error("Wrong delegation selected for withdrawal");
+        throw new ClientError({
+          message: "Wrong delegation selected for withdrawal",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.WITHDRAW,
+        });
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
@@ -167,12 +178,11 @@ export const Delegations = ({}) => {
         DelegationState.INTERMEDIATE_WITHDRAWAL,
       );
     } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.WITHDRAW,
+      handleError({
+        error,
+        displayOptions: {
+          retryAction: () => handleModal(id, MODE_WITHDRAW),
         },
-        retryAction: () => handleModal(id, MODE_WITHDRAW),
       });
     } finally {
       setModalOpen(false);
@@ -231,18 +241,21 @@ export const Delegations = ({}) => {
 
   useEffect(() => {
     if (modalOpen && !selectedDelegation) {
-      showError({
-        error: {
+      handleError({
+        error: new ServerError({
           message: "Delegation not found",
-          errorState: ErrorState.SERVER_ERROR,
+          status: HttpStatusCode.NotFound,
+          endpoint: API_ENDPOINTS.STAKER_DELEGATIONS,
+        }),
+        displayOptions: {
+          noCancel: false,
         },
-        noCancel: false,
       });
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
     }
-  }, [modalOpen, selectedDelegation, showError]);
+  }, [modalOpen, selectedDelegation, handleError]);
 
   if (!connected || !delegationsAPI || !network) {
     return;

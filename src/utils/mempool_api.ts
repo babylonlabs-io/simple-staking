@@ -1,7 +1,11 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+import { HttpStatusCode } from "axios";
 
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ServerError } from "@/app/context/Error/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { fetchApi } from "@/utils/fetch";
 
 const { mempoolApiUrl } = getNetworkConfigBTC();
 
@@ -9,6 +13,23 @@ export interface MerkleProof {
   blockHeight: number;
   merkle: string[];
   pos: number;
+}
+
+interface TxInfoResponse {
+  txid: string;
+  version: number;
+  locktime: number;
+  vin: string[];
+  vout: string[];
+  size: number;
+  weight: number;
+  fee: number;
+  status: {
+    confirmed: boolean;
+    block_height: number;
+    block_hash: string;
+    block_time: number;
+  };
 }
 
 interface TxInfo {
@@ -30,15 +51,6 @@ interface TxInfo {
 
 interface MempoolUTXO extends UTXO {
   confirmed: boolean;
-}
-
-export class ServerError extends Error {
-  constructor(
-    message: string,
-    public code: number,
-  ) {
-    super(message);
-  }
 }
 
 /*
@@ -66,7 +78,7 @@ function utxosInfoUrl(address: string): URL {
 
 // URL for retrieving information about the recommended network fees
 function networkFeesUrl(): URL {
-  return new URL(mempoolAPI + "v1/fees/recommended");
+  return new URL(mempoolAPI + API_ENDPOINTS.MEMPOOL.FEES_RECOMMENDED);
 }
 
 // URL for retrieving the tip height of the BTC chain
@@ -82,12 +94,19 @@ function validateAddressUrl(address: string): URL {
 
 // URL for the transaction info endpoint
 function txInfoUrl(txId: string): URL {
-  return new URL(mempoolAPI + "tx/" + txId);
+  return new URL(mempoolAPI + API_ENDPOINTS.MEMPOOL.TX + "/" + txId);
 }
 
 // URL for the transaction merkle proof endpoint
 function txMerkleProofUrl(txId: string): URL {
-  return new URL(mempoolAPI + "tx/" + txId + "/merkle-proof");
+  return new URL(
+    mempoolAPI +
+      API_ENDPOINTS.MEMPOOL.TX +
+      "/" +
+      txId +
+      "/" +
+      API_ENDPOINTS.MEMPOOL.MERKLE_PROOF,
+  );
 }
 
 // URL for the transaction hex endpoint
@@ -101,26 +120,15 @@ function txHexUrl(txId: string): URL {
  * @returns A promise that resolves to the response message.
  */
 export async function pushTx(txHex: string): Promise<string> {
-  const response = await fetch(pushTxUrl(), {
+  return fetchApi<string>(pushTxUrl(), {
     method: "POST",
     body: txHex,
+    parseAs: "text",
+    formatErrorResponse: (errorText) => {
+      const message = errorText.split('"message":"')[1]?.split('"}')[0];
+      return message || "Error broadcasting transaction. Please try again";
+    },
   });
-  if (!response.ok) {
-    try {
-      const mempoolError = await response.text();
-      // Extract the error message from the response
-      const message = mempoolError.split('"message":"')[1].split('"}')[0];
-      if (mempoolError.includes("error") || mempoolError.includes("message")) {
-        throw new Error(message);
-      } else {
-        throw new Error("Error broadcasting transaction. Please try again");
-      }
-    } catch (error: Error | any) {
-      throw new Error(error?.message || error);
-    }
-  } else {
-    return await response.text();
-  }
 }
 
 /**
@@ -130,17 +138,17 @@ export async function pushTx(txHex: string): Promise<string> {
  *          holds.
  */
 export async function getAddressBalance(address: string): Promise<number> {
-  const response = await fetch(addressInfoUrl(address));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
-  } else {
-    const addressInfo = await response.json();
-    return (
-      addressInfo.chain_stats.funded_txo_sum -
-      addressInfo.chain_stats.spent_txo_sum
-    );
-  }
+  const addressInfo = await fetchApi<{
+    chain_stats: {
+      funded_txo_sum: number;
+      spent_txo_sum: number;
+    };
+  }>(addressInfoUrl(address));
+
+  return (
+    addressInfo.chain_stats.funded_txo_sum -
+    addressInfo.chain_stats.spent_txo_sum
+  );
 }
 
 /**
@@ -148,25 +156,22 @@ export async function getAddressBalance(address: string): Promise<number> {
  * @returns A promise that resolves into a `Fees` object.
  */
 export async function getNetworkFees(): Promise<Fees> {
-  const response = await fetch(networkFeesUrl());
-  if (!response.ok) {
-    const err = await response.text();
-    throw new Error(err);
-  } else {
-    return await response.json();
-  }
+  return fetchApi<Fees>(networkFeesUrl());
 }
 
 // Get the tip height of the BTC chain
 export async function getTipHeight(): Promise<number> {
-  const response = await fetch(btcTipHeightUrl());
-  const result = await response.text();
-  if (!response.ok) {
-    throw new Error(result);
-  }
+  const result = await fetchApi<string>(btcTipHeightUrl(), {
+    parseAs: "text",
+  });
+
   const height = Number(result);
   if (Number.isNaN(height)) {
-    throw new Error("Invalid result returned");
+    throw new ServerError({
+      message: "Invalid result returned",
+      status: HttpStatusCode.BadRequest,
+      endpoint: btcTipHeightUrl().toString(),
+    });
   }
   return height;
 }
@@ -179,41 +184,40 @@ export async function getTipHeight(): Promise<number> {
  */
 export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
   // Get all UTXOs for the given address
-  let utxos: {
-    txid: string;
-    vout: number;
-    value: number;
-    status: {
-      confirmed: boolean;
-    };
-  }[] = [];
-  try {
-    const response = await fetch(utxosInfoUrl(address));
-    utxos = await response.json();
-  } catch (error: Error | any) {
-    throw new Error(error?.message || error);
-  }
+  const utxos = await fetchApi<
+    {
+      txid: string;
+      vout: number;
+      value: number;
+      status: {
+        confirmed: boolean;
+      };
+    }[]
+  >(utxosInfoUrl(address));
 
-  const sortedUTXOs = utxos.sort((a: any, b: any) => b.value - a.value);
+  const sortedUTXOs = utxos.sort((a, b) => b.value - a.value);
 
-  const response = await fetch(validateAddressUrl(address));
-  const addressInfo = await response.json();
+  const addressInfo = await fetchApi<{
+    isvalid: boolean;
+    scriptPubKey: string;
+  }>(validateAddressUrl(address));
   const { isvalid, scriptPubKey } = addressInfo;
+
   if (!isvalid) {
-    throw new Error("Invalid address");
+    throw new ServerError({
+      message: "Invalid address",
+      status: HttpStatusCode.BadRequest,
+      endpoint: validateAddressUrl(address).toString(),
+    });
   }
 
-  // Iterate through the final list of UTXOs to construct the result list.
-  // The result contains some extra information,
-  return sortedUTXOs.map((s) => {
-    return {
-      txid: s.txid,
-      vout: s.vout,
-      value: s.value,
-      scriptPubKey,
-      confirmed: s.status.confirmed,
-    };
-  });
+  return sortedUTXOs.map((s) => ({
+    txid: s.txid,
+    vout: s.vout,
+    value: s.value,
+    scriptPubKey: scriptPubKey,
+    confirmed: s.status.confirmed,
+  }));
 }
 
 /**
@@ -222,13 +226,15 @@ export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
  * @returns A promise that resolves into the transaction information.
  */
 export async function getTxInfo(txId: string): Promise<TxInfo> {
-  const response = await fetch(txInfoUrl(txId));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new ServerError(err, response.status);
-  }
+  const response = await fetchApi<TxInfoResponse>(txInfoUrl(txId));
   const { txid, version, locktime, vin, vout, size, weight, fee, status } =
-    await response.json();
+    response;
+  const {
+    confirmed,
+    block_height: blockHeight,
+    block_hash: blockHash,
+    block_time: blockTime,
+  } = status;
   return {
     txid,
     version,
@@ -239,10 +245,10 @@ export async function getTxInfo(txId: string): Promise<TxInfo> {
     weight,
     fee,
     status: {
-      confirmed: status.confirmed,
-      blockHeight: status.block_height,
-      blockHash: status.block_hash,
-      blockTime: status.block_time,
+      confirmed,
+      blockHeight,
+      blockHash,
+      blockTime,
     },
   };
 }
@@ -253,20 +259,19 @@ export async function getTxInfo(txId: string): Promise<TxInfo> {
  * @returns A promise that resolves into the merkle proof.
  */
 export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
-  const response = await fetch(txMerkleProofUrl(txId));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new ServerError(err, response.status);
-  }
-  const data: {
+  const response = await fetchApi<{
     block_height: number;
     merkle: string[];
     pos: number;
-  } = await response.json();
+  }>(txMerkleProofUrl(txId));
 
-  const { block_height, merkle, pos } = data;
+  const { block_height, merkle, pos } = response;
   if (!block_height || !merkle.length || !pos) {
-    throw new Error("Invalid transaction merkle proof result returned");
+    throw new ServerError({
+      message: "Invalid transaction merkle proof result returned",
+      status: HttpStatusCode.InternalServerError,
+      endpoint: txMerkleProofUrl(txId).toString(),
+    });
   }
 
   return {
@@ -282,10 +287,6 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
  * @returns A promise that resolves into the transaction hex.
  */
 export async function getTxHex(txId: string): Promise<string> {
-  const response = await fetch(txHexUrl(txId));
-  if (!response.ok) {
-    const err = await response.text();
-    throw new ServerError(err, response.status);
-  }
-  return await response.text();
+  const response = await fetchApi<string>(txHexUrl(txId));
+  return response;
 }

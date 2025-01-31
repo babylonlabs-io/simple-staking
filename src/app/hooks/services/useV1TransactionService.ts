@@ -4,8 +4,11 @@ import { useCallback } from "react";
 
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
+import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
+import { ErrorType } from "@/app/types/errors";
 import { validateStakingInput } from "@/utils/delegations";
 import { txFeeSafetyCheck } from "@/utils/delegations/fee";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
@@ -51,10 +54,13 @@ export function useV1TransactionService() {
     ) => {
       // Perform checks
       if (!bbnStakingParams) {
+        // system error
         throw new Error("Staking params not loaded");
       }
-      if (!btcConnected || !btcNetwork)
+      if (!btcConnected || !btcNetwork) {
+        // wallet error
         throw new Error("BTC Wallet not connected");
+      }
       validateStakingInput(stakingInput);
 
       // Get the staking params at the time of the staking transaction
@@ -64,9 +70,8 @@ export function useV1TransactionService() {
       );
 
       if (!stakingParam) {
-        throw new Error(
-          `Unable to find staking params for height ${stakingHeight}`,
-        );
+        // system error
+        throw new Error(`Params for height ${stakingHeight} not found`);
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
@@ -87,7 +92,11 @@ export function useV1TransactionService() {
       // Check if this staking transaction is eligible for unbonding
       const eligibility = await getUnbondingEligibility(stakingTx.getId());
       if (!eligibility) {
-        throw new Error("Staking transaction is not eligible for unbonding");
+        throw new ClientError({
+          message: "Transaction not eligible",
+          category: ClientErrorCategory.CLIENT_TRANSACTION,
+          type: ErrorType.UNBONDING,
+        });
       }
 
       const txResult = staking.createUnbondingTransaction(stakingTx);
@@ -141,10 +150,13 @@ export function useV1TransactionService() {
     ) => {
       // Perform checks
       if (!bbnStakingParams) {
+        // system error
         throw new Error("Staking params not loaded");
       }
-      if (!btcConnected || !btcNetwork)
+      if (!btcConnected || !btcNetwork) {
+        // wallet error
         throw new Error("BTC Wallet not connected");
+      }
       validateStakingInput(stakingInput);
 
       // Get the staking params at the time of the staking transaction
@@ -154,9 +166,8 @@ export function useV1TransactionService() {
       );
 
       if (!stakingParam) {
-        throw new Error(
-          `Unable to find staking params for height ${stakingHeight}`,
-        );
+        // system error
+        throw new Error(`Params for height ${stakingHeight} not found`);
       }
 
       // Warning: We using the "Staking" instead of "ObservableStaking"
@@ -218,6 +229,10 @@ const getStakerSignature = (unbondingTx: Transaction): string => {
   try {
     return unbondingTx.ins[0].witness[0].toString("hex");
   } catch (error) {
-    throw new Error("Failed to get staker signature");
+    throw new ClientError({
+      message: "Invalid transaction signature",
+      category: ClientErrorCategory.CLIENT_TRANSACTION,
+      type: ErrorType.WITHDRAW,
+    });
   }
 };

@@ -17,8 +17,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { Fees } from "@/app/types/fee";
 import {
   getAddressBalance,
@@ -79,7 +78,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
   const [address, setAddress] = useState("");
 
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
   const btcConnector = useChainConnector("BTC");
   const { open = () => {}, connected } = useWalletConnect();
 
@@ -101,6 +100,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
+          // wallet error
           throw new Error(supportedNetworkMessage);
         }
 
@@ -130,17 +130,16 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             errorMessage = error.message;
             break;
         }
-        showError({
-          error: {
-            message: errorMessage,
-            errorState: ErrorState.WALLET,
+        handleError({
+          // wallet error
+          error: new Error(errorMessage),
+          displayOptions: {
+            retryAction: () => connectBTC(walletProvider),
           },
-          retryAction: () => connectBTC(walletProvider),
         });
-        captureError(error);
       }
     },
-    [showError, captureError],
+    [handleError],
   );
 
   useEffect(() => {

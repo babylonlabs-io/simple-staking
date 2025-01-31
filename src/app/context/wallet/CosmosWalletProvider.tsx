@@ -16,8 +16,7 @@ import {
   type PropsWithChildren,
 } from "react";
 
-import { useError } from "@/app/context/Error/ErrorContext";
-import { ErrorState } from "@/app/types/errors";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
@@ -46,7 +45,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     SigningStargateClient | undefined
   >();
 
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
   const { open = () => {} } = useWalletConnect();
   const bbnConnector = useChainConnector("BBN");
   const { rpc } = getNetworkConfigBBN();
@@ -75,17 +74,15 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
       } catch (error: any) {
-        showError({
-          error: {
-            message: error.message,
-            errorState: ErrorState.WALLET,
+        handleError({
+          error,
+          displayOptions: {
+            retryAction: () => connectCosmos(provider),
           },
-          retryAction: () => connectCosmos(provider),
         });
-        captureError(error);
       }
     },
-    [captureError, showError, rpc],
+    [handleError, rpc],
   );
 
   const cosmosContextValue = useMemo(

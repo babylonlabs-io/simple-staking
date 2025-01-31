@@ -1,5 +1,7 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios, { AxiosRequestConfig, HttpStatusCode } from "axios";
 import qs from "qs";
+
+import { ServerError } from "../context/Error/errors/serverError";
 
 type QueryParamValue =
   | string
@@ -37,8 +39,16 @@ export const apiWrapper = async (
     }
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      throw new Error(error?.response?.data?.message || generalErrorMessage);
+      throw new ServerError({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        endpoint: path,
+      });
     }
-    throw new Error(generalErrorMessage);
+    throw new ServerError({
+      message: generalErrorMessage,
+      status: HttpStatusCode.InternalServerError,
+      endpoint: path,
+    });
   }
 };

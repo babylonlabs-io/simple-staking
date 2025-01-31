@@ -40,12 +40,8 @@ interface UnbondingTxAPI {
 
 export const getDelegations = async (
   key: string,
-  publicKeyNoCoord?: string,
+  publicKeyNoCoord: string,
 ): Promise<PaginatedDelegations> => {
-  if (!publicKeyNoCoord) {
-    throw new Error("No public key provided");
-  }
-
   const params = {
     pagination_key: key,
     staker_btc_pk: publicKeyNoCoord,

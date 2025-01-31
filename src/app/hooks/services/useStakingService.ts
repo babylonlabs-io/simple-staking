@@ -2,14 +2,13 @@ import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { type FormFields, useStakingState } from "@/app/state/StakingState";
 import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
-import { ErrorState } from "@/app/types/errors";
 import { retry } from "@/utils";
 import { btcToSatoshi } from "@/utils/btc";
 
@@ -22,7 +21,7 @@ export function useStakingService() {
   const { addDelegation, updateDelegationStatus } = useDelegationV2State();
   const { estimateStakingFee, createDelegationEoi, submitStakingTx } =
     useTransactionService();
-  const { showError } = useError();
+  const { handleError } = useError();
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -86,17 +85,14 @@ export function useStakingService() {
         );
 
         setVerifiedDelegation(delegation as DelegationV2);
-        await refetchDelegations();
+        refetchDelegations();
         goToStep("verified");
         setProcessing(false);
       } catch (error: any) {
-        reset();
-        showError({
-          error: {
-            message: error.message,
-            errorState: ErrorState.STAKING,
-          },
+        handleError({
+          error,
         });
+        reset();
       }
     },
     [
@@ -105,7 +101,7 @@ export function useStakingService() {
       addDelegation,
       goToStep,
       setVerifiedDelegation,
-      showError,
+      handleError,
       reset,
       refetchDelegations,
     ],
@@ -144,10 +140,10 @@ export function useStakingService() {
         goToStep("feedback-success");
       } catch (error: any) {
         reset();
-        showError({
-          error: {
-            message: error.message,
-            errorState: ErrorState.STAKING,
+        handleError({
+          error,
+          displayOptions: {
+            retryAction: () => stakeDelegation(delegation),
           },
         });
       }
@@ -158,7 +154,7 @@ export function useStakingService() {
       goToStep,
       setProcessing,
       reset,
-      showError,
+      handleError,
     ],
   );
 

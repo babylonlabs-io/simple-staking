@@ -1,10 +1,6 @@
 import { apiWrapper } from "./apiWrapper";
 
 export const getUnbondingEligibility = async (txID: string) => {
-  if (!txID) {
-    throw new Error("No transaction ID provided");
-  }
-
   const params = {
     staking_tx_hash_hex: txID,
   };
