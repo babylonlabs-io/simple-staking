@@ -6,7 +6,6 @@ import {
   Loader,
 } from "@babylonlabs-io/bbn-core-ui";
 import { PropsWithChildren } from "react";
-import { twMerge } from "tailwind-merge";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -28,11 +27,7 @@ export const ConfirmationModal = ({
   onClose,
   onSubmit,
 }: PropsWithChildren<ConfirmationModalProps>) => (
-  <ResponsiveDialog
-    className={twMerge("max-w-[660px]", className)}
-    open={open}
-    onClose={onClose}
-  >
+  <ResponsiveDialog className={className} open={open} onClose={onClose}>
     <DialogHeader
       title={title}
       className="text-accent-primary"

@@ -60,7 +60,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     intermediateState !== DelegationState.INTERMEDIATE_WITHDRAWAL
   ) {
     return (
-      <div className="flex justify-end lg:justify-start">
+      <div className="flex justify-start">
         <Button
           variant="outlined"
           size="small"
@@ -79,7 +79,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   // If FP is slashed, only show unbond button
   if (isSlashed) {
     return (
-      <div className="flex justify-end lg:justify-start">
+      <div className="flex justify-start">
         <Button
           variant="outlined"
           size="small"
@@ -96,7 +96,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   if (state === DelegationState.ACTIVE || isEligibleForRegistration) {
     return (
       <div
-        className="flex justify-end lg:justify-start"
+        className="flex justify-start"
         data-tooltip-id="tooltip-registration"
         data-tooltip-content={
           state === DelegationState.ACTIVE && !isEligibleForRegistration

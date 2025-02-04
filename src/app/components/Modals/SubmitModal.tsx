@@ -7,7 +7,6 @@ import {
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
 import type { JSX, PropsWithChildren } from "react";
-import { twMerge } from "tailwind-merge";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -18,8 +17,8 @@ interface SubmitModalProps {
   open: boolean;
   icon: JSX.Element;
   title: string | JSX.Element;
-  cancelButton?: string;
-  submitButton?: string;
+  cancelButton?: string | JSX.Element;
+  submitButton?: string | JSX.Element;
   onClose?: () => void;
   onSubmit?: () => void;
 }
@@ -42,11 +41,7 @@ export const SubmitModal = ({
   onClose,
   onSubmit,
 }: PropsWithChildren<SubmitModalProps>) => (
-  <ResponsiveDialog
-    className={twMerge("w-[660px] max-w-full", className)}
-    open={open}
-    onClose={onClose}
-  >
+  <ResponsiveDialog className={className} open={open} onClose={onClose}>
     <DialogBody className="text-accent-primary py-16 text-center">
       <div className="inline-flex bg-primary-contrast h-20 w-20 items-center justify-center mb-6">
         {icon}

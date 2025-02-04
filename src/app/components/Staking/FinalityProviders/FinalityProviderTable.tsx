@@ -80,7 +80,7 @@ export const FinalityProviderTable = ({
 
   return (
     <Table
-      wrapperClassName="h-[28.5rem]"
+      wrapperClassName="max-h-[28.5rem]"
       className="min-w-full"
       data={tableData}
       columns={finalityProviderColumns}

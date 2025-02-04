@@ -24,7 +24,11 @@ export const StakeModal = ({
     open={open}
     icon={<BiSolidBadgeCheck className="text-5xl text-primary-light" />}
     title="Verified"
-    submitButton={`Stake ${btc.coinName}`}
+    submitButton={
+      <>
+        Stake <span className="hidden md:inline">{btc.coinName}</span>
+      </>
+    }
     cancelButton="Close"
     onSubmit={onSubmit}
     onClose={onClose}

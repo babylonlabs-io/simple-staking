@@ -1,11 +1,20 @@
+import { twMerge } from "tailwind-merge";
+
 interface DelegationCellProps {
   children: React.ReactNode;
-  order: string;
   className?: string;
 }
 
 export const DelegationCell: React.FC<DelegationCellProps> = ({
   children,
-  order,
   className = "",
-}) => <div className={`${order} ${className}`}>{children}</div>;
+}) => (
+  <td
+    className={twMerge(
+      "h-16 px-4 whitespace-nowrap overflow-hidden text-ellipsis",
+      className,
+    )}
+  >
+    {children}
+  </td>
+);

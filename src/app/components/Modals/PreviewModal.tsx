@@ -136,7 +136,8 @@ export const PreviewModal = ({
         onClose={onClose}
         className="text-accent-primary"
       />
-      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
+
+      <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4">
         <div className="flex flex-col">
           {previewFields.map((field, index) => (
             <Fragment key={field.key}>
@@ -166,25 +167,28 @@ export const PreviewModal = ({
           </Text>
         </div>
       </DialogBody>
+
       <DialogFooter className="flex gap-4">
         <Button
           variant="outlined"
           color="primary"
           onClick={onClose}
-          className="flex-1 text-xs sm:text-base"
+          className="flex-1"
         >
           Cancel
         </Button>
         <Button
           variant="contained"
           onClick={onSign}
-          className="flex-1 text-xs sm:text-base"
+          className="flex-1"
           disabled={processing}
         >
           {processing ? (
             <Loader size={16} className="text-white" />
           ) : (
-            "Proceed to Signing"
+            <>
+              Proceed <span className="hidden md:inline">to Signing</span>
+            </>
           )}
         </Button>
       </DialogFooter>
