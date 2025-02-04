@@ -10,5 +10,7 @@ declare global {
     $onekey: any;
     bitkeep: any;
     cactuslink: any;
+    // TODO remove
+    getOfflineSignerOnlyAmino: any;
   }
 }

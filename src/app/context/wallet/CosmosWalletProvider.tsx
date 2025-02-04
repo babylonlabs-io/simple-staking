@@ -64,9 +64,10 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const address = await provider.getAddress();
-        const offlineSigner = await provider.getOfflineSigner();
+        // const offlineSigner = await provider.getOfflineSigner();
+        // TODO remove
+        const offlineSigner = window.getOfflineSignerOnlyAmino("bbn-test-5");
         const aminoTypes = createBbnAminoTypes();
-        // const offlineSigner = window.getOfflineSignerOnlyAmino("bbn-test-5");
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
           offlineSigner,
