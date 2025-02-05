@@ -6,12 +6,6 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true,
   },
-  headers: () => [
-    {
-      source: "/_next/data/:path*",
-      headers: [{ key: "Cache-Control", value: "private, no-cache" }],
-    },
-  ],
 };
 
 const config = withSentryConfig(nextConfig, {
