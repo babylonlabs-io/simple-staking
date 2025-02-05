@@ -73,8 +73,7 @@ export function useDelegationService() {
     submitSlashingWithdrawalTx,
   } = useTransactionService();
 
-  const { getFinalityProvider, getSlashedFinalityProvider } =
-    useFinalityProviderState();
+  const { getSlashedFinalityProvider } = useFinalityProviderState();
 
   const validations = useMemo(
     () =>
@@ -113,7 +112,7 @@ export function useDelegationService() {
         }),
         {} as Record<string, { isSlashed: boolean }>,
       ),
-    [delegations, getFinalityProvider],
+    [delegations, getSlashedFinalityProvider],
   );
 
   const COMMANDS: Record<ActionType, DelegationCommand> = useMemo(
