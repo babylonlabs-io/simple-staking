@@ -10,6 +10,7 @@ export const LOW_VALUE_UTXO_THRESHOLD = 10000;
 export const toNetwork = (network: Network): networks.Network => {
   switch (network) {
     case Network.MAINNET:
+    case Network.CANARY:
       return networks.bitcoin;
     case Network.TESTNET:
     case Network.SIGNET:

@@ -42,6 +42,7 @@ const config: Record<string, BTCConfig> = {
   mainnet: mainnetConfig,
   signet: signetConfig,
   testnet: testnetConfig,
+  canary: canaryConfig,
 };
 
 export function getNetworkConfigBTC(): BTCConfig {
@@ -65,6 +66,11 @@ export function validateAddress(network: Network, address: string): void {
     // wallet error
     throw new Error(
       "Incorrect address prefix for Mainnet. Expected address to start with 'bc1'.",
+    );
+  } else if (network === Network.CANARY && !address.startsWith("bc1")) {
+    // wallet error
+    throw new Error(
+      "Incorrect address prefix for Canary. Expected address to start with 'bc1'.",
     );
   } else if (
     [Network.SIGNET, Network.TESTNET].includes(network) &&
