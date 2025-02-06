@@ -1,6 +1,8 @@
 import type { BTCConfig } from "@babylonlabs-io/bbn-wallet-connect";
 
+import { MEMPOOL_API } from "@/app/constants";
 import { Network } from "@/app/types/network";
+
 export const network =
   (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.SIGNET;
 
@@ -8,15 +10,23 @@ const mainnetConfig: BTCConfig = {
   coinName: "BTC",
   coinSymbol: "BTC",
   networkName: "BTC",
-  mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}`,
+  mempoolApiUrl: `${MEMPOOL_API}`,
   network: Network.MAINNET,
+};
+
+const canaryConfig: BTCConfig = {
+  coinName: "BTC",
+  coinSymbol: "BTC",
+  networkName: "BTC",
+  mempoolApiUrl: `${MEMPOOL_API}`,
+  network: Network.CANARY,
 };
 
 const signetConfig: BTCConfig = {
   coinName: "Signet BTC",
   coinSymbol: "sBTC",
   networkName: "BTC signet",
-  mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}/signet`,
+  mempoolApiUrl: `${MEMPOOL_API}/signet`,
   network: Network.SIGNET,
 };
 
@@ -24,7 +34,7 @@ const testnetConfig: BTCConfig = {
   coinName: "Testnet BTC",
   coinSymbol: "tBTC",
   networkName: "BTC testnet",
-  mempoolApiUrl: `${process.env.NEXT_PUBLIC_MEMPOOL_API}/testnet`,
+  mempoolApiUrl: `${MEMPOOL_API}/testnet`,
   network: Network.TESTNET,
 };
 
@@ -63,7 +73,12 @@ export function validateAddress(network: Network, address: string): void {
       "Incorrect address prefix for Testnet / Signet. Expected address to start with 'tb1'.",
     );
   } else if (
-    ![Network.MAINNET, Network.SIGNET, Network.TESTNET].includes(network)
+    ![
+      Network.MAINNET,
+      Network.SIGNET,
+      Network.TESTNET,
+      Network.CANARY,
+    ].includes(network)
   ) {
     // wallet error
     throw new Error(

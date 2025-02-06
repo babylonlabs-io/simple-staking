@@ -9,6 +9,9 @@ import { generateMockDelegation } from "../../helper/generateMockDelegation";
 
 // Mock the getTxInfo function
 jest.mock("@/utils/mempool_api");
+jest.mock("@/app/constants", () => ({
+  MEMPOOL_API: "https://mempool.space",
+}));
 
 describe("utils/local_storage/filterDelegationsLocalStorage", () => {
   const notExceedingLimitDelegations: Delegation[] = [
