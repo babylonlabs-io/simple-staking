@@ -48,6 +48,8 @@ export function getNetworkConfigBTC(): BTCConfig {
   switch (network) {
     case Network.MAINNET:
       return config.mainnet;
+    case Network.CANARY:
+      return config.canary;
     case Network.SIGNET:
       return config.signet;
     // we do not use Testnet
