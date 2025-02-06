@@ -173,7 +173,11 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const getSlashedFinalityProvider = useCallback(
     (btcPkHex: string) =>
-      data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
+      data?.finalityProviders.find(
+        (fp) =>
+          fp.btcPk === btcPkHex &&
+          fp.state === FinalityProviderStateEnum.SLASHED,
+      ) || null,
     [data?.finalityProviders],
   );
 
