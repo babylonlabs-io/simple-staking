@@ -1,3 +1,4 @@
+import { SigningType } from "@babylonlabs-io/btc-staking-ts";
 import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -11,7 +12,7 @@ import { DelegationV2StakingState as DelegationState } from "@/app/types/delegat
 import { ErrorType } from "@/app/types/errors";
 import { retry } from "@/utils";
 
-import { SigningStep, useTransactionService } from "./useTransactionService";
+import { useTransactionService } from "./useTransactionService";
 
 interface RegistrationData {
   stakingTxHex: string;
@@ -31,7 +32,8 @@ export function useRegistrationService() {
     resetRegistration: reset,
     refetch: refetchV1Delegations,
   } = useDelegationState();
-  const { transitionPhase1Delegation } = useTransactionService();
+  const { transitionPhase1Delegation, subscribeToSigningSteps } =
+    useTransactionService();
   const { addDelegation, refetch: refetchV2Delegations } =
     useDelegationV2State();
   const { handleError } = useError();
@@ -65,14 +67,30 @@ export function useRegistrationService() {
         },
       };
 
+      const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
+        switch (step) {
+          case SigningType.STAKING_SLASHING:
+            setStep("registration-staking-slashing");
+            break;
+          case SigningType.UNBONDING_SLASHING:
+            setStep("registration-unbonding-slashing");
+            break;
+          case SigningType.PROOF_OF_POSSESSION:
+            setStep("registration-proof-of-possession");
+            break;
+          case SigningType.CREATE_BTC_DELEGATION_MSG:
+            setStep("registration-sign-bbn");
+            break;
+        }
+      });
+
       await transitionPhase1Delegation(
         registrationData.stakingTxHex,
         registrationData.startHeight,
         registrationData.stakingInput,
-        async (step: SigningStep) => {
-          setStep(`registration-${step}`);
-        },
       );
+      // Unsubscribe from signing steps
+      unsubscribe();
 
       addDelegation({
         stakingAmount: selectedDelegation.stakingValueSat,
@@ -102,15 +120,17 @@ export function useRegistrationService() {
       reset();
     }
   }, [
-    transitionPhase1Delegation,
-    setProcessing,
     setStep,
     reset,
     handleError,
     selectedDelegation,
+    setProcessing,
+    subscribeToSigningSteps,
+    transitionPhase1Delegation,
     addDelegation,
     refetchV1Delegations,
     refetchV2Delegations,
+    reset,
   ]);
 
   return { registerPhase1Delegation };
