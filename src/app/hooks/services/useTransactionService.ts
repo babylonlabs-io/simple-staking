@@ -29,7 +29,7 @@ export interface BtcStakingInputs {
 export const useTransactionService = () => {
   const { availableUTXOs, networkInfo, refetchUTXOs } = useAppState();
 
-  const { signBbnTx, sendBbnTx } = useBbnTransaction();
+  const { signBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const {
@@ -41,7 +41,7 @@ export const useTransactionService = () => {
     connected: btcConnected,
     signPsbt,
     publicKeyNoCoord,
-    address,
+    address: btcAddress,
     signMessage,
     network: btcNetwork,
     pushTx,
@@ -49,17 +49,23 @@ export const useTransactionService = () => {
 
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
+  const stakerInfo = useMemo(
+    () => ({
+      address: btcAddress,
+      publicKeyNoCoordHex: publicKeyNoCoord,
+    }),
+    [btcAddress, publicKeyNoCoord],
+  );
+
+  const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
+
+  // TODO: Move below manager creation into a hook
   // Create the btc staking manager which is used to create the staking transaction
   const btcStakingManager = useMemo(() => {
     if (
       !btcNetwork ||
       !versionedParams ||
-      !tipHeader ||
-      !availableUTXOs ||
-      !address ||
-      !publicKeyNoCoord ||
       !cosmosConnected ||
-      !bech32Address ||
       !btcConnected ||
       !signPsbt ||
       !signMessage ||
@@ -71,15 +77,9 @@ export const useTransactionService = () => {
     const btcProvider = {
       signPsbt,
       signMessage,
-      getStakerInfo: async () => ({
-        address,
-        publicKeyNoCoordHex: publicKeyNoCoord,
-      }),
-      getUTXOs: async () => availableUTXOs,
     };
 
     const bbnProvider = {
-      getBabylonBtcTipHeight: async () => tipHeader.height,
       getBabylonAddress: async () => bech32Address,
       signTransaction: async <T extends object>(msg: {
         typeUrl: string;
@@ -96,10 +96,6 @@ export const useTransactionService = () => {
   }, [
     btcNetwork,
     versionedParams,
-    tipHeader,
-    availableUTXOs,
-    address,
-    publicKeyNoCoord,
     cosmosConnected,
     bech32Address,
     btcConnected,
@@ -113,28 +109,36 @@ export const useTransactionService = () => {
    *
    * @param stakingInput - The staking inputs
    * @param feeRate - The fee rate
-   * @param signingCallback - The signing callback
    * @returns The staking transaction hash
    */
   const createDelegationEoi = useCallback(
     async (stakingInput: BtcStakingInputs, feeRate: number) => {
-      validateStakingInput(stakingInput);
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
+      if (!availableUTXOs) {
+        throw new Error("Available UTXOs not initialized");
       }
 
       const { stakingTx, signedBabylonTx } =
-        await btcStakingManager.preStakeRegistrationBabylonTransaction(
+        await btcStakingManager!.preStakeRegistrationBabylonTransaction(
+          stakerInfo,
           stakingInput,
+          tipHeight,
+          availableUTXOs,
           feeRate,
+          bech32Address,
         );
-      // Send the transaction
-      await sendBbnTx(signedBabylonTx);
-
-      return stakingTx.getId();
+      return {
+        stakingTxHash: stakingTx.getId(),
+        signedBabylonTx,
+      };
     },
-    [btcStakingManager, sendBbnTx],
+    [availableUTXOs, bech32Address, btcStakingManager, stakerInfo, tipHeight],
   );
 
   /**
@@ -145,19 +149,25 @@ export const useTransactionService = () => {
    * @returns The staking fee
    */
   const estimateStakingFee = useCallback(
-    async (
-      stakingInput: BtcStakingInputs,
-      feeRate: number,
-    ): Promise<number> => {
-      validateStakingInput(stakingInput);
-
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
+    (stakingInput: BtcStakingInputs, feeRate: number): number => {
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
+      if (!availableUTXOs) {
+        throw new Error("Available UTXOs not initialized");
       }
-
-      return btcStakingManager.estimateBtcStakingFee(stakingInput, feeRate);
+      return btcStakingManager!.estimateBtcStakingFee(
+        stakerInfo,
+        tipHeight,
+        stakingInput,
+        availableUTXOs,
+        feeRate,
+      );
     },
-    [btcStakingManager],
+    [btcStakingManager, tipHeight, stakerInfo, availableUTXOs],
   );
 
   /**
@@ -166,7 +176,6 @@ export const useTransactionService = () => {
    * @param stakingTxHex - The staking transaction hex
    * @param stakingHeight - The staking height of the phase-1 delegation
    * @param stakingInput - The staking inputs
-   * @param signingCallback - The signing callback
    */
   const transitionPhase1Delegation = useCallback(
     async (
@@ -174,24 +183,32 @@ export const useTransactionService = () => {
       stakingHeight: number,
       stakingInput: BtcStakingInputs,
     ) => {
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
       const inclusionProof = await getInclusionProof(stakingTx);
 
       const { signedBabylonTx } =
-        await btcStakingManager.postStakeRegistrationBabylonTransaction(
+        await btcStakingManager!.postStakeRegistrationBabylonTransaction(
+          stakerInfo,
           stakingTx,
           stakingHeight,
           stakingInput,
           inclusionProof,
+          bech32Address,
         );
 
-      await sendBbnTx(signedBabylonTx);
+      return {
+        stakingTxHash: stakingTx.getId(),
+        signedBabylonTx,
+      };
     },
-    [btcStakingManager, sendBbnTx],
+    [bech32Address, btcStakingManager, stakerInfo, tipHeight],
   );
 
   /**
@@ -209,14 +226,22 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       unsignedStakingTxHex: string,
     ) => {
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
+      if (!availableUTXOs) {
+        throw new Error("Available UTXOs not initialized");
       }
 
       const signedStakingTx =
-        await btcStakingManager.createSignedBtcStakingTransaction(
+        await btcStakingManager!.createSignedBtcStakingTransaction(
+          stakerInfo,
           stakingInput,
           Transaction.fromHex(unsignedStakingTxHex),
+          availableUTXOs,
           paramVersion,
         );
 
@@ -230,7 +255,14 @@ export const useTransactionService = () => {
       await pushTx(signedStakingTx.toHex());
       refetchUTXOs();
     },
-    [btcStakingManager, pushTx, refetchUTXOs],
+    [
+      availableUTXOs,
+      btcStakingManager,
+      pushTx,
+      refetchUTXOs,
+      stakerInfo,
+      tipHeight,
+    ],
   );
 
   /**
@@ -253,15 +285,18 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
-      validateStakingInput(stakingInput);
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
       const unsignedUnbondingTx = Transaction.fromHex(unbondingTxHex);
 
       const { transaction: signedUnbondingTx } =
-        await btcStakingManager.createSignedBtcUnbondingTransaction(
+        await btcStakingManager!.createSignedBtcUnbondingTransaction(
+          stakerInfo,
           stakingInput,
           paramVersion,
           Transaction.fromHex(stakingTxHex),
@@ -271,7 +306,7 @@ export const useTransactionService = () => {
 
       await pushTx(signedUnbondingTx.toHex());
     },
-    [btcStakingManager, pushTx],
+    [btcStakingManager, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -287,14 +322,16 @@ export const useTransactionService = () => {
       paramVersion: number,
       earlyUnbondingTxHex: string,
     ) => {
-      validateStakingInput(stakingInput);
-
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
       const { transaction: signedWithdrawalTx } =
-        await btcStakingManager.createSignedBtcWithdrawEarlyUnbondedTransaction(
+        await btcStakingManager!.createSignedBtcWithdrawEarlyUnbondedTransaction(
+          stakerInfo,
           stakingInput,
           paramVersion,
           Transaction.fromHex(earlyUnbondingTxHex),
@@ -302,7 +339,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx],
+    [btcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -318,14 +355,16 @@ export const useTransactionService = () => {
       paramVersion: number,
       stakingTxHex: string,
     ) => {
-      validateStakingInput(stakingInput);
-
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
       const { transaction: signedWithdrawalTx } =
-        await btcStakingManager.createSignedBtcWithdrawStakingExpiredTransaction(
+        await btcStakingManager!.createSignedBtcWithdrawStakingExpiredTransaction(
+          stakerInfo,
           stakingInput,
           paramVersion,
           Transaction.fromHex(stakingTxHex),
@@ -333,7 +372,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx],
+    [btcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -349,14 +388,16 @@ export const useTransactionService = () => {
       paramVersion: number,
       slashingTxHex: string,
     ) => {
-      validateStakingInput(stakingInput);
-
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
       const { transaction: signedWithdrawalTx } =
-        await btcStakingManager.createSignedBtcWithdrawSlashingTransaction(
+        await btcStakingManager!.createSignedBtcWithdrawSlashingTransaction(
+          stakerInfo,
           stakingInput,
           paramVersion,
           Transaction.fromHex(slashingTxHex),
@@ -364,7 +405,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx],
+    [btcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -401,6 +442,11 @@ export const useTransactionService = () => {
   };
 };
 
+/**
+ * Get the inclusion proof for a staking transaction
+ * @param stakingTx - The staking transaction
+ * @returns The inclusion proof
+ */
 const getInclusionProof = async (stakingTx: Transaction) => {
   // Get the merkle proof
   const { pos, merkle } = await getTxMerkleProof(stakingTx.getId());
@@ -414,4 +460,29 @@ const getInclusionProof = async (stakingTx: Transaction) => {
     merkle,
     blockHashHex,
   };
+};
+
+/**
+ * Validate the common inputs
+ * @param btcStakingManager - The BTC Staking Manager
+ * @param stakingInput - The staking inputs (e.g. amount, timelock, etc.)
+ * @param tipHeight - The BTC tip height from the Babylon chain
+ * @param stakerInfo - The staker info (e.g. address, public key, etc.)
+ */
+const validateCommonInputs = (
+  btcStakingManager: BabylonBtcStakingManager | null,
+  stakingInput: BtcStakingInputs,
+  tipHeight: number,
+  stakerInfo: { address: string; publicKeyNoCoordHex: string },
+) => {
+  validateStakingInput(stakingInput);
+  if (!btcStakingManager) {
+    throw new Error("BTC Staking Manager not initialized");
+  }
+  if (!tipHeight) {
+    throw new Error("Tip height not initialized");
+  }
+  if (!stakerInfo.address || !stakerInfo.publicKeyNoCoordHex) {
+    throw new Error("Staker info not initialized");
+  }
 };

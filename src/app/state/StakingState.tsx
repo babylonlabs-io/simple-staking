@@ -281,7 +281,6 @@ export function StakingState({ children }: PropsWithChildren) {
           setCancelModalShown(true);
         }
       }
-
       setCurrentStep(stepName);
     },
     [

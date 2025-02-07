@@ -21,7 +21,6 @@ import { getBbnParamByBtcHeight } from "@/utils/params";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
-import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
 import { BtcStakingInputs } from "./useTransactionService";
 
@@ -30,21 +29,25 @@ export function useV1TransactionService() {
     connected: btcConnected,
     signPsbt,
     publicKeyNoCoord,
-    address,
+    address: btcAddress,
     network: btcNetwork,
     pushTx,
     signMessage,
   } = useBTCWallet();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
-  const { networkInfo, availableUTXOs } = useAppState();
+  const { networkInfo } = useAppState();
 
   const { signBbnTx } = useBbnTransaction();
-  const {
-    btcTipQuery: { data: tipHeader },
-  } = useBbnQuery();
 
-  const { connected: cosmosConnected, bech32Address } = useCosmosWallet();
+  const { connected: cosmosConnected } = useCosmosWallet();
+  const stakerBtcInfo = useMemo(
+    () => ({
+      address: btcAddress,
+      publicKeyNoCoordHex: publicKeyNoCoord,
+    }),
+    [btcAddress, publicKeyNoCoord],
+  );
 
   // We use phase-2 parameters instead of legacy global parameters.
   // Phase-2 BBN parameters include all phase-1 global parameters,
@@ -53,17 +56,14 @@ export function useV1TransactionService() {
   // const bbnStakingParams = networkInfo?.params.bbnStakingParams.versions;
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
+  // TODO: Move below manager creation into a hook
   // Create the btc staking manager which is used to create the staking transaction
   const btcStakingManager = useMemo(() => {
     if (
       !btcNetwork ||
       !versionedParams ||
-      !tipHeader ||
-      !availableUTXOs ||
-      !address ||
       !publicKeyNoCoord ||
       !cosmosConnected ||
-      !bech32Address ||
       !btcConnected ||
       !signPsbt ||
       !signMessage ||
@@ -75,16 +75,9 @@ export function useV1TransactionService() {
     const btcProvider = {
       signPsbt,
       signMessage,
-      getStakerInfo: async () => ({
-        address,
-        publicKeyNoCoordHex: publicKeyNoCoord,
-      }),
-      getUTXOs: async () => availableUTXOs,
     };
 
     const bbnProvider = {
-      getBabylonBtcTipHeight: async () => tipHeader.height,
-      getBabylonAddress: async () => bech32Address,
       signTransaction: async <T extends object>(msg: {
         typeUrl: string;
         value: T;
@@ -100,12 +93,8 @@ export function useV1TransactionService() {
   }, [
     btcNetwork,
     versionedParams,
-    tipHeader,
-    availableUTXOs,
-    address,
     publicKeyNoCoord,
     cosmosConnected,
-    bech32Address,
     btcConnected,
     signPsbt,
     signMessage,
@@ -127,11 +116,7 @@ export function useV1TransactionService() {
       stakingHeight: number,
       stakingTxHex: string,
     ) => {
-      // Perform checks
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
-      validateStakingInput(stakingInput);
+      validateCommonInputs(btcStakingManager, stakingInput, stakerBtcInfo);
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
       // Check if this staking transaction is eligible for unbonding
@@ -145,7 +130,8 @@ export function useV1TransactionService() {
       }
 
       const { transaction: signedUnbondingTx } =
-        await btcStakingManager.createPartialSignedBtcUnbondingTransaction(
+        await btcStakingManager!.createPartialSignedBtcUnbondingTransaction(
+          stakerBtcInfo,
           stakingInput,
           stakingHeight,
           stakingTx,
@@ -162,7 +148,7 @@ export function useV1TransactionService() {
         throw new Error(`Error submitting unbonding transaction: ${error}`);
       }
     },
-    [btcStakingManager],
+    [btcStakingManager, stakerBtcInfo],
   );
 
   /**
@@ -172,7 +158,8 @@ export function useV1TransactionService() {
    * If earlyUnbondingTxHex is provided, the early unbonding transaction will be used,
    * otherwise the staking transaction will be used
    *
-   * @param stakingInput - The staking inputs
+   * @param stakingInput - The staking inputs (e.g. amount, timelock, etc.)
+   * @param stakingHeight - The height of the staking transaction
    * @param stakingTxHex - The staking transaction hex
    * @param earlyUnbondingTxHex - The early unbonding transaction hex
    */
@@ -183,10 +170,8 @@ export function useV1TransactionService() {
       stakingTxHex: string,
       earlyUnbondingTxHex?: string,
     ) => {
-      if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
-      }
-      if (!versionedParams) {
+      validateCommonInputs(btcStakingManager, stakingInput, stakerBtcInfo);
+      if (!versionedParams?.length) {
         throw new Error("Staking params not loaded");
       }
       // Get the param version based on height
@@ -200,7 +185,8 @@ export function useV1TransactionService() {
       if (earlyUnbondingTxHex) {
         const earlyUnbondingTx = Transaction.fromHex(earlyUnbondingTxHex);
         result =
-          await btcStakingManager.createSignedBtcWithdrawEarlyUnbondedTransaction(
+          await btcStakingManager!.createSignedBtcWithdrawEarlyUnbondedTransaction(
+            stakerBtcInfo,
             stakingInput,
             paramVersion,
             earlyUnbondingTx,
@@ -208,7 +194,8 @@ export function useV1TransactionService() {
           );
       } else {
         result =
-          await btcStakingManager.createSignedBtcWithdrawStakingExpiredTransaction(
+          await btcStakingManager!.createSignedBtcWithdrawStakingExpiredTransaction(
+            stakerBtcInfo,
             stakingInput,
             paramVersion,
             Transaction.fromHex(stakingTxHex),
@@ -221,7 +208,7 @@ export function useV1TransactionService() {
 
       await pushTx(result.transaction.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx, versionedParams],
+    [btcStakingManager, defaultFeeRate, pushTx, stakerBtcInfo, versionedParams],
   );
 
   return {
@@ -229,3 +216,23 @@ export function useV1TransactionService() {
     submitWithdrawalTx,
   };
 }
+
+/**
+ * Validate the common inputs
+ * @param btcStakingManager - The BTC Staking Manager
+ * @param stakingInput - The staking inputs (e.g. amount, timelock, etc.)
+ * @param stakerInfo - The staker info (e.g. address, public key, etc.)
+ */
+const validateCommonInputs = (
+  btcStakingManager: BabylonBtcStakingManager | null,
+  stakingInput: BtcStakingInputs,
+  stakerBtcInfo: { address: string; publicKeyNoCoordHex: string },
+) => {
+  validateStakingInput(stakingInput);
+  if (!btcStakingManager) {
+    throw new Error("BTC Staking Manager not initialized");
+  }
+  if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
+    throw new Error("Staker info not initialized");
+  }
+};

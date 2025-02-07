@@ -12,6 +12,8 @@ import { DelegationV2StakingState as DelegationState } from "@/app/types/delegat
 import { ErrorType } from "@/app/types/errors";
 import { retry } from "@/utils";
 
+import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+
 import { useTransactionService } from "./useTransactionService";
 
 interface RegistrationData {
@@ -36,6 +38,7 @@ export function useRegistrationService() {
     useTransactionService();
   const { addDelegation, refetch: refetchV2Delegations } =
     useDelegationV2State();
+  const { sendBbnTx } = useBbnTransaction();
   const { handleError } = useError();
 
   const registerPhase1Delegation = useCallback(async () => {
@@ -84,11 +87,14 @@ export function useRegistrationService() {
         }
       });
 
-      await transitionPhase1Delegation(
+      const { signedBabylonTx } = await transitionPhase1Delegation(
         registrationData.stakingTxHex,
         registrationData.startHeight,
         registrationData.stakingInput,
       );
+      // Send the transaction
+      setStep("registration-send-bbn");
+      await sendBbnTx(signedBabylonTx);
       // Unsubscribe from signing steps
       unsubscribe();
 
@@ -121,15 +127,16 @@ export function useRegistrationService() {
     }
   }, [
     setStep,
-    reset,
-    handleError,
     selectedDelegation,
+    handleError,
     setProcessing,
     subscribeToSigningSteps,
     transitionPhase1Delegation,
+    sendBbnTx,
     addDelegation,
     refetchV1Delegations,
     refetchV2Delegations,
+    reset,
   ]);
 
   return { registerPhase1Delegation };

@@ -17,11 +17,14 @@ import {
 import { retry } from "@/utils";
 import { btcToSatoshi } from "@/utils/btc";
 
+import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+
 import { useTransactionService } from "./useTransactionService";
 
 export function useStakingService() {
   const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingState();
+  const { sendBbnTx } = useBbnTransaction();
   const { refetch: refetchDelegations } = useDelegationV2State();
   const { addDelegation, updateDelegationStatus } = useDelegationV2State();
   const {
@@ -88,14 +91,18 @@ export function useStakingService() {
           }
         });
 
-        const stakingTxHashHex = await createDelegationEoi(eoiInput, feeRate);
+        const { stakingTxHash, signedBabylonTx } = await createDelegationEoi(
+          eoiInput,
+          feeRate,
+        );
         unsubscribe();
-
+        // Send the transaction
         goToStep(StakingStep.EOI_SEND_BBN);
+        await sendBbnTx(signedBabylonTx);
 
         addDelegation({
           stakingAmount: amount,
-          stakingTxHashHex,
+          stakingTxHashHex: stakingTxHash,
           startHeight: 0,
           state: DelegationState.INTERMEDIATE_PENDING_VERIFICATION,
         });
@@ -103,7 +110,7 @@ export function useStakingService() {
         goToStep(StakingStep.VERIFYING);
 
         const delegation = await retry(
-          () => getDelegationV2(stakingTxHashHex),
+          () => getDelegationV2(stakingTxHash),
           (delegation) => delegation?.state === DelegationState.VERIFIED,
           5 * ONE_SECOND,
         );
@@ -124,6 +131,7 @@ export function useStakingService() {
       subscribeToSigningSteps,
       createDelegationEoi,
       goToStep,
+      sendBbnTx,
       addDelegation,
       setVerifiedDelegation,
       handleError,
