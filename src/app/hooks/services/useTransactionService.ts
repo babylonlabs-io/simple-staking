@@ -11,6 +11,7 @@ import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
+import { ErrorType } from "@/app/types/errors";
 import { validateStakingInput } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
@@ -18,7 +19,6 @@ import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
 import { useNetworkFees } from "../client/api/useNetworkFees";
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
-import { ErrorType } from "@/app/types/errors";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;

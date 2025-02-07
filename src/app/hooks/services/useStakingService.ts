@@ -129,8 +129,6 @@ export function useStakingService() {
       handleError,
       reset,
       refetchDelegations,
-      reset,
-      handleError,
     ],
   );
 

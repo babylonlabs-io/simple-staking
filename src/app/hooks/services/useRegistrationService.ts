@@ -130,7 +130,6 @@ export function useRegistrationService() {
     addDelegation,
     refetchV1Delegations,
     refetchV2Delegations,
-    reset,
   ]);
 
   return { registerPhase1Delegation };
