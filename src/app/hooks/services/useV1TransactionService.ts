@@ -11,7 +11,6 @@ import { postUnbonding } from "@/app/api/postUnbonding";
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
 import { ErrorType } from "@/app/types/errors";
 import { validateStakingInput } from "@/utils/delegations";
@@ -20,27 +19,16 @@ import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getBbnParamByBtcHeight } from "@/utils/params";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
-import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
+import { useStakingManagerService } from "./useStakingManagerService";
 import { BtcStakingInputs } from "./useTransactionService";
 
 export function useV1TransactionService() {
-  const {
-    connected: btcConnected,
-    signPsbt,
-    publicKeyNoCoord,
-    address: btcAddress,
-    network: btcNetwork,
-    pushTx,
-    signMessage,
-  } = useBTCWallet();
+  const { publicKeyNoCoord, address: btcAddress, pushTx } = useBTCWallet();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const { networkInfo } = useAppState();
 
-  const { signBbnTx } = useBbnTransaction();
-
-  const { connected: cosmosConnected } = useCosmosWallet();
   const stakerBtcInfo = useMemo(
     () => ({
       address: btcAddress,
@@ -53,53 +41,9 @@ export function useV1TransactionService() {
   // Phase-2 BBN parameters include all phase-1 global parameters,
   // except for the "tag" field which is only used for staking transactions.
   // The "tag" is not needed for withdrawal or unbonding transactions.
-  // const bbnStakingParams = networkInfo?.params.bbnStakingParams.versions;
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
-  // TODO: Move below manager creation into a hook
-  // Create the btc staking manager which is used to create the staking transaction
-  const btcStakingManager = useMemo(() => {
-    if (
-      !btcNetwork ||
-      !versionedParams ||
-      !publicKeyNoCoord ||
-      !cosmosConnected ||
-      !btcConnected ||
-      !signPsbt ||
-      !signMessage ||
-      !signBbnTx
-    ) {
-      return null;
-    }
-
-    const btcProvider = {
-      signPsbt,
-      signMessage,
-    };
-
-    const bbnProvider = {
-      signTransaction: async <T extends object>(msg: {
-        typeUrl: string;
-        value: T;
-      }) => signBbnTx(msg),
-    };
-
-    return new BabylonBtcStakingManager(
-      btcNetwork,
-      versionedParams,
-      btcProvider,
-      bbnProvider,
-    );
-  }, [
-    btcNetwork,
-    versionedParams,
-    publicKeyNoCoord,
-    cosmosConnected,
-    btcConnected,
-    signPsbt,
-    signMessage,
-    signBbnTx,
-  ]);
+  const { btcStakingManager } = useStakingManagerService();
 
   /**
    * Submit the unbonding transaction to babylon API for further processing

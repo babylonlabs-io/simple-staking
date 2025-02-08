@@ -17,8 +17,9 @@ import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
-import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
+
+import { useStakingManagerService } from "./useStakingManagerService";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
@@ -27,27 +28,16 @@ export interface BtcStakingInputs {
 }
 
 export const useTransactionService = () => {
-  const { availableUTXOs, networkInfo, refetchUTXOs } = useAppState();
+  const { availableUTXOs, refetchUTXOs } = useAppState();
 
-  const { signBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const {
     btcTipQuery: { data: tipHeader },
   } = useBbnQuery();
 
-  const { connected: cosmosConnected, bech32Address } = useCosmosWallet();
-  const {
-    connected: btcConnected,
-    signPsbt,
-    publicKeyNoCoord,
-    address: btcAddress,
-    signMessage,
-    network: btcNetwork,
-    pushTx,
-  } = useBTCWallet();
-
-  const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
+  const { bech32Address } = useCosmosWallet();
+  const { publicKeyNoCoord, address: btcAddress, pushTx } = useBTCWallet();
 
   const stakerInfo = useMemo(
     () => ({
@@ -59,51 +49,7 @@ export const useTransactionService = () => {
 
   const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
 
-  // TODO: Move below manager creation into a hook
-  // Create the btc staking manager which is used to create the staking transaction
-  const btcStakingManager = useMemo(() => {
-    if (
-      !btcNetwork ||
-      !versionedParams ||
-      !cosmosConnected ||
-      !btcConnected ||
-      !signPsbt ||
-      !signMessage ||
-      !signBbnTx
-    ) {
-      return null;
-    }
-
-    const btcProvider = {
-      signPsbt,
-      signMessage,
-    };
-
-    const bbnProvider = {
-      getBabylonAddress: async () => bech32Address,
-      signTransaction: async <T extends object>(msg: {
-        typeUrl: string;
-        value: T;
-      }) => signBbnTx(msg),
-    };
-
-    return new BabylonBtcStakingManager(
-      btcNetwork,
-      versionedParams,
-      btcProvider,
-      bbnProvider,
-    );
-  }, [
-    btcNetwork,
-    versionedParams,
-    cosmosConnected,
-    bech32Address,
-    btcConnected,
-    signPsbt,
-    signMessage,
-    signBbnTx,
-  ]);
-
+  const { btcStakingManager } = useStakingManagerService();
   /**
    * Create the delegation EOI
    *
