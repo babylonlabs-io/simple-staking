@@ -379,7 +379,7 @@ export const useTransactionService = () => {
     (callback: (step: SigningType) => void) => {
       const btcStakingManager = createBtcStakingManager();
       if (!btcStakingManager) {
-        throw new Error("BTC Staking Manager not initialized");
+        return () => {};
       }
 
       btcStakingManager.on(StakingEventType.SIGNING, callback);
