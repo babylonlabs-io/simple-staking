@@ -1,7 +1,6 @@
 import {
   BabylonBtcStakingManager,
-  SigningType,
-  StakingEventType,
+  SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
@@ -49,7 +48,11 @@ export const useTransactionService = () => {
 
   const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
 
-  const { createBtcStakingManager } = useStakingManagerService();
+  const {
+    createBtcStakingManager,
+    on: managerEventsOn,
+    off: managerEventsOff,
+  } = useStakingManagerService();
 
   /**
    * Create the delegation EOI
@@ -376,20 +379,15 @@ export const useTransactionService = () => {
    * @returns A cleanup function to remove the listener
    */
   const subscribeToSigningSteps = useCallback(
-    (callback: (step: SigningType) => void) => {
-      const btcStakingManager = createBtcStakingManager();
-      if (!btcStakingManager) {
-        return () => {};
-      }
-
-      btcStakingManager.on(StakingEventType.SIGNING, callback);
+    (callback: (step: SigningStep) => void) => {
+      managerEventsOn(callback);
 
       // Return cleanup function
       return () => {
-        btcStakingManager.off(StakingEventType.SIGNING, callback);
+        managerEventsOff(callback);
       };
     },
-    [createBtcStakingManager],
+    [managerEventsOff, managerEventsOn],
   );
 
   return {

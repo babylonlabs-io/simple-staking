@@ -104,7 +104,7 @@ export function useV1TransactionService() {
         throw new Error(`Error submitting unbonding transaction: ${error}`);
       }
     },
-    [createBtcStakingManager, stakerBtcInfo],
+    [createBtcStakingManager, stakerBtcInfo, versionedParams],
   );
 
   /**

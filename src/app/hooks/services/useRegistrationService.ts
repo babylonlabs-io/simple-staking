@@ -1,4 +1,4 @@
-import { SigningType } from "@babylonlabs-io/btc-staking-ts";
+import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
 import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -29,20 +29,20 @@ interface RegistrationData {
   };
 }
 
-type RegistrationSigningType = Extract<
-  SigningType,
+type RegistrationSigningStep = Extract<
+  SigningStep,
   | "staking-slashing"
   | "unbonding-slashing"
   | "proof-of-possession"
   | "create-btc-delegation-msg"
 >;
 
-const REGISTRATION_STEP_MAP: Record<RegistrationSigningType, RegistrationStep> =
+const REGISTRATION_STEP_MAP: Record<RegistrationSigningStep, RegistrationStep> =
   {
-    [SigningType.STAKING_SLASHING]: "registration-staking-slashing",
-    [SigningType.UNBONDING_SLASHING]: "registration-unbonding-slashing",
-    [SigningType.PROOF_OF_POSSESSION]: "registration-proof-of-possession",
-    [SigningType.CREATE_BTC_DELEGATION_MSG]: "registration-sign-bbn",
+    [SigningStep.STAKING_SLASHING]: "registration-staking-slashing",
+    [SigningStep.UNBONDING_SLASHING]: "registration-unbonding-slashing",
+    [SigningStep.PROOF_OF_POSSESSION]: "registration-proof-of-possession",
+    [SigningStep.CREATE_BTC_DELEGATION_MSG]: "registration-sign-bbn",
   };
 
 export function useRegistrationService() {
@@ -61,8 +61,8 @@ export function useRegistrationService() {
   const { handleError } = useError();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
-      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningType];
+    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
+      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
       if (stepName) {
         setStep(stepName);
       }

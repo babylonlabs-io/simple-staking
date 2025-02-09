@@ -1,4 +1,4 @@
-import { SigningType } from "@babylonlabs-io/btc-staking-ts";
+import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
 import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -21,15 +21,15 @@ import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
 import { useTransactionService } from "./useTransactionService";
 
-type StakingSigningType = Extract<
-  SigningType,
+type StakingSigningStep = Extract<
+  SigningStep,
   | "staking-slashing"
   | "unbonding-slashing"
   | "proof-of-possession"
   | "create-btc-delegation-msg"
 >;
 
-const STAKING_SIGNING_STEP_MAP: Record<StakingSigningType, StakingStep> = {
+const STAKING_SIGNING_STEP_MAP: Record<StakingSigningStep, StakingStep> = {
   "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
   "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
   "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
@@ -51,8 +51,8 @@ export function useStakingService() {
   const { handleError } = useError();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
-      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningType];
+    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
+      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
       if (stepName) {
         goToStep(stepName);
       }
