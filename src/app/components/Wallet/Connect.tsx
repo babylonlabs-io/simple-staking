@@ -16,8 +16,8 @@ import { FaLock, FaLockOpen } from "react-icons/fa6";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
+import bbnIcon from "@/app/assets/bbn.svg";
 import bitcoin from "@/app/assets/bitcoin.png";
-import bbnIcon from "@/app/assets/icon-black.svg";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
@@ -137,7 +137,7 @@ export const Connect: React.FC<ConnectProps> = ({
             className="max-w-[40px] max-h-[40px]"
           />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <Text variant="body1" className="text-accent-primary text-base">
             Bitcoin
           </Text>
@@ -146,7 +146,6 @@ export const Connect: React.FC<ConnectProps> = ({
             value={btcAddress}
             address
             noFade
-            fullWidth
             symbols={12}
           />
         </div>
@@ -169,9 +168,13 @@ export const Connect: React.FC<ConnectProps> = ({
       <div className="divider my-0" />
       <div className="flex flex-row gap-2">
         <div className="flex items-center justify-center">
-          <Image src={bbnIcon} alt="babylon" width={40} height={40} />
+          <Image
+            src={bbnIcon}
+            alt="babylon"
+            className="max-w-[40px] max-h-[40px]"
+          />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <Text variant="body1" className="text-accent-primary text-base">
             {bbnNetworkFullName}
           </Text>
@@ -180,7 +183,6 @@ export const Connect: React.FC<ConnectProps> = ({
             value={bech32Address}
             address
             noFade
-            fullWidth
             symbols={12}
           />
         </div>
