@@ -1,6 +1,6 @@
 import {
   BabylonBtcStakingManager,
-  getStakerSignature,
+  getUnbondingTxStakerSignature,
   TransactionResult,
 } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
@@ -80,7 +80,8 @@ export function useV1TransactionService() {
           stakingHeight,
           stakingTx,
         );
-      const stakerSignatureHex = getStakerSignature(signedUnbondingTx);
+      const stakerSignatureHex =
+        getUnbondingTxStakerSignature(signedUnbondingTx);
       try {
         await postUnbonding(
           stakerSignatureHex,

@@ -1,5 +1,5 @@
 import { SigningType } from "@babylonlabs-io/btc-staking-ts";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
@@ -21,6 +21,21 @@ import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
 import { useTransactionService } from "./useTransactionService";
 
+type StakingSigningType = Extract<
+  SigningType,
+  | "staking-slashing"
+  | "unbonding-slashing"
+  | "proof-of-possession"
+  | "create-btc-delegation-msg"
+>;
+
+const STAKING_SIGNING_STEP_MAP: Record<StakingSigningType, StakingStep> = {
+  "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
+  "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
+  "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
+  "create-btc-delegation-msg": StakingStep.EOI_SIGN_BBN,
+};
+
 export function useStakingService() {
   const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingState();
@@ -34,6 +49,17 @@ export function useStakingService() {
     subscribeToSigningSteps,
   } = useTransactionService();
   const { handleError } = useError();
+
+  useEffect(() => {
+    const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
+      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningType];
+      if (stepName) {
+        goToStep(stepName);
+      }
+    });
+
+    return unsubscribe;
+  }, [subscribeToSigningSteps, goToStep]);
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -72,30 +98,12 @@ export function useStakingService() {
           stakingTimelock: term,
           feeRate: feeRate,
         };
-
         setProcessing(true);
-        const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
-          switch (step) {
-            case SigningType.STAKING_SLASHING:
-              goToStep(StakingStep.EOI_STAKING_SLASHING);
-              break;
-            case SigningType.UNBONDING_SLASHING:
-              goToStep(StakingStep.EOI_UNBONDING_SLASHING);
-              break;
-            case SigningType.PROOF_OF_POSSESSION:
-              goToStep(StakingStep.EOI_PROOF_OF_POSSESSION);
-              break;
-            case SigningType.CREATE_BTC_DELEGATION_MSG:
-              goToStep(StakingStep.EOI_SIGN_BBN);
-              break;
-          }
-        });
-
         const { stakingTxHash, signedBabylonTx } = await createDelegationEoi(
           eoiInput,
           feeRate,
         );
-        unsubscribe();
+
         // Send the transaction
         goToStep(StakingStep.EOI_SEND_BBN);
         await sendBbnTx(signedBabylonTx);
@@ -128,7 +136,6 @@ export function useStakingService() {
     },
     [
       setProcessing,
-      subscribeToSigningSteps,
       createDelegationEoi,
       goToStep,
       sendBbnTx,

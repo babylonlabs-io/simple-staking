@@ -1,12 +1,15 @@
 import { SigningType } from "@babylonlabs-io/btc-staking-ts";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors";
-import { useDelegationState } from "@/app/state/DelegationState";
+import {
+  RegistrationStep,
+  useDelegationState,
+} from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
 import { ErrorType } from "@/app/types/errors";
@@ -26,6 +29,22 @@ interface RegistrationData {
   };
 }
 
+type RegistrationSigningType = Extract<
+  SigningType,
+  | "staking-slashing"
+  | "unbonding-slashing"
+  | "proof-of-possession"
+  | "create-btc-delegation-msg"
+>;
+
+const REGISTRATION_STEP_MAP: Record<RegistrationSigningType, RegistrationStep> =
+  {
+    "staking-slashing": "registration-staking-slashing",
+    "unbonding-slashing": "registration-unbonding-slashing",
+    "proof-of-possession": "registration-proof-of-possession",
+    "create-btc-delegation-msg": "registration-sign-bbn",
+  };
+
 export function useRegistrationService() {
   const {
     setRegistrationStep: setStep,
@@ -40,6 +59,17 @@ export function useRegistrationService() {
     useDelegationV2State();
   const { sendBbnTx } = useBbnTransaction();
   const { handleError } = useError();
+
+  useEffect(() => {
+    const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
+      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningType];
+      if (stepName) {
+        setStep(stepName);
+      }
+    });
+
+    return unsubscribe;
+  }, [subscribeToSigningSteps, setStep]);
 
   const registerPhase1Delegation = useCallback(async () => {
     // set the step to staking-slashing
@@ -70,23 +100,6 @@ export function useRegistrationService() {
         },
       };
 
-      const unsubscribe = subscribeToSigningSteps((step: SigningType) => {
-        switch (step) {
-          case SigningType.STAKING_SLASHING:
-            setStep("registration-staking-slashing");
-            break;
-          case SigningType.UNBONDING_SLASHING:
-            setStep("registration-unbonding-slashing");
-            break;
-          case SigningType.PROOF_OF_POSSESSION:
-            setStep("registration-proof-of-possession");
-            break;
-          case SigningType.CREATE_BTC_DELEGATION_MSG:
-            setStep("registration-sign-bbn");
-            break;
-        }
-      });
-
       const { signedBabylonTx } = await transitionPhase1Delegation(
         registrationData.stakingTxHex,
         registrationData.startHeight,
@@ -95,8 +108,6 @@ export function useRegistrationService() {
       // Send the transaction
       setStep("registration-send-bbn");
       await sendBbnTx(signedBabylonTx);
-      // Unsubscribe from signing steps
-      unsubscribe();
 
       addDelegation({
         stakingAmount: selectedDelegation.stakingValueSat,
@@ -130,7 +141,6 @@ export function useRegistrationService() {
     selectedDelegation,
     handleError,
     setProcessing,
-    subscribeToSigningSteps,
     transitionPhase1Delegation,
     sendBbnTx,
     addDelegation,
