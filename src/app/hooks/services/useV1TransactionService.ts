@@ -2,6 +2,7 @@ import {
   BabylonBtcStakingManager,
   getUnbondingTxStakerSignature,
   TransactionResult,
+  VersionedStakingParams,
 } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
@@ -43,7 +44,7 @@ export function useV1TransactionService() {
   // The "tag" is not needed for withdrawal or unbonding transactions.
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
-  const { btcStakingManager } = useStakingManagerService();
+  const { createBtcStakingManager } = useStakingManagerService();
 
   /**
    * Submit the unbonding transaction to babylon API for further processing
@@ -60,7 +61,11 @@ export function useV1TransactionService() {
       stakingHeight: number,
       stakingTxHex: string,
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(btcStakingManager, stakingInput, stakerBtcInfo);
+      if (!versionedParams?.length) {
+        throw new Error("Staking params not loaded");
+      }
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
       // Check if this staking transaction is eligible for unbonding
@@ -73,11 +78,17 @@ export function useV1TransactionService() {
         });
       }
 
+      // Get the param version based on height
+      const { version: paramsVersion } = getBbnParamByBtcHeight(
+        stakingHeight,
+        versionedParams!,
+      );
+
       const { transaction: signedUnbondingTx } =
         await btcStakingManager!.createPartialSignedBtcUnbondingTransaction(
           stakerBtcInfo,
           stakingInput,
-          stakingHeight,
+          paramsVersion,
           stakingTx,
         );
       const stakerSignatureHex =
@@ -93,7 +104,7 @@ export function useV1TransactionService() {
         throw new Error(`Error submitting unbonding transaction: ${error}`);
       }
     },
-    [btcStakingManager, stakerBtcInfo],
+    [createBtcStakingManager, stakerBtcInfo],
   );
 
   /**
@@ -115,14 +126,17 @@ export function useV1TransactionService() {
       stakingTxHex: string,
       earlyUnbondingTxHex?: string,
     ) => {
-      validateCommonInputs(btcStakingManager, stakingInput, stakerBtcInfo);
-      if (!versionedParams?.length) {
-        throw new Error("Staking params not loaded");
-      }
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        stakerBtcInfo,
+        versionedParams,
+      );
       // Get the param version based on height
       const { version: paramVersion } = getBbnParamByBtcHeight(
         stakingHeight,
-        versionedParams,
+        versionedParams!,
       );
 
       validateStakingInput(stakingInput);
@@ -153,7 +167,13 @@ export function useV1TransactionService() {
 
       await pushTx(result.transaction.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx, stakerBtcInfo, versionedParams],
+    [
+      createBtcStakingManager,
+      defaultFeeRate,
+      pushTx,
+      stakerBtcInfo,
+      versionedParams,
+    ],
   );
 
   return {
@@ -172,6 +192,7 @@ const validateCommonInputs = (
   btcStakingManager: BabylonBtcStakingManager | null,
   stakingInput: BtcStakingInputs,
   stakerBtcInfo: { address: string; publicKeyNoCoordHex: string },
+  versionedParams?: VersionedStakingParams[],
 ) => {
   validateStakingInput(stakingInput);
   if (!btcStakingManager) {
@@ -179,5 +200,8 @@ const validateCommonInputs = (
   }
   if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
     throw new Error("Staker info not initialized");
+  }
+  if (!versionedParams?.length) {
+    throw new Error("Staking params not loaded");
   }
 };

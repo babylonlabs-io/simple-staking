@@ -49,7 +49,8 @@ export const useTransactionService = () => {
 
   const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
 
-  const { btcStakingManager } = useStakingManagerService();
+  const { createBtcStakingManager } = useStakingManagerService();
+
   /**
    * Create the delegation EOI
    *
@@ -59,6 +60,8 @@ export const useTransactionService = () => {
    */
   const createDelegationEoi = useCallback(
     async (stakingInput: BtcStakingInputs, feeRate: number) => {
+      const btcStakingManager = createBtcStakingManager();
+
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -84,7 +87,13 @@ export const useTransactionService = () => {
         signedBabylonTx,
       };
     },
-    [availableUTXOs, bech32Address, btcStakingManager, stakerInfo, tipHeight],
+    [
+      availableUTXOs,
+      bech32Address,
+      createBtcStakingManager,
+      stakerInfo,
+      tipHeight,
+    ],
   );
 
   /**
@@ -96,6 +105,7 @@ export const useTransactionService = () => {
    */
   const estimateStakingFee = useCallback(
     (stakingInput: BtcStakingInputs, feeRate: number): number => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -113,7 +123,7 @@ export const useTransactionService = () => {
         feeRate,
       );
     },
-    [btcStakingManager, tipHeight, stakerInfo, availableUTXOs],
+    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs],
   );
 
   /**
@@ -129,6 +139,7 @@ export const useTransactionService = () => {
       stakingHeight: number,
       stakingInput: BtcStakingInputs,
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -154,7 +165,7 @@ export const useTransactionService = () => {
         signedBabylonTx,
       };
     },
-    [bech32Address, btcStakingManager, stakerInfo, tipHeight],
+    [bech32Address, createBtcStakingManager, stakerInfo, tipHeight],
   );
 
   /**
@@ -172,6 +183,7 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       unsignedStakingTxHex: string,
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -203,7 +215,7 @@ export const useTransactionService = () => {
     },
     [
       availableUTXOs,
-      btcStakingManager,
+      createBtcStakingManager,
       pushTx,
       refetchUTXOs,
       stakerInfo,
@@ -231,6 +243,7 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -252,7 +265,7 @@ export const useTransactionService = () => {
 
       await pushTx(signedUnbondingTx.toHex());
     },
-    [btcStakingManager, pushTx, stakerInfo, tipHeight],
+    [createBtcStakingManager, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -268,6 +281,7 @@ export const useTransactionService = () => {
       paramVersion: number,
       earlyUnbondingTxHex: string,
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -285,7 +299,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -301,6 +315,7 @@ export const useTransactionService = () => {
       paramVersion: number,
       stakingTxHex: string,
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -318,7 +333,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -334,6 +349,7 @@ export const useTransactionService = () => {
       paramVersion: number,
       slashingTxHex: string,
     ) => {
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -351,7 +367,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [btcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -361,8 +377,9 @@ export const useTransactionService = () => {
    */
   const subscribeToSigningSteps = useCallback(
     (callback: (step: SigningType) => void) => {
+      const btcStakingManager = createBtcStakingManager();
       if (!btcStakingManager) {
-        return () => {};
+        throw new Error("BTC Staking Manager not initialized");
       }
 
       btcStakingManager.on(StakingEventType.SIGNING, callback);
@@ -372,7 +389,7 @@ export const useTransactionService = () => {
         btcStakingManager.off(StakingEventType.SIGNING, callback);
       };
     },
-    [btcStakingManager],
+    [createBtcStakingManager],
   );
 
   return {

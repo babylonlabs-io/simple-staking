@@ -1,5 +1,5 @@
 import { BabylonBtcStakingManager } from "@babylonlabs-io/btc-staking-ts";
-import { useMemo } from "react";
+import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
@@ -20,7 +20,7 @@ export const useStakingManagerService = () => {
 
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
-  const btcStakingManager = useMemo(() => {
+  const createBtcStakingManager = useCallback(() => {
     if (
       !btcNetwork ||
       !cosmosConnected ||
@@ -61,7 +61,8 @@ export const useStakingManagerService = () => {
     signMessage,
     signBbnTx,
   ]);
+
   return {
-    btcStakingManager,
+    createBtcStakingManager,
   };
 };

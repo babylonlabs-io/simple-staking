@@ -39,10 +39,10 @@ type RegistrationSigningType = Extract<
 
 const REGISTRATION_STEP_MAP: Record<RegistrationSigningType, RegistrationStep> =
   {
-    "staking-slashing": "registration-staking-slashing",
-    "unbonding-slashing": "registration-unbonding-slashing",
-    "proof-of-possession": "registration-proof-of-possession",
-    "create-btc-delegation-msg": "registration-sign-bbn",
+    [SigningType.STAKING_SLASHING]: "registration-staking-slashing",
+    [SigningType.UNBONDING_SLASHING]: "registration-unbonding-slashing",
+    [SigningType.PROOF_OF_POSSESSION]: "registration-proof-of-possession",
+    [SigningType.CREATE_BTC_DELEGATION_MSG]: "registration-sign-bbn",
   };
 
 export function useRegistrationService() {
