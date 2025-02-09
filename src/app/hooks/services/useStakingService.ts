@@ -1,10 +1,15 @@
-import { useCallback } from "react";
+import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
+import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import { type FormFields, useStakingState } from "@/app/state/StakingState";
+import {
+  type FormFields,
+  StakingStep,
+  useStakingState,
+} from "@/app/state/StakingState";
 import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
@@ -12,16 +17,49 @@ import {
 import { retry } from "@/utils";
 import { btcToSatoshi } from "@/utils/btc";
 
+import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+
 import { useTransactionService } from "./useTransactionService";
+
+type StakingSigningStep = Extract<
+  SigningStep,
+  | "staking-slashing"
+  | "unbonding-slashing"
+  | "proof-of-possession"
+  | "create-btc-delegation-msg"
+>;
+
+const STAKING_SIGNING_STEP_MAP: Record<StakingSigningStep, StakingStep> = {
+  "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
+  "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
+  "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
+  "create-btc-delegation-msg": StakingStep.EOI_SIGN_BBN,
+};
 
 export function useStakingService() {
   const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingState();
+  const { sendBbnTx } = useBbnTransaction();
   const { refetch: refetchDelegations } = useDelegationV2State();
   const { addDelegation, updateDelegationStatus } = useDelegationV2State();
-  const { estimateStakingFee, createDelegationEoi, submitStakingTx } =
-    useTransactionService();
+  const {
+    estimateStakingFee,
+    createDelegationEoi,
+    submitStakingTx,
+    subscribeToSigningSteps,
+  } = useTransactionService();
   const { handleError } = useError();
+
+  useEffect(() => {
+    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
+      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
+      if (stepName) {
+        goToStep(stepName);
+      }
+    });
+
+    return unsubscribe;
+  }, [subscribeToSigningSteps, goToStep]);
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -46,7 +84,7 @@ export function useStakingService() {
   const displayPreview = useCallback(
     (formFields: FormFields) => {
       setFormData(formFields);
-      goToStep("preview");
+      goToStep(StakingStep.PREVIEW);
     },
     [setFormData, goToStep],
   );
@@ -60,33 +98,34 @@ export function useStakingService() {
           stakingTimelock: term,
           feeRate: feeRate,
         };
-
         setProcessing(true);
-
-        const stakingTxHashHex = await createDelegationEoi(
+        const { stakingTxHash, signedBabylonTx } = await createDelegationEoi(
           eoiInput,
           feeRate,
-          async (step) => goToStep(`eoi-${step}`),
         );
+
+        // Send the transaction
+        goToStep(StakingStep.EOI_SEND_BBN);
+        await sendBbnTx(signedBabylonTx);
 
         addDelegation({
           stakingAmount: amount,
-          stakingTxHashHex,
+          stakingTxHashHex: stakingTxHash,
           startHeight: 0,
           state: DelegationState.INTERMEDIATE_PENDING_VERIFICATION,
         });
 
-        goToStep("verifying");
+        goToStep(StakingStep.VERIFYING);
 
         const delegation = await retry(
-          () => getDelegationV2(stakingTxHashHex),
+          () => getDelegationV2(stakingTxHash),
           (delegation) => delegation?.state === DelegationState.VERIFIED,
           5 * ONE_SECOND,
         );
 
         setVerifiedDelegation(delegation as DelegationV2);
         refetchDelegations();
-        goToStep("verified");
+        goToStep(StakingStep.VERIFIED);
         setProcessing(false);
       } catch (error: any) {
         handleError({
@@ -96,10 +135,11 @@ export function useStakingService() {
       }
     },
     [
-      createDelegationEoi,
       setProcessing,
-      addDelegation,
+      createDelegationEoi,
       goToStep,
+      sendBbnTx,
+      addDelegation,
       setVerifiedDelegation,
       handleError,
       reset,
@@ -137,7 +177,7 @@ export function useStakingService() {
         );
 
         reset();
-        goToStep("feedback-success");
+        goToStep(StakingStep.FEEDBACK_SUCCESS);
       } catch (error: any) {
         reset();
         handleError({

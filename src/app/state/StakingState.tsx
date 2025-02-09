@@ -31,18 +31,18 @@ export interface FormFields {
   feeAmount: number;
 }
 
-export type StakingStep =
-  | undefined
-  | "preview"
-  | "eoi-staking-slashing"
-  | "eoi-unbonding-slashing"
-  | "eoi-proof-of-possession"
-  | "eoi-sign-bbn"
-  | "eoi-send-bbn"
-  | "verifying"
-  | "verified"
-  | "feedback-success"
-  | "feedback-cancel";
+export enum StakingStep {
+  PREVIEW = "preview",
+  EOI_STAKING_SLASHING = "eoi-staking-slashing",
+  EOI_UNBONDING_SLASHING = "eoi-unbonding-slashing",
+  EOI_PROOF_OF_POSSESSION = "eoi-proof-of-possession",
+  EOI_SIGN_BBN = "eoi-sign-bbn",
+  EOI_SEND_BBN = "eoi-send-bbn",
+  VERIFYING = "verifying",
+  VERIFIED = "verified",
+  FEEDBACK_SUCCESS = "feedback-success",
+  FEEDBACK_CANCEL = "feedback-cancel",
+}
 
 export interface StakingState {
   hasError: boolean;
@@ -65,7 +65,7 @@ export interface StakingState {
     unbondingTime: number;
   };
   formData?: FormFields;
-  step: StakingStep;
+  step?: StakingStep;
   verifiedDelegation?: DelegationV2;
   goToStep: (name: StakingStep) => void;
   setProcessing: (value: boolean) => void;
@@ -266,7 +266,7 @@ export function StakingState({ children }: PropsWithChildren) {
 
   const goToStep = useCallback(
     (stepName: StakingStep) => {
-      if (stepName === "feedback-success") {
+      if (stepName === StakingStep.FEEDBACK_SUCCESS) {
         if (successModalShown) {
           return;
         } else {
@@ -274,14 +274,13 @@ export function StakingState({ children }: PropsWithChildren) {
         }
       }
 
-      if (stepName === "feedback-cancel") {
+      if (stepName === StakingStep.FEEDBACK_CANCEL) {
         if (cancelModalShown) {
           return;
         } else {
           setCancelModalShown(true);
         }
       }
-
       setCurrentStep(stepName);
     },
     [

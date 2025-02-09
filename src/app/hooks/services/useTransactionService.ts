@@ -1,17 +1,9 @@
 import {
-  btccheckpoint,
-  btcstaking,
-  btcstakingtx,
-} from "@babylonlabs-io/babylon-proto-ts";
-import {
-  BTCSigType,
-  ProofOfPossessionBTC,
-} from "@babylonlabs-io/babylon-proto-ts/dist/generated/babylon/btcstaking/v1/pop";
-import { createCovenantWitness, Staking } from "@babylonlabs-io/btc-staking-ts";
-import { fromBech32 } from "@cosmjs/encoding";
-import { SigningStargateClient } from "@cosmjs/stargate";
-import { Network, Psbt, Transaction } from "bitcoinjs-lib";
-import { useCallback } from "react";
+  BabylonBtcStakingManager,
+  SigningStep,
+} from "@babylonlabs-io/btc-staking-ts";
+import { Transaction } from "bitcoinjs-lib";
+import { useCallback, useMemo } from "react";
 
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
@@ -19,25 +11,14 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
 import { ErrorType } from "@/app/types/errors";
-import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { deriveMerkleProof } from "@/utils/btc";
-import { reverseBuffer } from "@/utils/buffer";
-import {
-  clearTxSignatures,
-  extractSchnorrSignaturesFromTransaction,
-  uint8ArrayToHex,
-  validateStakingInput,
-} from "@/utils/delegations";
+import { validateStakingInput } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
-import { getBbnParamByBtcHeight, getBbnParamByVersion } from "@/utils/params";
-import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
-import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
+
+import { useStakingManagerService } from "./useStakingManagerService";
 
 export interface BtcStakingInputs {
   finalityProviderPkNoCoordHex: string;
@@ -45,145 +26,76 @@ export interface BtcStakingInputs {
   stakingTimelock: number;
 }
 
-interface BtcSigningFuncs {
-  signPsbt: (psbtHex: string) => Promise<string>;
-  signMessage: (message: string, type: "ecdsa") => Promise<string>;
-  signingCallback: (step: SigningStep) => Promise<void>;
-}
-
-export enum SigningStep {
-  STAKING_SLASHING = "staking-slashing",
-  UNBONDING_SLASHING = "unbonding-slashing",
-  PROOF_OF_POSSESSION = "proof-of-possession",
-  SIGN_BBN = "sign-bbn",
-  SEND_BBN = "send-bbn",
-}
-
-const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
-const { coinSymbol } = getNetworkConfigBTC();
-
 export const useTransactionService = () => {
-  const {
-    availableUTXOs: inputUTXOs,
-    networkInfo,
-    refetchUTXOs,
-  } = useAppState();
+  const { availableUTXOs, refetchUTXOs } = useAppState();
 
-  const { signBbnTx, sendBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const {
     btcTipQuery: { data: tipHeader },
   } = useBbnQuery();
 
-  const {
-    connected: cosmosConnected,
-    bech32Address,
-    signingStargateClient,
-  } = useCosmosWallet();
-  const {
-    connected: btcConnected,
-    signPsbt,
-    publicKeyNoCoord,
-    address,
-    signMessage,
-    network: btcNetwork,
-    pushTx,
-  } = useBTCWallet();
+  const { bech32Address } = useCosmosWallet();
+  const { publicKeyNoCoord, address: btcAddress, pushTx } = useBTCWallet();
 
-  const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
+  const stakerInfo = useMemo(
+    () => ({
+      address: btcAddress,
+      publicKeyNoCoordHex: publicKeyNoCoord,
+    }),
+    [btcAddress, publicKeyNoCoord],
+  );
+
+  const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
+
+  const {
+    createBtcStakingManager,
+    on: managerEventsOn,
+    off: managerEventsOff,
+  } = useStakingManagerService();
 
   /**
    * Create the delegation EOI
    *
    * @param stakingInput - The staking inputs
    * @param feeRate - The fee rate
-   * @param signingCallback - The signing callback
    * @returns The staking transaction hash
    */
   const createDelegationEoi = useCallback(
-    async (
-      stakingInput: BtcStakingInputs,
-      feeRate: number,
-      signingCallback: (step: SigningStep) => Promise<void>,
-    ) => {
-      // Perform checks
-      checkWalletConnection(
-        cosmosConnected,
-        btcConnected,
-        btcNetwork,
-        signingStargateClient,
-      );
+    async (stakingInput: BtcStakingInputs, feeRate: number) => {
+      const btcStakingManager = createBtcStakingManager();
 
-      validateStakingInput(stakingInput);
-
-      if (!tipHeader) {
-        // wallet error
-        throw new Error(
-          `${coinSymbol} tip not loaded from ${bbnNetworkFullName}`,
-        );
-      }
-
-      if (!versionedParams || versionedParams.length == 0) {
-        // system error
-        throw new Error("Staking params not loaded");
-      }
-
-      // Get the param based on the tip height
-      // EOI should always be created based on the BTC tip height from BBN chain
-      const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
-
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
-      );
-
-      // Create and sign staking transaction
-      const { transaction } = staking.createStakingTransaction(
-        stakingInput.stakingAmountSat,
-        inputUTXOs!,
-        feeRate,
-      );
-
-      const delegationMsg = await createBtcDelegationMsg(
-        staking,
+      validateCommonInputs(
+        btcStakingManager,
         stakingInput,
-        transaction,
-        bech32Address,
-        { address, publicKeyNoCoordHex: publicKeyNoCoord },
-        p,
-        { signPsbt, signMessage, signingCallback },
+        tipHeight,
+        stakerInfo,
       );
-      // Sign the transaction
-      await signingCallback(SigningStep.SIGN_BBN);
-      const signedTx = await signBbnTx(delegationMsg);
-      // Send the transaction
-      await signingCallback(SigningStep.SEND_BBN);
-      await sendBbnTx(signedTx);
 
-      return transaction.getId();
+      if (!availableUTXOs) {
+        throw new Error("Available UTXOs not initialized");
+      }
+
+      const { stakingTx, signedBabylonTx } =
+        await btcStakingManager!.preStakeRegistrationBabylonTransaction(
+          stakerInfo,
+          stakingInput,
+          tipHeight,
+          availableUTXOs,
+          feeRate,
+          bech32Address,
+        );
+      return {
+        stakingTxHash: stakingTx.getId(),
+        signedBabylonTx,
+      };
     },
     [
-      cosmosConnected,
-      btcConnected,
-      btcNetwork,
-      signingStargateClient,
-      tipHeader,
-      versionedParams,
-      address,
-      publicKeyNoCoord,
-      inputUTXOs,
+      availableUTXOs,
       bech32Address,
-      signPsbt,
-      signMessage,
-      signBbnTx,
-      sendBbnTx,
+      createBtcStakingManager,
+      stakerInfo,
+      tipHeight,
     ],
   );
 
@@ -196,58 +108,25 @@ export const useTransactionService = () => {
    */
   const estimateStakingFee = useCallback(
     (stakingInput: BtcStakingInputs, feeRate: number): number => {
-      // Perform checks
-      checkWalletConnection(
-        cosmosConnected,
-        btcConnected,
-        btcNetwork,
-        signingStargateClient,
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
       );
-      if (!tipHeader) {
-        // wallet error
-        throw new Error(`${coinSymbol} tip not loaded`);
+      if (!availableUTXOs) {
+        throw new Error("Available UTXOs not initialized");
       }
-
-      validateStakingInput(stakingInput);
-
-      if (!versionedParams || versionedParams.length == 0) {
-        // system error
-        throw new Error("Staking params not loaded");
-      }
-
-      // Get the param based on the tip height
-      const p = getBbnParamByBtcHeight(tipHeader.height, versionedParams);
-
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
-      );
-
-      const { fee: stakingFee } = staking.createStakingTransaction(
-        stakingInput.stakingAmountSat,
-        inputUTXOs!,
+      return btcStakingManager!.estimateBtcStakingFee(
+        stakerInfo,
+        tipHeight,
+        stakingInput,
+        availableUTXOs,
         feeRate,
       );
-
-      return stakingFee;
     },
-    [
-      btcConnected,
-      cosmosConnected,
-      signingStargateClient,
-      btcNetwork,
-      tipHeader,
-      versionedParams,
-      address,
-      publicKeyNoCoord,
-      inputUTXOs,
-    ],
+    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs],
   );
 
   /**
@@ -256,83 +135,40 @@ export const useTransactionService = () => {
    * @param stakingTxHex - The staking transaction hex
    * @param stakingHeight - The staking height of the phase-1 delegation
    * @param stakingInput - The staking inputs
-   * @param signingCallback - The signing callback
    */
   const transitionPhase1Delegation = useCallback(
     async (
       stakingTxHex: string,
       stakingHeight: number,
       stakingInput: BtcStakingInputs,
-      signingCallback: (step: SigningStep) => Promise<void>,
     ) => {
-      // Perform checks
-      checkWalletConnection(
-        cosmosConnected,
-        btcConnected,
-        btcNetwork,
-        signingStargateClient,
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
       );
-      if (!versionedParams || versionedParams?.length === 0) {
-        // system error
-        throw new Error("Params not loaded");
-      }
-
-      // Get the staking params at the time of the staking transaction
-      const p = getBbnParamByBtcHeight(stakingHeight, versionedParams);
-      if (!p) {
-        // system error
-        throw new Error(`Params for height ${stakingHeight} not found`);
-      }
-
-      validateStakingInput(stakingInput);
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
-      const stakingInstance = new Staking(
-        btcNetwork!,
-        { address, publicKeyNoCoordHex: publicKeyNoCoord },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
-      );
-
-      // Get the merkle proof
       const inclusionProof = await getInclusionProof(stakingTx);
-      // Create delegation message
-      const delegationMsg = await createBtcDelegationMsg(
-        stakingInstance,
-        stakingInput,
-        stakingTx,
-        bech32Address,
-        { address, publicKeyNoCoordHex: publicKeyNoCoord },
-        p,
-        {
-          signPsbt,
-          signMessage,
-          signingCallback,
-        },
-        inclusionProof,
-      );
-      // Sign the transaction
-      await signingCallback(SigningStep.SIGN_BBN);
-      const signedTx = await signBbnTx(delegationMsg);
-      // Send the transaction
-      await signingCallback(SigningStep.SEND_BBN);
-      await sendBbnTx(signedTx);
+
+      const { signedBabylonTx } =
+        await btcStakingManager!.postStakeRegistrationBabylonTransaction(
+          stakerInfo,
+          stakingTx,
+          stakingHeight,
+          stakingInput,
+          inclusionProof,
+          bech32Address,
+        );
+
+      return {
+        stakingTxHash: stakingTx.getId(),
+        signedBabylonTx,
+      };
     },
-    [
-      cosmosConnected,
-      btcConnected,
-      btcNetwork,
-      signingStargateClient,
-      versionedParams,
-      address,
-      publicKeyNoCoord,
-      bech32Address,
-      signPsbt,
-      signMessage,
-      signBbnTx,
-      sendBbnTx,
-    ],
+    [bech32Address, createBtcStakingManager, stakerInfo, tipHeight],
   );
 
   /**
@@ -348,40 +184,28 @@ export const useTransactionService = () => {
       stakingInput: BtcStakingInputs,
       paramVersion: number,
       expectedTxHashHex: string,
-      stakingTxHex: string,
+      unsignedStakingTxHex: string,
     ) => {
-      // Perform checks
-      if (!versionedParams || versionedParams?.length === 0) {
-        // system error
-        throw new Error(`Params version ${paramVersion} not found`);
-      }
-      if (!btcConnected || !btcNetwork) {
-        // wallet error
-        throw new Error("BTC Wallet not connected");
-      }
-      validateStakingInput(stakingInput);
-
-      // Get the param based on version from the EOI
-      const p = getBbnParamByVersion(paramVersion, versionedParams);
-
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
       );
-      const stakingPsbt = staking.toStakingPsbt(
-        Transaction.fromHex(stakingTxHex),
-        inputUTXOs!,
-      );
+      if (!availableUTXOs) {
+        throw new Error("Available UTXOs not initialized");
+      }
 
-      const signedStakingPsbtHex = await signPsbt(stakingPsbt.toHex());
       const signedStakingTx =
-        Psbt.fromHex(signedStakingPsbtHex).extractTransaction();
+        await btcStakingManager!.createSignedBtcStakingTransaction(
+          stakerInfo,
+          stakingInput,
+          Transaction.fromHex(unsignedStakingTxHex),
+          availableUTXOs,
+          paramVersion,
+        );
+
       if (signedStakingTx.getId() !== expectedTxHashHex) {
         throw new ClientError({
           message: `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
@@ -393,15 +217,12 @@ export const useTransactionService = () => {
       refetchUTXOs();
     },
     [
-      versionedParams,
-      btcConnected,
-      btcNetwork,
-      address,
-      publicKeyNoCoord,
-      inputUTXOs,
-      signPsbt,
+      availableUTXOs,
+      createBtcStakingManager,
       pushTx,
       refetchUTXOs,
+      stakerInfo,
+      tipHeight,
     ],
   );
 
@@ -425,82 +246,29 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
-      // Perform checks
-      if (!versionedParams || versionedParams?.length === 0) {
-        // system error
-        throw new Error("Params not loaded");
-      }
-      if (!btcConnected || !btcNetwork) {
-        // wallet error
-        throw new Error("BTC Wallet not connected");
-      }
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
-      validateStakingInput(stakingInput);
+      const unsignedUnbondingTx = Transaction.fromHex(unbondingTxHex);
 
-      const stakingTx = Transaction.fromHex(stakingTxHex);
-
-      // Get the staking params at the time of the staking transaction
-      const p = getBbnParamByVersion(paramVersion, versionedParams);
-      if (!p) {
-        // system error
-        throw new Error(
-          `Unable to find staking params for version ${paramVersion}`,
+      const { transaction: signedUnbondingTx } =
+        await btcStakingManager!.createSignedBtcUnbondingTransaction(
+          stakerInfo,
+          stakingInput,
+          paramVersion,
+          Transaction.fromHex(stakingTxHex),
+          unsignedUnbondingTx,
+          covenantUnbondingSignatures,
         );
-      }
 
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
-      );
-
-      const unbondingTx = Transaction.fromHex(unbondingTxHex);
-      const unbondingPsbt = staking.toUnbondingPsbt(unbondingTx, stakingTx);
-      const signedUnbondingPsbtHex = await signPsbt(unbondingPsbt.toHex());
-
-      // Compare the unbonding tx hash with the one from API
-      const signedUnbondingTx = Psbt.fromHex(
-        signedUnbondingPsbtHex,
-      ).extractTransaction();
-
-      // Add covenant unbonding signatures
-      // Convert the params of covenants to buffer
-      const covenantBuffers = p.covenantNoCoordPks.map((covenant) =>
-        Buffer.from(covenant, "hex"),
-      );
-      const witness = createCovenantWitness(
-        signedUnbondingTx.ins[0].witness,
-        covenantBuffers,
-        covenantUnbondingSignatures,
-        p.covenantQuorum,
-      );
-      // Overwrite the witness to include the covenant unbonding signatures
-      signedUnbondingTx.ins[0].witness = witness;
-      // Perform the final check on the unbonding tx hash
-      const unbondingTxId = unbondingTx.getId();
-      if (signedUnbondingTx.getId() !== unbondingTxId) {
-        throw new ClientError({
-          message: `Unbonding transaction hash mismatch, expected ${unbondingTxId} but got ${signedUnbondingTx.getId()}`,
-          category: ClientErrorCategory.CLIENT_TRANSACTION,
-          type: ErrorType.STAKING,
-        });
-      }
       await pushTx(signedUnbondingTx.toHex());
     },
-    [
-      versionedParams,
-      btcConnected,
-      btcNetwork,
-      address,
-      publicKeyNoCoord,
-      signPsbt,
-      pushTx,
-    ],
+    [createBtcStakingManager, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -516,59 +284,25 @@ export const useTransactionService = () => {
       paramVersion: number,
       earlyUnbondingTxHex: string,
     ) => {
-      // Perform checks
-      if (!versionedParams || versionedParams?.length === 0) {
-        // system error
-        throw new Error("Params not loaded");
-      }
-      if (!btcConnected || !btcNetwork) {
-        // wallet error
-        throw new Error("BTC Wallet not connected");
-      }
-
-      validateStakingInput(stakingInput);
-
-      const p = getBbnParamByVersion(paramVersion, versionedParams);
-      if (!p) {
-        // system error
-        throw new Error(
-          `Unable to find staking params for version ${paramVersion}`,
-        );
-      }
-
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
       );
 
-      const { psbt: unbondingPsbt } =
-        staking.createWithdrawEarlyUnbondedTransaction(
+      const { transaction: signedWithdrawalTx } =
+        await btcStakingManager!.createSignedBtcWithdrawEarlyUnbondedTransaction(
+          stakerInfo,
+          stakingInput,
+          paramVersion,
           Transaction.fromHex(earlyUnbondingTxHex),
           defaultFeeRate,
         );
-
-      const signedWithdrawalPsbtHex = await signPsbt(unbondingPsbt.toHex());
-      const signedWithdrawalTx = Psbt.fromHex(
-        signedWithdrawalPsbtHex,
-      ).extractTransaction();
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [
-      versionedParams,
-      btcConnected,
-      btcNetwork,
-      address,
-      publicKeyNoCoord,
-      defaultFeeRate,
-      signPsbt,
-      pushTx,
-    ],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -584,58 +318,25 @@ export const useTransactionService = () => {
       paramVersion: number,
       stakingTxHex: string,
     ) => {
-      // Perform checks
-      if (!versionedParams || versionedParams?.length === 0) {
-        // system error
-        throw new Error("Params not loaded");
-      }
-      if (!btcConnected || !btcNetwork) {
-        // wallet error
-        throw new Error("BTC Wallet not connected");
-      }
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
-      validateStakingInput(stakingInput);
-
-      const p = getBbnParamByVersion(paramVersion, versionedParams);
-      if (!p) {
-        // system error
-        throw new Error(
-          `Unable to find staking params for version ${paramVersion}`,
+      const { transaction: signedWithdrawalTx } =
+        await btcStakingManager!.createSignedBtcWithdrawStakingExpiredTransaction(
+          stakerInfo,
+          stakingInput,
+          paramVersion,
+          Transaction.fromHex(stakingTxHex),
+          defaultFeeRate,
         );
-      }
-
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
-      );
-
-      const { psbt } = staking.createWithdrawStakingExpiredTransaction(
-        Transaction.fromHex(stakingTxHex),
-        defaultFeeRate,
-      );
-
-      const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
-      const signedWithdrawalTx = Psbt.fromHex(
-        signedWithdrawalPsbtHex,
-      ).extractTransaction();
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [
-      versionedParams,
-      btcConnected,
-      btcNetwork,
-      address,
-      publicKeyNoCoord,
-      signPsbt,
-      pushTx,
-      defaultFeeRate,
-    ],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -651,56 +352,42 @@ export const useTransactionService = () => {
       paramVersion: number,
       slashingTxHex: string,
     ) => {
-      // Perform checks
-      if (!versionedParams || versionedParams?.length === 0) {
-        // system error
-        throw new Error("Params not loaded");
-      }
-      if (!btcConnected || !btcNetwork)
-        throw new Error("BTC Wallet not connected");
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
 
-      validateStakingInput(stakingInput);
-
-      const p = getBbnParamByVersion(paramVersion, versionedParams);
-      if (!p) {
-        // system error
-        throw new Error(
-          `Unable to find staking params for version ${paramVersion}`,
+      const { transaction: signedWithdrawalTx } =
+        await btcStakingManager!.createSignedBtcWithdrawSlashingTransaction(
+          stakerInfo,
+          stakingInput,
+          paramVersion,
+          Transaction.fromHex(slashingTxHex),
+          defaultFeeRate,
         );
-      }
-
-      const staking = new Staking(
-        btcNetwork!,
-        {
-          address,
-          publicKeyNoCoordHex: publicKeyNoCoord,
-        },
-        p,
-        stakingInput.finalityProviderPkNoCoordHex,
-        stakingInput.stakingTimelock,
-      );
-
-      const { psbt } = staking.createWithdrawSlashingTransaction(
-        Transaction.fromHex(slashingTxHex),
-        defaultFeeRate,
-      );
-
-      const signedWithdrawalPsbtHex = await signPsbt(psbt.toHex());
-      const signedWithdrawalTx = Psbt.fromHex(
-        signedWithdrawalPsbtHex,
-      ).extractTransaction();
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [
-      versionedParams,
-      btcConnected,
-      btcNetwork,
-      address,
-      publicKeyNoCoord,
-      signPsbt,
-      pushTx,
-      defaultFeeRate,
-    ],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+  );
+
+  /**
+   * Subscribe to signing step events
+   * @param callback - The callback to be called when a signing step event occurs
+   * @returns A cleanup function to remove the listener
+   */
+  const subscribeToSigningSteps = useCallback(
+    (callback: (step: SigningStep) => void) => {
+      managerEventsOn(callback);
+
+      // Return cleanup function
+      return () => {
+        managerEventsOff(callback);
+      };
+    },
+    [managerEventsOff, managerEventsOn],
   );
 
   return {
@@ -712,152 +399,51 @@ export const useTransactionService = () => {
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
+    subscribeToSigningSteps,
   };
 };
 
-const createBtcDelegationMsg = async (
-  stakingInstance: Staking,
-  stakingInput: BtcStakingInputs,
-  stakingTx: Transaction,
-  bech32Address: string,
-  stakerInfo: {
-    address: string;
-    publicKeyNoCoordHex: string;
-  },
-  param: BbnStakingParamsVersion,
-  btcSigningFuncs: BtcSigningFuncs,
-  inclusionProof?: btcstaking.InclusionProof,
-) => {
-  const { transaction: unbondingTx } =
-    stakingInstance.createUnbondingTransaction(stakingTx);
-
-  // Create slashing transactions and extract signatures
-  await btcSigningFuncs.signingCallback(SigningStep.STAKING_SLASHING);
-  const { psbt: slashingPsbt } =
-    stakingInstance.createStakingOutputSlashingTransaction(stakingTx);
-  const signedSlashingPsbtHex = await btcSigningFuncs.signPsbt(
-    slashingPsbt.toHex(),
-  );
-  const signedSlashingTx = Psbt.fromHex(
-    signedSlashingPsbtHex,
-  ).extractTransaction();
-  const slashingSig = extractSchnorrSignaturesFromTransaction(signedSlashingTx);
-  if (!slashingSig) {
-    throw new ClientError({
-      message: "No signature found in the staking output slashing PSBT",
-      category: ClientErrorCategory.CLIENT_TRANSACTION,
-      type: ErrorType.STAKING,
-    });
-  }
-
-  await btcSigningFuncs.signingCallback(SigningStep.UNBONDING_SLASHING);
-  const { psbt: unbondingSlashingPsbt } =
-    stakingInstance.createUnbondingOutputSlashingTransaction(unbondingTx);
-  const signedUnbondingSlashingPsbtHex = await btcSigningFuncs.signPsbt(
-    unbondingSlashingPsbt.toHex(),
-  );
-  const signedUnbondingSlashingTx = Psbt.fromHex(
-    signedUnbondingSlashingPsbtHex,
-  ).extractTransaction();
-  const unbondingSignatures = extractSchnorrSignaturesFromTransaction(
-    signedUnbondingSlashingTx,
-  );
-  if (!unbondingSignatures) {
-    throw new ClientError({
-      message: "No signature found in the unbonding output slashing PSBT",
-      category: ClientErrorCategory.CLIENT_TRANSACTION,
-      type: ErrorType.STAKING,
-    });
-  }
-
-  await btcSigningFuncs.signingCallback(SigningStep.PROOF_OF_POSSESSION);
-  // Create Proof of Possession
-  const bech32AddressHex = uint8ArrayToHex(fromBech32(bech32Address).data);
-  const signedBbnAddress = await btcSigningFuncs.signMessage(
-    bech32AddressHex,
-    "ecdsa",
-  );
-  const ecdsaSig = Uint8Array.from(Buffer.from(signedBbnAddress, "base64"));
-  const proofOfPossession: ProofOfPossessionBTC = {
-    btcSigType: BTCSigType.ECDSA,
-    btcSig: ecdsaSig,
-  };
-
-  // Prepare and send protobuf message
-  const msg: btcstakingtx.MsgCreateBTCDelegation =
-    btcstakingtx.MsgCreateBTCDelegation.fromPartial({
-      stakerAddr: bech32Address,
-      pop: proofOfPossession,
-      btcPk: Uint8Array.from(
-        Buffer.from(stakerInfo.publicKeyNoCoordHex, "hex"),
-      ),
-      fpBtcPkList: [
-        Uint8Array.from(
-          Buffer.from(stakingInput.finalityProviderPkNoCoordHex, "hex"),
-        ),
-      ],
-      stakingTime: stakingInput.stakingTimelock,
-      stakingValue: stakingInput.stakingAmountSat,
-      stakingTx: Uint8Array.from(stakingTx.toBuffer()),
-      slashingTx: Uint8Array.from(
-        Buffer.from(clearTxSignatures(signedSlashingTx).toHex(), "hex"),
-      ),
-      delegatorSlashingSig: Uint8Array.from(slashingSig),
-      unbondingTime: param.unbondingTime,
-      unbondingTx: Uint8Array.from(unbondingTx.toBuffer()),
-      unbondingValue: stakingInput.stakingAmountSat - param.unbondingFeeSat,
-      unbondingSlashingTx: Uint8Array.from(
-        Buffer.from(
-          clearTxSignatures(signedUnbondingSlashingTx).toHex(),
-          "hex",
-        ),
-      ),
-      delegatorUnbondingSlashingSig: Uint8Array.from(unbondingSignatures),
-      stakingTxInclusionProof: inclusionProof,
-    });
-
-  return {
-    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgCreateBTCDelegation,
-    value: msg,
-  };
-};
-
-const checkWalletConnection = (
-  cosmosConnected: boolean,
-  btcConnected: boolean,
-  btcNetwork: Network | undefined,
-  signingStargateClient: SigningStargateClient | undefined,
-) => {
-  if (
-    !cosmosConnected ||
-    !btcConnected ||
-    !btcNetwork ||
-    !signingStargateClient
-  ) {
-    // wallet error
-    throw new Error("Wallet not connected");
-  }
-};
-
-const getInclusionProof = async (
-  stakingTx: Transaction,
-): Promise<btcstaking.InclusionProof> => {
+/**
+ * Get the inclusion proof for a staking transaction
+ * @param stakingTx - The staking transaction
+ * @returns The inclusion proof
+ */
+const getInclusionProof = async (stakingTx: Transaction) => {
   // Get the merkle proof
   const { pos, merkle } = await getTxMerkleProof(stakingTx.getId());
-  const proofHex = deriveMerkleProof(merkle);
 
   const {
-    status: { blockHash },
+    status: { blockHash: blockHashHex },
   } = await getTxInfo(stakingTx.getId());
 
-  const hash = reverseBuffer(Uint8Array.from(Buffer.from(blockHash, "hex")));
-  const inclusionProofKey: btccheckpoint.TransactionKey =
-    btccheckpoint.TransactionKey.fromPartial({
-      index: pos,
-      hash,
-    });
-  return btcstaking.InclusionProof.fromPartial({
-    key: inclusionProofKey,
-    proof: Uint8Array.from(Buffer.from(proofHex, "hex")),
-  });
+  return {
+    pos,
+    merkle,
+    blockHashHex,
+  };
+};
+
+/**
+ * Validate the common inputs
+ * @param btcStakingManager - The BTC Staking Manager
+ * @param stakingInput - The staking inputs (e.g. amount, timelock, etc.)
+ * @param tipHeight - The BTC tip height from the Babylon chain
+ * @param stakerInfo - The staker info (e.g. address, public key, etc.)
+ */
+const validateCommonInputs = (
+  btcStakingManager: BabylonBtcStakingManager | null,
+  stakingInput: BtcStakingInputs,
+  tipHeight: number,
+  stakerInfo: { address: string; publicKeyNoCoordHex: string },
+) => {
+  validateStakingInput(stakingInput);
+  if (!btcStakingManager) {
+    throw new Error("BTC Staking Manager not initialized");
+  }
+  if (!tipHeight) {
+    throw new Error("Tip height not initialized");
+  }
+  if (!stakerInfo.address || !stakerInfo.publicKeyNoCoordHex) {
+    throw new Error("Staker info not initialized");
+  }
 };
