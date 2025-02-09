@@ -5,6 +5,7 @@ import {
   Heading,
   Text,
 } from "@babylonlabs-io/bbn-core-ui";
+import { useCallback } from "react";
 import { MdCancel } from "react-icons/md";
 
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -14,6 +15,7 @@ import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface WalletDisconnectModalProps {
   isOpen: boolean;
+  closeMenu: () => void;
   onClose: () => void;
   onDisconnect: () => void;
 }
@@ -23,9 +25,15 @@ const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 export const WalletDisconnectModal = ({
   isOpen,
+  closeMenu,
   onClose,
   onDisconnect,
 }: WalletDisconnectModalProps) => {
+  const handleDisconnect = useCallback(() => {
+    onDisconnect();
+    closeMenu();
+  }, [onDisconnect, closeMenu]);
+
   return (
     <ResponsiveDialog open={isOpen} onClose={onClose}>
       <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary items-center">
@@ -56,7 +64,7 @@ export const WalletDisconnectModal = ({
         <Button
           variant="contained"
           color="secondary"
-          onClick={onDisconnect}
+          onClick={handleDisconnect}
           className="flex-1"
         >
           Disconnect
