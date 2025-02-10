@@ -41,7 +41,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
     }
   }, [selectedValue]);
 
-  const renderLabel = (label: string, amount: number, hint: string) => {
+  const renderLabel = (label: string, amount: string, hint: string) => {
     return (
       <Text
         as="span"
@@ -57,7 +57,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
     );
   };
 
-  const renderCustomLabel = (label: string, amount: number) => {
+  const renderCustomLabel = (label: string, amount: string) => {
     return (
       <Text
         as="span"
@@ -84,28 +84,28 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
       labelRenderer: renderLabel,
       className: "border border-secondary-strokeLight rounded p-4",
       key: "fast",
-      value: fastestFee,
+      value: fastestFee.toString(),
       hint: "Next Block",
     },
     {
       labelRenderer: renderLabel,
       className: "border border-secondary-strokeLight rounded p-4",
       key: "medium",
-      value: mediumFee,
+      value: mediumFee.toString(),
       hint: "Estimated 30mins",
     },
     {
       labelRenderer: renderLabel,
       className: "border border-secondary-strokeLight rounded p-4",
       key: "slow",
-      value: lowestFee,
+      value: lowestFee.toString(),
       hint: "Estimated 60mins",
     },
     {
       labelRenderer: renderCustomLabel,
       className: "items-center border border-transparent px-4 py-2",
       key: "custom",
-      value: parseFloat(customFee),
+      value: customFee,
       hint: "Next Block",
     },
   ];
@@ -115,8 +115,8 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
       (option) => option.key === selectedValue,
     );
 
-    if (selectedOption && !Number.isNaN(selectedOption.value)) {
-      onSubmit?.(selectedOption.value);
+    if (selectedOption && selectedOption.value) {
+      onSubmit?.(parseFloat(selectedOption.value));
       onClose?.();
     }
   }
