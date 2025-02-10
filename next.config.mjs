@@ -6,6 +6,14 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true,
   },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/rpc/:path*",
+  //       destination: "http://localhost:26657/:path*",
+  //     },
+  //   ];
+  // },
 };
 
 const config = withSentryConfig(nextConfig, {
