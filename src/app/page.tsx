@@ -14,6 +14,7 @@ import { Header } from "./components/Header/Header";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Stats } from "./components/Stats/Stats";
+import { useBTCWallet } from "./context/wallet/BTCWalletProvider";
 
 const Home = () => {
   useEffect(() => {
@@ -21,11 +22,19 @@ const Home = () => {
   }, []);
 
   const [showPhase2HereModal, setShowPhase2HereModal] = useState(true);
+  const { publicKeyNoCoord, getPublicKeyHex } = useBTCWallet();
+
+  const printPK = async () => {
+    console.log("PK", await getPublicKeyHex());
+    console.log("PK no coord", publicKeyNoCoord);
+  };
 
   return (
     <>
       <Banner />
       <Header />
+
+      <button onClick={printPK}>print pk</button>
 
       <Container
         as="main"
