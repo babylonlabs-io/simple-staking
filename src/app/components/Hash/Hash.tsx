@@ -2,7 +2,7 @@ import { Text } from "@babylonlabs-io/bbn-core-ui";
 import { useEffect, useState } from "react";
 import { FiCopy } from "react-icons/fi";
 import { IoIosCheckmarkCircle } from "react-icons/io";
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 import { useCopyToClipboard } from "usehooks-ts";
 
 import { trim } from "@/utils/trim";
@@ -53,6 +53,7 @@ export const Hash: React.FC<HashProps> = ({
         "hover:opacity-100 pointer-events-auto text-accent-primary",
         className,
         !noFade && "opacity-50",
+        fullWidth && "w-full",
       )}
       onClick={handleCopy}
     >
@@ -61,7 +62,6 @@ export const Hash: React.FC<HashProps> = ({
         style={{
           minWidth: small ? "3.5rem" : "5.5rem",
         }}
-        className={twJoin(fullWidth ? "w-full" : "")}
       >
         {copiedText || (
           <>

@@ -2,8 +2,6 @@ import {
   Avatar,
   AvatarGroup,
   Button,
-  MobileDialog,
-  Popover,
   Text,
   Toggle,
 } from "@babylonlabs-io/bbn-core-ui";
@@ -15,22 +13,22 @@ import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
-import { IoIosMoon, IoIosSunny } from "react-icons/io";
-import { MdKeyboardArrowDown } from "react-icons/md";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
+import bbnIcon from "@/app/assets/bbn.svg";
 import bitcoin from "@/app/assets/bitcoin.png";
-import bbnIcon from "@/app/assets/icon-black.svg";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
-import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { Hash } from "../Hash/Hash";
+import { MenuButton } from "../Menu/MenuButton";
+import { MenuContent } from "../Menu/MenuContent";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface ConnectProps {
   loading?: boolean;
@@ -43,15 +41,9 @@ export const Connect: React.FC<ConnectProps> = ({
   loading = false,
   onConnect,
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isMobileView = useIsMobileView();
-  const {
-    includeOrdinals,
-    excludeOrdinals,
-    ordinalsExcluded,
-    theme,
-    setTheme,
-  } = useAppState();
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { includeOrdinals, excludeOrdinals, ordinalsExcluded } = useAppState();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Wallet states
   const { address: btcAddress, connected: btcConnected } = useBTCWallet();
@@ -61,7 +53,6 @@ export const Connect: React.FC<ConnectProps> = ({
   // Widget states
   const { selectedWallets } = useWidgetState();
 
-  const [showMenu, setShowMenu] = useState(false);
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
@@ -70,18 +61,12 @@ export const Connect: React.FC<ConnectProps> = ({
     [btcConnected, bbnConnected],
   );
 
-  const handleClickOutside = useCallback(() => {
-    setShowMenu(false);
-  }, []);
-
   const handleDisconnectClick = useCallback(() => {
-    setShowMenu(false);
     setShowDisconnectModal(true);
   }, []);
 
   const handleDisconnectCancel = useCallback(() => {
     setShowDisconnectModal(false);
-    setShowMenu(true);
   }, []);
 
   const handleDisconnectConfirm = useCallback(() => {
@@ -109,7 +94,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   if (!isConnected) {
     return (
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-2">
         <Button
           size="large"
           color="secondary"
@@ -120,6 +105,23 @@ export const Connect: React.FC<ConnectProps> = ({
           <PiWalletBold size={20} className="flex md:hidden" />
           <span className="hidden md:flex">Connect Wallets</span>
         </Button>
+
+        <MenuButton
+          ref={buttonRef}
+          isOpen={isMenuOpen}
+          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+        />
+        <MenuContent
+          anchorEl={buttonRef.current}
+          className="p-4"
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        >
+          <div className="min-w-[250px]">
+            <ThemeToggle />
+          </div>
+        </MenuContent>
+
         {!isApiNormal && renderApiNotAvailableTooltip}
       </div>
     );
@@ -135,7 +137,7 @@ export const Connect: React.FC<ConnectProps> = ({
             className="max-w-[40px] max-h-[40px]"
           />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <Text variant="body1" className="text-accent-primary text-base">
             Bitcoin
           </Text>
@@ -144,7 +146,6 @@ export const Connect: React.FC<ConnectProps> = ({
             value={btcAddress}
             address
             noFade
-            fullWidth
             symbols={12}
           />
         </div>
@@ -167,9 +168,13 @@ export const Connect: React.FC<ConnectProps> = ({
       <div className="divider my-0" />
       <div className="flex flex-row gap-2">
         <div className="flex items-center justify-center">
-          <Image src={bbnIcon} alt="babylon" width={40} height={40} />
+          <Image
+            src={bbnIcon}
+            alt="babylon"
+            className="max-w-[40px] max-h-[40px]"
+          />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full">
           <Text variant="body1" className="text-accent-primary text-base">
             {bbnNetworkFullName}
           </Text>
@@ -178,7 +183,6 @@ export const Connect: React.FC<ConnectProps> = ({
             value={bech32Address}
             address
             noFade
-            fullWidth
             symbols={12}
           />
         </div>
@@ -191,33 +195,13 @@ export const Connect: React.FC<ConnectProps> = ({
         <button className="text-sm w-full text-left">Disconnect Wallets</button>
       </div>
       <div className="divider my-0" />
-      <div className="flex flex-row items-center justify-between">
-        <Text
-          variant="body2"
-          className="text-sm text-accent-primary capitalize"
-        >
-          {theme} Mode
-        </Text>
-        <div className="flex flex-col items-center justify-center">
-          <Toggle
-            defaultValue={theme === "dark"}
-            onChange={(value) => {
-              setTheme(value ? "dark" : "light");
-            }}
-            inactiveIcon={<IoIosMoon size={10} />}
-            activeIcon={<IoIosSunny size={12} />}
-          />
-        </div>
-      </div>
+      <ThemeToggle />
     </div>
   );
 
   return (
     <>
-      <div
-        ref={containerRef}
-        className="relative flex flex-row items-center gap-2"
-      >
+      <div className="relative flex flex-row items-center gap-2">
         <div className="flex flex-row">
           <AvatarGroup max={2} variant="circular">
             <Avatar
@@ -242,39 +226,27 @@ export const Connect: React.FC<ConnectProps> = ({
             <Text variant="body1">{bech32Address.slice(0, 6)}</Text>
           </div>
         </div>
-        <button
-          onClick={() => setShowMenu(!showMenu)}
-          className="flex items-center justify-center p-2 border rounded border-secondary-contrast text-secondary-contrast"
-        >
-          <MdKeyboardArrowDown size={24} />
-        </button>
+        <MenuButton
+          ref={buttonRef}
+          isOpen={isMenuOpen}
+          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+        />
 
-        {isMobileView ? (
-          <MobileDialog
-            open={showMenu}
-            onClose={handleClickOutside}
-            className="p-4"
-          >
-            {walletContent}
-          </MobileDialog>
-        ) : (
-          <Popover
-            anchorEl={containerRef.current}
-            open={showMenu}
-            offset={[0, 11]}
-            placement="bottom-end"
-            onClickOutside={handleClickOutside}
-            className="flex flex-col gap-2 bg-surface rounded p-4 border border-secondary-strokeLight"
-          >
-            {walletContent}
-          </Popover>
-        )}
+        <MenuContent
+          anchorEl={buttonRef.current}
+          className="p-4 min-w-[250px]"
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        >
+          {walletContent}
+        </MenuContent>
       </div>
 
       <WalletDisconnectModal
         isOpen={showDisconnectModal}
         onClose={handleDisconnectCancel}
         onDisconnect={handleDisconnectConfirm}
+        closeMenu={() => setIsMenuOpen(false)}
       />
     </>
   );
