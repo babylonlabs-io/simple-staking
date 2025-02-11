@@ -15,11 +15,6 @@ const msgCreateBTCDelegationConverter = {
     //
     toAmino: (msg: btcstakingtx.MsgCreateBTCDelegation) => {
       console.log("toAmino", msg);
-      console.log(
-        "msg.pop.btcSig",
-        Buffer.from(msg?.pop?.btcSig).toString("hex"),
-      );
-      console.log("btc_pk", Buffer.from(msg.btcPk).toString("hex"));
       return {
         staker_addr: msg.stakerAddr,
         pop: msg.pop
@@ -71,14 +66,6 @@ const msgCreateBTCDelegationConverter = {
     //
     fromAmino: (json: any): btcstakingtx.MsgCreateBTCDelegation => {
       console.log("fromAmino", json);
-      console.log("json.pop.btc_sig", json.pop.btc_sig);
-      console.log(
-        "json.pop.btc_sign buf",
-        Buffer.from(json.pop.btc_sig, "hex"),
-      );
-      console.log("json.btc_pk", json.btc_pk);
-      console.log("json.btc_pk buf", Buffer.from(json.btc_pk, "hex"));
-
       return {
         stakerAddr: json.staker_addr,
         pop: json.pop
