@@ -76,9 +76,6 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             aminoTypes,
           },
         );
-        // console.log("client", client);
-        console.log("offlineSigner", offlineSigner);
-        console.log("offlineSigner.getAccounts", offlineSigner.getAccounts);
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);

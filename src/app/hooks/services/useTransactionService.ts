@@ -157,7 +157,8 @@ export const useTransactionService = () => {
       await signingCallback(SigningStep.SIGN_BBN);
       console.log("delegationMsg", delegationMsg);
       const signedTx = await signBbnTx(delegationMsg);
-      console.log("signedTx", signedTx.toString());
+      console.log("signedTx hex", Buffer.from(signedTx).toString("hex"));
+      console.log("signedTx base64", Buffer.from(signedTx).toString("base64"));
       // Send the transaction
       await signingCallback(SigningStep.SEND_BBN);
       await sendBbnTx(signedTx);
@@ -308,7 +309,6 @@ export const useTransactionService = () => {
       await signingCallback(SigningStep.SIGN_BBN);
       console.log("delegationMsg", delegationMsg);
       const signedTx = await signBbnTx(delegationMsg);
-      console.log("signedTx", Buffer.from(signedTx).toString("hex"));
       // Send the transaction
       await signingCallback(SigningStep.SEND_BBN);
       await sendBbnTx(signedTx);

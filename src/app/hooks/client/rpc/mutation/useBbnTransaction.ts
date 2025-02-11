@@ -51,7 +51,15 @@ export const useBbnTransaction = () => {
       // estimate gas
       const fee = await estimateBbnGasFee(msg);
       // sign it
-      return signTx(msg, fee);
+      try {
+        const signed = await signTx(msg, fee);
+        console.log("signed hex", Buffer.from("signed").toString("hex"));
+        console.log("signed base", Buffer.from("signed").toString("base64"));
+        return signed;
+      } catch (error: Error | any) {
+        console.log("sign err", error);
+        throw new Error(error?.message || error);
+      }
     },
     [estimateBbnGasFee, signTx],
   );
