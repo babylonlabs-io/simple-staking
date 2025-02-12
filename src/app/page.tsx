@@ -18,6 +18,7 @@ import {
   getPublicKeyNoCoord,
   isSupportedAddressType,
   toNetwork,
+  validateAddressWithPK,
 } from "@/utils/wallet/index";
 import { Network, WalletProvider } from "@/utils/wallet/wallet_provider";
 
@@ -30,6 +31,7 @@ import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { LoadingView } from "./components/Loading/Loading";
+import { AddressValidationModal } from "./components/Modals/AddressValidationModal";
 import { ConnectModal } from "./components/Modals/ConnectModal";
 import { ErrorModal } from "./components/Modals/ErrorModal";
 import { FilterOrdinalsModal } from "./components/Modals/FilterOrdinalsModal";
@@ -40,6 +42,7 @@ import { Stats } from "./components/Stats/Stats";
 import { Summary } from "./components/Summary/Summary";
 import { UnbondingDisabledBanner } from "./components/UnbondingDisabledBanner/UnbondingDisabledBanner";
 import { useError } from "./context/Error/ErrorContext";
+import { useAddressValidation } from "./hooks/useAddressValidation";
 import { Delegation, DelegationState } from "./types/delegations";
 import { ErrorState } from "./types/errors";
 
@@ -49,6 +52,11 @@ const Home: React.FC<HomeProps> = () => {
   const [btcWallet, setBTCWallet] = useState<WalletProvider>();
   const [btcWalletNetwork, setBTCWalletNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
+  const {
+    open: validationModalOpen,
+    openValidationModal,
+    closeValidationModal,
+  } = useAddressValidation();
 
   const [address, setAddress] = useState("");
   const {
@@ -245,11 +253,12 @@ const Home: React.FC<HomeProps> = () => {
           throw new Error(supportedNetworkMessage);
         }
 
-        const publicKeyNoCoord = getPublicKeyNoCoord(
-          await walletProvider.getPublicKeyHex(),
-        );
+        const publicKey = await walletProvider.getPublicKeyHex();
+        const publicKeyNoCoord = getPublicKeyNoCoord(publicKey);
+        const network = await walletProvider.getNetwork();
+
         setBTCWallet(walletProvider);
-        setBTCWalletNetwork(toNetwork(await walletProvider.getNetwork()));
+        setBTCWalletNetwork(toNetwork(network));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
 
@@ -263,6 +272,10 @@ const Home: React.FC<HomeProps> = () => {
           address,
           public_key: publicKeyNoCoord.toString("hex"),
         });
+
+        if (!validateAddressWithPK(address, publicKey, network)) {
+          openValidationModal();
+        }
       } catch (error: Error | any) {
         if (
           error instanceof WalletError &&
@@ -435,7 +448,7 @@ const Home: React.FC<HomeProps> = () => {
         connectDisabled={!!address}
       />
       <FilterOrdinalsModal
-        open={filterOrdinalsModalOpen}
+        open={filterOrdinalsModalOpen && !validationModalOpen}
         onClose={handleCloseFilterOrdinalsModal}
         shouldFilterOrdinals={shouldFilterOrdinals}
         setShouldFilterOrdinals={handleShouldFilterOrdinals}
@@ -447,6 +460,15 @@ const Home: React.FC<HomeProps> = () => {
         onClose={hideError}
         onRetry={retryErrorAction}
         noCancel={noCancel}
+      />
+      <AddressValidationModal
+        open={validationModalOpen}
+        onCancel={() => {
+          handleDisconnectBTC();
+          setFilterOrdinalsModalOpen(false);
+          closeValidationModal();
+        }}
+        onSubmit={closeValidationModal}
       />
       <UnbondingDisabledModal />
     </main>
