@@ -156,7 +156,11 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (!btcWalletProvider) return;
 
-    const cb = () => void connectBTC(btcWalletProvider);
+    const cb = async () => {
+      await btcWalletProvider.connectWallet();
+      void connectBTC(btcWalletProvider);
+    };
+
     btcWalletProvider.on("accountChanged", cb);
 
     return () => void btcWalletProvider.off("accountChanged", cb);
