@@ -15,7 +15,7 @@ export function BTCFeeAmount() {
 
   const btcInUsd = prices?.[coinSymbol] ?? 0;
   const feeInUsd = (satoshiToBtc(parseFloat(feeAmount)) * btcInUsd).toFixed(2);
-  const feeInUsdDisplay = feeInUsd === "0.00" ? "" : `$${feeInUsd}`;
+  const feeInUsdDisplay = feeInUsd === "0.00" ? "-" : `$${feeInUsd}`;
 
   return (
     <FeeItem title={`${coinSymbol} Network Fee`} hint={feeInUsdDisplay}>
