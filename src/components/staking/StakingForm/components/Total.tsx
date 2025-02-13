@@ -19,7 +19,7 @@ export function Total() {
 
   const btcInUsd = prices?.[coinSymbol] ?? 0;
   const totalInUsd = (total * btcInUsd).toFixed(2);
-  const totalInUsdDisplay = totalInUsd === "0.00" ? "" : `$${totalInUsd}`;
+  const totalInUsdDisplay = totalInUsd === "0.00" ? "-" : `$${totalInUsd}`;
 
   return (
     <div className="flex flex-row items-start justify-between text-accent-primary">
