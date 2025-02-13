@@ -10,7 +10,7 @@ const { coinSymbol } = getNetworkConfigBBN();
 
 export function BBNFeeAmount({ amount = "0" }: FeeStatsProps) {
   return (
-    <FeeItem title="Babylon Network Fee">
+    <FeeItem title={`${coinSymbol} Network Fee`}>
       {amount} {coinSymbol}
     </FeeItem>
   );
