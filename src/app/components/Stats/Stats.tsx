@@ -2,6 +2,7 @@ import { Card } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";
+import { usePrices } from "@/app/hooks/client/api/usePrices";
 import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
@@ -9,7 +10,7 @@ import { maxDecimals } from "@/utils/maxDecimals";
 
 import { StatItem } from "./StatItem";
 
-const { coinName, coinSymbol } = getNetworkConfigBTC();
+const { coinSymbol } = getNetworkConfigBTC();
 
 const formatter = Intl.NumberFormat("en", {
   notation: "compact",
@@ -18,6 +19,7 @@ const formatter = Intl.NumberFormat("en", {
 
 export const Stats = memo(() => {
   const { data, isLoading } = useSystemStats();
+  const { data: prices } = usePrices();
 
   const activeTvl = data?.active_tvl ?? 0;
   const activeStakers = data?.active_stakers ?? 0;
@@ -25,16 +27,22 @@ export const Stats = memo(() => {
   const totalFinalityProviders = data?.total_finality_providers ?? 0;
   const activeFinalityProviders = data?.active_finality_providers ?? 0;
 
+  const btcInUsd = prices?.[coinSymbol] ?? 0;
+  const tvlInBtc = satoshiToBtc(activeTvl);
+  const tvlInUsd = tvlInBtc * btcInUsd;
+
   return (
     <Section
       title="Babylon Bitcoin Staking Stats"
       titleClassName="text-accent-contrast"
     >
-      <Card className="flex flex-col justify-between  text-base md:flex-row">
+      <Card className="flex flex-col justify-between text-base md:flex-row">
         <StatItem
           loading={isLoading}
           title={`Confirmed ${coinSymbol} TVL`}
-          value={`${satoshiToBtc(activeTvl) >= 1 ? maxDecimals(satoshiToBtc(activeTvl), 2) : maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinSymbol}`}
+          value={`${tvlInBtc >= 1 ? maxDecimals(tvlInBtc, 2) : maxDecimals(tvlInBtc, 8)} ${coinSymbol} ${
+            btcInUsd ? `($${formatter.format(tvlInUsd)})` : ""
+          }`}
           tooltip="Total number of active bitcoins staked"
         />
 
@@ -59,7 +67,9 @@ export const Stats = memo(() => {
         <StatItem
           loading={isLoading}
           title="Finality Providers"
-          value={`${activeFinalityProviders} Active (${totalFinalityProviders} Total)`}
+          value={`${activeFinalityProviders} Active (${
+            totalFinalityProviders
+          } Total)`}
           tooltip="Active and total number of finality providers"
         />
       </Card>
