@@ -11,6 +11,7 @@ import {
 import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
+import { usePrices } from "@/app/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -61,6 +62,12 @@ export const PreviewModal = ({
       networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
     ) || "7 days";
 
+  const { data: prices } = usePrices();
+  const btcInUsd = prices?.[coinSymbol] ?? 0;
+
+  const formatUsd = (sats: number) =>
+    `$${(satoshiToBtc(sats) * btcInUsd).toFixed(2)}`;
+
   const FinalityProviderValue = isMobileView ? (
     <span className="flex gap-2">
       {finalityProviderAvatar && (
@@ -85,9 +92,18 @@ export const PreviewModal = ({
     {
       key: "Stake Amount",
       value: (
-        <Text variant="body1">
-          {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
-        </Text>
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {formatUsd(stakingAmountSat)}
+          </Text>
+        </>
       ),
     },
     {
@@ -97,9 +113,18 @@ export const PreviewModal = ({
     {
       key: "Transaction fee",
       value: (
-        <Text variant="body1">
-          {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
-        </Text>
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {formatUsd(stakingFeeSat)}
+          </Text>
+        </>
       ),
     },
     {
@@ -122,9 +147,18 @@ export const PreviewModal = ({
     {
       key: "Unbonding fee",
       value: (
-        <Text variant="body1">
-          {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
-        </Text>
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {formatUsd(unbondingFeeSat)}
+          </Text>
+        </>
       ),
     },
   ];
