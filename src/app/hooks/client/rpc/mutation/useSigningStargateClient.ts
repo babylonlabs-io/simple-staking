@@ -93,13 +93,27 @@ export const useSigningStargateClient = () => {
         throw new Error("Wallet not connected");
       }
 
-      const res = await signingStargateClient.sign(
-        bech32Address,
-        [msg],
-        fee,
-        "",
-      );
-      return TxRaw.encode(res).finish();
+      try {
+        const signerData =
+          await signingStargateClient.getAccount(bech32Address);
+        console.log("signerData", signerData);
+        const res = await signingStargateClient.sign(
+          bech32Address,
+          [msg],
+          fee,
+          "",
+          // {
+          //   accountNumber: signerData!.accountNumber,
+          //   sequence: signerData!.sequence,
+          //   chainId: "devnet-9",
+          // }
+        );
+        return TxRaw.encode(res).finish();
+      } catch (error) {
+        console.log("errorin the signTx");
+        console.error(error);
+        throw error;
+      }
     },
 
     [signingStargateClient, bech32Address],
@@ -122,17 +136,26 @@ export const useSigningStargateClient = () => {
         throw new Error("Wallet not connected");
       }
 
-      const res = await signingStargateClient.broadcastTx(tx);
-      if (res.code !== 0) {
-        // wallet error
-        throw new Error(
-          `Failed to send transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
-        );
+      try {
+        console.log("broadcasting tx");
+        const res = await signingStargateClient.broadcastTx(tx);
+        if (res.code !== 0) {
+          console.log("error in the broadcastTx");
+          console.error(res);
+          // wallet error
+          throw new Error(
+            `Failed to send transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
+          );
+        }
+        return {
+          gasUsed: res.gasUsed.toString(),
+          txHash: res.transactionHash,
+        };
+      } catch (error) {
+        console.log("errorin the broadcastTx");
+        console.error(error);
+        throw error;
       }
-      return {
-        gasUsed: res.gasUsed.toString(),
-        txHash: res.transactionHash,
-      };
     },
     [signingStargateClient, bech32Address],
   );

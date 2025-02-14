@@ -5,6 +5,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/bbn-wallet-connect";
+import { isOfflineDirectSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import {
   createContext,
@@ -18,6 +19,7 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { createBbnAminoTypes } from "@/utils/wallet/babylonAminos";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 interface CosmosWalletContextProps {
@@ -62,11 +64,16 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const address = await provider.getAddress();
-        const offlineSigner = await provider.getOfflineSigner();
+        const offlineSigner = await (
+          window as any
+        ).leap.getOfflineSignerOnlyAmino("devnet-9");
+        // Should be false which means we are in the amino signer mode
+        console.log(isOfflineDirectSigner(offlineSigner));
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
           offlineSigner,
           {
+            aminoTypes: createBbnAminoTypes(),
             registry: createBbnRegistry(),
           },
         );
