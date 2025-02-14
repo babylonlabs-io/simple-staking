@@ -97,6 +97,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
 
       try {
+        await walletProvider.connectWallet();
+
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
@@ -156,10 +158,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (!btcWalletProvider) return;
 
-    const cb = async () => {
-      await btcWalletProvider.connectWallet();
-      void connectBTC(btcWalletProvider);
-    };
+    const cb = () => connectBTC(btcWalletProvider);
 
     btcWalletProvider.on("accountChanged", cb);
 
