@@ -1,6 +1,7 @@
-import { Card } from "@babylonlabs-io/bbn-core-ui";
+import { List } from "@babylonlabs-io/bbn-core-ui";
 
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
 import { AuthGuard } from "@/components/common/AuthGuard";
@@ -11,6 +12,7 @@ import { satoshiToBtc } from "@/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { Section } from "../Section/Section";
+import { ActionComponent } from "../Stats/ActionComponent";
 import { StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
@@ -38,16 +40,16 @@ export function PersonalBalance() {
   } = useBalanceState();
 
   const { claimRewards, showPreview } = useRewardsService();
-
+  const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
   return (
     <AuthGuard>
       <Section title="Wallet Balance">
-        <Card className="flex flex-col justify-between text-base md:flex-row">
+        <List orientation="adaptive" className="bg-surface">
           <StatItem
             loading={loading}
-            title={`Total ${coinName} Balance`}
+            title={isMobile ? "Total Balance" : `Total ${coinName} Balance`}
             value={`${satoshiToBtc(combinedTotalBtcBalance)} ${coinSymbol}`}
             tooltip={
               inscriptionsBtcBalance
@@ -56,35 +58,32 @@ export function PersonalBalance() {
             }
           />
 
-          <div className="divider mx-0 my-2 md:divider-horizontal" />
-
           <StatItem
             loading={loading}
             title={"Stakable Balance"}
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 
-          <div className="divider mx-0 my-2 md:divider-horizontal" />
-
           <StatItem
             loading={loading}
-            title={`${bbnNetworkName} Balance`}
+            title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
             value={`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
           />
 
-          <div className="divider mx-0 my-2 md:divider-horizontal" />
-
           <StatItem
             loading={loading}
-            title={`${bbnNetworkName} Rewards`}
+            title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
-            actionComponent={{
-              title: "Claim",
-              onAction: showPreview,
-              isDisabled: !rewardBalance || processing,
-            }}
+            suffix={
+              <ActionComponent
+                className="h-6"
+                title="Claim"
+                onAction={showPreview}
+                isDisabled={!rewardBalance || processing}
+              />
+            }
           />
-        </Card>
+        </List>
 
         <ClaimRewardModal
           processing={processing}
