@@ -1,4 +1,4 @@
-import { Card } from "@babylonlabs-io/bbn-core-ui";
+import { List } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";
@@ -30,15 +30,13 @@ export const Stats = memo(() => {
       title="Babylon Bitcoin Staking Stats"
       titleClassName="text-accent-contrast"
     >
-      <Card className="flex flex-col justify-between  text-base md:flex-row">
+      <List orientation="adaptive" className="bg-surface">
         <StatItem
           loading={isLoading}
           title={`Confirmed ${coinSymbol} TVL`}
           value={`${satoshiToBtc(activeTvl) >= 1 ? maxDecimals(satoshiToBtc(activeTvl), 2) : maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinSymbol}`}
           tooltip="Total number of active bitcoins staked"
         />
-
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
 
         <StatItem
           loading={isLoading}
@@ -47,7 +45,6 @@ export const Stats = memo(() => {
           tooltip="Total number of active bitcoin stakers"
         />
 
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
         <StatItem
           loading={isLoading}
           title="Delegations"
@@ -55,14 +52,13 @@ export const Stats = memo(() => {
           tooltip="Total number of active bitcoin staking delegations"
         />
 
-        <div className="divider mx-0 my-2 md:divider-horizontal" />
         <StatItem
           loading={isLoading}
           title="Finality Providers"
           value={`${activeFinalityProviders} Active (${totalFinalityProviders} Total)`}
           tooltip="Active and total number of finality providers"
         />
-      </Card>
+      </List>
     </Section>
   );
 });
