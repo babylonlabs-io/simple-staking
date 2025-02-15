@@ -13,6 +13,7 @@ COPY next.config.mjs .
 COPY tsconfig.json .
 COPY tailwind.config.ts .
 COPY postcss.config.js .
+COPY sentry.client.config.ts .
 
 ARG NEXT_PUBLIC_MEMPOOL_API
 ENV NEXT_PUBLIC_MEMPOOL_API=${NEXT_PUBLIC_MEMPOOL_API}
