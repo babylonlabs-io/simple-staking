@@ -1,4 +1,4 @@
-import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import Link from "next/link";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
@@ -139,7 +139,11 @@ export function DelegationList() {
           validations,
           slashedStatuses,
         }}
-        fallback={<div>No delegations found</div>}
+        fallback={
+          <Text as="div" className="text-accent-secondary">
+            No delegations found
+          </Text>
+        }
       />
 
       <DelegationModal
