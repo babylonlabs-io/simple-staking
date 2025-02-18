@@ -12,3 +12,8 @@ export const usePrices = () => {
     staleTime: ONE_MINUTE,
   });
 };
+
+export const usePrice = (symbol: string) => {
+  const { data: prices } = usePrices();
+  return prices?.[symbol] ?? 0;
+};

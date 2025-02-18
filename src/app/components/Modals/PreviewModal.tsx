@@ -11,11 +11,12 @@ import {
 import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { usePrices } from "@/app/hooks/client/api/usePrices";
+import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
+import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
 
@@ -62,11 +63,7 @@ export const PreviewModal = ({
       networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
     ) || "7 days";
 
-  const { data: prices } = usePrices();
-  const btcInUsd = prices?.[coinSymbol] ?? 0;
-
-  const formatUsd = (sats: number) =>
-    `$${(satoshiToBtc(sats) * btcInUsd).toFixed(2)}`;
+  const btcInUsd = usePrice(coinSymbol);
 
   const FinalityProviderValue = isMobileView ? (
     <span className="flex gap-2">
@@ -101,7 +98,10 @@ export const PreviewModal = ({
             variant="body2"
             className="text-accent-secondary ml-2"
           >
-            {formatUsd(stakingAmountSat)}
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(stakingAmountSat),
+              btcInUsd,
+            )}
           </Text>
         </>
       ),
@@ -122,7 +122,10 @@ export const PreviewModal = ({
             variant="body2"
             className="text-accent-secondary ml-2"
           >
-            {formatUsd(stakingFeeSat)}
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(stakingFeeSat),
+              btcInUsd,
+            )}
           </Text>
         </>
       ),
@@ -156,7 +159,10 @@ export const PreviewModal = ({
             variant="body2"
             className="text-accent-secondary ml-2"
           >
-            {formatUsd(unbondingFeeSat)}
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(unbondingFeeSat),
+              btcInUsd,
+            )}
           </Text>
         </>
       ),
