@@ -156,7 +156,7 @@ export const Connect: React.FC<ConnectProps> = ({
         </Text>
         <div className="flex flex-col items-center justify-center">
           <Toggle
-            defaultValue={ordinalsExcluded}
+            defaultValue={!ordinalsExcluded}
             onChange={(value) =>
               value ? includeOrdinals() : excludeOrdinals()
             }
