@@ -66,7 +66,11 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         const address = await provider.getAddress();
         // const offlineSigner = await provider.getOfflineSigner();
         // TODO remove
-        const offlineSigner = window.getOfflineSignerOnlyAmino("bbn-test-5");
+        const offlineSigner =
+          await window.keplr.getOfflineSignerOnlyAmino("bbn-test-5");
+        // const offlineSigner =
+        //   await window.keplr.getOfflineSignerAuto("bbn-test-5");
+        // const offlineSigner = await window.keplr.getOfflineSigner("bbn-test-5");
         const aminoTypes = createBbnAminoTypes();
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
@@ -76,6 +80,21 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             aminoTypes,
           },
         );
+        const chainId = await client.getChainId(); // "bbn-test-5"
+        console.log("chainId", chainId);
+
+        const { accountNumber, sequence } = await client.getSequence(address);
+        console.log("accountNumber", accountNumber);
+        console.log("sequence", sequence);
+
+        // explicit signer data
+        const signerData = {
+          accountNumber: accountNumber,
+          sequence: sequence,
+          chainId: chainId,
+        };
+        console.log("signerData", signerData);
+
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);

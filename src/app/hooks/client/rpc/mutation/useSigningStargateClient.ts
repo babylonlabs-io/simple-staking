@@ -89,11 +89,23 @@ export const useSigningStargateClient = () => {
         throw new Error("Wallet not connected");
       }
 
+      const { accountNumber, sequence } =
+        await signingStargateClient.getSequence(bech32Address);
+      const chainId = await signingStargateClient.getChainId();
+
       const res = await signingStargateClient.sign(
         bech32Address,
         [msg],
         fee,
         "",
+        {
+          accountNumber,
+          sequence,
+          chainId,
+          // accountNumber: 54545,
+          // sequence: 71,
+          // chainId: "bbn-test-5",
+        },
       );
       return TxRaw.encode(res).finish();
     },

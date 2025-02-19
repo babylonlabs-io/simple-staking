@@ -5,11 +5,12 @@ import {
 } from "@babylonlabs-io/babylon-proto-ts";
 import { AminoTypes } from "@cosmjs/stargate";
 
-import { BBN_REGISTRY_TYPE_URLS } from "./bbnRegistry";
+// import { BBN_REGISTRY_TYPE_URLS } from "./bbnRegistry";
 
 const msgCreateBTCDelegationConverter = {
-  [BBN_REGISTRY_TYPE_URLS.MsgCreateBTCDelegation]: {
-    aminoType: BBN_REGISTRY_TYPE_URLS.MsgCreateBTCDelegation,
+  "/babylon.btcstaking.v1.MsgCreateBTCDelegation": {
+    aminoType: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
+    // aminoType: "CREATE_BABY",
     //
     // 1) Protobuf -> Amino JSON
     //
@@ -114,8 +115,9 @@ const msgCreateBTCDelegationConverter = {
 };
 
 const msgWithdrawRewardConverter = {
-  [BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward]: {
-    aminoType: BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward,
+  "/babylon.incentive.MsgWithdrawReward": {
+    aminoType: "/babylon.incentive.MsgWithdrawReward",
+    // aminoType: "WITHDRAW_BABY",
     toAmino: (msg: incentivetx.MsgWithdrawReward) => {
       return {
         type: msg.type,

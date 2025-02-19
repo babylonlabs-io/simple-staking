@@ -12,5 +12,7 @@ declare global {
     cactuslink: any;
     // TODO remove
     getOfflineSignerOnlyAmino: any;
+    getOfflineSigner: any;
+    getOfflineSignerAuto: any;
   }
 }
