@@ -2,14 +2,15 @@ import { List } from "@babylonlabs-io/bbn-core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";
+import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
-import { maxDecimals } from "@/utils/maxDecimals";
+import { formatBTCTvl } from "@/utils/formatBTCTvl";
 
 import { StatItem } from "./StatItem";
 
-const { coinName, coinSymbol } = getNetworkConfigBTC();
+const { coinSymbol } = getNetworkConfigBTC();
 
 const formatter = Intl.NumberFormat("en", {
   notation: "compact",
@@ -25,6 +26,11 @@ export const Stats = memo(() => {
   const totalFinalityProviders = data?.total_finality_providers ?? 0;
   const activeFinalityProviders = data?.active_finality_providers ?? 0;
 
+  const btcInUsd = usePrice(coinSymbol);
+
+  const tvlInBtc = satoshiToBtc(activeTvl);
+  const tvlInUsd = tvlInBtc * btcInUsd;
+
   return (
     <Section
       title="Babylon Bitcoin Staking Stats"
@@ -34,7 +40,7 @@ export const Stats = memo(() => {
         <StatItem
           loading={isLoading}
           title={`Confirmed ${coinSymbol} TVL`}
-          value={`${satoshiToBtc(activeTvl) >= 1 ? maxDecimals(satoshiToBtc(activeTvl), 2) : maxDecimals(satoshiToBtc(activeTvl), 8)} ${coinSymbol}`}
+          value={formatBTCTvl(tvlInBtc, coinSymbol, tvlInUsd)}
           tooltip="Total number of active bitcoins staked"
         />
 
@@ -55,7 +61,9 @@ export const Stats = memo(() => {
         <StatItem
           loading={isLoading}
           title="Finality Providers"
-          value={`${activeFinalityProviders} Active (${totalFinalityProviders} Total)`}
+          value={`${activeFinalityProviders} Active (${
+            totalFinalityProviders
+          } Total)`}
           tooltip="Active and total number of finality providers"
         />
       </List>

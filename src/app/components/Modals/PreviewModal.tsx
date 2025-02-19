@@ -11,10 +11,12 @@ import {
 import { Fragment } from "react";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
+import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
+import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
 
@@ -61,6 +63,8 @@ export const PreviewModal = ({
       networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
     ) || "7 days";
 
+  const btcInUsd = usePrice(coinSymbol);
+
   const FinalityProviderValue = isMobileView ? (
     <span className="flex gap-2">
       {finalityProviderAvatar && (
@@ -85,9 +89,21 @@ export const PreviewModal = ({
     {
       key: "Stake Amount",
       value: (
-        <Text variant="body1">
-          {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
-        </Text>
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(stakingAmountSat),
+              btcInUsd,
+            )}
+          </Text>
+        </>
       ),
     },
     {
@@ -97,9 +113,21 @@ export const PreviewModal = ({
     {
       key: "Transaction fee",
       value: (
-        <Text variant="body1">
-          {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
-        </Text>
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(stakingFeeSat),
+              btcInUsd,
+            )}
+          </Text>
+        </>
       ),
     },
     {
@@ -122,9 +150,21 @@ export const PreviewModal = ({
     {
       key: "Unbonding fee",
       value: (
-        <Text variant="body1">
-          {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
-        </Text>
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(unbondingFeeSat),
+              btcInUsd,
+            )}
+          </Text>
+        </>
       ),
     },
   ];
