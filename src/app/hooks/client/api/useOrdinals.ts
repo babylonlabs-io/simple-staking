@@ -19,7 +19,7 @@ export function useOrdinals(
 
   const fetchOrdinals = async (): Promise<InscriptionIdentifier[]> => {
     const inscriptions = await Promise.race([
-      getInscriptions(),
+      getInscriptions().catch(() => null),
       wait(WALLET_FETCH_INSRIPTIONS_TIMEOUT),
     ]);
 
@@ -31,6 +31,7 @@ export function useOrdinals(
       filterDust(utxos),
       address,
     );
+
     return verifiedUTXOs.filter((utxo) => utxo.inscription);
   };
 

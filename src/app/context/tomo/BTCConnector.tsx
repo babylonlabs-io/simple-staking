@@ -30,15 +30,12 @@ const createProvider = (provider: BTCProvider): IBTCProvider => {
     getWalletProviderName: () => provider.getWalletProviderName(),
     getWalletProviderIcon: () => provider.getWalletProviderIcon(),
     getInscriptions: () =>
-      provider
-        .getInscriptions()
-        .then((result) =>
-          result.list.map((ordinal) => ({
-            txid: ordinal.inscriptionId,
-            vout: ordinal.outputValue,
-          })),
-        )
-        .catch(() => []),
+      provider.getInscriptions().then((result) =>
+        (result.list || []).map((ordinal) => ({
+          txid: ordinal.inscriptionId,
+          vout: ordinal.outputValue,
+        })),
+      ),
   };
 };
 
