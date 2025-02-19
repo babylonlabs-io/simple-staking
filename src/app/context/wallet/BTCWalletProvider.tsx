@@ -182,8 +182,13 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       getNetworkFees: async () => getNetworkFees(),
       pushTx: async (txHex: string) => pushTx(txHex),
       getBTCTipHeight: async () => getTipHeight(),
-      getInscriptions: async (): Promise<InscriptionIdentifier[]> =>
-        btcWalletProvider?.getInscriptions().catch(() => []) ?? [],
+      getInscriptions: async (): Promise<InscriptionIdentifier[]> => {
+        if (!btcWalletProvider?.getInscriptions) {
+          throw new Error("`getInscriptions` method is not provided");
+        }
+
+        return btcWalletProvider.getInscriptions();
+      },
     }),
     [btcWalletProvider],
   );
