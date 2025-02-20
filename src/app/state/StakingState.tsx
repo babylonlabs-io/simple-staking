@@ -248,10 +248,6 @@ export function StakingState({ children }: PropsWithChildren) {
             .max(
               stakingInfo?.maxFeeRate ?? 0,
               "Selected fee rate is higher than the hour fee",
-            )
-            .min(
-              stakingInfo?.defaultFeeRate ?? 0,
-              "Fees are low, inclusion is not guaranteed",
             ),
 
           feeAmount: number()
