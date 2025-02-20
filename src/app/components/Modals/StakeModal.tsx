@@ -29,7 +29,7 @@ export const StakeModal = ({
         Stake <span className="hidden md:inline">{btc.coinName}</span>
       </>
     }
-    cancelButton="Close"
+    cancelButton="Later"
     onSubmit={onSubmit}
     onClose={onClose}
   >
