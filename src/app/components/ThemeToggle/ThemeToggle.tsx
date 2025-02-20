@@ -17,8 +17,8 @@ export const ThemeToggle = () => {
           onChange={(value) => {
             setTheme(value ? "dark" : "light");
           }}
-          inactiveIcon={<IoIosMoon size={10} />}
-          activeIcon={<IoIosSunny size={12} />}
+          inactiveIcon={<IoIosSunny size={12} />}
+          activeIcon={<IoIosMoon size={10} />}
         />
       </div>
     </div>
