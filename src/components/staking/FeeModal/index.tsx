@@ -1,11 +1,9 @@
 import {
   Button,
-  Chip,
   DialogBody,
   DialogFooter,
   DialogHeader,
   Heading,
-  Input,
   Loader,
   Radio,
   Text,
@@ -15,6 +13,10 @@ import { useEffect, useRef, useState } from "react";
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
+import { useStakingState } from "@/app/state/StakingState";
+
+import { CustomLabel } from "./components/CustomLabel";
+import { Label } from "./components/Label";
 
 interface FeeModalProps {
   open?: boolean;
@@ -26,6 +28,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
   const [selectedValue, setSelectedValue] = useState("");
   const [customFee, setCustomFee] = useState("");
   const customFeeRef = useRef<HTMLInputElement>(null);
+
   const {
     data: {
       fastestFee = 0,
@@ -34,6 +37,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
     } = {},
     isLoading,
   } = useNetworkFees();
+  const { stakingInfo: { defaultFeeRate = 0 } = {} } = useStakingState();
 
   useEffect(() => {
     if (selectedValue === "custom") {
@@ -41,72 +45,60 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
     }
   }, [selectedValue]);
 
-  const renderLabel = (label: string, amount: string, hint: string) => {
-    return (
-      <Text
-        as="span"
-        className="flex flex-1 justify-between items-center"
-        variant="body1"
-      >
-        <span>
-          <b className="capitalize">{label}</b> ({amount} sat/vB)
-        </span>
-
-        <Chip>{hint}</Chip>
-      </Text>
-    );
-  };
-
-  const renderCustomLabel = (label: string, amount: string) => {
-    return (
-      <Text
-        as="span"
-        className="flex items-center gap-4 [&>.bbn-input]:h-10"
-        variant="body1"
-      >
-        <b>Custom</b>{" "}
-        <Input
-          ref={customFeeRef}
-          type="number"
-          value={amount}
-          disabled={selectedValue !== label}
-          suffix={
-            <Text className="whitespace-nowrap text-primary">sats vB</Text>
-          }
-          onChange={(e) => void setCustomFee(e.currentTarget?.value)}
-        />
-      </Text>
-    );
-  };
-
   const feeOptions = [
     {
-      labelRenderer: renderLabel,
+      label: (
+        <Label
+          label="Fast"
+          amount={fastestFee.toString()}
+          hint="Next Block"
+          warning={fastestFee < defaultFeeRate}
+        />
+      ),
       className: "border border-secondary-strokeLight rounded p-4",
       key: "fast",
       value: fastestFee.toString(),
-      hint: "Next Block",
     },
     {
-      labelRenderer: renderLabel,
+      label: (
+        <Label
+          label="Medium"
+          amount={mediumFee.toString()}
+          hint="Estimated 30mins"
+          warning={mediumFee < defaultFeeRate}
+        />
+      ),
       className: "border border-secondary-strokeLight rounded p-4",
       key: "medium",
       value: mediumFee.toString(),
-      hint: "Estimated 30mins",
     },
     {
-      labelRenderer: renderLabel,
+      label: (
+        <Label
+          label="Slow"
+          amount={lowestFee.toString()}
+          hint="Estimated 60mins"
+          warning={lowestFee < defaultFeeRate}
+        />
+      ),
       className: "border border-secondary-strokeLight rounded p-4",
       key: "slow",
       value: lowestFee.toString(),
-      hint: "Estimated 60mins",
     },
     {
-      labelRenderer: renderCustomLabel,
+      label: (
+        <CustomLabel
+          ref={customFeeRef}
+          label="Custom"
+          amount={customFee}
+          disabled={selectedValue !== "custom"}
+          warning={parseFloat(customFee) < defaultFeeRate}
+          onChange={(e) => void setCustomFee(e.currentTarget?.value)}
+        />
+      ),
       className: "items-center border border-transparent px-4 py-2",
       key: "custom",
       value: customFee,
-      hint: "Next Block",
     },
   ];
 
@@ -150,11 +142,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
               <Radio
                 key={option.key}
                 labelClassName={option.className}
-                label={option.labelRenderer(
-                  option.key,
-                  option.value,
-                  option.hint,
-                )}
+                label={option.label}
                 checked={selectedValue === option.key}
                 value={option.key}
                 onChange={() => void setSelectedValue(option.key)}
