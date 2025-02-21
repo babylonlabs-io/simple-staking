@@ -3,7 +3,7 @@
   "version": "0.3.9",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -H 0.0.0.0",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -27,7 +27,7 @@
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "0.0.3-canary.5",
     "@babylonlabs-io/bbn-core-ui": "0.10.2",
-    "@babylonlabs-io/bbn-wallet-connect": "0.3.13",
+    "@babylonlabs-io/bbn-wallet-connect": "0.3.14",
     "@babylonlabs-io/btc-staking-ts": "0.4.0-canary.13",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@bitcoinerlab/secp256k1": "^1.1.1",
