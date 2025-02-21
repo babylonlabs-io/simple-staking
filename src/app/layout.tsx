@@ -1,15 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { twJoin } from "tailwind-merge";
 
-import { network } from "@/config/network.config";
-import { Network } from "@/utils/wallet/btc_wallet_provider";
+import { Network } from "@/app/types/network";
+import { network } from "@/config/network/btc";
 
 import MetaTags from "./components/Meta/MetaTags";
 import "./globals.css";
 import Providers from "./providers";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Babylon - Staking Dashboard",
@@ -26,18 +23,19 @@ export default function RootLayout({
       <head>
         <MetaTags />
       </head>
-      <body className={inter.className}>
+      <body className="font-sans">
         <Providers>
-          <main
+          <div
             className={twJoin(
               `relative h-full min-h-svh w-full`,
               network === Network.MAINNET
                 ? "main-app-mainnet"
                 : "main-app-testnet",
+              "bg-primary-contrast",
             )}
           >
             {children}
-          </main>
+          </div>
         </Providers>
       </body>
     </html>

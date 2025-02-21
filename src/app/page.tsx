@@ -1,16 +1,18 @@
 "use client";
 
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { DelegationTabs } from "./components/Delegations/DelegationTabs";
+import { StakingForm } from "@/app/components/Staking/StakingForm";
+
+import { Banner } from "./components/Banner/Banner";
+import { Container } from "./components/Container/Container";
+import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
-import { FilterOrdinalsModal } from "./components/Modals/FilterOrdinalsModal";
-import { NetworkBadge } from "./components/NetworkBadge/NetworkBadge";
+import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
-import { Staking } from "./components/Staking/Staking";
 import { Stats } from "./components/Stats/Stats";
 
 const Home = () => {
@@ -18,21 +20,29 @@ const Home = () => {
     initBTCCurve();
   }, []);
 
+  const [showPhase2HereModal, setShowPhase2HereModal] = useState(true);
+
   return (
     <>
-      <NetworkBadge />
+      <Banner />
       <Header />
-      <div className="container mx-auto flex justify-center p-6">
-        <div className="container flex flex-col gap-6">
-          <Stats />
-          <PersonalBalance />
-          <Staking />
-          <DelegationTabs />
-        </div>
-      </div>
-      <FAQ />
+
+      <Container
+        as="main"
+        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
+      >
+        <Stats />
+        <PersonalBalance />
+        <StakingForm />
+        <Activity />
+        <FAQ />
+      </Container>
+
       <Footer />
-      <FilterOrdinalsModal />
+      <Phase2HereModal
+        open={showPhase2HereModal}
+        onClose={() => setShowPhase2HereModal(false)}
+      />
     </>
   );
 };

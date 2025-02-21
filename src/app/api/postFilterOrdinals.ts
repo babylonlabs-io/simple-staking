@@ -1,5 +1,6 @@
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+
 import { chunkArray } from "@/utils/chunkArray";
-import { UTXO } from "@/utils/wallet/btc_wallet_provider";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -24,11 +25,13 @@ export const postVerifyUtxoOrdinals = async (
         "/v1/ordinals/verify-utxos",
         "Error verifying utxos ordinals",
         {
-          address,
-          utxos: chunk.map((utxo) => ({
-            txid: utxo.txid,
-            vout: utxo.vout,
-          })),
+          body: {
+            address,
+            utxos: chunk.map((utxo) => ({
+              txid: utxo.txid,
+              vout: utxo.vout,
+            })),
+          },
         },
         TIMEOUT_DURATION,
       ),

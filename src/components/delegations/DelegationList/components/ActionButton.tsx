@@ -1,47 +1,66 @@
-import { DelegationV2StakingState as state } from "@/app/types/delegationsV2";
+import { Button } from "@babylonlabs-io/bbn-core-ui";
+
+import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
+import { ActionType } from "@/app/hooks/services/useDelegationService";
+import {
+  DelegationV2,
+  DelegationV2StakingState as State,
+} from "@/app/types/delegationsV2";
+import { Hint } from "@/components/common/Hint";
 
 interface ActionButtonProps {
-  txHash: string;
+  disabled?: boolean;
+  tooltip?: string | JSX.Element;
+  delegation: DelegationV2;
   state: string;
-  onClick?: (action: string, txHash: string) => void;
+  onClick?: (action: ActionType, delegation: DelegationV2) => void;
 }
 
-type ButtonAdapter = (props: ActionButtonProps) => JSX.Element;
-type ButtonStrategy = Record<string, ButtonAdapter>;
-
-const ACTION_BUTTONS: ButtonStrategy = {
-  [state.VERIFIED]: (props: ActionButtonProps) => (
-    <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
-      onClick={() => props.onClick?.("stake", props.txHash)}
-      disabled={props.state === state.INTERMEDIATE_PENDING_CONFIRMATION}
-    >
-      Stake
-    </button>
-  ),
-  [state.ACTIVE]: (props: ActionButtonProps) => (
-    <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
-      onClick={() => props.onClick?.("unbound", props.txHash)}
-      disabled={props.state === state.INTERMEDIATE_UNBONDING}
-    >
-      Unbond
-    </button>
-  ),
-
-  [state.WITHDRAWABLE]: (props: ActionButtonProps) => (
-    <button
-      className="btn btn-outline btn-xs inline-flex text-sm font-normal text-primary"
-      onClick={() => props.onClick?.("withdraw", props.txHash)}
-      disabled={props.state === state.INTERMEDIATE_WITHDRAWAL}
-    >
-      Withdraw
-    </button>
-  ),
+const ACTION_BUTTON_PROPS: Record<
+  string,
+  { action: ActionType; title: string }
+> = {
+  [State.VERIFIED]: {
+    action: ACTIONS.STAKE,
+    title: "Stake",
+  },
+  [State.ACTIVE]: {
+    action: ACTIONS.UNBOND,
+    title: "Unbond",
+  },
+  [State.EARLY_UNBONDING_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
+    title: "Withdraw",
+  },
+  [State.TIMELOCK_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_TIMELOCK,
+    title: "Withdraw",
+  },
+  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
+    title: "Withdraw",
+  },
+  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+    action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
+    title: "Withdraw",
+  },
 };
 
 export function ActionButton(props: ActionButtonProps) {
-  const Button = ACTION_BUTTONS[props.state];
+  const buttonProps = ACTION_BUTTON_PROPS[props.state];
 
-  return <Button {...props} />;
+  if (!buttonProps) return null;
+
+  return (
+    <Hint tooltip={props.tooltip} attachToChildren={true}>
+      <Button
+        variant="outlined"
+        size="small"
+        onClick={() => props.onClick?.(buttonProps.action, props.delegation)}
+        disabled={props.disabled}
+      >
+        {buttonProps.title}
+      </Button>
+    </Hint>
+  );
 }

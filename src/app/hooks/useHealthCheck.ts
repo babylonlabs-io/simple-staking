@@ -7,13 +7,12 @@ import {
 } from "@/app/services/healthCheckService";
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
 
-import { useError } from "../context/Error/ErrorContext";
-import { ErrorState } from "../types/errors";
+import { useError } from "../context/Error/ErrorProvider";
 
 export const useHealthCheck = () => {
-  const { showError, captureError } = useError();
+  const { handleError } = useError();
 
-  const { data, error, isError, refetch } = useQuery({
+  const { data, error, isError, isLoading, refetch } = useQuery({
     queryKey: ["api available"],
     queryFn: getHealthCheck,
     refetchOnMount: false,
@@ -22,16 +21,14 @@ export const useHealthCheck = () => {
 
   useEffect(() => {
     if (isError) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.SERVER_ERROR,
+      handleError({
+        error,
+        displayOptions: {
+          retryAction: refetch,
         },
-        retryAction: refetch,
       });
-      captureError(error);
     }
-  }, [isError, error, showError, refetch, captureError]);
+  }, [isError, error, refetch, handleError]);
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
   const isGeoBlocked = data ? isGeoBlockedResult(data) : false;
@@ -43,6 +40,7 @@ export const useHealthCheck = () => {
     apiMessage,
     isError,
     error,
+    isLoading,
     refetch,
   };
 };

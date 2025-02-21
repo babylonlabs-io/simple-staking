@@ -1,6 +1,10 @@
+"use client";
+
+import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
 import Image from "next/image";
 
-import GenericErrorCharacter from "@/app/assets/generic-error-character.svg";
+import BitcoinBlock from "@/app/assets/bitcoin-block.svg";
+import { Container } from "@/app/components/Container/Container";
 
 import { Footer } from "../Footer/Footer";
 import { SimplifiedHeader } from "../Header/SimplifiedHeader";
@@ -12,32 +16,41 @@ interface Props {
 }
 
 export default function GenericError({
-  title = "Something goes wrong",
-  message = "There was an unexpected error that caused the website to crash.  You can report the issue in our forum, or reach out via email for assistance. Together, we can enhance our platform’s reliability!",
-  image = GenericErrorCharacter,
+  title = "Oops! Something Went Wrong",
+  message = `It looks like we’re experiencing a temporary issue on our end.
+  Our team is already on it, and we’ll have things back to normal as soon as possible. 
+  Please check back shortly, and thank you for your patience!`,
+  image = BitcoinBlock,
 }: Props) {
   return (
     <div className="h-full min-h-svh w-full flex flex-col justify-between">
-      <SimplifiedHeader />
-      <div className="container mx-auto flex justify-center p-6">
-        <div className="flex flex-row items-center justify-evenly">
-          <div className="grow-[5] flex flex-col items-center gap-6">
-            <div className="text-3xl font-semibold md:text-7xl">{title}</div>
-            <div className="md:hidden">
-              <Image src={GenericErrorCharacter} alt="Generic Error" />
-            </div>
-            <div className="divider my-1" />
-            <div className="text-sm">{message}</div>
-            <div className="flex flex-col gap-3 self-stretch md:flex-row md:w-[400px]">
-              <button className="btn btn-primary flex-1">Email Us</button>
-              <button className="btn btn-outline flex-1">Report the Bug</button>
-            </div>
+      <SimplifiedHeader isMinimal />
+
+      <Container className="py-12 px-6">
+        <div className="flex flex-col items-center justify-center gap-8">
+          <Image
+            src={image}
+            alt="Generic Error"
+            className="w-full h-auto max-w-[120px]"
+          />
+          <Heading variant="h5" className="text-accent-primary">
+            {title}
+          </Heading>
+          <div className="w-full max-w-[650px]">
+            <Text variant="body1" className="text-center text-accent-primary">
+              {message}
+            </Text>
           </div>
-          <div className="hidden grow-[3] md:flex">
-            <Image src={image} alt="Generic Error" />
-          </div>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={() => history.go()}
+          >
+            Back to homepage
+          </Button>
         </div>
-      </div>
+      </Container>
+
       <Footer />
     </div>
   );

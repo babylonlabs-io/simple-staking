@@ -27,7 +27,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "node_modules/@testing-library/jest-dom",
-    "tests"
+    "tests",
+    "src/components/delegations/DelegationList/components/StatusTooltip.tsx"
   ],
   "exclude": ["node_modules"]
 }

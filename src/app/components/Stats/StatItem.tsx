@@ -1,51 +1,49 @@
-import { type JSX } from "react";
+import {
+  type ListItemProps,
+  ListItem,
+  Loader,
+} from "@babylonlabs-io/bbn-core-ui";
+import { useId } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
-interface StatItemProps {
+interface StatItemProps extends ListItemProps {
   loading?: boolean;
-  icon: JSX.Element;
-  title: string;
-  value: string | number;
   tooltip?: string;
 }
 
 export const StatItem = ({
   loading,
-  icon,
   title,
   value,
   tooltip,
-}: StatItemProps) => (
-  <div className="flex items-center gap-2 md:flex-1 md:flex-col lg:flex-initial lg:flex-row flex-wrap justify-center">
-    <div className="flex items-center gap-2">
-      {icon}
-      <div className="flex items-center gap-1">
-        <p className="dark:text-neutral-content">{title}</p>
-        {tooltip && (
-          <>
-            <span
-              className="cursor-pointer text-xs"
-              data-tooltip-id={`tooltip-${title}`}
-              data-tooltip-content={tooltip}
-              data-tooltip-place="top"
-            >
-              <AiOutlineInfoCircle />
-            </span>
-            <Tooltip id={`tooltip-${title}`} className="tooltip-wrap" />
-          </>
-        )}
-      </div>
-    </div>
+  suffix,
+  ...props
+}: StatItemProps) => {
+  const tooltipId = useId();
+  const suffixEl =
+    !suffix && tooltip ? (
+      <>
+        <span
+          className="block size-5 cursor-pointer text-xs"
+          data-tooltip-id={tooltipId}
+          data-tooltip-content={tooltip}
+          data-tooltip-place="top"
+        >
+          <AiOutlineInfoCircle size={20} />
+        </span>
+        <Tooltip id={tooltipId} className="tooltip-wrap" />
+      </>
+    ) : (
+      suffix
+    );
 
-    <div>
-      <p className="flex-1 text-right">
-        {loading ? (
-          <span className="loading loading-spinner text-primary" />
-        ) : (
-          <strong>{value}</strong>
-        )}
-      </p>
-    </div>
-  </div>
-);
+  return (
+    <ListItem
+      {...props}
+      title={title}
+      value={loading ? <Loader size={20} /> : value}
+      suffix={suffixEl}
+    />
+  );
+};

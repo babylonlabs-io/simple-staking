@@ -1,5 +1,3 @@
-import { encode } from "url-safe-base64";
-
 import { Pagination } from "../types/api";
 import { Delegation } from "../types/delegations";
 
@@ -24,7 +22,7 @@ interface DelegationAPI {
   staking_tx: StakingTxAPI;
   unbonding_tx?: UnbondingTxAPI;
   is_overflow: boolean;
-  transitioned: boolean;
+  is_eligible_for_transition: boolean;
 }
 
 interface StakingTxAPI {
@@ -42,27 +40,21 @@ interface UnbondingTxAPI {
 
 export const getDelegations = async (
   key: string,
-  publicKeyNoCoord?: string,
+  publicKeyNoCoord: string,
 ): Promise<PaginatedDelegations> => {
-  if (!publicKeyNoCoord) {
-    throw new Error("No public key provided");
-  }
-
-  // const limit = 100;
-  // const reverse = false;
-
   const params = {
-    pagination_key: encode(key),
-    // "pagination_reverse": reverse,
-    // "pagination_limit": limit,
-    staker_btc_pk: encode(publicKeyNoCoord),
+    pagination_key: key,
+    staker_btc_pk: publicKeyNoCoord,
+    // We only fetch for states that can have pending actions.
+    // We don't care terminal states such as "withdrawn" or "transitioned".
+    pending_action: true,
   };
 
   const response = await apiWrapper(
     "GET",
     "/v1/staker/delegations",
     "Error getting delegations",
-    params,
+    { query: params },
   );
 
   const delegationsAPIResponse: DelegationsAPIResponse = response.data;
@@ -88,7 +80,7 @@ export const getDelegations = async (
             outputIndex: apiDelegation.unbonding_tx.output_index,
           }
         : undefined,
-      transitioned: apiDelegation.transitioned,
+      isEligibleForTransition: apiDelegation.is_eligible_for_transition,
     }),
   );
 

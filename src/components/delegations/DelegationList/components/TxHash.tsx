@@ -1,21 +1,23 @@
-import { getNetworkConfig } from "@/config/network.config";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { trim } from "@/utils/trim";
 
-const { mempoolApiUrl } = getNetworkConfig();
+const { mempoolApiUrl } = getNetworkConfigBTC();
 
 interface TxHashProps {
   value: string;
 }
 
 export function TxHash({ value }: TxHashProps) {
+  if (!value) return <span>-</span>;
+
   return (
     <a
       href={`${mempoolApiUrl}/tx/${value}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-primary hover:underline"
+      className="text-accent-primary hover:underline"
     >
-      {trim(value)}
+      {trim(value) ?? value}
     </a>
   );
 }

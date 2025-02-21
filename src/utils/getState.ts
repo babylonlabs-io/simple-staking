@@ -1,10 +1,13 @@
 import { DelegationState } from "@/app/types/delegations";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 
 // Convert state to human readable format
 export const getState = (state: string) => {
   switch (state) {
     case DelegationState.ACTIVE:
-      return "Active";
+      return "Pending Registration";
     case DelegationState.UNBONDING_REQUESTED:
       return "Unbonding Requested";
     case DelegationState.UNBONDING:
@@ -25,7 +28,7 @@ export const getState = (state: string) => {
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal Submitted";
     case DelegationState.INTERMEDIATE_TRANSITIONING:
-      return "Transitioning";
+      return "Active/Pending Registration";
     case DelegationState.TRANSITIONED:
       return "Transitioned";
     default:
@@ -37,7 +40,9 @@ export const getState = (state: string) => {
 export const getStateTooltip = (state: string) => {
   switch (state) {
     case DelegationState.ACTIVE:
-      return "Stake is active";
+      return "Stake is pending registration to the Babylon chain";
+    case DelegationState.UNBONDING_REQUESTED:
+      return "Stake is requesting unbonding";
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:
@@ -52,9 +57,9 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal transaction pending confirmation on Bitcoin";
     case DelegationState.INTERMEDIATE_TRANSITIONING:
-      return "Stake is transitioning to the Babylon chain network";
+      return `Stake is pending registration to the ${bbnNetworkFullName} network`;
     case DelegationState.TRANSITIONED:
-      return "Stake has been transitioned to the Babylon chain network";
+      return `Stake has been transitioned to the ${bbnNetworkFullName} network`;
     default:
       return "Unknown";
   }

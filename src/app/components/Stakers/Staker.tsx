@@ -1,5 +1,5 @@
-import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { getNetworkConfigBTC } from "@/config/network/btc";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 import { Hash } from "../Hash/Hash";
@@ -15,7 +15,7 @@ export const Staker: React.FC<StakerProps> = ({
   delegations,
   activeTVLSat,
 }) => {
-  const { coinName } = getNetworkConfig();
+  const { coinName } = getNetworkConfigBTC();
 
   return (
     <div className="card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200">

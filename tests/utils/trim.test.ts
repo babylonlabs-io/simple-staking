@@ -21,7 +21,7 @@ describe("trim", () => {
   });
 
   it("should return empty string for empty string", () => {
-    expect(trim("")).toBe("");
+    expect(trim("")).toBe("-");
   });
 
   it("should handle cases where symbols count is 0", () => {

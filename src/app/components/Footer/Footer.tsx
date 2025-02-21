@@ -1,3 +1,4 @@
+import { Text } from "@babylonlabs-io/bbn-core-ui";
 import {
   BsDiscord,
   BsGithub,
@@ -9,6 +10,10 @@ import { FaXTwitter } from "react-icons/fa6";
 import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail, MdForum } from "react-icons/md";
+
+import { Container } from "@/app/components/Container/Container";
+
+import { Logo } from "../Logo/Logo";
 
 const iconLinks = [
   {
@@ -65,45 +70,47 @@ const iconLinks = [
 
 export const Footer: React.FC = () => {
   return (
-    <div className="container mx-auto flex flex-col items-center">
-      <div className="w-24">
-        <div className="divider my-1" />
-      </div>
-      <div className="flex justify-center gap-8 p-2">
-        <a
-          href="https://babylonlabs.io/terms-of-use"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-primary"
-        >
-          Terms of Use
-        </a>
-        <a
-          href="https://babylonlabs.io/privacy-policy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transition-colors hover:text-primary"
-        >
-          Privacy Policy
-        </a>
-      </div>
-      <div className="flex flex-wrap justify-center gap-8 p-4 pt-2 md:flex-row md:p-6 md:pt-2">
-        {iconLinks.map(({ name, url, Icon }) => (
-          <div
-            key={name}
-            className="flex w-4 items-center justify-center text-[22px] text-xl"
-          >
+    <footer className="relative flex bg-primary-main before:absolute before:h-3 before:w-2/3 before:bg-primary-main before:left-1/4 before:-top-2 text-accent-contrast py-10 md:py-20">
+      <Container className="flex flex-col items-center md:items-start md:justify-between md:flex-row-reverse">
+        <Logo className="w-[250px] h-[61px] lg:w-[367px] lg:h-[90px]" />
+
+        <div className="mt-10 md:mt-0">
+          <div className="flex flex-wrap justify-center pt-2 gap-x-5 gap-y-8 pb-10 md:pb-8 mb:pt-0 md:justify-start">
+            {iconLinks.map(({ name, url, Icon }) => (
+              <a
+                key={name}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-colors hover:text-secondary-main"
+              >
+                <Icon size={28} title={name} />
+              </a>
+            ))}
+          </div>
+
+          <Text variant="body2" className="text-center md:text-left">
             <a
-              href={url}
+              href="https://babylonlabs.io/terms-of-use"
               target="_blank"
               rel="noopener noreferrer"
-              className="transition-colors hover:text-primary"
+              className="transition-colors hover:text-secondary-main"
             >
-              <Icon title={name} />
-            </a>
-          </div>
-        ))}
-      </div>
-    </div>
+              Terms of Use
+            </a>{" "}
+            -{" "}
+            <a
+              href="https://babylonlabs.io/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="transition-colors hover:text-secondary-main"
+            >
+              Privacy Policy
+            </a>{" "}
+            - 2024 Babylon Labs. All rights reserved.
+          </Text>
+        </div>
+      </Container>
+    </footer>
   );
 };

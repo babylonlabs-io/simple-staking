@@ -1,15 +1,9 @@
-import {
-  initBTCCurve,
-  ObservableStakingScriptData,
-  StakingScripts,
-} from "@babylonlabs-io/btc-staking-ts";
+import { initBTCCurve, UTXO } from "@babylonlabs-io/btc-staking-ts";
 import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
-import { GlobalParamsVersion } from "@/app/types/globalParams";
 import { getPublicKeyNoCoord } from "@/utils/wallet";
-import { UTXO } from "@/utils/wallet/btc_wallet_provider";
 
 // Initialize the ECC library
 initBTCCurve();
@@ -98,120 +92,8 @@ export class DataGenerator {
     return buffer;
   };
 
-  // Generate a single global param
-  generateRandomGlobalParams = (
-    isFixedTimelock = false,
-    previousPram: GlobalParamsVersion | undefined = undefined,
-  ) => {
-    const stakingTerm = this.generateRandomStakingTerm();
-    const committeeSize = Math.floor(Math.random() * 20) + 5;
-    const covenantPks = this.generateRandomCovenantCommittee(committeeSize).map(
-      (buffer) => buffer.toString("hex"),
-    );
-    const covenantQuorum = Math.floor(Math.random() * (committeeSize - 1)) + 1;
-    const unbondingTime = this.generateRandomUnbondingTime(stakingTerm);
-    const tag = this.generateRandomTag().toString("hex");
-
-    let minStakingTimeBlocks = this.getRandomIntegerBetween(1, 100);
-    let maxStakingTimeBlocks =
-      minStakingTimeBlocks + this.getRandomIntegerBetween(1, 1000);
-    if (isFixedTimelock) {
-      maxStakingTimeBlocks = minStakingTimeBlocks;
-    }
-
-    const minStakingAmountSat = this.getRandomIntegerBetween(10000, 100000);
-    const maxStakingAmountSat = this.getRandomIntegerBetween(
-      minStakingAmountSat,
-      100000000,
-    );
-
-    const defaultParams = {
-      version: 0,
-      activationHeight: 0,
-      stakingCapSat: 0,
-      stakingCapHeight: 0,
-      covenantPks: covenantPks,
-      covenantQuorum: covenantQuorum,
-    };
-    const prev = previousPram ? previousPram : defaultParams;
-
-    return {
-      version: prev.version + 1,
-      activationHeight:
-        prev.activationHeight + this.getRandomIntegerBetween(0, 10000),
-      stakingCapSat:
-        prev.stakingCapSat + this.getRandomIntegerBetween(0, 10000),
-      stakingCapHeight:
-        prev.stakingCapHeight + Math.floor(Math.random() * 10000),
-      covenantPks: prev.covenantPks,
-      covenantQuorum: prev.covenantQuorum,
-      unbondingFeeSat: this.getRandomIntegerBetween(0, 100),
-      maxStakingAmountSat,
-      minStakingAmountSat,
-      maxStakingTimeBlocks,
-      minStakingTimeBlocks,
-      confirmationDepth: this.getRandomIntegerBetween(1, 20),
-      unbondingTime,
-      tag,
-    };
-  };
-
-  // Generate a list of global params
-  generateGlobalPramsVersions = (
-    numVersions: number,
-  ): GlobalParamsVersion[] => {
-    let versions = [];
-    let lastVersion;
-    for (let i = 0; i < numVersions; i++) {
-      const isFixedTimelock = Math.random() > 0.5;
-      versions.push(
-        this.generateRandomGlobalParams(isFixedTimelock, lastVersion),
-      );
-      lastVersion = versions[i];
-    }
-    return versions;
-  };
-
   getNetwork = () => {
     return this.network;
-  };
-
-  generateMockStakingScripts = (
-    globalParams: GlobalParamsVersion,
-    publicKeyNoCoord: string,
-    finalityProviderPk: string,
-    stakingTxTimelock: number,
-  ): StakingScripts => {
-    // Convert covenant PKs to buffers
-    const covenantPKsBuffer = globalParams.covenantPks.map((pk: string) =>
-      Buffer.from(pk, "hex"),
-    );
-
-    // Create staking script data
-    let stakingScriptData;
-    try {
-      stakingScriptData = new ObservableStakingScriptData(
-        Buffer.from(publicKeyNoCoord, "hex"),
-        [Buffer.from(finalityProviderPk, "hex")],
-        covenantPKsBuffer,
-        globalParams.covenantQuorum,
-        stakingTxTimelock,
-        globalParams.unbondingTime,
-        Buffer.from(globalParams.tag, "hex"),
-      );
-    } catch (error: Error | any) {
-      throw new Error(error?.message || "Cannot build staking script data");
-    }
-
-    // Build scripts
-    let scripts;
-    try {
-      scripts = stakingScriptData.buildScripts();
-    } catch (error: Error | any) {
-      throw new Error(error?.message || "Error while recreating scripts");
-    }
-
-    return scripts;
   };
 
   generateRandomUTXOs = (

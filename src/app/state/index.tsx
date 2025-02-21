@@ -1,93 +1,103 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import {
+  InscriptionIdentifier,
+  useInscriptionProvider,
+} from "@babylonlabs-io/bbn-wallet-connect";
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
-import { useBTCTipHeight } from "@/app/hooks/api/useBTCTipHeight";
-import { useOrdinals } from "@/app/hooks/api/useOrdinals";
-import { useParams } from "@/app/hooks/api/useParams";
-import { useUTXOs } from "@/app/hooks/api/useUTXOs";
-import { useVersions } from "@/app/hooks/api/useVersions";
+import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
+import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { filterDust } from "@/utils/wallet";
-import type {
-  InscriptionIdentifier,
-  UTXO,
-} from "@/utils/wallet/btc_wallet_provider";
 
-import { Params } from "../types/params";
+import { useNetworkInfo } from "../hooks/client/api/useNetworkInfo";
+import { NetworkInfo } from "../types/networkInfo";
 
+import { BalanceState } from "./BalanceState";
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
+import { FinalityProviderState } from "./FinalityProviderState";
+import { RewardsState } from "./RewardState";
+import { StakingState } from "./StakingState";
 
-const STATE_LIST = [DelegationState, DelegationV2State];
+// The order of the states is important for the state provider
+const STATE_LIST = [
+  DelegationState,
+  DelegationV2State,
+  FinalityProviderState,
+  BalanceState,
+  StakingState,
+  RewardsState,
+];
 
 export interface AppState {
+  theme: "dark" | "light";
   availableUTXOs?: UTXO[];
-  totalBalance: number;
-  params?: Params;
-  currentHeight?: number;
+  allUTXOs?: UTXO[];
+  inscriptionsUTXOs?: UTXO[];
+  networkInfo?: NetworkInfo;
   isError: boolean;
   isLoading: boolean;
   ordinalsExcluded: boolean;
   includeOrdinals: () => void;
   excludeOrdinals: () => void;
+  refetchUTXOs: () => void;
+  setTheme: (theme: "dark" | "light") => void;
 }
 
 const { StateProvider, useState: useApplicationState } =
   createStateUtils<AppState>({
+    theme: "light",
     isLoading: false,
     isError: false,
-    totalBalance: 0,
     ordinalsExcluded: true,
     includeOrdinals: () => {},
     excludeOrdinals: () => {},
+    refetchUTXOs: () => {},
+    setTheme: () => {},
   });
 
 export function AppState({ children }: PropsWithChildren) {
-  const [ordinalsExcluded, setOrdinalsExcluded] = useState(true);
+  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
+    useInscriptionProvider();
+
+  useEffect(() => {
+    document.body.classList.add(theme);
+
+    return () => document.body.classList.remove(theme);
+  }, [theme]);
 
   // States
   const {
-    data: utxos = [],
+    allUTXOs = [],
+    confirmedUTXOs = [],
     isLoading: isUTXOLoading,
     isError: isUTXOError,
+    refetch: refetchUTXOs,
   } = useUTXOs();
   const {
     data: ordinals = [],
     isLoading: isOrdinalLoading,
     isError: isOrdinalError,
-  } = useOrdinals(utxos, {
+  } = useOrdinals(confirmedUTXOs, {
     enabled: !isUTXOLoading,
   });
   const {
-    data: versions,
-    isLoading: isVersionLoading,
-    isError: isVersionError,
-  } = useVersions();
-
-  const {
-    data: params,
-    isLoading: isParamsLoading,
-    isError: isParamsError,
-  } = useParams();
-
-  const {
-    data: height,
-    isLoading: isHeightLoading,
-    isError: isHeightError,
-  } = useBTCTipHeight();
+    data: networkInfo,
+    isLoading: isNetworkInfoLoading,
+    isError: isNetworkInfoError,
+  } = useNetworkInfo();
 
   // Computed
-  const isLoading =
-    isVersionLoading ||
-    isHeightLoading ||
-    isUTXOLoading ||
-    isOrdinalLoading ||
-    isParamsLoading;
-  const isError =
-    isHeightError ||
-    isVersionError ||
-    isUTXOError ||
-    isOrdinalError ||
-    isParamsError;
+  const isLoading = isUTXOLoading || isOrdinalLoading || isNetworkInfoLoading;
+  const isError = isUTXOError || isOrdinalError || isNetworkInfoError;
 
   const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
     () =>
@@ -98,47 +108,57 @@ export function AppState({ children }: PropsWithChildren) {
     [ordinals],
   );
 
+  const inscriptionsUTXOs = useMemo(() => {
+    return confirmedUTXOs.filter((utxo) => ordinalMap[utxo.txid]);
+  }, [confirmedUTXOs, ordinalMap]);
+
   const availableUTXOs = useMemo(() => {
     if (isLoading) return [];
 
     return ordinalsExcluded
-      ? filterDust(utxos).filter((utxo) => !ordinalMap[utxo.txid])
-      : utxos;
-  }, [isLoading, ordinalsExcluded, utxos, ordinalMap]);
-
-  const totalBalance = useMemo(
-    () =>
-      availableUTXOs.reduce((accumulator, item) => accumulator + item.value, 0),
-    [availableUTXOs],
-  );
+      ? filterDust(confirmedUTXOs).filter((utxo) => !ordinalMap[utxo.txid])
+      : confirmedUTXOs;
+  }, [isLoading, ordinalsExcluded, confirmedUTXOs, ordinalMap]);
 
   // Handlers
-  const includeOrdinals = useCallback(() => setOrdinalsExcluded(false), []);
-  const excludeOrdinals = useCallback(() => setOrdinalsExcluded(true), []);
+  const includeOrdinals = useCallback(
+    () => toggleLockInscriptions?.(false),
+    [toggleLockInscriptions],
+  );
+  const excludeOrdinals = useCallback(
+    () => toggleLockInscriptions?.(true),
+    [toggleLockInscriptions],
+  );
 
   // Context
   const context = useMemo(
     () => ({
+      theme,
+      allUTXOs,
       availableUTXOs,
-      currentHeight: height,
-      totalBalance,
-      params,
+      inscriptionsUTXOs,
+      networkInfo,
       isError,
       isLoading,
       ordinalsExcluded,
       includeOrdinals,
       excludeOrdinals,
+      refetchUTXOs,
+      setTheme,
     }),
     [
+      theme,
+      allUTXOs,
       availableUTXOs,
-      height,
-      totalBalance,
-      params,
+      inscriptionsUTXOs,
+      networkInfo,
       isError,
       isLoading,
       ordinalsExcluded,
       includeOrdinals,
       excludeOrdinals,
+      refetchUTXOs,
+      setTheme,
     ],
   );
 

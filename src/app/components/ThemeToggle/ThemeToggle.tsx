@@ -1,54 +1,26 @@
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
-import { FiMoon, FiSun } from "react-icons/fi";
+import { Text, Toggle } from "@babylonlabs-io/bbn-core-ui";
+import { IoIosMoon, IoIosSunny } from "react-icons/io";
 
-interface ThemeToggleProps {}
+import { useAppState } from "@/app/state";
 
-// implementation so we avoid hydration error:
-// https://github.com/pacocoursey/next-themes#avoid-hydration-mismatch
-export const ThemeToggle: React.FC<ThemeToggleProps> = () => {
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
-
-  // useEffect only runs on the client, so now we can safely show the UI
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  if (!mounted) {
-    return (
-      <div className="flex h-[40px] w-[68px] items-center justify-center gap-1 rounded-full bg-base-100 p-2">
-        <span className="loading loading-spinner loading-xs text-primary" />
-      </div>
-    );
-  }
-
-  const lightSelected = resolvedTheme === "light";
-
-  const getPrimaryActive = () => {
-    if (lightSelected) {
-      return "bg-white";
-    } else {
-      return "bg-primary";
-    }
-  };
-
-  const iconStyles = (active: boolean) =>
-    `rounded-full p-1 transition duration-300 ease-in-out ${
-      active ? getPrimaryActive() : "bg-transparent"
-    }`;
+export const ThemeToggle = () => {
+  const { theme, setTheme } = useAppState();
 
   return (
-    <button
-      onClick={() => (lightSelected ? setTheme("dark") : setTheme("light"))}
-      className="flex gap-1 rounded-full bg-base-100 p-2 outline-none"
-    >
-      <div className={`${iconStyles(lightSelected)}`}>
-        <FiSun size={16} />
+    <div className="flex flex-row items-center justify-between">
+      <Text variant="body2" className="text-sm text-accent-primary capitalize">
+        {theme} Mode
+      </Text>
+      <div className="flex flex-col items-center justify-center">
+        <Toggle
+          defaultValue={theme === "dark"}
+          onChange={(value) => {
+            setTheme(value ? "dark" : "light");
+          }}
+          inactiveIcon={<IoIosSunny size={12} />}
+          activeIcon={<IoIosMoon size={10} />}
+        />
       </div>
-      <div className={`${iconStyles(!lightSelected)}`}>
-        <FiMoon size={16} />
-      </div>
-    </button>
+    </div>
   );
 };

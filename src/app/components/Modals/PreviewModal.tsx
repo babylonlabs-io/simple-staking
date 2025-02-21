@@ -1,135 +1,237 @@
-import { IoMdClose } from "react-icons/io";
-import { twJoin } from "tailwind-merge";
+import {
+  Avatar,
+  Button,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  Heading,
+  Loader,
+  Text,
+} from "@babylonlabs-io/bbn-core-ui";
+import { Fragment } from "react";
 
-import { getNetworkConfig } from "@/config/network.config";
-import { blocksToDisplayTime } from "@/utils/blocksToDisplayTime";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
+import { usePrice } from "@/app/hooks/client/api/usePrices";
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
+import { satoshiToBtc } from "@/utils/btc";
+import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";
+import { blocksToDisplayTime } from "@/utils/time";
 
-import { LoadingView } from "../Loading/Loading";
-
-import { GeneralModal } from "./GeneralModal";
+import { ResponsiveDialog } from "./ResponsiveDialog";
 
 interface PreviewModalProps {
   open: boolean;
-  onClose: (value: boolean) => void;
+  onClose: () => void;
   onSign: () => void;
   finalityProvider: string | undefined;
+  finalityProviderAvatar: string | undefined;
   stakingAmountSat: number;
-  stakingTimeBlocks: number;
+  stakingTimelock: number;
   stakingFeeSat: number;
   feeRate: number;
   unbondingFeeSat: number;
-  awaitingWalletResponse: boolean;
+  processing: boolean;
 }
 
-export const PreviewModal: React.FC<PreviewModalProps> = ({
+const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+
+export const PreviewModal = ({
   open,
   onClose,
   finalityProvider,
+  finalityProviderAvatar,
   stakingAmountSat,
-  stakingTimeBlocks,
+  stakingTimelock,
   onSign,
   stakingFeeSat,
   feeRate,
   unbondingFeeSat,
-  awaitingWalletResponse,
-}) => {
-  const cardStyles =
-    "card border bg-base-300 p-4 text-sm dark:border-0 dark:bg-base-200";
+  processing,
+}: PreviewModalProps) => {
+  const isMobileView = useIsMobileView();
+  const { coinSymbol, networkName } = getNetworkConfigBTC();
 
-  const { coinName } = getNetworkConfig();
+  const { data: networkInfo } = useNetworkInfo();
+  const confirmationDepth =
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 10;
+  const unbondingTime =
+    blocksToDisplayTime(
+      networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
+    ) || "7 days";
 
-  // TODO: Get confirmation depth from params
-  const confirmationDepth = 10;
+  const btcInUsd = usePrice(coinSymbol);
+
+  const FinalityProviderValue = isMobileView ? (
+    <span className="flex gap-2">
+      {finalityProviderAvatar && (
+        <Avatar
+          size="small"
+          url={finalityProviderAvatar}
+          variant="circular"
+          alt={finalityProvider || "-"}
+        />
+      )}
+      <Text variant="body1">{finalityProvider || "-"}</Text>
+    </span>
+  ) : (
+    <Text variant="body1">{finalityProvider || "-"}</Text>
+  );
+
+  const previewFields = [
+    {
+      key: "Finality Provider",
+      value: FinalityProviderValue,
+    },
+    {
+      key: "Stake Amount",
+      value: (
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(stakingAmountSat),
+              btcInUsd,
+            )}
+          </Text>
+        </>
+      ),
+    },
+    {
+      key: "Fee rate",
+      value: <Text variant="body1">{feeRate} sat/vB</Text>,
+    },
+    {
+      key: "Transaction fee",
+      value: (
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(stakingFeeSat),
+              btcInUsd,
+            )}
+          </Text>
+        </>
+      ),
+    },
+    {
+      key: "Term",
+      value: (
+        <>
+          <Text variant="body1">{stakingTimelock} blocks</Text>
+          <Text variant="body2" className="text-accent-secondary">
+            ~ {blocksToDisplayTime(stakingTimelock)}
+          </Text>
+        </>
+      ),
+    },
+    {
+      key: "On Demand Unbonding",
+      value: (
+        <Text variant="body1">Enabled (~ {unbondingTime} unbonding time)</Text>
+      ),
+    },
+    {
+      key: "Unbonding fee",
+      value: (
+        <>
+          <Text variant="body1">
+            {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
+          </Text>
+          <Text
+            as="span"
+            variant="body2"
+            className="text-accent-secondary ml-2"
+          >
+            {calculateTokenValueInCurrency(
+              satoshiToBtc(unbondingFeeSat),
+              btcInUsd,
+            )}
+          </Text>
+        </>
+      ),
+    },
+  ];
 
   return (
-    <GeneralModal
-      open={open}
-      onClose={onClose}
-      closeOnOverlayClick={!awaitingWalletResponse}
-      closeOnEsc={false}
-    >
-      <div className="mb-4 flex items-center justify-between">
-        <h3 className="font-bold">Preview</h3>
-        {!awaitingWalletResponse && (
-          <button
-            className="btn btn-circle btn-ghost btn-sm"
-            onClick={() => onClose(false)}
-          >
-            <IoMdClose size={24} />
-          </button>
-        )}
-      </div>
-      <div className="flex flex-col gap-4 text-sm">
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className={twJoin(cardStyles, "flex-1")}>
-            <p className="text-xs dark:text-neutral-content">
-              Finality Provider
-            </p>
-            <p>{finalityProvider || "-"}</p>
-          </div>
-          <div className={twJoin(cardStyles, "flex-1")}>
-            <p className="text-xs dark:text-neutral-content">Stake Amount</p>
-            <p>{`${maxDecimals(satoshiToBtc(stakingAmountSat), 8)} ${coinName}`}</p>
-          </div>
+    <ResponsiveDialog open={open} onClose={onClose}>
+      <DialogHeader
+        title="Preview"
+        onClose={onClose}
+        className="text-accent-primary"
+      />
+
+      <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4">
+        <div className="flex flex-col">
+          {previewFields.map((field, index) => (
+            <Fragment key={field.key}>
+              <div key={field.key} className="flex justify-between">
+                <Text variant="body1">{field.key}</Text>
+                <div className="text-right">{field.value}</div>
+              </div>
+              {index < previewFields.length - 1 && (
+                <div className="divider mx-0 my-2" />
+              )}
+            </Fragment>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className={twJoin(cardStyles, "flex-1")}>
-            <p className="text-xs dark:text-neutral-content">Fee rate</p>
-            <p>{feeRate} sat/vB</p>
-          </div>
-          <div className={twJoin(cardStyles, "flex-1")}>
-            <p className="text-xs dark:text-neutral-content">Transaction fee</p>
-            <p>{`${maxDecimals(satoshiToBtc(stakingFeeSat), 8)} ${coinName}`}</p>
-          </div>
+        <br />
+        <div className="flex flex-col gap-2">
+          <Heading variant="h6">Attention!</Heading>
+          <Text variant="body2">
+            1. No third party possesses your staked {coinSymbol}. You are the
+            only one who can unbond and withdraw your stake.
+          </Text>
+          <Text variant="body2">
+            2. Your stake will first be sent to {bbnNetworkFullName} for
+            verification (~20 seconds), then you will be prompted to submit it
+            to the {networkName} ledger. It will be marked as
+            &quot;Pending&quot; until it receives {confirmationDepth} Bitcoin
+            confirmations.
+          </Text>
         </div>
-        <div className="flex flex-col gap-4 md:flex-row">
-          <div className={twJoin(cardStyles, "basis-1/5")}>
-            <p className="text-xs dark:text-neutral-content">Term</p>
-            <p>{blocksToDisplayTime(stakingTimeBlocks)}</p>
-          </div>
-          <div className={twJoin(cardStyles, "basis-2/5")}>
-            <p className="text-xs dark:text-neutral-content">Slashing ratio</p>
-            <p>12.3%</p>
-          </div>
-          <div className={twJoin(cardStyles, "basis-2/5")}>
-            <p className="text-xs dark:text-neutral-content">Unbonding fee</p>
-            <p>{`${maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} ${coinName}`}</p>
-          </div>
-        </div>
-        <h4 className="text-center text-base">Attention!</h4>
-        <p className="dark:text-neutral-content">
-          1. No third party possesses your staked {coinName}. You are the only
-          one who can unbond and withdraw your stake.
-        </p>
-        <p className="dark:text-neutral-content">
-          2. Your stake will initially have the status of &quot;Pending&quot;
-          until it receives {confirmationDepth} Bitcoin confirmations.
-          &quot;Pending&quot; stake is only accessible through the device it was
-          created.
-        </p>
-        {awaitingWalletResponse ? (
-          <LoadingView
-            text="Awaiting wallet signature and broadcast"
-            noBorder
-          />
-        ) : (
-          <div className="flex gap-4">
-            <button
-              className="btn btn-outline flex-1"
-              onClick={() => {
-                onClose(false);
-              }}
-            >
-              Cancel
-            </button>
-            <button className="btn-primary btn flex-1" onClick={onSign}>
-              Proceed To Signing
-            </button>
-          </div>
-        )}
-      </div>
-    </GeneralModal>
+      </DialogBody>
+
+      <DialogFooter className="flex gap-4">
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={onClose}
+          className="flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          variant="contained"
+          onClick={onSign}
+          className="flex-1"
+          disabled={processing}
+        >
+          {processing ? (
+            <Loader size={16} className="text-white" />
+          ) : (
+            <>
+              Proceed <span className="hidden md:inline">to Signing</span>
+            </>
+          )}
+        </Button>
+      </DialogFooter>
+    </ResponsiveDialog>
   );
 };

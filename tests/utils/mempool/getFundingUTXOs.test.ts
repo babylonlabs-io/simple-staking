@@ -1,11 +1,11 @@
-import { getFundingUTXOs } from "@/utils/mempool_api";
+import { getUTXOs } from "@/utils/mempool_api";
 
 // Mocking fetch globally
 global.fetch = jest.fn() as jest.Mock;
 
 // Mocking getNetworkConfig to return a specific mempoolApiUrl
-jest.mock("@/config/network.config", () => ({
-  getNetworkConfig: jest.fn(() => ({
+jest.mock("@/config/network/btc", () => ({
+  getNetworkConfigBTC: jest.fn(() => ({
     mempoolApiUrl: "https://mempool.space",
   })),
 }));
@@ -64,11 +64,12 @@ describe("getFundingUTXOs", () => {
     scriptPubKey: "",
   };
 
-  it("should return UTXOs that satisfy the amount requirement", async () => {
+  it("should return all UTXOs", async () => {
     (global.fetch as jest.Mock)
       .mockImplementationOnce((url: URL) => {
         if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
+            ok: true,
             json: async () => mockUTXOs,
           });
         }
@@ -79,57 +80,35 @@ describe("getFundingUTXOs", () => {
           "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
+            ok: true,
             json: async () => mockAddressInfo,
           });
         }
       });
 
-    const result = await getFundingUTXOs("testAddress", 100000);
+    const result = await getUTXOs("testAddress");
 
     expect(result).toEqual([
       {
-        txid: "regular medium utxo",
-        vout: 3,
-        value: 150000,
+        txid: "unconfirmed utxo",
+        vout: 2,
+        value: 200000,
         scriptPubKey,
+        confirmed: false,
       },
-    ]);
-  });
-
-  it("should return all confirmed UTXOs if no amount is provided", async () => {
-    (global.fetch as jest.Mock)
-      .mockImplementationOnce((url: URL) => {
-        if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
-          return Promise.resolve({
-            json: async () => mockUTXOs,
-          });
-        }
-      })
-      .mockImplementationOnce((url: URL) => {
-        if (
-          url.href ===
-          "https://mempool.space/api/v1/validate-address/testAddress"
-        ) {
-          return Promise.resolve({
-            json: async () => mockAddressInfo,
-          });
-        }
-      });
-
-    const result = await getFundingUTXOs("testAddress");
-
-    expect(result).toEqual([
       {
         txid: "regular medium utxo",
         vout: 3,
         value: 150000,
         scriptPubKey,
+        confirmed: true,
       },
       {
         txid: "regular small utxo",
         vout: 0,
         value: 10000,
         scriptPubKey,
+        confirmed: true,
       },
     ]);
   });
@@ -139,6 +118,7 @@ describe("getFundingUTXOs", () => {
       .mockImplementationOnce((url: URL) => {
         if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
           return Promise.resolve({
+            ok: true,
             json: async () => mockUTXOs,
           });
         }
@@ -149,53 +129,12 @@ describe("getFundingUTXOs", () => {
           "https://mempool.space/api/v1/validate-address/testAddress"
         ) {
           return Promise.resolve({
+            ok: true,
             json: async () => mockInvalidAddressInfo,
           });
         }
       });
 
-    await expect(getFundingUTXOs("testAddress", 100000)).rejects.toThrow(
-      "Invalid address",
-    );
-  });
-
-  it("should return an empty array if the amount cannot be satisfied", async () => {
-    const insufficientUTXOs = [
-      {
-        txid: "abcdbe6b5362b71ae86f34750eee52d02eeda4268d999b0e7bc29f444c4b7d80",
-        vout: 1,
-        status: {
-          confirmed: true,
-          block_height: 851842,
-          block_hash:
-            "000000000000000000010995e987a0e4e10420d84895ed555bad221a9686ca66",
-          block_time: 1720789492,
-        },
-        value: 50000,
-      },
-    ];
-
-    (global.fetch as jest.Mock)
-      .mockImplementationOnce((url: URL) => {
-        if (url.href === "https://mempool.space/api/address/testAddress/utxo") {
-          return Promise.resolve({
-            json: async () => insufficientUTXOs,
-          });
-        }
-      })
-      .mockImplementationOnce((url: URL) => {
-        if (
-          url.href ===
-          "https://mempool.space/api/v1/validate-address/testAddress"
-        ) {
-          return Promise.resolve({
-            json: async () => mockAddressInfo,
-          });
-        }
-      });
-
-    const result = await getFundingUTXOs("testAddress", 200000);
-
-    expect(result).toEqual([]);
+    await expect(getUTXOs("testAddress")).rejects.toThrow("Invalid address");
   });
 });

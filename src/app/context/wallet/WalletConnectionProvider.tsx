@@ -1,119 +1,61 @@
-import {
-  TomoContextProvider,
-  useTomoModalControl,
-  useTomoProviders,
-  useTomoWalletConnect,
-  useTomoWalletState,
-} from "@tomo-inc/wallet-connect-sdk";
-import "@tomo-inc/wallet-connect-sdk/style.css";
-import { useTheme } from "next-themes";
-import {
-  createContext,
-  useCallback,
-  useContext,
-  type PropsWithChildren,
-} from "react";
+"use client";
 
-import { getNetworkConfig } from "@/config/network.config";
-import { keplrRegistry } from "@/config/wallet/babylon";
+import {
+  ChainConfigArr,
+  WalletProvider,
+} from "@babylonlabs-io/bbn-wallet-connect";
+import { type PropsWithChildren } from "react";
 
-// We have to split the connection into two parts
-// so we can use the tomoWalletConnect and tomoModal hooks
+import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
+import { TomoWidget } from "@/app/context/tomo/TomoWidget";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBTC } from "@/config/network/btc";
+
+import { useError } from "../Error/ErrorProvider";
+import { TomoBBNConnector } from "../tomo/BBNConnector";
+import { TomoBTCConnector } from "../tomo/BTCConnector";
+
+const context = typeof window !== "undefined" ? window : {};
+
+const config: ChainConfigArr = [
+  {
+    chain: "BTC",
+    connectors: [
+      {
+        id: "tomo-btc-connector",
+        widget: () => <TomoWidget chainName="bitcoin" />,
+      },
+    ],
+    config: getNetworkConfigBTC(),
+  },
+  {
+    chain: "BBN",
+    connectors: [
+      {
+        id: "tomo-bbn-connector",
+        widget: () => <TomoWidget chainName="cosmos" />,
+      },
+    ],
+    config: getNetworkConfigBBN(),
+  },
+] as const;
+
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
-  const { resolvedTheme } = useTheme();
+  const { handleError } = useError();
 
-  const { mempoolApiUrl, network, networkName } = getNetworkConfig();
-  const bitcoinChain = {
-    id: 1,
-    name: networkName,
-    type: "bitcoin" as any,
-    network: network,
-    backendUrls: {
-      mempoolUrl: mempoolApiUrl + "/api/",
-    },
+  const onError = (error: Error) => {
+    handleError({
+      error,
+    });
   };
 
   return (
-    <TomoContextProvider
-      bitcoinChains={[bitcoinChain]}
-      chainTypes={["bitcoin", "cosmos"]}
-      cosmosChains={[
-        {
-          id: 2,
-          name: "Babylon Devnet 4",
-          type: "cosmos",
-          network: "devnet-4",
-          modularData: keplrRegistry,
-          backendUrls: {
-            rpcRrl: "https://rpc.devnet.babylonlabs.io",
-          },
-          logo: "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
-        },
-      ]}
-      style={{
-        rounded: "medium",
-        theme: resolvedTheme as "dark" | "light",
-        primaryColor: "#FF7C2A",
-      }}
-    >
-      <WalletConnectionProviderInternal>
+    <TomoConnectionProvider>
+      <WalletProvider config={config} context={context} onError={onError}>
+        <TomoBTCConnector />
+        <TomoBBNConnector />
         {children}
-      </WalletConnectionProviderInternal>
-    </TomoContextProvider>
+      </WalletProvider>
+    </TomoConnectionProvider>
   );
 };
-
-interface WalletConnectionContextProps {
-  open: () => Promise<void>;
-  disconnect: () => Promise<void>;
-  isConnected: boolean;
-  providers: ReturnType<typeof useTomoProviders>;
-  tomoWalletConnect: ReturnType<typeof useTomoWalletConnect>;
-  tomoModal: ReturnType<typeof useTomoModalControl>;
-  tomoWalletState: ReturnType<typeof useTomoWalletState>;
-}
-
-const WalletConnectionContext = createContext<WalletConnectionContextProps>({
-  open: async () => {},
-  disconnect: async () => {},
-  isConnected: false,
-  providers: {} as ReturnType<typeof useTomoProviders>,
-  tomoWalletConnect: {} as ReturnType<typeof useTomoWalletConnect>,
-  tomoModal: {} as ReturnType<typeof useTomoModalControl>,
-  tomoWalletState: {} as ReturnType<typeof useTomoWalletState>,
-});
-
-const WalletConnectionProviderInternal = ({ children }: PropsWithChildren) => {
-  const tomoModal = useTomoModalControl();
-  const tomoWalletConnect = useTomoWalletConnect();
-  const tomoWalletState = useTomoWalletState();
-  const providers = useTomoProviders();
-
-  const open = useCallback(async () => {
-    await tomoModal.open("connect");
-  }, [tomoModal]);
-
-  const disconnect = useCallback(async () => {
-    await tomoWalletConnect.disconnect();
-  }, [tomoWalletConnect]);
-
-  const isConnected = tomoWalletState.isConnected;
-
-  return (
-    <WalletConnectionContext.Provider
-      value={{
-        open,
-        disconnect,
-        isConnected,
-        providers,
-        tomoWalletConnect,
-        tomoModal,
-        tomoWalletState,
-      }}
-    >
-      {children}
-    </WalletConnectionContext.Provider>
-  );
-};
-
-export const useWalletConnection = () => useContext(WalletConnectionContext);

@@ -1,14 +1,14 @@
 import { FaBitcoin } from "react-icons/fa";
 
-import { getNetworkConfig } from "@/config/network.config";
-import { satoshiToBtc } from "@/utils/btcConversions";
+import { getNetworkConfigBTC } from "@/config/network/btc";
+import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
 interface Amount {
   value: number;
 }
 
-const { coinName } = getNetworkConfig();
+const { coinName } = getNetworkConfigBTC();
 
 export function Amount({ value }: Amount) {
   return (

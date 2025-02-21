@@ -10,6 +10,7 @@ export const isStakingSignReady = (
   time: number,
   fpSelected: boolean,
   stakingFeeSat: number,
+  bbnBalance: number,
 ): { isReady: boolean; reason: string } => {
   if (!fpSelected)
     return {
@@ -46,6 +47,11 @@ export const isStakingSignReady = (
     return {
       isReady: false,
       reason: "Not enough funds to cover fees for staking",
+    };
+  } else if (bbnBalance === 0) {
+    return {
+      isReady: false,
+      reason: "Insufficient BABY Balance in Babylon Wallet",
     };
   }
   return {

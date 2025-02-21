@@ -1,33 +1,43 @@
-import React from "react";
-import { FiSearch } from "react-icons/fi";
+import { Input } from "@babylonlabs-io/bbn-core-ui";
+import { useCallback } from "react";
+import { MdCancel } from "react-icons/md";
+import { RiSearchLine } from "react-icons/ri";
 
-interface FinalityProviderSearchProps {
-  searchValue: string;
-  onSearch: (searchTerm: string) => void;
-}
+import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 
-export const FinalityProviderSearch: React.FC<FinalityProviderSearchProps> = ({
-  searchValue,
-  onSearch,
-}) => {
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    onSearch(e.target.value);
-  };
+export const FinalityProviderSearch = () => {
+  const { filter, handleFilter } = useFinalityProviderState();
+
+  const onSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      handleFilter("search", e.target.value);
+    },
+    [handleFilter],
+  );
+
+  const onClearSearch = useCallback(() => {
+    handleFilter("search", "");
+  }, [handleFilter]);
+
+  const searchSuffix = filter.search ? (
+    <button
+      onClick={onClearSearch}
+      className="opacity-60 hover:opacity-100 transition-opacity"
+    >
+      <MdCancel size={18} className="text-secondary-strokeDark" />
+    </button>
+  ) : (
+    <span className="text-secondary-strokeDark">
+      <RiSearchLine size={20} />
+    </span>
+  );
 
   return (
-    <div className="w-full">
-      <div className="relative">
-        <div className="absolute inset-y-0 left-0 flex items-center justify-center w-10">
-          <FiSearch className="text-sm md:text-lg" />
-        </div>
-        <input
-          type="text"
-          placeholder="Search by Name or Public Key"
-          value={searchValue}
-          onChange={handleSearch}
-          className="w-full pl-10 pr-4 py-2 text-sm bg-transparent border-b border-gray-300 focus:outline-none focus:border-primary"
-        />
-      </div>
-    </div>
+    <Input
+      placeholder="Search by Name or Public Key"
+      suffix={searchSuffix}
+      value={filter.search}
+      onChange={onSearchChange}
+    />
   );
 };

@@ -1,26 +1,42 @@
-export enum ErrorState {
-  SERVER_ERROR = "SERVER_ERROR",
-  UNBONDING = "UNBONDING",
-  WALLET = "WALLET",
-  WITHDRAW = "WITHDRAW",
+export enum ErrorType {
+  // Server-related errors
+  SERVER = "SERVER",
+
+  // Staking lifecycle errors
   STAKING = "STAKING",
-  TRANSITION = "TRANSITION",
+  UNBONDING = "UNBONDING",
+  WITHDRAW = "WITHDRAW",
+  REGISTRATION = "REGISTRATION",
+
+  // Wallet errors
+  WALLET = "WALLET",
+
+  // Data errors
+  DELEGATIONS = "DELEGATIONS",
+
+  // Fallback
+  UNKNOWN = "UNKNOWN",
 }
 
-export interface ErrorType {
+export interface Error {
   message: string;
-  errorState?: ErrorState;
+  type?: ErrorType;
+  displayMessage?: string;
+  sentryEventId?: string;
+}
+
+export interface ErrorDisplayOptions {
+  retryAction?: () => void;
+  noCancel?: boolean;
 }
 
 export interface ErrorHandlerParam {
   error: Error | null;
-  hasError: boolean;
-  errorState: ErrorState;
-  refetchFunction: () => void;
+  displayOptions?: ErrorDisplayOptions;
 }
 
 export interface ShowErrorParams {
-  error: ErrorType;
+  error: Error;
   retryAction?: () => void;
   noCancel?: boolean;
 }

@@ -4,6 +4,9 @@ import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDeleg
 
 // Mock the filterDelegationsLocalStorage function
 jest.mock("@/utils/local_storage/filterDelegationsLocalStorage");
+jest.mock("@/app/constants", () => ({
+  MEMPOOL_API: "https://mempool.space",
+}));
 
 describe("utils/local_storage/calculateDelegationsDiff", () => {
   const mockDelegationsHash1: Delegation[] = [

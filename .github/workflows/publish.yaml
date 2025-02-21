@@ -21,7 +21,16 @@ jobs:
     strategy:
       matrix:
         environment:
-          [devnet, phase-2-devnet, staging, testnet, mainnet-private, mainnet]
+          [
+            devnet,
+            phase-2-devnet,
+            staging,
+            testnet,
+            phase-2-testnet,
+            mainnet-private,
+            phase-2-private-mainnet,
+            mainnet,
+          ]
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
@@ -39,10 +48,12 @@ jobs:
           build-args: |
             NEXT_PUBLIC_MEMPOOL_API=${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
             NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_POINTS_API_URL=${{ vars.NEXT_PUBLIC_POINTS_API_URL }}
             NEXT_PUBLIC_NETWORK=${{ vars.NEXT_PUBLIC_NETWORK }}
             NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
             NEXT_PUBLIC_SENTRY_DSN=${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+            NEXT_PUBLIC_FIXED_STAKING_TERM=${{ vars.NEXT_PUBLIC_FIXED_STAKING_TERM }}
+            NEXT_PUBLIC_COMMIT_HASH=${{ github.sha }}
+            NEXT_PUBLIC_BBN_GAS_PRICE=${{ vars.NEXT_PUBLIC_BBN_GAS_PRICE }}
       - name: Upload Docker image to workspace
         uses: actions/upload-artifact@v4
         with:
@@ -54,7 +65,16 @@ jobs:
     strategy:
       matrix:
         environment:
-          [devnet, phase-2-devnet, staging, testnet, mainnet-private, mainnet]
+          [
+            devnet,
+            phase-2-devnet,
+            staging,
+            testnet,
+            phase-2-testnet,
+            mainnet-private,
+            phase-2-private-mainnet,
+            mainnet,
+          ]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace
@@ -88,7 +108,16 @@ jobs:
     strategy:
       matrix:
         environment:
-          [devnet, phase-2-devnet, staging, testnet, mainnet-private, mainnet]
+          [
+            devnet,
+            phase-2-devnet,
+            staging,
+            testnet,
+            phase-2-testnet,
+            mainnet-private,
+            phase-2-private-mainnet,
+            mainnet,
+          ]
     needs: ["docker_build"]
     steps:
       - name: Download Docker image from workspace

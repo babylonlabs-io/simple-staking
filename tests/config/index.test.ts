@@ -1,5 +1,9 @@
 import { shouldDisplayTestingMsg } from "@/config";
 
+jest.mock("@/app/constants", () => ({
+  MEMPOOL_API: "https://mempool.space",
+}));
+
 describe("shouldDisplayTestingMsg", () => {
   beforeEach(() => {
     delete process.env.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES;

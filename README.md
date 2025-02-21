@@ -20,11 +20,11 @@ where,
   node queries
 - `NEXT_PUBLIC_API_URL` specifies the back-end API to use for the staking
   system queries
-- `NEXT_PUBLIC_POINTS_API_URL` specifies the Points API to use for the points
-  system (Optional)
 - `NEXT_PUBLIC_NETWORK` specifies the BTC network environment
 - `NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES` boolean value to indicate whether display 
 testing network related message. Default to true
+- `NEXT_PUBLIC_FIXED_STAKING_TERM` boolean value to indicate whether the staking term is fixed. Default to false
+- `NEXT_PUBLIC_BBN_GAS_PRICE` specifies the gas price for BABY. Default to 0.002
 
 Then, to start a development server:
 
@@ -34,5 +34,5 @@ npm run dev
 
 ## Wallet Integration
 
-Instructions for wallet integration can be found in this
-[document](./docs/WalletIntegration.md).
+Instructions for wallet integration can be found in the
+[bbn-wallet-connect documentation](https://github.com/babylonlabs-io/bbn-wallet-connect).

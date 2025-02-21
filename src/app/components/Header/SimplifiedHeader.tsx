@@ -1,28 +1,25 @@
-import { shouldDisplayTestingMsg } from "@/config";
+import { twJoin } from "tailwind-merge";
 
+import { Container } from "../Container/Container";
 import { Logo } from "../Logo/Logo";
-import { TestingInfo } from "../TestingInfo/TestingInfo";
 
-export const SimplifiedHeader = () => {
+export const SimplifiedHeader = ({
+  isMinimal = false,
+}: {
+  isMinimal?: boolean;
+}) => {
   return (
-    <nav>
-      <div className="bg-base-300 shadow-sm">
-        <div className="container mx-auto flex w-full items-center justify-between gap-4 p-6 pb-4 md:pb-6">
+    <nav className="w-full">
+      <section
+        className={twJoin(
+          "bg-primary-main w-full",
+          isMinimal ? "h-[84px]" : "h-[300px]",
+        )}
+      >
+        <Container className="h-20 p-6 flex items-center justify-between">
           <Logo />
-          <div className="flex flex-1">
-            {shouldDisplayTestingMsg() && (
-              <div className="hidden flex-1 xl:flex">
-                <TestingInfo />
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-      {shouldDisplayTestingMsg() && (
-        <div className="container mx-auto flex w-full items-center p-6 pb-0 xl:hidden">
-          <TestingInfo />
-        </div>
-      )}
+        </Container>
+      </section>
     </nav>
   );
 };

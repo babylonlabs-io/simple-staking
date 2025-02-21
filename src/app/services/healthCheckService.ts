@@ -1,5 +1,9 @@
+import { HttpStatusCode } from "axios";
+
 import { isAxiosError451 } from "../api/error";
 import { fetchHealthCheck } from "../api/healthCheckClient";
+import { API_ENDPOINTS } from "../constants/endpoints";
+import { ServerError } from "../context/Error/errors/serverError";
 import {
   API_ERROR_MESSAGE,
   GEO_BLOCK_MESSAGE,
@@ -16,7 +20,11 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
         message: healthCheckAPIResponse.data,
       };
     } else {
-      throw new Error(API_ERROR_MESSAGE);
+      throw new ServerError({
+        message: API_ERROR_MESSAGE,
+        endpoint: API_ENDPOINTS.HEALTHCHECK,
+        status: HttpStatusCode.InternalServerError,
+      });
     }
   } catch (error: any) {
     if (isAxiosError451(error)) {

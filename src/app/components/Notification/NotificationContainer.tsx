@@ -1,8 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import { twJoin } from "tailwind-merge";
-import { useMediaQuery } from "usehooks-ts";
 
-import { screenBreakPoints } from "@/config/screen-breakpoints";
+import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 
 const commonClassName = "relative overflow-hidden rounded-lg px-4 py-3 md:p-3";
 
@@ -18,7 +17,7 @@ const BG_COLOR = {
 } as const;
 
 export const NotificationContainer = () => {
-  const isMobileView = useMediaQuery(`(max-width: ${screenBreakPoints.md})`);
+  const isMobileView = useIsMobileView();
 
   return (
     <ToastContainer
@@ -29,7 +28,7 @@ export const NotificationContainer = () => {
       closeButton={false}
       icon={false}
       hideProgressBar={true}
-      position={isMobileView ? "top-center" : "top-right"}
+      position={isMobileView ? "top-center" : "bottom-center"}
     />
   );
 };

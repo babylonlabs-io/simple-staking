@@ -1,18 +1,46 @@
-import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import type {
-  DelegationV2,
-  DelegationV2Params,
-} from "@/app/types/delegationsV2";
-import { useCurrentTime } from "@/hooks/useCurrentTime";
+import { Card, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
+import Link from "next/link";
 
-import { type TableColumn, GridTable } from "../../common/GridTable";
+import { DOCUMENTATION_LINKS } from "@/app/constants";
+import {
+  ActionType,
+  useDelegationService,
+} from "@/app/hooks/services/useDelegationService";
+import { type DelegationV2 } from "@/app/types/delegationsV2";
+import { GridTable, type TableColumn } from "@/components/common/GridTable";
+import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
+import { getNetworkConfig } from "@/config/network";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
+import { DelegationModal } from "./components/DelegationModal";
+import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 
-const columns: TableColumn<DelegationV2, DelegationV2Params>[] = [
+type TableParams = {
+  validations: Record<string, { valid: boolean; error?: string }>;
+  handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
+  slashedStatuses: Record<string, { isSlashed: boolean }>;
+};
+
+const networkConfig = getNetworkConfig();
+
+const columns: TableColumn<DelegationV2, TableParams>[] = [
+  {
+    field: "Inception",
+    headerName: "Inception",
+    width: "max-content",
+    renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
+  },
+  {
+    field: "finalityProvider",
+    headerName: "Finality Provider",
+    width: "max-content",
+    renderCell: (row) => (
+      <FinalityProviderMoniker value={row.finalityProviderBtcPksHex[0]} />
+    ),
+  },
   {
     field: "stakingAmount",
     headerName: "Amount",
@@ -20,62 +48,113 @@ const columns: TableColumn<DelegationV2, DelegationV2Params>[] = [
     renderCell: (row) => <Amount value={row.stakingAmount} />,
   },
   {
-    field: "startHeight",
-    headerName: "Duration",
-    width: "max-content",
-    align: "center",
-  },
-  {
     field: "stakingTxHashHex",
-    headerName: "Transaction hash",
-    cellClassName: "justify-center",
-    align: "center",
+    headerName: "Transaction ID",
     renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
   },
   {
     field: "state",
     headerName: "Status",
-    cellClassName: "justify-center",
-    align: "center",
-    renderCell: (row) => <Status value={row.state} />,
+    renderCell: (row) => <Status delegation={row} />,
   },
   {
     field: "actions",
     headerName: "Action",
-    cellClassName: "justify-center",
-    align: "center",
-    renderCell: (row) => (
-      <ActionButton txHash={row.stakingTxHashHex} state={row.state} />
-    ),
+    renderCell: (
+      row,
+      _,
+      { handleActionClick, validations, slashedStatuses },
+    ) => {
+      const { valid, error } = validations[row.stakingTxHashHex];
+      const { isSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
+      const tooltip = isSlashed ? (
+        <>
+          <span>
+            This finality provider has been slashed.{" "}
+            <Link
+              className="text-secondary-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </Link>
+          </span>
+        </>
+      ) : (
+        error
+      );
+
+      return (
+        <ActionButton
+          disabled={!valid || isSlashed}
+          tooltip={tooltip}
+          delegation={row}
+          state={row.state}
+          onClick={handleActionClick}
+        />
+      );
+    },
   },
 ];
 
 export function DelegationList() {
-  const currentTime = useCurrentTime();
   const {
-    delegations = [],
-    fetchMoreDelegations,
-    hasMoreDelegations,
+    processing,
+    confirmationModal,
+    delegations,
     isLoading,
-  } = useDelegationV2State();
+    hasMoreDelegations,
+    validations,
+    fetchMoreDelegations,
+    executeDelegationAction,
+    openConfirmationModal,
+    closeConfirmationModal,
+    slashedStatuses,
+  } = useDelegationService();
 
   return (
-    <GridTable
-      getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-      columns={columns}
-      data={delegations}
-      loading={isLoading}
-      infiniteScroll={hasMoreDelegations}
-      onInfiniteScroll={fetchMoreDelegations}
-      classNames={{
-        headerCellClassName: "py-2 px-4 bg-base-300",
-        wrapperClassName: "max-h-[21rem] overflow-x-auto",
-        bodyClassName: "gap-y-4 min-w-[1000px]",
-        cellClassName:
-          "p-4 first:pl-4 first:rounded-l-2xl last:pr-4 last:rounded-r-2xl bg-base-300 border dark:bg-base-200 dark:border-0 flex items-center text-sm",
-      }}
-      params={{ currentTime }}
-      fallback={<div>No delegations found</div>}
-    />
+    <Card>
+      <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+        {networkConfig.bbn.networkFullName} Stakes
+      </Heading>
+
+      <GridTable
+        getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
+        columns={columns}
+        data={delegations}
+        loading={isLoading}
+        infiniteScroll={hasMoreDelegations}
+        onInfiniteScroll={fetchMoreDelegations}
+        classNames={{
+          headerRowClassName: "text-accent-primary text-xs",
+          headerCellClassName: "p-4 text-align-left text-accent-secondary",
+          rowClassName: "group",
+          wrapperClassName: "max-h-[25rem] overflow-x-auto",
+          bodyClassName: "min-w-[1000px]",
+          cellClassName:
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
+        }}
+        params={{
+          handleActionClick: openConfirmationModal,
+          validations,
+          slashedStatuses,
+        }}
+        fallback={
+          <Text as="div" className="text-accent-secondary">
+            No delegations found
+          </Text>
+        }
+      />
+
+      <DelegationModal
+        action={confirmationModal?.action}
+        delegation={confirmationModal?.delegation ?? null}
+        param={confirmationModal?.param ?? null}
+        processing={processing}
+        onSubmit={executeDelegationAction}
+        onClose={closeConfirmationModal}
+        networkConfig={networkConfig}
+      />
+    </Card>
   );
 }

@@ -1,45 +1,54 @@
-import axios from "axios";
+import axios, { AxiosRequestConfig, HttpStatusCode } from "axios";
+import qs from "qs";
+
+import { ServerError } from "../context/Error/errors/serverError";
+
+type QueryParamValue =
+  | string
+  | number
+  | boolean
+  | Array<string | number | boolean>;
+type QueryParams = Record<string, QueryParamValue | undefined>;
+
+interface RequestParams {
+  query?: QueryParams;
+  body?: any;
+}
 
 export const apiWrapper = async (
   method: "GET" | "POST",
   path: string,
   generalErrorMessage: string,
-  params?: any,
+  params?: RequestParams,
   timeout?: number,
 ) => {
-  let response;
-  let handler;
-  switch (method) {
-    case "GET":
-      handler = axios.get;
-      break;
-    case "POST":
-      handler = axios.post;
-      break;
-    default:
-      throw new Error("Invalid method");
-  }
+  const axiosConfig: AxiosRequestConfig = {
+    timeout: timeout || 0,
+    params: params?.query,
+    paramsSerializer: (params) =>
+      qs.stringify(params, { arrayFormat: "repeat" }),
+  };
+
+  const url = `${process.env.NEXT_PUBLIC_API_URL}${path}`;
 
   try {
-    // destructure params in case of post request
-    response = await handler(
-      `${process.env.NEXT_PUBLIC_API_URL}${path}`,
-      method === "POST"
-        ? { ...params }
-        : {
-            params,
-          },
-      {
-        timeout: timeout || 0, // 0 is no timeout
-      },
-    );
+    if (method === "GET") {
+      return await axios.get(url, axiosConfig);
+    } else {
+      return await axios.post(url, params?.body, axiosConfig);
+    }
   } catch (error) {
     if (axios.isAxiosError(error)) {
-      const message = error?.response?.data?.message;
-      throw new Error(message || generalErrorMessage);
-    } else {
-      throw new Error(generalErrorMessage);
+      throw new ServerError({
+        message: error.response?.data?.message,
+        status: error.response?.status,
+        endpoint: path,
+      });
     }
+    throw new ServerError({
+      message: generalErrorMessage,
+      status: HttpStatusCode.InternalServerError,
+      endpoint: path,
+    });
   }
-  return response;
 };

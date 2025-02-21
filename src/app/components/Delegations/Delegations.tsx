@@ -1,75 +1,46 @@
-import type { networks } from "bitcoinjs-lib";
-import { useEffect, useMemo, useState } from "react";
+import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
+import { HttpStatusCode } from "axios";
+import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
-import { DelegationsPointsProvider } from "@/app/context/api/DelegationsPointsProvider";
-import { useError } from "@/app/context/Error/ErrorContext";
+import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
+import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError } from "@/app/context/Error/errors/clientError";
+import { ServerError } from "@/app/context/Error/errors/serverError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useDelegations } from "@/app/hooks/api/useDelegations";
-import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useDelegations } from "@/app/hooks/client/api/useDelegations";
+import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
+import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
 import { useDelegationState } from "@/app/state/DelegationState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ErrorState } from "@/app/types/errors";
-import { shouldDisplayPoints } from "@/config";
-import { signWithdrawalTx } from "@/utils/delegations/signWithdrawalTx";
+import { ErrorType } from "@/app/types/errors";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
-import { MODE, MODE_WITHDRAW, WithdrawModal } from "../Modals/WithdrawModal";
+import { UnbondModal } from "../Modals/UnbondModal";
 
 import { Delegation } from "./Delegation";
 
-export const Delegations = () => {
-  const { data: delegationsAPI } = useDelegations();
-  const { address, publicKeyNoCoord, connected, network } = useBTCWallet();
+const MODE_TRANSITION = "transition";
+const MODE_WITHDRAW = "withdraw";
+const MODE_UNBOND = "unbond";
+type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW | typeof MODE_UNBOND;
 
-  if (!connected || !delegationsAPI || !network) {
-    return;
-  }
-
-  return (
-    <DelegationsPointsProvider
-      publicKeyNoCoord={publicKeyNoCoord}
-      delegationsAPI={delegationsAPI.delegations}
-      isWalletConnected={connected}
-      address={address}
-    >
-      <DelegationsContent
-        delegationsAPI={delegationsAPI.delegations}
-        address={address}
-        btcWalletNetwork={network}
-        publicKeyNoCoord={publicKeyNoCoord}
-        isWalletConnected={connected}
-      />
-    </DelegationsPointsProvider>
-  );
-};
-
-interface DelegationsContentProps {
-  delegationsAPI: DelegationInterface[];
-  publicKeyNoCoord: string;
-  btcWalletNetwork: networks.Network;
-  address: string;
-  isWalletConnected: boolean;
-}
-
-const DelegationsContent: React.FC<DelegationsContentProps> = ({
-  delegationsAPI,
-  address,
-  btcWalletNetwork,
-  publicKeyNoCoord,
-}) => {
+export const Delegations = ({}) => {
+  const { publicKeyNoCoord, connected, network } = useBTCWallet();
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
-  const { showError, captureError } = useError();
-  const { isApiNormal, isGeoBlocked } = useHealthCheck();
+  const { handleError } = useError();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
+  const { data: delegationsAPI } = useDelegations();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -77,16 +48,13 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     isLoading,
   } = useDelegationState();
 
-  const { signPsbt, getNetworkFees, pushTx } = useBTCWallet();
+  const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
+  const { data: networkFees } = useNetworkFees();
 
-  const delegation = useMemo(
-    () =>
-      delegationsAPI.find((delegation) => delegation.stakingTxHashHex === txID),
-    [delegationsAPI, txID],
+  const selectedDelegation = delegationsAPI?.delegations.find(
+    (delegation) => delegation.stakingTxHashHex === txID,
   );
 
-  const shouldShowPoints =
-    isApiNormal && !isGeoBlocked && shouldDisplayPoints();
   // Local storage state for intermediate delegations (transitioning, withdrawing)
   const intermediateDelegationsLocalStorageKey =
     getIntermediateDelegationsLocalStorageKey(publicKeyNoCoord);
@@ -133,32 +101,88 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
     });
   };
 
-  // Handles withdrawing requests for delegations that have expired timelocks
-  // It constructs a withdrawal transaction, creates a signature for it, and submits it to the Bitcoin network
-  const handleWithdraw = async (id: string) => {
+  const handleUnbond = async (id: string) => {
     try {
-      // Prevent the modal from closing
-      setAwaitingWalletResponse(true);
+      if (selectedDelegation?.stakingTxHashHex != id) {
+        throw new ClientError({
+          message: "Wrong delegation selected for unbonding",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.UNBONDING,
+        });
+      }
       // Sign the withdrawal transaction
-      const { delegation } = await signWithdrawalTx(
-        id,
-        delegationsAPI,
-        publicKeyNoCoord,
-        btcWalletNetwork,
-        signPsbt,
-        address,
-        getNetworkFees,
-        pushTx,
+      const { stakingTx, finalityProviderPkHex, stakingValueSat } =
+        selectedDelegation;
+      setAwaitingWalletResponse(true);
+      await submitUnbondingTx(
+        {
+          stakingTimelock: stakingTx.timelock,
+          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          stakingAmountSat: stakingValueSat,
+        },
+        stakingTx.startHeight,
+        stakingTx.txHex,
       );
       // Update the local state with the new intermediate delegation
-      updateLocalStorage(delegation, DelegationState.INTERMEDIATE_WITHDRAWAL);
+      updateLocalStorage(
+        selectedDelegation,
+        DelegationState.INTERMEDIATE_UNBONDING,
+      );
     } catch (error: Error | any) {
-      showError({
-        error: {
-          message: error.message,
-          errorState: ErrorState.WITHDRAW,
+      handleError({
+        error,
+      });
+    } finally {
+      setModalOpen(false);
+      setTxID("");
+      setModalMode(undefined);
+      setAwaitingWalletResponse(false);
+    }
+  };
+
+  // Handles withdrawing requests for delegations that have expired timelocks
+  // It constructs a withdrawal transaction, creates a signature for it,
+  // and submits it to the Bitcoin network
+  const handleWithdraw = async (id: string) => {
+    try {
+      if (!networkFees) {
+        // system error
+        throw new Error("Network fees not found");
+      }
+      // Prevent the modal from closing
+      setAwaitingWalletResponse(true);
+
+      if (selectedDelegation?.stakingTxHashHex != id) {
+        throw new ClientError({
+          message: "Wrong delegation selected for withdrawal",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.WITHDRAW,
+        });
+      }
+      // Sign the withdrawal transaction
+      const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
+        selectedDelegation;
+      await submitWithdrawalTx(
+        {
+          stakingTimelock: stakingTx.timelock,
+          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          stakingAmountSat: stakingValueSat,
         },
-        retryAction: () => handleModal(id, MODE_WITHDRAW),
+        stakingTx.startHeight,
+        stakingTx.txHex,
+        unbondingTx?.txHex,
+      );
+      // Update the local state with the new intermediate delegation
+      updateLocalStorage(
+        selectedDelegation,
+        DelegationState.INTERMEDIATE_WITHDRAWAL,
+      );
+    } catch (error: Error | any) {
+      handleError({
+        error,
+        displayOptions: {
+          retryAction: () => handleModal(id, MODE_WITHDRAW),
+        },
       });
     } finally {
       setModalOpen(false);
@@ -185,7 +209,7 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
       }
 
       return intermediateDelegations.filter((intermediateDelegation) => {
-        const matchingDelegation = delegationsAPI.find(
+        const matchingDelegation = delegationsAPI.delegations.find(
           (delegation) =>
             delegation?.stakingTxHashHex ===
             intermediateDelegation?.stakingTxHashHex,
@@ -216,56 +240,76 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
   }, [delegationsAPI, setIntermediateDelegationsLocalStorage]);
 
   useEffect(() => {
-    if (modalOpen && !delegation) {
-      showError({
-        error: {
+    if (modalOpen && !selectedDelegation) {
+      handleError({
+        error: new ServerError({
           message: "Delegation not found",
-          errorState: ErrorState.SERVER_ERROR,
+          status: HttpStatusCode.NotFound,
+          endpoint: API_ENDPOINTS.STAKER_DELEGATIONS,
+        }),
+        displayOptions: {
+          noCancel: false,
         },
-        noCancel: false,
       });
       setModalOpen(false);
       setTxID("");
       setModalMode(undefined);
     }
-  }, [modalOpen, delegation, showError]);
+  }, [modalOpen, selectedDelegation, handleError]);
+
+  if (!connected || !delegationsAPI || !network) {
+    return;
+  }
 
   // combine delegations from the API and local storage, prioritizing API data
   const combinedDelegationsData = delegationsAPI
-    ? [...delegations, ...delegationsAPI]
+    ? [...delegations, ...delegationsAPI.delegations]
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
+  if (combinedDelegationsData.length === 0) {
+    return null;
+  }
+
   return (
     <>
-      {combinedDelegationsData.length === 0 ? (
-        <div className="rounded-2xl border border-neutral-content p-4 text-center dark:border-neutral-content/20">
-          <p>No history found</p>
-        </div>
-      ) : (
-        <>
-          <div
-            className={`hidden ${shouldShowPoints ? "grid-cols-6" : "grid-cols-5"} gap-2 px-4 lg:grid`}
-          >
-            <p>Amount</p>
-            <p>Inception</p>
-            <p className="text-center">Transaction hash</p>
-            <p className="text-center">Status</p>
-            {shouldShowPoints && <p className="text-center">Points</p>}
-            <p>Action</p>
-          </div>
-          <div
-            id="staking-history"
-            className="no-scrollbar max-h-[21rem] overflow-y-auto"
-          >
-            <InfiniteScroll
-              className="flex flex-col gap-4 pt-3"
-              dataLength={combinedDelegationsData.length}
-              next={fetchMoreDelegations}
-              hasMore={hasMoreDelegations}
-              loader={isLoading ? <LoadingTableList /> : null}
-              scrollableTarget="staking-history"
-            >
+      <Card className="mb-6">
+        <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+          Pending Registration
+        </Heading>
+
+        <InfiniteScroll
+          className="no-scrollbar max-h-[25rem] overflow-auto"
+          dataLength={combinedDelegationsData.length}
+          next={fetchMoreDelegations}
+          hasMore={hasMoreDelegations}
+          loader={isLoading ? <LoadingTableList /> : null}
+        >
+          <table className="w-full min-w-[1000px]">
+            <thead className="sticky top-0 bg-surface">
+              <tr className="text-accent-secondary text-xs">
+                <th className="text-left h-[52px] md:min-w-52 px-4 whitespace-nowrap font-normal">
+                  Inception
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Finality Provider
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Amount
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Transaction ID
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Status
+                </th>
+                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  Action
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
               {combinedDelegationsData?.map((delegation) => {
                 if (!delegation) return null;
                 const { stakingTx, stakingTxHashHex } = delegation;
@@ -281,24 +325,33 @@ const DelegationsContent: React.FC<DelegationsContentProps> = ({
                     onWithdraw={() =>
                       handleModal(stakingTxHashHex, MODE_WITHDRAW)
                     }
+                    onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
                     intermediateState={intermediateDelegation?.state}
                   />
                 );
               })}
-            </InfiniteScroll>
-          </div>
-        </>
-      )}
-      {modalMode && txID && delegation && (
+            </tbody>
+          </table>
+        </InfiniteScroll>
+      </Card>
+      {modalMode && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
-          onProceed={() => {
+          onSubmit={() => {
             handleWithdraw(txID);
           }}
-          mode={modalMode}
-          awaitingWalletResponse={awaitingWalletResponse}
-          delegation={delegation}
+          processing={awaitingWalletResponse}
+        />
+      )}
+      {modalMode === MODE_UNBOND && (
+        <UnbondModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onSubmit={() => {
+            handleUnbond(txID);
+          }}
+          processing={awaitingWalletResponse}
         />
       )}
     </>
