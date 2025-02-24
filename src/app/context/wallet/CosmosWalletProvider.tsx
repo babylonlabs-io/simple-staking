@@ -66,7 +66,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         const address = await provider.getAddress();
         const offlineSigner = await (
           window as any
-        ).leap.getOfflineSignerOnlyAmino("devnet-9");
+        ).keplr.getOfflineSignerOnlyAmino("bbn-test-5");
         // Should be false which means we are in the amino signer mode
         console.log(isOfflineDirectSigner(offlineSigner));
         const client = await SigningStargateClient.connectWithSigner(

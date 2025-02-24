@@ -63,6 +63,8 @@ export const useBbnTransaction = () => {
    */
   const sendBbnTx = useCallback(
     async (tx: Uint8Array) => {
+      const txBase64 = Buffer.from(tx).toString("base64");
+      console.log("Sending transaction", txBase64);
       return broadcastTx(tx);
     },
     [broadcastTx],

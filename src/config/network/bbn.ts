@@ -38,7 +38,8 @@ const signetConfig: BBNConfig = {
 
 const testnetConfig: BBNConfig = {
   chainId: bbnTestnet.chainId,
-  rpc: bbnTestnet.rpc,
+  // rpc: bbnTestnet.rpc,
+  rpc: "https://babylon-testnet-rpc.nodes.guru",
   chainData: bbnTestnet,
   networkName: "Testnet BABY",
   networkFullName: "Testnet Babylon Chain",
