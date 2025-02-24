@@ -63,6 +63,11 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       if (!provider) return;
 
       try {
+        // Monitor onChange event
+        // window.addEventListener("keplr_keystorechange", (a) => {
+        //   console.log("Keplr key store has changed. Refetching account info...", a);
+        //   // Refetch account or key information here
+        // });
         const address = await provider.getAddress();
         // const offlineSigner = await provider.getOfflineSigner();
         // TODO remove
