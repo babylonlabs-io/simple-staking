@@ -1,9 +1,9 @@
-export const BBN_TESTNET_RPC_URL = "https://rpc-dapp.testnet.babylonlabs.io/";
+export const BBN_TESTNET_RPC_URL = "https://babylon-testnet-rpc.nodes.guru/";
 // export const BBN_TESTNET_RPC_URL = "http://localhost:26657/";
 // export const BBN_TESTNET_RPC_URL =
 // "https://af5e-2a02-587-4b48-e500-28ff-a214-2bb4-4c5a.ngrok-free.app";
 // "https://623b-2a02-587-4b48-e500-28ff-a214-2bb4-4c5a.ngrok-free.app";
-export const BBN_TESTNET_LCD_URL = "https://lcd-dapp.testnet.babylonlabs.io/";
+export const BBN_TESTNET_LCD_URL = "https://babylon-testnet-api.nodes.guru/";
 
 export const bbnTestnet = {
   chainId: "bbn-test-5",
