@@ -1,8 +1,4 @@
-import {
-  btcstaking,
-  btcstakingtx,
-  incentivetx,
-} from "@babylonlabs-io/babylon-proto-ts";
+import { btcstakingtx, incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { AminoTypes } from "@cosmjs/stargate";
 
 // import { BBN_REGISTRY_TYPE_URLS } from "./bbnRegistry";
@@ -15,50 +11,51 @@ const msgCreateBTCDelegationConverter = {
     // 1) Protobuf -> Amino JSON
     //
     toAmino: (msg: btcstakingtx.MsgCreateBTCDelegation) => {
-      console.log("toAmino", msg);
+      const pop = msg.pop;
+      if (!pop) {
+        throw new Error("proof of possession is undefined");
+      }
       return {
         staker_addr: msg.stakerAddr,
-        pop: msg.pop
-          ? {
-              btc_sig_type: msg.pop.btcSigType.toString(),
-              btc_sig: Buffer.from(msg.pop.btcSig).toString("hex"),
-            }
-          : undefined,
-        btc_pk: Buffer.from(msg.btcPk).toString("hex"),
+        btc_pk: Buffer.from(msg.btcPk).toString("base64"),
+        pop: {
+          btc_sig_type: pop.btcSigType,
+          btc_sig: Buffer.from(pop.btcSig).toString("base64"),
+        },
         fp_btc_pk_list: msg.fpBtcPkList.map((pk) =>
-          Buffer.from(pk).toString("hex"),
+          Buffer.from(pk).toString("base64"),
         ),
-        staking_time: msg.stakingTime.toString(),
+        staking_time: msg.stakingTime,
         staking_value: msg.stakingValue.toString(),
-        staking_tx: Buffer.from(msg.stakingTx).toString("hex"),
-        staking_tx_inclusion_proof: msg.stakingTxInclusionProof
-          ? {
-              key: msg.stakingTxInclusionProof.key
-                ? {
-                    index: msg.stakingTxInclusionProof.key.index.toString(),
-                    hash: Buffer.from(
-                      msg.stakingTxInclusionProof.key.hash,
-                    ).toString("hex"),
-                  }
-                : undefined,
-              proof: Buffer.from(msg.stakingTxInclusionProof.proof).toString(
-                "hex",
-              ),
-            }
-          : undefined,
-        slashing_tx: Buffer.from(msg.slashingTx).toString("hex"),
+        staking_tx: Buffer.from(msg.stakingTx).toString("base64"),
+        slashing_tx: Buffer.from(msg.slashingTx).toString("base64"),
         delegator_slashing_sig: Buffer.from(msg.delegatorSlashingSig).toString(
-          "hex",
+          "base64",
         ),
-        unbonding_time: msg.unbondingTime.toString(),
-        unbonding_tx: Buffer.from(msg.unbondingTx).toString("hex"),
+        unbonding_time: msg.unbondingTime,
+        unbonding_tx: Buffer.from(msg.unbondingTx).toString("base64"),
         unbonding_value: msg.unbondingValue.toString(),
         unbonding_slashing_tx: Buffer.from(msg.unbondingSlashingTx).toString(
-          "hex",
+          "base64",
         ),
         delegator_unbonding_slashing_sig: Buffer.from(
           msg.delegatorUnbondingSlashingSig,
-        ).toString("hex"),
+        ).toString("base64"),
+        ...(msg.stakingTxInclusionProof?.key
+          ? {
+              staking_tx_inclusion_proof: {
+                key: {
+                  index: msg.stakingTxInclusionProof.key.index,
+                  hash: Buffer.from(
+                    msg.stakingTxInclusionProof.key.hash,
+                  ).toString("base64"),
+                },
+                proof: Buffer.from(msg.stakingTxInclusionProof.proof).toString(
+                  "base64",
+                ),
+              },
+            }
+          : {}),
       };
     },
 
@@ -66,50 +63,50 @@ const msgCreateBTCDelegationConverter = {
     // 2) Amino JSON -> Protobuf
     //
     fromAmino: (json: any): btcstakingtx.MsgCreateBTCDelegation => {
-      console.log("fromAmino", json);
+      const hasInclusionProof = json.staking_tx_inclusion_proof?.key.hash;
+
       return {
         stakerAddr: json.staker_addr,
-        pop: json.pop
+        btcPk: Buffer.from(json.btc_pk, "base64"),
+        pop: {
+          btcSigType: json.pop.btc_sig_type,
+          btcSig: Buffer.from(json.pop.btc_sig, "base64"),
+        },
+        fpBtcPkList: json.fp_btc_pk_list.map((pk: string) =>
+          Buffer.from(pk, "base64"),
+        ),
+        stakingTime: json.staking_time,
+        stakingValue: parseInt(json.staking_value, 10),
+        stakingTx: Buffer.from(json.staking_tx, "base64"),
+        stakingTxInclusionProof: hasInclusionProof
           ? {
-              btcSigType: parseInt(json.pop.btc_sig_type, 10),
-              btcSig: Buffer.from(json.pop.btc_sig, "hex"),
+              key: {
+                index: json.staking_tx_inclusion_proof.key.index,
+                hash: Buffer.from(
+                  json.staking_tx_inclusion_proof.key.hash,
+                  "base64",
+                ),
+              },
+              proof: Buffer.from(
+                json.staking_tx_inclusion_proof.proof,
+                "base64",
+              ),
             }
           : undefined,
-        btcPk: Buffer.from(json.btc_pk, "hex"),
-        fpBtcPkList: (json.fp_btc_pk_list || []).map((pk: string) =>
-          Buffer.from(pk, "hex"),
+        slashingTx: Buffer.from(json.slashing_tx, "base64"),
+        delegatorSlashingSig: Buffer.from(
+          json.delegator_slashing_sig,
+          "base64",
         ),
-        stakingTime: parseInt(json.staking_time, 10),
-        stakingValue: parseInt(json.staking_value, 10),
-        stakingTx: Buffer.from(json.staking_tx, "hex"),
-        stakingTxInclusionProof: json.staking_tx_inclusion_proof
-          ? btcstaking.InclusionProof.fromPartial({
-              key: json.staking_tx_inclusion_proof.key
-                ? {
-                    index: parseInt(
-                      json.staking_tx_inclusion_proof.key.index,
-                      10,
-                    ),
-                    hash: Buffer.from(
-                      json.staking_tx_inclusion_proof.key.hash,
-                      "hex",
-                    ),
-                  }
-                : undefined,
-              proof: Buffer.from(json.staking_tx_inclusion_proof.proof, "hex"),
-            })
-          : undefined,
-        slashingTx: Buffer.from(json.slashing_tx, "hex"),
-        delegatorSlashingSig: Buffer.from(json.delegator_slashing_sig, "hex"),
-        unbondingTime: parseInt(json.unbonding_time, 10),
-        unbondingTx: Buffer.from(json.unbonding_tx, "hex"),
+        unbondingTime: json.unbonding_time,
+        unbondingTx: Buffer.from(json.unbonding_tx, "base64"),
         unbondingValue: parseInt(json.unbonding_value, 10),
-        unbondingSlashingTx: Buffer.from(json.unbonding_slashing_tx, "hex"),
+        unbondingSlashingTx: Buffer.from(json.unbonding_slashing_tx, "base64"),
         delegatorUnbondingSlashingSig: Buffer.from(
           json.delegator_unbonding_slashing_sig,
-          "hex",
+          "base64",
         ),
-      };
+      } as any;
     },
   },
 };
