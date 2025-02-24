@@ -73,6 +73,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         // TODO remove
         const offlineSigner =
           await window.keplr.getOfflineSignerOnlyAmino("bbn-test-5");
+        // await window.$onekey.cosmos.getOfflineSignerOnlyAmino("bbn-test-5");
         // const offlineSigner =
         //   await window.keplr.getOfflineSignerAuto("bbn-test-5");
         // const offlineSigner = await window.keplr.getOfflineSigner("bbn-test-5");
