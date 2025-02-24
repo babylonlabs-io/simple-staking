@@ -117,6 +117,20 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     [captureError, showError, rpc],
   );
 
+  // Listen for BABY account changes
+  useEffect(() => {
+    if (!BBNWalletProvider) return;
+
+    const cb = async () => {
+      await BBNWalletProvider.connectWallet();
+      connectCosmos(BBNWalletProvider);
+    };
+
+    window.addEventListener("keplr_keystorechange", cb);
+
+    return () => window.removeEventListener("keplr_keystorechange", cb);
+  }, [BBNWalletProvider, connectCosmos]);
+
   const cosmosContextValue = useMemo(
     () => ({
       bech32Address: cosmosBech32Address,
