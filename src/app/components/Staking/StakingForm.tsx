@@ -1,4 +1,4 @@
-import { Card, Form } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Form } from "@babylonlabs-io/core-ui";
 
 import { Section } from "@/app/components/Section/Section";
 import { useStakingService } from "@/app/hooks/services/useStakingService";

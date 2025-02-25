@@ -1,4 +1,4 @@
-import { Heading, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Heading, Text } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 
 import { shouldDisplayTestingMsg } from "@/config";

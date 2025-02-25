@@ -3,7 +3,7 @@ import {
   IBTCProvider,
   useChainConnector,
   useWidgetState,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import {
   BTCProvider,
   useTomoProviders,

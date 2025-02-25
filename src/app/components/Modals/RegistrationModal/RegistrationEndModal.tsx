@@ -1,4 +1,4 @@
-import { Text } from "@babylonlabs-io/bbn-core-ui";
+import { Text } from "@babylonlabs-io/core-ui";
 
 import { getNetworkConfig } from "@/config/network";
 

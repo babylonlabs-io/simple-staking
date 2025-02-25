@@ -1,4 +1,4 @@
-import { Select } from "@babylonlabs-io/bbn-core-ui";
+import { Select } from "@babylonlabs-io/core-ui";
 
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 

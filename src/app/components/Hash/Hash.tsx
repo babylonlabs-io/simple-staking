@@ -1,4 +1,4 @@
-import { Text } from "@babylonlabs-io/bbn-core-ui";
+import { Text } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import { FiCopy } from "react-icons/fi";
 import { IoIosCheckmarkCircle } from "react-icons/io";

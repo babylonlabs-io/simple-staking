@@ -1,4 +1,4 @@
-// import { Avatar } from "@babylonlabs-io/bbn-core-ui";
+// import { Avatar } from "@babylonlabs-io/core-ui";
 
 import { Hash } from "@/app/components/Hash/Hash";
 import {

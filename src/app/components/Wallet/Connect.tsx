@@ -4,11 +4,11 @@ import {
   Button,
   Text,
   Toggle,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import {
   useWalletConnect,
   useWidgetState,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
@@ -22,6 +22,7 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
+import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { Hash } from "../Hash/Hash";
@@ -43,6 +44,8 @@ export const Connect: React.FC<ConnectProps> = ({
 }) => {
   const buttonRef = useRef<HTMLButtonElement>(null);
   const { includeOrdinals, excludeOrdinals, ordinalsExcluded } = useAppState();
+  const { linkedDelegationsVisibility, displayLinkedDelegations } =
+    useDelegationV2State();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Wallet states
@@ -162,6 +165,17 @@ export const Connect: React.FC<ConnectProps> = ({
             }
             inactiveIcon={<FaLock size={10} />}
             activeIcon={<FaLockOpen size={10} />}
+          />
+        </div>
+      </div>
+      <div className="flex flex-row items-center justify-between">
+        <Text variant="body2" className="text-sm text-accent-primary">
+          Linked Wallet Stakes
+        </Text>
+        <div className="flex flex-col items-center justify-center">
+          <Toggle
+            value={linkedDelegationsVisibility}
+            onChange={displayLinkedDelegations}
           />
         </div>
       </div>

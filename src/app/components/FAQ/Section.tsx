@@ -4,7 +4,7 @@ import {
   AccordionSummary,
   Heading,
   Text,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import { ReactNode } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 

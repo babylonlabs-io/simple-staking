@@ -1,4 +1,4 @@
-import { Card, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Heading, Text } from "@babylonlabs-io/core-ui";
 import Link from "next/link";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";

@@ -1,4 +1,4 @@
-import { Card } from "@babylonlabs-io/bbn-core-ui";
+import { Card } from "@babylonlabs-io/core-ui";
 
 import { Section as SectionContainer } from "@/app/components/Section/Section";
 import { getNetworkConfigBTC } from "@/config/network/btc";

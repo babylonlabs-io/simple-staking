@@ -65,12 +65,20 @@ export const getDelegationV2 = async (
   }
 };
 
-export const getDelegationsV2 = async (
-  publicKeyNoCoord: string,
-  pageKey?: string,
-): Promise<PaginatedDelegations> => {
+interface DelegationProps {
+  stakerPublicKey: string;
+  babylonAddress?: string;
+  pageKey?: string;
+}
+
+export const getDelegationsV2 = async ({
+  stakerPublicKey,
+  babylonAddress,
+  pageKey,
+}: DelegationProps): Promise<PaginatedDelegations> => {
   const params = {
-    staker_pk_hex: publicKeyNoCoord,
+    staker_pk_hex: stakerPublicKey,
+    babylon_address: babylonAddress,
     pagination_key: pageKey ? pageKey : "",
   };
 

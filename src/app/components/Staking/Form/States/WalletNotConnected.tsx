@@ -1,4 +1,4 @@
-import { Button, Heading, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";

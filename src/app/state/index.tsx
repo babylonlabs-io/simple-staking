@@ -1,8 +1,8 @@
+import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import {
   InscriptionIdentifier,
   useInscriptionProvider,
-} from "@babylonlabs-io/bbn-wallet-connect";
-import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+} from "@babylonlabs-io/wallet-connector";
 import {
   useCallback,
   useEffect,

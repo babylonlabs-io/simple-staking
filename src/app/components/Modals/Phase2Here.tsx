@@ -3,7 +3,7 @@ import {
   DialogBody,
   DialogFooter,
   Heading,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 import { MdLooksTwo } from "react-icons/md";
 

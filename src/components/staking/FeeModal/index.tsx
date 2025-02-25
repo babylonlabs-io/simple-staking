@@ -7,7 +7,7 @@ import {
   Loader,
   Radio,
   Text,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import { useEffect, useRef, useState } from "react";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";

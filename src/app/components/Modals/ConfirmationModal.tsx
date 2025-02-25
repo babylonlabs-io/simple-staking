@@ -4,7 +4,7 @@ import {
   DialogFooter,
   DialogHeader,
   Loader,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";

@@ -1,4 +1,4 @@
-import type { BBNConfig } from "@babylonlabs-io/bbn-wallet-connect";
+import type { BBNConfig } from "@babylonlabs-io/wallet-connector";
 
 import { Network } from "@/app/types/network";
 

@@ -1,4 +1,4 @@
-import { useWalletConnect } from "@babylonlabs-io/bbn-wallet-connect";
+import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import {
   useEffect,
   useState,
