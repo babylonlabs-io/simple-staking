@@ -6,7 +6,7 @@ import {
   Heading,
   MobileDialog,
   Text,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import { FiCheck, FiCopy } from "react-icons/fi";
 import { MdOutlineSwapHoriz } from "react-icons/md";

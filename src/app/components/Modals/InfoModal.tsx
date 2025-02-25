@@ -4,7 +4,7 @@ import {
   DialogFooter,
   DialogHeader,
   Text,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { getNetworkConfigBTC } from "@/config/network/btc";

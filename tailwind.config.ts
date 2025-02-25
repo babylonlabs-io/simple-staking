@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 import { screenBreakPoints } from "./src/config/screen-breakpoints";
 
-const coreUIConfig = require("@babylonlabs-io/bbn-core-ui/tailwind");
+const coreUIConfig = require("@babylonlabs-io/core-ui/tailwind");
 
 const config: Config = {
   presets: [coreUIConfig],

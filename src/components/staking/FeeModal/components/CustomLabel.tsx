@@ -1,4 +1,4 @@
-import { Input, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Input, Text } from "@babylonlabs-io/core-ui";
 import { ChangeEventHandler, forwardRef } from "react";
 
 import { WarningTooltip } from "./WarningTooltip";

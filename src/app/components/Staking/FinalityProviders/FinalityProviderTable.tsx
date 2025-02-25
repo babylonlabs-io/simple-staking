@@ -1,4 +1,4 @@
-import { Loader, Table, useWatch } from "@babylonlabs-io/bbn-core-ui";
+import { Loader, Table, useWatch } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 import { useMemo } from "react";
 

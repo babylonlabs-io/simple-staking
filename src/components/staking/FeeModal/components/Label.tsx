@@ -1,4 +1,4 @@
-import { Chip, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Chip, Text } from "@babylonlabs-io/core-ui";
 
 import { WarningTooltip } from "./WarningTooltip";
 

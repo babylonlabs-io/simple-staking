@@ -1,4 +1,4 @@
-import type { Network } from "@babylonlabs-io/bbn-wallet-connect";
+import type { Network } from "@babylonlabs-io/wallet-connector";
 
 import { network } from "./network/btc";
 

@@ -1,4 +1,4 @@
-import { HiddenField, NumberField, Text } from "@babylonlabs-io/bbn-core-ui";
+import { HiddenField, NumberField, Text } from "@babylonlabs-io/core-ui";
 
 interface TermFieldProps {
   min?: number;

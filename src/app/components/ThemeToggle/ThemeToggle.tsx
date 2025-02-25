@@ -1,4 +1,4 @@
-import { Text, Toggle } from "@babylonlabs-io/bbn-core-ui";
+import { Text, Toggle } from "@babylonlabs-io/core-ui";
 import { IoIosMoon, IoIosSunny } from "react-icons/io";
 
 import { useAppState } from "@/app/state";

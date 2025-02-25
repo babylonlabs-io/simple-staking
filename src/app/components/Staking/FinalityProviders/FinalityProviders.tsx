@@ -3,7 +3,7 @@ import {
   HiddenField,
   Text,
   useFormContext,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 
 import { FinalityProviderFilter } from "./FinalityProviderFilter";
 import { FinalityProviderSearch } from "./FinalityProviderSearch";

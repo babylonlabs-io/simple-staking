@@ -1,4 +1,4 @@
-import { useFormContext } from "@babylonlabs-io/bbn-core-ui";
+import { useFormContext } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/app/components/Modals/CancelFeedbackModal";

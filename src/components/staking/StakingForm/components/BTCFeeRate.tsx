@@ -1,4 +1,4 @@
-import { Button, useFormContext, useWatch } from "@babylonlabs-io/bbn-core-ui";
+import { Button, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import { FaPen } from "react-icons/fa6";
 

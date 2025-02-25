@@ -4,11 +4,11 @@ import {
   Button,
   Text,
   Toggle,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import {
   useWalletConnect,
   useWidgetState,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";

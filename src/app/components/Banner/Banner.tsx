@@ -1,4 +1,4 @@
-import { Text } from "@babylonlabs-io/bbn-core-ui";
+import { Text } from "@babylonlabs-io/core-ui";
 import { PiWarningOctagonFill } from "react-icons/pi";
 
 import { shouldDisplayTestingMsg } from "@/config";

@@ -4,7 +4,7 @@ import {
   IBBNProvider,
   useChainConnector,
   useWalletConnect,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import {
   createContext,

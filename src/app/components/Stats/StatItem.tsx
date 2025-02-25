@@ -1,8 +1,4 @@
-import {
-  type ListItemProps,
-  ListItem,
-  Loader,
-} from "@babylonlabs-io/bbn-core-ui";
+import { type ListItemProps, ListItem, Loader } from "@babylonlabs-io/core-ui";
 import { useId } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
