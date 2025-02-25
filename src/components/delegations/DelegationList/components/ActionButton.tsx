@@ -1,4 +1,4 @@
-import { Button } from "@babylonlabs-io/bbn-core-ui";
+import { Button } from "@babylonlabs-io/core-ui";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";

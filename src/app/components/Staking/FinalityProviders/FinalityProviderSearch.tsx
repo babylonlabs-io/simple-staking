@@ -1,4 +1,4 @@
-import { Input } from "@babylonlabs-io/bbn-core-ui";
+import { Input } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
 import { MdCancel } from "react-icons/md";
 import { RiSearchLine } from "react-icons/ri";

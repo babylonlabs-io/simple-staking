@@ -1,4 +1,4 @@
-import { NumberField, Text } from "@babylonlabs-io/bbn-core-ui";
+import { NumberField, Text } from "@babylonlabs-io/core-ui";
 
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";

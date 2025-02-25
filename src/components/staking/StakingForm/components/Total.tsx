@@ -1,4 +1,4 @@
-import { Text, useWatch } from "@babylonlabs-io/bbn-core-ui";
+import { Text, useWatch } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { usePrice } from "@/app/hooks/client/api/usePrices";

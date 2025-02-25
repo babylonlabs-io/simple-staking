@@ -1,4 +1,4 @@
-import { Button, Popover } from "@babylonlabs-io/bbn-core-ui";
+import { Button, Popover } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
