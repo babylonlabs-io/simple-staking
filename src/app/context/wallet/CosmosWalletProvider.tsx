@@ -90,19 +90,26 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     [handleError, rpc],
   );
 
-  // Listen for BABY account changes in Keplr
   useEffect(() => {
     if (!BBNWalletProvider) return;
 
-    const cb = async () => {
-      // signer should also be updated
-      await BBNWalletProvider.connectWallet();
-      connectCosmos(BBNWalletProvider);
+    const setupKeplrListener = async () => {
+      const providerName = await BBNWalletProvider.getWalletProviderName();
+      if (providerName.toLowerCase() !== "keplr") return;
+
+      const cb = async () => {
+        await BBNWalletProvider.connectWallet();
+        connectCosmos(BBNWalletProvider);
+      };
+
+      window.addEventListener("keplr_keystorechange", cb);
+      return () => window.removeEventListener("keplr_keystorechange", cb);
     };
 
-    window.addEventListener("keplr_keystorechange", cb);
-
-    return () => window.removeEventListener("keplr_keystorechange", cb);
+    const cleanup = setupKeplrListener();
+    return () => {
+      cleanup.then((cleanupFn) => cleanupFn?.());
+    };
   }, [BBNWalletProvider, connectCosmos]);
 
   const cosmosContextValue = useMemo(
