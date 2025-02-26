@@ -1,4 +1,4 @@
-import { useFieldState } from "@babylonlabs-io/bbn-core-ui";
+import { useFieldState } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 
 const FIELDS = ["finalityProvider", "term", "amount"];

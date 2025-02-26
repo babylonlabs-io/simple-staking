@@ -1,4 +1,4 @@
-import { List } from "@babylonlabs-io/bbn-core-ui";
+import { List } from "@babylonlabs-io/core-ui";
 
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";

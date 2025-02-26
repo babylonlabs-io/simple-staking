@@ -1,4 +1,4 @@
-import { Card, Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Card, Heading } from "@babylonlabs-io/core-ui";
 import { HttpStatusCode } from "axios";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";

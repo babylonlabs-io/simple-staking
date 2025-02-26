@@ -1,4 +1,4 @@
-import { BBNConfig, BTCConfig } from "@babylonlabs-io/bbn-wallet-connect";
+import { BBNConfig, BTCConfig } from "@babylonlabs-io/wallet-connector";
 
 import { getNetworkConfigBBN } from "./bbn";
 import { getNetworkConfigBTC } from "./btc";

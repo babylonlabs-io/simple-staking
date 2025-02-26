@@ -1,6 +1,6 @@
 "use client";
 
-import { ScrollLocker } from "@babylonlabs-io/bbn-core-ui";
+import { ScrollLocker } from "@babylonlabs-io/core-ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";

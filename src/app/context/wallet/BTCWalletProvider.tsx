@@ -5,7 +5,7 @@ import {
   Network,
   useChainConnector,
   useWalletConnect,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,

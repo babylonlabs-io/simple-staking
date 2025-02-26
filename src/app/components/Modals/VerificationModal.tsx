@@ -1,4 +1,4 @@
-import { Loader } from "@babylonlabs-io/bbn-core-ui";
+import { Loader } from "@babylonlabs-io/core-ui";
 
 import { getNetworkConfig } from "@/config/network";
 

@@ -1,4 +1,4 @@
-import { useWatch } from "@babylonlabs-io/bbn-core-ui";
+import { useWatch } from "@babylonlabs-io/core-ui";
 
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { getNetworkConfigBTC } from "@/config/network/btc";

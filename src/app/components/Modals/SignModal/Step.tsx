@@ -1,4 +1,4 @@
-import { Loader, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Loader, Text } from "@babylonlabs-io/core-ui";
 import type { PropsWithChildren, ReactNode } from "react";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";

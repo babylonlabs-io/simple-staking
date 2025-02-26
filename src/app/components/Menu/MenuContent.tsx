@@ -1,4 +1,4 @@
-import { MobileDialog, Popover } from "@babylonlabs-io/bbn-core-ui";
+import { MobileDialog, Popover } from "@babylonlabs-io/core-ui";
 
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 

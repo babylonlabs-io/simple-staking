@@ -1,4 +1,4 @@
-import { Heading } from "@babylonlabs-io/bbn-core-ui";
+import { Heading } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 import { twMerge } from "tailwind-merge";
 

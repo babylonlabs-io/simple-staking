@@ -1,9 +1,4 @@
-import {
-  Heading,
-  HiddenField,
-  Loader,
-  Text,
-} from "@babylonlabs-io/bbn-core-ui";
+import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
 
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";

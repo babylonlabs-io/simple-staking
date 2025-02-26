@@ -1,4 +1,4 @@
-import { Text } from "@babylonlabs-io/bbn-core-ui";
+import { Text } from "@babylonlabs-io/core-ui";
 import { BiSolidEditAlt } from "react-icons/bi";
 
 import { getNetworkConfigBBN } from "@/config/network/bbn";
