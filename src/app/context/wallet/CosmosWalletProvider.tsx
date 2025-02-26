@@ -106,10 +106,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       return () => window.removeEventListener("keplr_keystorechange", cb);
     };
 
-    const cleanup = setupKeplrListener();
-    return () => {
-      cleanup.then((cleanupFn) => cleanupFn?.());
-    };
+    setupKeplrListener();
   }, [BBNWalletProvider, connectCosmos]);
 
   const cosmosContextValue = useMemo(
