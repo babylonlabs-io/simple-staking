@@ -5,6 +5,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
+import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import {
   createContext,
@@ -18,6 +19,7 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 interface CosmosWalletContextProps {
@@ -65,9 +67,12 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         const offlineSigner = await provider.getOfflineSigner();
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
-          offlineSigner,
+          // Keplr OfflineAminoSigner | OfflineDirectSigner
+          // is compatible with CosmJS OfflineSigner
+          offlineSigner as OfflineSigner,
           {
             registry: createBbnRegistry(),
+            aminoTypes: createBbnAminoTypes(),
           },
         );
         setSigningStargateClient(client);
