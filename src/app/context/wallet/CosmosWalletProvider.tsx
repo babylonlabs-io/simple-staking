@@ -95,6 +95,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     if (!BBNWalletProvider) return;
 
     const cb = async () => {
+      // signer should also be updated
       await BBNWalletProvider.connectWallet();
       connectCosmos(BBNWalletProvider);
     };
