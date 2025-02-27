@@ -64,11 +64,13 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const address = await provider.getAddress();
-        const offlineSigner = await provider.getOfflineSigner();
+        const offlineSigner = provider.getOfflineSignerAuto
+          ? // use `auto` (if it is provided) for direct and amino support
+            await provider.getOfflineSignerAuto()
+          : // otherwise, use `getOfflineSigner` for direct signer
+            await provider.getOfflineSigner();
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
-          // Keplr OfflineAminoSigner | OfflineDirectSigner
-          // is compatible with CosmJS OfflineSigner
           offlineSigner as OfflineSigner,
           {
             registry: createBbnRegistry(),
