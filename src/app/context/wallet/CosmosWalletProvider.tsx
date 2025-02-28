@@ -99,9 +99,15 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       connectCosmos(BBNWalletProvider);
     };
 
-    BBNWalletProvider?.on("accountChanged", cb);
+    if (typeof BBNWalletProvider.on === "function") {
+      BBNWalletProvider.on("accountChanged", cb);
 
-    return () => void BBNWalletProvider.off("accountChanged", cb);
+      return () => {
+        if (typeof BBNWalletProvider.off === "function") {
+          BBNWalletProvider.off("accountChanged", cb);
+        }
+      };
+    }
   }, [BBNWalletProvider, connectCosmos]);
 
   const cosmosContextValue = useMemo(
