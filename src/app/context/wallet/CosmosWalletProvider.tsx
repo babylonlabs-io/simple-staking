@@ -85,6 +85,26 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     [handleError, rpc],
   );
 
+  // Listen for Babylon account changes
+  useEffect(() => {
+    if (!BBNWalletProvider) return;
+
+    const cb = async () => {
+      await BBNWalletProvider.connectWallet();
+      connectCosmos(BBNWalletProvider);
+    };
+
+    if (typeof BBNWalletProvider.on === "function") {
+      BBNWalletProvider.on("accountChanged", cb);
+
+      return () => {
+        if (typeof BBNWalletProvider.off === "function") {
+          BBNWalletProvider.off("accountChanged", cb);
+        }
+      };
+    }
+  }, [BBNWalletProvider, connectCosmos]);
+
   const cosmosContextValue = useMemo(
     () => ({
       bech32Address: cosmosBech32Address,
