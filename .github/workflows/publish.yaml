@@ -31,6 +31,7 @@ jobs:
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
+            mock-mainnet,
           ]
     environment: ${{ matrix.environment }}
     steps:
@@ -76,6 +77,7 @@ jobs:
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
+            mock-mainnet,
           ]
     needs: ["docker_build"]
     steps:
@@ -120,6 +122,7 @@ jobs:
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
+            mock-mainnet,
           ]
     needs: ["docker_build"]
     steps:
