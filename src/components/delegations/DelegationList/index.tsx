@@ -1,4 +1,4 @@
-import { Card, Heading, Text } from "@babylonlabs-io/core-ui";
+import { Card, Heading } from "@babylonlabs-io/core-ui";
 import Link from "next/link";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
@@ -17,6 +17,7 @@ import { DelegationModal } from "./components/DelegationModal";
 import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
+import { NoDelegations } from "./NoDelegations";
 
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
@@ -139,11 +140,7 @@ export function DelegationList() {
           validations,
           slashedStatuses,
         }}
-        fallback={
-          <Text as="div" className="text-accent-secondary">
-            No delegations found
-          </Text>
-        }
+        fallback={<NoDelegations />}
       />
 
       <DelegationModal
