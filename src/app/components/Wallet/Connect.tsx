@@ -20,6 +20,7 @@ import bbnIcon from "@/app/assets/bbn.svg";
 import bitcoin from "@/app/assets/bitcoin.png";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { useLogTermsOnBtcConnect } from "@/app/hooks/client/api/useAcceptTerms";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
@@ -52,6 +53,9 @@ export const Connect: React.FC<ConnectProps> = ({
   const { address: btcAddress, connected: btcConnected } = useBTCWallet();
   const { bech32Address, connected: bbnConnected } = useCosmosWallet();
   const { disconnect } = useWalletConnect();
+
+  // Log terms on BTC connect
+  useLogTermsOnBtcConnect();
 
   // Widget states
   const { selectedWallets } = useWidgetState();
