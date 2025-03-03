@@ -19,11 +19,11 @@ export const isStakingSignReady = (
     };
 
   // Amount parameters are ready
-  const amountParamatersReady = minAmount && maxAmount;
+  const amountParametersReady = minAmount && maxAmount;
   // App values are filled
   const amountValuesReady = amount >= minAmount && amount <= maxAmount;
   // Amount is ready
-  const amountIsReady = amountParamatersReady && amountValuesReady;
+  const amountIsReady = amountParametersReady && amountValuesReady;
 
   // Time parameters are ready
   const timeParametersReady = minTime && maxTime;
