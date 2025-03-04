@@ -143,13 +143,28 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    const unsubscribe = btcConnector?.on("connect", (wallet) => {
-      if (wallet.provider) {
-        connectBTC(wallet.provider);
+    const connectWallet = async () => {
+      if (btcConnector) {
+        // Assuming the okx value is getting from local storage
+        const wallet = await btcConnector?.connect("okx");
+        console.log("btc wallet", wallet);
+        if (wallet?.provider) {
+          connectBTC(wallet.provider);
+        }
+      } else {
+        console.log("btcConnector is undefined");
       }
-    });
+    };
 
-    return unsubscribe;
+    connectWallet();
+
+    // const unsubscribe = btcConnector?.on("connect", (wallet) => {
+    //   if (wallet.provider) {
+    //     connectBTC(wallet.provider);
+    //   }
+    // });
+
+    // return unsubscribe;
   }, [btcConnector, connectBTC]);
 
   // Listen for BTC account changes

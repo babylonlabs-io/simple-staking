@@ -103,11 +103,24 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    const unsubscribe = bbnConnector?.on("connect", (wallet) => {
-      connectCosmos(wallet.provider);
-    });
+    const connectWallet = async () => {
+      if (bbnConnector) {
+        // Assuming the keplr value is getting from local storage
+        const wallet = await bbnConnector.connect("keplr");
+        console.log("bbn wallet", wallet);
+        if (wallet?.provider) {
+          connectCosmos(wallet.provider);
+        }
+      }
+    };
 
-    return unsubscribe;
+    connectWallet();
+
+    // const unsubscribe = bbnConnector?.on("connect", (wallet) => {
+    //   connectCosmos(wallet.provider);
+    // });
+
+    // return unsubscribe;
   }, [bbnConnector, connectCosmos]);
 
   return (
