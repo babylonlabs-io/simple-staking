@@ -92,20 +92,17 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
   // Listen for Babylon account changes
   useEffect(() => {
-    if (!BBNWalletProvider) return;
+    if (!BBNWalletProvider || !BBNWalletProvider.off || !BBNWalletProvider.on) return;
 
     const cb = async () => {
       await BBNWalletProvider.connectWallet();
       connectCosmos(BBNWalletProvider);
     };
 
-    if (typeof BBNWalletProvider.on === "function") {
       BBNWalletProvider.on("accountChanged", cb);
 
       return () => {
-        if (typeof BBNWalletProvider.off === "function") {
           BBNWalletProvider.off("accountChanged", cb);
-        }
       };
     }
   }, [BBNWalletProvider, connectCosmos]);
