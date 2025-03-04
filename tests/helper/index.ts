@@ -77,7 +77,7 @@ export class DataGenerator {
   generateRandomCovenantCommittee = (size: number): Buffer[] => {
     const committe: Buffer[] = [];
     for (let i = 0; i < size; i++) {
-      // covenant committee PKs are with coordiantes
+      // covenant committee PKs are with coordinates
       const keyPair = this.generateRandomKeyPair();
       committe.push(Buffer.from(keyPair.publicKey, "hex"));
     }
