@@ -51,6 +51,7 @@ export const ErrorModal: React.FC = () => {
     [ErrorType.DELEGATIONS]: "Delegations Error",
     [ErrorType.WALLET]: "Wallet Error",
     [ErrorType.UNKNOWN]: "Unknown Error",
+    [ErrorType.TERMS]: "Terms Acceptance Error",
   };
 
   const ERROR_MESSAGES = {
@@ -62,6 +63,7 @@ export const ErrorModal: React.FC = () => {
     [ErrorType.REGISTRATION]: "Failed to transition due to:",
     [ErrorType.WALLET]: "Failed to perform wallet action due to:",
     [ErrorType.UNKNOWN]: "An unknown error occurred:",
+    [ErrorType.TERMS]: "Failed to log terms acceptance due to:",
   };
 
   const getErrorTitle = () => {
