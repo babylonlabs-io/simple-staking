@@ -109,7 +109,8 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         const wallet = await bbnConnector.connect("keplr");
         console.log("bbn wallet", wallet);
         if (wallet?.provider) {
-          connectCosmos(wallet.provider);
+          await wallet?.provider?.connectWallet();
+          await connectCosmos(wallet.provider);
         }
       }
     };

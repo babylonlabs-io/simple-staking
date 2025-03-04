@@ -50,7 +50,9 @@ export const Connect: React.FC<ConnectProps> = ({
 
   // Wallet states
   const { address: btcAddress, connected: btcConnected } = useBTCWallet();
+  console.log("btcConnected", btcConnected);
   const { bech32Address, connected: bbnConnected } = useCosmosWallet();
+  console.log("bbnConnected", bbnConnected);
   const { disconnect } = useWalletConnect();
 
   // Widget states
@@ -59,10 +61,13 @@ export const Connect: React.FC<ConnectProps> = ({
   const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
-  const isConnected = useMemo(
-    () => btcConnected && bbnConnected,
-    [btcConnected, bbnConnected],
-  );
+  // const isConnected = useMemo(
+  //   () => btcConnected && bbnConnected,
+  //   [btcConnected, bbnConnected],
+  // );
+  // The issue is that the implementation of the isConnected from btc and bbn is depends on the widget.
+  // if we remove this condition and let the isConnected depends on whether address can be returned, then everything should work
+  const isConnected = true;
 
   const handleDisconnectClick = useCallback(() => {
     setShowDisconnectModal(true);

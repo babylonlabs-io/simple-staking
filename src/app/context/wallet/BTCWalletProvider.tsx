@@ -149,7 +149,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         const wallet = await btcConnector?.connect("okx");
         console.log("btc wallet", wallet);
         if (wallet?.provider) {
-          connectBTC(wallet.provider);
+          await wallet?.provider?.connectWallet();
+          await connectBTC(wallet.provider);
         }
       } else {
         console.log("btcConnector is undefined");
