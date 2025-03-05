@@ -21,6 +21,8 @@ const createProvider = (provider: CosmosProvider): IBBNProvider => {
     getWalletProviderName: () => provider.getWalletProviderName(),
     getWalletProviderIcon: () => provider.getWalletProviderIcon(),
     getOfflineSigner: () => provider.getOfflineSigner(),
+    on: () => {},
+    off: () => {},
   };
 };
 
