@@ -2,7 +2,6 @@ import {
   createExternalWallet,
   IBBNProvider,
   useChainConnector,
-  useWidgetState,
 } from "@babylonlabs-io/wallet-connector";
 import {
   CosmosProvider,
@@ -15,7 +14,7 @@ import { memo, useCallback, useEffect, useMemo } from "react";
 
 const createProvider = (provider: CosmosProvider): IBBNProvider => {
   return {
-    connectWallet: async () => void provider.connectWallet(),
+    connectWallet: async () => void (await provider.connectWallet()),
     getAddress: () => provider.getAddress(),
     getPublicKeyHex: () => provider.getPublicKeyHex(),
     getWalletProviderName: () => provider.getWalletProviderName(),
@@ -34,7 +33,6 @@ export const TomoBBNConnector = memo(() => {
   const { cosmosProvider: connectedProvider } = useTomoProviders();
   const tomoWalletConnect = useTomoWalletConnect();
 
-  const { visible } = useWidgetState();
   const connector = useChainConnector("BBN");
 
   const connectedWallet = useMemo(() => {
@@ -62,10 +60,10 @@ export const TomoBBNConnector = memo(() => {
   );
 
   useEffect(() => {
-    if (visible && connectedWallet && connectedProvider) {
+    if (connectedWallet && connectedProvider) {
       connect(connectedWallet, connectedProvider);
     }
-  }, [visible, connectedWallet, connectedProvider, connect]);
+  }, [connectedWallet, connectedProvider, connect]);
 
   useEffect(() => {
     if (!connector) return;
