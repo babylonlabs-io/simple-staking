@@ -23,6 +23,7 @@ import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 interface CosmosWalletContextProps {
+  loading: boolean;
   bech32Address: string;
   connected: boolean;
   disconnect: () => void;
@@ -31,6 +32,7 @@ interface CosmosWalletContextProps {
 }
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
+  loading: true,
   bech32Address: "",
   connected: false,
   disconnect: () => {},
@@ -39,6 +41,7 @@ const CosmosWalletContext = createContext<CosmosWalletContextProps>({
 });
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
+  const [loading, setLoading] = useState(true);
   const [BBNWalletProvider, setBBNWalletProvider] = useState<
     IBBNProvider | undefined
   >();
@@ -61,6 +64,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const connectCosmos = useCallback(
     async (provider: IBBNProvider | null) => {
       if (!provider) return;
+      setLoading(true);
 
       try {
         const address = await provider.getAddress();
@@ -80,6 +84,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
+        setLoading(false);
       } catch (error: any) {
         handleError({
           error,
@@ -94,6 +99,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
   const cosmosContextValue = useMemo(
     () => ({
+      loading,
       bech32Address: cosmosBech32Address,
       connected: Boolean(BBNWalletProvider) && Boolean(signingStargateClient),
       disconnect: cosmosDisconnect,
@@ -101,6 +107,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       signingStargateClient,
     }),
     [
+      loading,
       cosmosBech32Address,
       BBNWalletProvider,
       cosmosDisconnect,
@@ -110,6 +117,14 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
+    if (!bbnConnector) return;
+
+    setLoading(false);
+
+    if (bbnConnector.connectedWallet) {
+      connectCosmos(bbnConnector?.connectedWallet.provider);
+    }
+
     const unsubscribe = bbnConnector?.on("connect", (wallet) => {
       connectCosmos(wallet.provider);
     });
