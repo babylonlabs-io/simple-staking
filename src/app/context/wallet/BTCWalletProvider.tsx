@@ -33,6 +33,7 @@ import {
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
 
 interface BTCWalletContextProps {
+  loading: boolean;
   network?: networks.Network;
   publicKeyNoCoord: string;
   address: string;
@@ -53,6 +54,7 @@ interface BTCWalletContextProps {
 }
 
 const BTCWalletContext = createContext<BTCWalletContextProps>({
+  loading: true,
   network: undefined,
   connected: false,
   publicKeyNoCoord: "",
@@ -73,6 +75,7 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
 });
 
 export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
+  const [loading, setLoading] = useState(true);
   const [btcWalletProvider, setBTCWalletProvider] = useState<IBTCProvider>();
   const [network, setNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
@@ -92,6 +95,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const connectBTC = useCallback(
     async (walletProvider: IBTCProvider | null) => {
       if (!walletProvider) return;
+      setLoading(true);
 
       const supportedNetworkMessage =
         "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
@@ -112,6 +116,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setNetwork(toNetwork(await walletProvider.getNetwork()));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+        setLoading(false);
       } catch (error: any) {
         if (
           error instanceof WalletError &&
@@ -143,6 +148,14 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
+    if (!btcConnector) return;
+
+    setLoading(false);
+
+    if (btcConnector.connectedWallet) {
+      connectBTC(btcConnector?.connectedWallet.provider);
+    }
+
     const unsubscribe = btcConnector?.on("connect", (wallet) => {
       if (wallet.provider) {
         connectBTC(wallet.provider);
@@ -195,6 +208,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
   const btcContextValue = useMemo(
     () => ({
+      loading,
       network,
       publicKeyNoCoord,
       address,
@@ -204,6 +218,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       ...btcWalletMethods,
     }),
     [
+      loading,
       connected,
       network,
       publicKeyNoCoord,
