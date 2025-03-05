@@ -6,6 +6,8 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { type PropsWithChildren } from "react";
 
+import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
+import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
 import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
 import { TomoWidget } from "@/app/context/tomo/TomoWidget";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -16,6 +18,11 @@ import { TomoBBNConnector } from "../tomo/BBNConnector";
 import { TomoBTCConnector } from "../tomo/BTCConnector";
 
 const context = typeof window !== "undefined" ? window : {};
+
+const lifecycleHooks = {
+  acceptTermsOfService: logTermsAcceptance,
+  verifyBTCAddress: verifyBTCAddress,
+};
 
 const config: ChainConfigArr = [
   {
@@ -51,7 +58,12 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <TomoConnectionProvider>
-      <WalletProvider config={config} context={context} onError={onError}>
+      <WalletProvider
+        lifecycleHooks={lifecycleHooks}
+        config={config}
+        context={context}
+        onError={onError}
+      >
         <TomoBTCConnector />
         <TomoBBNConnector />
         {children}
