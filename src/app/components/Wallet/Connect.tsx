@@ -49,8 +49,16 @@ export const Connect: React.FC<ConnectProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Wallet states
-  const { address: btcAddress, connected: btcConnected } = useBTCWallet();
-  const { bech32Address, connected: bbnConnected } = useCosmosWallet();
+  const {
+    loading: btcLoading,
+    address: btcAddress,
+    connected: btcConnected,
+  } = useBTCWallet();
+  const {
+    loading: bbnLoading,
+    bech32Address,
+    connected: bbnConnected,
+  } = useCosmosWallet();
   const { disconnect } = useWalletConnect();
 
   // Widget states
@@ -63,6 +71,9 @@ export const Connect: React.FC<ConnectProps> = ({
     () => btcConnected && bbnConnected,
     [btcConnected, bbnConnected],
   );
+
+  const isLoading =
+    isConnected || !isApiNormal || loading || btcLoading || bbnLoading;
 
   const handleDisconnectClick = useCallback(() => {
     setShowDisconnectModal(true);
@@ -103,7 +114,7 @@ export const Connect: React.FC<ConnectProps> = ({
           color="secondary"
           className="h-[2.5rem] min-h-[2.5rem] rounded-full px-6 py-2 text-white text-base md:rounded"
           onClick={onConnect}
-          disabled={isConnected || !isApiNormal || loading}
+          disabled={isLoading}
         >
           <PiWalletBold size={20} className="flex md:hidden" />
           <span className="hidden md:flex">Connect Wallets</span>
