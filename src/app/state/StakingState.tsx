@@ -6,6 +6,7 @@ import { validateDecimalPoints } from "@/app/components/Staking/Form/validation/
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { useStakingDisabled } from "@/app/hooks/useStakingDisabled";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
 import { IS_FIXED_TERM_FIELD } from "@/config";
@@ -48,6 +49,7 @@ export interface StakingState {
   hasError: boolean;
   blocked: boolean;
   available: boolean;
+  disabled: boolean;
   loading: boolean;
   processing: boolean;
   errorMessage?: string;
@@ -79,6 +81,7 @@ const { StateProvider, useState: useStakingState } =
     hasError: false,
     blocked: false,
     available: false,
+    disabled: false,
     loading: false,
     processing: false,
     errorMessage: "",
@@ -142,12 +145,14 @@ export function StakingState({ children }: PropsWithChildren) {
   const { stakableBtcBalance, loading: isBalanceLoading } = useBalanceState();
 
   const { publicKeyNoCoord } = useBTCWallet();
+  const isStakingDisabled = useStakingDisabled();
 
   const loading =
     isStateLoading || isCheckLoading || isFeeLoading || isBalanceLoading;
   const hasError = isStateError || isNetworkFeeError || !isApiNormal;
   const blocked = isGeoBlocked;
   const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
+  const disabled = isStakingDisabled;
   const errorMessage = apiMessage;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
@@ -300,6 +305,7 @@ export function StakingState({ children }: PropsWithChildren) {
       hasError,
       blocked,
       available,
+      disabled,
       loading,
       processing,
       errorMessage,
@@ -318,6 +324,7 @@ export function StakingState({ children }: PropsWithChildren) {
       hasError,
       blocked,
       available,
+      disabled,
       loading,
       processing,
       errorMessage,

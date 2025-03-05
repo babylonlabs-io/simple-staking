@@ -19,6 +19,7 @@ export function StakingForm() {
     hasError,
     blocked,
     available,
+    disabled,
     errorMessage,
   } = useStakingState();
   const { displayPreview } = useStakingService();
@@ -41,6 +42,7 @@ export function StakingForm() {
               loading={loading}
               available={available}
               blocked={blocked}
+              disabled={disabled}
               hasError={hasError}
               error={errorMessage}
               stakingInfo={stakingInfo}
