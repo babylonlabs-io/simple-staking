@@ -2,7 +2,6 @@ import {
   createExternalWallet,
   IBTCProvider,
   useChainConnector,
-  useWidgetState,
 } from "@babylonlabs-io/wallet-connector";
 import {
   BTCProvider,
@@ -15,7 +14,7 @@ import { memo, useCallback, useEffect, useMemo } from "react";
 
 const createProvider = (provider: BTCProvider): IBTCProvider => {
   return {
-    connectWallet: async () => void provider.connectWallet(),
+    connectWallet: async () => void (await provider.connectWallet()),
     getAddress: () => provider.getAddress(),
     getPublicKeyHex: () => provider.getPublicKeyHex(),
     signPsbt: (psbtHex: string) => provider.signPsbt(psbtHex),
@@ -45,7 +44,6 @@ export const TomoBTCConnector = memo(() => {
   const { bitcoinProvider: connectedProvider } = useTomoProviders();
   const tomoWalletConnect = useTomoWalletConnect();
 
-  const { visible } = useWidgetState();
   const connector = useChainConnector("BTC");
 
   const connectedWallet = useMemo(() => {
@@ -73,10 +71,10 @@ export const TomoBTCConnector = memo(() => {
   );
 
   useEffect(() => {
-    if (visible && connectedWallet && connectedProvider) {
+    if (connectedWallet && connectedProvider) {
       connect(connectedWallet, connectedProvider);
     }
-  }, [visible, connectedWallet, connectedProvider, connect]);
+  }, [connectedWallet, connectedProvider, connect]);
 
   useEffect(() => {
     if (!connector) return;
