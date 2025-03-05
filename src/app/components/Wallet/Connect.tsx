@@ -20,6 +20,7 @@ import bbnIcon from "@/app/assets/bbn.svg";
 import bitcoin from "@/app/assets/bitcoin.png";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { useAcceptTerms } from "@/app/hooks/client/api/useAcceptTerms";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
@@ -47,6 +48,8 @@ export const Connect: React.FC<ConnectProps> = ({
   const { linkedDelegationsVisibility, displayLinkedDelegations } =
     useDelegationV2State();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  useAcceptTerms();
 
   // Wallet states
   const {

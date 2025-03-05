@@ -15,6 +15,8 @@ import { useError } from "../Error/ErrorProvider";
 import { TomoBBNConnector } from "../tomo/BBNConnector";
 import { TomoBTCConnector } from "../tomo/BTCConnector";
 
+import { useLifecycleContext } from "./LifecycleProvider";
+
 const context = typeof window !== "undefined" ? window : {};
 
 const config: ChainConfigArr = [
@@ -42,6 +44,7 @@ const config: ChainConfigArr = [
 
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
+  const { lifecycleHooks } = useLifecycleContext();
 
   const onError = (error: Error) => {
     handleError({
@@ -51,7 +54,12 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
 
   return (
     <TomoConnectionProvider>
-      <WalletProvider config={config} context={context} onError={onError}>
+      <WalletProvider
+        config={config}
+        context={context}
+        onError={onError}
+        lifecycleHooks={lifecycleHooks}
+      >
         <TomoBTCConnector />
         <TomoBBNConnector />
         {children}

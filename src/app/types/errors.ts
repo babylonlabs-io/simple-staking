@@ -16,6 +16,9 @@ export enum ErrorType {
 
   // Fallback
   UNKNOWN = "UNKNOWN",
+
+  // Terms acceptance errors
+  TERMS = "TERMS",
 }
 
 export interface Error {

@@ -13,6 +13,7 @@ import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
+import { LifecycleProvider } from "./context/wallet/LifecycleProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
 import { AppState } from "./state";
 
@@ -30,19 +31,21 @@ function Providers({ children }: React.PropsWithChildren) {
           <QueryClientProvider client={client}>
             <ErrorProvider>
               <BbnRpcProvider>
-                <WalletConnectionProvider>
-                  <BTCWalletProvider>
-                    <CosmosWalletProvider>
-                      <AppState>
-                        <StakingStatsProvider>
-                          <ReactQueryStreamedHydration>
-                            {children}
-                          </ReactQueryStreamedHydration>
-                        </StakingStatsProvider>
-                      </AppState>
-                    </CosmosWalletProvider>
-                  </BTCWalletProvider>
-                </WalletConnectionProvider>
+                <LifecycleProvider>
+                  <WalletConnectionProvider>
+                    <BTCWalletProvider>
+                      <CosmosWalletProvider>
+                        <AppState>
+                          <StakingStatsProvider>
+                            <ReactQueryStreamedHydration>
+                              {children}
+                            </ReactQueryStreamedHydration>
+                          </StakingStatsProvider>
+                        </AppState>
+                      </CosmosWalletProvider>
+                    </BTCWalletProvider>
+                  </WalletConnectionProvider>
+                </LifecycleProvider>
               </BbnRpcProvider>
             </ErrorProvider>
             <ReactQueryDevtools
