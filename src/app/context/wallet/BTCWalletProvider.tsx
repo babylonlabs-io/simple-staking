@@ -149,9 +149,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     if (!btcConnector) return;
-
     setLoading(false);
-
     if (btcConnector.connectedWallet) {
       connectBTC(btcConnector?.connectedWallet.provider);
     }
