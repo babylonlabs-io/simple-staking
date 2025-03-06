@@ -17,6 +17,12 @@ Sentry.init({
   // This is pointing to the DSN (Data Source Name) for my local instance.
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
+  // Tunnel endpoint for proxying Sentry events through our own server
+  // This helps avoid ad-blockers and CSP issues
+  tunnel: process.env.NEXT_PUBLIC_SIDECAR_API_URL
+    ? `${process.env.NEXT_PUBLIC_SIDECAR_API_URL}/sentry-tunnel`
+    : "http://localhost:8092/sentry-tunnel",
+
   // This environment variable is provided in the CI
   environment: process.env.environment ?? "local",
 
