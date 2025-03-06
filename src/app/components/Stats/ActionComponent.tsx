@@ -1,4 +1,4 @@
-import { Button, Loader } from "@babylonlabs-io/bbn-core-ui";
+import { Button, Loader } from "@babylonlabs-io/core-ui";
 
 interface ActionComponentProps {
   title: string;

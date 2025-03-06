@@ -5,7 +5,7 @@ import {
   Heading,
   Loader,
   Text,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 import type { JSX, PropsWithChildren } from "react";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";

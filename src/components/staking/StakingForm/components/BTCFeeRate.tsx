@@ -1,11 +1,11 @@
-import { Button, useFormContext, useWatch } from "@babylonlabs-io/bbn-core-ui";
+import { Button, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import { FaPen } from "react-icons/fa6";
 
 import { useStakingService } from "@/app/hooks/services/useStakingService";
+import { FeeModal } from "@/components/staking/FeeModal";
 
 import { FeeItem } from "./FeeItem";
-import { FeeModal } from "./FeeModal";
 
 interface FeeFiledProps {
   defaultRate?: number;

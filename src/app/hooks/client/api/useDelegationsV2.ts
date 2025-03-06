@@ -11,18 +11,25 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
 export const DELEGATIONS_V2_KEY = "DELEGATIONS_V2";
 
-export function useDelegationsV2({
-  enabled = true,
-}: {
-  enabled?: boolean;
-} = {}) {
+export function useDelegationsV2(
+  babylonAddress?: string,
+  {
+    enabled = true,
+  }: {
+    enabled?: boolean;
+  } = {},
+) {
   const { publicKeyNoCoord } = useBTCWallet();
   const { isOpen, handleError } = useError();
 
   const query = useInfiniteQuery({
-    queryKey: [DELEGATIONS_V2_KEY, publicKeyNoCoord],
+    queryKey: [DELEGATIONS_V2_KEY, publicKeyNoCoord, babylonAddress],
     queryFn: ({ pageParam = "" }) =>
-      getDelegationsV2(publicKeyNoCoord, pageParam),
+      getDelegationsV2({
+        stakerPublicKey: publicKeyNoCoord,
+        pageKey: pageParam,
+        babylonAddress,
+      }),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key

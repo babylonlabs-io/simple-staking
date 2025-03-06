@@ -1,4 +1,4 @@
-import { Button, useFormState } from "@babylonlabs-io/bbn-core-ui";
+import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { Tooltip } from "react-tooltip";
 
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";

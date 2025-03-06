@@ -5,7 +5,7 @@ import {
   DialogHeader,
   Loader,
   Text,
-} from "@babylonlabs-io/bbn-core-ui";
+} from "@babylonlabs-io/core-ui";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/config/network/bbn";

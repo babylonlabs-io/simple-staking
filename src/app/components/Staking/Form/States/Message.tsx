@@ -1,4 +1,4 @@
-import { Heading, Text } from "@babylonlabs-io/bbn-core-ui";
+import { Heading, Text } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
 interface MessageProps {

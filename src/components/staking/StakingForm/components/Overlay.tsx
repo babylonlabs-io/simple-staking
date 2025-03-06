@@ -1,4 +1,4 @@
-import { useFieldState } from "@babylonlabs-io/bbn-core-ui";
+import { useFieldState } from "@babylonlabs-io/core-ui";
 import { type PropsWithChildren } from "react";
 import { twJoin, twMerge } from "tailwind-merge";
 

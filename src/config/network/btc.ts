@@ -1,4 +1,4 @@
-import type { BTCConfig } from "@babylonlabs-io/bbn-wallet-connect";
+import type { BTCConfig } from "@babylonlabs-io/wallet-connector";
 
 import { MEMPOOL_API } from "@/app/constants";
 import { Network } from "@/app/types/network";

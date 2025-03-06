@@ -1,4 +1,4 @@
-import { Text } from "@babylonlabs-io/bbn-core-ui";
+import { Text } from "@babylonlabs-io/core-ui";
 
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -23,9 +23,9 @@ export const UnbondModal = ({
   processing,
 }: UnbondModalProps) => {
   const { data: networkInfo } = useNetworkInfo();
+
   if (!networkInfo) {
-    // system error
-    throw new Error("Network info not found");
+    return null;
   }
 
   const unbondingTime = blocksToDisplayTime(

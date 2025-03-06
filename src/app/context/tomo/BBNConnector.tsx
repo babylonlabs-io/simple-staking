@@ -3,7 +3,7 @@ import {
   IBBNProvider,
   useChainConnector,
   useWidgetState,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import {
   CosmosProvider,
   useTomoProviders,
@@ -21,6 +21,8 @@ const createProvider = (provider: CosmosProvider): IBBNProvider => {
     getWalletProviderName: () => provider.getWalletProviderName(),
     getWalletProviderIcon: () => provider.getWalletProviderIcon(),
     getOfflineSigner: () => provider.getOfflineSigner(),
+    on: () => {},
+    off: () => {},
   };
 };
 

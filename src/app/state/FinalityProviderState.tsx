@@ -51,10 +51,10 @@ const STATUS_FILTERS = {
 
 const FILTERS = {
   search: (fp: FinalityProvider, filter: FilterState) => {
-    const pattern = new RegExp(filter.search, "i");
-
+    const searchTerm = filter.search.toLowerCase();
     return (
-      pattern.test(fp.description?.moniker ?? "") || pattern.test(fp.btcPk)
+      (fp.description?.moniker?.toLowerCase().includes(searchTerm) ?? false) ||
+      fp.btcPk.toLowerCase().includes(searchTerm)
     );
   },
   status: (fp: FinalityProvider, filter: FilterState) =>

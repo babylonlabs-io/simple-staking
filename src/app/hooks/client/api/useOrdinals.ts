@@ -1,5 +1,5 @@
-import { InscriptionIdentifier } from "@babylonlabs-io/bbn-wallet-connect";
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
+import { InscriptionIdentifier } from "@babylonlabs-io/wallet-connector";
 
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";

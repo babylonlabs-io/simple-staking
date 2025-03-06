@@ -1,4 +1,4 @@
-import { List } from "@babylonlabs-io/bbn-core-ui";
+import { List } from "@babylonlabs-io/core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";

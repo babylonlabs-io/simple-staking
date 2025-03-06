@@ -3,7 +3,7 @@
 import {
   ChainConfigArr,
   WalletProvider,
-} from "@babylonlabs-io/bbn-wallet-connect";
+} from "@babylonlabs-io/wallet-connector";
 import { type PropsWithChildren } from "react";
 
 import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
