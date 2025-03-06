@@ -17,7 +17,7 @@ import { StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
-const { coinName, coinSymbol } = getNetworkConfigBTC();
+const { coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
   // Load reward state
@@ -35,8 +35,8 @@ export function PersonalBalance() {
   const {
     bbnBalance,
     stakableBtcBalance,
+    stakedBtcBalance,
     inscriptionsBtcBalance,
-    combinedTotalBtcBalance,
   } = useBalanceState();
 
   const { claimRewards, showPreview } = useRewardsService();
@@ -49,8 +49,8 @@ export function PersonalBalance() {
         <List orientation="adaptive" className="bg-surface">
           <StatItem
             loading={loading}
-            title={isMobile ? "Total Balance" : `Total ${coinName} Balance`}
-            value={`${satoshiToBtc(combinedTotalBtcBalance)} ${coinSymbol}`}
+            title="Staked Balance"
+            value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
             tooltip={
               inscriptionsBtcBalance
                 ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
