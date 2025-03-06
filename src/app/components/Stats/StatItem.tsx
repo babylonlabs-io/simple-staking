@@ -13,7 +13,15 @@ export enum LoadingStyle {
   ShowSpinner = "show-spinner",
   ShowSpinnerAndValue = "show-spinner-and-value",
 }
-
+const SPINNER_RENDERERS: Record<LoadingStyle, (value: string) => JSX.Element> = {
+  [LoadingStyle.ShowSpinner]: () => <Loader size={20} />,
+  [LoadingStyle.ShowSpinnerAndValue]: (value: string) => (
+        <>
+          <span className="opacity-50">{value}</span>
+          <Loader size={20} />
+        </>
+      )
+}
 export const StatItem = ({
   loading,
   title,
