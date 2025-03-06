@@ -1,4 +1,4 @@
-import { List, LoadingStyle } from "@babylonlabs-io/core-ui";
+import { List } from "@babylonlabs-io/core-ui";
 
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
@@ -14,7 +14,7 @@ import { satoshiToBtc } from "@/utils/btc";
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
-import { StatItem } from "../Stats/StatItem";
+import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
@@ -64,12 +64,12 @@ export function PersonalBalance() {
 
           <StatItem
             loading={loading || hasUnconfirmedUTXOs}
-            loadingStyle={
-              loading
-                ? LoadingStyle.ShowSpinner
-                : LoadingStyle.ShowSpinnerAndValue
-            }
             title={"Stakable Balance"}
+            loadingStyle={
+              hasUnconfirmedUTXOs
+                ? LoadingStyle.ShowSpinnerAndValue
+                : LoadingStyle.ShowSpinner
+            }
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 

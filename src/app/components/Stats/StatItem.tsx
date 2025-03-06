@@ -1,16 +1,16 @@
-import {
-  type ListItemProps,
-  ListItem,
-  LoadingStyle,
-} from "@babylonlabs-io/core-ui";
+import { type ListItemProps, ListItem, Loader } from "@babylonlabs-io/core-ui";
 import { useId } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 interface StatItemProps extends ListItemProps {
   loading?: boolean;
-  loadingStyle?: LoadingStyle;
   tooltip?: string;
+}
+
+export enum LoadingStyle {
+  ShowSpinner = "show-spinner",
+  ShowSpinnerAndValue = "show-spinner-and-value",
 }
 
 export const StatItem = ({
@@ -18,8 +18,8 @@ export const StatItem = ({
   title,
   value,
   tooltip,
+  loadingStyle = LoadingStyle.ShowSpinner,
   suffix,
-  loadingStyle,
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
@@ -40,14 +40,29 @@ export const StatItem = ({
       suffix
     );
 
+  const renderValue = () => {
+    if (loading && loadingStyle === LoadingStyle.ShowSpinner) {
+      return <Loader size={20} />;
+    }
+
+    if (loading && loadingStyle === LoadingStyle.ShowSpinnerAndValue) {
+      return (
+        <>
+          <span className="opacity-50">{value}</span>
+          <Loader size={20} />
+        </>
+      );
+    }
+
+    return value;
+  };
+
   return (
     <ListItem
       {...props}
       title={title}
-      value={value}
+      value={renderValue()}
       suffix={suffixEl}
-      loading={loading}
-      loadingStyle={loadingStyle}
     />
   );
 };
