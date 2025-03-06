@@ -23,9 +23,9 @@ export const UnbondModal = ({
   processing,
 }: UnbondModalProps) => {
   const { data: networkInfo } = useNetworkInfo();
+
   if (!networkInfo) {
-    // system error
-    throw new Error("Network info not found");
+    return null;
   }
 
   const unbondingTime = blocksToDisplayTime(

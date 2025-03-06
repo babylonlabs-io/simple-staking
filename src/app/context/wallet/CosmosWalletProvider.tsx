@@ -5,6 +5,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
+import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
 import {
   createContext,
@@ -18,9 +19,11 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
 interface CosmosWalletContextProps {
+  loading: boolean;
   bech32Address: string;
   connected: boolean;
   disconnect: () => void;
@@ -29,6 +32,7 @@ interface CosmosWalletContextProps {
 }
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
+  loading: true,
   bech32Address: "",
   connected: false,
   disconnect: () => {},
@@ -37,6 +41,7 @@ const CosmosWalletContext = createContext<CosmosWalletContextProps>({
 });
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
+  const [loading, setLoading] = useState(true);
   const [BBNWalletProvider, setBBNWalletProvider] = useState<
     IBBNProvider | undefined
   >();
@@ -59,20 +64,27 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const connectCosmos = useCallback(
     async (provider: IBBNProvider | null) => {
       if (!provider) return;
+      setLoading(true);
 
       try {
         const address = await provider.getAddress();
-        const offlineSigner = await provider.getOfflineSigner();
+        const offlineSigner = provider.getOfflineSignerAuto
+          ? // use `auto` (if it is provided) for direct and amino support
+            await provider.getOfflineSignerAuto()
+          : // otherwise, use `getOfflineSigner` for direct signer
+            await provider.getOfflineSigner();
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
-          offlineSigner,
+          offlineSigner as OfflineSigner,
           {
             registry: createBbnRegistry(),
+            aminoTypes: createBbnAminoTypes(),
           },
         );
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
+        setLoading(false);
       } catch (error: any) {
         handleError({
           error,
@@ -85,8 +97,25 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     [handleError, rpc],
   );
 
+  // Listen for Babylon account changes
+  useEffect(() => {
+    if (!BBNWalletProvider || !BBNWalletProvider.off || !BBNWalletProvider.on)
+      return;
+
+    const cb = async () => {
+      await BBNWalletProvider.connectWallet();
+      connectCosmos(BBNWalletProvider);
+    };
+
+    BBNWalletProvider.on("accountChanged", cb);
+    return () => {
+      BBNWalletProvider.off("accountChanged", cb);
+    };
+  }, [BBNWalletProvider, connectCosmos]);
+
   const cosmosContextValue = useMemo(
     () => ({
+      loading,
       bech32Address: cosmosBech32Address,
       connected: Boolean(BBNWalletProvider) && Boolean(signingStargateClient),
       disconnect: cosmosDisconnect,
@@ -94,6 +123,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       signingStargateClient,
     }),
     [
+      loading,
       cosmosBech32Address,
       BBNWalletProvider,
       cosmosDisconnect,
@@ -103,6 +133,14 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
+    if (!bbnConnector) return;
+
+    setLoading(false);
+
+    if (bbnConnector.connectedWallet) {
+      connectCosmos(bbnConnector?.connectedWallet.provider);
+    }
+
     const unsubscribe = bbnConnector?.on("connect", (wallet) => {
       connectCosmos(wallet.provider);
     });
