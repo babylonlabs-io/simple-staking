@@ -49,7 +49,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   const { bech32Address } = useCosmosWallet();
 
   const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
-    useDelegationsV2(showLinkedDelegations ? bech32Address : undefined);
+    useDelegationsV2(!showLinkedDelegations ? bech32Address : undefined);
   // States
   const { delegations, addPendingDelegation, updateDelegationStatus } =
     useDelegationStorage(
