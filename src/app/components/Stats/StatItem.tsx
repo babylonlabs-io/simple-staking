@@ -6,6 +6,7 @@ import { Tooltip } from "react-tooltip";
 interface StatItemProps extends ListItemProps {
   loading?: boolean;
   tooltip?: string;
+  loadingStyle?: LoadingStyle;
 }
 
 export enum LoadingStyle {
@@ -18,8 +19,8 @@ export const StatItem = ({
   title,
   value,
   tooltip,
-  loadingStyle = LoadingStyle.ShowSpinner,
   suffix,
+  loadingStyle = LoadingStyle.ShowSpinner,
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
