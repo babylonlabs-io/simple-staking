@@ -13,15 +13,20 @@ export enum LoadingStyle {
   ShowSpinner = "show-spinner",
   ShowSpinnerAndValue = "show-spinner-and-value",
 }
-const SPINNER_RENDERERS: Record<LoadingStyle, (value: string) => JSX.Element> = {
+
+const SPINNER_RENDERERS: Record<
+  LoadingStyle,
+  (value: string | JSX.Element) => JSX.Element
+> = {
   [LoadingStyle.ShowSpinner]: () => <Loader size={20} />,
-  [LoadingStyle.ShowSpinnerAndValue]: (value: string) => (
-        <>
-          <span className="opacity-50">{value}</span>
-          <Loader size={20} />
-        </>
-      )
-}
+  [LoadingStyle.ShowSpinnerAndValue]: (value) => (
+    <>
+      <span className="opacity-50">{value}</span>
+      <Loader size={20} />
+    </>
+  ),
+};
+
 export const StatItem = ({
   loading,
   title,
@@ -49,19 +54,11 @@ export const StatItem = ({
       suffix
     );
 
-  const renderValue = () => {
-    if (loading) {
-      return SPINNER_RENDERERS[loadingStyle]?.(value);
-    }
-
-    return value;
-  };
-
   return (
     <ListItem
       {...props}
       title={title}
-      value={renderValue()}
+      value={loading ? SPINNER_RENDERERS[loadingStyle](value) : value}
       suffix={suffixEl}
     />
   );

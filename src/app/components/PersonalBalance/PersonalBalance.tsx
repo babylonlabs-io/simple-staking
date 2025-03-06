@@ -64,7 +64,7 @@ export function PersonalBalance() {
 
           <StatItem
             loading={loading || hasUnconfirmedUTXOs}
-            title={"Stakable Balance"}
+            title="Stakable Balance"
             loadingStyle={
               hasUnconfirmedUTXOs
                 ? LoadingStyle.ShowSpinnerAndValue
