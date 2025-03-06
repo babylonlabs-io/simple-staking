@@ -1,5 +1,6 @@
-import { List } from "@babylonlabs-io/core-ui";
+import { List, LoadingState } from "@babylonlabs-io/core-ui";
 
+import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
@@ -39,16 +40,20 @@ export function PersonalBalance() {
     combinedTotalBtcBalance,
   } = useBalanceState();
 
+  const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
+  const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
+
   const { claimRewards, showPreview } = useRewardsService();
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
+  const statItemIsLoading = loading ? LoadingState.ShowSpinner : undefined;
 
   return (
     <AuthGuard>
       <Section title="Wallet Balance">
         <List orientation="adaptive" className="bg-surface">
           <StatItem
-            loading={loading}
+            loading={statItemIsLoading}
             title={isMobile ? "Total Balance" : `Total ${coinName} Balance`}
             value={`${satoshiToBtc(combinedTotalBtcBalance)} ${coinSymbol}`}
             tooltip={
@@ -59,19 +64,23 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={loading}
+            loading={
+              hasUnconfirmedUTXOs
+                ? LoadingState.ShowSpinnerAndValue
+                : statItemIsLoading
+            }
             title={"Stakable Balance"}
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 
           <StatItem
-            loading={loading}
+            loading={statItemIsLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
             value={`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
           />
 
           <StatItem
-            loading={loading}
+            loading={statItemIsLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
             suffix={

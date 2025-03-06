@@ -1,10 +1,14 @@
-import { type ListItemProps, ListItem, Loader } from "@babylonlabs-io/core-ui";
+import {
+  type ListItemProps,
+  ListItem,
+  LoadingState,
+} from "@babylonlabs-io/core-ui";
 import { useId } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 interface StatItemProps extends ListItemProps {
-  loading?: boolean;
+  loading?: LoadingState;
   tooltip?: string;
 }
 
@@ -38,8 +42,9 @@ export const StatItem = ({
     <ListItem
       {...props}
       title={title}
-      value={loading ? <Loader size={20} /> : value}
+      value={value}
       suffix={suffixEl}
+      loading={loading}
     />
   );
 };

@@ -1,4 +1,4 @@
-import { List } from "@babylonlabs-io/core-ui";
+import { List, LoadingState } from "@babylonlabs-io/core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";
@@ -30,6 +30,7 @@ export const Stats = memo(() => {
 
   const tvlInBtc = satoshiToBtc(activeTvl);
   const tvlInUsd = tvlInBtc * btcInUsd;
+  const statItemIsLoading = isLoading ? LoadingState.ShowSpinner : undefined;
 
   return (
     <Section
@@ -38,28 +39,28 @@ export const Stats = memo(() => {
     >
       <List orientation="adaptive" className="bg-surface">
         <StatItem
-          loading={isLoading}
+          loading={statItemIsLoading}
           title={`Confirmed ${coinSymbol} TVL`}
           value={formatBTCTvl(tvlInBtc, coinSymbol, tvlInUsd)}
           tooltip="Total number of active bitcoins staked"
         />
 
         <StatItem
-          loading={isLoading}
+          loading={statItemIsLoading}
           title="Stakers"
           value={formatter.format(activeStakers)}
           tooltip="Total number of active bitcoin stakers"
         />
 
         <StatItem
-          loading={isLoading}
+          loading={statItemIsLoading}
           title="Delegations"
           value={formatter.format(activeDelegations)}
           tooltip="Total number of active bitcoin staking delegations"
         />
 
         <StatItem
-          loading={isLoading}
+          loading={statItemIsLoading}
           title="Finality Providers"
           value={`${activeFinalityProviders} Active (${
             totalFinalityProviders
