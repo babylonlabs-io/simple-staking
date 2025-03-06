@@ -50,17 +50,8 @@ export const StatItem = ({
     );
 
   const renderValue = () => {
-    if (loading && loadingStyle === LoadingStyle.ShowSpinner) {
-      return <Loader size={20} />;
-    }
-
-    if (loading && loadingStyle === LoadingStyle.ShowSpinnerAndValue) {
-      return (
-        <>
-          <span className="opacity-50">{value}</span>
-          <Loader size={20} />
-        </>
-      );
+    if (loading) {
+      return SPINNER_RENDERERS[loadingStyle]?.(value);
     }
 
     return value;
