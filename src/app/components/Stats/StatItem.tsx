@@ -1,14 +1,15 @@
 import {
   type ListItemProps,
   ListItem,
-  LoadingState,
+  LoadingStyle,
 } from "@babylonlabs-io/core-ui";
 import { useId } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 interface StatItemProps extends ListItemProps {
-  loading?: LoadingState;
+  loading?: boolean;
+  loadingStyle?: LoadingStyle;
   tooltip?: string;
 }
 
@@ -18,6 +19,7 @@ export const StatItem = ({
   value,
   tooltip,
   suffix,
+  loadingStyle,
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
@@ -45,6 +47,7 @@ export const StatItem = ({
       value={value}
       suffix={suffixEl}
       loading={loading}
+      loadingStyle={loadingStyle}
     />
   );
 };

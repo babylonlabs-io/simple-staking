@@ -1,4 +1,4 @@
-import { List, LoadingState } from "@babylonlabs-io/core-ui";
+import { List, LoadingStyle } from "@babylonlabs-io/core-ui";
 
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
@@ -46,14 +46,13 @@ export function PersonalBalance() {
   const { claimRewards, showPreview } = useRewardsService();
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
-  const statItemIsLoading = loading ? LoadingState.ShowSpinner : undefined;
 
   return (
     <AuthGuard>
       <Section title="Wallet Balance">
         <List orientation="adaptive" className="bg-surface">
           <StatItem
-            loading={statItemIsLoading}
+            loading={loading}
             title={isMobile ? "Total Balance" : `Total ${coinName} Balance`}
             value={`${satoshiToBtc(combinedTotalBtcBalance)} ${coinSymbol}`}
             tooltip={
@@ -64,23 +63,24 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={
-              hasUnconfirmedUTXOs
-                ? LoadingState.ShowSpinnerAndValue
-                : statItemIsLoading
+            loading={loading || hasUnconfirmedUTXOs}
+            loadingStyle={
+              loading
+                ? LoadingStyle.ShowSpinner
+                : LoadingStyle.ShowSpinnerAndValue
             }
             title={"Stakable Balance"}
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 
           <StatItem
-            loading={statItemIsLoading}
+            loading={loading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
             value={`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
           />
 
           <StatItem
-            loading={statItemIsLoading}
+            loading={loading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
             suffix={
