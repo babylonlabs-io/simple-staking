@@ -6,7 +6,26 @@ import { Tooltip } from "react-tooltip";
 interface StatItemProps extends ListItemProps {
   loading?: boolean;
   tooltip?: string;
+  loadingStyle?: LoadingStyle;
 }
+
+export enum LoadingStyle {
+  ShowSpinner = "show-spinner",
+  ShowSpinnerAndValue = "show-spinner-and-value",
+}
+
+const SPINNER_RENDERERS: Record<
+  LoadingStyle,
+  (value: string | JSX.Element) => JSX.Element
+> = {
+  [LoadingStyle.ShowSpinner]: () => <Loader size={20} />,
+  [LoadingStyle.ShowSpinnerAndValue]: (value) => (
+    <>
+      <span className="opacity-50">{value}</span>
+      <Loader size={20} />
+    </>
+  ),
+};
 
 export const StatItem = ({
   loading,
@@ -14,6 +33,7 @@ export const StatItem = ({
   value,
   tooltip,
   suffix,
+  loadingStyle = LoadingStyle.ShowSpinner,
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
@@ -38,7 +58,7 @@ export const StatItem = ({
     <ListItem
       {...props}
       title={title}
-      value={loading ? <Loader size={20} /> : value}
+      value={loading ? SPINNER_RENDERERS[loadingStyle](value) : value}
       suffix={suffixEl}
     />
   );

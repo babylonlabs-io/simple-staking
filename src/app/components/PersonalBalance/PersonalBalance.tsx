@@ -1,5 +1,6 @@
 import { List } from "@babylonlabs-io/core-ui";
 
+import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
@@ -13,7 +14,7 @@ import { satoshiToBtc } from "@/utils/btc";
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
-import { StatItem } from "../Stats/StatItem";
+import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
@@ -39,6 +40,9 @@ export function PersonalBalance() {
     inscriptionsBtcBalance,
   } = useBalanceState();
 
+  const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
+  const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
+
   const { claimRewards, showPreview } = useRewardsService();
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
@@ -59,8 +63,13 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={loading}
-            title={"Stakable Balance"}
+            loading={loading || hasUnconfirmedUTXOs}
+            title="Stakable Balance"
+            loadingStyle={
+              hasUnconfirmedUTXOs
+                ? LoadingStyle.ShowSpinnerAndValue
+                : LoadingStyle.ShowSpinner
+            }
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 
