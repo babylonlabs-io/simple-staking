@@ -1,5 +1,7 @@
 import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
+import Image from "next/image";
 
+import polygonIcon from "@/app/assets/polygon-1.svg";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
 import { Message } from "@/app/components/Staking/Form/States/Message";
@@ -24,6 +26,7 @@ interface DelegationFormProps {
   loading?: boolean;
   blocked?: boolean;
   available?: boolean;
+  disabled?: boolean;
   hasError?: boolean;
   error?: string;
   stakingInfo?: {
@@ -42,6 +45,7 @@ export function DelegationForm({
   loading,
   blocked,
   available,
+  disabled = false,
   hasError,
   error,
   stakingInfo,
@@ -59,9 +63,34 @@ export function DelegationForm({
   if (blocked) {
     return (
       <Message
-        icon={walletIcon}
         title="Unavailable in Your Region"
         message={error ?? ""}
+        icon={
+          <Image
+            src={walletIcon}
+            alt="Unavailable in Your Region"
+            width={120}
+            height={122}
+            className="rotate-12"
+          />
+        }
+      />
+    );
+  }
+
+  if (disabled) {
+    return (
+      <Message
+        title="Staking Currently Unavailable"
+        message="Staking is temporarily disabled due to network downtime. New stakes are paused until the network resumes."
+        icon={
+          <Image
+            src={polygonIcon}
+            alt="Staking Unavailable"
+            width={120}
+            height={122}
+          />
+        }
       />
     );
   }
@@ -71,7 +100,15 @@ export function DelegationForm({
       <Message
         title="Staking Temporarily Unavailable"
         message="Staking is not enabled at this time. Please check back later."
-        icon={stakingNotStartedIcon}
+        icon={
+          <Image
+            src={stakingNotStartedIcon}
+            alt="Staking Not Started"
+            width={120}
+            height={122}
+            className="rotate-12"
+          />
+        }
       />
     );
   }
@@ -79,7 +116,15 @@ export function DelegationForm({
   if (hasError) {
     return (
       <Message
-        icon={apiNotAvailable}
+        icon={
+          <Image
+            src={apiNotAvailable}
+            alt="Staking is not available"
+            width={120}
+            height={122}
+            className="rotate-12"
+          />
+        }
         title="Staking is not available"
         message={error ?? ""}
       />
