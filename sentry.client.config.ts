@@ -5,7 +5,7 @@
 /**
  * Extra notes:
  * This file is automatically included in the bundle by withSentryConfig() function
- * so it is not neccessary to create an instrumentation.ts for this file specifically.
+ * so it is not necessary to create an instrumentation.ts for this file specifically.
  * Reference: https://github.com/getsentry/sentry-javascript/blob/afa79b68640caf7ea3f3bc91c584e92225a49bc8/packages/nextjs/src/config/webpack.ts#L379
  */
 
