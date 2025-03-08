@@ -52,13 +52,13 @@ jobs:
           S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
 
       - name: Archive output
-        run: tar -cvf /tmp/simple-staking-${{ matrix.environment }}.tar -C out .
+        run: tar -cvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar -C out .
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: simple-staking-${{ matrix.environment }}
-          path: /tmp/simple-staking-${{ matrix.environment }}.tar
+          path: /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar
 
       - name: Upload to S3 with commit sha
         env:
