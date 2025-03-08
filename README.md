@@ -25,6 +25,8 @@ where,
 testing network related message. Default to true
 - `NEXT_PUBLIC_FIXED_STAKING_TERM` boolean value to indicate whether the staking term is fixed. Default to false
 - `NEXT_PUBLIC_BBN_GAS_PRICE` specifies the gas price for BABY. Default to 0.002
+- `NEXT_PUBLIC_SENTRY_DSN` specifies the Sentry DSN for error reporting
+- `NEXT_PUBLIC_SIDECAR_API_URL` specifies the base URL for the sidecar API service
 
 Then, to start a development server:
 

@@ -14,6 +14,8 @@ import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 
+import { STAKING_DISABLED } from "../constants";
+
 import { useBalanceState } from "./BalanceState";
 
 const formatStakingAmount = (value: number) =>
@@ -48,6 +50,7 @@ export interface StakingState {
   hasError: boolean;
   blocked: boolean;
   available: boolean;
+  disabled: boolean;
   loading: boolean;
   processing: boolean;
   errorMessage?: string;
@@ -79,6 +82,7 @@ const { StateProvider, useState: useStakingState } =
     hasError: false,
     blocked: false,
     available: false,
+    disabled: false,
     loading: false,
     processing: false,
     errorMessage: "",
@@ -300,6 +304,7 @@ export function StakingState({ children }: PropsWithChildren) {
       hasError,
       blocked,
       available,
+      disabled: STAKING_DISABLED,
       loading,
       processing,
       errorMessage,

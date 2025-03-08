@@ -1,19 +1,16 @@
 import { Heading, Text } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
 
 interface MessageProps {
   title: string;
   message: string;
-  icon: any;
+  icon: JSX.Element;
 }
 
 export const Message: React.FC<MessageProps> = ({ title, message, icon }) => {
   return (
     <div className="flex flex-1 flex-col">
       <div className="flex flex-1 flex-col items-center justify-center gap-8">
-        <div className="rotate-12">
-          <Image src={icon} alt="Wallet" width={120} height={122} />
-        </div>
+        {icon}
         <div className="flex flex-col gap-2 justify-center items-center self-stretch">
           <Heading variant="h5" className="text-accent-primary text-2xl">
             {title}

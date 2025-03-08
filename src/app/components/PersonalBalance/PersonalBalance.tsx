@@ -1,5 +1,6 @@
 import { List } from "@babylonlabs-io/core-ui";
 
+import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
@@ -13,11 +14,11 @@ import { satoshiToBtc } from "@/utils/btc";
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
-import { StatItem } from "../Stats/StatItem";
+import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
-const { coinName, coinSymbol } = getNetworkConfigBTC();
+const { coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
   // Load reward state
@@ -35,9 +36,12 @@ export function PersonalBalance() {
   const {
     bbnBalance,
     stakableBtcBalance,
+    stakedBtcBalance,
     inscriptionsBtcBalance,
-    combinedTotalBtcBalance,
   } = useBalanceState();
+
+  const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
+  const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
 
   const { claimRewards, showPreview } = useRewardsService();
   const isMobile = useIsMobileView();
@@ -49,8 +53,8 @@ export function PersonalBalance() {
         <List orientation="adaptive" className="bg-surface">
           <StatItem
             loading={loading}
-            title={isMobile ? "Total Balance" : `Total ${coinName} Balance`}
-            value={`${satoshiToBtc(combinedTotalBtcBalance)} ${coinSymbol}`}
+            title="Staked Balance"
+            value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
             tooltip={
               inscriptionsBtcBalance
                 ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
@@ -59,8 +63,13 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={loading}
-            title={"Stakable Balance"}
+            loading={loading || hasUnconfirmedUTXOs}
+            title="Stakable Balance"
+            loadingStyle={
+              hasUnconfirmedUTXOs
+                ? LoadingStyle.ShowSpinnerAndValue
+                : LoadingStyle.ShowSpinner
+            }
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
           />
 
