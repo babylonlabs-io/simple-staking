@@ -73,7 +73,7 @@ export const useRewardsService = () => {
 
 const createWithdrawRewardMsg = (bech32Address: string) => {
   const withdrawRewardMsg = incentivetx.MsgWithdrawReward.fromPartial({
-    type: "btc_delegation",
+    type: "btc_staker",
     address: bech32Address,
   });
 
