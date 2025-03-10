@@ -104,13 +104,13 @@ export function useDelegationService() {
         (acc, delegation) => ({
           ...acc,
           [delegation.stakingTxHashHex]: {
-            isSlashed:
+            isFpSlashed:
               getSlashedFinalityProvider(
                 delegation.finalityProviderBtcPksHex[0],
               ) !== null,
           },
         }),
-        {} as Record<string, { isSlashed: boolean }>,
+        {} as Record<string, { isFpSlashed: boolean }>,
       ),
     [delegations, getSlashedFinalityProvider],
   );

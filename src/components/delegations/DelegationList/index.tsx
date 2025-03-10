@@ -22,7 +22,7 @@ import { NoDelegations } from "./NoDelegations";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
-  slashedStatuses: Record<string, { isSlashed: boolean }>;
+  slashedStatuses: Record<string, { isFpSlashed: boolean }>;
 };
 
 const networkConfig = getNetworkConfig();
@@ -67,8 +67,8 @@ const columns: TableColumn<DelegationV2, TableParams>[] = [
       { handleActionClick, validations, slashedStatuses },
     ) => {
       const { valid, error } = validations[row.stakingTxHashHex];
-      const { isSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
-      const tooltip = isSlashed ? (
+      const { isFpSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
+      const tooltip = isFpSlashed ? (
         <>
           <span>
             This finality provider has been slashed.{" "}
@@ -87,7 +87,7 @@ const columns: TableColumn<DelegationV2, TableParams>[] = [
 
       return (
         <ActionButton
-          disabled={!valid || isSlashed}
+          disabled={!valid}
           tooltip={tooltip}
           delegation={row}
           state={row.state}
