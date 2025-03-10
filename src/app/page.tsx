@@ -1,7 +1,7 @@
 "use client";
 
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { StakingForm } from "@/app/components/Staking/StakingForm";
 
@@ -20,8 +20,6 @@ const Home = () => {
     initBTCCurve();
   }, []);
 
-  const [showPhase2HereModal, setShowPhase2HereModal] = useState(true);
-
   return (
     <>
       <Banner />
@@ -39,10 +37,7 @@ const Home = () => {
       </Container>
 
       <Footer />
-      <Phase2HereModal
-        open={showPhase2HereModal}
-        onClose={() => setShowPhase2HereModal(false)}
-      />
+      <Phase2HereModal />
     </>
   );
 };
