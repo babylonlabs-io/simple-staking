@@ -2,6 +2,7 @@
 import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: false,
   output: "standalone",
   experimental: {
     forceSwcTransforms: true,
