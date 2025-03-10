@@ -113,19 +113,19 @@ const STATUSES: Record<string, StatusAdapter> = {
     tooltip: "Stake is requesting unbonding",
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
+    label: "Withdrawing",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
+    label: "Withdrawing",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
   [State.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
+    label: "Withdrawing",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
   [State.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED]: () => ({
-    label: "Withdrawal",
+    label: "Withdrawing",
     tooltip: "Withdrawal transaction pending confirmation on Bitcoin",
   }),
 };
