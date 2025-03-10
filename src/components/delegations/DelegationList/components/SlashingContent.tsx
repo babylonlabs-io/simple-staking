@@ -65,12 +65,12 @@ export const SlashingContent = ({
   if (delegation.state === DelegationV2StakingState.SLASHED) {
     return (
       <>
-        The FP you selected has been slashed, resulting in{" "}
+        The Finality Provider you selected has been slashed, resulting in{" "}
         <b>
           {maxDecimals(satoshiToBtc(slashingAmount ?? 0), 8)} {coinName}
         </b>{" "}
         being deducted from your delegation. It will take {unbondingTime.blocks}{" "}
-        blocks (≈ {unbondingTime.time}) before it becomes withdrawable.{" "}
+        blocks (~ {unbondingTime.time}) before it becomes withdrawable.{" "}
         <Link
           className="text-secondary-main"
           target="_blank"
