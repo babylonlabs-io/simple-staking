@@ -1,12 +1,10 @@
-import type { BTCConfig } from "@babylonlabs-io/wallet-connector";
-
 import { MEMPOOL_API } from "@/app/constants";
 import { Network } from "@/app/types/network";
 
 export const network =
   (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.SIGNET;
 
-const mainnetConfig: BTCConfig = {
+const mainnetConfig = {
   coinName: "BTC",
   coinSymbol: "BTC",
   networkName: "BTC",
@@ -14,7 +12,15 @@ const mainnetConfig: BTCConfig = {
   network: Network.MAINNET,
 };
 
-const canaryConfig: BTCConfig = {
+const mockConfig = {
+  coinName: "BTC",
+  coinSymbol: "BTC",
+  networkName: "BTC",
+  mempoolApiUrl: `${MEMPOOL_API}`,
+  network: Network.MOCK_MAINNET,
+};
+
+const canaryConfig = {
   coinName: "BTC",
   coinSymbol: "BTC",
   networkName: "BTC",
@@ -22,7 +28,7 @@ const canaryConfig: BTCConfig = {
   network: Network.CANARY,
 };
 
-const signetConfig: BTCConfig = {
+const signetConfig = {
   coinName: "Signet BTC",
   coinSymbol: "sBTC",
   networkName: "BTC signet",
@@ -30,7 +36,7 @@ const signetConfig: BTCConfig = {
   network: Network.SIGNET,
 };
 
-const testnetConfig: BTCConfig = {
+const testnetConfig = {
   coinName: "Testnet BTC",
   coinSymbol: "tBTC",
   networkName: "BTC testnet",
@@ -38,14 +44,15 @@ const testnetConfig: BTCConfig = {
   network: Network.TESTNET,
 };
 
-const config: Record<string, BTCConfig> = {
+const config = {
   mainnet: mainnetConfig,
   signet: signetConfig,
   testnet: testnetConfig,
   canary: canaryConfig,
+  mock: mockConfig,
 };
 
-export function getNetworkConfigBTC(): BTCConfig {
+export function getNetworkConfigBTC(): any {
   switch (network) {
     case Network.MAINNET:
       return config.mainnet;
@@ -56,13 +63,18 @@ export function getNetworkConfigBTC(): BTCConfig {
     // we do not use Testnet
     case Network.TESTNET:
       return config.signet;
+    case Network.MOCK_MAINNET:
+      return config.mock;
     default:
       return config.signet;
   }
 }
 
 export function validateAddress(network: Network, address: string): void {
-  if (network === Network.MAINNET && !address.startsWith("bc1")) {
+  if (
+    (network === Network.MAINNET || network === Network.MOCK_MAINNET) &&
+    !address.startsWith("bc1")
+  ) {
     // wallet error
     throw new Error(
       "Incorrect address prefix for Mainnet. Expected address to start with 'bc1'.",
@@ -86,6 +98,7 @@ export function validateAddress(network: Network, address: string): void {
       Network.SIGNET,
       Network.TESTNET,
       Network.CANARY,
+      Network.MOCK_MAINNET,
     ].includes(network)
   ) {
     // wallet error

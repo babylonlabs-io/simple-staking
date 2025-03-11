@@ -4,10 +4,20 @@ import { Network } from "@/app/types/network";
 
 import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
+import { bbnMock } from "./bbn/mock";
 import { bbnTestnet } from "./bbn/testnet";
 
 export const network =
   (process.env.NEXT_PUBLIC_NETWORK as Network) || Network.SIGNET;
+
+const mockConfig: BBNConfig = {
+  chainId: bbnMock.chainId,
+  rpc: bbnMock.rpc,
+  chainData: bbnMock,
+  networkName: "BABY",
+  networkFullName: "Babylon Chain",
+  coinSymbol: "BABY",
+};
 
 const mainnetConfig: BBNConfig = {
   chainId: bbnTestnet.chainId,
@@ -50,6 +60,7 @@ const config: Record<string, BBNConfig> = {
   canary: canaryConfig,
   signet: signetConfig,
   testnet: testnetConfig,
+  mock: mockConfig,
 };
 
 export function getNetworkConfigBBN(): BBNConfig {
@@ -62,6 +73,8 @@ export function getNetworkConfigBBN(): BBNConfig {
       return config.signet;
     case Network.TESTNET:
       return config.testnet;
+    case Network.MOCK_MAINNET:
+      return config.mock;
     default:
       return config.signet;
   }

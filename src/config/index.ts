@@ -1,5 +1,3 @@
-import type { Network } from "@babylonlabs-io/wallet-connector";
-
 import { network } from "./network/btc";
 
 // Default gas price for BABY
@@ -21,7 +19,7 @@ export const getNetworkAppUrl = (): string => {
 };
 
 // getBtcNetwork function is used to get the BTC network based on the environment
-export const getBtcNetwork = (): Network => {
+export const getBtcNetwork = (): any => {
   return network;
 };
 
