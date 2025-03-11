@@ -156,3 +156,66 @@ jobs:
         run: |
           docker tag simple-staking:${{ github.sha }} ${{ vars.AWS_ECR_REGISTRY_ID }}/simple-staking:${{ github.ref_name }}-${{ matrix.environment }}
           docker push ${{ vars.AWS_ECR_REGISTRY_ID }}/simple-staking:${{ github.ref_name }}-${{ matrix.environment }}
+
+  s3_publish:
+    needs: [lint_test]
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        environment:
+          [
+            devnet,
+            phase-2-devnet,
+            testnet,
+            phase-2-testnet,
+            mainnet-private,
+            phase-2-private-mainnet,
+            mainnet,
+            phase-2-mainnet,
+            mock-mainnet,
+          ]
+    environment: ${{ matrix.environment }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project
+        run: npm run build
+        env:
+          NEXT_PUBLIC_MEMPOOL_API: ${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_NETWORK: ${{ vars.NEXT_PUBLIC_NETWORK }}
+          NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES: ${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+          NEXT_PUBLIC_FIXED_STAKING_TERM: ${{ vars.NEXT_PUBLIC_FIXED_STAKING_TERM }}
+          NEXT_PUBLIC_COMMIT_HASH: ${{ github.sha }}
+          NEXT_PUBLIC_BBN_GAS_PRICE: ${{ vars.NEXT_PUBLIC_BBN_GAS_PRICE }}
+          NEXT_PUBLIC_SIDECAR_API_URL: ${{ vars.NEXT_PUBLIC_SIDECAR_API_URL }}
+          S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
+
+      - name: Archive output
+        run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
+
+      - name: Upload to S3 with commit sha
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_S3_REGION }}
+        run: aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz s3://${{ vars.S3_PUBLIC_BUCKET }}/${{ matrix.environment }}/simple-staking-${{ github.sha }}.tar.gz
+
+      - name: Upload to S3 with Git Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ vars.AWS_S3_REGION }}
+        run: aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz s3://${{ vars.S3_PUBLIC_BUCKET }}/${{ matrix.environment }}/simple-staking-${{ github.ref_name }}.tar.gz

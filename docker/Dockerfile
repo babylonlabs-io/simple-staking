@@ -15,6 +15,9 @@ COPY tailwind.config.ts .
 COPY postcss.config.js .
 COPY sentry.client.config.ts .
 
+RUN sed -i '/images: { unoptimized: true },/d' next.config.mjs && \
+    sed -i 's/output: "export"/output: "standalone"/' next.config.mjs
+
 ARG NEXT_PUBLIC_MEMPOOL_API
 ENV NEXT_PUBLIC_MEMPOOL_API=${NEXT_PUBLIC_MEMPOOL_API}
 
