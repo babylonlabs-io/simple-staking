@@ -1,5 +1,4 @@
-import { HttpStatusCode } from "axios";
-
+import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { ErrorType } from "@/app/types/errors";
 
 export class ServerError extends Error {

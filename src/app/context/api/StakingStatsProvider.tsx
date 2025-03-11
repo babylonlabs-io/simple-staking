@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { HttpStatusCode } from "axios";
 import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
+import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 
 import { useError } from "../Error/ErrorProvider";

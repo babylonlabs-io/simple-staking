@@ -1,5 +1,4 @@
-import { HttpStatusCode } from "axios";
-
+import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { ServerError } from "@/app/context/Error/errors/serverError";
 import { ErrorType } from "@/app/types/errors";
 

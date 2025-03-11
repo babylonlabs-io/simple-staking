@@ -1,8 +1,13 @@
-import { isAxiosError } from "axios";
-
-export const isAxiosError451 = (error: any): boolean => {
+/**
+ * Checks if an error is a 451 HTTP status code error (Unavailable For Legal Reasons)
+ * @param error - The error to check
+ * @returns boolean indicating if the error has a 451 status code
+ */
+export const isError451 = (error: any): boolean => {
   return (
-    isAxiosError(error) &&
-    (error.response?.status === 451 || error.request.status === 451)
+    error &&
+    (error.status === 451 ||
+      (error.response && error.response.status === 451) ||
+      (error.request && error.request.status === 451))
   );
 };

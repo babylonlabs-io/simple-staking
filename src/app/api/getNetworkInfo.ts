@@ -1,5 +1,4 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
-import { AxiosResponse, HttpStatusCode } from "axios";
 
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 
@@ -7,6 +6,7 @@ import { ServerError } from "../context/Error/errors";
 import { NetworkInfo } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
+import { HttpStatusCode } from "./httpStatusCodes";
 
 interface NetworkInfoDataResponse {
   data: NetworkInfoAPI;
@@ -50,11 +50,12 @@ export interface BbnParams {
 }
 
 export const getNetworkInfo = async (): Promise<NetworkInfo> => {
-  const { data } = (await apiWrapper(
+  const response = await apiWrapper(
     "GET",
     "/v2/network-info",
     "Error getting network info",
-  )) as AxiosResponse<NetworkInfoDataResponse>;
+  );
+  const { data } = response;
   const { params, staking_status } = data.data;
 
   const stakingVersions = (params.bbn || [])
