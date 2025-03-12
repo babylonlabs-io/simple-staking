@@ -1,11 +1,10 @@
 import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
-import polygonIcon from "@/app/assets/polygon-1.svg";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
 import { Message } from "@/app/components/Staking/Form/States/Message";
-import stakingNotStartedIcon from "@/app/components/Staking/Form/States/staking-not-started.svg";
+import stakingUnavailableIcon from "@/app/components/Staking/Form/States/staking-unavailable.svg";
 import walletIcon from "@/app/components/Staking/Form/States/wallet-icon.svg";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
 import { BBN_FEE_AMOUNT } from "@/app/constants";
@@ -85,7 +84,7 @@ export function DelegationForm({
         message="Staking is temporarily disabled due to network downtime. New stakes are paused until the network resumes."
         icon={
           <Image
-            src={polygonIcon}
+            src={stakingUnavailableIcon}
             alt="Staking Unavailable"
             width={120}
             height={122}
@@ -102,11 +101,10 @@ export function DelegationForm({
         message="Staking is not enabled at this time. Please check back later."
         icon={
           <Image
-            src={stakingNotStartedIcon}
+            src={stakingUnavailableIcon}
             alt="Staking Not Started"
             width={120}
             height={122}
-            className="rotate-12"
           />
         }
       />
