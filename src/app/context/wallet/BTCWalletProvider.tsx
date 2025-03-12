@@ -19,6 +19,7 @@ import {
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { Fees } from "@/app/types/fee";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import {
   getAddressBalance,
   getNetworkFees,
@@ -31,6 +32,8 @@ import {
   toNetwork,
 } from "@/utils/wallet";
 import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
+
+const btcConfig = getNetworkConfigBTC();
 
 interface BTCWalletContextProps {
   loading: boolean;
@@ -101,6 +104,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
 
       try {
+        const network = await walletProvider.getNetwork();
+        if (network !== btcConfig.network) return;
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
@@ -113,7 +118,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         );
 
         setBTCWalletProvider(walletProvider);
-        setNetwork(toNetwork(await walletProvider.getNetwork()));
+        setNetwork(toNetwork(network));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
         setLoading(false);

@@ -2,20 +2,18 @@
 
 import {
   ChainConfigArr,
+  ExternalWallets,
   WalletProvider,
 } from "@babylonlabs-io/wallet-connector";
+import { useTheme } from "next-themes";
 import { useCallback, type PropsWithChildren } from "react";
 
 import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
-import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
-import { TomoWidget } from "@/app/context/tomo/TomoWidget";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { useError } from "../Error/ErrorProvider";
-import { TomoBBNConnector } from "../tomo/BBNConnector";
-import { TomoBTCConnector } from "../tomo/BTCConnector";
 
 const context = typeof window !== "undefined" ? window : {};
 
@@ -30,7 +28,7 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-btc-connector",
-        widget: () => <TomoWidget chainName="bitcoin" />,
+        widget: () => <ExternalWallets chainName="bitcoin" />,
       },
     ],
     config: getNetworkConfigBTC(),
@@ -40,7 +38,7 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-bbn-connector",
-        widget: () => <TomoWidget chainName="cosmos" />,
+        widget: () => <ExternalWallets chainName="cosmos" />,
       },
     ],
     config: getNetworkConfigBBN(),
@@ -49,6 +47,7 @@ const config: ChainConfigArr = [
 
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
+  const { theme } = useTheme();
 
   const onError = useCallback(
     (error: Error) => {
@@ -60,17 +59,15 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   );
 
   return (
-    <TomoConnectionProvider>
-      <WalletProvider
-        lifecycleHooks={lifecycleHooks}
-        config={config}
-        context={context}
-        onError={onError}
-      >
-        <TomoBTCConnector />
-        <TomoBBNConnector />
-        {children}
-      </WalletProvider>
-    </TomoConnectionProvider>
+    <WalletProvider
+      persistent
+      theme={theme}
+      lifecycleHooks={lifecycleHooks}
+      config={config}
+      context={context}
+      onError={onError}
+    >
+      {children}
+    </WalletProvider>
   );
 };
