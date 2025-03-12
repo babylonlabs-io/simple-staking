@@ -3,13 +3,8 @@ import {
   InscriptionIdentifier,
   useInscriptionProvider,
 } from "@babylonlabs-io/wallet-connector";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type PropsWithChildren,
-} from "react";
+import { useTheme } from "next-themes";
+import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
@@ -37,7 +32,7 @@ const STATE_LIST = [
 ];
 
 export interface AppState {
-  theme: "dark" | "light";
+  theme?: string;
   availableUTXOs?: UTXO[];
   allUTXOs?: UTXO[];
   inscriptionsUTXOs?: UTXO[];
@@ -53,7 +48,7 @@ export interface AppState {
 
 const { StateProvider, useState: useApplicationState } =
   createStateUtils<AppState>({
-    theme: "light",
+    theme: undefined,
     isLoading: false,
     isError: false,
     ordinalsExcluded: true,
@@ -64,15 +59,10 @@ const { StateProvider, useState: useApplicationState } =
   });
 
 export function AppState({ children }: PropsWithChildren) {
-  const [theme, setTheme] = useState<"dark" | "light">("light");
+  const { theme, setTheme } = useTheme();
+
   const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
     useInscriptionProvider();
-
-  useEffect(() => {
-    document.body.classList.add(theme);
-
-    return () => document.body.classList.remove(theme);
-  }, [theme]);
 
   // States
   const {
