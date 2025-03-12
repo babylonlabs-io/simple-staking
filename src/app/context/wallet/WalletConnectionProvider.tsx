@@ -10,6 +10,7 @@ import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
 import { TomoConnectionProvider } from "@/app/context/tomo/TomoProvider";
 import { TomoWidget } from "@/app/context/tomo/TomoWidget";
+import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -51,9 +52,19 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
 
   const onError = (error: Error) => {
-    handleError({
-      error,
-    });
+    if (error.message === "Keplr override") {
+      handleError({
+        error: {
+          message:
+            "Please disable other Cosmos extensions as they may interfere with Keplr.",
+          type: ErrorType.WALLET,
+        },
+      });
+    } else {
+      handleError({
+        error,
+      });
+    }
   };
 
   return (
