@@ -78,7 +78,7 @@ export function DelegationForm({
     );
   }
 
-  if (true) {
+  if (disabled) {
     return (
       <Message
         title="Staking Currently Unavailable"
