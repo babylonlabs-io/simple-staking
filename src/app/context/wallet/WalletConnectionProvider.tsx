@@ -4,7 +4,7 @@ import {
   ChainConfigArr,
   WalletProvider,
 } from "@babylonlabs-io/wallet-connector";
-import { type PropsWithChildren } from "react";
+import { useCallback, type PropsWithChildren } from "react";
 
 import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
@@ -50,11 +50,14 @@ const config: ChainConfigArr = [
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
 
-  const onError = (error: Error) => {
-    handleError({
-      error,
-    });
-  };
+  const onError = useCallback(
+    (error: Error) => {
+      handleError({
+        error,
+      });
+    },
+    [handleError],
+  );
 
   return (
     <TomoConnectionProvider>
