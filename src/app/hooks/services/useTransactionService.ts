@@ -427,7 +427,7 @@ const getInclusionProof = async (stakingTx: Transaction) => {
  * Validate the common inputs
  * @param btcStakingManager - The BTC Staking Manager
  * @param stakingInput - The staking inputs (e.g. amount, timelock, etc.)
- * @param tipHeight - The BTC tip height from the Babylon chain
+ * @param tipHeight - The BTC tip height from the Babylon Genesis
  * @param stakerInfo - The staker info (e.g. address, public key, etc.)
  */
 const validateCommonInputs = (

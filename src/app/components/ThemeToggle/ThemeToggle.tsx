@@ -6,6 +6,8 @@ import { useAppState } from "@/app/state";
 export const ThemeToggle = () => {
   const { theme, setTheme } = useAppState();
 
+  if (!theme) return null;
+
   return (
     <div className="flex flex-row items-center justify-between">
       <Text variant="body2" className="text-sm text-accent-primary capitalize">
