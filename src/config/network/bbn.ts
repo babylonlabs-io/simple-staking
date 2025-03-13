@@ -14,7 +14,7 @@ const mainnetConfig: BBNConfig = {
   rpc: bbnTestnet.rpc,
   chainData: bbnTestnet,
   networkName: "BABY",
-  networkFullName: "Babylon Chain",
+  networkFullName: "Babylon Genesis",
   coinSymbol: "BABY",
 };
 
@@ -23,7 +23,7 @@ const canaryConfig: BBNConfig = {
   rpc: bbnCanary.rpc,
   chainData: bbnCanary,
   networkName: "BABY",
-  networkFullName: "Babylon Chain",
+  networkFullName: "Babylon Genesis",
   coinSymbol: "BABY",
 };
 
@@ -32,7 +32,7 @@ const signetConfig: BBNConfig = {
   rpc: bbnDevnet.rpc,
   chainData: bbnDevnet,
   networkName: "Testnet BABY",
-  networkFullName: "Testnet Babylon Chain",
+  networkFullName: "Testnet Babylon Genesis",
   coinSymbol: "tBABY",
 };
 
@@ -41,7 +41,7 @@ const testnetConfig: BBNConfig = {
   rpc: bbnTestnet.rpc,
   chainData: bbnTestnet,
   networkName: "Testnet BABY",
-  networkFullName: "Testnet Babylon Chain",
+  networkFullName: "Testnet Babylon Genesis",
   coinSymbol: "tBABY",
 };
 

@@ -12,7 +12,10 @@ export const Message: React.FC<MessageProps> = ({ title, message, icon }) => {
       <div className="flex flex-1 flex-col items-center justify-center gap-8">
         {icon}
         <div className="flex flex-col gap-2 justify-center items-center self-stretch">
-          <Heading variant="h5" className="text-accent-primary text-2xl">
+          <Heading
+            variant="h5"
+            className="text-accent-primary text-center text-2xl"
+          >
             {title}
           </Heading>
           <Text

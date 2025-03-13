@@ -42,9 +42,7 @@ export function RegistrationEndModal({
     >
       <Text variant="body1" className="text-center">
         Your staking transaction has been successfully registered to the{" "}
-        {bbn.networkFullName}. It will be activated and receive voting power in
-        a few blocks. You can monitor the Activity tab for the activation
-        status.
+        {bbn.networkFullName}.
       </Text>
     </SubmitModal>
   );

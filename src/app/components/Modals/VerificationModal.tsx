@@ -19,7 +19,7 @@ const VERIFICATION_STEPS = {
         1/2 <br /> Processing Confirmation
       </>
     ),
-    description: `Waiting for the staking confirmation to be confirmed on ${bbn.networkFullName}.`,
+    description: `Waiting for the staking registration to be confirmed on ${bbn.networkFullName}.`,
   },
   2: {
     title: (
