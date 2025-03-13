@@ -1,7 +1,3 @@
-import type { Network } from "@babylonlabs-io/wallet-connector";
-
-import { network } from "./network/btc";
-
 // Default gas price for BABY
 const DEFAULT_BBN_GAS_PRICE = 0.002;
 
@@ -18,11 +14,6 @@ export const getNetworkAppUrl = (): string => {
   return shouldDisplayTestingMsg()
     ? "https://btcstaking.testnet.babylonchain.io"
     : "https://btcstaking.babylonlabs.io";
-};
-
-// getBtcNetwork function is used to get the BTC network based on the environment
-export const getBtcNetwork = (): Network => {
-  return network;
 };
 
 export const IS_FIXED_TERM_FIELD =
