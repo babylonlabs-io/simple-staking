@@ -41,9 +41,7 @@ export const apiWrapper = async (
   }
 
   if (timeout) {
-    const controller = new AbortController();
-    options.signal = controller.signal;
-    setTimeout(() => controller.abort(), timeout);
+    options.signal = AbortSignal.timeout(timeout);
   }
 
   try {
