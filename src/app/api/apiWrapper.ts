@@ -16,13 +16,16 @@ interface RequestParams {
   body?: any;
 }
 
-export const apiWrapper = async (
+export const apiWrapper = async <TResponseData = unknown>(
   method: "GET" | "POST",
   path: string,
   generalErrorMessage: string,
   params?: RequestParams,
   timeout?: number,
-) => {
+): Promise<{
+  data: TResponseData;
+  status: number;
+}> => {
   const queryString = params?.query
     ? `?${qs.stringify(params.query, { arrayFormat: "repeat" })}`
     : "";
