@@ -24,10 +24,7 @@ jobs:
           [
             devnet,
             phase-2-devnet,
-            staging,
-            testnet,
             phase-2-testnet,
-            mainnet-private,
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
@@ -71,10 +68,7 @@ jobs:
           [
             devnet,
             phase-2-devnet,
-            staging,
-            testnet,
             phase-2-testnet,
-            mainnet-private,
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
@@ -116,10 +110,7 @@ jobs:
           [
             devnet,
             phase-2-devnet,
-            staging,
-            testnet,
             phase-2-testnet,
-            mainnet-private,
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
@@ -167,9 +158,7 @@ jobs:
           [
             devnet,
             phase-2-devnet,
-            testnet,
             phase-2-testnet,
-            mainnet-private,
             phase-2-private-mainnet,
             mainnet,
             phase-2-mainnet,
