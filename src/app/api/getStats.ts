@@ -16,7 +16,11 @@ interface StatsAPI {
 }
 
 export const getStats = async (): Promise<StakingStats> => {
-  const response = await apiWrapper("GET", "/v1/stats", "Error getting stats");
+  const response = await apiWrapper<StatsAPIResponse>(
+    "GET",
+    "/v1/stats",
+    "Error getting stats",
+  );
   const statsAPIResponse: StatsAPIResponse = response.data;
   const statsAPI: StatsAPI = statsAPIResponse.data;
 

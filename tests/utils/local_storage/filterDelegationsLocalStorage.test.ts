@@ -1,5 +1,4 @@
-import { HttpStatusCode } from "axios";
-
+import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { ServerError } from "@/app/context/Error/errors";
 import { Delegation } from "@/app/types/delegations";
 import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDelegationsLocalStorage";

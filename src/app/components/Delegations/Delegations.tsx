@@ -1,9 +1,9 @@
 import { Card, Heading } from "@babylonlabs-io/core-ui";
-import { HttpStatusCode } from "axios";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
+import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";

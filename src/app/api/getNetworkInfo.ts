@@ -1,5 +1,4 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
-import { AxiosResponse, HttpStatusCode } from "axios";
 
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 
@@ -7,6 +6,7 @@ import { ServerError } from "../context/Error/errors";
 import { NetworkInfo } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
+import { HttpStatusCode } from "./httpStatusCodes";
 
 interface NetworkInfoDataResponse {
   data: NetworkInfoAPI;
@@ -47,18 +47,20 @@ export interface BbnParams {
   delegation_creation_base_gas_fee: number;
   btc_activation_height: number;
   allow_list_expiration_height: number;
+  btcActivationHeight?: number;
 }
 
 export const getNetworkInfo = async (): Promise<NetworkInfo> => {
-  const { data } = (await apiWrapper(
+  const response = await apiWrapper<NetworkInfoDataResponse>(
     "GET",
     "/v2/network-info",
     "Error getting network info",
-  )) as AxiosResponse<NetworkInfoDataResponse>;
+  );
+  const { data } = response;
   const { params, staking_status } = data.data;
 
   const stakingVersions = (params.bbn || [])
-    .sort((a, b) => a.version - b.version) // Sort by version ascending
+    .sort((a, b) => a.version - b.version)
     .map((v) => ({
       version: v.version,
       covenantNoCoordPks: v.covenant_pks.map((pk) =>
@@ -112,7 +114,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
 
   // Map the BTC checkpoint params to the expected format
   const epochCheckVersions = (params.btc || [])
-    .sort((a, b) => a.version - b.version) // Sort by version ascending
+    .sort((a, b) => a.version - b.version)
     .map((v) => ({
       version: v.version,
       btcConfirmationDepth: v.btc_confirmation_depth,

@@ -10,6 +10,10 @@ export interface UtxoInfo {
   inscription: boolean;
 }
 
+interface VerifyUtxosResponse {
+  data: UtxoInfo[];
+}
+
 const TIMEOUT_DURATION = 2000; // 2 seconds
 const BATCH_SIZE = 30;
 
@@ -20,7 +24,7 @@ export const postVerifyUtxoOrdinals = async (
   const utxoChunks = chunkArray(utxos, BATCH_SIZE);
   const responses = await Promise.all(
     utxoChunks.map((chunk) =>
-      apiWrapper(
+      apiWrapper<VerifyUtxosResponse>(
         "POST",
         "/v1/ordinals/verify-utxos",
         "Error verifying utxos ordinals",

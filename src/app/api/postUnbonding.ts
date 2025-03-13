@@ -20,7 +20,7 @@ export const postUnbonding = async (
     unbonding_tx_hex: unbondingTxHex,
   };
 
-  const response = await apiWrapper(
+  const response = await apiWrapper<unknown>(
     "POST",
     "/v1/unbonding",
     "Error submitting unbonding request",

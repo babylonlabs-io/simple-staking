@@ -5,7 +5,7 @@ export const getUnbondingEligibility = async (txID: string) => {
     staking_tx_hash_hex: txID,
   };
 
-  const response = await apiWrapper(
+  const response = await apiWrapper<unknown>(
     "GET",
     "/v1/unbonding/eligibility",
     "Error checking unbonding eligibility",

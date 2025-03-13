@@ -52,12 +52,11 @@ export const getDelegationV2 = async (
       staking_tx_hash_hex: stakingTxHashHex,
     };
 
-    const { data: delegationAPIResponse } = await apiWrapper(
-      "GET",
-      "/v2/delegation",
-      "Error getting delegation v2",
-      { query: params },
-    );
+    const { data: delegationAPIResponse } = await apiWrapper<{
+      data: DelegationV2API;
+    }>("GET", "/v2/delegation", "Error getting delegation v2", {
+      query: params,
+    });
 
     return apiToDelegationV2(delegationAPIResponse.data);
   } catch {
@@ -82,12 +81,12 @@ export const getDelegationsV2 = async ({
     pagination_key: pageKey ? pageKey : "",
   };
 
-  const { data: delegationsAPIResponse } = await apiWrapper(
-    "GET",
-    "/v2/delegations",
-    "Error getting delegations v2",
-    { query: params },
-  );
+  const { data: delegationsAPIResponse } = await apiWrapper<{
+    data: DelegationV2API[];
+    pagination: Pagination;
+  }>("GET", "/v2/delegations", "Error getting delegations v2", {
+    query: params,
+  });
 
   const pagination: Pagination = {
     next_key: delegationsAPIResponse.pagination.next_key,
