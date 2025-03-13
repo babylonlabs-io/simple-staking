@@ -16,7 +16,7 @@ interface SystemStatsAPIResponse {
 }
 
 export const getSystemStats = async (): Promise<SystemStats> => {
-  const response = await apiWrapper(
+  const response = await apiWrapper<SystemStatsAPIResponse>(
     "GET",
     "/v2/stats",
     "Error getting system stats",
