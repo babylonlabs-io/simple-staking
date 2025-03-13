@@ -110,13 +110,11 @@ describe("apiWrapper", () => {
   });
 
   it("should handle request timeout", async () => {
-    const mockAbortController = {
-      signal: "test-signal",
-      abort: jest.fn(),
-    };
-    global.AbortController = jest.fn(() => mockAbortController) as any;
-
-    jest.useFakeTimers();
+    const mockTimeoutSignal = "test-timeout-signal";
+    global.AbortSignal = {
+      ...global.AbortSignal,
+      timeout: jest.fn().mockReturnValue(mockTimeoutSignal),
+    } as any;
 
     const mockResponse = {
       ok: true,
@@ -133,19 +131,13 @@ describe("apiWrapper", () => {
       5000,
     );
 
-    expect(global.AbortController).toHaveBeenCalled();
+    expect(global.AbortSignal.timeout).toHaveBeenCalledWith(5000);
     expect(global.fetch).toHaveBeenCalledWith(
       "https://api.example.com/test",
       expect.objectContaining({
-        signal: "test-signal",
+        signal: mockTimeoutSignal,
       }),
     );
-
-    jest.advanceTimersByTime(5000);
-
-    expect(mockAbortController.abort).toHaveBeenCalled();
-
-    jest.useRealTimers();
 
     await promise;
   });
