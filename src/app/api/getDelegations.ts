@@ -50,7 +50,7 @@ export const getDelegations = async (
     pending_action: true,
   };
 
-  const response = await apiWrapper(
+  const response = await apiWrapper<DelegationsAPIResponse>(
     "GET",
     "/v1/staker/delegations",
     "Error getting delegations",
