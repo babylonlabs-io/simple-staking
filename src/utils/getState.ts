@@ -42,7 +42,7 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.ACTIVE:
       return `Stake is pending registration to the ${bbnNetworkFullName}`;
     case DelegationState.UNBONDING_REQUESTED:
-      return "Stake is requesting unbonding";
+      return "Stake unbonding in progress";
     case DelegationState.UNBONDED:
       return "Stake has been unbonded";
     case DelegationState.WITHDRAWN:
@@ -53,7 +53,7 @@ export const getStateTooltip = (state: string) => {
       return "Stake timelock has expired";
     // Intermediate local storage states
     case DelegationState.INTERMEDIATE_UNBONDING:
-      return "Stake is requesting unbonding";
+      return "Stake unbonding in progress";
     case DelegationState.INTERMEDIATE_WITHDRAWAL:
       return "Withdrawal transaction pending confirmation on Bitcoin";
     case DelegationState.INTERMEDIATE_TRANSITIONING:
