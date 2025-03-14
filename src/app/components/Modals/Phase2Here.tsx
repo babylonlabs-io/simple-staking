@@ -5,7 +5,7 @@ import {
   Heading,
 } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren, useState } from "react";
-import { MdLooksTwo } from "react-icons/md";
+import { MdCelebration } from "react-icons/md";
 
 import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -34,14 +34,14 @@ export const Phase2HereModal = ({
     >
       <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 text-center items-center justify-center">
         <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
-          <MdLooksTwo className="text-5xl text-primary-light" />
+          <MdCelebration className="text-5xl text-primary-light" />
         </div>
         <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
         <p className="text-base">
           The {bbnNetworkFullName} blockchain has launched, signalling the start
-          of the new phase of the Babylon. {networkName} stakers can now
-          register on the {bbnNetworkFullName} blockchain to enhance security
-          and earn {bbnCoinSymbol}.
+          of the new phase of Babylon. {networkName} stakers can now register on
+          the {bbnNetworkFullName} blockchain to enhance security and earn{" "}
+          {bbnCoinSymbol}.
         </p>
         <p className="text-base">
           During the initial phase of the {bbnNetworkFullName} launch,
@@ -66,7 +66,7 @@ export const Phase2HereModal = ({
           onClick={() => setShowPhase2HereModal(false)}
           className="flex-1"
         >
-          Ok
+          OK
         </Button>
       </DialogFooter>
     </ResponsiveDialog>
