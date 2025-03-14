@@ -4,6 +4,8 @@ import { useCallback, useEffect } from "react";
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
   type FormFields,
@@ -49,6 +51,8 @@ export function useStakingService() {
     subscribeToSigningSteps,
   } = useTransactionService();
   const { handleError } = useError();
+  const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
+  const { bech32Address: cosmosAddress } = useCosmosWallet();
 
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
@@ -130,6 +134,11 @@ export function useStakingService() {
       } catch (error: any) {
         handleError({
           error,
+          userInfo: {
+            userPublicKey: publicKeyNoCoord,
+            babylonAddress: cosmosAddress,
+            btcAddress: btcAddress,
+          },
         });
         reset();
       }
@@ -144,6 +153,9 @@ export function useStakingService() {
       handleError,
       reset,
       refetchDelegations,
+      publicKeyNoCoord,
+      cosmosAddress,
+      btcAddress,
     ],
   );
 
@@ -185,6 +197,12 @@ export function useStakingService() {
           displayOptions: {
             retryAction: () => stakeDelegation(delegation),
           },
+          userInfo: {
+            userPublicKey: publicKeyNoCoord,
+            babylonAddress: cosmosAddress,
+            btcAddress: btcAddress,
+            stakingTxHash: delegation.stakingTxHashHex,
+          },
         });
       }
     },
@@ -195,6 +213,9 @@ export function useStakingService() {
       setProcessing,
       reset,
       handleError,
+      publicKeyNoCoord,
+      cosmosAddress,
+      btcAddress,
     ],
   );
 

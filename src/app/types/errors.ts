@@ -23,6 +23,11 @@ export interface Error {
   type?: ErrorType;
   displayMessage?: string;
   sentryEventId?: string;
+  trace?: string;
+  userPublicKey?: string;
+  babylonAddress?: string;
+  stakingTxHash?: string;
+  btcAddress?: string;
 }
 
 export interface ErrorDisplayOptions {
@@ -33,6 +38,12 @@ export interface ErrorDisplayOptions {
 export interface ErrorHandlerParam {
   error: Error | null;
   displayOptions?: ErrorDisplayOptions;
+  userInfo?: {
+    userPublicKey?: string;
+    babylonAddress?: string;
+    stakingTxHash?: string;
+    btcAddress?: string;
+  };
 }
 
 export interface ShowErrorParams {

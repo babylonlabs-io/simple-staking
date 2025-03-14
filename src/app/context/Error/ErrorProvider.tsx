@@ -9,7 +9,11 @@ import React, {
 } from "react";
 
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
-import { Error, ErrorHandlerParam, ErrorType } from "@/app/types/errors";
+import {
+  Error as AppError,
+  ErrorHandlerParam,
+  ErrorType,
+} from "@/app/types/errors";
 
 import { ClientError, ServerError } from "./errors";
 
@@ -29,7 +33,7 @@ interface ErrorProviderProps {
 
 type ErrorState = {
   isOpen: boolean;
-  error: Error;
+  error: AppError;
   modalOptions: {
     retryAction?: () => void;
     noCancel?: boolean;
@@ -56,8 +60,11 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   }, []);
 
   const handleError = useCallback(
-    ({ error, displayOptions }: ErrorHandlerParam) => {
+    ({ error, displayOptions, userInfo }: ErrorHandlerParam) => {
       if (!error) return;
+
+      // Extract stack trace if available
+      const stackTrace = error instanceof Error ? error.stack || "" : "";
 
       const eventId = Sentry.withScope((scope) => {
         if (error instanceof ServerError) {
@@ -65,11 +72,35 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
             errorType: ErrorType.SERVER,
             endpoint: error.endpoint,
             status: error.status,
+            trace: stackTrace,
+            ...(userInfo && {
+              userPublicKey: userInfo.userPublicKey,
+              babylonAddress: userInfo.babylonAddress,
+              stakingTxHash: userInfo.stakingTxHash,
+              btcAddress: userInfo.btcAddress,
+            }),
           });
         } else if (error instanceof ClientError) {
           scope.setExtras({
             errorCategory: error.category,
             errorType: error.type ?? ErrorType.UNKNOWN,
+            trace: stackTrace,
+            ...(userInfo && {
+              userPublicKey: userInfo.userPublicKey,
+              babylonAddress: userInfo.babylonAddress,
+              stakingTxHash: userInfo.stakingTxHash,
+              btcAddress: userInfo.btcAddress,
+            }),
+          });
+        } else {
+          scope.setExtras({
+            trace: stackTrace,
+            ...(userInfo && {
+              userPublicKey: userInfo.userPublicKey,
+              babylonAddress: userInfo.babylonAddress,
+              stakingTxHash: userInfo.stakingTxHash,
+              btcAddress: userInfo.btcAddress,
+            }),
           });
         }
         return Sentry.captureException(error);
@@ -78,6 +109,13 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       const errorData = {
         message: error.message,
         sentryEventId: eventId,
+        trace: stackTrace,
+        ...(userInfo && {
+          userPublicKey: userInfo.userPublicKey,
+          babylonAddress: userInfo.babylonAddress,
+          stakingTxHash: userInfo.stakingTxHash,
+          btcAddress: userInfo.btcAddress,
+        }),
         ...(error instanceof ClientError && {
           displayMessage: error.displayMessage,
         }),
