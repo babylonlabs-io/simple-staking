@@ -2,9 +2,11 @@ import Image from "next/image";
 import { twJoin } from "tailwind-merge";
 
 import { Network } from "@/app/types/network";
-import { network } from "@/config/network/btc";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import testnetIcon from "./testnet-icon.png";
+
+const { network } = getNetworkConfigBTC();
 
 export const NetworkBadge = () => {
   return (
