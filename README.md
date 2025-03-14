@@ -40,3 +40,4 @@ npm run dev
 
 Instructions for wallet integration can be found in the
 [bbn-wallet-connect documentation](https://github.com/babylonlabs-io/bbn-wallet-connect).
+
