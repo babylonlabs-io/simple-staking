@@ -17,7 +17,7 @@ import { useClientQuery } from "../../useClient";
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
 const BBN_REWARDS_KEY = "BBN_REWARDS";
-const REWARD_GAUGE_KEY_BTC_DELEGATION = "btc_delegation";
+const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
 
 /**
  * Query service for Babylon which contains all the queries for
