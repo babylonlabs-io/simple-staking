@@ -1,9 +1,9 @@
-export const BBN_CANARY_RPC_URL = "https://rpc.btc-mainnet.babylonlabs.io/";
-export const BBN_CANARY_LCD_URL = "https://lcd.btc-mainnet.babylonlabs.io/";
+export const BBN_CANARY_RPC_URL = "https://rpc.mock-mainnet.babylonlabs.io/";
+export const BBN_CANARY_LCD_URL = "https://lcd.mock-mainnet.babylonlabs.io/";
 
 export const bbnCanary = {
-  chainId: "bbn-priv-main-1",
-  chainName: "Babylon Private Mainnet",
+  chainId: "bbn-mock-1",
+  chainName: "Babylon Mock Mainnet",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
   rpc: BBN_CANARY_RPC_URL,
