@@ -14,7 +14,10 @@ import * as Sentry from "@sentry/nextjs";
 import { getCommitHash } from "@/utils/version";
 
 Sentry.init({
-  enabled: Boolean(process.env.NEXT_PUBLIC_SIDECAR_API_URL),
+  enabled: Boolean(
+    process.env.NEXT_PUBLIC_SIDECAR_API_URL &&
+      process.env.NEXT_PUBLIC_SENTRY_DSN,
+  ),
   // This is pointing to the DSN (Data Source Name) for my local instance.
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
