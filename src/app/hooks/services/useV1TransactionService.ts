@@ -62,10 +62,12 @@ export function useV1TransactionService() {
       stakingTxHex: string,
     ) => {
       const btcStakingManager = createBtcStakingManager();
-      validateCommonInputs(btcStakingManager, stakingInput, stakerBtcInfo);
-      if (!versionedParams?.length) {
-        throw new Error("Staking params not loaded");
-      }
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        stakerBtcInfo,
+        versionedParams,
+      );
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
       // Check if this staking transaction is eligible for unbonding
