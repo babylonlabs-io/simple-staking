@@ -49,7 +49,7 @@ const STATUSES: Record<string, StatusAdapter> = {
   }),
   [State.EARLY_UNBONDING]: ({ networkInfo }) => ({
     label: "Unbonding",
-    tooltip: `Stake unbonding in progress. It will take ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)} before you can withdraw your stake.`,
+    tooltip: `Stake unbonding is in progress. The unbonding time is set to ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)}.`,
   }),
   [State.TIMELOCK_WITHDRAWABLE]: () => ({
     label: "Withdrawable",
@@ -110,7 +110,7 @@ const STATUSES: Record<string, StatusAdapter> = {
   }),
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: ({ networkInfo }) => ({
     label: "Unbonding",
-    tooltip: `Stake unbonding in progress. It will take ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)} before you can withdraw your stake.`,
+    tooltip: `Stake unbonding is in progress. The unbonding time is set to ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)}.`,
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: () => ({
     label: "Withdrawing",
