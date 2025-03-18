@@ -8,14 +8,21 @@ interface TermsPayload {
 const ALLOWED_STATUSES = ["medium", "low"];
 
 export const verifyBTCAddress = async (address: string) => {
-  const { data: response } = await apiWrapper(
+  interface AddressScreeningResponse {
+    data: {
+      btc_address?: {
+        risk: string;
+      };
+    };
+  }
+
+  const { data: response } = await apiWrapper<AddressScreeningResponse>(
     "GET",
     "/address/screening",
     "Error verifying BTC address",
     { query: { btc_address: address } },
   );
 
-  return ALLOWED_STATUSES.includes(
-    response.data?.btc_address?.risk?.toLowerCase(),
-  );
+  const risk = response.data?.btc_address?.risk;
+  return risk ? ALLOWED_STATUSES.includes(risk.toLowerCase()) : false;
 };

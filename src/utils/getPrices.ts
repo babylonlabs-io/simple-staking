@@ -5,7 +5,7 @@ interface PricesResponse {
 }
 
 export const getPrices = async (): Promise<Record<string, number>> => {
-  const response = await apiWrapper(
+  const response = await apiWrapper<PricesResponse>(
     "GET",
     "/v2/prices",
     "Error getting prices",

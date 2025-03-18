@@ -58,7 +58,7 @@ export const getFinalityProvidersV2 = async ({
     name,
   };
 
-  const response = await apiWrapper(
+  const response = await apiWrapper<FinalityProvidersAPIResponse>(
     "GET",
     "/v2/finality-providers",
     "Error getting finality providers",

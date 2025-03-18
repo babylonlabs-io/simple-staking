@@ -1,6 +1,6 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
-import { HttpStatusCode } from "axios";
 
+import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ServerError } from "@/app/context/Error/errors";
 import { Fees } from "@/app/types/fee";

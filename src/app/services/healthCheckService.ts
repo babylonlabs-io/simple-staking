@@ -1,7 +1,6 @@
-import { HttpStatusCode } from "axios";
-
-import { isAxiosError451 } from "../api/error";
+import { isError451 } from "../api/error";
 import { fetchHealthCheck } from "../api/healthCheckClient";
+import { HttpStatusCode } from "../api/httpStatusCodes";
 import { API_ENDPOINTS } from "../constants/endpoints";
 import { ServerError } from "../context/Error/errors/serverError";
 import {
@@ -27,7 +26,7 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
       });
     }
   } catch (error: any) {
-    if (isAxiosError451(error)) {
+    if (isError451(error)) {
       return {
         status: HealthCheckStatus.GeoBlocked,
         message: GEO_BLOCK_MESSAGE,

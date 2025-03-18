@@ -19,7 +19,7 @@ export const logTermsAcceptance = async ({
     public_key: encode(getPublicKeyNoCoord(public_key).toString("hex")),
   };
 
-  const response = await apiWrapper(
+  const response = await apiWrapper<unknown>(
     "POST",
     "/log-terms-acceptance",
     "Error submitting terms acceptance request",

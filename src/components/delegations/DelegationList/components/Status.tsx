@@ -49,7 +49,7 @@ const STATUSES: Record<string, StatusAdapter> = {
   }),
   [State.EARLY_UNBONDING]: ({ networkInfo }) => ({
     label: "Unbonding",
-    tooltip: `It will take ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)} before you can withdraw your stake.`,
+    tooltip: `Stake unbonding is in progress. The unbonding time is set to ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)}.`,
   }),
   [State.TIMELOCK_WITHDRAWABLE]: () => ({
     label: "Withdrawable",
@@ -108,9 +108,9 @@ const STATUSES: Record<string, StatusAdapter> = {
     label: `Pending ${coinName} Confirmation`,
     tooltip: `Stake is pending ${networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0} ${coinName} confirmations`,
   }),
-  [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
+  [State.INTERMEDIATE_UNBONDING_SUBMITTED]: ({ networkInfo }) => ({
     label: "Unbonding",
-    tooltip: "Stake is requesting unbonding",
+    tooltip: `Stake unbonding is in progress. The unbonding time is set to ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)}.`,
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: () => ({
     label: "Withdrawing",
