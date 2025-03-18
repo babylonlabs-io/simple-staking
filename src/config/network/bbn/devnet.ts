@@ -1,5 +1,10 @@
-export const BBN_DEVNET_RPC_URL = "https://rpc-dapp.devnet.babylonlabs.io";
-export const BBN_DEVNET_LCD_URL = "https://lcd-dapp.devnet.babylonlabs.io";
+export const BBN_DEVNET_RPC_URL = process.env.NEXT_PUBLIC_BABY_RPC_URL
+  ? process.env.NEXT_PUBLIC_BABY_RPC_URL
+  : "https://rpc-dapp.devnet.babylonlabs.io/";
+
+export const BBN_DEVNET_LCD_URL = process.env.NEXT_PUBLIC_BABY_LCD_URL
+  ? process.env.NEXT_PUBLIC_BABY_LCD_URL
+  : "https://lcd-dapp.devnet.babylonlabs.io/";
 
 export const bbnDevnet = {
   chainId: "devnet-9",
