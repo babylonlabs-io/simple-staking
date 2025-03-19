@@ -1,4 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
+import React from "react";
 
 import { Connect } from "@/app/components/Wallet/Connect";
 import * as BTCWalletContext from "@/app/context/wallet/BTCWalletProvider";
@@ -6,6 +13,30 @@ import * as CosmosWalletContext from "@/app/context/wallet/CosmosWalletProvider"
 import * as AppStateContext from "@/app/state";
 import * as DelegationV2StateContext from "@/app/state/DelegationV2State";
 import "@testing-library/jest-dom";
+
+// Mock the SVG and image imports
+jest.mock("@/app/assets/bbn.svg", () => "bbn-icon-mock");
+jest.mock("@/app/assets/bitcoin.png", () => "bitcoin-icon-mock");
+jest.mock("@/app/assets/warning-triangle.svg", () => "warning-triangle-mock");
+jest.mock(
+  "@/app/components/Staking/Form/States/connect-icon.svg",
+  () => "connect-icon-mock",
+);
+
+// Mock window.matchMedia - required for useMediaQuery hook
+Object.defineProperty(window, "matchMedia", {
+  writable: true,
+  value: jest.fn().mockImplementation((query) => ({
+    matches: false,
+    media: query,
+    onchange: null,
+    addListener: jest.fn(), // Deprecated
+    removeListener: jest.fn(), // Deprecated
+    addEventListener: jest.fn(),
+    removeEventListener: jest.fn(),
+    dispatchEvent: jest.fn(),
+  })),
+});
 
 // Mock clipboard API
 Object.assign(navigator, {
@@ -35,7 +66,7 @@ jest.mock("@/app/state/DelegationV2State", () => ({
 jest.mock("next/image", () => ({
   __esModule: true,
   default: (props: any) => {
-    return <img {...props} />;
+    return <img src={props.src} alt={props.alt} />;
   },
 }));
 
@@ -49,6 +80,41 @@ jest.mock("@babylonlabs-io/wallet-connector", () => ({
   })),
   useInscriptionProvider: jest.fn(),
 }));
+
+// Mock react-tooltip
+jest.mock("react-tooltip", () => ({
+  Tooltip: () => <div data-testid="tooltip" />,
+}));
+
+// Mock health check hook
+jest.mock("@/app/hooks/useHealthCheck", () => ({
+  useHealthCheck: jest.fn(() => ({
+    isApiNormal: true,
+    isGeoBlocked: false,
+    apiMessage: "",
+  })),
+}));
+
+// Mock breakpoint hooks
+jest.mock("@/app/hooks/useBreakpoint", () => ({
+  useBreakpoint: jest.fn().mockReturnValue(false),
+  useIsMobileView: jest.fn().mockReturnValue(false),
+}));
+
+// Mock Popover from core-ui to prevent act warnings
+jest.mock("@babylonlabs-io/core-ui", () => {
+  const originalModule = jest.requireActual("@babylonlabs-io/core-ui");
+  return {
+    ...originalModule,
+    Popover: ({
+      children,
+      open,
+    }: {
+      children: React.ReactNode;
+      open: boolean;
+    }) => (open ? <div>{children}</div> : null),
+  };
+});
 
 describe("Connect Component", () => {
   const mockPublicKey =
@@ -82,6 +148,7 @@ describe("Connect Component", () => {
       getBTCTipHeight: jest.fn(),
       getInscriptions: jest.fn(),
       open: jest.fn(),
+      network: undefined,
     });
 
     // Mock CosmosWallet context
@@ -124,38 +191,63 @@ describe("Connect Component", () => {
 
   describe("Bitcoin Public Key Button", () => {
     it("should display the Bitcoin public key", async () => {
-      render(<Connect {...mockConnectedProps} />);
+      await act(async () => {
+        render(<Connect {...mockConnectedProps} />);
+      });
 
-      // Open the wallet menu
-      const menuButton = screen.getByRole("button", { name: /menu/i });
-      fireEvent.click(menuButton);
+      // Find and click the menu button
+      const menuButtons = screen.getAllByRole("button");
+      const menuButton = menuButtons.find((button) =>
+        button.className.includes("border rounded border-secondary-contrast"),
+      );
+
+      expect(menuButton).toBeDefined();
+
+      await act(async () => {
+        fireEvent.click(menuButton!);
+      });
 
       // Check that the Bitcoin public key is displayed
-      const publicKeyText = await screen.findByText("Bitcoin Public Key");
-      expect(publicKeyText).toBeInTheDocument();
+      await waitFor(() => {
+        const publicKeyText = screen.getByText("Bitcoin Public Key");
+        expect(publicKeyText).toBeInTheDocument();
 
-      // The public key should be displayed
-      expect(screen.getByText(mockPublicKey)).toBeInTheDocument();
+        // The public key should be displayed
+        expect(screen.getByText(mockPublicKey)).toBeInTheDocument();
+      });
     });
 
     it("should copy the Bitcoin public key when copy button is clicked", async () => {
-      render(<Connect {...mockConnectedProps} />);
+      await act(async () => {
+        render(<Connect {...mockConnectedProps} />);
+      });
 
-      // Open the wallet menu
-      const menuButton = screen.getByRole("button", { name: /menu/i });
-      fireEvent.click(menuButton);
+      // Find and click the menu button
+      const menuButtons = screen.getAllByRole("button");
+      const menuButton = menuButtons.find((button) =>
+        button.className.includes("border rounded border-secondary-contrast"),
+      );
 
-      // Find the copy button (it's inside the container with the public key)
-      const copyButton = screen.getByLabelText("Copy public key");
-      fireEvent.click(copyButton);
+      expect(menuButton).toBeDefined();
+
+      await act(async () => {
+        fireEvent.click(menuButton!);
+      });
+
+      await waitFor(async () => {
+        // Find the copy button (it's next to the public key)
+        const copyButton = screen.getByRole("button", {
+          name: "Copy public key",
+        });
+
+        await act(async () => {
+          fireEvent.click(copyButton);
+        });
+      });
 
       // Check that the clipboard API was called with the correct public key
       expect(navigator.clipboard.writeText).toHaveBeenCalledWith(mockPublicKey);
-
-      // Since we can't directly test for the checkmark icon due to the implementation,
-      // we'll test that the clipboard was called with the correct arguments
       expect(navigator.clipboard.writeText).toHaveBeenCalledTimes(1);
-      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(mockPublicKey);
     });
   });
 });
