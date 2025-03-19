@@ -13,6 +13,8 @@ import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
+import { FiCopy } from "react-icons/fi";
+import { IoIosCheckmarkCircle } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
@@ -47,12 +49,14 @@ export const Connect: React.FC<ConnectProps> = ({
   const { linkedDelegationsVisibility, displayLinkedDelegations } =
     useDelegationV2State();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   // Wallet states
   const {
     loading: btcLoading,
     address: btcAddress,
     connected: btcConnected,
+    publicKeyNoCoord,
   } = useBTCWallet();
   const {
     loading: bbnLoading,
@@ -87,6 +91,12 @@ export const Connect: React.FC<ConnectProps> = ({
     setShowDisconnectModal(false);
     disconnect();
   }, [disconnect]);
+
+  const handleCopyPublicKey = useCallback(() => {
+    navigator.clipboard.writeText(publicKeyNoCoord);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }, [publicKeyNoCoord]);
 
   const renderApiNotAvailableTooltip = useMemo(() => {
     if (!isGeoBlocked && isApiNormal) return null;
@@ -162,6 +172,30 @@ export const Connect: React.FC<ConnectProps> = ({
             noFade
             symbols={12}
           />
+        </div>
+      </div>
+      <div className="flex flex-col justify-start items-start self-stretch mb-1 gap-2">
+        <Text variant="body2" className="text-sm text-accent-primary">
+          Bitcoin Public Key
+        </Text>
+        <div className="flex justify-between items-center px-[12.5px] py-[10px] rounded border border-secondary-strokeLight bg-surface w-[250px]">
+          <Text
+            variant="body2"
+            className="text-accent-secondary break-all w-full mr-2"
+          >
+            {publicKeyNoCoord}
+            <button
+              onClick={handleCopyPublicKey}
+              className="text-accent-secondary cursor-pointer flex-shrink-0 ml-1"
+              aria-label="Copy public key"
+            >
+              {copied ? (
+                <IoIosCheckmarkCircle className="w-3 h-3" />
+              ) : (
+                <FiCopy className="w-3 h-3" />
+              )}
+            </button>
+          </Text>
         </div>
       </div>
       <div className="flex flex-row items-center justify-between">
