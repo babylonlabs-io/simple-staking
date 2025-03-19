@@ -162,7 +162,7 @@ export function Status({ delegation }: StatusProps) {
 
   const delegationStatus = useMemo(
     () =>
-      FP_STATUSES[delegation.fp.state]?.[delegation.state]?.({
+      FP_STATUSES[delegation.fp?.state]?.[delegation.state]?.({
         delegation,
         networkInfo,
       }) ??

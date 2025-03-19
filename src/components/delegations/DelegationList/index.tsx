@@ -28,34 +28,37 @@ const columns: TableColumn<DelegationWithFP, TableParams>[] = [
   {
     field: "Inception",
     headerName: "Inception",
-    width: "max-content",
+    width: "minmax(max-content, 1fr)",
     renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
   },
   {
     field: "finalityProvider",
     headerName: "Finality Provider",
-    width: "max-content",
+    width: "minmax(max-content, 1fr)",
     renderCell: (row) => <FinalityProviderMoniker value={row.fp} />,
   },
   {
     field: "stakingAmount",
     headerName: "Amount",
-    width: "max-content",
+    width: "minmax(max-content, 1fr)",
     renderCell: (row) => <Amount value={row.stakingAmount} />,
   },
   {
     field: "stakingTxHashHex",
     headerName: "Transaction ID",
+    width: "minmax(max-content, 1fr)",
     renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
   },
   {
     field: "state",
     headerName: "Status",
+    width: "minmax(max-content, 1fr)",
     renderCell: (row) => <Status delegation={row} />,
   },
   {
     field: "actions",
     headerName: "Action",
+    width: "minmax(max-content, 0.5fr)",
     renderCell: (row, _, { handleActionClick, validations }) => {
       const { valid, error } = validations[row.stakingTxHashHex];
 

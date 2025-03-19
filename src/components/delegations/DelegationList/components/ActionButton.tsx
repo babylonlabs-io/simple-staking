@@ -63,7 +63,7 @@ export function ActionButton({
   onClick,
 }: ActionButtonProps) {
   const buttonProps =
-    ACTION_BUTTON_PROPS[delegation.fp.state]?.[delegation.state] ??
+    ACTION_BUTTON_PROPS[delegation.fp?.state]?.[delegation.state] ??
     FALLBACK_PROPS[delegation.state];
 
   if (!buttonProps) return null;
