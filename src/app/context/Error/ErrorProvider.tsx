@@ -9,6 +9,8 @@ import React, {
 } from "react";
 
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import {
   Error as AppError,
   ErrorHandlerParam,
@@ -52,6 +54,9 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     modalOptions: {},
   });
 
+  const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
+  const { bech32Address: cosmosAddress } = useCosmosWallet();
+
   const dismissError = useCallback(() => {
     setState((prev) => ({ ...prev, isOpen: false }));
     setTimeout(() => {
@@ -66,6 +71,14 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       // Extract stack trace if available
       const stackTrace = error instanceof Error ? error.stack || "" : "";
 
+      // Combine provided userInfo with wallet context
+      const combinedUserInfo = {
+        userPublicKey: userInfo?.userPublicKey || publicKeyNoCoord,
+        babylonAddress: userInfo?.babylonAddress || cosmosAddress,
+        btcAddress: userInfo?.btcAddress || btcAddress,
+        stakingTxHash: userInfo?.stakingTxHash,
+      };
+
       const eventId = Sentry.withScope((scope) => {
         if (error instanceof ServerError) {
           scope.setExtras({
@@ -73,34 +86,19 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
             endpoint: error.endpoint,
             status: error.status,
             trace: stackTrace,
-            ...(userInfo && {
-              userPublicKey: userInfo.userPublicKey,
-              babylonAddress: userInfo.babylonAddress,
-              stakingTxHash: userInfo.stakingTxHash,
-              btcAddress: userInfo.btcAddress,
-            }),
+            ...combinedUserInfo,
           });
         } else if (error instanceof ClientError) {
           scope.setExtras({
             errorCategory: error.category,
             errorType: error.type ?? ErrorType.UNKNOWN,
             trace: stackTrace,
-            ...(userInfo && {
-              userPublicKey: userInfo.userPublicKey,
-              babylonAddress: userInfo.babylonAddress,
-              stakingTxHash: userInfo.stakingTxHash,
-              btcAddress: userInfo.btcAddress,
-            }),
+            ...combinedUserInfo,
           });
         } else {
           scope.setExtras({
             trace: stackTrace,
-            ...(userInfo && {
-              userPublicKey: userInfo.userPublicKey,
-              babylonAddress: userInfo.babylonAddress,
-              stakingTxHash: userInfo.stakingTxHash,
-              btcAddress: userInfo.btcAddress,
-            }),
+            ...combinedUserInfo,
           });
         }
         return Sentry.captureException(error);
@@ -110,12 +108,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         message: error.message,
         sentryEventId: eventId,
         trace: stackTrace,
-        ...(userInfo && {
-          userPublicKey: userInfo.userPublicKey,
-          babylonAddress: userInfo.babylonAddress,
-          stakingTxHash: userInfo.stakingTxHash,
-          btcAddress: userInfo.btcAddress,
-        }),
+        ...combinedUserInfo,
         ...(error instanceof ClientError && {
           displayMessage: error.displayMessage,
         }),
@@ -135,7 +128,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         },
       });
     },
-    [],
+    [publicKeyNoCoord, cosmosAddress, btcAddress],
   );
 
   const contextValue = useMemo(
