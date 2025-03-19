@@ -62,7 +62,7 @@ export function useDelegationService() {
     delegations = [],
     fetchMoreDelegations,
     hasMoreDelegations,
-    isLoading,
+    isLoading: isDelegationLoading,
     updateDelegationStatus,
   } = useDelegationV2State();
 
@@ -74,17 +74,22 @@ export function useDelegationService() {
     submitSlashingWithdrawalTx,
   } = useTransactionService();
 
-  const { finalityProviderMap } = useFinalityProviderState();
+  const { isFetching: isFPLoading, finalityProviderMap } =
+    useFinalityProviderState();
+
+  const isLoading = isDelegationLoading || isFPLoading;
 
   const delegationsWithFP = useMemo(
     () =>
-      delegations.map((d) => ({
-        ...d,
-        fp: finalityProviderMap.get(
-          d.finalityProviderBtcPksHex[0],
-        ) as FinalityProvider,
-      })),
-    [delegations, finalityProviderMap],
+      !isLoading
+        ? delegations.map((d) => ({
+            ...d,
+            fp: finalityProviderMap.get(
+              d.finalityProviderBtcPksHex[0],
+            ) as FinalityProvider,
+          }))
+        : [],
+    [isLoading, delegations, finalityProviderMap],
   );
 
   const validations = useMemo(
