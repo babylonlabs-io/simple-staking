@@ -22,6 +22,8 @@ import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
+const { chainId, rpc } = getNetworkConfigBBN();
+
 interface CosmosWalletContextProps {
   loading: boolean;
   bech32Address: string;
@@ -53,7 +55,6 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
   const { open = () => {} } = useWalletConnect();
   const bbnConnector = useChainConnector("BBN");
-  const { rpc } = getNetworkConfigBBN();
 
   const cosmosDisconnect = useCallback(() => {
     setBBNWalletProvider(undefined);
@@ -67,12 +68,16 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       setLoading(true);
 
       try {
-        const address = await provider.getAddress();
         const offlineSigner = provider.getOfflineSignerAuto
           ? // use `auto` (if it is provided) for direct and amino support
             await provider.getOfflineSignerAuto()
           : // otherwise, use `getOfflineSigner` for direct signer
             await provider.getOfflineSigner();
+
+        // @ts-ignore - chainId is missing in keplr types
+        if (offlineSigner.chainId && offlineSigner.chainId !== chainId) return;
+
+        const address = await provider.getAddress();
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
           offlineSigner as OfflineSigner,
@@ -94,7 +99,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError, rpc],
+    [handleError],
   );
 
   // Listen for Babylon account changes

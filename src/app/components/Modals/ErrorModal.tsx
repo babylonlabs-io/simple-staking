@@ -1,24 +1,22 @@
 import {
   Button,
-  Dialog,
   DialogBody,
   DialogFooter,
   Heading,
-  MobileDialog,
   Text,
 } from "@babylonlabs-io/core-ui";
+import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FiCheck, FiCopy } from "react-icons/fi";
-import { MdOutlineSwapHoriz } from "react-icons/md";
 
+import WarningTriangle from "@/app/assets/warning-triangle.svg";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { ErrorType, ShowErrorParams } from "@/app/types/errors";
 import { getCommitHash } from "@/utils/version";
 
+import { ResponsiveDialog } from "./ResponsiveDialog";
+
 export const ErrorModal: React.FC = () => {
-  const isMobileView = useIsMobileView();
-  const DialogComponent = isMobileView ? MobileDialog : Dialog;
   const { error, modalOptions, dismissError, isOpen } = useError();
   const { retryAction, noCancel } = modalOptions;
   const [copied, setCopied] = useState(false);
@@ -50,7 +48,7 @@ export const ErrorModal: React.FC = () => {
     [ErrorType.REGISTRATION]: "Transition Error",
     [ErrorType.DELEGATIONS]: "Delegations Error",
     [ErrorType.WALLET]: "Wallet Error",
-    [ErrorType.UNKNOWN]: "Unknown Error",
+    [ErrorType.UNKNOWN]: "System Error",
   };
 
   const ERROR_MESSAGES = {
@@ -61,7 +59,7 @@ export const ErrorModal: React.FC = () => {
     [ErrorType.DELEGATIONS]: "Failed to fetch delegations due to:",
     [ErrorType.REGISTRATION]: "Failed to transition due to:",
     [ErrorType.WALLET]: "Failed to perform wallet action due to:",
-    [ErrorType.UNKNOWN]: "An unknown error occurred:",
+    [ErrorType.UNKNOWN]: "A system error occurred:",
   };
 
   const getErrorTitle = () => {
@@ -106,26 +104,28 @@ export const ErrorModal: React.FC = () => {
   }, [copied]);
 
   return (
-    <DialogComponent
-      backdropClassName="z-[100]"
+    <ResponsiveDialog
       className="z-[150]"
+      backdropClassName="z-[100]"
       open={isOpen}
       onClose={dismissError}
     >
-      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 items-center justify-center">
-        <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
-          <MdOutlineSwapHoriz className="text-5xl text-primary-light" />
+      <DialogBody className="text-accent-primary py-16 text-center">
+        <div className="inline-flex bg-primary-contrast h-20 w-20 items-center justify-center mb-6">
+          <Image src={WarningTriangle} alt="Warning" width={48} height={42} />
         </div>
-        <Heading variant="h3" className="text-center font-bold text-error-main">
+
+        <Heading variant="h4" className="mb-4 text-accent-primary">
           {getErrorTitle()}
         </Heading>
+
         <div className="flex flex-col gap-3">
-          <Text variant="body1" className="text-center">
+          <Text variant="body1" className="text-center text-accent-secondary">
             {getErrorMessage()}
           </Text>
           <div className="flex items-center justify-center gap-2 mt-2">
             <button
-              className="flex items-center gap-1 text-sm text-primary-dark hover:opacity-70"
+              className="flex items-center gap-1 text-sm text-accent-secondary hover:opacity-70"
               onClick={copyErrorDetails}
             >
               {copied ? (
@@ -138,7 +138,8 @@ export const ErrorModal: React.FC = () => {
           </div>
         </div>
       </DialogBody>
-      <DialogFooter className="mt-4 flex justify-around gap-4">
+
+      <DialogFooter className="flex gap-4">
         {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
           <Button
             variant="outlined"
@@ -155,6 +156,6 @@ export const ErrorModal: React.FC = () => {
           </Button>
         )}
       </DialogFooter>
-    </DialogComponent>
+    </ResponsiveDialog>
   );
 };

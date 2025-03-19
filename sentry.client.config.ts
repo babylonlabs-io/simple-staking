@@ -14,6 +14,10 @@ import * as Sentry from "@sentry/nextjs";
 import { getCommitHash } from "@/utils/version";
 
 Sentry.init({
+  enabled: Boolean(
+    process.env.NEXT_PUBLIC_SIDECAR_API_URL &&
+      process.env.NEXT_PUBLIC_SENTRY_DSN,
+  ),
   // This is pointing to the DSN (Data Source Name) for my local instance.
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
@@ -32,16 +36,27 @@ Sentry.init({
 
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: 1,
+  tracesSampler: (samplingContext) => {
+    const hasErrorTag = samplingContext.tags?.error === "true";
+
+    // Only sample at 100% if it's an error transaction with the error tag
+    if (hasErrorTag) {
+      return 1.0;
+    }
+
+    // Default sampling rate for everything else
+    return 0.01;
+  },
+
+  enableTracing: true,
 
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
+
   replaysOnErrorSampleRate: 1.0,
 
-  // This sets the sample rate to be 10%. You may want this to be 100% while
-  // in development and sample at a lower rate in production
-  replaysSessionSampleRate: 0.1,
+  replaysSessionSampleRate: 0,
 
-  // You can remove this option if you're not planning to use the Sentry Session Replay feature:
   integrations: [
     Sentry.replayIntegration({
       // Additional Replay configuration goes in here, for example:
