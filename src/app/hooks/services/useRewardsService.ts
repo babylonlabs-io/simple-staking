@@ -2,6 +2,7 @@ import { incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { useCallback } from "react";
 
 import { useRewardsState } from "@/app/state/RewardState";
+import { shouldUseLegacyRewardsQuery } from "@/config/feature-flags";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
@@ -72,8 +73,13 @@ export const useRewardsService = () => {
 };
 
 const createWithdrawRewardMsg = (bech32Address: string) => {
+  let type = "btc_staker";
+  if (shouldUseLegacyRewardsQuery()) {
+    type = "btc_delegation";
+  }
+
   const withdrawRewardMsg = incentivetx.MsgWithdrawReward.fromPartial({
-    type: "btc_staker",
+    type,
     address: bech32Address,
   });
 

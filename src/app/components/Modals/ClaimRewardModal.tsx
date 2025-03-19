@@ -1,7 +1,7 @@
 import { Heading, Text } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 
-import { shouldDisplayTestingMsg } from "@/config";
+import { shouldDisplayTestingMsg } from "@/config/feature-flags";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { ubbnToBaby } from "@/utils/bbn";
 import { trim } from "@/utils/trim";

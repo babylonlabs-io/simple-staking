@@ -7,7 +7,7 @@ import {
 import { PropsWithChildren, useState } from "react";
 import { MdCelebration } from "react-icons/md";
 
-import { shouldDisplayTestingMsg } from "@/config";
+import { shouldDisplayTestingMsg } from "@/config/feature-flags";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 

@@ -11,6 +11,7 @@ import {
 import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { shouldUseLegacyRewardsQuery } from "@/config/feature-flags";
 
 import { useClientQuery } from "../../useClient";
 
@@ -62,15 +63,20 @@ export const useBbnQuery = () => {
         return 0;
       }
 
-      const coins =
-        rewards.rewardGauges[REWARD_GAUGE_KEY_BTC_DELEGATION]?.coins;
+      let type = REWARD_GAUGE_KEY_BTC_DELEGATION;
+      if (shouldUseLegacyRewardsQuery()) {
+        type = "BTC_DELEGATION";
+      }
+
+      const coins = rewards.rewardGauges[type]?.coins;
       if (!coins) {
         return 0;
       }
 
-      const withdrawnCoins = rewards.rewardGauges[
-        REWARD_GAUGE_KEY_BTC_DELEGATION
-      ]?.withdrawnCoins.reduce((acc, coin) => acc + Number(coin.amount), 0);
+      const withdrawnCoins = rewards.rewardGauges[type]?.withdrawnCoins.reduce(
+        (acc, coin) => acc + Number(coin.amount),
+        0,
+      );
 
       return (
         coins.reduce((acc, coin) => acc + Number(coin.amount), 0) -
