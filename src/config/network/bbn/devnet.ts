@@ -7,8 +7,8 @@ export const BBN_DEVNET_LCD_URL = process.env.NEXT_PUBLIC_BABY_LCD_URL
   : "https://lcd-dapp.devnet.babylonlabs.io/";
 
 export const bbnDevnet = {
-  chainId: "devnet-9",
-  chainName: "Babylon Devnet 9",
+  chainId: "devnet-10",
+  chainName: "Babylon Devnet 10",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-dev/chain.png",
   rpc: BBN_DEVNET_RPC_URL,
