@@ -1,12 +1,10 @@
 import { Card, Heading } from "@babylonlabs-io/core-ui";
-import Link from "next/link";
 
-import { DOCUMENTATION_LINKS } from "@/app/constants";
 import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { type DelegationV2 } from "@/app/types/delegationsV2";
+import { DelegationWithFP, type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/config/network";
@@ -22,12 +20,11 @@ import { NoDelegations } from "./NoDelegations";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
-  slashedStatuses: Record<string, { isFpSlashed: boolean }>;
 };
 
 const networkConfig = getNetworkConfig();
 
-const columns: TableColumn<DelegationV2, TableParams>[] = [
+const columns: TableColumn<DelegationWithFP, TableParams>[] = [
   {
     field: "Inception",
     headerName: "Inception",
@@ -38,9 +35,7 @@ const columns: TableColumn<DelegationV2, TableParams>[] = [
     field: "finalityProvider",
     headerName: "Finality Provider",
     width: "max-content",
-    renderCell: (row) => (
-      <FinalityProviderMoniker value={row.finalityProviderBtcPksHex[0]} />
-    ),
+    renderCell: (row) => <FinalityProviderMoniker value={row.fp} />,
   },
   {
     field: "stakingAmount",
@@ -61,36 +56,14 @@ const columns: TableColumn<DelegationV2, TableParams>[] = [
   {
     field: "actions",
     headerName: "Action",
-    renderCell: (
-      row,
-      _,
-      { handleActionClick, validations, slashedStatuses },
-    ) => {
+    renderCell: (row, _, { handleActionClick, validations }) => {
       const { valid, error } = validations[row.stakingTxHashHex];
-      const { isFpSlashed } = slashedStatuses[row.stakingTxHashHex] || {};
-      const tooltip = isFpSlashed ? (
-        <>
-          <span>
-            This finality provider has been slashed.{" "}
-            <Link
-              className="text-secondary-main"
-              target="_blank"
-              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
-            >
-              Learn more
-            </Link>
-          </span>
-        </>
-      ) : (
-        error
-      );
 
       return (
         <ActionButton
           disabled={!valid}
-          tooltip={tooltip}
+          tooltip={error}
           delegation={row}
-          state={row.state}
           onClick={handleActionClick}
         />
       );
@@ -110,7 +83,6 @@ export function DelegationList() {
     executeDelegationAction,
     openConfirmationModal,
     closeConfirmationModal,
-    slashedStatuses,
   } = useDelegationService();
 
   return (
@@ -138,7 +110,6 @@ export function DelegationList() {
         params={{
           handleActionClick: openConfirmationModal,
           validations,
-          slashedStatuses,
         }}
         fallback={<NoDelegations />}
       />

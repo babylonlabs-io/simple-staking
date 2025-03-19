@@ -1,23 +1,23 @@
 import Link from "next/link";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
-import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
-import { FinalityProviderState } from "@/app/types/finalityProviders";
+import {
+  FinalityProvider,
+  FinalityProviderState,
+} from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
 
 interface FinalityProviderMonikerProps {
-  value: string;
+  value: FinalityProvider;
 }
 
 const STATUSES: Record<
-  FinalityProviderState,
+  string,
   {
     tooltip?: React.ReactNode;
     status?: "warning" | "error";
   }
 > = {
-  [FinalityProviderState.ACTIVE]: {},
-  [FinalityProviderState.INACTIVE]: {},
   [FinalityProviderState.JAILED]: {
     tooltip: (
       <span>
@@ -51,14 +51,11 @@ const STATUSES: Record<
 };
 
 export function FinalityProviderMoniker({
-  value,
+  value: finalProvider,
 }: FinalityProviderMonikerProps) {
-  const { getFinalityProvider } = useFinalityProviderState();
-
-  const finalProvider = getFinalityProvider(value);
   const moniker = finalProvider?.description?.moniker ?? "-";
   const state = finalProvider?.state ?? FinalityProviderState.ACTIVE;
-  const { tooltip, status } = STATUSES[state as FinalityProviderState] ?? {};
+  const { tooltip, status } = STATUSES[state] ?? {};
 
   return (
     <Hint tooltip={tooltip} status={status}>
