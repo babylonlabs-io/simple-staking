@@ -47,7 +47,6 @@ export const Connect: React.FC<ConnectProps> = ({
   const { linkedDelegationsVisibility, displayLinkedDelegations } =
     useDelegationV2State();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   // Wallet states
   const {
@@ -89,12 +88,6 @@ export const Connect: React.FC<ConnectProps> = ({
     setShowDisconnectModal(false);
     disconnect();
   }, [disconnect]);
-
-  const handleCopyPublicKey = useCallback(() => {
-    navigator.clipboard.writeText(publicKeyNoCoord);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }, [publicKeyNoCoord]);
 
   const renderApiNotAvailableTooltip = useMemo(() => {
     if (!isGeoBlocked && isApiNormal) return null;
