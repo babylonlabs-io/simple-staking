@@ -79,7 +79,6 @@ export const ErrorModal: React.FC = () => {
         version,
         release: version,
         environment: process.env.NODE_ENV,
-        ...(error.trace && { trace: error.trace }),
         ...error,
       },
       null,
