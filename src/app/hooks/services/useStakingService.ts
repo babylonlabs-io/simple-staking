@@ -3,9 +3,7 @@ import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError } from "@/app/context/Error/errors";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
   type FormFields,
@@ -16,16 +14,12 @@ import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
-import { ErrorType } from "@/app/types/errors";
 import { retry } from "@/utils";
 import { btcToSatoshi } from "@/utils/btc";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
 import { useTransactionService } from "./useTransactionService";
-
-// Set this to true to trigger the test error, false to disable
-const ENABLE_TEST_ERROR = true;
 
 type StakingSigningStep = Extract<
   SigningStep,
@@ -89,29 +83,10 @@ export function useStakingService() {
 
   const displayPreview = useCallback(
     (formFields: FormFields) => {
-      if (process.env.NODE_ENV !== "production" && ENABLE_TEST_ERROR) {
-        const testError = new ClientError({
-          message: "This is a test error to verify error handling",
-          type: ErrorType.STAKING,
-          category: ClientErrorCategory.CLIENT_TRANSACTION,
-        });
-
-        handleError({
-          error: testError,
-          displayOptions: {
-            retryAction: () => displayPreview(formFields),
-          },
-          userInfo: {
-            stakingTxHash: "test-tx-hash-12345",
-          },
-        });
-        return;
-      }
-
       setFormData(formFields);
       goToStep(StakingStep.PREVIEW);
     },
-    [setFormData, goToStep, handleError],
+    [setFormData, goToStep],
   );
 
   const createEOI = useCallback(
@@ -229,32 +204,5 @@ export function useStakingService() {
     ],
   );
 
-  // Function to trigger a test error for debugging
-  const triggerTestError = useCallback(() => {
-    if (process.env.NODE_ENV !== "production") {
-      const testError = new ClientError({
-        message: "This is a manually triggered test error",
-        type: ErrorType.STAKING,
-        category: ClientErrorCategory.CLIENT_TRANSACTION,
-      });
-
-      handleError({
-        error: testError,
-        displayOptions: {
-          retryAction: () => console.log("Retry action triggered"),
-        },
-        userInfo: {
-          stakingTxHash: "test-tx-hash-manual-trigger",
-        },
-      });
-    }
-  }, [handleError]);
-
-  return {
-    calculateFeeAmount,
-    displayPreview,
-    createEOI,
-    stakeDelegation,
-    triggerTestError, // Export the test function
-  };
+  return { calculateFeeAmount, displayPreview, createEOI, stakeDelegation };
 }

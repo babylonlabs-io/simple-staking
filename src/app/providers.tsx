@@ -8,7 +8,6 @@ import { ThemeProvider } from "next-themes";
 import React, { Suspense } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
-import { TestErrorButton } from "./components/TestErrorButton";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
@@ -35,7 +34,6 @@ function Providers({ children }: React.PropsWithChildren) {
                           <ReactQueryStreamedHydration>
                             {children}
                           </ReactQueryStreamedHydration>
-                          <TestErrorButton />
                         </StakingStatsProvider>
                       </AppState>
                     </CosmosWalletProvider>
