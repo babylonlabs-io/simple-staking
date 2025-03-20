@@ -1,10 +1,13 @@
+import Link from "next/link";
 import { useMemo, type JSX } from "react";
 
+import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useAppState } from "@/app/state";
 import {
-  DelegationV2,
+  DelegationWithFP,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
+import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { NetworkInfo } from "@/app/types/networkInfo";
 import { Hint } from "@/components/common/Hint";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -13,11 +16,11 @@ import { blocksToDisplayTime } from "@/utils/time";
 import { SlashingContent } from "./SlashingContent";
 
 interface StatusProps {
-  delegation: DelegationV2;
+  delegation: DelegationWithFP;
 }
 
 interface StatusParams {
-  delegation: DelegationV2;
+  delegation: DelegationWithFP;
   networkInfo?: NetworkInfo;
 }
 
@@ -130,12 +133,40 @@ const STATUSES: Record<string, StatusAdapter> = {
   }),
 };
 
+const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
+  [FinalityProviderState.ACTIVE]: {},
+  [FinalityProviderState.SLASHED]: {
+    [State.VERIFIED]: () => ({
+      label: "Invalid",
+      tooltip: (
+        <>
+          This Finality Provider has been slashed and is no longer available for
+          staking.{" "}
+          <Link
+            className="text-secondary-main"
+            target="_blank"
+            href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+          >
+            Learn more
+          </Link>
+        </>
+      ),
+    }),
+  },
+  [FinalityProviderState.INACTIVE]: {},
+  [FinalityProviderState.JAILED]: {},
+};
+
 export function Status({ delegation }: StatusProps) {
   const { networkInfo } = useAppState();
 
   const delegationStatus = useMemo(
     () =>
-      STATUSES[delegation.state]({
+      FP_STATUSES[delegation.fp?.state]?.[delegation.state]?.({
+        delegation,
+        networkInfo,
+      }) ??
+      STATUSES[delegation.state]?.({
         delegation,
         networkInfo,
       }),
