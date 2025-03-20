@@ -13,8 +13,6 @@ import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
-import { FiCopy } from "react-icons/fi";
-import { IoIosCheckmarkCircle } from "react-icons/io";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
@@ -174,30 +172,6 @@ export const Connect: React.FC<ConnectProps> = ({
           />
         </div>
       </div>
-      <div className="flex flex-col justify-start items-start self-stretch mb-1 gap-2">
-        <Text variant="body2" className="text-sm text-accent-primary">
-          Bitcoin Public Key
-        </Text>
-        <div className="flex justify-between items-center px-[12.5px] py-[10px] rounded border border-secondary-strokeLight bg-surface w-[250px]">
-          <Text
-            variant="body2"
-            className="text-accent-secondary break-all w-full mr-2"
-          >
-            {publicKeyNoCoord}
-            <button
-              onClick={handleCopyPublicKey}
-              className="text-accent-secondary cursor-pointer flex-shrink-0 ml-1"
-              aria-label="Copy public key"
-            >
-              {copied ? (
-                <IoIosCheckmarkCircle className="w-3 h-3" />
-              ) : (
-                <FiCopy className="w-3 h-3" />
-              )}
-            </button>
-          </Text>
-        </div>
-      </div>
       <div className="flex flex-row items-center justify-between">
         <Text variant="body2" className="text-sm text-accent-primary">
           {ordinalsExcluded ? "Not using Inscriptions" : "Using Inscriptions"}
@@ -223,6 +197,18 @@ export const Connect: React.FC<ConnectProps> = ({
             onChange={displayLinkedDelegations}
           />
         </div>
+      </div>
+      <div className="flex flex-col justify-start items-start self-stretch mb-1 gap-2">
+        <Text variant="body2" className="text-sm text-accent-primary">
+          Public Key
+        </Text>
+        <Hash
+          className="text-accent-secondary"
+          value={publicKeyNoCoord}
+          address
+          noFade
+          symbols={12}
+        />
       </div>
       <div className="divider my-0" />
       <div className="flex flex-row gap-2">
