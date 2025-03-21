@@ -15,7 +15,7 @@ export const DOCUMENTATION_LINKS = {
     "https://babylonlabs.io/blog/technical-preliminaries-of-bitcoin-staking",
 } as const;
 
-export const BBN_FEE_AMOUNT = process.env.NEXT_PUBLIC_BBN_FEE_AMOUNT;
+export const BBN_FEE_AMOUNT = process.env.NEXT_PUBLIC_BBN_FEE_AMOUNT || 5;
 
 export const MEMPOOL_API =
   process.env.NEXT_PUBLIC_MEMPOOL_API || "https://mempool.space";
