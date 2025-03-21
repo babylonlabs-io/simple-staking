@@ -3,61 +3,78 @@ import { Button } from "@babylonlabs-io/core-ui";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
 import {
-  DelegationV2,
-  DelegationV2StakingState as State,
+  DelegationV2StakingState as DelegationState,
+  DelegationWithFP,
 } from "@/app/types/delegationsV2";
+import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
 
 interface ActionButtonProps {
   disabled?: boolean;
   tooltip?: string | JSX.Element;
-  delegation: DelegationV2;
-  state: string;
-  onClick?: (action: ActionType, delegation: DelegationV2) => void;
+  delegation: DelegationWithFP;
+  onClick?: (action: ActionType, delegation: DelegationWithFP) => void;
 }
 
-const ACTION_BUTTON_PROPS: Record<
+type Actions = Record<
   string,
-  { action: ActionType; title: string }
-> = {
-  [State.VERIFIED]: {
-    action: ACTIONS.STAKE,
-    title: "Stake",
+  Record<string, { action: ActionType; title: string }>
+>;
+
+const ACTION_BUTTON_PROPS: Actions = {
+  [FinalityProviderState.ACTIVE]: {
+    [DelegationState.VERIFIED]: {
+      action: ACTIONS.STAKE,
+      title: "Stake",
+    },
   },
-  [State.ACTIVE]: {
+  [FinalityProviderState.INACTIVE]: {},
+  [FinalityProviderState.JAILED]: {},
+  [FinalityProviderState.SLASHED]: {},
+};
+
+const FALLBACK_PROPS: Record<string, { action: ActionType; title: string }> = {
+  [DelegationState.ACTIVE]: {
     action: ACTIONS.UNBOND,
     title: "Unbond",
   },
-  [State.EARLY_UNBONDING_WITHDRAWABLE]: {
+  [DelegationState.EARLY_UNBONDING_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
     title: "Withdraw",
   },
-  [State.TIMELOCK_WITHDRAWABLE]: {
+  [DelegationState.TIMELOCK_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_TIMELOCK,
     title: "Withdraw",
   },
-  [State.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+  [DelegationState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
     title: "Withdraw",
   },
-  [State.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+  [DelegationState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
     action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
     title: "Withdraw",
   },
 };
 
-export function ActionButton(props: ActionButtonProps) {
-  const buttonProps = ACTION_BUTTON_PROPS[props.state];
+export function ActionButton({
+  disabled,
+  delegation,
+  tooltip,
+  onClick,
+}: ActionButtonProps) {
+  const buttonProps =
+    ACTION_BUTTON_PROPS[delegation.fp?.state]?.[delegation.state] ??
+    FALLBACK_PROPS[delegation.state];
 
   if (!buttonProps) return null;
 
   return (
-    <Hint tooltip={props.tooltip} attachToChildren={true}>
+    <Hint tooltip={tooltip} attachToChildren>
       <Button
         variant="outlined"
         size="small"
-        onClick={() => props.onClick?.(buttonProps.action, props.delegation)}
-        disabled={props.disabled}
+        onClick={() => onClick?.(buttonProps.action, delegation)}
+        disabled={disabled}
       >
         {buttonProps.title}
       </Button>
