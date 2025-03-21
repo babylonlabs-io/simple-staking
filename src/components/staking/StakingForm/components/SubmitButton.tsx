@@ -13,7 +13,7 @@ export function SubmitButton() {
     (fieldName) => (errors[fieldName]?.message as string) ?? "",
   );
 
-  const invalid = !isValid || bbnBalance === 0;
+  // const invalid = !isValid || bbnBalance === 0;
   const tooltip =
     errorMessage ??
     (bbnBalance === 0 ? "Insufficient BABY Balance in Babylon Wallet" : "");
@@ -22,13 +22,13 @@ export function SubmitButton() {
     <span
       className="cursor-pointer text-xs mt-8"
       data-tooltip-id="tooltip-staking-preview"
-      data-tooltip-content={invalid ? tooltip : ""}
+      // data-tooltip-content={invalid ? tooltip : ""}
       data-tooltip-place="top"
     >
       <Button
         //@ts-ignore - fix type issue in core-ui
         type="submit"
-        disabled={invalid}
+        // disabled={invalid}
         size="large"
         fluid
       >

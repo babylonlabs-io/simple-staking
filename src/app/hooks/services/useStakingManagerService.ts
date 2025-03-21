@@ -46,6 +46,7 @@ export const useStakingManagerService = () => {
 
     const btcProvider = {
       signPsbt: async (signingStep: SigningStep, psbt: string) => {
+        console.log("psbt", psbt);
         eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
         return signPsbt(psbt);
       },
