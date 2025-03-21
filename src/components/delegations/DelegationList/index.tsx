@@ -6,6 +6,7 @@ import {
 } from "@/app/hooks/services/useDelegationService";
 import { DelegationWithFP, type DelegationV2 } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
+import { Hint } from "@/components/common/Hint";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/config/network";
 
@@ -53,7 +54,11 @@ const columns: TableColumn<DelegationWithFP, TableParams>[] = [
     field: "state",
     headerName: "Status",
     width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <Status delegation={row} />,
+    renderCell: (row, _, { validations }) => {
+      const { valid } = validations[row.stakingTxHashHex];
+      if (!valid) return <Hint>Invalid</Hint>;
+      return <Status delegation={row} />;
+    },
   },
   {
     field: "actions",
@@ -62,9 +67,11 @@ const columns: TableColumn<DelegationWithFP, TableParams>[] = [
     renderCell: (row, _, { handleActionClick, validations }) => {
       const { valid, error } = validations[row.stakingTxHashHex];
 
+      // Hide the action button if the delegation is invalid
+      if (!valid) return null;
+
       return (
         <ActionButton
-          disabled={!valid}
           tooltip={error}
           delegation={row}
           onClick={handleActionClick}

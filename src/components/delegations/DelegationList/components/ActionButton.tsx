@@ -10,7 +10,6 @@ import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
 
 interface ActionButtonProps {
-  disabled?: boolean;
   tooltip?: string | JSX.Element;
   delegation: DelegationWithFP;
   onClick?: (action: ActionType, delegation: DelegationWithFP) => void;
@@ -57,7 +56,6 @@ const FALLBACK_PROPS: Record<string, { action: ActionType; title: string }> = {
 };
 
 export function ActionButton({
-  disabled,
   delegation,
   tooltip,
   onClick,
@@ -74,7 +72,6 @@ export function ActionButton({
         variant="outlined"
         size="small"
         onClick={() => onClick?.(buttonProps.action, delegation)}
-        disabled={disabled}
       >
         {buttonProps.title}
       </Button>
