@@ -53,6 +53,7 @@ export const Connect: React.FC<ConnectProps> = ({
     loading: btcLoading,
     address: btcAddress,
     connected: btcConnected,
+    publicKeyNoCoord,
   } = useBTCWallet();
   const {
     loading: bbnLoading,
@@ -189,6 +190,18 @@ export const Connect: React.FC<ConnectProps> = ({
             onChange={displayLinkedDelegations}
           />
         </div>
+      </div>
+      <div className="flex flex-col justify-start items-start self-stretch mb-1 gap-2">
+        <Text variant="body2" className="text-sm text-accent-primary">
+          Public Key
+        </Text>
+        <Hash
+          className="text-accent-secondary"
+          value={publicKeyNoCoord}
+          address
+          noFade
+          symbols={12}
+        />
       </div>
       <div className="divider my-0" />
       <div className="flex flex-row gap-2">
