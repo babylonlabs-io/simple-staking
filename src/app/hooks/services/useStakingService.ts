@@ -185,6 +185,9 @@ export function useStakingService() {
           displayOptions: {
             retryAction: () => stakeDelegation(delegation),
           },
+          metadata: {
+            stakingTxHash: delegation.stakingTxHashHex,
+          },
         });
       }
     },

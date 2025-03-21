@@ -76,12 +76,10 @@ export const ErrorModal: React.FC = () => {
       {
         date: new Date().toISOString(),
         device: navigator.userAgent,
-        message: error.message,
-        type: error.type,
         version,
-        eventId: error.sentryEventId,
         release: version,
         environment: process.env.NODE_ENV,
+        ...error,
       },
       null,
       2,
