@@ -1,12 +1,10 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { InscriptionIdentifier } from "@babylonlabs-io/wallet-connector";
 
-import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useClientQuery } from "@/app/hooks/client/useClient";
 import { wait } from "@/utils";
-import { filterDust } from "@/utils/wallet";
 
 export const ORDINAL_KEY = "ORDINALS";
 export const WALLET_FETCH_INSRIPTIONS_TIMEOUT = 3_000;
@@ -27,12 +25,13 @@ export function useOrdinals(
       return inscriptions;
     }
 
-    const verifiedUTXOs = await postVerifyUtxoOrdinals(
-      filterDust(utxos),
-      address,
-    );
+    // const verifiedUTXOs = await postVerifyUtxoOrdinals(
+    //   filterDust(utxos),
+    //   address,
+    // );
 
-    return verifiedUTXOs.filter((utxo) => utxo.inscription);
+    // return verifiedUTXOs.filter((utxo) => utxo.inscription);
+    return utxos;
   };
 
   const data = useClientQuery({
