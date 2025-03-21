@@ -65,18 +65,18 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
   }, []);
 
   const handleError = useCallback(
-    ({ error, displayOptions, userInfo }: ErrorHandlerParam) => {
+    ({ error, displayOptions, metadata }: ErrorHandlerParam) => {
       if (!error) return;
 
       // Extract stack trace if available
       const stackTrace = error instanceof Error ? error.stack || "" : "";
 
-      // Combine provided userInfo with wallet context
-      const combinedUserInfo = {
-        userPublicKey: userInfo?.userPublicKey || publicKeyNoCoord,
-        babylonAddress: userInfo?.babylonAddress || cosmosAddress,
-        btcAddress: userInfo?.btcAddress || btcAddress,
-        stakingTxHash: userInfo?.stakingTxHash,
+      // Combine provided metadata with wallet context
+      const combinedMetadata = {
+        userPublicKey: publicKeyNoCoord,
+        babylonAddress: cosmosAddress,
+        btcAddress: btcAddress,
+        ...metadata,
       };
 
       const eventId = Sentry.withScope((scope) => {
@@ -86,19 +86,19 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
             endpoint: error.endpoint,
             status: error.status,
             trace: stackTrace,
-            ...combinedUserInfo,
+            ...combinedMetadata,
           });
         } else if (error instanceof ClientError) {
           scope.setExtras({
             errorCategory: error.category,
             errorType: error.type ?? ErrorType.UNKNOWN,
             trace: stackTrace,
-            ...combinedUserInfo,
+            ...combinedMetadata,
           });
         } else {
           scope.setExtras({
             trace: stackTrace,
-            ...combinedUserInfo,
+            ...combinedMetadata,
           });
         }
         return Sentry.captureException(error);
@@ -108,7 +108,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         message: error.message,
         sentryEventId: eventId,
         trace: stackTrace,
-        ...combinedUserInfo,
+        ...combinedMetadata,
         ...(error instanceof ClientError && {
           displayMessage: error.displayMessage,
         }),

@@ -130,9 +130,6 @@ export function useStakingService() {
       } catch (error: any) {
         handleError({
           error,
-          userInfo: {
-            stakingTxHash: undefined,
-          },
         });
         reset();
       }
@@ -188,7 +185,7 @@ export function useStakingService() {
           displayOptions: {
             retryAction: () => stakeDelegation(delegation),
           },
-          userInfo: {
+          metadata: {
             stakingTxHash: delegation.stakingTxHashHex,
           },
         });

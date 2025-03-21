@@ -38,12 +38,7 @@ export interface ErrorDisplayOptions {
 export interface ErrorHandlerParam {
   error: Error | null;
   displayOptions?: ErrorDisplayOptions;
-  userInfo?: {
-    userPublicKey?: string;
-    babylonAddress?: string;
-    stakingTxHash?: string;
-    btcAddress?: string;
-  };
+  metadata?: Record<string, string>;
 }
 
 export interface ShowErrorParams {
