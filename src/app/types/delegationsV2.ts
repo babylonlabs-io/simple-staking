@@ -2,6 +2,7 @@ import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { ClientError } from "@/app/context/Error/errors";
 
 import { ErrorType } from "./errors";
+import { FinalityProvider } from "./finalityProviders";
 
 export interface DelegationLike {
   stakingAmount: number;
@@ -31,6 +32,10 @@ export interface DelegationV2 extends DelegationLike {
     unbondingSlashingTxHex: string;
     spendingHeight: number;
   };
+}
+
+export interface DelegationWithFP extends DelegationV2 {
+  fp: FinalityProvider;
 }
 
 export enum DelegationV2StakingState {

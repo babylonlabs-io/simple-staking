@@ -8,6 +8,7 @@ import stakingUnavailableIcon from "@/app/components/Staking/Form/States/staking
 import walletIcon from "@/app/components/Staking/Form/States/wallet-icon.svg";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
 import { BBN_FEE_AMOUNT } from "@/app/constants";
+import { useBalanceState } from "@/app/state/BalanceState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 
 import { AmountField } from "./components/AmountField";
@@ -49,6 +50,8 @@ export function DelegationForm({
   error,
   stakingInfo,
 }: DelegationFormProps) {
+  const { stakableBtcBalance } = useBalanceState();
+
   if (loading) {
     return (
       <StatusView
@@ -129,6 +132,11 @@ export function DelegationForm({
     );
   }
 
+  const maxAmount = Math.min(
+    stakableBtcBalance,
+    stakingInfo?.maxStakingAmountSat || 0,
+  );
+
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
       <div className="relative flex flex-1 flex-col gap-6">
@@ -152,7 +160,7 @@ export function DelegationForm({
 
             <AmountField
               min={stakingInfo?.minStakingAmountSat}
-              max={stakingInfo?.maxStakingAmountSat}
+              max={maxAmount}
             />
 
             <HiddenField name="feeRate" defaultValue="0" />

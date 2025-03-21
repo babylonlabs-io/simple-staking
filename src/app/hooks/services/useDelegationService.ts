@@ -11,6 +11,7 @@ import {
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
 import { ErrorType } from "@/app/types/errors";
+import { FinalityProvider } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { validateDelegation } from "@/utils/delegations";
 import { getBbnParamByVersion } from "@/utils/params";
@@ -61,7 +62,7 @@ export function useDelegationService() {
     delegations = [],
     fetchMoreDelegations,
     hasMoreDelegations,
-    isLoading,
+    isLoading: isDelegationLoading,
     updateDelegationStatus,
   } = useDelegationV2State();
 
@@ -73,7 +74,23 @@ export function useDelegationService() {
     submitSlashingWithdrawalTx,
   } = useTransactionService();
 
-  const { getSlashedFinalityProvider } = useFinalityProviderState();
+  const { isFetching: isFPLoading, finalityProviderMap } =
+    useFinalityProviderState();
+
+  const isLoading = isDelegationLoading || isFPLoading;
+
+  const delegationsWithFP = useMemo(
+    () =>
+      !isLoading
+        ? delegations.map((d) => ({
+            ...d,
+            fp: finalityProviderMap.get(
+              d.finalityProviderBtcPksHex[0],
+            ) as FinalityProvider,
+          }))
+        : [],
+    [isLoading, delegations, finalityProviderMap],
+  );
 
   const validations = useMemo(
     () =>
@@ -96,23 +113,6 @@ export function useDelegationService() {
         ? processingDelegations[confirmationModal.delegation.stakingTxHashHex]
         : false,
     [confirmationModal, processingDelegations],
-  );
-
-  const slashedStatuses = useMemo(
-    () =>
-      delegations.reduce(
-        (acc, delegation) => ({
-          ...acc,
-          [delegation.stakingTxHashHex]: {
-            isFpSlashed:
-              getSlashedFinalityProvider(
-                delegation.finalityProviderBtcPksHex[0],
-              ) !== null,
-          },
-        }),
-        {} as Record<string, { isFpSlashed: boolean }>,
-      ),
-    [delegations, getSlashedFinalityProvider],
   );
 
   const COMMANDS: Record<ActionType, DelegationCommand> = useMemo(
@@ -343,7 +343,7 @@ export function useDelegationService() {
   return {
     processing,
     isLoading,
-    delegations,
+    delegations: delegationsWithFP,
     validations,
     hasMoreDelegations,
     confirmationModal,
@@ -351,6 +351,5 @@ export function useDelegationService() {
     closeConfirmationModal,
     fetchMoreDelegations,
     executeDelegationAction,
-    slashedStatuses,
   };
 }

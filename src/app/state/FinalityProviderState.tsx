@@ -24,6 +24,7 @@ interface FilterState {
 interface FinalityProviderState {
   filter: FilterState;
   finalityProviders: FinalityProvider[];
+  finalityProviderMap: Map<string, FinalityProvider>;
   hasNextPage: boolean;
   isFetching: boolean;
   hasError: boolean;
@@ -33,7 +34,6 @@ interface FinalityProviderState {
   getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
-  getSlashedFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
 }
 
 const SORT_DIRECTIONS = {
@@ -73,7 +73,7 @@ const defaultState: FinalityProviderState = {
   getFinalityProvider: () => null,
   fetchNextPage: () => {},
   getFinalityProviderName: () => undefined,
-  getSlashedFinalityProvider: () => null,
+  finalityProviderMap: new Map(),
 };
 
 const { StateProvider, useState: useFpState } =
@@ -99,7 +99,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const { data: dataV1 } = useFinalityProviders();
 
-  const providersMap = useMemo(
+  const finalityProviderMap = useMemo(
     () =>
       (data?.finalityProviders ?? [])
         .sort((a, b) => (b.activeTVLSat ?? 0) - (a.activeTVLSat ?? 0))
@@ -127,9 +127,9 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const getFinalityProviderName = useCallback(
     (btcPkHex: string) =>
-      providersMap.get(btcPkHex)?.description?.moniker ??
+      finalityProviderMap.get(btcPkHex)?.description?.moniker ??
       providersV1Map.get(btcPkHex)?.description?.moniker,
-    [providersMap, providersV1Map],
+    [finalityProviderMap, providersV1Map],
   );
 
   const handleFilter = useCallback((key: keyof FilterState, value: string) => {
@@ -171,16 +171,6 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     [data?.finalityProviders],
   );
 
-  const getSlashedFinalityProvider = useCallback(
-    (btcPkHex: string) =>
-      data?.finalityProviders.find(
-        (fp) =>
-          fp.btcPk === btcPkHex &&
-          fp.state === FinalityProviderStateEnum.SLASHED,
-      ) || null,
-    [data?.finalityProviders],
-  );
-
   const state = useMemo(
     () => ({
       filter,
@@ -188,13 +178,13 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       isFetching,
       hasError: isError,
       hasNextPage,
+      finalityProviderMap,
       handleSort,
       handleFilter,
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
-      getSlashedFinalityProvider,
     }),
     [
       filter,
@@ -202,13 +192,13 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       isFetching,
       hasNextPage,
       isError,
+      finalityProviderMap,
       handleSort,
       handleFilter,
       isRowSelectable,
       getFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
-      getSlashedFinalityProvider,
     ],
   );
 
