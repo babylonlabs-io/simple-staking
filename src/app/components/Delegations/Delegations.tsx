@@ -334,7 +334,7 @@ export const Delegations = ({}) => {
           </table>
         </InfiniteScroll>
       </Card>
-      {modalMode && txID && selectedDelegation && (
+      {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
