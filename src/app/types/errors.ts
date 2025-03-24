@@ -28,21 +28,27 @@ export interface Error {
   babylonAddress?: string;
   stakingTxHash?: string;
   btcAddress?: string;
-}
-
-export interface ErrorDisplayOptions {
-  retryAction?: () => void;
-  noCancel?: boolean;
+  category?: string;
+  endpoint?: string;
+  request?: Record<string, any>;
+  response?: Record<string, any>;
+  errorSource?: string;
+  metadata?: Record<string, any>;
 }
 
 export interface ErrorHandlerParam {
   error: Error | null;
-  displayOptions?: ErrorDisplayOptions;
-  metadata?: Record<string, string>;
+  metadata?: Record<string, unknown>;
+  displayOptions?: {
+    retryAction?: () => void;
+    noCancel?: boolean;
+    showModal?: boolean;
+  };
 }
 
 export interface ShowErrorParams {
   error: Error;
   retryAction?: () => void;
   noCancel?: boolean;
+  showModal?: boolean;
 }
