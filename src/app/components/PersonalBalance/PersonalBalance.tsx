@@ -77,7 +77,11 @@ export function PersonalBalance() {
           <StatItem
             loading={isBalanceLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
-            value={isBalanceLoading ? "" : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
+            value={
+              isBalanceLoading
+                ? ""
+                : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
+            }
             loadingStyle={LoadingStyle.ShowSpinner}
           />
 
