@@ -81,14 +81,12 @@ export function useDelegationService() {
 
   const delegationsWithFP = useMemo(
     () =>
-      !isLoading
-        ? delegations.map((d) => ({
-            ...d,
-            fp: finalityProviderMap.get(
-              d.finalityProviderBtcPksHex[0],
-            ) as FinalityProvider,
-          }))
-        : [],
+      delegations.map((d) => ({
+        ...d,
+        fp: finalityProviderMap.get(
+          d.finalityProviderBtcPksHex[0],
+        ) as FinalityProvider,
+      })),
     [isLoading, delegations, finalityProviderMap],
   );
 
