@@ -2,9 +2,35 @@ import { apiWrapper } from "@/app/api/apiWrapper";
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { ServerError } from "@/app/context/Error/errors/serverError";
 
-global.fetch = jest.fn();
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 process.env.NEXT_PUBLIC_API_URL = "https://api.example.com";
+
+// Helper to create mock responses with the right structure
+function createMockResponse(options: {
+  ok: boolean;
+  status: number;
+  body?: any;
+  statusText?: string;
+}) {
+  const { ok, status, body, statusText = "OK" } = options;
+
+  return {
+    ok,
+    status,
+    statusText,
+    headers: {
+      entries: jest.fn().mockReturnValue([]),
+    },
+    json: jest.fn().mockResolvedValue(body),
+    text: jest
+      .fn()
+      .mockResolvedValue(
+        typeof body === "string" ? body : JSON.stringify(body),
+      ),
+  };
+}
 
 describe("apiWrapper", () => {
   beforeEach(() => {
@@ -12,12 +38,13 @@ describe("apiWrapper", () => {
   });
 
   it("should make a successful GET request", async () => {
-    const mockResponse = {
+    const responseBody = { data: "test data" };
+    const mockResponse = createMockResponse({
       ok: true,
       status: 200,
-      json: jest.fn().mockResolvedValue({ data: "test data" }),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      body: responseBody,
+    });
+    mockFetch.mockResolvedValue(mockResponse);
 
     const result = await apiWrapper("GET", "/test", "Failed to fetch data");
 
@@ -31,18 +58,19 @@ describe("apiWrapper", () => {
       }),
     );
     expect(result).toEqual({
-      data: { data: "test data" },
+      data: responseBody,
       status: 200,
     });
   });
 
   it("should make a successful POST request with body", async () => {
-    const mockResponse = {
+    const responseBody = { data: "created" };
+    const mockResponse = createMockResponse({
       ok: true,
       status: 201,
-      json: jest.fn().mockResolvedValue({ data: "created" }),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      body: responseBody,
+    });
+    mockFetch.mockResolvedValue(mockResponse);
 
     const result = await apiWrapper("POST", "/test", "Failed to create data", {
       body: { name: "test" },
@@ -59,18 +87,19 @@ describe("apiWrapper", () => {
       }),
     );
     expect(result).toEqual({
-      data: { data: "created" },
+      data: responseBody,
       status: 201,
     });
   });
 
   it("should handle query parameters correctly", async () => {
-    const mockResponse = {
+    const responseBody = { data: "test data" };
+    const mockResponse = createMockResponse({
       ok: true,
       status: 200,
-      json: jest.fn().mockResolvedValue({ data: "test data" }),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      body: responseBody,
+    });
+    mockFetch.mockResolvedValue(mockResponse);
 
     await apiWrapper("GET", "/test", "Failed to fetch data", {
       query: {
@@ -88,12 +117,13 @@ describe("apiWrapper", () => {
   });
 
   it("should handle undefined query parameters", async () => {
-    const mockResponse = {
+    const responseBody = { data: "test data" };
+    const mockResponse = createMockResponse({
       ok: true,
       status: 200,
-      json: jest.fn().mockResolvedValue({ data: "test data" }),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      body: responseBody,
+    });
+    mockFetch.mockResolvedValue(mockResponse);
 
     await apiWrapper("GET", "/test", "Failed to fetch data", {
       query: {
@@ -116,12 +146,13 @@ describe("apiWrapper", () => {
       timeout: jest.fn().mockReturnValue(mockTimeoutSignal),
     } as any;
 
-    const mockResponse = {
+    const responseBody = { data: "test data" };
+    const mockResponse = createMockResponse({
       ok: true,
       status: 200,
-      json: jest.fn().mockResolvedValue({ data: "test data" }),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      body: responseBody,
+    });
+    mockFetch.mockResolvedValue(mockResponse);
 
     const promise = apiWrapper(
       "GET",
@@ -143,12 +174,18 @@ describe("apiWrapper", () => {
   });
 
   it("should throw ServerError when response is not ok", async () => {
-    const mockResponse = {
+    const errorText = "Resource not found";
+    const mockResponse = createMockResponse({
       ok: false,
       status: 404,
-      text: jest.fn().mockResolvedValue("Resource not found"),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      body: errorText,
+      statusText: "Not Found",
+    });
+
+    // Override text method to return the specific error string
+    mockResponse.text = jest.fn().mockResolvedValue(errorText);
+
+    mockFetch.mockResolvedValue(mockResponse);
 
     await expect(
       apiWrapper("GET", "/test", "Failed to fetch data"),
@@ -159,18 +196,24 @@ describe("apiWrapper", () => {
     } catch (error) {
       expect(error).toBeInstanceOf(ServerError);
       expect((error as ServerError).status).toBe(404);
-      expect((error as ServerError).message).toBe("Resource not found");
+      expect((error as ServerError).message).toBe(errorText);
       expect((error as ServerError).endpoint).toBe("/test");
     }
   });
 
   it("should use general error message when response.text() fails", async () => {
-    const mockResponse = {
+    const mockResponse = createMockResponse({
       ok: false,
       status: 500,
-      text: jest.fn().mockRejectedValue(new Error("Failed to read response")),
-    };
-    (global.fetch as jest.Mock).mockResolvedValue(mockResponse);
+      statusText: "Server Error",
+    });
+
+    // Override text method to throw an error
+    mockResponse.text = jest
+      .fn()
+      .mockRejectedValue(new Error("Failed to read response"));
+
+    mockFetch.mockResolvedValue(mockResponse);
 
     await expect(
       apiWrapper("GET", "/test", "General error message"),
@@ -189,7 +232,7 @@ describe("apiWrapper", () => {
     const networkError = new TypeError(
       "NetworkError when attempting to fetch resource",
     );
-    (global.fetch as jest.Mock).mockRejectedValue(networkError);
+    mockFetch.mockRejectedValue(networkError);
 
     await expect(
       apiWrapper("GET", "/test", "Failed to fetch data"),
@@ -208,7 +251,7 @@ describe("apiWrapper", () => {
 
   it("should handle other errors", async () => {
     const otherError = new Error("Some other error");
-    (global.fetch as jest.Mock).mockRejectedValue(otherError);
+    mockFetch.mockRejectedValue(otherError);
 
     await expect(
       apiWrapper("GET", "/test", "General error message"),

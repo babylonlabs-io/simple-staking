@@ -4,6 +4,7 @@ export const ClientErrorCategory = {
   CLIENT_VALIDATION: "CLIENT_VALIDATION",
   CLIENT_TRANSACTION: "CLIENT_TRANSACTION",
   CLIENT_UNKNOWN: "CLIENT_UNKNOWN",
+  ORDINALS_ERROR: "ORDINALS_ERROR",
 } as const;
 
 export type ClientErrorCategory = ValueOf<typeof ClientErrorCategory>;
@@ -14,6 +15,7 @@ const CLIENT_ERROR_MESSAGES: Record<ClientErrorCategory, string> = {
     "The provided data is invalid. Please check your input and try again.",
   CLIENT_TRANSACTION: "Failed to process transaction. Please try again.",
   CLIENT_UNKNOWN: "An unexpected client error occurred.",
+  ORDINALS_ERROR: "Operation failed due to the presence of ordinals.",
 } as const;
 
 export function getClientErrorMessage(
