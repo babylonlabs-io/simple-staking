@@ -190,10 +190,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     () => ({
       getAddress: async () => btcWalletProvider?.getAddress() ?? "",
       getPublicKeyHex: async () => btcWalletProvider?.getPublicKeyHex() ?? "",
-      signPsbt: async (psbtHex: string) =>
-        btcWalletProvider?.signPsbt(psbtHex) ?? "",
-      signPsbts: async (psbtsHexes: string[]) =>
-        btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
+      signPsbt: async (psbtHex: string, options?: BTCSignOptions) =>
+        btcWalletProvider?.signPsbt(psbtHex, options) ?? "",
+      signPsbts: async (psbtsHexes: string[], options?: BTCSignOptions) =>
+        btcWalletProvider?.signPsbts(psbtsHexes, options) ?? [],
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
       signMessage: async (message: string, type: "ecdsa") =>
