@@ -14,6 +14,8 @@ import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
 import { useAppState } from "@/app/state";
 
+import { useNetworkInfo } from "../client/api/useNetworkInfo";
+
 const stakingManagerEvents = {
   SIGNING: "signing",
 } as const;
@@ -21,6 +23,7 @@ const stakingManagerEvents = {
 export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
+  const { data: networkInfoAPI } = useNetworkInfo();
 
   const { connected: cosmosConnected } = useCosmosWallet();
   const {
@@ -52,14 +55,17 @@ export const useStakingManagerService = () => {
       signPsbt: async (signingStep: SigningStep, psbt: string) => {
         console.log("psbt", psbt);
         eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
-        if (signingStep === SigningStep.STAKING) {
-          console.log("signing staking");
+        if (signingStep === SigningStep.STAKING && networkInfoAPI) {
+          const { covenantNoCoordPks, covenantQuorum } =
+            networkInfoAPI.params.bbnStakingParams.latestParam;
+          console.log("covenantNoCoordPks", covenantNoCoordPks);
+          console.log("covenantQuorum", covenantQuorum);
           const options: StakingSignOptions = {
             type: BTCSignType.STAKING,
-            covenantPks: [],
-            covenantThreshold: 0,
+            covenantPks: covenantNoCoordPks,
+            covenantThreshold: covenantQuorum,
             finalityProviderPk: "",
-            timelockBlocks: 0,
+            timelockBlocks: 64000, // TODO change
           };
           return signPsbt(psbt, options);
         } else {
@@ -104,6 +110,7 @@ export const useStakingManagerService = () => {
     signBbnTx,
     versionedParams,
     eventEmitter,
+    networkInfoAPI,
   ]);
 
   const on = useCallback(
