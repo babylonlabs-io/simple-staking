@@ -144,7 +144,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
               onUnbond(stakingTxHashHex);
               setIsPopoverOpen(false);
             }}
-            className="h-8 px-3 hover:bg-secondary-highlight rounded transition-colors text-left min-w-32 border border-secondary-strokeDark/50 text-accent-primary text-sm"
+            className="h-8 px-3 hover:bg-secondary-highlight rounded transition-colors text-left min-w-48 border border-secondary-strokeDark/20 text-accent-primary text-sm shadow-[0px_8px_16px_0px_rgba(0,0,0,0.12)]"
           >
             Unbound
           </Text>
