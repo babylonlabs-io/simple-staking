@@ -136,15 +136,16 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           anchorEl={anchorEl}
           placement="bottom-end"
           onClickOutside={() => setIsPopoverOpen(false)}
-          className="bg-surface flex justify-start items-start"
+          className="bg-surface p-4 rounded border border-secondary-strokeLight w-48 shadow-md"
         >
           <Text
+            variant="body2"
             as="button"
             onClick={() => {
               onUnbond(stakingTxHashHex);
               setIsPopoverOpen(false);
             }}
-            className="h-8 px-3 hover:bg-secondary-highlight rounded transition-colors text-left min-w-48 border border-secondary-strokeDark/20 text-accent-primary text-sm shadow-[0px_8px_16px_0px_rgba(0,0,0,0.12)]"
+            className="text-accent-primary transition-all hover:brightness-125"
           >
             Unbound
           </Text>
