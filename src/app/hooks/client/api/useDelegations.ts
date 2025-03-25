@@ -60,9 +60,18 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
         displayOptions: {
           retryAction: query.refetch,
         },
+        metadata: {
+          userPublicKey: publicKeyNoCoord,
+        },
       });
     }
-  }, [query.isError, query.error, query.refetch, handleError]);
+  }, [
+    query.isError,
+    query.error,
+    query.refetch,
+    handleError,
+    publicKeyNoCoord,
+  ]);
 
   return query;
 }

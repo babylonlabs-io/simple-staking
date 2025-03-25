@@ -61,9 +61,20 @@ export function useDelegationsV2(
         displayOptions: {
           retryAction: query.refetch,
         },
+        metadata: {
+          userPublicKey: publicKeyNoCoord,
+          babylonAddress,
+        },
       });
     }
-  }, [query.isError, query.error, query.refetch, handleError]);
+  }, [
+    query.isError,
+    query.error,
+    query.refetch,
+    handleError,
+    publicKeyNoCoord,
+    babylonAddress,
+  ]);
 
   return query;
 }
