@@ -63,6 +63,7 @@ export const useTransactionService = () => {
    */
   const createDelegationEoi = useCallback(
     async (stakingInput: BtcStakingInputs, feeRate: number) => {
+      console.log("createDelegationEoi");
       const btcStakingManager = createBtcStakingManager();
 
       validateCommonInputs(
@@ -186,7 +187,15 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       unsignedStakingTxHex: string,
     ) => {
-      const btcStakingManager = createBtcStakingManager();
+      console.log("submitStakingTx");
+      const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
+
+      // staking
+      const btcStakingManager = createBtcStakingManager(
+        finalityProviderPkNoCoordHex,
+        stakingTimelock,
+      );
+
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
