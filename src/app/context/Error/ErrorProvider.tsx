@@ -9,8 +9,6 @@ import React, {
 } from "react";
 
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
-import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import {
   Error as AppError,
   ErrorHandlerParam,
@@ -65,9 +63,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     modalOptions: {},
   });
 
-  const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
-  const { bech32Address: cosmosAddress } = useCosmosWallet();
-
   const dismissError = useCallback(() => {
     setState((prev) => ({ ...prev, isOpen: false }));
     setTimeout(() => {
@@ -91,11 +86,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       const errorSource: string | undefined =
         serverErrorSource || paramErrorSource || clientErrorSource;
 
-      // Combine provided metadata with wallet context
       const combinedMetadata = {
-        userPublicKey: publicKeyNoCoord,
-        babylonAddress: cosmosAddress,
-        btcAddress: btcAddress,
         errorSource: errorSource,
         ...metadata,
       };
@@ -167,7 +158,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         });
       }
     },
-    [publicKeyNoCoord, cosmosAddress, btcAddress],
+    [],
   );
 
   const contextValue = useMemo(

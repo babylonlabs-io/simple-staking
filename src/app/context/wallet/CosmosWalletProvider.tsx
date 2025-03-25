@@ -96,6 +96,9 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           displayOptions: {
             retryAction: () => connectCosmos(provider),
           },
+          metadata: {
+            babylonAddress: cosmosBech32Address,
+          },
         });
       }
     },
