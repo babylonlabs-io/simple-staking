@@ -1,5 +1,6 @@
 "use client";
 import {
+  BTCSignOptions,
   IBTCProvider,
   InscriptionIdentifier,
   Network,
@@ -45,8 +46,11 @@ interface BTCWalletContextProps {
   open: () => void;
   getAddress: () => Promise<string>;
   getPublicKeyHex: () => Promise<string>;
-  signPsbt: (psbtHex: string) => Promise<string>;
-  signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
+  signPsbt: (psbtHex: string, options?: BTCSignOptions) => Promise<string>;
+  signPsbts: (
+    psbtsHexes: string[],
+    options?: BTCSignOptions,
+  ) => Promise<string[]>;
   getNetwork: () => Promise<Network>;
   signMessage: (message: string, type: "ecdsa") => Promise<string>;
   getBalance: (address: string) => Promise<number>;
