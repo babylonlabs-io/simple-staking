@@ -147,7 +147,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             }}
             className="text-accent-primary transition-all hover:brightness-125"
           >
-            Unbound
+            Unbond
           </Text>
         </Popover>
       </div>

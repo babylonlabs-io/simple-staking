@@ -107,7 +107,7 @@ export const Footer: React.FC = () => {
             >
               Privacy Policy
             </a>{" "}
-            - 2024 Babylon Labs. All rights reserved.
+            - 2025 Babylon Labs. All rights reserved.
           </Text>
         </div>
       </Container>
