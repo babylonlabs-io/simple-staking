@@ -1,4 +1,4 @@
-import { Button, Popover } from "@babylonlabs-io/core-ui";
+import { Button, Popover, Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
@@ -136,19 +136,19 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           anchorEl={anchorEl}
           placement="bottom-end"
           onClickOutside={() => setIsPopoverOpen(false)}
+          className="bg-surface p-4 rounded border border-secondary-strokeLight w-48 shadow-md"
         >
-          <Button
-            className="bg-surface"
-            variant="outlined"
-            size="small"
-            color="primary"
+          <Text
+            variant="body2"
+            as="button"
             onClick={() => {
               onUnbond(stakingTxHashHex);
               setIsPopoverOpen(false);
             }}
+            className="text-accent-primary transition-all hover:brightness-125"
           >
-            Unbond
-          </Button>
+            Unbound
+          </Text>
         </Popover>
       </div>
     );
