@@ -29,7 +29,7 @@ const config: Record<string, BTCConfig> = {
     mempoolApiUrl: `${MEMPOOL_API}/signet`,
     network: Network.SIGNET,
   },
-  signet: {
+  devnet: {
     coinName: "Signet BTC",
     coinSymbol: "sBTC",
     networkName: "BTC signet",

@@ -24,7 +24,7 @@ const config: Record<string, BBNConfig> = {
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
   },
-  signet: {
+  devnet: {
     chainId: bbnDevnet.chainId,
     rpc: bbnDevnet.rpc,
     chainData: bbnDevnet,
