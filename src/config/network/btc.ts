@@ -3,7 +3,7 @@ import type { BTCConfig } from "@babylonlabs-io/wallet-connector";
 import { MEMPOOL_API } from "@/app/constants";
 import { Network } from "@/app/types/network";
 
-const defaultNetwork = "signet";
+const defaultNetwork = "devnet";
 export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
 
 const config: Record<string, BTCConfig> = {
