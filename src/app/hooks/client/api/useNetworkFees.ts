@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 
+import { API_DEFAULT_RETRY_COUNT } from "@/app/constants";
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useClientQuery } from "@/app/hooks/client/useClient";
 import { ErrorType } from "@/app/types/errors";
-import { Fees } from "@/app/types/fee";
 import { getNetworkFees } from "@/utils/mempool_api";
 
 export const NETWORK_FEES_KEY = "NETWORK_FEES";
@@ -32,15 +32,11 @@ export function useNetworkFees({ enabled = true }: { enabled?: boolean } = {}) {
   const { handleError } = useError();
   const [hasRpcError, setHasRpcError] = useState(false);
 
-  const fetchFees = async (): Promise<Fees> => {
-    return getNetworkFees();
-  };
-
   const query = useClientQuery({
     queryKey: [NETWORK_FEES_KEY],
-    queryFn: fetchFees,
+    queryFn: getNetworkFees,
     enabled,
-    retry: 2,
+    retry: API_DEFAULT_RETRY_COUNT,
   });
 
   useEffect(() => {
