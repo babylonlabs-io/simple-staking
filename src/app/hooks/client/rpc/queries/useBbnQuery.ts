@@ -7,7 +7,6 @@ import {
   createProtobufRpcClient,
   setupBankExtension,
 } from "@cosmjs/stargate";
-import { useEffect } from "react";
 
 import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
@@ -27,16 +26,8 @@ const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
  */
 export const useBbnQuery = () => {
   const { bech32Address, connected } = useCosmosWallet();
-  const { queryClient, error: rpcError } = useBbnRpc();
+  const { queryClient } = useBbnRpc();
   const { hasRpcError, reconnect } = useRpcErrorHandler();
-
-  // MOCK: Force mock error to be visible immediately
-  // This is just for testing - you can remove this later
-  useEffect(() => {
-    if (rpcError) {
-      console.error("RPC Error detected:", rpcError.message);
-    }
-  }, [rpcError]);
 
   /**
    * Gets the rewards from the user's account.
