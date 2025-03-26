@@ -7,12 +7,14 @@ import {
   createProtobufRpcClient,
   setupBankExtension,
 } from "@cosmjs/stargate";
+import { useEffect } from "react";
 
 import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 
 import { useClientQuery } from "../../useClient";
+import { useRpcErrorHandler } from "../useRpcErrorHandler";
 
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
@@ -25,7 +27,16 @@ const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
  */
 export const useBbnQuery = () => {
   const { bech32Address, connected } = useCosmosWallet();
-  const { queryClient } = useBbnRpc();
+  const { queryClient, error: rpcError } = useBbnRpc();
+  const { hasRpcError, reconnect } = useRpcErrorHandler();
+
+  // MOCK: Force mock error to be visible immediately
+  // This is just for testing - you can remove this later
+  useEffect(() => {
+    if (rpcError) {
+      console.error("RPC Error detected:", rpcError.message);
+    }
+  }, [rpcError]);
 
   /**
    * Gets the rewards from the user's account.
@@ -125,6 +136,8 @@ export const useBbnQuery = () => {
     rewardsQuery,
     balanceQuery,
     btcTipQuery,
+    hasRpcError,
+    reconnectRpc: reconnect,
   };
 };
 
