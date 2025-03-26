@@ -82,7 +82,7 @@ export const useStakingManagerService = () => {
         signMessage: async (
           signingStep: SigningStep,
           message: string,
-          type: "ecdsa",
+          type: "ecdsa" | "bip322-simple",
         ) => {
           eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
           return signMessage(message, type);
