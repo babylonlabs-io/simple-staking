@@ -5,7 +5,7 @@ import {
   type PaginatedFinalityProviders,
   getFinalityProvidersV2,
 } from "@/app/api/getFinalityProvidersV2";
-import { ONE_MINUTE } from "@/app/constants";
+import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 
 const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V2_KEY";
@@ -48,7 +48,7 @@ export function useFinalityProvidersV2({
       return flattenedData;
     },
     retry: (failureCount) => {
-      return !isOpen && failureCount <= 3;
+      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
     },
   });
 

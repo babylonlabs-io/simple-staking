@@ -4,6 +4,7 @@ import React, { ReactNode, createContext, useContext, useEffect } from "react";
 import { getStats } from "@/app/api/getStats";
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { API_DEFAULT_RETRY_COUNT } from "@/app/constants";
 
 import { useError } from "../Error/ErrorProvider";
 import { ServerError } from "../Error/errors/serverError";
@@ -43,7 +44,7 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
     queryFn: async () => getStats(),
     refetchInterval: 60000, // 1 minute
     retry: (failureCount) => {
-      return !isOpen && failureCount <= 3;
+      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
     },
   });
 

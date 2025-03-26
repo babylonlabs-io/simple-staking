@@ -10,7 +10,7 @@ import {
 } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import { ONE_MINUTE } from "@/app/constants";
+import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { Error } from "@/app/types/errors";
 
@@ -43,7 +43,7 @@ export function useClientQuery<
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
     retry: (failureCount) => {
-      return !isOpen && failureCount <= 3;
+      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
     },
     ...options,
   });
