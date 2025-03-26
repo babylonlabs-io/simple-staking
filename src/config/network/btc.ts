@@ -22,11 +22,12 @@ const config: Record<string, BTCConfig> = {
     network: Network.MAINNET,
   },
   testnet: {
-    coinName: "Testnet BTC",
-    coinSymbol: "tBTC",
-    networkName: "BTC testnet",
-    mempoolApiUrl: `${MEMPOOL_API}/testnet`,
-    network: Network.TESTNET,
+    // We do not use BTC Testnet
+    coinName: "Signet BTC",
+    coinSymbol: "sBTC",
+    networkName: "BTC signet",
+    mempoolApiUrl: `${MEMPOOL_API}/signet`,
+    network: Network.SIGNET,
   },
   signet: {
     coinName: "Signet BTC",
