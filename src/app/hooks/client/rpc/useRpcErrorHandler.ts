@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useEffect } from "react";
 
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
@@ -13,12 +13,8 @@ import { ErrorType } from "@/app/types/errors";
  * @returns Object containing a flag indicating if there's an RPC error
  */
 export function useRpcErrorHandler() {
-  const { error, isLoading } = useBbnRpc();
+  const { error, isLoading, reconnect } = useBbnRpc();
   const { handleError } = useError();
-
-  const reconnect = useCallback(() => {
-    window.location.reload();
-  }, []);
 
   useEffect(() => {
     if (error && !isLoading) {
