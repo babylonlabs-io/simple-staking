@@ -15,7 +15,6 @@ export function SubmitButton() {
     (fieldName) => (errors[fieldName]?.message as string) ?? "",
   );
 
-  const { coinSymbol } = getNetworkConfigBBN();
   const invalid = !isValid || bbnBalance === 0;
   const tooltip =
     errorMessage ??
