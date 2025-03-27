@@ -20,12 +20,11 @@ import { ClientError, ServerError } from "./errors";
 // Error source identifiers
 export const ERROR_SOURCES = {
   ORDINALS: "ORDINALS_ERROR",
-  ADDRESS_SCREENING: "ADDRESS_SCREENING_ERROR",
 };
 
 // Configuration for errors that shouldn't show a modal by default
 const SILENT_ERROR_CONFIG = {
-  sources: [ERROR_SOURCES.ORDINALS, ERROR_SOURCES.ADDRESS_SCREENING],
+  sources: [ERROR_SOURCES.ORDINALS],
 };
 
 const ErrorContext = createContext<ErrorContextType>({
