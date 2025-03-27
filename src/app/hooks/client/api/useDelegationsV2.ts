@@ -5,7 +5,7 @@ import {
   getDelegationsV2,
   type PaginatedDelegations,
 } from "@/app/api/getDelegationsV2";
-import { ONE_MINUTE } from "@/app/constants";
+import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
@@ -50,7 +50,7 @@ export function useDelegationsV2(
       return flattenedData;
     },
     retry: (failureCount, _error) => {
-      return !isOpen && failureCount <= 3;
+      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
     },
   });
 
@@ -61,9 +61,20 @@ export function useDelegationsV2(
         displayOptions: {
           retryAction: query.refetch,
         },
+        metadata: {
+          userPublicKey: publicKeyNoCoord,
+          babylonAddress,
+        },
       });
     }
-  }, [query.isError, query.error, query.refetch, handleError]);
+  }, [
+    query.isError,
+    query.error,
+    query.refetch,
+    handleError,
+    publicKeyNoCoord,
+    babylonAddress,
+  ]);
 
   return query;
 }

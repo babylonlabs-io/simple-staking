@@ -56,11 +56,6 @@ export function PersonalBalance() {
             loading={loading}
             title="Staked Balance"
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
-            tooltip={
-              inscriptionsBtcBalance
-                ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
-                : undefined
-            }
           />
 
           <StatItem
@@ -72,6 +67,11 @@ export function PersonalBalance() {
                 : LoadingStyle.ShowSpinner
             }
             value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
+            tooltip={
+              inscriptionsBtcBalance
+                ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+                : undefined
+            }
           />
 
           <StatItem

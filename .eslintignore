@@ -3,3 +3,4 @@
 /blob-report/
 /playwright/.cache/
 /out/
+.husky/

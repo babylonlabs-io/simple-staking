@@ -9,7 +9,10 @@ type QueryParamValue =
   | number
   | boolean
   | Array<string | number | boolean>;
-type QueryParams = Record<string, QueryParamValue | undefined>;
+
+interface QueryParams {
+  [key: string]: QueryParamValue | undefined;
+}
 
 interface RequestParams {
   query?: QueryParams;
@@ -47,14 +50,38 @@ export const apiWrapper = async <TResponseData = unknown>(
     options.signal = AbortSignal.timeout(timeout);
   }
 
+  const requestData = {
+    method,
+    url,
+    path,
+    queryParams: params?.query,
+    body: params?.body,
+    timeout,
+  };
+
   try {
     const response = await fetch(url, options);
 
+    const responseData = {
+      status: response.status,
+      statusText: response.statusText,
+      headers: Object.fromEntries(response.headers.entries()),
+    };
+
     if (!response.ok) {
+      const responseText = await response
+        .text()
+        .catch(() => generalErrorMessage);
+
       throw new ServerError({
-        message: await response.text().catch(() => generalErrorMessage),
+        message: responseText,
         status: response.status,
         endpoint: path,
+        request: requestData,
+        response: {
+          ...responseData,
+          body: responseText,
+        },
       });
     }
 
@@ -70,6 +97,7 @@ export const apiWrapper = async <TResponseData = unknown>(
         message: "Network error occurred",
         status: HttpStatusCode.ServiceUnavailable,
         endpoint: path,
+        request: requestData,
       });
     }
 
@@ -77,6 +105,8 @@ export const apiWrapper = async <TResponseData = unknown>(
       message: generalErrorMessage,
       status: HttpStatusCode.InternalServerError,
       endpoint: path,
+      request: requestData,
+      response: error instanceof Error ? { error: error.message } : undefined,
     });
   }
 };

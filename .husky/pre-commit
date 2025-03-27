@@ -1,4 +1,11 @@
-npm run sort-imports
-npm run format:fix
+#!/usr/bin/env sh
 
-git add .
+STAGED_FILES=$(git diff --cached --name-only)
+
+if [ -n "$STAGED_FILES" ]; then
+  echo "Formatting staged files..."
+  echo "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx|json|css|scss|md|yml|yaml)$' | xargs prettier --write
+  echo "$STAGED_FILES" | grep -E '\.(js|jsx|ts|tsx)$' | xargs eslint --fix
+fi
+
+echo "$STAGED_FILES" | xargs git add

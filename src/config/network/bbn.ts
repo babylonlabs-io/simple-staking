@@ -4,7 +4,7 @@ import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
 import { bbnTestnet } from "./bbn/testnet";
 
-const defaultNetwork = "signet";
+const defaultNetwork = "devnet";
 export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
 
 const config: Record<string, BBNConfig> = {
@@ -24,7 +24,7 @@ const config: Record<string, BBNConfig> = {
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
   },
-  signet: {
+  devnet: {
     chainId: bbnDevnet.chainId,
     rpc: bbnDevnet.rpc,
     chainData: bbnDevnet,

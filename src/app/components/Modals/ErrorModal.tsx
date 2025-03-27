@@ -68,7 +68,7 @@ export const ErrorModal: React.FC = () => {
 
   const getErrorMessage = () => {
     const prefix = ERROR_MESSAGES[error.type ?? ErrorType.UNKNOWN];
-    return `${prefix} ${error.message}`;
+    return `${prefix} ${error.displayMessage || error.message}`;
   };
 
   const copyErrorDetails = () => {
@@ -76,12 +76,10 @@ export const ErrorModal: React.FC = () => {
       {
         date: new Date().toISOString(),
         device: navigator.userAgent,
-        message: error.message,
-        type: error.type,
         version,
-        eventId: error.sentryEventId,
         release: version,
         environment: process.env.NODE_ENV,
+        ...error,
       },
       null,
       2,
@@ -118,7 +116,8 @@ export const ErrorModal: React.FC = () => {
           <Text variant="body1" className="text-center text-accent-secondary">
             {getErrorMessage()}
           </Text>
-          <div className="flex items-center justify-center gap-2 mt-2">
+
+          <div className="flex items-center justify-center gap-4 mt-2">
             <button
               className="flex items-center gap-1 text-sm text-accent-secondary hover:opacity-70"
               onClick={copyErrorDetails}

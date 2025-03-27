@@ -48,7 +48,10 @@ interface BTCWalletContextProps {
   signPsbt: (psbtHex: string) => Promise<string>;
   signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
   getNetwork: () => Promise<Network>;
-  signMessage: (message: string, type: "ecdsa") => Promise<string>;
+  signMessage: (
+    message: string,
+    type: "ecdsa" | "bip322-simple",
+  ) => Promise<string>;
   getBalance: (address: string) => Promise<number>;
   getNetworkFees: () => Promise<Fees>;
   pushTx: (txHex: string) => Promise<string>;
@@ -146,6 +149,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
           },
+          metadata: {
+            userPublicKey: publicKeyNoCoord,
+            btcAddress: address,
+          },
         });
       }
     },
@@ -192,7 +199,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
-      signMessage: async (message: string, type: "ecdsa") =>
+      signMessage: async (message: string, type: "ecdsa" | "bip322-simple") =>
         btcWalletProvider?.signMessage(message, type) ?? "",
       getBalance: async (address: string) => getAddressBalance(address),
       getNetworkFees: async () => getNetworkFees(),
