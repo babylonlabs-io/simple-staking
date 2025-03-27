@@ -15,6 +15,8 @@ interface BalanceStateProps {
   stakedBtcBalance: number;
   bbnBalance: number;
   inscriptionsBtcBalance: number;
+  hasRpcError: boolean;
+  reconnectRpc: () => void;
 }
 
 const STAKED_BALANCE_STATUSES = [
@@ -35,6 +37,8 @@ const defaultState: BalanceStateProps = {
   stakedBtcBalance: 0,
   bbnBalance: 0,
   inscriptionsBtcBalance: 0,
+  hasRpcError: false,
+  reconnectRpc: () => {},
 };
 
 const { StateProvider, useState: useBalanceState } =
@@ -50,6 +54,8 @@ export function BalanceState({ children }: PropsWithChildren) {
 
   const {
     balanceQuery: { data: bbnBalance = 0, isLoading: isCosmosBalanceLoading },
+    hasRpcError,
+    reconnectRpc,
   } = useBbnQuery();
 
   const { delegations } = useDelegationV2State();
@@ -115,6 +121,8 @@ export function BalanceState({ children }: PropsWithChildren) {
       bbnBalance,
       stakedBtcBalance,
       inscriptionsBtcBalance,
+      hasRpcError,
+      reconnectRpc,
     }),
     [
       loading,
@@ -123,6 +131,8 @@ export function BalanceState({ children }: PropsWithChildren) {
       bbnBalance,
       stakedBtcBalance,
       inscriptionsBtcBalance,
+      hasRpcError,
+      reconnectRpc,
     ],
   );
 
