@@ -38,6 +38,7 @@ export function PersonalBalance() {
     stakableBtcBalance,
     stakedBtcBalance,
     inscriptionsBtcBalance,
+    loading: isBalanceLoading,
   } = useBalanceState();
 
   const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
@@ -74,9 +75,14 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={loading}
+            loading={isBalanceLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
-            value={`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
+            value={
+              isBalanceLoading
+                ? ""
+                : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
+            }
+            loadingStyle={LoadingStyle.ShowSpinner}
           />
 
           <StatItem

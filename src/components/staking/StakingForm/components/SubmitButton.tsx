@@ -1,8 +1,12 @@
 import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { Tooltip } from "react-tooltip";
 
+import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
+import { getNetworkConfigBBN } from "@/config/network/bbn";
 
+  const { coinSymbol } = getNetworkConfigBBN();
+  
 export function SubmitButton() {
   const { isValid, errors } = useFormState();
   const {
@@ -16,7 +20,9 @@ export function SubmitButton() {
   const invalid = !isValid || bbnBalance === 0;
   const tooltip =
     errorMessage ??
-    (bbnBalance === 0 ? "Insufficient BABY Balance in Babylon Wallet" : "");
+    (bbnBalance === 0
+      ? `Insufficient ${coinSymbol} Balance in Babylon Wallet${BBN_FEE_AMOUNT ? `.\n${BBN_FEE_AMOUNT} ${coinSymbol} required for network fees.` : ""}`
+      : "");
 
   return (
     <span
