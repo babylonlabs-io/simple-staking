@@ -1,14 +1,8 @@
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { FaBitcoin } from "react-icons/fa";
 
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
-import { RegistrationEndModal } from "@/app/components/Modals/RegistrationModal/RegistrationEndModal";
-import { RegistrationStartModal } from "@/app/components/Modals/RegistrationModal/RegistrationStartModal";
-import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
-import { DOCUMENTATION_LINKS, ONE_MINUTE } from "@/app/constants";
-import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
-import { useDelegationState } from "@/app/state/DelegationState";
+import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
   type Delegation as DelegationInterface,
@@ -23,32 +17,21 @@ import { maxDecimals } from "@/utils/maxDecimals";
 import { durationTillNow } from "@/utils/time";
 import { trim } from "@/utils/trim";
 
-import { VerificationModal } from "../Modals/VerificationModal";
-
 import { DelegationCell } from "./components/DelegationCell";
 
 interface DelegationProps {
+  currentTime: number;
   delegation: DelegationInterface;
   onWithdraw: (id: string) => void;
   onUnbond: (id: string) => void;
+  onRegistration: (delegation: DelegationInterface) => Promise<void>;
   // This attribute is set when an action has been taken by the user
   // that should change the status but the back-end
   // has not had time to reflect this change yet
   intermediateState?: string;
 }
 
-// step index
-const REGISTRATION_INDEXES: Record<string, number> = {
-  "registration-staking-slashing": 1,
-  "registration-unbonding-slashing": 2,
-  "registration-proof-of-possession": 3,
-  "registration-sign-bbn": 4,
-};
-
-const VERIFICATION_STEPS: Record<string, 1 | 2> = {
-  "registration-send-bbn": 1,
-  "registration-verifying": 2,
-};
+const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
 interface FinalityProviderDisplayProps {
   fpName: string;
@@ -152,9 +135,11 @@ const DelegationState: React.FC<{
 };
 
 export const Delegation: React.FC<DelegationProps> = ({
+  currentTime,
   delegation,
   onWithdraw,
   onUnbond,
+  onRegistration,
   intermediateState,
 }) => {
   const {
@@ -168,18 +153,9 @@ export const Delegation: React.FC<DelegationProps> = ({
   } = delegation;
 
   const { startTimestamp } = stakingTx;
-  const [currentTime, setCurrentTime] = useState(Date.now());
-  const {
-    processing,
-    registrationStep: step,
-    setRegistrationStep: setStep,
-    setSelectedDelegation,
-    resetRegistration: handleCloseRegistration,
-  } = useDelegationState();
-  const { registerPhase1Delegation } = useRegistrationService();
+
   const { getFinalityProvider, getFinalityProviderName } =
     useFinalityProviderState();
-  const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
   const finalityProvider = getFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
@@ -193,20 +169,6 @@ export const Delegation: React.FC<DelegationProps> = ({
     isOverflow && isActive
       ? DelegationStateEnum.OVERFLOW
       : intermediateState || state;
-
-  useEffect(() => {
-    const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE);
-    return () => clearInterval(timerId);
-  }, []);
-
-  const onRegistration = async () => {
-    setSelectedDelegation(delegation);
-    setStep("registration-start");
-  };
-
-  const handleProceed = async () => {
-    await registerPhase1Delegation();
-  };
 
   return (
     <>
@@ -257,40 +219,12 @@ export const Delegation: React.FC<DelegationProps> = ({
             isEligibleForRegistration={isEligibleForTransition}
             stakingTxHashHex={stakingTxHashHex}
             finalityProviderPkHex={finalityProviderPkHex}
-            onRegistration={onRegistration}
+            onRegistration={() => onRegistration(delegation)}
             onUnbond={onUnbond}
             onWithdraw={onWithdraw}
           />
         </DelegationCell>
       </tr>
-
-      <RegistrationStartModal
-        open={step === "registration-start"}
-        onClose={handleCloseRegistration}
-        onProceed={handleProceed}
-      />
-
-      {step && Boolean(REGISTRATION_INDEXES[step]) && (
-        <SignModal
-          open
-          title="Transition to Phase 2"
-          step={REGISTRATION_INDEXES[step]}
-          processing={processing}
-        />
-      )}
-
-      {step && Boolean(VERIFICATION_STEPS[step]) && (
-        <VerificationModal
-          open
-          processing={processing}
-          step={VERIFICATION_STEPS[step]}
-        />
-      )}
-
-      <RegistrationEndModal
-        open={step === "registration-verified"}
-        onClose={handleCloseRegistration}
-      />
     </>
   );
 };
