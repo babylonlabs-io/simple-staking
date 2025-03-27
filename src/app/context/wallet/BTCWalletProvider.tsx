@@ -149,6 +149,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
           },
+          metadata: {
+            userPublicKey: publicKeyNoCoord,
+            btcAddress: address,
+          },
         });
       }
     },
