@@ -1,20 +1,23 @@
 import { useCallback } from "react";
+import { IoMdWarning } from "react-icons/io";
 
 import { SlashingModal } from "@/app/components/Modals/SlashingModal";
 import { StakeModal } from "@/app/components/Modals/StakeModal";
+import { SubmitModal } from "@/app/components/Modals/SubmitModal";
 import { UnbondModal } from "@/app/components/Modals/UnbondModal";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
-import { DelegationV2 } from "@/app/types/delegationsV2";
+import { DelegationWithFP } from "@/app/types/delegationsV2";
+import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { NetworkConfig } from "@/config/network";
 
 interface ConfirmationModalProps {
   processing: boolean;
   action: ActionType | undefined;
-  delegation: DelegationV2 | null;
-  onSubmit: (action: ActionType, delegation: DelegationV2) => void;
+  delegation: DelegationWithFP | null;
+  onSubmit: (action: ActionType, delegation: DelegationWithFP) => void;
   onClose: () => void;
   networkConfig: NetworkConfig;
   param: BbnStakingParamsVersion | null;
@@ -35,10 +38,45 @@ export function DelegationModal({
   return (
     <>
       <StakeModal
-        open={action === ACTIONS.STAKE}
+        open={
+          delegation?.fp.state === FinalityProviderState.ACTIVE &&
+          action === ACTIONS.STAKE
+        }
         onSubmit={handleSubmit}
         {...restProps}
       />
+      <SubmitModal
+        open={
+          delegation?.fp.state === FinalityProviderState.INACTIVE &&
+          action === ACTIONS.STAKE
+        }
+        icon={<IoMdWarning className="text-5xl text-primary-light" />}
+        title="Finality Provider is Inactive"
+        submitButton="Continue"
+        cancelButton="Cancel"
+        onSubmit={handleSubmit}
+        {...restProps}
+      >
+        Your stake will not earn rewards until the Finality Provider becomes
+        active. You can proceed or select an active Finality Provider to start
+        earning rewards.
+      </SubmitModal>
+      <SubmitModal
+        open={
+          delegation?.fp.state === FinalityProviderState.JAILED &&
+          action === ACTIONS.STAKE
+        }
+        icon={<IoMdWarning className="text-5xl text-primary-light" />}
+        title="Finality Provider is Jailed"
+        submitButton="Continue"
+        cancelButton="Cancel"
+        onSubmit={handleSubmit}
+        {...restProps}
+      >
+        Your stake will not earn rewards because this Finality Provider is
+        currently jailed. You can proceed or select an active Finality Provider
+        to ensure your stake is earning.
+      </SubmitModal>
       <UnbondModal
         open={action === ACTIONS.UNBOND}
         onSubmit={handleSubmit}

@@ -8,6 +8,7 @@ import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
   DelegationV2,
+  DelegationWithFP,
   DelegationV2StakingState as State,
 } from "@/app/types/delegationsV2";
 import { ErrorType } from "@/app/types/errors";
@@ -46,7 +47,7 @@ type DelegationCommand = (props: TxProps) => Promise<void>;
 
 interface ConfirmationModalState {
   action: ActionType;
-  delegation: DelegationV2;
+  delegation: DelegationWithFP;
   param: BbnStakingParamsVersion;
 }
 
@@ -87,7 +88,7 @@ export function useDelegationService() {
           d.finalityProviderBtcPksHex[0],
         ) as FinalityProvider,
       })),
-    [isLoading, delegations, finalityProviderMap],
+    [delegations, finalityProviderMap],
   );
 
   const validations = useMemo(
@@ -265,7 +266,7 @@ export function useDelegationService() {
   );
 
   const openConfirmationModal = useCallback(
-    (action: ActionType, delegation: DelegationV2) => {
+    (action: ActionType, delegation: DelegationWithFP) => {
       const param = getBbnParamByVersion(
         delegation.paramsVersion,
         networkInfo?.params.bbnStakingParams.versions || [],
