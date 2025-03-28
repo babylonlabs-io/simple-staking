@@ -26,32 +26,100 @@ const ACTION_BUTTON_PROPS: Actions = {
       action: ACTIONS.STAKE,
       title: "Stake",
     },
+    [DelegationState.ACTIVE]: {
+      action: ACTIONS.UNBOND,
+      title: "Unbond",
+    },
+    [DelegationState.EARLY_UNBONDING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
+      title: "Withdraw",
+    },
+    [DelegationState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
+      title: "Withdraw",
+    },
   },
-  [FinalityProviderState.INACTIVE]: {},
-  [FinalityProviderState.JAILED]: {},
-  [FinalityProviderState.SLASHED]: {},
-};
-
-const FALLBACK_PROPS: Record<string, { action: ActionType; title: string }> = {
-  [DelegationState.ACTIVE]: {
-    action: ACTIONS.UNBOND,
-    title: "Unbond",
+  [FinalityProviderState.INACTIVE]: {
+    [DelegationState.VERIFIED]: {
+      action: ACTIONS.STAKE,
+      title: "Stake",
+    },
+    [DelegationState.ACTIVE]: {
+      action: ACTIONS.UNBOND,
+      title: "Unbond",
+    },
+    [DelegationState.EARLY_UNBONDING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
+      title: "Withdraw",
+    },
+    [DelegationState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
+      title: "Withdraw",
+    },
   },
-  [DelegationState.EARLY_UNBONDING_WITHDRAWABLE]: {
-    action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
-    title: "Withdraw",
+  [FinalityProviderState.JAILED]: {
+    [DelegationState.VERIFIED]: {
+      action: ACTIONS.STAKE,
+      title: "Stake",
+    },
+    [DelegationState.ACTIVE]: {
+      action: ACTIONS.UNBOND,
+      title: "Unbond",
+    },
+    [DelegationState.EARLY_UNBONDING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
+      title: "Withdraw",
+    },
+    [DelegationState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
+      title: "Withdraw",
+    },
   },
-  [DelegationState.TIMELOCK_WITHDRAWABLE]: {
-    action: ACTIONS.WITHDRAW_ON_TIMELOCK,
-    title: "Withdraw",
-  },
-  [DelegationState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
-    action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
-    title: "Withdraw",
-  },
-  [DelegationState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
-    action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
-    title: "Withdraw",
+  [FinalityProviderState.SLASHED]: {
+    [DelegationState.ACTIVE]: {
+      action: ACTIONS.UNBOND,
+      title: "Unbond",
+    },
+    [DelegationState.EARLY_UNBONDING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK,
+      title: "Withdraw",
+    },
+    [DelegationState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
+      title: "Withdraw",
+    },
+    [DelegationState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
+      action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
+      title: "Withdraw",
+    },
   },
 };
 
@@ -61,8 +129,7 @@ export function ActionButton({
   onClick,
 }: ActionButtonProps) {
   const buttonProps =
-    ACTION_BUTTON_PROPS[delegation.fp?.state]?.[delegation.state] ??
-    FALLBACK_PROPS[delegation.state];
+    ACTION_BUTTON_PROPS[delegation.fp?.state]?.[delegation.state];
 
   if (!buttonProps) return null;
 
