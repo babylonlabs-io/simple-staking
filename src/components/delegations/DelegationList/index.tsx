@@ -4,7 +4,7 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { DelegationWithFP, type DelegationV2 } from "@/app/types/delegationsV2";
+import { DelegationWithFP } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
@@ -20,7 +20,7 @@ import { NoDelegations } from "./NoDelegations";
 
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
-  handleActionClick: (action: ActionType, delegation: DelegationV2) => void;
+  handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void;
 };
 
 const networkConfig = getNetworkConfig();

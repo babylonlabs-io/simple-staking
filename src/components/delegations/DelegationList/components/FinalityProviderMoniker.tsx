@@ -18,6 +18,9 @@ const STATUSES: Record<
     status?: "warning" | "error";
   }
 > = {
+  [FinalityProviderState.INACTIVE]: {
+    tooltip: "This finality provider is inactive.",
+  },
   [FinalityProviderState.JAILED]: {
     tooltip: (
       <span>
@@ -31,7 +34,6 @@ const STATUSES: Record<
         </Link>
       </span>
     ),
-    status: "error",
   },
   [FinalityProviderState.SLASHED]: {
     tooltip: (
