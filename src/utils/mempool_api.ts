@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ServerError } from "@/app/context/Error/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
-import { fetchApi } from "@/utils/fetch";
+import { fetchApi, validateUrlPath } from "@/utils/fetch";
 
 const { mempoolApiUrl } = getNetworkConfigBTC();
 
@@ -63,7 +63,7 @@ const mempoolAPI = `${mempoolApiUrl}/api/`;
 
 // URL for the address info endpoint
 function addressInfoUrl(address: string): URL {
-  return new URL(mempoolAPI + "address/" + address);
+  return new URL(mempoolAPI + "address/" + validateUrlPath(address));
 }
 
 // URL for the push transaction endpoint
@@ -73,7 +73,7 @@ function pushTxUrl(): URL {
 
 // URL for retrieving information about an address' UTXOs
 function utxosInfoUrl(address: string): URL {
-  return new URL(mempoolAPI + "address/" + address + "/utxo");
+  return new URL(mempoolAPI + "address/" + validateUrlPath(address) + "/utxo");
 }
 
 // URL for retrieving information about the recommended network fees
@@ -89,12 +89,16 @@ function btcTipHeightUrl(): URL {
 // URL for validating an address which contains a set of information about the address
 // including the scriptPubKey
 function validateAddressUrl(address: string): URL {
-  return new URL(mempoolAPI + "v1/validate-address/" + address);
+  return new URL(
+    mempoolAPI + "v1/validate-address/" + validateUrlPath(address),
+  );
 }
 
 // URL for the transaction info endpoint
 function txInfoUrl(txId: string): URL {
-  return new URL(mempoolAPI + API_ENDPOINTS.MEMPOOL.TX + "/" + txId);
+  return new URL(
+    mempoolAPI + API_ENDPOINTS.MEMPOOL.TX + "/" + validateUrlPath(txId),
+  );
 }
 
 // URL for the transaction merkle proof endpoint
@@ -103,7 +107,7 @@ function txMerkleProofUrl(txId: string): URL {
     mempoolAPI +
       API_ENDPOINTS.MEMPOOL.TX +
       "/" +
-      txId +
+      validateUrlPath(txId) +
       "/" +
       API_ENDPOINTS.MEMPOOL.MERKLE_PROOF,
   );
@@ -111,7 +115,7 @@ function txMerkleProofUrl(txId: string): URL {
 
 // URL for the transaction hex endpoint
 function txHexUrl(txId: string): URL {
-  return new URL(mempoolAPI + "tx/" + txId + "/hex");
+  return new URL(mempoolAPI + "tx/" + validateUrlPath(txId) + "/hex");
 }
 
 /**

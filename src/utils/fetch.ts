@@ -10,6 +10,35 @@ type FetchOptions = {
 };
 
 /**
+ * Validates a URL path component to prevent path traversal attacks
+ * @param path - The path component to validate
+ * @returns The validated path component
+ * @throws ServerError if the path contains potentially malicious sequences
+ */
+export const validateUrlPath = (path: string): string => {
+  const pathTraversalPatterns = [
+    /\.\./, // Double dot
+    /\.\/|\/\./, // Current directory references
+    /\/|\\/, // Forward and back slashes
+    /%2e%2e/i, // URL encoded '..'
+    /%2e\//i,
+    /\/%2e/i, // URL encoded './'
+    /%2f/i,
+    /%5c/i, // URL encoded '/' and '\'
+  ];
+
+  if (pathTraversalPatterns.some((pattern) => pattern.test(path))) {
+    throw new ServerError({
+      message: "Invalid parameter: potential path traversal detected",
+      status: HttpStatusCode.BadRequest,
+      endpoint: "validateUrlPath",
+    });
+  }
+
+  return path;
+};
+
+/**
  * Wrapper for fetch with standardized error handling and response parsing
  * @param url - The URL to fetch from
  * @param options - Fetch options for API requests
