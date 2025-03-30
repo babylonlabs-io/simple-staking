@@ -1,3 +1,8 @@
+/**
+ * Import polyfill for array.toSorted
+ */
+import "core-js/features/array/to-sorted";
+
 import { Loader, Table, useWatch } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 import { useMemo } from "react";
