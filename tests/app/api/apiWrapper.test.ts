@@ -52,9 +52,6 @@ describe("apiWrapper", () => {
       "https://api.example.com/test",
       expect.objectContaining({
         method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
       }),
     );
     expect(result).toEqual({

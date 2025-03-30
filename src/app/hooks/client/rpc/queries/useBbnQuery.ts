@@ -11,6 +11,7 @@ import {
 import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 
 import { useClientQuery } from "../../useClient";
 import { useRpcErrorHandler } from "../useRpcErrorHandler";
@@ -25,6 +26,7 @@ const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
  * interacting with Babylon RPC nodes
  */
 export const useBbnQuery = () => {
+  const { isGeoBlocked, isLoading: isHealthcheckLoading } = useHealthCheck();
   const { bech32Address, connected } = useCosmosWallet();
   const { queryClient } = useBbnRpc();
   const { hasRpcError, reconnect } = useRpcErrorHandler();
@@ -79,7 +81,13 @@ export const useBbnQuery = () => {
         (withdrawnCoins || 0)
       );
     },
-    enabled: Boolean(queryClient && connected && bech32Address),
+    enabled: Boolean(
+      queryClient &&
+        connected &&
+        bech32Address &&
+        !isGeoBlocked &&
+        !isHealthcheckLoading,
+    ),
     staleTime: ONE_MINUTE,
     refetchInterval: ONE_MINUTE,
   });
@@ -98,7 +106,13 @@ export const useBbnQuery = () => {
       const balance = await bank.balance(bech32Address, "ubbn");
       return Number(balance?.amount ?? 0);
     },
-    enabled: Boolean(queryClient && connected && bech32Address),
+    enabled: Boolean(
+      queryClient &&
+        connected &&
+        bech32Address &&
+        !isGeoBlocked &&
+        !isHealthcheckLoading,
+    ),
     staleTime: ONE_MINUTE,
     refetchInterval: ONE_MINUTE,
   });
@@ -118,7 +132,7 @@ export const useBbnQuery = () => {
       const { header } = await btclightQueryClient.Tip(req);
       return header;
     },
-    enabled: Boolean(queryClient),
+    enabled: Boolean(queryClient && !isGeoBlocked && !isHealthcheckLoading),
     staleTime: ONE_MINUTE,
     refetchInterval: false, // Disable automatic periodic refetching
   });

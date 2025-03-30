@@ -9,9 +9,12 @@ import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
+import { useHealthCheck } from "../../useHealthCheck";
+
 export const DELEGATIONS_KEY = "DELEGATIONS";
 
 export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
+  const { isGeoBlocked, isLoading } = useHealthCheck();
   const { publicKeyNoCoord } = useBTCWallet();
   const { handleError, isOpen } = useError();
 
@@ -35,7 +38,8 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       }
       return ONE_MINUTE;
     },
-    enabled: Boolean(publicKeyNoCoord) && enabled,
+    enabled:
+      Boolean(publicKeyNoCoord) && enabled && !isGeoBlocked && !isLoading,
     select: (data) => {
       const flattenedData = data.pages.reduce<PaginatedDelegations>(
         (acc, page) => {
