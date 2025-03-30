@@ -5,6 +5,7 @@ import { useRewardsState } from "@/app/state/RewardState";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
 export const useRewardsService = () => {
   const {
@@ -15,6 +16,7 @@ export const useRewardsService = () => {
     setProcessing,
     setTransactionFee,
   } = useRewardsState();
+  const { balanceQuery } = useBbnQuery();
 
   const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
 
@@ -50,17 +52,45 @@ export const useRewardsService = () => {
     closeRewardModal();
     setProcessing(true);
 
-    const msg = createWithdrawRewardMsg(bbnAddress);
+    try {
+      const msg = createWithdrawRewardMsg(bbnAddress);
+      const signedTx = await signBbnTx(msg);
+      await sendBbnTx(signedTx);
 
-    const signedTx = await signBbnTx(msg);
-    await sendBbnTx(signedTx);
-    await refetchRewardBalance();
-    setProcessing(false);
+      await refetchRewardBalance();
+
+      const initialBalance = balanceQuery.data || 0;
+      let attempts = 0;
+      const maxAttempts = 10;
+      const pollInterval = 2e3;
+
+      const pollBalance = async () => {
+        if (attempts >= maxAttempts) {
+          return;
+        }
+
+        attempts++;
+        await balanceQuery.refetch();
+
+        if (balanceQuery.data !== initialBalance) {
+          return;
+        }
+
+        setTimeout(pollBalance, pollInterval);
+      };
+
+      await pollBalance();
+    } catch (error) {
+      console.error("Error claiming rewards:", error);
+    } finally {
+      setProcessing(false);
+    }
   }, [
     bbnAddress,
     signBbnTx,
     sendBbnTx,
     refetchRewardBalance,
+    balanceQuery,
     setProcessing,
     closeRewardModal,
   ]);
