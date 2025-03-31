@@ -37,9 +37,12 @@ export const apiWrapper = async <TResponseData = unknown>(
 
   const options: RequestInit = {
     method,
-    headers: {
-      "Content-Type": "application/json",
-    },
+    headers:
+      method === "POST"
+        ? {
+            "Content-Type": "application/json",
+          }
+        : {},
   };
 
   if (params?.body) {

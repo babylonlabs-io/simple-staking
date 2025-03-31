@@ -65,12 +65,18 @@ export const Connect: React.FC<ConnectProps> = ({
   // Widget states
   const { selectedWallets } = useWidgetState();
 
-  const { isApiNormal, isGeoBlocked, apiMessage } = useHealthCheck();
+  const {
+    isApiNormal,
+    isGeoBlocked,
+    apiMessage,
+    isLoading: isHealthcheckLoading,
+  } = useHealthCheck();
   const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
   const isConnected = useMemo(
-    () => btcConnected && bbnConnected,
-    [btcConnected, bbnConnected],
+    () =>
+      btcConnected && bbnConnected && !isGeoBlocked && !isHealthcheckLoading,
+    [btcConnected, bbnConnected, isGeoBlocked, isHealthcheckLoading],
   );
 
   const isLoading =

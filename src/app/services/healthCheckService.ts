@@ -13,6 +13,7 @@ import {
 export const getHealthCheck = async (): Promise<HealthCheckResult> => {
   try {
     const healthCheckAPIResponse = await fetchHealthCheck();
+
     if (healthCheckAPIResponse.data) {
       return {
         status: HealthCheckStatus.Normal,
