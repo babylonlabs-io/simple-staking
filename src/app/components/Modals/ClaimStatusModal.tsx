@@ -1,10 +1,11 @@
 import { Loader, Text } from "@babylonlabs-io/core-ui";
 
+import { BABYLON_EXPLORER } from "@/app/constants";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { SubmitModal } from "./SubmitModal";
 
-const { coinSymbol, explorerUrl } = getNetworkConfigBBN();
+const { coinSymbol } = getNetworkConfigBBN();
 
 type ClaimStatus = "processing" | "success";
 
@@ -65,9 +66,9 @@ export const ClaimStatusModal = ({
             >
               Transaction Hash:
             </Text>
-            {explorerUrl ? (
+            {BABYLON_EXPLORER ? (
               <a
-                href={`${explorerUrl}/transaction/${transactionHash}`}
+                href={`${BABYLON_EXPLORER}/transaction/${transactionHash}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary-light hover:text-primary-light/80 underline break-all text-sm text-center"
