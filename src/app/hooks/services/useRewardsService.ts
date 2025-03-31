@@ -17,6 +17,10 @@ export const useRewardsService = () => {
     bbnAddress,
     openRewardModal,
     closeRewardModal,
+    openProcessingModal,
+    closeProcessingModal,
+    openSuccessModal,
+    setTransactionHash,
     refetchRewardBalance,
     setProcessing,
     setTransactionFee,
@@ -31,7 +35,6 @@ export const useRewardsService = () => {
    */
   const estimateClaimRewardsGas = useCallback(async (): Promise<number> => {
     const withdrawRewardMsg = createWithdrawRewardMsg(bbnAddress);
-
     const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
     return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
   }, [bbnAddress, estimateBbnGasFee]);
@@ -56,12 +59,23 @@ export const useRewardsService = () => {
   const claimRewards = useCallback(async () => {
     closeRewardModal();
     setProcessing(true);
+    openProcessingModal();
 
     try {
       const msg = createWithdrawRewardMsg(bbnAddress);
       const signedTx = await signBbnTx(msg);
-      await sendBbnTx(signedTx);
+      const result = await sendBbnTx(signedTx);
 
+      // Store transaction hash for display
+      if (result?.txHash) {
+        setTransactionHash(result.txHash);
+      }
+
+      // Close processing modal and show success
+      closeProcessingModal();
+      openSuccessModal();
+
+      // Refresh reward balance and wait for confirmation
       await refetchRewardBalance();
       const initialBalance = balanceQuery.data || 0;
       await retry(
@@ -71,6 +85,8 @@ export const useRewardsService = () => {
         MAX_RETRY_ATTEMPTS,
       );
     } catch (error: Error | any) {
+      setProcessing(false);
+      closeProcessingModal();
       handleError({
         error,
       });
@@ -85,6 +101,11 @@ export const useRewardsService = () => {
     balanceQuery,
     setProcessing,
     closeRewardModal,
+    openProcessingModal,
+    closeProcessingModal,
+    openSuccessModal,
+    setTransactionHash,
+    handleError,
   ]);
 
   return {

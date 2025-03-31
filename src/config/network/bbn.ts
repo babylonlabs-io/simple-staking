@@ -1,5 +1,7 @@
 import type { BBNConfig } from "@babylonlabs-io/wallet-connector";
 
+import { BABYLON_EXPLORER } from "@/app/constants";
+
 import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
 import { bbnTestnet } from "./bbn/testnet";
@@ -42,6 +44,15 @@ const config: Record<string, BBNConfig> = {
   },
 };
 
-export function getNetworkConfigBBN(): BBNConfig {
-  return config[network] ?? config[defaultNetwork];
+export type NetworkConfigWithExplorer = BBNConfig & {
+  explorerUrl?: string;
+};
+
+export function getNetworkConfigBBN(): NetworkConfigWithExplorer {
+  const baseConfig = config[network] ?? config[defaultNetwork];
+
+  return {
+    ...baseConfig,
+    explorerUrl: BABYLON_EXPLORER,
+  };
 }
