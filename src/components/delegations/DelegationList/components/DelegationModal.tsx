@@ -57,9 +57,9 @@ export function DelegationModal({
         onSubmit={handleSubmit}
         {...restProps}
       >
-        Your stake will not earn rewards until the Finality Provider becomes
-        active. You can proceed or select an active Finality Provider to start
-        earning rewards.
+        The finality provider you selected is not currently active, so you won’t
+        earn rewards for your stake unless it becomes active. You can proceed
+        with this choice or select a different, active finality provider.
       </SubmitModal>
       <SubmitModal
         open={
@@ -73,9 +73,9 @@ export function DelegationModal({
         onSubmit={handleSubmit}
         {...restProps}
       >
-        Your stake will not earn rewards because this Finality Provider is
-        currently jailed. You can proceed or select an active Finality Provider
-        to ensure your stake is earning.
+        The finality provider you selected is currently jailed, so you won’t
+        earn rewards for your stake unless it becomes active. You can proceed
+        with this choice or select a different, active finality provider.
       </SubmitModal>
       <UnbondModal
         open={action === ACTIONS.UNBOND}
