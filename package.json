@@ -38,6 +38,7 @@
     "@tanstack/react-query-next-experimental": "^5.28.14",
     "@uidotdev/usehooks": "^2.4.1",
     "bitcoinjs-lib": "6.1.5",
+    "core-js": "^3.41.0",
     "date-fns": "^3.6.0",
     "decimal.js-light": "^2.5.1",
     "framer-motion": "^11.1.9",
