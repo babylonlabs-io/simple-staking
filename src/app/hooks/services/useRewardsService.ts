@@ -1,11 +1,11 @@
 import { incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { useCallback } from "react";
 
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useRewardsState } from "@/app/state/RewardState";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
-import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
 export const useRewardsService = () => {
   const {
@@ -16,9 +16,9 @@ export const useRewardsService = () => {
     setProcessing,
     setTransactionFee,
   } = useRewardsState();
-  const { balanceQuery } = useBbnQuery();
 
   const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
+  const { handleError } = useError();
 
   /**
    * Estimates the gas fee for claiming rewards.
@@ -58,8 +58,10 @@ export const useRewardsService = () => {
       await sendBbnTx(signedTx);
 
       await refetchRewardBalance();
-    } catch (error) {
-      console.error("Error claiming rewards:", error);
+    } catch (error: Error | any) {
+      handleError({
+        error,
+      });
     } finally {
       setProcessing(false);
     }
@@ -70,6 +72,7 @@ export const useRewardsService = () => {
     refetchRewardBalance,
     setProcessing,
     closeRewardModal,
+    handleError,
   ]);
 
   return {
