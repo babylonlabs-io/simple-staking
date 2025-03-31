@@ -58,28 +58,6 @@ export const useRewardsService = () => {
       await sendBbnTx(signedTx);
 
       await refetchRewardBalance();
-
-      const initialBalance = balanceQuery.data || 0;
-      let attempts = 0;
-      const maxAttempts = 10;
-      const pollInterval = 2e3;
-
-      const pollBalance = async () => {
-        if (attempts >= maxAttempts) {
-          return;
-        }
-
-        attempts++;
-        await balanceQuery.refetch();
-
-        if (balanceQuery.data !== initialBalance) {
-          return;
-        }
-
-        setTimeout(pollBalance, pollInterval);
-      };
-
-      await pollBalance();
     } catch (error) {
       console.error("Error claiming rewards:", error);
     } finally {
@@ -90,7 +68,6 @@ export const useRewardsService = () => {
     signBbnTx,
     sendBbnTx,
     refetchRewardBalance,
-    balanceQuery,
     setProcessing,
     closeRewardModal,
   ]);
