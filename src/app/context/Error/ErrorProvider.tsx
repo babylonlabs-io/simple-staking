@@ -103,23 +103,26 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
       const eventId = Sentry.withScope((scope) => {
         if (error instanceof ServerError) {
+          scope.setTag("errorType", ErrorType.SERVER);
+          scope.setTag("status", error.status);
+          scope.setTag("endpoint", error.endpoint);
+
           scope.setExtras({
-            errorType: ErrorType.SERVER,
-            endpoint: error.endpoint,
-            status: error.status,
             trace: stackTrace,
             request: error.request || {},
             response: error.response || {},
             ...combinedMetadata,
           });
         } else if (error instanceof ClientError) {
+          scope.setTag("errorType", error.type ?? ErrorType.UNKNOWN);
+          scope.setTag("errorCategory", error.category);
+
           scope.setExtras({
-            errorCategory: error.category,
-            errorType: error.type ?? ErrorType.UNKNOWN,
             trace: stackTrace,
             ...combinedMetadata,
           });
         } else {
+          scope.setTag("errorType", ErrorType.UNKNOWN);
           scope.setExtras({
             trace: stackTrace,
             ...combinedMetadata,
