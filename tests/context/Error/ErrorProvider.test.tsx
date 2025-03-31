@@ -20,6 +20,7 @@ jest.mock("@sentry/nextjs", () => {
     withScope: mockSentryWithScope.mockImplementation((fn) => {
       const mockScope = {
         setExtras: jest.fn(),
+        setTag: jest.fn(),
       };
       fn(mockScope);
       return "mock-sentry-event-id";
@@ -99,18 +100,28 @@ describe("ErrorProvider", () => {
     expect(mockedSentry.captureException).toHaveBeenCalledWith(testError);
 
     const scopeFunction = mockedSentry.withScope.mock.calls[0][0];
-    const mockScope = { setExtras: jest.fn() };
+    const mockScope = {
+      setExtras: jest.fn(),
+      setTag: jest.fn(),
+    };
     scopeFunction(mockScope);
     const metadataPassedToSentry = mockScope.setExtras.mock.calls[0][0];
 
     expect(metadataPassedToSentry).toMatchObject({
-      errorCategory: ClientErrorCategory.CLIENT_TRANSACTION,
-      errorType: ErrorType.STAKING,
       userPublicKey: mockWalletData.userPublicKey,
       btcAddress: mockWalletData.btcAddress,
       babylonAddress: mockWalletData.babylonAddress,
       testField: "Additional test data",
     });
+
+    expect(mockScope.setTag).toHaveBeenCalledWith(
+      "errorType",
+      ErrorType.STAKING,
+    );
+    expect(mockScope.setTag).toHaveBeenCalledWith(
+      "errorCategory",
+      ClientErrorCategory.CLIENT_TRANSACTION,
+    );
   });
 
   it("handles error without wallet metadata", async () => {
@@ -134,13 +145,24 @@ describe("ErrorProvider", () => {
     expect(mockedSentry.captureException).toHaveBeenCalledWith(testError);
 
     const scopeFunction = mockedSentry.withScope.mock.calls[0][0];
-    const mockScope = { setExtras: jest.fn() };
+    const mockScope = {
+      setExtras: jest.fn(),
+      setTag: jest.fn(),
+    };
     scopeFunction(mockScope);
     const metadataPassedToSentry = mockScope.setExtras.mock.calls[0][0];
 
     expect(metadataPassedToSentry).toMatchObject({
-      errorCategory: ClientErrorCategory.CLIENT_UNKNOWN,
-      errorType: ErrorType.UNKNOWN,
+      errorSource: undefined,
     });
+
+    expect(mockScope.setTag).toHaveBeenCalledWith(
+      "errorType",
+      ErrorType.UNKNOWN,
+    );
+    expect(mockScope.setTag).toHaveBeenCalledWith(
+      "errorCategory",
+      ClientErrorCategory.CLIENT_UNKNOWN,
+    );
   });
 });
