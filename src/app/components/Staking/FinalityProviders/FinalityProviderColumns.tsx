@@ -20,7 +20,8 @@ export const finalityProviderColumns = [
   {
     key: "moniker",
     header: "Finality Provider",
-    cellClassName: "text-primary-dark",
+    cellClassName: "text-primary-dark truncate",
+    headerClassName: "w-[30%]",
     render: (_: unknown, row?: FinalityProvider) => {
       if (!row) return null;
 
@@ -39,6 +40,8 @@ export const finalityProviderColumns = [
   {
     key: "state",
     header: "Status",
+    cellClassName: "truncate",
+    headerClassName: "w-[15%]",
     render: (value: unknown) => {
       if (value == null) return "Unknown";
       return mapStatus(value as FinalityProviderState);
@@ -52,6 +55,8 @@ export const finalityProviderColumns = [
   {
     key: "btcPk",
     header: `${coinSymbol} PK`,
+    cellClassName: "truncate",
+    headerClassName: "w-[20%]",
     render: (_: unknown, row?: FinalityProvider) => {
       if (!row?.btcPk) return null;
       return <Hash value={row.btcPk} address small noFade />;
@@ -60,6 +65,8 @@ export const finalityProviderColumns = [
   {
     key: "activeTVLSat",
     header: "Total Delegation",
+    cellClassName: "truncate",
+    headerClassName: "w-[20%]",
     render: (value: unknown) => {
       const amount = Number(value);
       if (isNaN(amount)) return "-";
@@ -74,6 +81,8 @@ export const finalityProviderColumns = [
   {
     key: "commission",
     header: "Commission",
+    cellClassName: "truncate",
+    headerClassName: "w-[15%]",
     render: (value: unknown) => {
       const commission = Number(value);
       if (isNaN(commission)) return "-";

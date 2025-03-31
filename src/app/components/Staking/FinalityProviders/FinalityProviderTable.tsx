@@ -9,6 +9,8 @@ import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { finalityProviderColumns } from "./FinalityProviderColumns";
 import { StatusView } from "./FinalityProviderTableStatusView";
 
+import "@/app/styles/table-overrides.css";
+
 interface FinalityProviderTable {
   onSelectRow?: (fpPK: string) => void;
 }
@@ -79,19 +81,21 @@ export const FinalityProviderTable = ({
   }
 
   return (
-    <Table
-      wrapperClassName="max-h-[28.5rem]"
-      className="min-w-full"
-      data={tableData}
-      columns={finalityProviderColumns}
-      loading={isFetching}
-      hasMore={hasNextPage}
-      onLoadMore={fetchNextPage}
-      selectedRow={selectedFP}
-      onRowSelect={(row) => {
-        onSelectRow?.(row?.btcPk ?? "");
-      }}
-      isRowSelectable={isRowSelectable}
-    />
+    <div className="finality-provider-table-container">
+      <Table
+        wrapperClassName="max-h-[28.5rem] w-full finality-table-wrapper"
+        className="w-full finality-table"
+        data={tableData}
+        columns={finalityProviderColumns}
+        loading={isFetching}
+        hasMore={hasNextPage}
+        onLoadMore={fetchNextPage}
+        selectedRow={selectedFP}
+        onRowSelect={(row) => {
+          onSelectRow?.(row?.btcPk ?? "");
+        }}
+        isRowSelectable={isRowSelectable}
+      />
+    </div>
   );
 };

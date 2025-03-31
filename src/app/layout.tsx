@@ -7,6 +7,7 @@ import { network } from "@/config/network/btc";
 import MetaTags from "./components/Meta/MetaTags";
 import "./globals.css";
 import Providers from "./providers";
+import "./styles/table-overrides.css";
 
 export const metadata: Metadata = {
   title: "Babylon - Staking Dashboard",
