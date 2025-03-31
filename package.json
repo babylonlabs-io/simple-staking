@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "0.0.3-canary.7",
-    "@babylonlabs-io/core-ui": "0.11.0",
-    "@babylonlabs-io/wallet-connector": "0.6.9",
-    "@babylonlabs-io/btc-staking-ts": "0.4.0-canary.16",
+    "@babylonlabs-io/core-ui": "1.0.0",
+    "@babylonlabs-io/wallet-connector": "1.0.1",
+    "@babylonlabs-io/btc-staking-ts": "1.0.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cosmjs/proto-signing": "^0.32.4",
