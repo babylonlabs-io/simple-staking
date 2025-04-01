@@ -30,11 +30,11 @@ export function PersonalBalance() {
     showProcessingModal,
     closeProcessingModal,
     closeRewardModal,
-    setTransactionHash,
     bbnAddress,
     rewardBalance,
     transactionFee,
     transactionHash,
+    setTransactionHash,
   } = useRewardsState();
 
   // Load balance state
@@ -118,7 +118,10 @@ export function PersonalBalance() {
 
         <ClaimStatusModal
           open={showProcessingModal}
-          onClose={closeProcessingModal}
+          onClose={() => {
+            closeProcessingModal();
+            setTransactionHash("");
+          }}
           loading={processing}
           transactionHash={transactionHash}
         />

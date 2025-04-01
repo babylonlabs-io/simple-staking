@@ -4,6 +4,7 @@ import { BiSolidBadgeCheck } from "react-icons/bi";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { SubmitModal } from "../SubmitModal";
+
 import { SuccessContent } from "./SuccessContent";
 
 interface ClaimStatusModalProps {

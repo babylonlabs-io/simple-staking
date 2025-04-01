@@ -3,8 +3,8 @@ import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
-import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { API_DEFAULT_RETRY_COUNT } from "@/app/constants";
+import { API_ENDPOINTS } from "@/app/constants/endpoints";
 
 import { useError } from "../Error/ErrorProvider";
 import { ServerError } from "../Error/errors/serverError";

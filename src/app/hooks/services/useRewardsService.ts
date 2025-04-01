@@ -85,6 +85,7 @@ export const useRewardsService = () => {
     } catch (error: Error | any) {
       setProcessing(false);
       closeProcessingModal();
+      setTransactionHash("");
       handleError({
         error,
       });
