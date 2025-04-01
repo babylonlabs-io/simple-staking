@@ -12,7 +12,7 @@ import { ubbnToBaby } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
-import { ClaimStatusModal } from "../Modals/ClaimStatusModal";
+import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
 import { LoadingStyle, StatItem } from "../Stats/StatItem";
@@ -28,9 +28,9 @@ export function PersonalBalance() {
     processing,
     showRewardModal,
     showProcessingModal,
-    showSuccessModal,
-    closeSuccessModal,
+    closeProcessingModal,
     closeRewardModal,
+    setTransactionHash,
     bbnAddress,
     rewardBalance,
     transactionFee,
@@ -116,12 +116,10 @@ export function PersonalBalance() {
           transactionFee={transactionFee}
         />
 
-        <ClaimStatusModal open={showProcessingModal} status="processing" />
-
         <ClaimStatusModal
-          open={showSuccessModal}
-          onClose={closeSuccessModal}
-          status="success"
+          open={showProcessingModal}
+          onClose={closeProcessingModal}
+          loading={processing}
           transactionHash={transactionHash}
         />
       </Section>

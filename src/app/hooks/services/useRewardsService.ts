@@ -19,7 +19,6 @@ export const useRewardsService = () => {
     closeRewardModal,
     openProcessingModal,
     closeProcessingModal,
-    openSuccessModal,
     setTransactionHash,
     refetchRewardBalance,
     setProcessing,
@@ -71,9 +70,8 @@ export const useRewardsService = () => {
         setTransactionHash(result.txHash);
       }
 
-      // Close processing modal and show success
+      // Close processing modal
       closeProcessingModal();
-      openSuccessModal();
 
       // Refresh reward balance and wait for confirmation
       await refetchRewardBalance();
@@ -101,9 +99,6 @@ export const useRewardsService = () => {
     balanceQuery,
     setProcessing,
     closeRewardModal,
-    openProcessingModal,
-    closeProcessingModal,
-    openSuccessModal,
     setTransactionHash,
     handleError,
   ]);
