@@ -4,3 +4,8 @@ export enum Network {
   TESTNET = "testnet",
   SIGNET = "signet",
 }
+
+export enum ChainType {
+  BBN = "BBN",
+  BTC = "BTC",
+}

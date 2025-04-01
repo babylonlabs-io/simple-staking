@@ -18,7 +18,12 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
+import {
+  WalletError,
+  WalletErrorType,
+} from "@/app/context/Error/errors/walletError";
 import { Fees } from "@/app/types/fee";
+import { ChainType } from "@/app/types/network";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import {
   getAddressBalance,
@@ -31,8 +36,6 @@ import {
   isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet";
-import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
-
 const btcConfig = getNetworkConfigBTC();
 
 interface BTCWalletContextProps {
@@ -57,6 +60,7 @@ interface BTCWalletContextProps {
   pushTx: (txHex: string) => Promise<string>;
   getBTCTipHeight: () => Promise<number>;
   getInscriptions: () => Promise<InscriptionIdentifier[]>;
+  walletProviderName: string;
 }
 
 const BTCWalletContext = createContext<BTCWalletContextProps>({
@@ -78,6 +82,7 @@ const BTCWalletContext = createContext<BTCWalletContextProps>({
   pushTx: async () => "",
   getBTCTipHeight: async () => 0,
   getInscriptions: async () => [],
+  walletProviderName: "",
 });
 
 export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
@@ -86,6 +91,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const [network, setNetwork] = useState<networks.Network>();
   const [publicKeyNoCoord, setPublicKeyNoCoord] = useState("");
   const [address, setAddress] = useState("");
+  const [walletProviderName, setWalletProviderName] = useState("");
 
   const { handleError } = useError();
   const btcConnector = useChainConnector("BTC");
@@ -96,6 +102,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     setNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
+    setWalletProviderName("");
   }, []);
 
   const connectBTC = useCallback(
@@ -110,10 +117,17 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         const network = await walletProvider.getNetwork();
         if (network !== btcConfig.network) return;
         const address = await walletProvider.getAddress();
+        const walletProviderName = await walletProvider.getWalletProviderName();
         const supported = isSupportedAddressType(address);
         if (!supported) {
           // wallet error
-          throw new Error(supportedNetworkMessage);
+          throw new WalletError({
+            errorType: WalletErrorType.AddressTypeNotSupported,
+            message: supportedNetworkMessage,
+            chainType: ChainType.BTC,
+            chainId: btcConfig.network,
+            walletProviderName: walletProviderName || "Unknown",
+          });
         }
 
         const publicKeyNoCoord = getPublicKeyNoCoord(
@@ -124,6 +138,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setNetwork(toNetwork(network));
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+        setWalletProviderName(walletProviderName || "Unknown");
         setLoading(false);
       } catch (error: any) {
         if (
@@ -132,31 +147,46 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         ) {
           return;
         }
-        let errorMessage;
-        switch (true) {
-          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
-            error.message,
-          ):
+
+        let walletError;
+        if (error instanceof WalletError) {
+          walletError = error;
+        } else {
+          let errorType = WalletErrorType.ConnectionFailed;
+          let errorMessage = error.message;
+
+          if (
+            /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
+              error.message,
+            )
+          ) {
+            errorType = WalletErrorType.AddressTypeNotSupported;
             errorMessage = supportedNetworkMessage;
-            break;
-          default:
-            errorMessage = error.message;
-            break;
+          }
+
+          walletError = new WalletError({
+            errorType,
+            message: errorMessage,
+            chainType: ChainType.BTC,
+            chainId: btcConfig.network,
+            walletProviderName:
+              (await walletProvider.getWalletProviderName()) || "Unknown",
+            metadata: {
+              userPublicKey: publicKeyNoCoord,
+              btcAddress: address,
+            },
+          });
         }
+
         handleError({
-          // wallet error
-          error: new Error(errorMessage),
+          error: walletError,
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
-          },
-          metadata: {
-            userPublicKey: publicKeyNoCoord,
-            btcAddress: address,
           },
         });
       }
     },
-    [handleError],
+    [handleError, address, publicKeyNoCoord],
   );
 
   useEffect(() => {
@@ -225,6 +255,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       connected,
       open,
       disconnect: btcDisconnect,
+      walletProviderName,
       ...btcWalletMethods,
     }),
     [
@@ -235,6 +266,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       address,
       open,
       btcDisconnect,
+      walletProviderName,
       btcWalletMethods,
     ],
   );
