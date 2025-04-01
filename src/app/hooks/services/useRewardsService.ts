@@ -1,13 +1,16 @@
 import { incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { useCallback } from "react";
 
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useRewardsState } from "@/app/state/RewardState";
 import { retry } from "@/utils";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
-import { useError } from "@/app/context/Error/ErrorProvider";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
+
+const MAX_RETRY_ATTEMPTS = 10;
+const POLL_INTERVAL = 2000;
 
 export const useRewardsService = () => {
   const {
@@ -68,8 +71,8 @@ export const useRewardsService = () => {
           return balanceQuery.data;
         },
         (value) => value !== initialBalance,
-        2000,
-        10,
+        POLL_INTERVAL,
+        MAX_RETRY_ATTEMPTS,
       );
     } catch (error: Error | any) {
       handleError({
