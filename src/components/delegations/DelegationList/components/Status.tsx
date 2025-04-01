@@ -97,10 +97,12 @@ const STATUSES: Record<string, StatusAdapter> = {
   [State.EARLY_UNBONDING_SLASHING_WITHDRAWN]: () => ({
     label: "Withdrawn",
     tooltip: "Slashed Stake has been withdrawn",
+    status: "error",
   }),
   [State.TIMELOCK_SLASHING_WITHDRAWN]: () => ({
     label: "Withdrawn",
     tooltip: "Slashed Stake has been withdrawn",
+    status: "error",
   }),
   // Intermediate States
   [State.INTERMEDIATE_PENDING_VERIFICATION]: () => ({
@@ -137,7 +139,7 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
   [FinalityProviderState.ACTIVE]: {},
   [FinalityProviderState.SLASHED]: {
     [State.VERIFIED]: () => ({
-      label: "Invalid",
+      label: "Verified",
       tooltip: (
         <>
           This Finality Provider has been slashed and is no longer available for
@@ -151,6 +153,10 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
           </Link>
         </>
       ),
+    }),
+    [State.ACTIVE]: () => ({
+      label: "Active",
+      tooltip: "",
     }),
   },
   [FinalityProviderState.INACTIVE]: {},
