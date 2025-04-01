@@ -65,15 +65,10 @@ export const useRewardsService = () => {
       const signedTx = await signBbnTx(msg);
       const result = await sendBbnTx(signedTx);
 
-      // Store transaction hash for display
       if (result?.txHash) {
         setTransactionHash(result.txHash);
       }
 
-      // Close processing modal
-      closeProcessingModal();
-
-      // Refresh reward balance and wait for confirmation
       await refetchRewardBalance();
       const initialBalance = balanceQuery.data || 0;
       await retry(
@@ -83,7 +78,6 @@ export const useRewardsService = () => {
         MAX_RETRY_ATTEMPTS,
       );
     } catch (error: Error | any) {
-      setProcessing(false);
       closeProcessingModal();
       setTransactionHash("");
       handleError({
