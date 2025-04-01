@@ -11,6 +11,7 @@ export const enum WalletErrorType {
   WalletNotDetected = "WalletNotDetected",
   WalletDisconnected = "WalletDisconnected",
   WalletNotInitialized = "WalletNotInitialized",
+  WalletNotConnected = "WalletNotConnected",
 }
 
 export class WalletError extends Error {
@@ -86,6 +87,8 @@ export class WalletError extends Error {
         return "Wallet is disconnected. Please connect your wallet.";
       case WalletErrorType.WalletNotInitialized:
         return "Wallet is not initialized.";
+      case WalletErrorType.WalletNotConnected:
+        return "Wallet is not connected. Please connect your wallet.";
       default:
         return "An unexpected wallet error occurred.";
     }

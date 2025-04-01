@@ -135,7 +135,17 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         );
 
         setBTCWalletProvider(walletProvider);
-        setNetwork(toNetwork(network));
+        try {
+          setNetwork(toNetwork(network));
+        } catch (networkError: any) {
+          throw new WalletError({
+            errorType: WalletErrorType.UnsupportedNetwork,
+            message: networkError.message,
+            chainType: ChainType.BTC,
+            chainId: btcConfig.network,
+            walletProviderName: walletProviderName || "Unknown",
+          });
+        }
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
         setWalletProviderName(walletProviderName || "Unknown");
@@ -240,7 +250,18 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           throw new Error("`getInscriptions` method is not provided");
         }
 
-        return btcWalletProvider.getInscriptions();
+        try {
+          return btcWalletProvider.getInscriptions();
+        } catch (error: any) {
+          throw new WalletError({
+            errorType: WalletErrorType.WalletNotInitialized,
+            message: error.message || "Failed to get inscriptions",
+            chainType: ChainType.BTC,
+            chainId: btcConfig.network,
+            walletProviderName:
+              (await btcWalletProvider.getWalletProviderName()) || "Unknown",
+          });
+        }
       },
     }),
     [btcWalletProvider],

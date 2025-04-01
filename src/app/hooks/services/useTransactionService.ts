@@ -73,7 +73,12 @@ export const useTransactionService = () => {
       );
 
       if (!availableUTXOs) {
-        throw new Error("Available UTXOs not initialized");
+        throw new ClientError({
+          message: "Available UTXOs not initialized",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.STAKING,
+          metadata: { stakerInfo },
+        });
       }
 
       const { stakingTx, signedBabylonTx } =
@@ -116,7 +121,12 @@ export const useTransactionService = () => {
         stakerInfo,
       );
       if (!availableUTXOs) {
-        throw new Error("Available UTXOs not initialized");
+        throw new ClientError({
+          message: "Available UTXOs not initialized",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.STAKING,
+          metadata: { stakerInfo },
+        });
       }
       return btcStakingManager!.estimateBtcStakingFee(
         stakerInfo,
@@ -194,7 +204,12 @@ export const useTransactionService = () => {
         stakerInfo,
       );
       if (!availableUTXOs) {
-        throw new Error("Available UTXOs not initialized");
+        throw new ClientError({
+          message: "Available UTXOs not initialized",
+          category: ClientErrorCategory.CLIENT_VALIDATION,
+          type: ErrorType.STAKING,
+          metadata: { stakerInfo },
+        });
       }
 
       const signedStakingTx =
@@ -438,12 +453,27 @@ const validateCommonInputs = (
 ) => {
   validateStakingInput(stakingInput);
   if (!btcStakingManager) {
-    throw new Error("BTC Staking Manager not initialized");
+    throw new ClientError({
+      message: "BTC Staking Manager not initialized",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+      metadata: { stakerInfo },
+    });
   }
   if (!tipHeight) {
-    throw new Error("Tip height not initialized");
+    throw new ClientError({
+      message: "Tip height not initialized",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+      metadata: { stakerInfo },
+    });
   }
   if (!stakerInfo.address || !stakerInfo.publicKeyNoCoordHex) {
-    throw new Error("Staker info not initialized");
+    throw new ClientError({
+      message: "Staker info not initialized",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+      metadata: { stakerInfo },
+    });
   }
 };

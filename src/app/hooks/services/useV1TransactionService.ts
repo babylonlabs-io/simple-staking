@@ -103,7 +103,11 @@ export function useV1TransactionService() {
           signedUnbondingTx.toHex(),
         );
       } catch (error) {
-        throw new Error(`Error submitting unbonding transaction: ${error}`);
+        throw new ClientError({
+          message: `Error submitting unbonding transaction: ${error}`,
+          category: ClientErrorCategory.CLIENT_TRANSACTION,
+          type: ErrorType.UNBONDING,
+        });
       }
     },
     [createBtcStakingManager, stakerBtcInfo, versionedParams],
@@ -198,12 +202,25 @@ const validateCommonInputs = (
 ) => {
   validateStakingInput(stakingInput);
   if (!btcStakingManager) {
-    throw new Error("BTC Staking Manager not initialized");
+    throw new ClientError({
+      message: "BTC Staking Manager not initialized",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+    });
   }
   if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
-    throw new Error("Staker info not initialized");
+    throw new ClientError({
+      message: "Staker info not initialized",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+      metadata: { stakerInfo: stakerBtcInfo },
+    });
   }
   if (!versionedParams?.length) {
-    throw new Error("Staking params not loaded");
+    throw new ClientError({
+      message: "Staking params not loaded",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+    });
   }
 };
