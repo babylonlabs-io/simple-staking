@@ -2,7 +2,9 @@ import { incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { useCallback } from "react";
 
 import { useRewardsState } from "@/app/state/RewardState";
+import { retry } from "@/utils";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
+import { useError } from "@/app/context/Error/ErrorProvider";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
@@ -17,7 +19,7 @@ export const useRewardsService = () => {
     setTransactionFee,
   } = useRewardsState();
   const { balanceQuery } = useBbnQuery();
-
+  const { handleError } = useError();
   const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
 
   /**
@@ -60,28 +62,19 @@ export const useRewardsService = () => {
       await refetchRewardBalance();
 
       const initialBalance = balanceQuery.data || 0;
-      let attempts = 0;
-      const maxAttempts = 10;
-      const pollInterval = 2e3;
-
-      const pollBalance = async () => {
-        if (attempts >= maxAttempts) {
-          return;
-        }
-
-        attempts++;
-        await balanceQuery.refetch();
-
-        if (balanceQuery.data !== initialBalance) {
-          return;
-        }
-
-        setTimeout(pollBalance, pollInterval);
-      };
-
-      await pollBalance();
-    } catch (error) {
-      console.error("Error claiming rewards:", error);
+      await retry(
+        async () => {
+          await balanceQuery.refetch();
+          return balanceQuery.data;
+        },
+        (value) => value !== initialBalance,
+        2000,
+        10,
+      );
+    } catch (error: Error | any) {
+      handleError({
+        error,
+      });
     } finally {
       setProcessing(false);
     }
