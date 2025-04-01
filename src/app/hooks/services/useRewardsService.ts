@@ -9,8 +9,8 @@ import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 
-const MAX_RETRY_ATTEMPTS = 10;
-const POLL_INTERVAL = 2000;
+const MAX_RETRY_ATTEMPTS = 3;
+const POLL_INTERVAL = 10e3;
 
 export const useRewardsService = () => {
   const {
