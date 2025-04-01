@@ -75,10 +75,10 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={isBalanceLoading}
+            loading={isBalanceLoading || processing}
             title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
             value={
-              isBalanceLoading
+              isBalanceLoading || processing
                 ? ""
                 : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
             }

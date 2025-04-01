@@ -1,10 +1,16 @@
 import { incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { useCallback } from "react";
 
+import { ONE_SECOND } from "@/app/constants";
+import { useError } from "@/app/context/Error/ErrorProvider";
 import { useRewardsState } from "@/app/state/RewardState";
+import { retry } from "@/utils";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
+import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
+
+const MAX_RETRY_ATTEMPTS = 3;
 
 export const useRewardsService = () => {
   const {
@@ -15,7 +21,8 @@ export const useRewardsService = () => {
     setProcessing,
     setTransactionFee,
   } = useRewardsState();
-
+  const { balanceQuery } = useBbnQuery();
+  const { handleError } = useError();
   const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
 
   /**
@@ -50,17 +57,32 @@ export const useRewardsService = () => {
     closeRewardModal();
     setProcessing(true);
 
-    const msg = createWithdrawRewardMsg(bbnAddress);
+    try {
+      const msg = createWithdrawRewardMsg(bbnAddress);
+      const signedTx = await signBbnTx(msg);
+      await sendBbnTx(signedTx);
 
-    const signedTx = await signBbnTx(msg);
-    await sendBbnTx(signedTx);
-    await refetchRewardBalance();
-    setProcessing(false);
+      await refetchRewardBalance();
+      const initialBalance = balanceQuery.data || 0;
+      await retry(
+        () => balanceQuery.refetch().then((res) => res.data),
+        (value) => value !== initialBalance,
+        ONE_SECOND,
+        MAX_RETRY_ATTEMPTS,
+      );
+    } catch (error: Error | any) {
+      handleError({
+        error,
+      });
+    } finally {
+      setProcessing(false);
+    }
   }, [
     bbnAddress,
     signBbnTx,
     sendBbnTx,
     refetchRewardBalance,
+    balanceQuery,
     setProcessing,
     closeRewardModal,
   ]);
