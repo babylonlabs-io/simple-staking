@@ -7,13 +7,18 @@ import { createStateUtils } from "@/utils/createStateUtils";
 interface RewardsStateProps {
   loading: boolean;
   showRewardModal: boolean;
+  showProcessingModal: boolean;
   processing: boolean;
   bbnAddress: string;
   rewardBalance: number;
   transactionFee: number;
+  transactionHash: string;
+  setTransactionHash: (hash: string) => void;
   setTransactionFee: (value: number) => void;
   openRewardModal: () => void;
   closeRewardModal: () => void;
+  openProcessingModal: () => void;
+  closeProcessingModal: () => void;
   setProcessing: (value: boolean) => void;
   refetchRewardBalance: () => Promise<void>;
 }
@@ -21,12 +26,17 @@ interface RewardsStateProps {
 const defaultState: RewardsStateProps = {
   loading: false,
   showRewardModal: false,
+  showProcessingModal: false,
   processing: false,
   bbnAddress: "",
   rewardBalance: 0,
   transactionFee: 0,
+  transactionHash: "",
+  setTransactionHash: () => {},
   openRewardModal: () => {},
   closeRewardModal: () => {},
+  openProcessingModal: () => {},
+  closeProcessingModal: () => {},
   setProcessing: () => {},
   setTransactionFee: () => {},
   refetchRewardBalance: () => Promise.resolve(),
@@ -37,8 +47,10 @@ const { StateProvider, useState: useRewardsState } =
 
 export function RewardsState({ children }: PropsWithChildren) {
   const [showRewardModal, setRewardModal] = useState(false);
+  const [showProcessingModal, setProcessingModal] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [transactionFee, setTransactionFee] = useState(0);
+  const [transactionHash, setTransactionHash] = useState("");
 
   const { bech32Address: bbnAddress } = useCosmosWallet();
 
@@ -58,18 +70,31 @@ export function RewardsState({ children }: PropsWithChildren) {
     setRewardModal(false);
   }, []);
 
+  const openProcessingModal = useCallback(() => {
+    setProcessingModal(true);
+  }, []);
+
+  const closeProcessingModal = useCallback(() => {
+    setProcessingModal(false);
+  }, []);
+
   const context = useMemo(
     () => ({
       loading: isRewardBalanceLoading,
       showRewardModal,
+      showProcessingModal,
       processing,
       bbnAddress,
       rewardBalance,
       transactionFee,
+      transactionHash,
+      setTransactionHash,
       setTransactionFee,
       setProcessing,
       openRewardModal,
       closeRewardModal,
+      openProcessingModal,
+      closeProcessingModal,
       refetchRewardBalance: async () => {
         await refetchRewardBalance();
       },
@@ -77,10 +102,14 @@ export function RewardsState({ children }: PropsWithChildren) {
     [
       isRewardBalanceLoading,
       showRewardModal,
+      showProcessingModal,
+      openProcessingModal,
+      closeProcessingModal,
       processing,
       bbnAddress,
       rewardBalance,
       transactionFee,
+      transactionHash,
       openRewardModal,
       closeRewardModal,
       refetchRewardBalance,

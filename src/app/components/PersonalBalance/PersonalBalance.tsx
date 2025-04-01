@@ -12,6 +12,7 @@ import { ubbnToBaby } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
+import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
 import { LoadingStyle, StatItem } from "../Stats/StatItem";
@@ -23,13 +24,17 @@ const { coinSymbol } = getNetworkConfigBTC();
 export function PersonalBalance() {
   // Load reward state
   const {
-    loading,
+    loading: rewardLoading,
     processing,
     showRewardModal,
+    showProcessingModal,
+    closeProcessingModal,
+    closeRewardModal,
     bbnAddress,
     rewardBalance,
     transactionFee,
-    closeRewardModal,
+    transactionHash,
+    setTransactionHash,
   } = useRewardsState();
 
   // Load balance state
@@ -45,6 +50,7 @@ export function PersonalBalance() {
   const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
 
   const { claimRewards, showPreview } = useRewardsService();
+
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
@@ -53,13 +59,13 @@ export function PersonalBalance() {
       <Section title="Wallet Balance">
         <List orientation="adaptive" className="bg-surface">
           <StatItem
-            loading={loading}
+            loading={isBalanceLoading}
             title="Staked Balance"
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
           />
 
           <StatItem
-            loading={loading || hasUnconfirmedUTXOs}
+            loading={isBalanceLoading || hasUnconfirmedUTXOs}
             title="Stakable Balance"
             loadingStyle={
               hasUnconfirmedUTXOs
@@ -86,7 +92,7 @@ export function PersonalBalance() {
           />
 
           <StatItem
-            loading={loading}
+            loading={rewardLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
             suffix={
@@ -108,6 +114,16 @@ export function PersonalBalance() {
           receivingValue={`${formattedRewardBalance}`}
           address={bbnAddress}
           transactionFee={transactionFee}
+        />
+
+        <ClaimStatusModal
+          open={showProcessingModal}
+          onClose={() => {
+            closeProcessingModal();
+            setTransactionHash("");
+          }}
+          loading={processing}
+          transactionHash={transactionHash}
         />
       </Section>
     </AuthGuard>

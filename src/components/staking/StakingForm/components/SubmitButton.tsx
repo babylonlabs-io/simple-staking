@@ -5,8 +5,8 @@ import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 
-  const { coinSymbol } = getNetworkConfigBBN();
-  
+const { coinSymbol } = getNetworkConfigBBN();
+
 export function SubmitButton() {
   const { isValid, errors } = useFormState();
   const {

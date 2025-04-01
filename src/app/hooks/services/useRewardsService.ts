@@ -17,6 +17,9 @@ export const useRewardsService = () => {
     bbnAddress,
     openRewardModal,
     closeRewardModal,
+    openProcessingModal,
+    closeProcessingModal,
+    setTransactionHash,
     refetchRewardBalance,
     setProcessing,
     setTransactionFee,
@@ -31,7 +34,6 @@ export const useRewardsService = () => {
    */
   const estimateClaimRewardsGas = useCallback(async (): Promise<number> => {
     const withdrawRewardMsg = createWithdrawRewardMsg(bbnAddress);
-
     const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
     return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
   }, [bbnAddress, estimateBbnGasFee]);
@@ -56,11 +58,16 @@ export const useRewardsService = () => {
   const claimRewards = useCallback(async () => {
     closeRewardModal();
     setProcessing(true);
+    openProcessingModal();
 
     try {
       const msg = createWithdrawRewardMsg(bbnAddress);
       const signedTx = await signBbnTx(msg);
-      await sendBbnTx(signedTx);
+      const result = await sendBbnTx(signedTx);
+
+      if (result?.txHash) {
+        setTransactionHash(result.txHash);
+      }
 
       await refetchRewardBalance();
       const initialBalance = balanceQuery.data || 0;
@@ -71,6 +78,8 @@ export const useRewardsService = () => {
         MAX_RETRY_ATTEMPTS,
       );
     } catch (error: Error | any) {
+      closeProcessingModal();
+      setTransactionHash("");
       handleError({
         error,
       });
@@ -85,6 +94,8 @@ export const useRewardsService = () => {
     balanceQuery,
     setProcessing,
     closeRewardModal,
+    setTransactionHash,
+    handleError,
   ]);
 
   return {

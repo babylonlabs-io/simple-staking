@@ -29,8 +29,8 @@ import { ErrorType } from "@/app/types/errors";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
-import { VerificationModal } from "../Modals/VerificationModal";
 import { UnbondModal } from "../Modals/UnbondModal";
+import { VerificationModal } from "../Modals/VerificationModal";
 
 import { Delegation } from "./Delegation";
 
