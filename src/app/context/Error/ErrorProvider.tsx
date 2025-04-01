@@ -148,6 +148,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         message: error.message,
         sentryEventId: eventId,
         trace: stackTrace,
+        type: error.type,
         ...combinedMetadata,
         ...(error instanceof ClientError && {
           displayMessage: error.displayMessage,
@@ -166,10 +167,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           walletProviderName: error.getWalletProviderName(),
           walletErrorType: error.getType(),
         }),
-        type:
-          error instanceof WalletError
-            ? ErrorType.WALLET
-            : (error.type ?? ErrorType.UNKNOWN),
       };
 
       if (shouldShowModal) {

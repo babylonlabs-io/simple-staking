@@ -22,7 +22,7 @@ export class WalletError extends Error {
   readonly chainId?: string;
   readonly walletProviderName?: string;
   readonly metadata?: Record<string, any>;
-  readonly type: ErrorType = ErrorType.WALLET;
+  readonly type: ErrorType;
 
   /**
    * @param errorType      Type of wallet error
@@ -54,6 +54,7 @@ export class WalletError extends Error {
     this.walletProviderName = walletProviderName;
     this.metadata = metadata || {};
     this.displayMessage = this.getDisplayMessageFromType(errorType, message);
+    this.type = ErrorType.WALLET;
     Object.setPrototypeOf(this, WalletError.prototype);
   }
 
