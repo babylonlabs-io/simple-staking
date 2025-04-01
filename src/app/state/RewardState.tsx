@@ -2,7 +2,6 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
-import { retry } from "@/utils";
 import { createStateUtils } from "@/utils/createStateUtils";
 
 interface RewardsStateProps {
@@ -47,9 +46,8 @@ export function RewardsState({ children }: PropsWithChildren) {
     rewardsQuery: {
       data: rewardBalance = 0,
       isLoading: isRewardBalanceLoading,
-      refetch: refetchRewards,
+      refetch: refetchRewardBalance,
     },
-    balanceQuery,
   } = useBbnQuery();
 
   const openRewardModal = useCallback(() => {
@@ -59,23 +57,6 @@ export function RewardsState({ children }: PropsWithChildren) {
   const closeRewardModal = useCallback(() => {
     setRewardModal(false);
   }, []);
-
-  const refetchRewardBalance = useCallback(async () => {
-    await refetchRewards();
-
-    if (balanceQuery) {
-      const initialBalance = balanceQuery.data || 0;
-
-      await retry(
-        () => {
-          return balanceQuery.refetch().then(() => balanceQuery.data || 0);
-        },
-        (currentBalance) => currentBalance !== initialBalance,
-        2e3, // 2 seconds polling interval
-        10, // Maximum 10 attempts
-      );
-    }
-  }, [refetchRewards, balanceQuery]);
 
   const context = useMemo(
     () => ({
@@ -89,7 +70,9 @@ export function RewardsState({ children }: PropsWithChildren) {
       setProcessing,
       openRewardModal,
       closeRewardModal,
-      refetchRewardBalance,
+      refetchRewardBalance: async () => {
+        await refetchRewardBalance();
+      },
     }),
     [
       isRewardBalanceLoading,
