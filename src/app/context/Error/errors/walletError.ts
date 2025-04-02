@@ -24,6 +24,24 @@ export class WalletError extends Error {
   readonly metadata?: Record<string, any>;
   readonly type: ErrorType;
 
+  private readonly errorMessages: Record<WalletErrorType, string> = {
+    [WalletErrorType.ConnectionCancelled]:
+      "Connection was cancelled by the user.",
+    [WalletErrorType.ConnectionFailed]: "Failed to connect to wallet.",
+    [WalletErrorType.UnsupportedWallet]: "This wallet is not supported.",
+    [WalletErrorType.UnsupportedNetwork]: "This network is not supported.",
+    [WalletErrorType.AddressTypeNotSupported]:
+      "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.",
+    [WalletErrorType.SigningFailed]: "Failed to sign transaction.",
+    [WalletErrorType.WalletNotDetected]:
+      "Wallet extension not detected. Please install the wallet extension.",
+    [WalletErrorType.WalletDisconnected]:
+      "Wallet is disconnected. Please connect your wallet.",
+    [WalletErrorType.WalletNotInitialized]: "Wallet is not initialized.",
+    [WalletErrorType.WalletNotConnected]:
+      "Wallet is not connected. Please connect your wallet.",
+  };
+
   /**
    * @param errorType      Type of wallet error
    * @param message        Error message
@@ -62,37 +80,11 @@ export class WalletError extends Error {
     type: WalletErrorType,
     message: string,
   ): string {
-    const baseMessage = this.getBaseMessageForType(type);
+    const baseMessage =
+      this.errorMessages[type] ?? "An unexpected wallet error occurred.";
     return message
       ? `${baseMessage}${message !== baseMessage ? ` Details: ${message}` : ""}`
       : baseMessage;
-  }
-
-  private getBaseMessageForType(type: WalletErrorType): string {
-    switch (type) {
-      case WalletErrorType.ConnectionCancelled:
-        return "Connection was cancelled by the user.";
-      case WalletErrorType.ConnectionFailed:
-        return "Failed to connect to wallet.";
-      case WalletErrorType.UnsupportedWallet:
-        return "This wallet is not supported.";
-      case WalletErrorType.UnsupportedNetwork:
-        return "This network is not supported.";
-      case WalletErrorType.AddressTypeNotSupported:
-        return "Only Native SegWit and Taproot addresses are supported. Please switch the address type in your wallet and try again.";
-      case WalletErrorType.SigningFailed:
-        return "Failed to sign transaction.";
-      case WalletErrorType.WalletNotDetected:
-        return "Wallet extension not detected. Please install the wallet extension.";
-      case WalletErrorType.WalletDisconnected:
-        return "Wallet is disconnected. Please connect your wallet.";
-      case WalletErrorType.WalletNotInitialized:
-        return "Wallet is not initialized.";
-      case WalletErrorType.WalletNotConnected:
-        return "Wallet is not connected. Please connect your wallet.";
-      default:
-        return "An unexpected wallet error occurred.";
-    }
   }
 
   public getType(): WalletErrorType {

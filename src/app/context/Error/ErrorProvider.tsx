@@ -162,10 +162,10 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         }),
         ...(error instanceof WalletError && {
           displayMessage: error.displayMessage,
-          chainType: error.getChainType(),
-          chainId: error.getChainId(),
-          walletProviderName: error.getWalletProviderName(),
-          walletErrorType: error.getType(),
+          chainType: error.chainType,
+          chainId: error.chainId,
+          walletProviderName: error.walletProviderName,
+          walletErrorType: error.errorType,
         }),
       };
 

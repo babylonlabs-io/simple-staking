@@ -47,21 +47,16 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
       setError(null);
     } catch (err) {
       setError(
-        err instanceof Error
-          ? new WalletError({
-              errorType: WalletErrorType.ConnectionFailed,
-              message: err.message || "Failed to connect",
-              chainType: ChainType.BBN,
-              chainId: network,
-              walletProviderName,
-            })
-          : new WalletError({
-              errorType: WalletErrorType.ConnectionFailed,
-              message: "Failed to connect",
-              chainType: ChainType.BBN,
-              chainId: network,
-              walletProviderName,
-            }),
+        new WalletError({
+          errorType: WalletErrorType.ConnectionFailed,
+          message:
+            err instanceof Error
+              ? err.message || "Failed to connect"
+              : "Failed to connect",
+          chainType: ChainType.BBN,
+          chainId: network,
+          walletProviderName,
+        }),
       );
       setIsLoading(false);
     }
