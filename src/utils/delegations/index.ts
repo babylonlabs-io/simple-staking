@@ -90,7 +90,7 @@ const VALIDATORS: Partial<Record<DelegationState, Validator>> = {
     if (!valid) {
       return {
         valid: false,
-        error: "Please ensure your UTXOs are still available",
+        error: "This stake is now invalid as the UTXO has already been used",
       };
     }
 
