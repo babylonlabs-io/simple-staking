@@ -28,7 +28,9 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-btc-connector",
-        widget: () => <ExternalWallets chainName="bitcoin" />,
+        widget: ({ onError }) => (
+          <ExternalWallets chainName="bitcoin" onError={onError} />
+        ),
       },
     ],
     config: getNetworkConfigBTC(),
@@ -38,7 +40,9 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-bbn-connector",
-        widget: () => <ExternalWallets chainName="cosmos" />,
+        widget: ({ onError }) => (
+          <ExternalWallets chainName="cosmos" onError={onError} />
+        ),
       },
     ],
     config: getNetworkConfigBBN(),
