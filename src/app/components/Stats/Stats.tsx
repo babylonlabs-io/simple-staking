@@ -18,18 +18,16 @@ const formatter = Intl.NumberFormat("en", {
 });
 
 export const Stats = memo(() => {
-  const { data, isLoading } = useSystemStats();
-
-  const activeTvl = data?.active_tvl ?? 0;
-  const activeStakers = data?.active_stakers ?? 0;
-  const activeDelegations = data?.active_delegations ?? 0;
-  const totalFinalityProviders = data?.total_finality_providers ?? 0;
-  const activeFinalityProviders = data?.active_finality_providers ?? 0;
-
-  const btcInUsd = usePrice(coinSymbol);
-
-  const tvlInBtc = satoshiToBtc(activeTvl);
-  const tvlInUsd = tvlInBtc * btcInUsd;
+  const {
+    data: {
+      total_active_tvl: totalActiveTVL = 0,
+      active_tvl: activeTVL = 0,
+      total_finality_providers: totalFPs = 0,
+      active_finality_providers: activeFPs = 0,
+    } = {},
+    isLoading,
+  } = useSystemStats();
+  const usdRate = usePrice(coinSymbol);
 
   return (
     <Section
@@ -39,32 +37,27 @@ export const Stats = memo(() => {
       <List orientation="adaptive" className="bg-surface">
         <StatItem
           loading={isLoading}
-          title={`Confirmed ${coinSymbol} TVL`}
-          value={formatBTCTvl(tvlInBtc, coinSymbol, tvlInUsd)}
-          tooltip="Total number of active bitcoins staked"
+          title={`Total ${coinSymbol} TVL`}
+          value={formatBTCTvl(
+            satoshiToBtc(totalActiveTVL),
+            coinSymbol,
+            usdRate,
+          )}
+          tooltip="Total number of active Bitcoins Staked"
         />
 
         <StatItem
           loading={isLoading}
-          title="Stakers"
-          value={formatter.format(activeStakers)}
-          tooltip="Total number of active bitcoin stakers"
-        />
-
-        <StatItem
-          loading={isLoading}
-          title="Delegations"
-          value={formatter.format(activeDelegations)}
-          tooltip="Total number of active bitcoin staking delegations"
+          title={`Activated ${coinSymbol} TVL`}
+          value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
+          tooltip="The total amount of Bitcoin that has been registered"
         />
 
         <StatItem
           loading={isLoading}
           title="Finality Providers"
-          value={`${activeFinalityProviders} Active (${
-            totalFinalityProviders
-          } Total)`}
-          tooltip="Active and total number of finality providers"
+          value={`${formatter.format(activeFPs)} Active (${formatter.format(totalFPs)} Total)`}
+          tooltip="Active and total number of Finality Providers"
         />
       </List>
     </Section>

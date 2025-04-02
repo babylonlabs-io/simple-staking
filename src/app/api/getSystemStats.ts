@@ -9,6 +9,7 @@ export interface SystemStats {
   total_stakers: number;
   active_finality_providers: number;
   total_finality_providers: number;
+  total_active_tvl: number;
 }
 
 interface SystemStatsAPIResponse {
