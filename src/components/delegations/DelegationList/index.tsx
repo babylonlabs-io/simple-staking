@@ -55,8 +55,9 @@ const columns: TableColumn<DelegationWithFP, TableParams>[] = [
     headerName: "Status",
     width: "minmax(max-content, 1fr)",
     renderCell: (row, _, { validations }) => {
-      const { valid } = validations[row.stakingTxHashHex];
-      if (!valid) return <Hint>Invalid</Hint>;
+      const { valid, error } = validations[row.stakingTxHashHex];
+      if (!valid) return <Hint tooltip={error}>Unavailable</Hint>;
+
       return <Status delegation={row} />;
     },
   },

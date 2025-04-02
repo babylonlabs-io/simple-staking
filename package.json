@@ -26,9 +26,9 @@
   },
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "0.0.3-canary.7",
+    "@babylonlabs-io/btc-staking-ts": "1.0.0",
     "@babylonlabs-io/core-ui": "1.0.0",
     "@babylonlabs-io/wallet-connector": "1.0.1",
-    "@babylonlabs-io/btc-staking-ts": "1.0.0",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cosmjs/proto-signing": "^0.32.4",
@@ -87,6 +87,7 @@
     "husky": "^9.0.11",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "lint-staged": "^15.5.0",
     "postcss": "^8",
     "postcss-import": "^16.1.0",
     "prettier": "^3.2.5",
@@ -102,5 +103,13 @@
     "whatwg-url@11.0.0": {
       "tr46": "4.0.0"
     }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --quiet --fix"
+    ],
+    "*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}": [
+      "prettier --write --ignore-unknown"
+    ]
   }
 }
