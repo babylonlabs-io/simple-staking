@@ -2,10 +2,7 @@ import {
   BabylonBtcStakingManager,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
-import {
-  BTCSignType,
-  StakingSignOptions,
-} from "@babylonlabs-io/wallet-connector";
+import { StakingSignOptions } from "@babylonlabs-io/wallet-connector";
 import { EventEmitter } from "events";
 import { useCallback, useRef } from "react";
 
@@ -54,8 +51,14 @@ export const useStakingManagerService = () => {
 
       const btcProvider = {
         signPsbt: async (signingStep: SigningStep, psbt: string) => {
+          console.log("signingStep", signingStep);
+          console.log("psbt", psbt);
           eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
-          if (signingStep === SigningStep.STAKING && networkInfoAPI) {
+          if (
+            (signingStep === SigningStep.STAKING ||
+              signingStep === SigningStep.UNBONDING) &&
+            networkInfoAPI
+          ) {
             const { covenantNoCoordPks, covenantQuorum } =
               networkInfoAPI.params.bbnStakingParams.latestParam;
             if (
@@ -67,7 +70,7 @@ export const useStakingManagerService = () => {
               throw new Error("Missing parameters for staking");
             }
             const options: StakingSignOptions = {
-              type: BTCSignType.STAKING,
+              type: signingStep,
               covenantPks: covenantNoCoordPks,
               covenantThreshold: covenantQuorum,
               finalityProviderPk: finalityProviderPK,

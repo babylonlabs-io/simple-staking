@@ -253,7 +253,14 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
-      const btcStakingManager = createBtcStakingManager();
+      const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
+
+      // Unbonding transaction requires additional parameters on Ledger devices
+      const btcStakingManager = createBtcStakingManager(
+        finalityProviderPkNoCoordHex,
+        stakingTimelock,
+      );
+
       validateCommonInputs(
         btcStakingManager,
         stakingInput,

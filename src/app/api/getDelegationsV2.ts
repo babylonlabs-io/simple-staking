@@ -91,6 +91,11 @@ export const getDelegationsV2 = async ({
   const pagination: Pagination = {
     next_key: delegationsAPIResponse.pagination.next_key,
   };
+
+  console.log(
+    "staking_timelock",
+    delegationsAPIResponse.data[0].delegation_staking.staking_timelock,
+  );
   return {
     delegations: delegationsAPIResponse.data.map(apiToDelegationV2),
     pagination,
