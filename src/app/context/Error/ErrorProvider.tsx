@@ -16,6 +16,7 @@ import {
 } from "@/app/types/errors";
 
 import { ClientError, ServerError } from "./errors";
+import { WalletError } from "./errors/walletError";
 
 // Error source identifiers
 export const ERROR_SOURCES = {
@@ -121,6 +122,18 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
             trace: stackTrace,
             ...combinedMetadata,
           });
+        } else if (error instanceof WalletError) {
+          scope.setTag("errorType", ErrorType.WALLET);
+          scope.setTag("walletErrorType", error.getType());
+          scope.setTag("chainType", error.getChainType());
+          scope.setTag("chainId", error.getChainId());
+          scope.setTag("walletProviderName", error.getWalletProviderName());
+
+          scope.setExtras({
+            trace: stackTrace,
+            ...combinedMetadata,
+            ...(error.metadata || {}),
+          });
         } else {
           scope.setTag("errorType", ErrorType.UNKNOWN);
           scope.setExtras({
@@ -135,6 +148,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         message: error.message,
         sentryEventId: eventId,
         trace: stackTrace,
+        type: error.type,
         ...combinedMetadata,
         ...(error instanceof ClientError && {
           displayMessage: error.displayMessage,
@@ -146,7 +160,13 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           request: error.request || {},
           response: error.response || {},
         }),
-        type: error.type ?? ErrorType.UNKNOWN,
+        ...(error instanceof WalletError && {
+          displayMessage: error.displayMessage,
+          chainType: error.chainType,
+          chainId: error.chainId,
+          walletProviderName: error.walletProviderName,
+          walletErrorType: error.errorType,
+        }),
       };
 
       if (shouldShowModal) {

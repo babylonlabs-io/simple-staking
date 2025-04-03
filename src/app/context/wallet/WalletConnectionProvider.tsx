@@ -14,6 +14,7 @@ import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { useError } from "../Error/ErrorProvider";
+import { WalletError, WalletErrorType } from "../Error/errors/walletError";
 
 const context = typeof window !== "undefined" ? window : {};
 
@@ -51,9 +52,16 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
 
   const onError = useCallback(
     (error: Error) => {
-      handleError({
-        error,
-      });
+      if (error instanceof WalletError) {
+        handleError({ error });
+      } else {
+        const walletError = new WalletError({
+          errorType: WalletErrorType.ConnectionFailed,
+          message: error.message,
+          metadata: { originalError: error.name },
+        });
+        handleError({ error: walletError });
+      }
     },
     [handleError],
   );

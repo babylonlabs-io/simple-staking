@@ -8,12 +8,19 @@ import {
   useState,
 } from "react";
 
-import { getNetworkConfigBBN } from "@/config/network/bbn";
+import {
+  WalletError,
+  WalletErrorType,
+} from "@/app/context/Error/errors/walletError";
+import { ChainType } from "@/app/types/network";
+import { getNetworkConfigBBN, network } from "@/config/network/bbn";
+
+import { useCosmosWallet } from "../wallet/CosmosWalletProvider";
 
 interface BbnRpcContextType {
   queryClient: QueryClient | undefined;
   isLoading: boolean;
-  error: Error | null;
+  error: WalletError | null;
   reconnect: () => Promise<void>;
 }
 
@@ -27,8 +34,9 @@ const BbnRpcContext = createContext<BbnRpcContextType>({
 export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
   const [queryClient, setQueryClient] = useState<QueryClient>();
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
+  const [error, setError] = useState<WalletError | null>(null);
   const { rpc } = getNetworkConfigBBN();
+  const { walletProviderName } = useCosmosWallet();
 
   const connect = useCallback(async () => {
     try {
@@ -38,10 +46,21 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to connect"));
+      setError(
+        new WalletError({
+          errorType: WalletErrorType.ConnectionFailed,
+          message:
+            err instanceof Error
+              ? err.message || "Failed to connect"
+              : "Failed to connect",
+          chainType: ChainType.BBN,
+          chainId: network,
+          walletProviderName,
+        }),
+      );
       setIsLoading(false);
     }
-  }, [rpc]);
+  }, [rpc, walletProviderName]);
 
   useEffect(() => {
     let mounted = true;
