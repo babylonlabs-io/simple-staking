@@ -124,10 +124,10 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           });
         } else if (error instanceof WalletError) {
           scope.setTag("errorType", ErrorType.WALLET);
-          scope.setTag("walletErrorType", error.getType());
-          scope.setTag("chainType", error.getChainType());
-          scope.setTag("chainId", error.getChainId());
-          scope.setTag("walletProviderName", error.getWalletProviderName());
+          scope.setTag("walletErrorType", error.errorType);
+          scope.setTag("chainType", error.chainType);
+          scope.setTag("chainId", error.chainId);
+          scope.setTag("walletProviderName", error.walletProviderName);
 
           scope.setExtras({
             trace: stackTrace,

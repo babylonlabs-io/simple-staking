@@ -86,24 +86,4 @@ export class WalletError extends Error {
       ? `${baseMessage}${message !== baseMessage ? ` Details: ${message}` : ""}`
       : baseMessage;
   }
-
-  public getType(): WalletErrorType {
-    return this.errorType;
-  }
-
-  public getDisplayMessage(): string {
-    return this.displayMessage;
-  }
-
-  public getChainType(): ChainType | undefined {
-    return this.chainType;
-  }
-
-  public getChainId(): string | undefined {
-    return this.chainId;
-  }
-
-  public getWalletProviderName(): string | undefined {
-    return this.walletProviderName;
-  }
 }
