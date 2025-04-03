@@ -241,6 +241,7 @@ export const useTransactionService = () => {
    * @param stakingTxHex - The staking transaction hex
    * @param unbondingTxHex - The unbonding transaction hex
    * @param covenantUnbondingSignatures - The covenant unbonding signatures
+   * @param unbondingTimelock - The unbonding timelock
    */
   const submitUnbondingTx = useCallback(
     async (
@@ -252,13 +253,15 @@ export const useTransactionService = () => {
         btcPkHex: string;
         sigHex: string;
       }[],
+      unbondingTimelock: number,
     ) => {
       const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
 
-      // Unbonding transaction requires additional parameters on Ledger devices
+      // Pass both staking and unbonding timelocks
       const btcStakingManager = createBtcStakingManager(
         finalityProviderPkNoCoordHex,
         stakingTimelock,
+        unbondingTimelock,
       );
 
       validateCommonInputs(

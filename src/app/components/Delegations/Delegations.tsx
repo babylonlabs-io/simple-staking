@@ -113,6 +113,7 @@ export const Delegations = ({}) => {
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
         selectedDelegation;
+      console.log("selectedDelegation", selectedDelegation);
       setAwaitingWalletResponse(true);
       await submitUnbondingTx(
         {

@@ -2,7 +2,10 @@ import {
   BabylonBtcStakingManager,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
-import { BTCSignOptions } from "@babylonlabs-io/wallet-connector";
+import {
+  StakingSignOptions,
+  UnbondingSignOptions,
+} from "@babylonlabs-io/wallet-connector";
 import { EventEmitter } from "events";
 import { useCallback, useRef } from "react";
 
@@ -35,7 +38,11 @@ export const useStakingManagerService = () => {
   const { current: eventEmitter } = useRef<EventEmitter>(new EventEmitter());
 
   const createBtcStakingManager = useCallback(
-    (finalityProviderPK?: string, stakingTimelock?: number) => {
+    (
+      finalityProviderPK?: string,
+      stakingTimelock?: number,
+      unbondingTimelock?: number,
+    ) => {
       if (
         !btcNetwork ||
         !cosmosConnected ||
@@ -61,22 +68,39 @@ export const useStakingManagerService = () => {
           ) {
             const { covenantNoCoordPks, covenantQuorum } =
               networkInfoAPI.params.bbnStakingParams.latestParam;
-            if (
-              !covenantNoCoordPks ||
-              !covenantQuorum ||
-              !stakingTimelock ||
-              !finalityProviderPK
-            ) {
+            if (!covenantNoCoordPks || !covenantQuorum || !finalityProviderPK) {
               throw new Error("Missing parameters for staking");
             }
-            const options: BTCSignOptions = {
-              type: signingStep,
-              covenantPks: covenantNoCoordPks,
-              covenantThreshold: covenantQuorum,
-              finalityProviderPk: finalityProviderPK,
-              timelockBlocks: stakingTimelock,
-            };
-            return signPsbt(psbt, options);
+
+            if (signingStep === SigningStep.STAKING) {
+              if (!stakingTimelock) {
+                throw new Error("Missing staking timelock");
+              }
+              // Create the options with all properties at once for StakingSignOptions
+              const options: StakingSignOptions = {
+                type: SigningStep.STAKING,
+                covenantPks: covenantNoCoordPks,
+                covenantThreshold: covenantQuorum,
+                finalityProviderPk: finalityProviderPK,
+                stakingTimelockBlocks: stakingTimelock,
+              };
+              return signPsbt(psbt, options);
+            } else if (signingStep === SigningStep.UNBONDING) {
+              if (!unbondingTimelock) {
+                throw new Error("Missing unbonding timelock");
+              }
+              // Create the options with all properties at once for UnbondingSignOptions
+              const options: UnbondingSignOptions = {
+                type: SigningStep.UNBONDING,
+                covenantPks: covenantNoCoordPks,
+                covenantThreshold: covenantQuorum,
+                finalityProviderPk: finalityProviderPK,
+                unbondingTimelockBlocks: unbondingTimelock,
+              };
+              return signPsbt(psbt, options);
+            } else {
+              return signPsbt(psbt);
+            }
           } else {
             return signPsbt(psbt);
           }
