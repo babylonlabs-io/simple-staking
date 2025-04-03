@@ -48,7 +48,10 @@ import {
   StakingStep,
   useStakingState,
 } from "@/app/state/StakingState";
-import { DelegationV2StakingState } from "@/app/types/delegationsV2";
+import {
+  DelegationV2,
+  DelegationV2StakingState,
+} from "@/app/types/delegationsV2";
 
 // Mock getFeeRateFromMempool
 jest.mock("@/utils/getFeeRateFromMempool", () => ({
@@ -268,7 +271,7 @@ describe("StakingState", () => {
     expect(result.current.available).toBe(false);
   });
 
-  it("should set errorMessage from health check apiMessage", () => {
+  it("should set errorMessage correctly from health check", () => {
     const testErrorMessage = "Test API error message";
     mockUseHealthCheck.mockReturnValue({
       ...mockUseHealthCheck(),
@@ -474,5 +477,346 @@ describe("StakingState", () => {
     expect(result.current.formData).toBeUndefined();
     expect(result.current.processing).toBe(false);
     expect(result.current.verifiedDelegation).toBeUndefined();
+  });
+
+  // State transition tests
+  describe("state transitions", () => {
+    it("should transition between steps using goToStep", () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      // Initial state should have no step
+      expect(result.current.step).toBeUndefined();
+
+      // Transition to PREVIEW step
+      act(() => {
+        result.current.goToStep(StakingStep.PREVIEW);
+      });
+      expect(result.current.step).toBe(StakingStep.PREVIEW);
+
+      // Transition to EOI_STAKING_SLASHING step
+      act(() => {
+        result.current.goToStep(StakingStep.EOI_STAKING_SLASHING);
+      });
+      expect(result.current.step).toBe(StakingStep.EOI_STAKING_SLASHING);
+
+      // Transition to VERIFYING step
+      act(() => {
+        result.current.goToStep(StakingStep.VERIFYING);
+      });
+      expect(result.current.step).toBe(StakingStep.VERIFYING);
+    });
+
+    it("should set processing state correctly", () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      // Initial processing state should be false
+      expect(result.current.processing).toBe(false);
+
+      // Set processing to true
+      act(() => {
+        result.current.setProcessing(true);
+      });
+      expect(result.current.processing).toBe(true);
+
+      // Set processing back to false
+      act(() => {
+        result.current.setProcessing(false);
+      });
+      expect(result.current.processing).toBe(false);
+    });
+
+    it("should update form data correctly", () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      const initialFormData = result.current.formData;
+      const newFormData = {
+        finalityProvider: "test-provider",
+        amount: 100000,
+        term: 5000,
+        feeRate: 5,
+        feeAmount: 1000,
+      };
+
+      // Update form data
+      act(() => {
+        result.current.setFormData(newFormData);
+      });
+
+      // Check that form data was updated
+      expect(result.current.formData).toEqual(newFormData);
+      expect(result.current.formData).not.toEqual(initialFormData);
+
+      // Clear form data
+      act(() => {
+        result.current.setFormData(undefined);
+      });
+
+      // Form data should be undefined
+      expect(result.current.formData).toBeUndefined();
+    });
+
+    it("should update verified delegation correctly", () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      // Initial verified delegation should be undefined
+      expect(result.current.verifiedDelegation).toBeUndefined();
+
+      const mockDelegation: DelegationV2 = {
+        stakingAmount: 100000,
+        stakingTxHashHex: "mock-hash",
+        stakingTxHex: "mock-tx-hex",
+        paramsVersion: 1,
+        finalityProviderBtcPksHex: ["mock-fp-pk"],
+        stakerBtcPkHex: "mock-staker-pk",
+        stakingTimelock: 5000,
+        bbnInceptionHeight: 100,
+        bbnInceptionTime: "2023-01-01",
+        startHeight: 101,
+        endHeight: 5101,
+        unbondingTimelock: 144,
+        unbondingTxHex: "mock-unbonding-tx",
+        state: DelegationV2StakingState.VERIFIED,
+        slashing: {
+          stakingSlashingTxHex: "mock-slashing-tx",
+          unbondingSlashingTxHex: "mock-unbonding-slashing-tx",
+          spendingHeight: 200,
+        },
+      };
+
+      // Set verified delegation
+      act(() => {
+        result.current.setVerifiedDelegation(mockDelegation);
+      });
+
+      // Check that verified delegation was set
+      expect(result.current.verifiedDelegation).toEqual(mockDelegation);
+
+      // Clear verified delegation
+      act(() => {
+        result.current.setVerifiedDelegation(undefined);
+      });
+
+      // Verified delegation should be undefined
+      expect(result.current.verifiedDelegation).toBeUndefined();
+    });
+
+    it("should reset the state correctly", () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      // Set up a non-default state
+      const newFormData = {
+        finalityProvider: "test-provider",
+        amount: 100000,
+        term: 5000,
+        feeRate: 5,
+        feeAmount: 1000,
+      };
+
+      const mockDelegation: DelegationV2 = {
+        stakingAmount: 100000,
+        stakingTxHashHex: "mock-hash",
+        stakingTxHex: "mock-tx-hex",
+        paramsVersion: 1,
+        finalityProviderBtcPksHex: ["mock-fp-pk"],
+        stakerBtcPkHex: "mock-staker-pk",
+        stakingTimelock: 5000,
+        bbnInceptionHeight: 100,
+        bbnInceptionTime: "2023-01-01",
+        startHeight: 101,
+        endHeight: 5101,
+        unbondingTimelock: 144,
+        unbondingTxHex: "mock-unbonding-tx",
+        state: DelegationV2StakingState.VERIFIED,
+        slashing: {
+          stakingSlashingTxHex: "mock-slashing-tx",
+          unbondingSlashingTxHex: "mock-unbonding-slashing-tx",
+          spendingHeight: 200,
+        },
+      };
+
+      act(() => {
+        result.current.goToStep(StakingStep.VERIFYING);
+        result.current.setProcessing(true);
+        result.current.setFormData(newFormData);
+        result.current.setVerifiedDelegation(mockDelegation);
+      });
+
+      // Verify non-default state
+      expect(result.current.step).toBe(StakingStep.VERIFYING);
+      expect(result.current.processing).toBe(true);
+      expect(result.current.formData).toEqual(newFormData);
+      expect(result.current.verifiedDelegation).toEqual(mockDelegation);
+
+      // Reset the state
+      act(() => {
+        result.current.reset();
+      });
+
+      // Verify state was reset
+      expect(result.current.step).toBeUndefined();
+      expect(result.current.processing).toBe(false);
+      expect(result.current.formData).toBeUndefined();
+      expect(result.current.verifiedDelegation).toBeUndefined();
+    });
+  });
+
+  describe("state transitions with workflow sequences", () => {
+    it("should handle a complete staking workflow", async () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      // Step 1: Fill the form
+      const stakingFormData = {
+        finalityProvider: "test-provider",
+        amount: 100000,
+        term: 5000,
+        feeRate: 5,
+        feeAmount: 1000,
+      };
+
+      act(() => {
+        result.current.setFormData(stakingFormData);
+      });
+      expect(result.current.formData).toEqual(stakingFormData);
+
+      // Step 2: Go to preview
+      act(() => {
+        result.current.goToStep(StakingStep.PREVIEW);
+      });
+      expect(result.current.step).toBe(StakingStep.PREVIEW);
+
+      // Step 3: Go through EOI screens
+      act(() => {
+        result.current.goToStep(StakingStep.EOI_STAKING_SLASHING);
+      });
+      expect(result.current.step).toBe(StakingStep.EOI_STAKING_SLASHING);
+
+      act(() => {
+        result.current.goToStep(StakingStep.EOI_UNBONDING_SLASHING);
+      });
+      expect(result.current.step).toBe(StakingStep.EOI_UNBONDING_SLASHING);
+
+      act(() => {
+        result.current.goToStep(StakingStep.EOI_PROOF_OF_POSSESSION);
+      });
+      expect(result.current.step).toBe(StakingStep.EOI_PROOF_OF_POSSESSION);
+
+      act(() => {
+        result.current.goToStep(StakingStep.EOI_SIGN_BBN);
+      });
+      expect(result.current.step).toBe(StakingStep.EOI_SIGN_BBN);
+
+      // Step 4: Start staking transaction process
+      act(() => {
+        result.current.goToStep(StakingStep.EOI_SEND_BBN);
+        result.current.setProcessing(true);
+      });
+      expect(result.current.step).toBe(StakingStep.EOI_SEND_BBN);
+      expect(result.current.processing).toBe(true);
+
+      // Step 5: Transaction sent, waiting for verification
+      act(() => {
+        result.current.goToStep(StakingStep.VERIFYING);
+      });
+      expect(result.current.step).toBe(StakingStep.VERIFYING);
+
+      // Step 6: Verified delegation received
+      const mockDelegation: DelegationV2 = {
+        stakingAmount: stakingFormData.amount,
+        stakingTxHashHex: "mock-hash",
+        stakingTxHex: "mock-tx-hex",
+        paramsVersion: 1,
+        finalityProviderBtcPksHex: [stakingFormData.finalityProvider],
+        stakerBtcPkHex: "mock-staker-pk",
+        stakingTimelock: stakingFormData.term,
+        bbnInceptionHeight: 100,
+        bbnInceptionTime: "2023-01-01",
+        startHeight: 101,
+        endHeight: 101 + stakingFormData.term,
+        unbondingTimelock: 144,
+        unbondingTxHex: "mock-unbonding-tx",
+        state: DelegationV2StakingState.VERIFIED,
+        slashing: {
+          stakingSlashingTxHex: "mock-slashing-tx",
+          unbondingSlashingTxHex: "mock-unbonding-slashing-tx",
+          spendingHeight: 200,
+        },
+      };
+
+      act(() => {
+        result.current.setVerifiedDelegation(mockDelegation);
+        result.current.goToStep(StakingStep.VERIFIED);
+        result.current.setProcessing(false);
+      });
+
+      expect(result.current.verifiedDelegation).toEqual(mockDelegation);
+      expect(result.current.step).toBe(StakingStep.VERIFIED);
+      expect(result.current.processing).toBe(false);
+
+      // Step 7: Show success feedback
+      act(() => {
+        result.current.goToStep(StakingStep.FEEDBACK_SUCCESS);
+      });
+      expect(result.current.step).toBe(StakingStep.FEEDBACK_SUCCESS);
+
+      // Step 8: Reset everything for a new staking
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(result.current.step).toBeUndefined();
+      expect(result.current.processing).toBe(false);
+      expect(result.current.formData).toBeUndefined();
+      expect(result.current.verifiedDelegation).toBeUndefined();
+    });
+
+    it("should handle a cancelled staking workflow", () => {
+      const { result } = renderHook(() => useStakingState(), {
+        wrapper: TestWrapper,
+      });
+
+      // Step 1: Fill the form
+      const stakingFormData = {
+        finalityProvider: "test-provider",
+        amount: 100000,
+        term: 5000,
+        feeRate: 5,
+        feeAmount: 1000,
+      };
+
+      act(() => {
+        result.current.setFormData(stakingFormData);
+      });
+
+      // Step 2: Go to preview
+      act(() => {
+        result.current.goToStep(StakingStep.PREVIEW);
+      });
+
+      // Step 3: Decide to cancel
+      act(() => {
+        result.current.goToStep(StakingStep.FEEDBACK_CANCEL);
+      });
+      expect(result.current.step).toBe(StakingStep.FEEDBACK_CANCEL);
+
+      // Step 4: Reset
+      act(() => {
+        result.current.reset();
+      });
+
+      expect(result.current.step).toBeUndefined();
+      expect(result.current.formData).toBeUndefined();
+    });
   });
 });
