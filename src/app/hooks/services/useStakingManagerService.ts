@@ -2,7 +2,7 @@ import {
   BabylonBtcStakingManager,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
-import { StakingSignOptions } from "@babylonlabs-io/wallet-connector";
+import { BTCSignOptions } from "@babylonlabs-io/wallet-connector";
 import { EventEmitter } from "events";
 import { useCallback, useRef } from "react";
 
@@ -69,7 +69,7 @@ export const useStakingManagerService = () => {
             ) {
               throw new Error("Missing parameters for staking");
             }
-            const options: StakingSignOptions = {
+            const options: BTCSignOptions = {
               type: signingStep,
               covenantPks: covenantNoCoordPks,
               covenantThreshold: covenantQuorum,
