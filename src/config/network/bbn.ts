@@ -2,6 +2,7 @@ import type { BBNConfig } from "@babylonlabs-io/wallet-connector";
 
 import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
+import { bbnMainnet } from "./bbn/mainnet";
 import { bbnTestnet } from "./bbn/testnet";
 
 const defaultNetwork = "devnet";
@@ -9,9 +10,9 @@ export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
 
 const config: Record<string, BBNConfig> = {
   mainnet: {
-    chainId: bbnTestnet.chainId,
-    rpc: bbnTestnet.rpc,
-    chainData: bbnTestnet,
+    chainId: bbnMainnet.chainId,
+    rpc: bbnMainnet.rpc,
+    chainData: bbnMainnet,
     networkName: "BABY",
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
