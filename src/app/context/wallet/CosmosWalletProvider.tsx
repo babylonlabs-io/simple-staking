@@ -102,7 +102,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError],
+    [handleError, cosmosBech32Address],
   );
 
   // Listen for Babylon account changes

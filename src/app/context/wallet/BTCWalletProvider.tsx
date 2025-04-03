@@ -156,7 +156,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError],
+    [handleError, publicKeyNoCoord, address],
   );
 
   useEffect(() => {
