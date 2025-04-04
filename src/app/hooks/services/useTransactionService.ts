@@ -417,7 +417,6 @@ export const useTransactionService = () => {
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
     subscribeToSigningSteps,
-    logUnbondingScripts,
   };
 };
 
