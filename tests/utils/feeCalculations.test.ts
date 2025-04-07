@@ -13,7 +13,6 @@ import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
 // Constants from the actual codebase
 const DUST_LIMIT = 546; // satoshis
 const MIN_FEE_RATE = 128; // sats/vbyte
-const DEFAULT_PLATFORM_FEE = 1000; // satoshis
 
 // Simplified UTXO interface for testing
 interface UTXO {
