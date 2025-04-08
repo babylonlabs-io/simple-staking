@@ -256,6 +256,13 @@ export const Delegations = ({}) => {
 
         if (
           intermediateDelegation.state ===
+          DelegationState.INTERMEDIATE_UNBONDING
+        ) {
+          return matchingDelegation.state !== DelegationState.UNBONDED;
+        }
+
+        if (
+          intermediateDelegation.state ===
           DelegationState.INTERMEDIATE_WITHDRAWAL
         ) {
           return matchingDelegation.state !== DelegationState.WITHDRAWN;
