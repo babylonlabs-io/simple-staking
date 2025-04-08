@@ -18,6 +18,8 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { WalletError } from "@/app/context/Error/errors/walletError";
+import { ChainType } from "@/app/types/network";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
@@ -31,6 +33,7 @@ interface CosmosWalletContextProps {
   disconnect: () => void;
   open: () => void;
   signingStargateClient: SigningStargateClient | undefined;
+  walletProviderName: string;
 }
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
@@ -40,6 +43,7 @@ const CosmosWalletContext = createContext<CosmosWalletContextProps>({
   disconnect: () => {},
   open: () => {},
   signingStargateClient: undefined,
+  walletProviderName: "",
 });
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
@@ -51,6 +55,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const [signingStargateClient, setSigningStargateClient] = useState<
     SigningStargateClient | undefined
   >();
+  const [walletProviderName, setWalletProviderName] = useState("");
 
   const { handleError } = useError();
   const { open = () => {} } = useWalletConnect();
@@ -60,6 +65,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     setBBNWalletProvider(undefined);
     setCosmosBech32Address("");
     setSigningStargateClient(undefined);
+    setWalletProviderName("");
   }, []);
 
   const connectCosmos = useCallback(
@@ -86,23 +92,34 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             aminoTypes: createBbnAminoTypes(),
           },
         );
+        const providerName =
+          (await provider.getWalletProviderName()) || "Unknown";
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
+        setWalletProviderName(providerName);
         setLoading(false);
       } catch (error: any) {
+        let walletError;
+        if (error instanceof WalletError) {
+          walletError = error;
+        } else {
+          walletError = new WalletError({
+            message: error.message,
+            chainType: ChainType.BBN,
+            walletProviderName,
+          });
+        }
+
         handleError({
-          error,
+          error: walletError,
           displayOptions: {
             retryAction: () => connectCosmos(provider),
-          },
-          metadata: {
-            babylonAddress: cosmosBech32Address,
           },
         });
       }
     },
-    [handleError, cosmosBech32Address],
+    [handleError, cosmosBech32Address, walletProviderName],
   );
 
   // Listen for Babylon account changes
@@ -126,6 +143,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       loading,
       bech32Address: cosmosBech32Address,
       connected: Boolean(BBNWalletProvider) && Boolean(signingStargateClient),
+      walletProviderName,
       disconnect: cosmosDisconnect,
       open,
       signingStargateClient,
@@ -134,6 +152,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       loading,
       cosmosBech32Address,
       BBNWalletProvider,
+      walletProviderName,
       cosmosDisconnect,
       open,
       signingStargateClient,

@@ -35,12 +35,4 @@ export class ClientError extends Error {
     this.displayMessage = getClientErrorMessage(category, message);
     Object.setPrototypeOf(this, ClientError.prototype);
   }
-
-  public getDisplayMessage(): string {
-    return this.displayMessage;
-  }
-
-  public getErrorCode(): ClientErrorCategory | undefined {
-    return this.category;
-  }
 }

@@ -1,11 +1,14 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 
+import { ClientErrorCategory } from "@/app/constants/errorMessages";
+import { ClientError } from "@/app/context/Error/errors";
 import { BtcStakingInputs } from "@/app/hooks/services/useTransactionService";
 import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
+import { ErrorType } from "@/app/types/errors";
 
 /**
  * Clears the signatures from a transaction.
@@ -55,13 +58,27 @@ export const uint8ArrayToHex = (uint8Array: Uint8Array): string => {
 /**
  * Validates the staking input for a delegation.
  * @param stakingInput - The staking input to validate.
- * @throws An error if the staking input is invalid.
+ * @throws A ClientError if the staking input is invalid.
  */
 export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
   if (!stakingInput.finalityProviderPkNoCoordHex)
-    throw new Error("Finality provider not selected");
-  if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
-  if (!stakingInput.stakingTimelock) throw new Error("Staking time not set");
+    throw new ClientError({
+      message: "Finality provider not selected",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+    });
+  if (!stakingInput.stakingAmountSat)
+    throw new ClientError({
+      message: "Staking amount not set",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+    });
+  if (!stakingInput.stakingTimelock)
+    throw new ClientError({
+      message: "Staking time not set",
+      category: ClientErrorCategory.CLIENT_VALIDATION,
+      type: ErrorType.STAKING,
+    });
 };
 
 /**

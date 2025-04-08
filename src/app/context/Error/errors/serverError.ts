@@ -40,12 +40,4 @@ export class ServerError extends Error {
     this.response = response;
     Object.setPrototypeOf(this, ServerError.prototype);
   }
-
-  public getDisplayMessage(): string {
-    return this.displayMessage;
-  }
-
-  public getStatusCode(): number {
-    return this.status;
-  }
 }

@@ -15,7 +15,7 @@ describe("ClientError", () => {
     expect(error.message).toBe(mockMessage);
     expect(error.category).toBe(ClientErrorCategory.CLIENT_UNKNOWN);
     expect(error.type).toBe(ErrorType.UNKNOWN);
-    expect(error.getDisplayMessage()).toContain("unexpected client error");
+    expect(error.displayMessage).toContain("unexpected client error");
   });
 
   it("should create a client error with custom category and type", () => {
@@ -27,9 +27,7 @@ describe("ClientError", () => {
 
     expect(error.category).toBe(mockCategory);
     expect(error.type).toBe(ErrorType.WALLET);
-    expect(error.getDisplayMessage()).toContain(
-      getClientErrorMessage(mockCategory),
-    );
+    expect(error.displayMessage).toContain(getClientErrorMessage(mockCategory));
   });
 
   it("should include details in display message when provided", () => {
@@ -39,8 +37,8 @@ describe("ClientError", () => {
       category: mockCategory,
     });
 
-    expect(error.getDisplayMessage()).toContain(details);
-    expect(error.getDisplayMessage()).toContain("check your input");
+    expect(error.displayMessage).toContain(details);
+    expect(error.displayMessage).toContain("check your input");
   });
 
   it("should return correct error code", () => {
@@ -49,6 +47,6 @@ describe("ClientError", () => {
       category: mockCategory,
     });
 
-    expect(error.getErrorCode()).toBe(mockCategory);
+    expect(error.category).toBe(mockCategory);
   });
 });

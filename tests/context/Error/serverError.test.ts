@@ -16,8 +16,7 @@ describe("ServerError", () => {
     expect(error.status).toBe(HttpStatusCode.InternalServerError);
     expect(error.endpoint).toBe(mockEndpoint);
     expect(error.type).toBe(ErrorType.SERVER);
-    expect(error.getDisplayMessage()).toBe(mockMessage);
-    expect(error.getStatusCode()).toBe(HttpStatusCode.InternalServerError);
+    expect(error.displayMessage).toBe(mockMessage);
   });
 
   it("should create a server error with custom status code", () => {
@@ -29,16 +28,15 @@ describe("ServerError", () => {
     });
 
     expect(error.status).toBe(status);
-    expect(error.getStatusCode()).toBe(status);
     expect(error.endpoint).toBe(mockEndpoint);
     expect(error.type).toBe(ErrorType.SERVER);
-    expect(error.getDisplayMessage()).toBe(mockMessage);
+    expect(error.displayMessage).toBe(mockMessage);
   });
 
   it("should handle errors without endpoint", () => {
     const error = new ServerError({ message: mockMessage });
 
     expect(error.endpoint).toBeUndefined();
-    expect(error.getDisplayMessage()).toBe(mockMessage);
+    expect(error.displayMessage).toBe(mockMessage);
   });
 });
