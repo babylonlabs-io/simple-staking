@@ -315,75 +315,75 @@ export const Delegations = ({}) => {
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
-  if (combinedDelegationsData.length === 0) {
-    return null;
-  }
-
   return (
     <>
-      <Card className="mb-6">
-        <Heading variant="h6" className="text-accent-primary py-2 mb-6">
-          Pending Registration
-        </Heading>
+      {combinedDelegationsData.length !== 0 && (
+        <Card className="mb-6">
+          <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+            Pending Registration
+          </Heading>
 
-        <InfiniteScroll
-          className="no-scrollbar max-h-[25rem] overflow-auto"
-          dataLength={combinedDelegationsData.length}
-          next={fetchMoreDelegations}
-          hasMore={hasMoreDelegations}
-          loader={isLoading ? <LoadingTableList /> : null}
-        >
-          <table className="w-full min-w-[1000px]">
-            <thead className="sticky top-0 bg-surface">
-              <tr className="text-accent-secondary text-xs">
-                <th className="text-left h-[52px] md:min-w-52 px-4 whitespace-nowrap font-normal">
-                  Inception
-                </th>
-                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
-                  Finality Provider
-                </th>
-                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
-                  Amount
-                </th>
-                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
-                  Transaction ID
-                </th>
-                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
-                  Status
-                </th>
-                <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
-                  Action
-                </th>
-              </tr>
-            </thead>
+          <InfiniteScroll
+            className="no-scrollbar max-h-[25rem] overflow-auto"
+            dataLength={combinedDelegationsData.length}
+            next={fetchMoreDelegations}
+            hasMore={hasMoreDelegations}
+            loader={isLoading ? <LoadingTableList /> : null}
+          >
+            <table className="w-full min-w-[1000px]">
+              <thead className="sticky top-0 bg-surface">
+                <tr className="text-accent-secondary text-xs">
+                  <th className="text-left h-[52px] md:min-w-52 px-4 whitespace-nowrap font-normal">
+                    Inception
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Finality Provider
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Amount
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Transaction ID
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Status
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Action
+                  </th>
+                </tr>
+              </thead>
 
-            <tbody>
-              {combinedDelegationsData?.map((delegation) => {
-                if (!delegation) return null;
-                const { stakingTx, stakingTxHashHex } = delegation;
-                const intermediateDelegation =
-                  intermediateDelegationsLocalStorage.find(
-                    (item) => item.stakingTxHashHex === stakingTxHashHex,
+              <tbody>
+                {combinedDelegationsData?.map((delegation) => {
+                  if (!delegation) return null;
+                  const { stakingTx, stakingTxHashHex } = delegation;
+                  const intermediateDelegation =
+                    intermediateDelegationsLocalStorage.find(
+                      (item) => item.stakingTxHashHex === stakingTxHashHex,
+                    );
+
+                  return (
+                    <Delegation
+                      currentTime={currentTime}
+                      key={stakingTxHashHex + stakingTx.startHeight}
+                      delegation={delegation}
+                      onWithdraw={() =>
+                        handleModal(stakingTxHashHex, MODE_WITHDRAW)
+                      }
+                      onRegistration={onRegistration}
+                      onUnbond={() =>
+                        handleModal(stakingTxHashHex, MODE_UNBOND)
+                      }
+                      intermediateState={intermediateDelegation?.state}
+                    />
                   );
-
-                return (
-                  <Delegation
-                    currentTime={currentTime}
-                    key={stakingTxHashHex + stakingTx.startHeight}
-                    delegation={delegation}
-                    onWithdraw={() =>
-                      handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                    }
-                    onRegistration={onRegistration}
-                    onUnbond={() => handleModal(stakingTxHashHex, MODE_UNBOND)}
-                    intermediateState={intermediateDelegation?.state}
-                  />
-                );
-              })}
-            </tbody>
-          </table>
-        </InfiniteScroll>
-      </Card>
+                })}
+              </tbody>
+            </table>
+          </InfiniteScroll>
+        </Card>
+      )}
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
