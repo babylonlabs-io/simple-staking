@@ -15,6 +15,7 @@ import { useDelegationStorage } from "../hooks/storage/useDelegationStorage";
 
 interface DelegationV2State {
   isLoading: boolean;
+  isFetchingNextPage: boolean;
   linkedDelegationsVisibility: boolean;
   hasMoreDelegations: boolean;
   delegations: DelegationV2[];
@@ -30,6 +31,7 @@ const { StateProvider, useState: useDelegationV2State } =
   createStateUtils<DelegationV2State>({
     linkedDelegationsVisibility: false,
     isLoading: false,
+    isFetchingNextPage: false,
     delegations: [],
     hasMoreDelegations: false,
     addDelegation: () => {},
@@ -48,8 +50,14 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
 
-  const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
-    useDelegationsV2(!showLinkedDelegations ? bech32Address : undefined);
+  const {
+    data,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading,
+    hasNextPage,
+    refetch,
+  } = useDelegationsV2(!showLinkedDelegations ? bech32Address : undefined);
   // States
   const { delegations, addPendingDelegation, updateDelegationStatus } =
     useDelegationStorage(
@@ -67,7 +75,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   const state = useMemo(
     () => ({
       delegations,
-      isLoading: isFetchingNextPage,
+      isLoading,
+      isFetchingNextPage,
       hasMoreDelegations: hasNextPage,
       linkedDelegationsVisibility: showLinkedDelegations,
       displayLinkedDelegations: setLinkedDelegations,
@@ -82,6 +91,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     [
       delegations,
       isFetchingNextPage,
+      isLoading,
       hasNextPage,
       showLinkedDelegations,
       addPendingDelegation,
