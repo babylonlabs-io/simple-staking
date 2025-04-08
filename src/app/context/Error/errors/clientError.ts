@@ -17,18 +17,21 @@ export class ClientError extends Error {
    * @param type           Error type
    * @param metadata       Additional metadata about the error
    */
-  constructor({
-    message,
-    category = ClientErrorCategory.CLIENT_UNKNOWN,
-    type = ErrorType.UNKNOWN,
-    metadata,
-  }: {
-    message: string;
-    category?: ClientErrorCategory;
-    type?: ErrorType;
-    metadata?: Record<string, any>;
-  }) {
-    super(message);
+  constructor(
+    {
+      message,
+      category = ClientErrorCategory.CLIENT_UNKNOWN,
+      type = ErrorType.UNKNOWN,
+      metadata,
+    }: {
+      message: string;
+      category?: ClientErrorCategory;
+      type?: ErrorType;
+      metadata?: Record<string, any>;
+    },
+    options?: ErrorOptions,
+  ) {
+    super(message, options);
     this.category = category;
     this.type = type;
     this.metadata = metadata || {};
