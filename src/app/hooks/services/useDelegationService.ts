@@ -64,6 +64,7 @@ export function useDelegationService() {
     fetchMoreDelegations,
     hasMoreDelegations,
     isLoading: isDelegationLoading,
+    isFetchingNextPage,
     updateDelegationStatus,
   } = useDelegationV2State();
 
@@ -346,6 +347,7 @@ export function useDelegationService() {
     validations,
     hasMoreDelegations,
     confirmationModal,
+    isFetchingNextPage,
     openConfirmationModal,
     closeConfirmationModal,
     fetchMoreDelegations,

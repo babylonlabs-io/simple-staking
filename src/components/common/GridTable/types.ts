@@ -28,6 +28,7 @@ type CellClassNameCreator<R extends object, P extends object> = (
 
 export interface TableProps<R extends object, P extends object = {}> {
   loading?: boolean;
+  isFetchingNextPage?: boolean;
   classNames?: {
     wrapperClassName?: string;
     headerCellClassName?: string;

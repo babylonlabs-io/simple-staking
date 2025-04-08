@@ -88,6 +88,7 @@ export function DelegationList() {
     confirmationModal,
     delegations,
     isLoading,
+    isFetchingNextPage,
     hasMoreDelegations,
     validations,
     fetchMoreDelegations,
@@ -107,6 +108,7 @@ export function DelegationList() {
         columns={columns}
         data={delegations}
         loading={isLoading}
+        isFetchingNextPage={isFetchingNextPage}
         infiniteScroll={hasMoreDelegations}
         onInfiniteScroll={fetchMoreDelegations}
         classNames={{
