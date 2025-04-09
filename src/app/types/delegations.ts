@@ -35,13 +35,9 @@ export const INTERMEDIATE_UNBONDING = "intermediate_unbonding";
 export const INTERMEDIATE_WITHDRAWAL = "intermediate_withdrawal";
 export const TRANSITIONED = "transitioned";
 export const INTERMEDIATE_TRANSITIONING = "intermediate_transitioning";
-export const NOT_REGISTERED = "not_registered";
-export const REGISTERED = "registered";
 
 // Define the state of a delegation as per API
 export const DelegationState = {
-  NOT_REGISTERED,
-  REGISTERED,
   ACTIVE,
   UNBONDING_REQUESTED,
   UNBONDING,

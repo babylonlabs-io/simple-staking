@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { useMemo } from "react";
 import { FaBitcoin } from "react-icons/fa";
 
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
@@ -95,8 +94,13 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
 const DelegationState: React.FC<{
   displayState: string;
   isSlashed: boolean;
-}> = ({ displayState, isSlashed }) => {
+  isFPResgistered: boolean;
+}> = ({ displayState, isSlashed, isFPResgistered }) => {
   const renderStateTooltip = () => {
+    if (!isFPResgistered) {
+      return "Your Finality Provider hasn’t registered yet. Once they’ve completed their registration to Babylon Genesis, you’ll be able to register your stake to.";
+    }
+
     if (isSlashed) {
       return (
         <span>
@@ -115,6 +119,7 @@ const DelegationState: React.FC<{
     if (displayState === DelegationStateEnum.OVERFLOW) {
       return "Stake is over the staking cap";
     }
+
     return getStateTooltip(displayState);
   };
 
@@ -167,15 +172,10 @@ export const Delegation: React.FC<DelegationProps> = ({
   const isSlashed = fpState === FinalityProviderState.SLASHED;
   const isJailed = fpState === FinalityProviderState.JAILED;
 
-  const displayState = useMemo(() => {
-    if (!isFpRegistered) {
-      return DelegationStateEnum.NOT_REGISTERED;
-    }
-
-    return isOverflow && isActive
+  const displayState =
+    isOverflow && isActive
       ? DelegationStateEnum.OVERFLOW
       : intermediateState || state;
-  }, [isFpRegistered, isOverflow, isActive, intermediateState, state]);
 
   return (
     <>
@@ -216,7 +216,11 @@ export const Delegation: React.FC<DelegationProps> = ({
           add its size 12px and gap 4px, 16/2 = 8px
           */}
         <DelegationCell>
-          <DelegationState displayState={displayState} isSlashed={isSlashed} />
+          <DelegationState
+            displayState={displayState}
+            isSlashed={isSlashed}
+            isFPResgistered={isFpRegistered}
+          />
         </DelegationCell>
 
         <DelegationCell>
