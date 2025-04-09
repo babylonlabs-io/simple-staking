@@ -18,6 +18,7 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ErrorType } from "@/app/types/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import {
@@ -31,7 +32,8 @@ import {
   isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet";
-import { WalletError, WalletErrorType } from "@/utils/wallet/errors";
+
+import { ClientError } from "../Error/errors";
 
 const btcConfig = getNetworkConfigBTC();
 
@@ -126,26 +128,14 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
         setLoading(false);
       } catch (error: any) {
-        if (
-          error instanceof WalletError &&
-          error.getType() === WalletErrorType.ConnectionCancelled
-        ) {
-          return;
-        }
-        let errorMessage;
-        switch (true) {
-          case /Incorrect address prefix for (Testnet \/ Signet|Mainnet)/.test(
-            error.message,
-          ):
-            errorMessage = supportedNetworkMessage;
-            break;
-          default:
-            errorMessage = error.message;
-            break;
-        }
         handleError({
-          // wallet error
-          error: new Error(errorMessage),
+          error: new ClientError(
+            {
+              message: error.message,
+              type: ErrorType.WALLET,
+            },
+            { cause: error },
+          ),
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
           },
