@@ -48,9 +48,9 @@ export const Stats = memo(() => {
 
         <StatItem
           loading={isLoading}
-          title={`Activated ${coinSymbol} TVL`}
+          title={`Registered ${coinSymbol} TVL`}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
-          tooltip="The total amount of Bitcoin that has been registered"
+          tooltip="The total amount of Bitcoin that has been registered in the Babylon Genesis network"
         />
 
         <StatItem
