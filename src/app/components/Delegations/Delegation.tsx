@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useMemo } from "react";
 import { FaBitcoin } from "react-icons/fa";
 
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
@@ -154,21 +155,27 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   const { startTimestamp } = stakingTx;
 
-  const { getFinalityProvider, getFinalityProviderName } =
+  const { getRegisteredFinalityProvider, getFinalityProviderName } =
     useFinalityProviderState();
 
-  const finalityProvider = getFinalityProvider(finalityProviderPkHex);
+  const finalityProvider = getRegisteredFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
   const fpName = getFinalityProviderName(finalityProviderPkHex) ?? "-";
 
   const isActive = state === DelegationStateEnum.ACTIVE;
+  const isFpRegistered = finalityProvider !== null;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
   const isJailed = fpState === FinalityProviderState.JAILED;
 
-  const displayState =
-    isOverflow && isActive
+  const displayState = useMemo(() => {
+    if (!isFpRegistered) {
+      return DelegationStateEnum.NOT_REGISTERED;
+    }
+
+    return isOverflow && isActive
       ? DelegationStateEnum.OVERFLOW
       : intermediateState || state;
+  }, [isFpRegistered, isOverflow, isActive, intermediateState, state]);
 
   return (
     <>

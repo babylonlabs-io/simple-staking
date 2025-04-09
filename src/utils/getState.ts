@@ -39,6 +39,10 @@ export const getState = (state: string) => {
 // Create state tooltips for the additional information
 export const getStateTooltip = (state: string) => {
   switch (state) {
+    case DelegationState.NOT_REGISTERED:
+      return `Your Finality Provider hasn’t registered yet. Once they’ve completed their registration to Babylon Genesis, you’ll be able to register your stake to.`;
+    case DelegationState.REGISTERED:
+      return `Your Finality Provider is now registered on Babylon Genesis. You are now able to register your stake.`;
     case DelegationState.ACTIVE:
       return `Stake is pending registration to the ${bbnNetworkFullName}`;
     case DelegationState.UNBONDING_REQUESTED:
