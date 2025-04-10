@@ -98,7 +98,7 @@ const DelegationState: React.FC<{
 }> = ({ displayState, isSlashed, isFPResgistered }) => {
   const renderStateTooltip = () => {
     if (!isFPResgistered) {
-      return "Your Finality Provider hasn’t registered yet. Once they’ve completed their registration to Babylon Genesis, you’ll be able to register your stake.";
+      return "Your Finality Provider is not registered on Babylon Genesis. You need to wait for their registration to become eligible to register your stake to Babylon Genesis";
     }
 
     if (isSlashed) {
@@ -166,7 +166,6 @@ export const Delegation: React.FC<DelegationProps> = ({
   const finalityProvider = getRegisteredFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
   const fpName = getFinalityProviderName(finalityProviderPkHex) ?? "-";
-
   const isActive = state === DelegationStateEnum.ACTIVE;
   const isFpRegistered = finalityProvider !== null;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
@@ -228,6 +227,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             state={state}
             intermediateState={intermediateState}
             isEligibleForRegistration={isEligibleForTransition}
+            isFpRegistered={isFpRegistered}
             stakingTxHashHex={stakingTxHashHex}
             finalityProviderPkHex={finalityProviderPkHex}
             onRegistration={() => onRegistration(delegation)}
