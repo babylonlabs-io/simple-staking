@@ -100,8 +100,8 @@ export function DelegationForm({
   if (!available) {
     return (
       <Message
-        title="Staking Temporarily Unavailable"
-        message="Staking is not enabled at this time. Please check back later."
+        title="New Stakes Registration Temporarily Unavailable"
+        message="Creation of new stakes will be enabled on April 24, 10am UTC. Phase-1 Cap-1 stakers can register their stakes to Babylon using the modal below."
         icon={
           <Image
             src={stakingUnavailableIcon}
