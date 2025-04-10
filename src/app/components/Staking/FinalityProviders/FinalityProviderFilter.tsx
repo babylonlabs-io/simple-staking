@@ -1,8 +1,6 @@
 import { Select } from "@babylonlabs-io/core-ui";
-import { useCallback, useEffect, useRef } from "react";
 
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
-import { FinalityProviderState as FinalityProviderStateEnum } from "@/app/types/finalityProviders";
 
 const options = [
   { value: "active", label: "Active" },
@@ -10,36 +8,7 @@ const options = [
 ];
 
 export const FinalityProviderFilter = () => {
-  const { filter, handleFilter, isFetching, finalityProviderMap } =
-    useFinalityProviderState();
-
-  const initialCheckDone = useRef(false);
-
-  const hasActiveProviders = useCallback(() => {
-    return Array.from(finalityProviderMap.values()).some(
-      (provider) => provider.state === FinalityProviderStateEnum.ACTIVE,
-    );
-  }, [finalityProviderMap]);
-
-  useEffect(() => {
-    if (
-      !initialCheckDone.current &&
-      !isFetching &&
-      filter.status === "active" &&
-      finalityProviderMap.size > 0
-    ) {
-      initialCheckDone.current = true;
-      if (!hasActiveProviders()) {
-        handleFilter("status", "inactive");
-      }
-    }
-  }, [
-    filter.status,
-    hasActiveProviders,
-    handleFilter,
-    isFetching,
-    finalityProviderMap,
-  ]);
+  const { filter, handleFilter } = useFinalityProviderState();
 
   return (
     <Select
