@@ -15,7 +15,6 @@ jobs:
       run-unit-tests: true
 
   s3_publish:
-    needs: [lint_test]
     runs-on: ubuntu-22.04
     strategy:
       matrix:
