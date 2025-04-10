@@ -16,6 +16,11 @@ export const getNetworkAppUrl = (): string => {
     : "https://btcstaking.babylonlabs.io";
 };
 
+export const getDefaultFilterValue = (): "active" | "inactive" => {
+  const envValue = process.env.NEXT_PUBLIC_DEFAULT_FP_FILTER;
+  return envValue === "inactive" ? "inactive" : "active";
+};
+
 export const IS_FIXED_TERM_FIELD =
   process.env.NEXT_PUBLIC_FIXED_STAKING_TERM === "true";
 

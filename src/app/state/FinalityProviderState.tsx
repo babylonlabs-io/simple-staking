@@ -9,6 +9,7 @@ import {
   FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
+import { getDefaultFilterValue } from "@/config";
 import { createStateUtils } from "@/utils/createStateUtils";
 
 interface SortState {
@@ -59,11 +60,6 @@ const FILTERS = {
   },
   status: (fp: FinalityProvider, filter: FilterState) =>
     filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
-};
-
-const getDefaultFilterValue = (): "active" | "inactive" => {
-  const envValue = process.env.NEXT_PUBLIC_DEFAULT_FP_FILTER;
-  return envValue === "inactive" ? "inactive" : "active";
 };
 
 const defaultState: FinalityProviderState = {
