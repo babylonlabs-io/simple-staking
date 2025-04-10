@@ -98,7 +98,7 @@ const DelegationState: React.FC<{
 }> = ({ displayState, isSlashed, isFPResgistered }) => {
   const renderStateTooltip = () => {
     if (!isFPResgistered) {
-      return "Your Finality Provider hasn’t registered yet. Once they’ve completed their registration to Babylon Genesis, you’ll be able to register your stake to.";
+      return "Your Finality Provider hasn’t registered yet. Once they’ve completed their registration to Babylon Genesis, you’ll be able to register your stake.";
     }
 
     if (isSlashed) {
