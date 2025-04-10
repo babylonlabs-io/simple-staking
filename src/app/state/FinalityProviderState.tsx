@@ -9,7 +9,7 @@ import {
   FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
-import { getDefaultFilterValue } from "@/config";
+import { DEFAULT_FILTER_VALUE } from "@/config";
 import { createStateUtils } from "@/utils/createStateUtils";
 
 interface SortState {
@@ -63,7 +63,10 @@ const FILTERS = {
 };
 
 const defaultState: FinalityProviderState = {
-  filter: { search: "", status: getDefaultFilterValue() },
+  filter: {
+    search: "",
+    status: DEFAULT_FILTER_VALUE as "active" | "inactive" | "",
+  },
   finalityProviders: [],
   hasNextPage: false,
   isFetching: false,
@@ -86,7 +89,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
-    status: getDefaultFilterValue(),
+    status: DEFAULT_FILTER_VALUE as "active" | "inactive" | "",
   });
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
