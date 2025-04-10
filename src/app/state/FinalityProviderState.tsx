@@ -61,8 +61,13 @@ const FILTERS = {
     filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
 };
 
+const getDefaultFilterValue = (): "active" | "inactive" => {
+  const envValue = process.env.NEXT_PUBLIC_DEFAULT_FP_FILTER;
+  return envValue === "inactive" ? "inactive" : "active";
+};
+
 const defaultState: FinalityProviderState = {
-  filter: { search: "", status: "inactive" },
+  filter: { search: "", status: getDefaultFilterValue() },
   finalityProviders: [],
   hasNextPage: false,
   isFetching: false,
@@ -85,7 +90,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
-    status: "inactive",
+    status: getDefaultFilterValue(),
   });
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
