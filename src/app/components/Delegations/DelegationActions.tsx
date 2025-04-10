@@ -32,7 +32,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
 
   const {
     balanceQuery: { data: bbnBalance = 0 },
@@ -40,7 +40,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
 
   const { networkFullName, coinSymbol } = getNetworkConfigBBN();
 
-  const finalityProvider = getFinalityProvider(finalityProviderPkHex);
+  const finalityProvider = getRegisteredFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
 

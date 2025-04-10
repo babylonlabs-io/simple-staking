@@ -48,7 +48,7 @@ export const Phase2HereModal = ({
           eligibility criteria will be in place for stake registration. Over
           time, access will gradually expand to allow the registration of all
           existing stakers and the creation of new ones.{" "}
-          <a href="https://babylonlabs.io/blog/babylon-phase-2-testnet-launch">
+          <a href="https://babylon.foundation/blogs/babylon-phase-2-launch-official-announcement">
             Learn more here.
           </a>
         </p>
