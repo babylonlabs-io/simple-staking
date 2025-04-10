@@ -46,7 +46,7 @@ export const bbnMainnet = {
       coinImageUrl:
         "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
       gasPriceStep: {
-        low: 0.005,
+        low: 0.007,
         average: 0.007,
         high: 0.01,
       },
