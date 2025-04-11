@@ -1,0 +1,80 @@
+/* Fix for finality provider table width issues */
+.finality-provider-table-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.finality-table-wrapper {
+  width: 100% !important;
+  table-layout: fixed !important;
+  position: relative;
+}
+
+.finality-table {
+  width: 100% !important;
+  table-layout: fixed !important;
+  min-width: 0 !important;
+}
+
+.finality-table-wrapper table,
+.finality-table table {
+  width: 100%;
+  table-layout: fixed;
+  max-width: 100%;
+}
+
+.finality-table-wrapper th,
+.finality-table-wrapper td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.finality-provider-table-container .bbn-table-wrapper {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+.finality-provider-table-container .bbn-table {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Custom table cell padding overrides for finality table */
+.finality-provider-table-container .bbn-table-body td {
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+@media (max-width: 1000px) {
+  .finality-provider-table-container .bbn-table-header th {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+
+  .finality-provider-table-container .bbn-table-body td {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+  }
+}
+
+/* Padding for screens between 1000px and 1130px */
+@media (min-width: 1000px) and (max-width: 1129.98px) {
+  .finality-provider-table-container .bbn-table-header th {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .finality-provider-table-container .bbn-table-body td {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+}
+
+/* Padding for screens 1130px and larger */
+@media (min-width: 1130px) {
+  .finality-provider-table-container .bbn-table-body td {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+}
