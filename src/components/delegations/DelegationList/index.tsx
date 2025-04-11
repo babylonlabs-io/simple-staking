@@ -97,6 +97,8 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
+  const hasExistingStake = delegations.length > 0;
+
   return (
     <Card>
       <Heading variant="h6" className="text-accent-primary py-2 mb-6">
@@ -124,7 +126,7 @@ export function DelegationList() {
           handleActionClick: openConfirmationModal,
           validations,
         }}
-        fallback={<NoDelegations />}
+        fallback={<NoDelegations hasExistingStake={hasExistingStake} />}
       />
 
       <DelegationModal
