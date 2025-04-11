@@ -1,10 +1,10 @@
 import { Card, Heading } from "@babylonlabs-io/core-ui";
 
+import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { useDelegationState } from "@/app/state/DelegationState";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
@@ -98,9 +98,9 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const { delegations: phase1Delegations } = useDelegationState();
+  const { data: phase1DelegationsData } = useDelegations();
 
-  const hasExistingStake = phase1Delegations.length > 0;
+  const hasExistingStake = Boolean(phase1DelegationsData?.delegations?.length);
 
   return (
     <Card>
