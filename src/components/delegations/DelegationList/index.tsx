@@ -4,6 +4,7 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
+import { useDelegationState } from "@/app/state/DelegationState";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
@@ -97,7 +98,9 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const hasExistingStake = delegations.length > 0;
+  const { delegations: phase1Delegations } = useDelegationState();
+
+  const hasExistingStake = phase1Delegations.length > 0;
 
   return (
     <Card>
