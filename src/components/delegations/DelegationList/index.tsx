@@ -5,6 +5,7 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
+import { useDelegationState } from "@/app/state/DelegationState";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
@@ -98,9 +99,12 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const { data: phase1DelegationsData } = useDelegations();
+  const { data: delegationsAPI } = useDelegations();
+  const { delegations: localDelegations = [] } = useDelegationState();
 
-  const hasExistingStake = Boolean(phase1DelegationsData?.delegations?.length);
+  const phase1DelegationsExist = delegationsAPI
+    ? [...localDelegations, ...delegationsAPI.delegations].length > 0
+    : localDelegations.length > 0;
 
   return (
     <Card>
@@ -129,7 +133,7 @@ export function DelegationList() {
           handleActionClick: openConfirmationModal,
           validations,
         }}
-        fallback={<NoDelegations hasExistingStake={hasExistingStake} />}
+        fallback={<NoDelegations hasExistingStake={phase1DelegationsExist} />}
       />
 
       <DelegationModal
