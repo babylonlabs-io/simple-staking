@@ -1,10 +1,12 @@
-/** @type {import('next').NextConfig} */
 import { withSentryConfig } from "@sentry/nextjs";
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
   output: "export",
   images: { unoptimized: true },
+  productionBrowserSourceMaps: true,
   experimental: {
     forceSwcTransforms: true,
   },
@@ -15,7 +17,11 @@ const config = withSentryConfig(nextConfig, {
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
   org: "sentry",
-  project: "internal",
+  project: process.env.NEXT_PUBLIC_SENTRY_PROJECT_NAME ?? "internal",
+  sourcemaps: {
+    disable: false,
+    deleteSourceMapsAfterUpload: false,
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
