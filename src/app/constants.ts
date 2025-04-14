@@ -26,3 +26,7 @@ export const STAKING_DISABLED =
   process.env.NEXT_PUBLIC_STAKING_DISABLED === "true";
 
 export const BABYLON_EXPLORER = process.env.NEXT_PUBLIC_BABYLON_EXPLORER ?? "";
+
+export const REPLAYS_ON_ERROR_RATE = parseFloat(
+  process.env.NEXT_PUBLIC_REPLAYS_RATE ?? "0.05",
+);
