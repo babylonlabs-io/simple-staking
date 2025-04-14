@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - "main"
-      - 'release/v1.x'
+      - "release/v1.x"
     tags:
       - "*"
 
@@ -59,6 +59,7 @@ jobs:
           NEXT_PUBLIC_BBN_GAS_PRICE: ${{ vars.NEXT_PUBLIC_BBN_GAS_PRICE }}
           NEXT_PUBLIC_SIDECAR_API_URL: ${{ vars.NEXT_PUBLIC_SIDECAR_API_URL }}
           NEXT_PUBLIC_BABYLON_EXPLORER: ${{ vars.NEXT_PUBLIC_BABYLON_EXPLORER }}
+          NEXT_PUBLIC_REPLAYS_RATE: ${{ vars.NEXT_PUBLIC_REPLAYS_RATE }}
           S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
 
       - name: Archive output
