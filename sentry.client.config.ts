@@ -11,6 +11,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 
+import { REPLAYS_ON_ERROR_RATE } from "@/app/constants";
 import { getCommitHash } from "@/utils/version";
 
 Sentry.init({
@@ -53,7 +54,7 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
-  replaysOnErrorSampleRate: 0.05,
+  replaysOnErrorSampleRate: REPLAYS_ON_ERROR_RATE,
 
   replaysSessionSampleRate: 0,
 
