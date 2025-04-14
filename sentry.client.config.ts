@@ -53,14 +53,14 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
-  replaysOnErrorSampleRate: 1.0,
+  replaysOnErrorSampleRate: 0.05,
 
   replaysSessionSampleRate: 0,
 
   integrations: [
     Sentry.replayIntegration({
       // Additional Replay configuration goes in here, for example:
-      maskAllText: true,
+      maskAllText: false,
       blockAllMedia: true,
     }),
   ],
