@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
-    "build": "next build",
+    "build": "next build && npm run sentry:sourcemaps",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check .",
@@ -19,7 +19,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "sentry:sourcemaps": "sentry-cli sourcemaps inject .next && sentry-cli sourcemaps upload .next"
   },
   "engines": {
     "node": "22.3.0"

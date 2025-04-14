@@ -62,6 +62,10 @@ jobs:
           NEXT_PUBLIC_REPLAYS_RATE: ${{ vars.NEXT_PUBLIC_REPLAYS_RATE }}
           NEXT_PUBLIC_STAKING_DISABLED: ${{ vars.NEXT_PUBLIC_STAKING_DISABLED}}
           S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
+          SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_RELEASE: ${{ github.sha }}
 
       - name: Archive output
         run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
