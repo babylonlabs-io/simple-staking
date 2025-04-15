@@ -1,26 +1,24 @@
-import { ReactNode } from "react";
+"use client";
+
+import { useLanguage } from "@/app/contexts/LanguageContext";
+import { translations } from "@/app/translations";
 
 export interface Question {
   title: string;
-  content: ReactNode;
+  content: React.ReactNode;
 }
 
-export const questions = (coinName: string): Question[] => {
-  const questionList = [
+export const useQuestions = (coinName: string): Question[] => {
+  const { language } = useLanguage();
+  const t = translations[language];
+
+  return [
     {
-      title: "What is Babylon?",
-      content: (
-        <p>
-          Babylon is a suite of security-sharing protocols that bring
-          Bitcoin&apos;s unparalleled security to the decentralized world. The
-          latest protocol, Bitcoin Staking, enables Bitcoin holders to stake
-          their Bitcoin to provide crypto-economic security to PoS
-          (proof-of-stake) systems in a trustless and self-custodial way.
-        </p>
-      ),
+      title: t.whatIsBabylon,
+      content: <p>{t.whatIsBabylonContent}</p>,
     },
     {
-      title: "How does Bitcoin Staking work?",
+      title: t.howDoesStakingWork,
       content: (
         <>
           <p>
@@ -46,7 +44,7 @@ export const questions = (coinName: string): Question[] => {
       ),
     },
     {
-      title: "What does this staking dApp allow me to do?",
+      title: t.whatCanStakingAppDo,
       content: (
         <p>
           The staking dApp is an interface to the Babylon Bitcoin Staking
@@ -58,7 +56,7 @@ export const questions = (coinName: string): Question[] => {
       ),
     },
     {
-      title: `Does my ${coinName} leave my wallet once staked?`,
+      title: t.doesBtcLeaveWallet,
       content: (
         <p>
           Technically, your {coinName} has not left your custody. However, your
@@ -74,7 +72,7 @@ export const questions = (coinName: string): Question[] => {
       ),
     },
     {
-      title: "Are there any other ways to stake?",
+      title: t.otherWaysToStake,
       content: (
         <p>
           Hands-on stakers can operate the{" "}
@@ -106,5 +104,4 @@ export const questions = (coinName: string): Question[] => {
       ),
     },
   ];
-  return questionList;
 };

@@ -1,10 +1,14 @@
+"use client";
+
 import { List } from "@babylonlabs-io/core-ui";
 
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
+import { translations } from "@/app/translations";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -22,6 +26,9 @@ const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
 const { coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   // Load reward state
   const {
     loading: rewardLoading,
@@ -52,21 +59,23 @@ export function PersonalBalance() {
   const { claimRewards, showPreview } = useRewardsService();
 
   const isMobile = useIsMobileView();
-  const formattedRewardBalance = ubbnToBaby(rewardBalance);
+  const formattedRewardBalance = rewardBalance
+    ? ubbnToBaby(rewardBalance).toFixed(6)
+    : "0.000000";
 
   return (
     <AuthGuard>
-      <Section title="Wallet Balance">
+      <Section title={t.walletBalance}>
         <List orientation="adaptive" className="bg-surface">
           <StatItem
             loading={isBalanceLoading}
-            title="Staked Balance"
+            title={t.stakedBalance}
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
           />
 
           <StatItem
             loading={isBalanceLoading || hasUnconfirmedUTXOs}
-            title="Stakable Balance"
+            title={t.stakableBalance}
             loadingStyle={
               hasUnconfirmedUTXOs
                 ? LoadingStyle.ShowSpinnerAndValue
@@ -82,7 +91,7 @@ export function PersonalBalance() {
 
           <StatItem
             loading={isBalanceLoading || processing}
-            title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
+            title={`${isMobile ? "BABY" : bbnNetworkName} ${t.bbnBalance}`}
             value={
               isBalanceLoading || processing
                 ? ""
@@ -93,12 +102,12 @@ export function PersonalBalance() {
 
           <StatItem
             loading={rewardLoading}
-            title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
+            title={`${isMobile ? "BABY" : bbnNetworkName} ${t.bbnRewards}`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
             suffix={
               <ActionComponent
                 className="h-6"
-                title="Claim"
+                title={t.claim}
                 onAction={showPreview}
                 isDisabled={!rewardBalance || processing}
               />

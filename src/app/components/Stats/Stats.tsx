@@ -1,9 +1,13 @@
+"use client";
+
 import { List } from "@babylonlabs-io/core-ui";
 import { memo } from "react";
 
 import { Section } from "@/app/components/Section/Section";
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
+import { translations } from "@/app/translations";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { formatBTCTvl } from "@/utils/formatBTCTvl";
@@ -28,16 +32,15 @@ export const Stats = memo(() => {
     isLoading,
   } = useSystemStats();
   const usdRate = usePrice(coinSymbol);
+  const { language } = useLanguage();
+  const t = translations[language];
 
   return (
-    <Section
-      title="Babylon Bitcoin Staking Stats"
-      titleClassName="text-accent-contrast"
-    >
+    <Section title={t.stakingStats} titleClassName="text-accent-contrast">
       <List orientation="adaptive" className="bg-surface">
         <StatItem
           loading={isLoading}
-          title={`Total ${coinSymbol} TVL`}
+          title={t.totalBtcTvl}
           value={formatBTCTvl(
             satoshiToBtc(totalActiveTVL),
             coinSymbol,
@@ -48,15 +51,15 @@ export const Stats = memo(() => {
 
         <StatItem
           loading={isLoading}
-          title={`Registered ${coinSymbol} TVL`}
+          title={t.registeredBtcTvl}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
           tooltip="The total amount of Bitcoin that has been registered in the Babylon Genesis network"
         />
 
         <StatItem
           loading={isLoading}
-          title="Finality Providers"
-          value={`${formatter.format(activeFPs)} Active (${formatter.format(totalFPs)} Total)`}
+          title={t.finalityProviders}
+          value={`${formatter.format(activeFPs)} ${t.active} (${formatter.format(totalFPs)} ${t.total})`}
           tooltip="Active and total number of Finality Providers"
         />
       </List>
