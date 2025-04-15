@@ -7,6 +7,7 @@ import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useAppState } from "@/app/state";
 import { translations } from "@/app/translations";
 
+import { GoogleLoginButton } from "../GoogleLoginButton";
 import { SmallLogo } from "../Logo/SmallLogo";
 import { Connect } from "../Wallet/Connect";
 
@@ -22,6 +23,7 @@ export const Header = () => {
         <SmallLogo />
 
         <div className="flex items-center gap-4">
+          <GoogleLoginButton />
           <Connect loading={loading} onConnect={open} />
           <div className="flex items-center gap-2">
             <button
