@@ -10,6 +10,7 @@ import { Activity } from "./components/Delegations/Activity";
 import { Header } from "./components/Header/Header";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
+import { PersonalBalanceStaked } from "./components/PersonalBalance/PersonalBalanceStaked";
 import { Stats } from "./components/Stats/Stats";
 
 const Home = () => {
@@ -27,8 +28,13 @@ const Home = () => {
         className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
       >
         <Stats />
-        <PersonalBalance />
-        <StakingForm />
+        <div className="flex flex-col gap-6 lg:flex-row">
+          <StakingForm />
+          <div className="flex-1 min-w-0 flex flex-col">
+            <PersonalBalance />
+            <PersonalBalanceStaked />
+          </div>
+        </div>
         <Activity />
         {/* <FAQ /> */}
       </Container>

@@ -1,4 +1,4 @@
-import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
+import { HiddenField, Loader } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
@@ -140,13 +140,13 @@ export function DelegationForm({
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
       <div className="relative flex flex-1 flex-col gap-6">
-        <Heading variant="h5" className="text-accent-primary">
+        {/* <Heading variant="h5" className="text-accent-primary">
           Step 2
         </Heading>
 
         <Text variant="body1" className="text-accent-secondary">
           Set Staking Amount
-        </Text>
+        </Text> */}
 
         <InfoAlert />
 

@@ -18,13 +18,14 @@ import { satoshiToBtc } from "@/utils/btc";
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
-import { LoadingStyle, StatItem } from "../Stats/StatItem";
+import { ActionComponent } from "../Stats/ActionComponent";
+import { StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
 const { coinSymbol } = getNetworkConfigBTC();
 
-export function PersonalBalance() {
+export function PersonalBalanceStaked() {
   const { language } = useLanguage();
   const t = translations[language];
 
@@ -64,16 +65,16 @@ export function PersonalBalance() {
 
   return (
     <AuthGuard>
-      <Section title={t.walletBalance} className="flex-1">
+      <Section title={t.stakedWalletBalance} className="flex-1">
         <List orientation="vertical" className="bg-surface rounded-lg">
-          {/* <StatItem
+          <StatItem
             loading={isBalanceLoading}
             title={t.stakedBalance}
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
             className="flex-row"
-          /> */}
+          />
 
-          <StatItem
+          {/* <StatItem
             loading={isBalanceLoading || hasUnconfirmedUTXOs}
             title={t.stakableBalance}
             loadingStyle={
@@ -100,9 +101,9 @@ export function PersonalBalance() {
             }
             loadingStyle={LoadingStyle.ShowSpinner}
             className="flex-row"
-          />
+          /> */}
 
-          {/* <StatItem
+          <StatItem
             loading={rewardLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} ${t.bbnRewards}`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
@@ -115,7 +116,7 @@ export function PersonalBalance() {
               />
             }
             className="flex-row"
-          /> */}
+          />
         </List>
 
         <ClaimRewardModal
