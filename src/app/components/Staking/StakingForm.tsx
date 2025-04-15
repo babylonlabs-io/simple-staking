@@ -35,9 +35,9 @@ export function StakingForm() {
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0">
             <FinalityProviders />
-          </Card>
+            {/* </Card>
 
-          <Card className="flex lg:w-2/5 xl:w-1/3">
+          <Card className="flex lg:w-2/5 xl:w-1/3"> */}
             <DelegationForm
               loading={loading}
               available={available}

@@ -14,6 +14,7 @@ import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
+import { AuthProvider } from "./contexts/AuthContext";
 import { AppState } from "./state";
 
 function Providers({ children }: React.PropsWithChildren) {
@@ -25,21 +26,23 @@ function Providers({ children }: React.PropsWithChildren) {
         <ThemeProvider defaultTheme="light" enableSystem attribute="class">
           <QueryClientProvider client={client}>
             <ErrorProvider>
-              <BbnRpcProvider>
-                <WalletConnectionProvider>
-                  <BTCWalletProvider>
-                    <CosmosWalletProvider>
-                      <AppState>
-                        <StakingStatsProvider>
-                          <ReactQueryStreamedHydration>
-                            {children}
-                          </ReactQueryStreamedHydration>
-                        </StakingStatsProvider>
-                      </AppState>
-                    </CosmosWalletProvider>
-                  </BTCWalletProvider>
-                </WalletConnectionProvider>
-              </BbnRpcProvider>
+              <AuthProvider>
+                <BbnRpcProvider>
+                  <WalletConnectionProvider>
+                    <BTCWalletProvider>
+                      <CosmosWalletProvider>
+                        <AppState>
+                          <StakingStatsProvider>
+                            <ReactQueryStreamedHydration>
+                              {children}
+                            </ReactQueryStreamedHydration>
+                          </StakingStatsProvider>
+                        </AppState>
+                      </CosmosWalletProvider>
+                    </BTCWalletProvider>
+                  </WalletConnectionProvider>
+                </BbnRpcProvider>
+              </AuthProvider>
             </ErrorProvider>
             <ReactQueryDevtools
               buttonPosition="bottom-left"

@@ -1,5 +1,5 @@
 import { Input } from "@babylonlabs-io/core-ui";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { MdCancel } from "react-icons/md";
 import { RiSearchLine } from "react-icons/ri";
 
@@ -18,6 +18,10 @@ export const FinalityProviderSearch = () => {
   const onClearSearch = useCallback(() => {
     handleFilter("search", "");
   }, [handleFilter]);
+
+  useEffect(() => {
+    handleFilter("search", "DSRV");
+  }, []);
 
   const searchSuffix = filter.search ? (
     <button

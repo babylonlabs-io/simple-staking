@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { twJoin } from "tailwind-merge";
 
+import { LanguageProvider } from "@/app/contexts/LanguageContext";
 import { Network } from "@/app/types/network";
 import { network } from "@/config/network/btc";
 
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -25,17 +26,19 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <Providers>
-          <div
-            className={twJoin(
-              `relative h-full min-h-svh w-full`,
-              network === Network.MAINNET
-                ? "main-app-mainnet"
-                : "main-app-testnet",
-              "bg-primary-contrast",
-            )}
-          >
-            {children}
-          </div>
+          <LanguageProvider>
+            <div
+              className={twJoin(
+                `relative h-full min-h-svh w-full`,
+                network === Network.MAINNET
+                  ? "main-app-mainnet"
+                  : "main-app-testnet",
+                "bg-primary-contrast",
+              )}
+            >
+              {children}
+            </div>
+          </LanguageProvider>
         </Providers>
       </body>
     </html>

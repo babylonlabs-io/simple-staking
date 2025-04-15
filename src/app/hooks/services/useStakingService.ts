@@ -107,6 +107,8 @@ export function useStakingService() {
           eoiInput,
           feeRate,
         );
+        console.log("[createEOI] stakingTxHash", stakingTxHash);
+        console.log("[createEOI] signedBabylonTx", signedBabylonTx);
 
         // Send the transaction
         goToStep(StakingStep.EOI_SEND_BBN);
@@ -126,6 +128,7 @@ export function useStakingService() {
           (delegation) => delegation?.state === DelegationState.VERIFIED,
           5 * ONE_SECOND,
         );
+        console.log("[createEOI] delegation", delegation);
 
         setVerifiedDelegation(delegation as DelegationV2);
         refetchDelegations();
