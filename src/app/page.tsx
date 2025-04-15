@@ -8,7 +8,6 @@ import { Header } from "./components/Header/Header";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { PersonalBalanceStaked } from "./components/PersonalBalance/PersonalBalanceStaked";
-import { Stats } from "./components/Stats/Stats";
 import { StakingTabs } from "./components/Tabs/StakingTabs";
 
 const Home = () => {
@@ -23,9 +22,10 @@ const Home = () => {
 
       <Container
         as="main"
-        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
+        // className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
+        className="flex flex-col gap-12 md:gap-16 pb-16 pt-16"
       >
-        <Stats />
+        {/* <Stats /> */}
         <div className="flex flex-col gap-6 lg:flex-row flex-1">
           <StakingTabs />
           <div className=" min-w-0 flex flex-col">

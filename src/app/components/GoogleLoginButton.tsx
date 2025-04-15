@@ -1,11 +1,19 @@
+import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
+
 import { useAuth } from "@/app/contexts/AuthContext";
 
 export const GoogleLoginButton = () => {
   const { user, signInWithGoogle, logout } = useAuth();
+  const { disconnect } = useWalletConnect();
+
+  const handleLogout = () => {
+    disconnect();
+    logout();
+  };
 
   return (
     <button
-      onClick={user ? logout : signInWithGoogle}
+      onClick={user ? handleLogout : signInWithGoogle}
       className="flex items-center justify-center gap-2 rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     >
       {user ? (
