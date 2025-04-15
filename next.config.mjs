@@ -16,11 +16,14 @@ const config = withSentryConfig(nextConfig, {
   // For all available options, see:
   // https://github.com/getsentry/sentry-webpack-plugin#options
 
-  org: "sentry",
-  project: process.env.NEXT_PUBLIC_SENTRY_PROJECT_NAME ?? "internal",
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  sentryUrl: process.env.SENTRY_URL, // Only needed if using self-hosted Sentry
   sourcemaps: {
     disable: false,
-    deleteSourceMapsAfterUpload: false,
+    deleteSourceMapsAfterUpload: true,
+    hideSourceMaps: true
   },
 
   // Only print logs for uploading source maps in CI
@@ -42,9 +45,6 @@ const config = withSentryConfig(nextConfig, {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Hides source maps from generated client bundles
-  hideSourceMaps: false,
 
   // Automatically tree-shake Sentry logger statements to reduce bundle size
   disableLogger: true,
