@@ -33,7 +33,6 @@
     "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmjs/stargate": "^0.32.4",
-    "@cosmjs/tendermint-rpc": "^0.33.1",
     "@firebase/auth": "^1.10.0",
     "@heroicons/react": "^2.2.0",
     "@sentry/nextjs": "^8.30.0",
