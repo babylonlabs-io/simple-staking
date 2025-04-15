@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { GoogleLoginRequired } from "@/app/components/Auth/GoogleLoginRequired";
+import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useDelegationService } from "@/app/hooks/services/useDelegationService";
 import { translations } from "@/app/translations";
@@ -17,6 +19,7 @@ export const StakingTabs = () => {
   const [activeTab, setActiveTab] = useState<"staking" | "activity">("staking");
 
   const { delegations } = useDelegationService();
+  const { user } = useAuth();
 
   const activeDelegationsCount = delegations.filter(
     (delegation) =>
@@ -25,6 +28,10 @@ export const StakingTabs = () => {
   ).length;
 
   console.log("activeDelegationsCount", activeDelegationsCount);
+
+  if (!user) {
+    return <GoogleLoginRequired />;
+  }
 
   return (
     <div className="flex-1 min-w-0">

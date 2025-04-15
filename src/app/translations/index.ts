@@ -61,6 +61,12 @@ export const translations = {
     termsOfUse: "Terms of Use",
     privacyPolicy: "Privacy Policy",
     allRightsReserved: "All rights reserved",
+
+    // Google Login
+    googleLoginRequired: "Google Login Required",
+    googleLoginRequiredDescription:
+      "Please sign in with your Google account to access this service.",
+    signInWithGoogle: "Sign in with Google",
   },
   ko: {
     // Header
@@ -124,5 +130,11 @@ export const translations = {
     termsOfUse: "이용약관",
     privacyPolicy: "개인정보처리방침",
     allRightsReserved: "모든 권리 보유",
+
+    // Google Login
+    googleLoginRequired: "구글 로그인 필요",
+    googleLoginRequiredDescription:
+      "이 서비스에 접근하려면 구글 계정으로 로그인해야 합니다.",
+    signInWithGoogle: "구글로 로그인",
   },
 };
