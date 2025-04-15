@@ -32,7 +32,7 @@ export function StakingModal() {
     verifiedDelegation,
     reset: resetState,
   } = useStakingState();
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
   const {
     reset: resetForm,
@@ -41,8 +41,8 @@ export function StakingModal() {
   } = useFormContext();
 
   const fp = useMemo(
-    () => getFinalityProvider(formData?.finalityProvider ?? ""),
-    [formData, getFinalityProvider],
+    () => getRegisteredFinalityProvider(formData?.finalityProvider ?? ""),
+    [formData, getRegisteredFinalityProvider],
   );
 
   if (!step) {

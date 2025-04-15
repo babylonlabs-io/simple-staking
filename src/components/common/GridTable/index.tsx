@@ -1,8 +1,10 @@
+import { Loader } from "@babylonlabs-io/core-ui";
 import { useId } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { twJoin, twMerge } from "tailwind-merge";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
+import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 
 import { GridCell } from "./components/TCell";
 import { GridHead } from "./components/THead";
@@ -11,6 +13,7 @@ import { createColumnTemplate } from "./utils";
 
 export function GridTable<R extends object, P extends object = {}>({
   loading = false,
+  isFetchingNextPage = false,
   infiniteScroll = false,
   classNames,
   columns,
@@ -31,6 +34,16 @@ export function GridTable<R extends object, P extends object = {}>({
       onRowClick?.(row);
       onCellClick?.(row, col);
     };
+  }
+
+  if (loading) {
+    return (
+      <StatusView
+        className="flex-1 h-auto"
+        icon={<Loader className="text-primary-light" />}
+        title="Please wait..."
+      />
+    );
   }
 
   if (!data?.length) {
@@ -54,7 +67,7 @@ export function GridTable<R extends object, P extends object = {}>({
         dataLength={data.length}
         next={onInfiniteScroll}
         hasMore={infiniteScroll}
-        loader={loading ? <LoadingTableList /> : null}
+        loader={isFetchingNextPage ? <LoadingTableList /> : null}
         scrollableTarget={id}
       >
         <div className={twMerge("contents", classNames?.headerRowClassName)}>

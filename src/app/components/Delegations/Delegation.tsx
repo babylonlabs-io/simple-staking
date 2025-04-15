@@ -94,8 +94,13 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
 const DelegationState: React.FC<{
   displayState: string;
   isSlashed: boolean;
-}> = ({ displayState, isSlashed }) => {
+  isFPResgistered: boolean;
+}> = ({ displayState, isSlashed, isFPResgistered }) => {
   const renderStateTooltip = () => {
+    if (!isFPResgistered) {
+      return "Your Finality Provider is not registered on Babylon Genesis. You need to wait for their registration to become eligible to register your stake to Babylon Genesis";
+    }
+
     if (isSlashed) {
       return (
         <span>
@@ -114,6 +119,7 @@ const DelegationState: React.FC<{
     if (displayState === DelegationStateEnum.OVERFLOW) {
       return "Stake is over the staking cap";
     }
+
     return getStateTooltip(displayState);
   };
 
@@ -154,14 +160,14 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   const { startTimestamp } = stakingTx;
 
-  const { getFinalityProvider, getFinalityProviderName } =
+  const { getRegisteredFinalityProvider, getFinalityProviderName } =
     useFinalityProviderState();
 
-  const finalityProvider = getFinalityProvider(finalityProviderPkHex);
+  const finalityProvider = getRegisteredFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
   const fpName = getFinalityProviderName(finalityProviderPkHex) ?? "-";
-
   const isActive = state === DelegationStateEnum.ACTIVE;
+  const isFpRegistered = finalityProvider !== null;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
   const isJailed = fpState === FinalityProviderState.JAILED;
 
@@ -209,7 +215,11 @@ export const Delegation: React.FC<DelegationProps> = ({
           add its size 12px and gap 4px, 16/2 = 8px
           */}
         <DelegationCell>
-          <DelegationState displayState={displayState} isSlashed={isSlashed} />
+          <DelegationState
+            displayState={displayState}
+            isSlashed={isSlashed}
+            isFPResgistered={isFpRegistered}
+          />
         </DelegationCell>
 
         <DelegationCell>
@@ -217,6 +227,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             state={state}
             intermediateState={intermediateState}
             isEligibleForRegistration={isEligibleForTransition}
+            isFpRegistered={isFpRegistered}
             stakingTxHashHex={stakingTxHashHex}
             finalityProviderPkHex={finalityProviderPkHex}
             onRegistration={() => onRegistration(delegation)}

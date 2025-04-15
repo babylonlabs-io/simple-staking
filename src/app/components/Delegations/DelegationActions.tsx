@@ -13,6 +13,7 @@ interface DelegationActionsProps {
   state: string;
   intermediateState?: string;
   isEligibleForRegistration: boolean;
+  isFpRegistered: boolean;
   stakingTxHashHex: string;
   finalityProviderPkHex: string;
   onRegistration: () => Promise<void>;
@@ -24,6 +25,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   state,
   intermediateState,
   isEligibleForRegistration,
+  isFpRegistered,
   stakingTxHashHex,
   finalityProviderPkHex,
   onRegistration,
@@ -32,7 +34,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const { getFinalityProvider } = useFinalityProviderState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
 
   const {
     balanceQuery: { data: bbnBalance = 0 },
@@ -40,7 +42,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
 
   const { networkFullName, coinSymbol } = getNetworkConfigBBN();
 
-  const finalityProvider = getFinalityProvider(finalityProviderPkHex);
+  const finalityProvider = getRegisteredFinalityProvider(finalityProviderPkHex);
   const fpState = finalityProvider?.state;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
 
@@ -48,6 +50,18 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const insufficientBalanceMessage = hasInsufficientBalance
     ? `Insufficient ${coinSymbol} Balance in ${networkFullName} Wallet`
     : "";
+
+  const getDelegationTooltip = () => {
+    if (!isFpRegistered) {
+      return "Registration is not available as your finality provider has not yet registered to Babylon Genesis.";
+    }
+
+    if (state === DelegationState.ACTIVE && !isEligibleForRegistration) {
+      return "Your finality provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check again on April 24, 10am UTC.";
+    }
+
+    return insufficientBalanceMessage;
+  };
 
   // We no longer show the registration button when the unbonding transaction is pending
   if (intermediateState === DelegationState.INTERMEDIATE_UNBONDING) {
@@ -98,11 +112,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
       <div
         className="flex justify-start"
         data-tooltip-id="tooltip-registration"
-        data-tooltip-content={
-          state === DelegationState.ACTIVE && !isEligibleForRegistration
-            ? "Staking registration is not available yet, come back later"
-            : insufficientBalanceMessage
-        }
+        data-tooltip-content={getDelegationTooltip()}
       >
         <div className="flex items-center gap-1">
           <Button

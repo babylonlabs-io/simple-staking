@@ -1,18 +1,18 @@
-export const BBN_CANARY_RPC_URL = process.env.NEXT_PUBLIC_BABY_RPC_URL
+export const BBN_MAINNET_RPC_URL = process.env.NEXT_PUBLIC_BABY_RPC_URL
   ? process.env.NEXT_PUBLIC_BABY_RPC_URL
-  : "https://rpc.btc-mainnet.babylonlabs.io/";
+  : "https://rpc-dapp.babylonlabs.io/";
 
-export const BBN_CANARY_LCD_URL = process.env.NEXT_PUBLIC_BABY_LCD_URL
+export const BBN_MAINNET_LCD_URL = process.env.NEXT_PUBLIC_BABY_LCD_URL
   ? process.env.NEXT_PUBLIC_BABY_LCD_URL
-  : "https://lcd.btc-mainnet.babylonlabs.io/";
+  : "https://lcd-dapp.babylonlabs.io/";
 
-export const bbnCanary = {
-  chainId: "bbn-priv-main-1",
-  chainName: "Babylon Private Mainnet",
+export const bbnMainnet = {
+  chainId: "bbn-1",
+  chainName: "Babylon Genesis",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
-  rpc: BBN_CANARY_RPC_URL,
-  rest: BBN_CANARY_LCD_URL,
+  rpc: BBN_MAINNET_RPC_URL,
+  rest: BBN_MAINNET_LCD_URL,
   nodeProvider: {
     name: "Babylonlabs",
     email: "contact@babylonlabs.io",

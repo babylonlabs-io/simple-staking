@@ -40,7 +40,7 @@ export const getState = (state: string) => {
 export const getStateTooltip = (state: string) => {
   switch (state) {
     case DelegationState.ACTIVE:
-      return `Stake is pending registration to the ${bbnNetworkFullName}`;
+      return "Your Finality Provider is registered on Babylon Genesis";
     case DelegationState.UNBONDING_REQUESTED:
       return "Stake unbonding is in progress";
     case DelegationState.UNBONDED:

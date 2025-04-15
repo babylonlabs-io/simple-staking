@@ -87,14 +87,16 @@ export const useRewardsService = () => {
       setProcessing(false);
     }
   }, [
+    closeRewardModal,
+    setProcessing,
+    openProcessingModal,
     bbnAddress,
     signBbnTx,
     sendBbnTx,
     refetchRewardBalance,
     balanceQuery,
-    setProcessing,
-    closeRewardModal,
     setTransactionHash,
+    closeProcessingModal,
     handleError,
   ]);
 

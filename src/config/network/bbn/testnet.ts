@@ -10,7 +10,7 @@ export const bbnTestnet = {
   chainId: "bbn-test-5",
   chainName: "Babylon Phase-2 Testnet",
   chainSymbolImageUrl:
-    "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
+    "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
   rpc: BBN_TESTNET_RPC_URL,
   rest: BBN_TESTNET_LCD_URL,
   nodeProvider: {
@@ -35,7 +35,7 @@ export const bbnTestnet = {
       coinMinimalDenom: "ubbn",
       coinDecimals: 6,
       coinImageUrl:
-        "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
+        "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
     },
   ],
   feeCurrencies: [
@@ -44,9 +44,9 @@ export const bbnTestnet = {
       coinMinimalDenom: "ubbn",
       coinDecimals: 6,
       coinImageUrl:
-        "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
+        "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
       gasPriceStep: {
-        low: 0.005,
+        low: 0.007,
         average: 0.007,
         high: 0.01,
       },
@@ -57,7 +57,7 @@ export const bbnTestnet = {
     coinMinimalDenom: "ubbn",
     coinDecimals: 6,
     coinImageUrl:
-      "https://raw.githubusercontent.com/chainapsis/keplr-chain-registry/main/images/bbn-test/chain.png",
+      "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
   },
   features: ["cosmwasm"],
 };

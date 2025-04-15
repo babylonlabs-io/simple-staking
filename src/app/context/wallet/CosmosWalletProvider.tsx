@@ -18,9 +18,12 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
+
+import { ClientError } from "../Error/errors";
 
 const { chainId, rpc } = getNetworkConfigBBN();
 
@@ -92,7 +95,13 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setLoading(false);
       } catch (error: any) {
         handleError({
-          error,
+          error: new ClientError(
+            {
+              message: error.message,
+              type: ErrorType.WALLET,
+            },
+            { cause: error },
+          ),
           displayOptions: {
             retryAction: () => connectCosmos(provider),
           },
@@ -102,7 +111,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError],
+    [handleError, cosmosBech32Address],
   );
 
   // Listen for Babylon account changes

@@ -9,6 +9,7 @@ import {
   FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
+import { DEFAULT_FILTER_VALUE } from "@/config";
 import { createStateUtils } from "@/utils/createStateUtils";
 
 interface SortState {
@@ -31,7 +32,7 @@ interface FinalityProviderState {
   handleSort: (sortField: string) => void;
   handleFilter: (key: keyof FilterState, value: string) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
-  getFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
+  getRegisteredFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   fetchNextPage: () => void;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
 }
@@ -62,7 +63,10 @@ const FILTERS = {
 };
 
 const defaultState: FinalityProviderState = {
-  filter: { search: "", status: "active" },
+  filter: {
+    search: "",
+    status: DEFAULT_FILTER_VALUE,
+  },
   finalityProviders: [],
   hasNextPage: false,
   isFetching: false,
@@ -70,7 +74,7 @@ const defaultState: FinalityProviderState = {
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
-  getFinalityProvider: () => null,
+  getRegisteredFinalityProvider: () => null,
   fetchNextPage: () => {},
   getFinalityProviderName: () => undefined,
   finalityProviderMap: new Map(),
@@ -85,7 +89,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
-    status: "active",
+    status: DEFAULT_FILTER_VALUE,
   });
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
@@ -165,7 +169,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     );
   }, [data?.finalityProviders, filter]);
 
-  const getFinalityProvider = useCallback(
+  const getRegisteredFinalityProvider = useCallback(
     (btcPkHex: string) =>
       data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
     [data?.finalityProviders],
@@ -182,7 +186,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       handleSort,
       handleFilter,
       isRowSelectable,
-      getFinalityProvider,
+      getRegisteredFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
     }),
@@ -196,7 +200,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       handleSort,
       handleFilter,
       isRowSelectable,
-      getFinalityProvider,
+      getRegisteredFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
     ],

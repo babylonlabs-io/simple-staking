@@ -10,10 +10,12 @@ import { useCallback, type PropsWithChildren } from "react";
 
 import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
+import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { useError } from "../Error/ErrorProvider";
+import { ClientError } from "../Error/errors";
 
 const context = typeof window !== "undefined" ? window : {};
 
@@ -28,7 +30,9 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-btc-connector",
-        widget: () => <ExternalWallets chainName="bitcoin" />,
+        widget: ({ onError }) => (
+          <ExternalWallets chainName="bitcoin" onError={onError} />
+        ),
       },
     ],
     config: getNetworkConfigBTC(),
@@ -38,7 +42,9 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-bbn-connector",
-        widget: () => <ExternalWallets chainName="cosmos" />,
+        widget: ({ onError }) => (
+          <ExternalWallets chainName="cosmos" onError={onError} />
+        ),
       },
     ],
     config: getNetworkConfigBBN(),
@@ -51,8 +57,18 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
 
   const onError = useCallback(
     (error: Error) => {
+      if (error?.message?.includes("rejected")) {
+        return;
+      }
+
       handleError({
-        error,
+        error: new ClientError(
+          {
+            message: error.message,
+            type: ErrorType.WALLET,
+          },
+          { cause: error },
+        ),
       });
     },
     [handleError],
