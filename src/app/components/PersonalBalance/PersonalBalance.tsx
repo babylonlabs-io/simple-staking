@@ -87,7 +87,7 @@ export function PersonalBalance() {
                 ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
                 : undefined
             }
-            className="flex-row"
+            className="flex-col items-start"
           />
 
           <StatItem
@@ -99,7 +99,7 @@ export function PersonalBalance() {
                 : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
             }
             loadingStyle={LoadingStyle.ShowSpinner}
-            className="flex-row"
+            className="flex-col items-start"
           />
 
           {/* <StatItem

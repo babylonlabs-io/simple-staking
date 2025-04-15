@@ -18,7 +18,7 @@ export const translations = {
     bbnRewards: "BBN Rewards",
     claim: "Claim",
     walletBalance: "Wallet Balance",
-    stakedWalletBalance: "Staked Wallet Balance",
+    stakedWalletBalance: "Staked Balance",
 
     // Staking
     stakingStats: "Babylon Bitcoin Staking Stats",
@@ -29,6 +29,9 @@ export const translations = {
     newStakesUnavailableMessage:
       "Creation of new stakes will be enabled on April 24, 10am UTC. Phase-1 Cap-1 stakers can register their stakes to Babylon using the modal below.",
     unavailableInRegion: "Unavailable in Your Region",
+
+    // Activity
+    activity: "Activity",
 
     // FAQ
     faqTitle: "FAQ's",
@@ -89,6 +92,9 @@ export const translations = {
     newStakesUnavailableMessage:
       "새로운 스테이킹 생성은 4월 24일 UTC 10시에 활성화됩니다. Phase-1 Cap-1 스테이커는 아래 모달을 사용하여 바빌론에 스테이킹을 등록할 수 있습니다.",
     unavailableInRegion: "해당 지역에서 사용할 수 없음",
+
+    // Activity
+    activity: "활동 내역",
 
     // FAQ
     faqTitle: "자주 묻는 질문",

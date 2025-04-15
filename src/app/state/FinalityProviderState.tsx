@@ -88,7 +88,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const fpParam = searchParams.get("fp");
 
   const [filter, setFilter] = useState<FilterState>({
-    search: fpParam || "",
+    search: fpParam || "DSRV",
     status: DEFAULT_FILTER_VALUE,
   });
   const [sortState, setSortState] = useState<SortState>({});

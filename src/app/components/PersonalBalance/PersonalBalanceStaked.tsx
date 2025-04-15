@@ -71,7 +71,7 @@ export function PersonalBalanceStaked() {
             loading={isBalanceLoading}
             title={t.stakedBalance}
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
-            className="flex-row"
+            className="flex-col items-start"
           />
 
           {/* <StatItem
@@ -115,7 +115,7 @@ export function PersonalBalanceStaked() {
                 isDisabled={!rewardBalance || processing}
               />
             }
-            className="flex-row"
+            className="flex-col items-start"
           />
         </List>
 
