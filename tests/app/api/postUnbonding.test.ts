@@ -1,34 +1,30 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
 import { postUnbonding } from "@/app/api/postUnbonding";
 
+import {
+  mockAcceptedResponse,
+  mockRejectedResponse,
+  mockUnbondingParams,
+} from "./postUnbonding.mocks";
+
 // Mock the apiWrapper module
 jest.mock("@/app/api/apiWrapper");
 
 describe("postUnbonding", () => {
-  const mockParams = {
-    stakerSignedSignatureHex: "mockSignature123",
-    stakingTxHashHex: "mockStakingTxHash",
-    unbondingTxHashHex: "mockUnbondingTxHash",
-    unbondingTxHex: "mockUnbondingTxHex",
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   it("returns true when the unbonding request is accepted", async () => {
     // Mock the apiWrapper to return a 202 status
-    (apiWrapper as jest.Mock).mockResolvedValue({
-      status: 202,
-      data: {}, // Data doesn't matter for this test
-    });
+    (apiWrapper as jest.Mock).mockResolvedValue(mockAcceptedResponse);
 
     // Call the function with mock parameters
     const result = await postUnbonding(
-      mockParams.stakerSignedSignatureHex,
-      mockParams.stakingTxHashHex,
-      mockParams.unbondingTxHashHex,
-      mockParams.unbondingTxHex,
+      mockUnbondingParams.stakerSignedSignatureHex,
+      mockUnbondingParams.stakingTxHashHex,
+      mockUnbondingParams.unbondingTxHashHex,
+      mockUnbondingParams.unbondingTxHex,
     );
 
     // Verify apiWrapper was called with correct parameters
@@ -38,10 +34,11 @@ describe("postUnbonding", () => {
       "Error submitting unbonding request",
       {
         body: {
-          staker_signed_signature_hex: mockParams.stakerSignedSignatureHex,
-          staking_tx_hash_hex: mockParams.stakingTxHashHex,
-          unbonding_tx_hash_hex: mockParams.unbondingTxHashHex,
-          unbonding_tx_hex: mockParams.unbondingTxHex,
+          staker_signed_signature_hex:
+            mockUnbondingParams.stakerSignedSignatureHex,
+          staking_tx_hash_hex: mockUnbondingParams.stakingTxHashHex,
+          unbonding_tx_hash_hex: mockUnbondingParams.unbondingTxHashHex,
+          unbonding_tx_hex: mockUnbondingParams.unbondingTxHex,
         },
       },
     );
@@ -52,17 +49,14 @@ describe("postUnbonding", () => {
 
   it("returns false when the unbonding request is not accepted", async () => {
     // Mock the apiWrapper to return a non-202 status
-    (apiWrapper as jest.Mock).mockResolvedValue({
-      status: 200,
-      data: {}, // Data doesn't matter for this test
-    });
+    (apiWrapper as jest.Mock).mockResolvedValue(mockRejectedResponse);
 
     // Call the function with mock parameters
     const result = await postUnbonding(
-      mockParams.stakerSignedSignatureHex,
-      mockParams.stakingTxHashHex,
-      mockParams.unbondingTxHashHex,
-      mockParams.unbondingTxHex,
+      mockUnbondingParams.stakerSignedSignatureHex,
+      mockUnbondingParams.stakingTxHashHex,
+      mockUnbondingParams.unbondingTxHashHex,
+      mockUnbondingParams.unbondingTxHex,
     );
 
     // Verify the result is false
@@ -77,10 +71,10 @@ describe("postUnbonding", () => {
     // Verify the error is rethrown
     await expect(
       postUnbonding(
-        mockParams.stakerSignedSignatureHex,
-        mockParams.stakingTxHashHex,
-        mockParams.unbondingTxHashHex,
-        mockParams.unbondingTxHex,
+        mockUnbondingParams.stakerSignedSignatureHex,
+        mockUnbondingParams.stakingTxHashHex,
+        mockUnbondingParams.unbondingTxHashHex,
+        mockUnbondingParams.unbondingTxHex,
       ),
     ).rejects.toThrow("API error");
   });
