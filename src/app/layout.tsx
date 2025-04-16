@@ -10,8 +10,8 @@ import "./globals.css";
 import Providers from "./providers";
 
 export const metadata: Metadata = {
-  title: "Babylon - Staking Dashboard",
-  description: "BTC Staking Dashboard",
+  title: "DSRV - Staking Dashboard",
+  description: "Staking Dashboard",
 };
 
 export default function RootLayout({

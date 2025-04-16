@@ -7,7 +7,7 @@ import { Delegations } from "./Delegations";
 export function Activity() {
   return (
     <AuthGuard>
-      <Section title="Activity">
+      <Section title="Activity" titleClassName="md:text-xl">
         <Delegations />
         <DelegationList />
       </Section>

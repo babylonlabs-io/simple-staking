@@ -10,6 +10,8 @@ export const translations = {
     finalityProviders: "Finality Providers",
     active: "Active",
     total: "Total",
+    totalDelegations: "Total Delegations",
+    description: "Description",
 
     // Personal Balance
     stakedBalance: "Staked Balance",
@@ -139,6 +141,20 @@ export const translations = {
     ethereum: "Ethereum",
     xrp: "XRP",
     comingSoon: "Coming Soon",
+
+    // Info Alert
+    info: "Info",
+    unbondingInfo:
+      "You can unbond and withdraw your stake anytime with an unbonding time of {time}.",
+    learnMore: "Learn More",
+
+    // Info Modal
+    stakeTimelockAndUnbonding: "Stake Timelock and On-Demand Unbonding",
+    stakeTimelockInfo:
+      "Stakes made through this dashboard are locked for up to {maxStakingPeriod}. You can on-demand unbond at any time, with withdrawal available after a {unbondingTime} unbonding period. If the maximum staking period expires, your stake becomes withdrawable automatically, with no need for prior unbonding.",
+    stakeTimelockNote:
+      "Note: Timeframes are approximate, based on an average {coinName} block time of 10 minutes.",
+    done: "Done",
   },
   ko: {
     // Header
@@ -151,6 +167,8 @@ export const translations = {
     finalityProviders: "파이널리티 프로바이더",
     active: "활성",
     total: "전체",
+    totalDelegations: "총 위임 수",
+    description: "설명",
 
     // Personal Balance
     stakedBalance: "스테이킹된 잔액",
@@ -280,5 +298,19 @@ export const translations = {
     ethereum: "이더리움",
     xrp: "리플",
     comingSoon: "출시 예정",
+
+    // Info Alert
+    info: "정보",
+    unbondingInfo:
+      "언본딩 시간 {time} 동안 언제든지 스테이킹을 해제하고 인출할 수 있습니다.",
+    learnMore: "더 알아보기",
+
+    // Info Modal
+    stakeTimelockAndUnbonding: "스테이킹 타임락 및 온디맨드 언본딩",
+    stakeTimelockInfo:
+      "이 대시보드를 통해 생성된 스테이킹은 최대 {maxStakingPeriod} 동안 잠깁니다. 언제든지 온디맨드 언본딩이 가능하며, {unbondingTime}의 언본딩 기간 후에 인출할 수 있습니다. 최대 스테이킹 기간이 만료되면, 사전 언본딩 없이 자동으로 인출 가능한 상태가 됩니다.",
+    stakeTimelockNote:
+      "참고: 시간은 평균 {coinName} 블록 시간 10분을 기준으로 한 대략적인 수치입니다.",
+    done: "완료",
   },
 };

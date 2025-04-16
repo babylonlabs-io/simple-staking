@@ -3,12 +3,16 @@ import { useState } from "react";
 import { MdErrorOutline } from "react-icons/md";
 
 import { InfoModal } from "@/app/components/Modals/InfoModal";
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useStakingState } from "@/app/state/StakingState";
+import { translations } from "@/app/translations";
 import { blocksToDisplayTime } from "@/utils/time";
 
 export function InfoAlert() {
   const [showMore, setShowMore] = useState(false);
   const { stakingInfo } = useStakingState();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   return (
     <div className="rounded bg-secondary-highlight flex flex-row items-start justify-between py-2 px-4">
@@ -18,18 +22,20 @@ export function InfoAlert() {
 
       <div className="flex flex-col gap-1 grow">
         <Text variant="subtitle1" className="font-medium text-accent-primary">
-          Info
+          {t.info}
         </Text>
         <Text variant="body1" className="text-accent-secondary">
-          You can unbond and withdraw your stake anytime with an unbonding time
-          of {blocksToDisplayTime(stakingInfo?.unbondingTime)}.
+          {t.unbondingInfo.replace(
+            "{time}",
+            blocksToDisplayTime(stakingInfo?.unbondingTime),
+          )}
         </Text>{" "}
         <a
           rel="noopener noreferrer"
           className="cursor-pointer text-secondary-main/90 hover:text-secondary-main"
           onClick={() => setShowMore(true)}
         >
-          Learn More
+          {t.learnMore}
         </a>
       </div>
 

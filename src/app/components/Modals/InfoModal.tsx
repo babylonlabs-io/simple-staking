@@ -6,7 +6,9 @@ import {
   Text,
 } from "@babylonlabs-io/core-ui";
 
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
+import { translations } from "@/app/translations";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { blocksToDisplayTime } from "@/utils/time";
 
@@ -21,6 +23,8 @@ const { coinName } = getNetworkConfigBTC();
 
 export function InfoModal({ open, onClose }: InfoModalProps) {
   const { data: networkInfo } = useNetworkInfo();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   const unbondingTime = blocksToDisplayTime(
     networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
@@ -32,22 +36,19 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
   return (
     <ResponsiveDialog open={open} onClose={onClose}>
       <DialogHeader
-        title="Stake Timelock and On-Demand Unbonding"
+        title={t.stakeTimelockAndUnbonding}
         onClose={onClose}
         className="text-accent-primary"
       />
       <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
         <div className="py-4 flex flex-col items-start gap-4">
           <Text variant="body1">
-            Stakes made through this dashboard are locked for up to{" "}
-            {maxStakingPeriod}. You can on-demand unbond at any time, with
-            withdrawal available after a {unbondingTime} unbonding period. If
-            the maximum staking period expires, your stake becomes withdrawable
-            automatically, with no need for prior unbonding.
+            {t.stakeTimelockInfo
+              .replace("{maxStakingPeriod}", maxStakingPeriod)
+              .replace("{unbondingTime}", unbondingTime)}
           </Text>
           <Text variant="body1" className="text-accent-secondary italic">
-            Note: Timeframes are approximate, based on an average {coinName}{" "}
-            block time of 10 minutes.
+            {t.stakeTimelockNote.replace("{coinName}", coinName)}
           </Text>
         </div>
       </DialogBody>
@@ -57,7 +58,7 @@ export function InfoModal({ open, onClose }: InfoModalProps) {
           className="flex-1 text-xs sm:text-base"
           onClick={onClose}
         >
-          Done
+          {t.done}
         </Button>
       </DialogFooter>
     </ResponsiveDialog>

@@ -65,7 +65,7 @@ export function PersonalBalanceStaked() {
 
   return (
     <AuthGuard>
-      <Section title={t.stakedWalletBalance} className="flex-1">
+      <Section title={t.stakedWalletBalance}>
         <List orientation="vertical" className="bg-surface rounded-lg">
           <StatItem
             loading={isBalanceLoading}

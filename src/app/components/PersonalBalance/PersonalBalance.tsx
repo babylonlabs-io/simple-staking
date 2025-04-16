@@ -64,7 +64,7 @@ export function PersonalBalance() {
 
   return (
     <AuthGuard>
-      <Section title={t.walletBalance} className="flex-1">
+      <Section title={t.walletBalance}>
         <List orientation="vertical" className="bg-surface rounded-lg">
           {/* <StatItem
             loading={isBalanceLoading}

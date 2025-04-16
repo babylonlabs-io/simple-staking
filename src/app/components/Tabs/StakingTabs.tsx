@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { GoogleLoginRequired } from "@/app/components/Auth/GoogleLoginRequired";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useDelegationService } from "@/app/hooks/services/useDelegationService";
@@ -29,15 +28,11 @@ export const StakingTabs = () => {
 
   console.log("activeDelegationsCount", activeDelegationsCount);
 
-  if (!user) {
-    return <GoogleLoginRequired />;
-  }
-
   return (
     <div className="flex-1 min-w-0">
       <div className="flex border-b border-gray-200">
         <button
-          className={`px-4 py-2 text-sm font-medium ${
+          className={`px-4 py-2 text-3xl font-medium ${
             activeTab === "staking"
               ? "text-accent-primary border-b-2 border-primary-main"
               : "text-gray-500 hover:text-gray-700"
@@ -47,7 +42,7 @@ export const StakingTabs = () => {
           {t.stake}
         </button>
         <button
-          className={`px-4 py-2 text-sm font-medium relative ${
+          className={`px-4 py-2 text-3xl font-medium relative ${
             activeTab === "activity"
               ? "text-accent-primaryborder-b-2 border-primary-main"
               : "text-gray-500 hover:text-gray-700"
