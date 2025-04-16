@@ -35,6 +35,8 @@ Sentry.init({
   // Reference: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
   release: process.env.GITHUB_SHA ?? "NA",
 
+  dist: process.env.VERCEL_URL ?? process.env.NODE_ENV ?? "local",
+
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: 1,
   tracesSampler: (samplingContext) => {
