@@ -1,10 +1,5 @@
 import { apiWrapper } from "./apiWrapper";
 
-interface TermsPayload {
-  address: string;
-  public_key: string;
-}
-
 const ALLOWED_STATUSES = ["medium", "low"];
 
 export const verifyBTCAddress = async (address: string) => {
