@@ -1,11 +1,9 @@
 import { Card, Heading } from "@babylonlabs-io/core-ui";
 
-import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { useDelegationState } from "@/app/state/DelegationState";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
@@ -99,13 +97,6 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const { data: delegationsAPI } = useDelegations();
-  const { delegations: localDelegations = [] } = useDelegationState();
-
-  const phase1DelegationsExist = delegationsAPI
-    ? [...localDelegations, ...delegationsAPI.delegations].length > 0
-    : localDelegations.length > 0;
-
   return (
     <Card>
       <Heading variant="h6" className="text-accent-primary py-2 mb-6">
@@ -133,7 +124,7 @@ export function DelegationList() {
           handleActionClick: openConfirmationModal,
           validations,
         }}
-        fallback={<NoDelegations hasExistingStake={phase1DelegationsExist} />}
+        fallback={<NoDelegations />}
       />
 
       <DelegationModal
