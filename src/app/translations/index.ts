@@ -67,6 +67,77 @@ export const translations = {
     googleLoginRequiredDescription:
       "Please sign in with your Google account to access this service.",
     signInWithGoogle: "Sign in with Google",
+
+    // Error Messages
+    errorOccurred: "An error occurred",
+    networkError: "Network error occurred",
+    insufficientBalance: "Insufficient balance",
+    transactionFailed: "Transaction failed",
+    invalidInput: "Invalid input",
+    walletConnectionFailed: "Wallet connection failed",
+    stakeRegistrationFailed: "Stake registration failed",
+    claimFailed: "Claim failed",
+
+    // Notification Messages
+    transactionSuccess: "Transaction successful",
+    stakeRegistered: "Stake registered successfully",
+    rewardsClaimed: "Rewards claimed successfully",
+    walletConnected: "Wallet connected successfully",
+    walletDisconnected: "Wallet disconnected successfully",
+
+    // Status Messages
+    connecting: "Connecting...",
+    disconnecting: "Disconnecting...",
+    registering: "Registering...",
+    claiming: "Claiming...",
+    confirming: "Confirming...",
+
+    // Button Texts
+    retry: "Retry",
+    cancel: "Cancel",
+    confirm: "Confirm",
+    back: "Back",
+    next: "Next",
+    close: "Close",
+    viewDetails: "View Details",
+    refresh: "Refresh",
+
+    // Preview Modal
+    preview: "Preview",
+    finalityProvider: "Finality Provider",
+    stakeAmount: "Stake Amount",
+    feeRate: "Fee rate",
+    transactionFee: "Transaction fee",
+    term: "Term",
+    onDemandUnbonding: "On Demand Unbonding",
+    unbondingFee: "Unbonding fee",
+    attention: "Attention!",
+    previewAttention1:
+      "No third party possesses your staked {coinSymbol}. You are the only one who can unbond and withdraw your stake.",
+    previewAttention2:
+      'Your stake will first be sent to {bbnNetworkFullName} for verification (~20 seconds), then you will be prompted to submit it to the {networkName} ledger. It will be marked as "Pending" until it receives {confirmationDepth} Bitcoin confirmations.',
+    proceedToSigning: "Proceed to Signing",
+
+    // Sign Modal
+    signMessages: "Please sign the following messages",
+    consentToSlashing: "Consent to slashing",
+    consentToSlashingDuringUnbonding: "Consent to slashing during unbonding",
+    addressBinding:
+      "{coinSymbol}-{bbnCoinSymbol} address binding for receiving staking rewards",
+    stakingTransactionRegistration: "Staking transaction registration",
+    sign: "Sign",
+
+    // Navigation
+    staking: "Staking",
+    custody: "Custody",
+
+    // Crypto Selection
+    selectCrypto: "Select Crypto",
+    bitcoin: "Bitcoin",
+    sui: "Sui",
+    ethereum: "Ethereum",
+    xrp: "XRP",
+    comingSoon: "Coming Soon",
   },
   ko: {
     // Header
@@ -136,5 +207,76 @@ export const translations = {
     googleLoginRequiredDescription:
       "이 서비스에 접근하려면 구글 계정으로 로그인해야 합니다.",
     signInWithGoogle: "구글로 로그인",
+
+    // Error Messages
+    errorOccurred: "오류가 발생했습니다",
+    networkError: "네트워크 오류가 발생했습니다",
+    insufficientBalance: "잔액이 부족합니다",
+    transactionFailed: "트랜잭션이 실패했습니다",
+    invalidInput: "잘못된 입력입니다",
+    walletConnectionFailed: "지갑 연결에 실패했습니다",
+    stakeRegistrationFailed: "스테이킹 등록에 실패했습니다",
+    claimFailed: "보상 수령에 실패했습니다",
+
+    // Notification Messages
+    transactionSuccess: "트랜잭션이 성공적으로 완료되었습니다",
+    stakeRegistered: "스테이킹이 성공적으로 등록되었습니다",
+    rewardsClaimed: "보상이 성공적으로 수령되었습니다",
+    walletConnected: "지갑이 성공적으로 연결되었습니다",
+    walletDisconnected: "지갑 연결이 해제되었습니다",
+
+    // Status Messages
+    connecting: "연결 중...",
+    disconnecting: "연결 해제 중...",
+    registering: "등록 중...",
+    claiming: "수령 중...",
+    confirming: "확인 중...",
+
+    // Button Texts
+    retry: "다시 시도",
+    cancel: "취소",
+    confirm: "확인",
+    back: "뒤로",
+    next: "다음",
+    close: "닫기",
+    viewDetails: "상세 보기",
+    refresh: "새로고침",
+
+    // Preview Modal
+    preview: "미리보기",
+    finalityProvider: "파이널리티 프로바이더",
+    stakeAmount: "스테이킹 금액",
+    feeRate: "수수료율",
+    transactionFee: "트랜잭션 수수료",
+    term: "기간",
+    onDemandUnbonding: "온디맨드 언본딩",
+    unbondingFee: "언본딩 수수료",
+    attention: "주의사항!",
+    previewAttention1:
+      "제3자는 당신의 스테이킹된 {coinSymbol}을 소유하지 않습니다. 당신만이 스테이킹을 해제하고 인출할 수 있습니다.",
+    previewAttention2:
+      '스테이킹은 먼저 {bbnNetworkFullName}으로 전송되어 검증됩니다(~20초). 그 후 {networkName} 원장에 제출하라는 메시지가 표시됩니다. {confirmationDepth}개의 비트코인 확인을 받을 때까지 "대기 중"으로 표시됩니다.',
+    proceedToSigning: "서명 진행",
+
+    // Sign Modal
+    signMessages: "다음 메시지에 서명해주세요",
+    consentToSlashing: "슬래싱 동의",
+    consentToSlashingDuringUnbonding: "언본딩 중 슬래싱 동의",
+    addressBinding:
+      "스테이킹 보상 수령을 위한 {coinSymbol}-{bbnCoinSymbol} 주소 바인딩",
+    stakingTransactionRegistration: "스테이킹 트랜잭션 등록",
+    sign: "서명",
+
+    // Navigation
+    staking: "스테이킹",
+    custody: "커스터디",
+
+    // Crypto Selection
+    selectCrypto: "암호화폐 선택",
+    bitcoin: "비트코인",
+    sui: "수이",
+    ethereum: "이더리움",
+    xrp: "리플",
+    comingSoon: "출시 예정",
   },
 };

@@ -10,9 +10,11 @@ import {
 } from "@babylonlabs-io/core-ui";
 import { Fragment } from "react";
 
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
+import { translations } from "@/app/translations";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
@@ -53,6 +55,8 @@ export const PreviewModal = ({
 }: PreviewModalProps) => {
   const isMobileView = useIsMobileView();
   const { coinSymbol, networkName } = getNetworkConfigBTC();
+  const { language } = useLanguage();
+  const t = translations[language];
 
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
@@ -83,11 +87,11 @@ export const PreviewModal = ({
 
   const previewFields = [
     {
-      key: "Finality Provider",
+      key: t.finalityProvider,
       value: FinalityProviderValue,
     },
     {
-      key: "Stake Amount",
+      key: t.stakeAmount,
       value: (
         <>
           <Text variant="body1">
@@ -107,11 +111,11 @@ export const PreviewModal = ({
       ),
     },
     {
-      key: "Fee rate",
+      key: t.feeRate,
       value: <Text variant="body1">{feeRate} sat/vB</Text>,
     },
     {
-      key: "Transaction fee",
+      key: t.transactionFee,
       value: (
         <>
           <Text variant="body1">
@@ -131,7 +135,7 @@ export const PreviewModal = ({
       ),
     },
     {
-      key: "Term",
+      key: t.term,
       value: (
         <>
           <Text variant="body1">{stakingTimelock} blocks</Text>
@@ -142,13 +146,13 @@ export const PreviewModal = ({
       ),
     },
     {
-      key: "On Demand Unbonding",
+      key: t.onDemandUnbonding,
       value: (
         <Text variant="body1">Enabled (~ {unbondingTime} unbonding time)</Text>
       ),
     },
     {
-      key: "Unbonding fee",
+      key: t.unbondingFee,
       value: (
         <>
           <Text variant="body1">
@@ -172,7 +176,7 @@ export const PreviewModal = ({
   return (
     <ResponsiveDialog open={open} onClose={onClose}>
       <DialogHeader
-        title="Preview"
+        title={t.preview}
         onClose={onClose}
         className="text-accent-primary"
       />
@@ -193,17 +197,15 @@ export const PreviewModal = ({
         </div>
         <br />
         <div className="flex flex-col gap-2">
-          <Heading variant="h6">Attention!</Heading>
+          <Heading variant="h6">{t.attention}</Heading>
           <Text variant="body2">
-            1. No third party possesses your staked {coinSymbol}. You are the
-            only one who can unbond and withdraw your stake.
+            {t.previewAttention1.replace("{coinSymbol}", coinSymbol)}
           </Text>
           <Text variant="body2">
-            2. Your stake will first be sent to {bbnNetworkFullName} for
-            verification (~20 seconds), then you will be prompted to submit it
-            to the {networkName} ledger. It will be marked as
-            &quot;Pending&quot; until it receives {confirmationDepth} Bitcoin
-            confirmations.
+            {t.previewAttention2
+              .replace("{bbnNetworkFullName}", bbnNetworkFullName)
+              .replace("{networkName}", networkName)
+              .replace("{confirmationDepth}", confirmationDepth.toString())}
           </Text>
         </div>
       </DialogBody>
@@ -215,7 +217,7 @@ export const PreviewModal = ({
           onClick={onClose}
           className="flex-1"
         >
-          Cancel
+          {t.cancel}
         </Button>
         <Button
           variant="contained"
@@ -226,9 +228,7 @@ export const PreviewModal = ({
           {processing ? (
             <Loader size={16} className="text-white" />
           ) : (
-            <>
-              Proceed <span className="hidden md:inline">to Signing</span>
-            </>
+            <>{t.proceedToSigning}</>
           )}
         </Button>
       </DialogFooter>

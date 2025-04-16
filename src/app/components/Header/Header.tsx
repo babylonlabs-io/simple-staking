@@ -1,6 +1,7 @@
 "use client";
 
 import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
+import Link from "next/link";
 
 import { Container } from "@/app/components/Container/Container";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -23,7 +24,20 @@ export const Header = () => {
     <header className="bg-black">
       {/* <header className="bg-primary-main h-[12.75rem]"> */}
       <Container className="h-20 flex items-center justify-between">
-        <SmallLogo />
+        <div className="flex items-center gap-8">
+          <SmallLogo />
+          <nav className="hidden md:flex items-center gap-6">
+            <Link
+              href="/"
+              className="text-accent-contrast hover:text-primary-main transition-colors"
+            >
+              {t.staking}
+            </Link>
+            <span className="text-accent-contrast/50 cursor-not-allowed">
+              {t.custody}
+            </span>
+          </nav>
+        </div>
 
         <div className="flex items-center gap-4">
           <GoogleLoginButton />

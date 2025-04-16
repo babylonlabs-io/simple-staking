@@ -4,6 +4,7 @@ import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
 import { Container } from "./components/Container/Container";
+import { CryptoBanner } from "./components/CryptoBanner/CryptoBanner";
 import { Header } from "./components/Header/Header";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
@@ -19,6 +20,7 @@ const Home = () => {
     <>
       {/* <Banner /> */}
       <Header />
+      <CryptoBanner />
 
       <Container
         as="main"

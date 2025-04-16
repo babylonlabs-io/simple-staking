@@ -39,7 +39,7 @@ export const StakingTabs = () => {
         <button
           className={`px-4 py-2 text-sm font-medium ${
             activeTab === "staking"
-              ? "border-b-2 border-primary-main text-primary-main"
+              ? "text-accent-primary border-b-2 border-primary-main"
               : "text-gray-500 hover:text-gray-700"
           }`}
           onClick={() => setActiveTab("staking")}
@@ -49,7 +49,7 @@ export const StakingTabs = () => {
         <button
           className={`px-4 py-2 text-sm font-medium relative ${
             activeTab === "activity"
-              ? "border-b-2 border-primary-main text-primary-main"
+              ? "text-accent-primaryborder-b-2 border-primary-main"
               : "text-gray-500 hover:text-gray-700"
           }`}
           onClick={() => setActiveTab("activity")}

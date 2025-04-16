@@ -23,7 +23,11 @@ function Providers({ children }: React.PropsWithChildren) {
   return (
     <Suspense>
       <ScrollLocker>
-        <ThemeProvider defaultTheme="light" enableSystem attribute="class">
+        <ThemeProvider
+          defaultTheme="dark"
+          enableSystem={false}
+          attribute="class"
+        >
           <QueryClientProvider client={client}>
             <ErrorProvider>
               <AuthProvider>
