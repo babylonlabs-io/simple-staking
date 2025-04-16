@@ -40,7 +40,7 @@ export const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <GoogleLoginButton />
+          {!user && <GoogleLoginButton />}
           {user && <Connect loading={loading} onConnect={open} />}
           <div className="flex items-center gap-2">
             <button

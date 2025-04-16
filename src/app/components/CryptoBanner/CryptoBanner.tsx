@@ -36,7 +36,7 @@ export const CryptoBanner = () => {
 
   return (
     <div className="bg-surface border-b border-secondary-strokeLight">
-      <div className="container mx-auto px-4 py-3">
+      <div className="container mx-auto py-3">
         <div className="flex items-center justify-between">
           <span className="text-accent-secondary text-sm">
             {t.selectCrypto}

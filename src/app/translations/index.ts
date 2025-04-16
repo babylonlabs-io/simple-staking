@@ -67,6 +67,7 @@ export const translations = {
     googleLoginRequiredDescription:
       "Please sign in with your Google account to access this service.",
     signInWithGoogle: "Sign in with Google",
+    logout: "Logout",
 
     // Error Messages
     errorOccurred: "An error occurred",
@@ -207,6 +208,7 @@ export const translations = {
     googleLoginRequiredDescription:
       "이 서비스에 접근하려면 구글 계정으로 로그인해야 합니다.",
     signInWithGoogle: "구글로 로그인",
+    logout: "로그아웃",
 
     // Error Messages
     errorOccurred: "오류가 발생했습니다",
