@@ -7,6 +7,8 @@ import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experime
 import { ThemeProvider } from "next-themes";
 import React, { Suspense } from "react";
 
+import { useSentrySessionId } from "@/app/hooks/useSentrySessionId";
+
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
@@ -18,6 +20,7 @@ import { AppState } from "./state";
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(new QueryClient());
+  useSentrySessionId();
 
   return (
     <Suspense>
