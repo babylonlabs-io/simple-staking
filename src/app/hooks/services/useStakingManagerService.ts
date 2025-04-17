@@ -5,6 +5,7 @@ import {
 import {
   StakingSignOptions,
   UnbondingSignOptions,
+  UnbondingSlashingSignOptions,
 } from "@babylonlabs-io/wallet-connector";
 import { EventEmitter } from "events";
 import { useCallback, useRef } from "react";
@@ -63,7 +64,8 @@ export const useStakingManagerService = () => {
           eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
           if (
             (signingStep === SigningStep.STAKING ||
-              signingStep === SigningStep.UNBONDING) &&
+              signingStep === SigningStep.UNBONDING ||
+              signingStep === SigningStep.UNBONDING_SLASHING) &&
             networkInfoAPI
           ) {
             const { covenantNoCoordPks, covenantQuorum } =
@@ -96,6 +98,15 @@ export const useStakingManagerService = () => {
                 covenantThreshold: covenantQuorum,
                 finalityProviderPk: finalityProviderPK,
                 unbondingTimelockBlocks: unbondingTimelock,
+              };
+              return signPsbt(psbt, options);
+            } else if (signingStep === SigningStep.UNBONDING_SLASHING) {
+              // Create the options with all properties at once for UnbondingSignOptions
+              const options: UnbondingSlashingSignOptions = {
+                type: SigningStep.UNBONDING_SLASHING,
+                covenantPks: covenantNoCoordPks,
+                covenantThreshold: covenantQuorum,
+                finalityProviderPk: finalityProviderPK,
               };
               return signPsbt(psbt, options);
             } else {
