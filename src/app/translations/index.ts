@@ -313,4 +313,163 @@ export const translations = {
       "참고: 시간은 평균 {coinName} 블록 시간 10분을 기준으로 한 대략적인 수치입니다.",
     done: "완료",
   },
+  jp: {
+    // Header
+    connect: "接続",
+    disconnect: "切断",
+
+    // Stats
+    totalBtcTvl: "総BTC TVL",
+    registeredBtcTvl: "登録済みBTC TVL",
+    finalityProviders: "ファイナリティプロバイダー",
+    active: "アクティブ",
+    total: "合計",
+    totalDelegations: "総委任数",
+    description: "説明",
+
+    // Personal Balance
+    stakedBalance: "ステーキング残高",
+    stakableBalance: "ステーキング可能残高",
+    bbnBalance: "BBN残高",
+    bbnRewards: "BBN報酬",
+    claim: "請求",
+    walletBalance: "ウォレット残高",
+    stakedWalletBalance: "ステーキング済み残高",
+
+    // Staking
+    stakingStats: "バビロンビットコインステーキング統計",
+    stakingUnavailable: "ステーキング一時停止中",
+    stakingUnavailableMessage:
+      "ネットワークダウンタイムにより、ステーキングが一時的に停止されています。ネットワークが再開されるまで、新しいステーキングは一時停止されます。",
+    newStakesUnavailable: "新規ステーキング登録一時停止中",
+    newStakesUnavailableMessage:
+      "新規ステーキングの作成は4月24日UTC 10時に有効化されます。Phase-1 Cap-1ステーカーは以下のモーダルを使用してバビロンにステーキングを登録できます。",
+    unavailableInRegion: "お住まいの地域では利用できません",
+
+    // Activity
+    activity: "アクティビティ",
+
+    // FAQ
+    faqTitle: "よくある質問",
+    whatIsBabylon: "バビロンとは何ですか？",
+    whatIsBabylonContent:
+      "バビロンは、ビットコインの卓越したセキュリティを分散型の世界にもたらすセキュリティ共有プロトコルの集合です。最新のプロトコルであるビットコインステーキングは、ビットコイン保有者が信頼することなく自分のビットコインをステーキングし、PoS（プルーフオブステーク）システムに暗号経済的なセキュリティを提供できるようにします。",
+    howDoesStakingWork: "ビットコインステーキングはどのように機能しますか？",
+    howDoesStakingWorkContent:
+      "ビットコイン保有者は、信頼することなく自分のビットコインを一定期間（タイムロック）ロックし、その代わりに基盤となるPoSプロトコルで投票権を得ます。その代わりに、ビットコイン保有者はPoSステーキング報酬を受け取ります。",
+    whatCanStakingAppDo: "このステーキングdAppで何ができますか？",
+    whatCanStakingAppDoContent:
+      "ステーキングdAppは、バビロンビットコインステーキングプロトコルのインターフェースです。バビロンビットコインステーキングプロトコルは、ビットコイン保有者が自分のビットコインをステーキングし、選択したファイナリティプロバイダーに投票権を委任できるようにします。ステーカーは過去のステーキング履歴を確認し、早期引き出しのためにステーキングのロック解除リクエストを送信できます。",
+    doesBtcLeaveWallet:
+      "ステーキングすると、ビットコインはウォレットから出ていきますか？",
+    doesBtcLeaveWalletContent:
+      "技術的には、あなたのビットコインはあなたの管理下にあります。ただし、ステーキングされたビットコインはロックされた後、ウォレットの利用可能残高として表示されません。現在のウォレット実装では、まだあなたの管理下にあるステーキングされたビットコインを表示する方法を知りません。ステーキングする際、あなたはビットコインを第三者に送信しません。それはあなたが制御する自己管理型のビットコインステーキングスクリプトにロックされます。これは、ビットコインの後続の移動にあなたの承認が必要であることを意味します。あなただけがステーキングを解除し、引き出すことができます。",
+    otherWaysToStake: "ステーキングする他の方法はありますか？",
+    otherWaysToStakeContent:
+      "手動で操作したいステーカーは、CLIからビットコインステーキングトランザクションを作成できるbtc-staker CLIプログラムを操作できます。",
+
+    // Common
+    loading: "読み込み中...",
+    pleaseWait: "お待ちください...",
+    proceed: "進む",
+    processingConfirmation: "確認処理中",
+    pendingVerification: "検証待ち",
+    stake: "ステーキング",
+    termsOfUse: "利用規約",
+    privacyPolicy: "プライバシーポリシー",
+    allRightsReserved: "全著作権所有",
+
+    // Google Login
+    googleLoginRequired: "Googleログインが必要です",
+    googleLoginRequiredDescription:
+      "このサービスにアクセスするには、Googleアカウントでログインする必要があります。",
+    signInWithGoogle: "Googleでログイン",
+    logout: "ログアウト",
+
+    // Error Messages
+    errorOccurred: "エラーが発生しました",
+    networkError: "ネットワークエラーが発生しました",
+    insufficientBalance: "残高が不足しています",
+    transactionFailed: "トランザクションが失敗しました",
+    invalidInput: "無効な入力です",
+    walletConnectionFailed: "ウォレット接続に失敗しました",
+    stakeRegistrationFailed: "ステーキング登録に失敗しました",
+    claimFailed: "報酬の請求に失敗しました",
+
+    // Notification Messages
+    transactionSuccess: "トランザクションが正常に完了しました",
+    stakeRegistered: "ステーキングが正常に登録されました",
+    rewardsClaimed: "報酬が正常に請求されました",
+    walletConnected: "ウォレットが正常に接続されました",
+    walletDisconnected: "ウォレット接続が解除されました",
+
+    // Status Messages
+    connecting: "接続中...",
+    disconnecting: "切断中...",
+    registering: "登録中...",
+    claiming: "請求中...",
+    confirming: "確認中...",
+
+    // Button Texts
+    retry: "再試行",
+    cancel: "キャンセル",
+    confirm: "確認",
+    back: "戻る",
+    next: "次へ",
+    close: "閉じる",
+    viewDetails: "詳細を表示",
+    refresh: "更新",
+
+    // Preview Modal
+    preview: "プレビュー",
+    finalityProvider: "ファイナリティプロバイダー",
+    stakeAmount: "ステーキング金額",
+    feeRate: "手数料率",
+    transactionFee: "トランザクション手数料",
+    term: "期間",
+    onDemandUnbonding: "オンデマンドアンボンディング",
+    unbondingFee: "アンボンディング手数料",
+    attention: "注意！",
+    previewAttention1:
+      "第三者あなたのステーキングされた{coinSymbol}を所有していません。あなただけがステーキングを解除し、引き出すことができます。",
+    previewAttention2:
+      "ステーキングは最初に{bbnNetworkFullName}に送信され、検証されます（約20秒）。その後、{networkName}台帳に提出するよう求められます。{confirmationDepth}個のビットコイン確認を受けるまで「保留中」と表示されます。",
+    proceedToSigning: "署名に進む",
+
+    // Sign Modal
+    signMessages: "以下のメッセージに署名してください",
+    consentToSlashing: "スラッシング同意",
+    consentToSlashingDuringUnbonding: "アンボンディング中のスラッシング同意",
+    addressBinding:
+      "ステーキング報酬受取のための{coinSymbol}-{bbnCoinSymbol}アドレスバインディング",
+    stakingTransactionRegistration: "ステーキングトランザクション登録",
+    sign: "署名",
+
+    // Navigation
+    staking: "ステーキング",
+    custody: "カストディ",
+
+    // Crypto Selection
+    selectCrypto: "暗号通貨を選択",
+    bitcoin: "ビットコイン",
+    sui: "スイ",
+    ethereum: "イーサリアム",
+    xrp: "リップル",
+    comingSoon: "近日公開",
+
+    // Info Alert
+    info: "情報",
+    unbondingInfo:
+      "アンボンディング時間{time}の間、いつでもステーキングを解除し、引き出すことができます。",
+    learnMore: "詳細を見る",
+
+    // Info Modal
+    stakeTimelockAndUnbonding:
+      "ステーキングタイムロックとオンデマンドアンボンディング",
+    stakeTimelockInfo:
+      "このダッシュボードを通じて作成されたステーキングは、最大{maxStakingPeriod}間ロックされます。いつでもオンデマンドアンボンディングが可能で、{unbondingTime}のアンボンディング期間後に引き出すことができます。最大ステーキング期間が満了すると、事前のアンボンディングなしで自動的に引き出し可能な状態になります。",
+    stakeTimelockNote:
+      "注：時間は平均{coinName}ブロック時間10分を基準とした概算値です。",
+    done: "完了",
+  },
 };

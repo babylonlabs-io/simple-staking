@@ -89,12 +89,12 @@ export const FinalityProviderTable = ({
       {tableData.map((fp) => (
         <div
           key={fp.btcPk}
-          className={`p-4 rounded-lg border ${
-            selectedFP === fp.btcPk
-              ? "border-primary-light bg-primary-light/10"
-              : "border-gray-200 hover:border-primary-light"
-          } cursor-pointer transition-colors`}
-          onClick={() => onSelectRow?.(fp.btcPk)}
+          // className={`p-4 rounded-lg border ${
+          //   selectedFP === fp.btcPk
+          //     ? "border-primary-light bg-primary-light/10"
+          //     : "border-gray-200 hover:border-primary-light"
+          // } cursor-pointer transition-colors`}
+          // onClick={() => onSelectRow?.(fp.btcPk)}
         >
           <div className="space-y-3">
             <div className="flex items-center justify-between">

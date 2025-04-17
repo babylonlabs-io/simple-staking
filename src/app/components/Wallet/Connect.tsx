@@ -7,7 +7,6 @@ import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
-import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
 import bbnIcon from "@/app/assets/bbn.svg";
@@ -26,7 +25,6 @@ import { Hash } from "../Hash/Hash";
 import { MenuButton } from "../Menu/MenuButton";
 import { MenuContent } from "../Menu/MenuContent";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
-import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface ConnectProps {
   loading?: boolean;
@@ -117,15 +115,18 @@ export const Connect: React.FC<ConnectProps> = ({
   if (!isConnected) {
     return (
       <div className="flex items-center gap-2">
-        <AvatarGroup max={3} variant="circular">
+        {/* <AvatarGroup max={3} variant="circular">
           <Avatar
             alt={user?.email || ""}
             url={user?.photoURL || ""}
             size="large"
             className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
           />
-        </AvatarGroup>
-        <button
+        </AvatarGroup> */}
+        <Text variant="body2" className="text-accent-secondary text-sm">
+          {user?.email}
+        </Text>
+        {/* <button
           // size="large"
           // color="primary"
           className="h-[2.5rem] min-h-[2.5rem] rounded-lg px-6 py-2 text-white text-base md:rounded bg-[#113FE1]"
@@ -134,7 +135,7 @@ export const Connect: React.FC<ConnectProps> = ({
         >
           <PiWalletBold size={20} className="flex md:hidden" />
           <span className="hidden md:flex">Connect Wallets</span>
-        </button>
+        </button> */}
 
         <MenuButton
           ref={buttonRef}
@@ -181,9 +182,17 @@ export const Connect: React.FC<ConnectProps> = ({
               </Text>
             </div>
           </div>
-          <div className="min-w-[250px]">
+          {/* <div className="min-w-[250px]">
             <ThemeToggle />
+          </div> */}
+          <div className="divider my-0" />
+          <div
+            className="flex items-center justify-start text-secondary-main cursor-pointer transition-colors w-full py-2"
+            onClick={handleDisconnectClick}
+          >
+            <button className="text-sm w-full text-left">{t.logout}</button>
           </div>
+          <div className="divider my-0" />
         </MenuContent>
 
         {!isApiNormal && renderApiNotAvailableTooltip}
@@ -316,8 +325,8 @@ export const Connect: React.FC<ConnectProps> = ({
       >
         <button className="text-sm w-full text-left">{t.logout}</button>
       </div>
-      <div className="divider my-0" />
-      <ThemeToggle />
+      {/* <div className="divider my-0" />
+      <ThemeToggle /> */}
     </div>
   );
 

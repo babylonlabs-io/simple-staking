@@ -139,7 +139,7 @@ export function DelegationForm({
 
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
-      <div className="relative flex flex-1 flex-col gap-6">
+      <div className="relative flex flex-1 flex-col gap-6 px-4 py-6 lg:px-8 lg:py-8">
         {/* <Heading variant="h5" className="text-accent-primary">
           Step 2
         </Heading>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
-import Link from "next/link";
 
 import { Container } from "@/app/components/Container/Container";
 import { useAuth } from "@/app/contexts/AuthContext";
@@ -26,7 +25,7 @@ export const Header = () => {
       <Container className="h-20 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <SmallLogo />
-          <nav className="hidden md:flex items-center gap-6">
+          {/* <nav className="hidden md:flex items-center gap-6">
             <Link
               href="/"
               className="text-accent-contrast hover:text-primary-main transition-colors"
@@ -36,7 +35,7 @@ export const Header = () => {
             <span className="text-accent-contrast/50 cursor-not-allowed">
               {t.custody}
             </span>
-          </nav>
+          </nav> */}
         </div>
 
         <div className="flex items-center gap-4">
@@ -55,6 +54,13 @@ export const Header = () => {
               onClick={() => setLanguage("ko")}
             >
               KO
+            </button>
+            <span className="text-accent-secondary text-sm font-medium">|</span>
+            <button
+              className={`text-sm font-medium ${language === "jp" ? "text-accent-secondary" : "text-accent-secondary/50"}`}
+              onClick={() => setLanguage("jp")}
+            >
+              JP
             </button>
           </div>
         </div>

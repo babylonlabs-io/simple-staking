@@ -35,39 +35,60 @@ export const CryptoBanner = () => {
   const t = translations[language];
 
   return (
-    <div className="bg-surface border-b border-secondary-strokeLight">
+    <div className="bg-white border-b border-secondary-strokeLight">
       <div className="container mx-auto py-3">
         <div className="flex items-center justify-between">
-          <span className="text-accent-secondary text-sm">
-            {t.selectCrypto}
-          </span>
-          <div className="flex items-center gap-4">
-            {cryptos.map((crypto) => (
-              <div
-                key={crypto.id}
-                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg ${
-                  crypto.enabled
-                    ? "bg-primary-main/10 border border-primary-main"
-                    : "opacity-50 cursor-not-allowed"
-                }`}
-              >
-                <Image
-                  src={crypto.icon}
-                  alt={crypto.name}
-                  width={20}
-                  height={20}
-                  className="rounded-full"
-                />
-                <span className="text-sm font-medium">
-                  {t[crypto.name as keyof typeof t]}
-                </span>
-                {!crypto.enabled && (
-                  <span className="text-xs text-accent-secondary">
-                    {t.comingSoon}
-                  </span>
-                )}
-              </div>
-            ))}
+          <span className="text-black text-sm">{t.staking}</span>
+          <div className="flex items-center">
+            <span className="text-black text-sm">{t.selectCrypto}</span>
+            <div className="flex items-center gap-2">
+              {cryptos
+                .filter((crypto) => crypto.enabled)
+                .map((crypto) => (
+                  <div
+                    key={crypto.id}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
+                      crypto.enabled ? "" : "cursor-not-allowed"
+                    }`}
+                  >
+                    <Image
+                      src={crypto.icon}
+                      alt={crypto.name}
+                      width={20}
+                      height={20}
+                      className="rounded-full"
+                    />
+                    <span className="text-sm text-black font-medium">
+                      {t[crypto.name as keyof typeof t]}
+                    </span>
+                  </div>
+                ))}
+              {/* divider */}
+              <div className="h-4 w-px bg-secondary-strokeLight" />
+              {/* coming soon */}
+              <span className="text-xs text-black">{t.comingSoon}</span>
+              {cryptos
+                .filter((crypto) => !crypto.enabled)
+                .map((crypto) => (
+                  <div
+                    key={crypto.id}
+                    className={`flex items-center gap-1 px-3 py-1.5 rounded-lg ${
+                      crypto.enabled ? "" : "cursor-not-allowed"
+                    }`}
+                  >
+                    <Image
+                      src={crypto.icon}
+                      alt={crypto.name}
+                      width={20}
+                      height={20}
+                      className="rounded-full"
+                    />
+                    <span className="text-sm text-black font-medium">
+                      {t[crypto.name as keyof typeof t]}
+                    </span>
+                  </div>
+                ))}
+            </div>
           </div>
         </div>
       </div>

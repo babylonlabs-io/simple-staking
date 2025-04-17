@@ -1,7 +1,5 @@
 "use client";
 
-import { List } from "@babylonlabs-io/core-ui";
-
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
@@ -65,13 +63,13 @@ export function PersonalBalanceStaked() {
 
   return (
     <AuthGuard>
-      <Section title={t.stakedWalletBalance}>
-        <List orientation="vertical" className="bg-surface rounded-lg">
+      <Section title={t.stakedWalletBalance} titleClassName="md:text-3xl">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
           <StatItem
             loading={isBalanceLoading}
             title={t.stakedBalance}
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
-            className="flex-col items-start"
+            className="flex-col items-start border-b-0 gap-2"
           />
 
           {/* <StatItem
@@ -115,9 +113,9 @@ export function PersonalBalanceStaked() {
                 isDisabled={!rewardBalance || processing}
               />
             }
-            className="flex-col items-start"
+            className="flex-col items-start gap-2"
           />
-        </List>
+        </div>
 
         <ClaimRewardModal
           processing={processing}

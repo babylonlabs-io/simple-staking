@@ -20,13 +20,18 @@ export function Section({
         as="h3"
         variant="h5"
         className={twMerge(
-          "text-accent-primary capitalize mb-4 md:mb-6 md:text-[2.125rem] md:leading-[2.625rem] md:tracking-0.25",
+          "text-accent-primary capitalize md:text-[2.125rem] md:leading-[2.625rem] md:tracking-0.25",
           titleClassName,
         )}
+        style={{
+          paddingBottom: "0.5rem",
+          borderBottom: "1px solid",
+          borderImage:
+            "linear-gradient(90deg, #4F4633 -16.24%, #887957 34%, #060504 97.34%) 1",
+        }}
       >
         {title}
       </Heading>
-
       {children}
     </section>
   );

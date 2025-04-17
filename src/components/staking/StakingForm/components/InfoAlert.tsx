@@ -15,7 +15,7 @@ export function InfoAlert() {
   const t = translations[language];
 
   return (
-    <div className="rounded bg-secondary-highlight flex flex-row items-start justify-between py-2 px-4">
+    <div className="rounded flex flex-row items-start justify-between py-2 px-4">
       <div className="py-2 pr-3">
         <MdErrorOutline size={22} className="text-secondary-strokeDark" />
       </div>

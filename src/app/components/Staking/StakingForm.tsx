@@ -1,6 +1,5 @@
-import { Card, Form } from "@babylonlabs-io/core-ui";
+import { Form } from "@babylonlabs-io/core-ui";
 
-import { Section } from "@/app/components/Section/Section";
 import { useStakingService } from "@/app/hooks/services/useStakingService";
 import { useStakingState } from "@/app/state/StakingState";
 import { DelegationForm } from "@/components/staking/StakingForm";
@@ -25,7 +24,10 @@ export function StakingForm() {
   const { displayPreview } = useStakingService();
 
   return (
-    <Section title={`${networkName} Staking`} titleClassName="md:text-xl">
+    <div>
+      <span className="text-accent-secondary text-xl mb-4">
+        {`${networkName} Staking`}
+      </span>
       <Form
         schema={validationSchema}
         mode="onChange"
@@ -33,11 +35,19 @@ export function StakingForm() {
         onSubmit={displayPreview}
       >
         <div className="flex flex-col gap-6 lg:flex-row">
-          <Card className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0">
             <FinalityProviders />
-          </Card>
+          </div>
 
-          <Card className="flex lg:w-2/5 xl:w-1/3">
+          <div
+            className="flex lg:w-2/5 xl:w-1/3"
+            style={{
+              borderLeft: "1px solid",
+              borderRight: "1px solid",
+              borderImage:
+                "linear-gradient(180deg, #040403 0%, #887957 44.23%, #060504 100%) 1",
+            }}
+          >
             <DelegationForm
               loading={loading}
               available={available}
@@ -47,11 +57,11 @@ export function StakingForm() {
               error={errorMessage}
               stakingInfo={stakingInfo}
             />
-          </Card>
+          </div>
         </div>
 
         <StakingModal />
       </Form>
-    </Section>
+    </div>
   );
 }
