@@ -27,6 +27,10 @@ export const GoogleLoginButton = ({ className }: GoogleLoginButtonProps) => {
         "min-h-[2.5rem] flex items-center gap-2 border px-[32px] py-[20px] rounded-lg md:rounded text-sm font-medium text-white shadow-sm hover:bg-[#000111] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
         className,
       )}
+      style={{
+        border: "1px solid",
+        borderColor: "#EDD2A1",
+      }}
     >
       {user ? (
         <>
