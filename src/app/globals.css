@@ -271,3 +271,36 @@ body > .tomo-social {
 /* .bbn-toggle-control-active {
   background-color: #113fe1;
 } */
+
+.bbn-input {
+  display: flex;
+  align-items: center;
+  border-radius: 0.25rem;
+  border-width: 0px;
+  border-bottom: 1px solid;
+  border-image: linear-gradient(
+      90deg,
+      #4f4633 -16.24%,
+      #887957 68.4%,
+      #060504 97.34%
+    )
+    1;
+  /* border-color: hsl(var(--twc-secondary-strokeDark) / 0.5); */
+  --tw-bg-opacity: 1;
+  background-color: transparent;
+  padding: 0.5rem 0rem;
+  --tw-text-opacity: 1;
+  color: #958263;
+  transition-property: color, background-color, border-color,
+    text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 0.15s;
+}
+
+.bbn-input.bbn-input-error {
+  --tw-border-opacity: 1;
+  border-color: hsl(
+    var(--twc-error-main) /
+      var(--twc-error-main-opacity, var(--tw-border-opacity))
+  );
+}

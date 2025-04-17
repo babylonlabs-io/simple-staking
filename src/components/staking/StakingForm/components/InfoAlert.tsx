@@ -1,6 +1,5 @@
 import { Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
-import { MdErrorOutline } from "react-icons/md";
 
 import { InfoModal } from "@/app/components/Modals/InfoModal";
 import { useLanguage } from "@/app/contexts/LanguageContext";
@@ -15,10 +14,10 @@ export function InfoAlert() {
   const t = translations[language];
 
   return (
-    <div className="rounded flex flex-row items-start justify-between py-2 px-4">
-      <div className="py-2 pr-3">
+    <div className="rounded flex flex-row items-start justify-between">
+      {/* <div className="py-2 pr-3">
         <MdErrorOutline size={22} className="text-secondary-strokeDark" />
-      </div>
+      </div> */}
 
       <div className="flex flex-col gap-1 grow">
         <Text variant="subtitle1" className="font-medium text-accent-primary">
@@ -28,15 +27,15 @@ export function InfoAlert() {
           {t.unbondingInfo.replace(
             "{time}",
             blocksToDisplayTime(stakingInfo?.unbondingTime),
-          )}
-        </Text>{" "}
-        <a
-          rel="noopener noreferrer"
-          className="cursor-pointer text-secondary-main/90 hover:text-secondary-main"
-          onClick={() => setShowMore(true)}
-        >
-          {t.learnMore}
-        </a>
+          )}{" "}
+          <a
+            rel="noopener noreferrer"
+            className="cursor-pointer text-[#958263]/90 hover:text-[#958263]"
+            onClick={() => setShowMore(true)}
+          >
+            {t.learnMore}
+          </a>
+        </Text>
       </div>
 
       <InfoModal open={showMore} onClose={() => setShowMore(false)} />

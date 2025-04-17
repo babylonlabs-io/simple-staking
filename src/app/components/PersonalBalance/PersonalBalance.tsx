@@ -1,5 +1,7 @@
 "use client";
 
+import { List } from "@babylonlabs-io/core-ui";
+
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
@@ -62,21 +64,22 @@ export function PersonalBalance() {
 
   return (
     <AuthGuard>
-      <Section title={t.walletBalance} titleClassName="md:text-3xl">
-        <div
+      <Section title={t.btcBalance} titleClassName="md:text-3xl font-semiBold">
+        <List orientation="horizontal" className="border-0">
+          {/* <div
           className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"
           style={{
             borderTop: "1px solid",
             borderImage:
               "linear-gradient(90deg, #4F4633 -16.24%, #887957 34%, #060504 97.34%)",
           }}
-        >
-          {/* <StatItem
+        > */}
+          <StatItem
             loading={isBalanceLoading}
             title={t.stakedBalance}
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
-            className="flex-row"
-          /> */}
+            className="flex-col items-start border-b-0 p-0 gap-2"
+          />
 
           <StatItem
             loading={isBalanceLoading || hasUnconfirmedUTXOs}
@@ -95,7 +98,7 @@ export function PersonalBalance() {
             className="flex-col items-start border-b-0 gap-2"
           />
 
-          <StatItem
+          {/* <StatItem
             loading={isBalanceLoading || processing}
             title={`${isMobile ? "BABY" : bbnNetworkName} ${t.bbnBalance}`}
             value={
@@ -105,7 +108,7 @@ export function PersonalBalance() {
             }
             loadingStyle={LoadingStyle.ShowSpinner}
             className="flex-col items-start gap-2"
-          />
+          /> */}
 
           {/* <StatItem
             loading={rewardLoading}
@@ -121,7 +124,8 @@ export function PersonalBalance() {
             }
             className="flex-row"
           /> */}
-        </div>
+          {/* </div> */}
+        </List>
 
         <ClaimRewardModal
           processing={processing}

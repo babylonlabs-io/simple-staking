@@ -77,7 +77,7 @@ export function GridTable<R extends object, P extends object = {}>({
               sortable={col.sortable}
               field={col.field}
               className={twMerge(
-                "sticky top-0 bg-surface",
+                "sticky top-0",
                 classNames?.headerCellClassName,
                 col.headerCellClassName,
               )}

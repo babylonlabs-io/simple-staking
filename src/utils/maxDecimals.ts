@@ -16,5 +16,8 @@ import { Decimal } from "decimal.js-light";
  * maxDecimals(3.149, 3);           // returns 3.149
  */
 export const maxDecimals = (value: number, maxDecimals: number): number => {
+  if (value === undefined || value === null || isNaN(value)) {
+    return 0;
+  }
   return new Decimal(value).toDecimalPlaces(maxDecimals).toNumber();
 };

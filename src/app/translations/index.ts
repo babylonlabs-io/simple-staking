@@ -19,8 +19,8 @@ export const translations = {
     bbnBalance: "BBN Balance",
     bbnRewards: "BBN Rewards",
     claim: "Claim",
-    walletBalance: "Wallet Balance",
-    stakedWalletBalance: "Staked Balance",
+    btcBalance: "BTC Balance",
+    babylonBalance: "Babylon Balance",
 
     // Staking
     stakingStats: "Babylon Bitcoin Staking Stats",
@@ -176,8 +176,8 @@ export const translations = {
     bbnBalance: "BBN 잔액",
     bbnRewards: "BBN 보상",
     claim: "수령",
-    walletBalance: "지갑 잔액",
-    stakedWalletBalance: "스테이킹된 잔액",
+    btcBalance: "비트코인 잔액",
+    babylonBalance: "바빌론 잔액",
 
     // Staking
     stakingStats: "바빌론 비트코인 스테이킹 통계",
@@ -333,8 +333,8 @@ export const translations = {
     bbnBalance: "BBN残高",
     bbnRewards: "BBN報酬",
     claim: "請求",
-    walletBalance: "ウォレット残高",
-    stakedWalletBalance: "ステーキング済み残高",
+    btcBalance: "BTC 残高",
+    babylonBalance: "babylon 残高",
 
     // Staking
     stakingStats: "バビロンビットコインステーキング統計",

@@ -25,9 +25,6 @@ export function StakingForm() {
 
   return (
     <div>
-      <span className="text-accent-secondary text-xl mb-4">
-        {`${networkName} Staking`}
-      </span>
       <Form
         schema={validationSchema}
         mode="onChange"
@@ -43,7 +40,6 @@ export function StakingForm() {
             className="flex lg:w-2/5 xl:w-1/3"
             style={{
               borderLeft: "1px solid",
-              borderRight: "1px solid",
               borderImage:
                 "linear-gradient(180deg, #040403 0%, #887957 44.23%, #060504 100%) 1",
             }}

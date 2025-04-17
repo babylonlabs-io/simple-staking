@@ -1,5 +1,7 @@
 "use client";
 
+import { List } from "@babylonlabs-io/core-ui";
+
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
@@ -11,13 +13,12 @@ import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ubbnToBaby } from "@/utils/bbn";
-import { satoshiToBtc } from "@/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
-import { StatItem } from "../Stats/StatItem";
+import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
@@ -63,14 +64,18 @@ export function PersonalBalanceStaked() {
 
   return (
     <AuthGuard>
-      <Section title={t.stakedWalletBalance} titleClassName="md:text-3xl">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
-          <StatItem
+      <Section
+        title={t.babylonBalance}
+        titleClassName="md:text-3xl font-semiBold"
+      >
+        <List orientation="horizontal" className="border-0">
+          {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"> */}
+          {/* <StatItem
             loading={isBalanceLoading}
             title={t.stakedBalance}
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
             className="flex-col items-start border-b-0 gap-2"
-          />
+          /> */}
 
           {/* <StatItem
             loading={isBalanceLoading || hasUnconfirmedUTXOs}
@@ -88,7 +93,7 @@ export function PersonalBalanceStaked() {
             }
             className="flex-row"
           />
-
+          */}
           <StatItem
             loading={isBalanceLoading || processing}
             title={`${isMobile ? "BABY" : bbnNetworkName} ${t.bbnBalance}`}
@@ -98,8 +103,8 @@ export function PersonalBalanceStaked() {
                 : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
             }
             loadingStyle={LoadingStyle.ShowSpinner}
-            className="flex-row"
-          /> */}
+            className="flex-col items-start gap-2 border-b-0 p-0"
+          />
 
           <StatItem
             loading={rewardLoading}
@@ -115,7 +120,8 @@ export function PersonalBalanceStaked() {
             }
             className="flex-col items-start gap-2"
           />
-        </div>
+          {/* </div> */}
+        </List>
 
         <ClaimRewardModal
           processing={processing}

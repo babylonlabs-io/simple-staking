@@ -1,5 +1,3 @@
-import { Card, Heading } from "@babylonlabs-io/core-ui";
-
 import {
   ActionType,
   useDelegationService,
@@ -98,10 +96,10 @@ export function DelegationList() {
   } = useDelegationService();
 
   return (
-    <Card>
-      <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+    <div>
+      {/* <Heading variant="h6" className="text-accent-primary py-2 mb-6">
         {networkConfig.bbn.networkFullName} Stakes
-      </Heading>
+      </Heading> */}
 
       <GridTable
         getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
@@ -118,7 +116,7 @@ export function DelegationList() {
           wrapperClassName: "max-h-[25rem] overflow-x-auto",
           bodyClassName: "min-w-[1000px]",
           cellClassName:
-            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r flex items-center text-sm justify-start text-accent-primary",
         }}
         params={{
           handleActionClick: openConfirmationModal,
@@ -136,6 +134,6 @@ export function DelegationList() {
         onClose={closeConfirmationModal}
         networkConfig={networkConfig}
       />
-    </Card>
+    </div>
   );
 }

@@ -25,6 +25,7 @@ export function AmountField({ min = 0, max = 0 }: AmountFieldProps) {
   return (
     <NumberField
       name="amount"
+      // className="bg-transparent border-0 border-b border-solid border-accent-secondary"
       controlClassName="mb-6 [&_.bbn-input]:py-2.5 [&_.bbn-form-control-title]:mb-1 [&_.bbn-input-field]:text-base"
       label={label}
       placeholder={coinSymbol}

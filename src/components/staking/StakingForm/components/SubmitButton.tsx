@@ -1,4 +1,4 @@
-import { Button, useFormState } from "@babylonlabs-io/core-ui";
+import { useFormState } from "@babylonlabs-io/core-ui";
 import { Tooltip } from "react-tooltip";
 
 import { BBN_FEE_AMOUNT } from "@/app/constants";
@@ -31,15 +31,26 @@ export function SubmitButton() {
       data-tooltip-content={invalid ? tooltip : ""}
       data-tooltip-place="top"
     >
-      <Button
+      <button
         //@ts-ignore - fix type issue in core-ui
         type="submit"
         disabled={invalid}
-        size="large"
-        fluid
+        // size="large"
+        // fluid
+        className="text-lg bg-transparent border-2 border-[#887957] text-white hover:bg-[#887957] hover:text-[#887957] disabled:bg-[#111111] disabled:text-[#AAAAAA] disabled:border-[#887957] rounded-[8px] font-semiBold"
+        style={{
+          display: "flex",
+          width: "355px",
+          height: "42px",
+          padding: "0px 12px",
+          justifyContent: "center",
+          alignItems: "center",
+          gap: "8px",
+          flexShrink: 0,
+        }}
       >
         Preview
-      </Button>
+      </button>
 
       <Tooltip id="tooltip-staking-preview" className="tooltip-wrap z-50" />
     </span>

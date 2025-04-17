@@ -1,4 +1,4 @@
-import { Avatar, AvatarGroup, Text, Toggle } from "@babylonlabs-io/core-ui";
+import { Text, Toggle } from "@babylonlabs-io/core-ui";
 import {
   useWalletConnect,
   useWidgetState,
@@ -333,14 +333,11 @@ export const Connect: React.FC<ConnectProps> = ({
   return (
     <>
       <div className="relative flex flex-row items-center gap-2">
-        <div className="flex flex-row">
-          <AvatarGroup max={3} variant="circular">
-            <Avatar
-              alt={user?.email || ""}
-              url={user?.photoURL || ""}
-              size="large"
-              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
-            />
+        <div className="flex flex-row align-center">
+          <Text variant="body2" className="text-accent-secondary text-sm">
+            {user?.email}
+          </Text>
+          {/* <AvatarGroup max={3} variant="circular">
             <Avatar
               alt={selectedWallets["BTC"]?.name}
               url={selectedWallets["BTC"]?.icon}
@@ -353,7 +350,7 @@ export const Connect: React.FC<ConnectProps> = ({
               size="small"
               className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
             />
-          </AvatarGroup>
+          </AvatarGroup> */}
         </div>
         {/* <div className="hidden md:flex flex-col text-secondary-contrast">
           <Text variant="body1">Wallet Connected</Text>

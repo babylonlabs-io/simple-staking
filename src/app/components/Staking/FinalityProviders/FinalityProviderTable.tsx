@@ -97,34 +97,39 @@ export const FinalityProviderTable = ({
           // onClick={() => onSelectRow?.(fp.btcPk)}
         >
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">
+            <div className="flex items-center gap-[8px]">
+              <h3 className="text-[28px] font-semibold">
                 {fp.description.moniker}
               </h3>
+              <div className="w-2 h-2 rounded-full bg-green-500"></div>
               <span className="text-sm text-gray-500">
                 {FinalityProviderStateLabels[fp.state]}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <p className="text-sm text-gray-500">{t.finalityProvider}</p>
-                <p className="font-medium">{fp.btcPk}</p>
+                <p className="font-medium break-words">{fp.btcPk}</p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">{t.stakedBalance}</p>
-                <p className="font-medium">
-                  {maxDecimals(satoshiToBtc(fp.activeTVLSat), 8)} BTC
-                </p>
+              <div className="flex flex-col items-center">
+                <div>
+                  <p className="text-sm text-gray-500">{t.stakedBalance}</p>
+                  <p className="font-medium">
+                    {maxDecimals(satoshiToBtc(fp.activeTVLSat), 8)} BTC
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">{t.feeRate}</p>
-                <p className="font-medium">{fp.commission}%</p>
+              <div className="flex flex-col items-center">
+                <div>
+                  <p className="text-sm text-gray-500">{t.feeRate}</p>
+                  <p className="font-medium">{fp.commission}%</p>
+                </div>
               </div>
-              <div>
+              {/* <div>
                 <p className="text-sm text-gray-500">{t.totalDelegations}</p>
                 <p className="font-medium">{fp.totalDelegations}</p>
-              </div>
+              </div> */}
             </div>
 
             <div className="pt-2">

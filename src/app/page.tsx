@@ -12,6 +12,7 @@ import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { PersonalBalanceStaked } from "./components/PersonalBalance/PersonalBalanceStaked";
 import { WalletNotConnected } from "./components/Staking/Form/States/WalletNotConnected";
+import { ActivityTabs } from "./components/Tabs/ActivityTabs";
 import { StakingTabs } from "./components/Tabs/StakingTabs";
 import { useAuth } from "./contexts/AuthContext";
 
@@ -36,18 +37,17 @@ const Home = () => {
       <Container
         as="main"
         // className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
-        className="flex flex-col gap-12 md:gap-16 pb-6 pt-6 flex-1 justify-center"
+        className="flex flex-col gap-12 md:gap-16 pb-20 pt-24 flex-1 justify-center"
       >
         {connected ? (
-          <>
+          <div className="flex flex-col gap-16">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <PersonalBalance />
               <PersonalBalanceStaked />
             </div>
-            <div className="flex-1">
-              <StakingTabs />
-            </div>
-          </>
+            <StakingTabs />
+            <ActivityTabs />
+          </div>
         ) : (
           <div className="hidden md:flex flex-1 justify-center items-center flex-col">
             <div
