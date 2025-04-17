@@ -63,7 +63,12 @@ export const useTransactionService = () => {
    */
   const createDelegationEoi = useCallback(
     async (stakingInput: BtcStakingInputs, feeRate: number) => {
-      const btcStakingManager = createBtcStakingManager();
+      const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
+
+      // Unbonding slashing transaction requires additional parameters on Ledger devices
+      const btcStakingManager = createBtcStakingManager(
+        finalityProviderPkNoCoordHex,
+      );
 
       validateCommonInputs(
         btcStakingManager,
