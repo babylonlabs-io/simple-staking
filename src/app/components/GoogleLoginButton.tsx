@@ -1,10 +1,15 @@
 import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
+import { twMerge } from "tailwind-merge";
 
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { translations } from "@/app/translations";
 
-export const GoogleLoginButton = () => {
+interface GoogleLoginButtonProps {
+  className?: string;
+}
+
+export const GoogleLoginButton = ({ className }: GoogleLoginButtonProps) => {
   const { user, signInWithGoogle, logout } = useAuth();
   const { disconnect } = useWalletConnect();
   const { language } = useLanguage();
@@ -18,7 +23,10 @@ export const GoogleLoginButton = () => {
   return (
     <button
       onClick={user ? handleLogout : signInWithGoogle}
-      className="h-[2.5rem] min-h-[2.5rem] flex items-center justify-center gap-2 rounded-lg md:rounded px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#113FF2] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 bg-[#113FE1]"
+      className={twMerge(
+        "min-h-[2.5rem] flex items-center gap-2 border px-[32px] py-[20px] rounded-lg md:rounded text-sm font-medium text-white shadow-sm hover:bg-[#000111] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
+        className,
+      )}
     >
       {user ? (
         <>

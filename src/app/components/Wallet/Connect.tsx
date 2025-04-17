@@ -188,7 +188,7 @@ export const Connect: React.FC<ConnectProps> = ({
           <div className="divider my-0" />
           <div
             className="flex items-center justify-start text-secondary-main cursor-pointer transition-colors w-full py-2"
-            onClick={handleDisconnectClick}
+            onClick={() => logout()}
           >
             <button className="text-sm w-full text-left">{t.logout}</button>
           </div>
