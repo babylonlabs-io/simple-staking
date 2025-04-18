@@ -65,7 +65,7 @@ export const CryptoBanner = () => {
                       className="rounded-full"
                     />
                     <span className="text-sm text-black font-semibold underline">
-                      {t[crypto.name as keyof typeof t]}
+                      {t[crypto.name as "bitcoin" | "sui" | "ethereum" | "xrp"]}
                     </span>
                   </div>
                 ))}
@@ -90,7 +90,7 @@ export const CryptoBanner = () => {
                       className="rounded-full"
                     />
                     <span className="text-sm text-black font-medium">
-                      {t[crypto.name as keyof typeof t]}
+                      {t[crypto.name as "bitcoin" | "sui" | "ethereum" | "xrp"]}
                     </span>
                   </div>
                 ))}
