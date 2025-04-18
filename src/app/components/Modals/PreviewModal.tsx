@@ -111,7 +111,7 @@ export const PreviewModal = ({
       ),
     },
     {
-      key: t.feeRate,
+      key: t.commission,
       value: <Text variant="body1">{feeRate} sat/vB</Text>,
     },
     {
