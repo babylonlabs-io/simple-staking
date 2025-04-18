@@ -25,17 +25,15 @@ export const SlashingContent = ({
   delegation,
   networkInfo,
 }: SlashingContentProps) => {
-  const slashingAmount = useMemo(
-    () =>
-      getSlashingAmount(
-        delegation.stakingAmount,
-        getBbnParamByVersion(
-          delegation.paramsVersion,
-          networkInfo?.params.bbnStakingParams.versions || [],
-        ),
-      ),
-    [delegation, networkInfo],
-  );
+  const slashingAmount = useMemo(() => {
+    const params = getBbnParamByVersion(
+      delegation.paramsVersion,
+      networkInfo?.params.bbnStakingParams.versions || [],
+    );
+    const amount = getSlashingAmount(delegation.stakingAmount, params);
+
+    return amount;
+  }, [delegation, networkInfo]);
 
   const unbondingTime = useMemo(() => {
     const unbondingTimeBlocks =

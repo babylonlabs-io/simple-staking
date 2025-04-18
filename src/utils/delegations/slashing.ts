@@ -1,4 +1,8 @@
+import { Decimal } from "decimal.js-light";
+
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
+
+import { maxDecimals } from "../maxDecimals";
 
 /**
  * Calculates the slashing amount based on the staking amount and the slashing
@@ -17,7 +21,11 @@ export const getSlashingAmount = (
   }
 
   // Round the slashing rate to two decimal places
-  const slashingRate = parseFloat(param.slashing.slashingRate.toFixed(2));
+  const slashingRate = maxDecimals(
+    param.slashing.slashingRate,
+    2,
+    Decimal.ROUND_UP,
+  );
 
   return Math.floor(stakingAmount * slashingRate);
 };
