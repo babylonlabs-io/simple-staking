@@ -12,7 +12,8 @@
   --primary: #ff7c2a;
   --secondary: "#0DB7BF";
   --toastify-toast-width: 344px;
-  --twc-secondary-main: 227 86% 47%;
+  --twc-secondary-main: 32 54% 67%; /* 32 54% 64%; */
+  --twc-primary-light: 32 54% 67%; /* 32 54% 64%; */
 }
 
 @media screen and (min-width: 768px) {
@@ -303,4 +304,12 @@ body > .tomo-social {
     var(--twc-error-main) /
       var(--twc-error-main-opacity, var(--tw-border-opacity))
   );
+}
+
+.bbn-backdrop {
+  background-color: #00000099;
+}
+
+.bbn-dialog {
+  background-color: #000000;
 }

@@ -65,7 +65,7 @@ export function PersonalBalance() {
   return (
     <AuthGuard>
       <Section title={t.btcBalance} titleClassName="md:text-3xl font-semiBold">
-        <List orientation="horizontal" className="border-0">
+        <List orientation="horizontal" className="border-0 pt-4">
           {/* <div
           className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"
           style={{

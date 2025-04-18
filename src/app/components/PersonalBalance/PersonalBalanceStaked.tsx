@@ -68,7 +68,7 @@ export function PersonalBalanceStaked() {
         title={t.babylonBalance}
         titleClassName="md:text-3xl font-semiBold"
       >
-        <List orientation="horizontal" className="border-0">
+        <List orientation="horizontal" className="border-0 pt-4">
           {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2"> */}
           {/* <StatItem
             loading={isBalanceLoading}
@@ -102,8 +102,16 @@ export function PersonalBalanceStaked() {
                 ? ""
                 : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
             }
+            suffix={
+              <ActionComponent
+                className="h-6"
+                title={t.request}
+                onAction={showPreview}
+                isDisabled
+              />
+            }
             loadingStyle={LoadingStyle.ShowSpinner}
-            className="flex-col items-start gap-2 border-b-0 p-0"
+            className="flex-col items-start gap-2 border-b-0 p-0 pr-4"
           />
 
           <StatItem
@@ -118,7 +126,7 @@ export function PersonalBalanceStaked() {
                 isDisabled={!rewardBalance || processing}
               />
             }
-            className="flex-col items-start gap-2"
+            className="flex-col items-start gap-2 pr-8"
           />
           {/* </div> */}
         </List>

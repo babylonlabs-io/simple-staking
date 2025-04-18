@@ -122,8 +122,13 @@ export const FinalityProviderTable = ({
               </div>
               <div className="flex flex-col items-center">
                 <div>
-                  <p className="text-sm text-gray-500">{t.feeRate}</p>
-                  <p className="font-medium">{fp.commission}%</p>
+                  <p className="text-sm text-gray-500">{t.commission}</p>
+                  <p className="font-medium">
+                    {isNaN(Number(fp.commission))
+                      ? "-"
+                      : maxDecimals(Number(fp.commission) * 100, 2)}
+                    %
+                  </p>
                 </div>
               </div>
               {/* <div>
@@ -134,7 +139,10 @@ export const FinalityProviderTable = ({
 
             <div className="pt-2">
               <p className="text-sm text-gray-500">{t.description}</p>
-              <p className="text-sm">{fp.description.details}</p>
+              <p className="font-medium">
+                {/* {fp.description.details + fp.description.details} */}
+                {t.dsrvDescription3}
+              </p>
             </div>
           </div>
         </div>

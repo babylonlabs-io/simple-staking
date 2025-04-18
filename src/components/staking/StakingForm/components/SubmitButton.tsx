@@ -2,12 +2,17 @@ import { useFormState } from "@babylonlabs-io/core-ui";
 import { Tooltip } from "react-tooltip";
 
 import { BBN_FEE_AMOUNT } from "@/app/constants";
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
+import { translations } from "@/app/translations";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 const { coinSymbol } = getNetworkConfigBBN();
 
-export function SubmitButton() {
+export const SubmitButton = () => {
+  const { language } = useLanguage();
+  const t = translations[language];
+
   const { isValid, errors } = useFormState();
   const {
     balanceQuery: { data: bbnBalance = 0 },
@@ -37,7 +42,7 @@ export function SubmitButton() {
         disabled={invalid}
         // size="large"
         // fluid
-        className="text-lg bg-transparent border-2 border-[#887957] text-white hover:bg-[#887957] hover:text-[#887957] disabled:bg-[#111111] disabled:text-[#AAAAAA] disabled:border-[#887957] rounded-[8px] font-semiBold"
+        className="text-lg bg-transparent border-2 border-[#887957] text-white hover:bg-[#887957] hover:text-white disabled:bg-[#111111] disabled:text-[#AAAAAA] disabled:border-[#887957] rounded-[4px] font-semiBold"
         style={{
           display: "flex",
           width: "355px",
@@ -49,10 +54,10 @@ export function SubmitButton() {
           flexShrink: 0,
         }}
       >
-        Preview
+        {t.stake}
       </button>
 
       <Tooltip id="tooltip-staking-preview" className="tooltip-wrap z-50" />
     </span>
   );
-}
+};

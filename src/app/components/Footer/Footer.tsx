@@ -12,8 +12,8 @@ import { IoMdBook } from "react-icons/io";
 import { MdAlternateEmail, MdForum } from "react-icons/md";
 
 import { Container } from "@/app/components/Container/Container";
-
-import { Logo } from "../Logo/Logo";
+import { useLanguage } from "@/app/contexts/LanguageContext";
+import { translations } from "@/app/translations";
 
 const iconLinks = [
   {
@@ -69,47 +69,39 @@ const iconLinks = [
 ];
 
 export const Footer: React.FC = () => {
+  const { language } = useLanguage();
+  const t = translations[language].footer;
+
   return (
-    <footer className="relative flex bg-primary-main before:absolute before:h-3 before:w-2/3 before:bg-primary-main before:left-1/4 before:-top-2 text-accent-contrast py-10 md:py-20">
-      <Container className="flex flex-col items-center md:items-start md:justify-between md:flex-row-reverse">
-        <Logo className="w-[250px] h-[61px] lg:w-[367px] lg:h-[90px]" />
-
-        <div className="mt-10 md:mt-0">
-          <div className="flex flex-wrap justify-center pt-2 gap-x-5 gap-y-8 pb-10 md:pb-8 mb:pt-0 md:justify-start">
-            {iconLinks.map(({ name, url, Icon }) => (
-              <a
-                key={name}
-                href={url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="transition-colors hover:text-secondary-main"
-              >
-                <Icon size={28} title={name} />
-              </a>
-            ))}
-          </div>
-
-          <Text variant="body2" className="text-center md:text-left">
-            <a
-              href="https://babylonlabs.io/terms-of-use"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-secondary-main"
-            >
-              Terms of Use
-            </a>{" "}
-            -{" "}
-            <a
-              href="https://babylonlabs.io/privacy-policy"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="transition-colors hover:text-secondary-main"
-            >
-              Privacy Policy
-            </a>{" "}
-            - 2025 Babylon Labs. All rights reserved.
+    <footer
+      className="relative flex bg-primary-main before:absolute before:h-3 before:w-2/3 text-accent-contrast py-10 md:py-20"
+      style={{
+        background: "linear-gradient(359deg, #080705 -26.89%, #2B271C 253.87%)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
+    >
+      <Container className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-1">
+          <Text
+            variant="subtitle1"
+            className="text-center md:text-left text-2xl font-semibold"
+          >
+            {t.title}
           </Text>
+          <a
+            href="https://dsrv.com/product/custody"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-center md:text-left text-lg underline"
+          >
+            {t.viewMore}
+          </a>
         </div>
+
+        <Text variant="subtitle2" className="text-center md:text-left">
+          {t.copyright}
+        </Text>
       </Container>
     </footer>
   );

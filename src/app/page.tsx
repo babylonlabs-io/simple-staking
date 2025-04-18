@@ -6,19 +6,35 @@ import { useEffect } from "react";
 
 import { Container } from "./components/Container/Container";
 import { CryptoBanner } from "./components/CryptoBanner/CryptoBanner";
+import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { LoginScreen } from "./components/Login/LoginScreen";
-import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { PersonalBalanceStaked } from "./components/PersonalBalance/PersonalBalanceStaked";
 import { WalletNotConnected } from "./components/Staking/Form/States/WalletNotConnected";
 import { ActivityTabs } from "./components/Tabs/ActivityTabs";
 import { StakingTabs } from "./components/Tabs/StakingTabs";
 import { useAuth } from "./contexts/AuthContext";
+import { useLanguage } from "./contexts/LanguageContext";
+import { translations } from "./translations";
+
+const getBabylonDescription = (language: string) => {
+  switch (language) {
+    case "en":
+      return "Babylon Protocol is a revolutionary blockchain protocol that enables Bitcoin holders to stake their BTC and earn rewards while maintaining custody of their assets. It provides a secure and efficient way to participate in Proof-of-Stake networks using Bitcoin as collateral.";
+    case "ko":
+      return "바빌론 프로토콜은 비트코인 보유자가 자산의 보관권을 유지하면서 BTC를 스테이킹하고 보상을 받을 수 있게 하는 혁신적인 블록체인 프로토콜입니다. 비트코인을 담보로 사용하여 지분증명 네트워크에 안전하고 효율적으로 참여할 수 있는 방법을 제공합니다.";
+    case "jp":
+      return "バビロンプロトコルは、ビットコイン保有者が資産の保管権を維持しながらBTCをステーキングして報酬を得ることができる革新的なブロックチェーンプロトコルです。ビットコインを担保として使用して、プルーフ・オブ・ステークネットワークに安全かつ効率的に参加する方法を提供します。";
+    default:
+      return "Babylon Protocol is a revolutionary blockchain protocol that enables Bitcoin holders to stake their BTC and earn rewards while maintaining custody of their assets. It provides a secure and efficient way to participate in Proof-of-Stake networks using Bitcoin as collateral.";
+  }
+};
 
 const Home = () => {
   const { user } = useAuth();
   const { connected } = useWalletConnect();
+  const { language } = useLanguage();
 
   useEffect(() => {
     initBTCCurve();
@@ -64,33 +80,21 @@ const Home = () => {
             <div className="gap-20 flex flex-col items-start">
               <div className="grid grid-cols-2 gap-4">
                 <span className="text-white text-sm font-medium">
-                  DSRV is an integrated blockchain solutions company with the
-                  mission of enriching the crypto ecosystem via stronger
-                  connectivity. We strive to be your gateway to a suite of
-                  all-comprehensive blockchain services. Everything distributed,
-                  served complete.
+                  {translations[language].dsrvDescription1}
                 </span>
                 <span className="text-white text-sm font-medium">
-                  DSRV is an integrated blockchain solutions company with the
-                  mission of enriching the crypto ecosystem via stronger
-                  connectivity. We strive to be your gateway to a suite of
-                  all-comprehensive blockchain services. Everything distributed,
-                  served complete.
+                  {translations[language].dsrvDescription2}
                 </span>
               </div>
               <div className="flex flex-col gap-4">
                 <span className="text-white text-2xl font-medium">
-                  {`What's`}
+                  {`Babylon?`}
                 </span>
                 {/* divider */}
                 <div className="h-px w-full bg-secondary-strokeLight" />
                 <div className="grid grid-cols-2 gap-4">
                   <span className="text-white text-sm font-medium">
-                    DSRV is an integrated blockchain solutions company with the
-                    mission of enriching the crypto ecosystem via stronger
-                    connectivity. We strive to be your gateway to a suite of
-                    all-comprehensive blockchain services. Everything
-                    distributed, served complete.
+                    {getBabylonDescription(language)}
                   </span>
                 </div>
               </div>
@@ -101,8 +105,8 @@ const Home = () => {
         {/* <Stats /> */}
       </Container>
 
-      {/* <Footer /> */}
-      <Phase2HereModal />
+      <Footer />
+      {/* <Phase2HereModal /> */}
     </>
   );
 };

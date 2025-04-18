@@ -109,7 +109,7 @@ export const translations = {
     preview: "Preview",
     finalityProvider: "Finality Provider",
     stakeAmount: "Stake Amount",
-    feeRate: "Fee rate",
+    commission: "Commission",
     transactionFee: "Transaction fee",
     term: "Term",
     onDemandUnbonding: "On Demand Unbonding",
@@ -132,7 +132,7 @@ export const translations = {
 
     // Navigation
     staking: "Staking",
-    custody: "Custody",
+    custody: "DSRV Custody",
 
     // Crypto Selection
     selectCrypto: "Select Crypto",
@@ -155,6 +155,44 @@ export const translations = {
     stakeTimelockNote:
       "Note: Timeframes are approximate, based on an average {coinName} block time of 10 minutes.",
     done: "Done",
+
+    footer: {
+      title: "Enterprise Custody DSRV Custody",
+      viewMore: "View More",
+      copyright: "© 2025. DSRV labs. All rights reserved",
+    },
+
+    noDelegations: {
+      title: "No {networkName} Stakes",
+      description: "This is where your transitioned stakes will be displayed.",
+    },
+
+    walletNotConnected: {
+      title: "Connect wallets to start staking",
+      description:
+        "To start staking your {coinName} first connect wallets then select a Finality Provider",
+      button: "Connect Wallets",
+    },
+
+    request: "Request",
+
+    delegationList: {
+      inception: "Inception",
+      finalityProvider: "Finality Provider",
+      amount: "Amount",
+      transactionId: "Transaction ID",
+      status: "Status",
+      action: "Action",
+      unavailable: "Unavailable",
+      stakes: "{networkName} Stakes",
+    },
+
+    dsrvDescription1:
+      "DSRV is a leading blockchain infrastructure provider with extensive experience in validator operations and node management. Our team of experts ensures maximum security and reliability for your staked assets. By staking with DSRV, you benefit from our proven track record, 24/7 monitoring, and industry-leading security practices.",
+    dsrvDescription2:
+      "Staking Bitcoin with DSRV offers multiple advantages: competitive rewards, robust security measures, and professional infrastructure management. Our advanced monitoring systems and experienced team ensure optimal performance and minimal downtime. Join DSRV's staking program to maximize your Bitcoin returns while maintaining the highest security standards.",
+    dsrvDescription3:
+      "DSRV is an integrated blockchain solutions company with the mission of enriching the crypto ecosystem via stronger connectivity. We strive to be your gateway to a suite of all-comprehensive blockchain services. Everything distributed, served complete.",
   },
   ko: {
     // Header
@@ -266,7 +304,7 @@ export const translations = {
     preview: "미리보기",
     finalityProvider: "파이널리티 프로바이더",
     stakeAmount: "스테이킹 금액",
-    feeRate: "수수료율",
+    commission: "수수료율",
     transactionFee: "트랜잭션 수수료",
     term: "기간",
     onDemandUnbonding: "온디맨드 언본딩",
@@ -289,7 +327,7 @@ export const translations = {
 
     // Navigation
     staking: "스테이킹",
-    custody: "커스터디",
+    custody: "DSRV 커스터디",
 
     // Crypto Selection
     selectCrypto: "암호화폐 선택",
@@ -312,6 +350,44 @@ export const translations = {
     stakeTimelockNote:
       "참고: 시간은 평균 {coinName} 블록 시간 10분을 기준으로 한 대략적인 수치입니다.",
     done: "완료",
+
+    footer: {
+      title: "기업형 커스터디 DSRV Custody",
+      viewMore: "보러가기",
+      copyright: "© 2025. DSRV labs. All rights reserved",
+    },
+
+    noDelegations: {
+      title: "{networkName} 스테이킹 없음",
+      description: "여기에 전환된 스테이킹이 표시됩니다.",
+    },
+
+    walletNotConnected: {
+      title: "스테이킹을 시작하려면 지갑을 연결하세요",
+      description:
+        "{coinName} 스테이킹을 시작하려면 먼저 지갑을 연결한 후 파이널리티 프로바이더를 선택하세요",
+      button: "지갑 연결",
+    },
+
+    request: "요청",
+
+    delegationList: {
+      inception: "시작일",
+      finalityProvider: "파이널리티 프로바이더",
+      amount: "금액",
+      transactionId: "트랜잭션 ID",
+      status: "상태",
+      action: "작업",
+      unavailable: "사용 불가",
+      stakes: "{networkName} 스테이킹",
+    },
+
+    dsrvDescription1:
+      "DSRV는 검증자 운영과 노드 관리에 있어 풍부한 경험을 가진 선도적인 블록체인 인프라 제공업체입니다. 전문가 팀이 스테이킹된 자산의 최대 보안과 안정성을 보장합니다. DSRV와 함께 스테이킹하면 검증된 실적, 24/7 모니터링, 업계 최고의 보안 관행의 혜택을 누릴 수 있습니다.",
+    dsrvDescription2:
+      "DSRV와 함께 비트코인을 스테이킹하면 여러 가지 이점이 있습니다: 경쟁력 있는 보상, 강력한 보안 조치, 전문적인 인프라 관리. 고급 모니터링 시스템과 경험 많은 팀이 최적의 성능과 최소한의 다운타임을 보장합니다. 최고의 보안 기준을 유지하면서 비트코인 수익을 극대화하려면 DSRV의 스테이킹 프로그램에 참여하세요.",
+    dsrvDescription3:
+      "DSRV는 더 강력한 연결성을 통해 암호화폐 생태계를 풍요롭게 하는 것을 사명으로 하는 통합 블록체인 솔루션 기업입니다. 우리는 포괄적인 블록체인 서비스의 게이트웨이가 되기 위해 노력합니다. 모든 것이 분산되어 완벽하게 제공됩니다.",
   },
   jp: {
     // Header
@@ -424,7 +500,7 @@ export const translations = {
     preview: "プレビュー",
     finalityProvider: "ファイナリティプロバイダー",
     stakeAmount: "ステーキング金額",
-    feeRate: "手数料率",
+    commission: "手数料率",
     transactionFee: "トランザクション手数料",
     term: "期間",
     onDemandUnbonding: "オンデマンドアンボンディング",
@@ -447,7 +523,7 @@ export const translations = {
 
     // Navigation
     staking: "ステーキング",
-    custody: "カストディ",
+    custody: "DSRV カストディ",
 
     // Crypto Selection
     selectCrypto: "暗号通貨を選択",
@@ -471,5 +547,43 @@ export const translations = {
     stakeTimelockNote:
       "注：時間は平均{coinName}ブロック時間10分を基準とした概算値です。",
     done: "完了",
+
+    footer: {
+      title: "企業向けカストディ DSRV Custody",
+      viewMore: "詳細を見る",
+      copyright: "© 2025. DSRV labs. All rights reserved",
+    },
+
+    noDelegations: {
+      title: "{networkName}ステーキングなし",
+      description: "ここに移行されたステーキングが表示されます。",
+    },
+
+    walletNotConnected: {
+      title: "ステーキングを開始するにはウォレットを接続してください",
+      description:
+        "{coinName}のステーキングを開始するには、まずウォレットを接続し、その後ファイナリティプロバイダーを選択してください",
+      button: "ウォレットを接続",
+    },
+
+    request: "リクエスト",
+
+    delegationList: {
+      inception: "開始日",
+      finalityProvider: "ファイナリティプロバイダー",
+      amount: "金額",
+      transactionId: "トランザクションID",
+      status: "ステータス",
+      action: "アクション",
+      unavailable: "利用不可",
+      stakes: "{networkName}ステーキング",
+    },
+
+    dsrvDescription1:
+      "DSRVは、バリデーター運用とノード管理において豊富な経験を持つ、主要なブロックチェーンインフラストラクチャプロバイダーです。専門家チームがステーキングされた資産の最大限のセキュリティと信頼性を確保します。DSRVと共にステーキングすることで、実績のあるトラックレコード、24/7モニタリング、業界をリードするセキュリティプラクティスの恩恵を受けることができます。",
+    dsrvDescription2:
+      "DSRVと共にビットコインをステーキングすることで、複数の利点があります：競争力のある報酬、堅牢なセキュリティ対策、専門的なインフラストラクチャ管理。高度なモニタリングシステムと経験豊富なチームが、最適なパフォーマンスと最小限のダウンタイムを確保します。最高のセキュリティ基準を維持しながらビットコインのリターンを最大化するために、DSRVのステーキングプログラムに参加してください。",
+    dsrvDescription3:
+      "DSRVは、より強力な接続性を通じて暗号資産エコシステムを豊かにすることを使命とする統合ブロックチェーンソリューション企業です。私たちは包括的なブロックチェーンサービスのゲートウェイとなることを目指しています。すべてが分散され、完全に提供されます。",
   },
 };

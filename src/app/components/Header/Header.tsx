@@ -1,12 +1,15 @@
 "use client";
 
 import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
+import Link from "next/link";
+import { FaExternalLinkAlt } from "react-icons/fa";
 
 import { Container } from "@/app/components/Container/Container";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useAppState } from "@/app/state";
 import { translations } from "@/app/translations";
+
 
 import { GoogleLoginButton } from "../GoogleLoginButton";
 import { SmallLogo } from "../Logo/SmallLogo";
@@ -25,17 +28,22 @@ export const Header = () => {
       <Container className="h-20 flex items-center justify-between">
         <div className="flex items-center gap-8">
           <SmallLogo />
-          {/* <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-6">
             <Link
               href="/"
-              className="text-accent-contrast hover:text-primary-main transition-colors"
+              className="text-accent-contrast hover:text-accent-primary transition-colors"
             >
               {t.staking}
             </Link>
-            <span className="text-accent-contrast/50 cursor-not-allowed">
+            <Link
+              href="https://dsrv.com/ko/product/custody"
+              target="_blank"
+              className="text-accent-contrast hover:text-accent-primary transition-colors flex items-center gap-2"
+            >
               {t.custody}
-            </span>
-          </nav> */}
+              <FaExternalLinkAlt size={12} />
+            </Link>
+          </nav>
         </div>
 
         <div className="flex items-center gap-4">

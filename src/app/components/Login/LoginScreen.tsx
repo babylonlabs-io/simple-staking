@@ -1,4 +1,4 @@
-import { useLanguage } from "@/app/hooks/useLanguage";
+import { useLanguage } from "@/app/contexts/LanguageContext";
 import { translations } from "@/app/translations";
 
 import { GoogleLoginButton } from "../GoogleLoginButton";
@@ -9,7 +9,7 @@ export const LoginScreen = () => {
 
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center main-bg-grdient">
-      <div className="w-full max-w-md p-8 rounded-lg shadow-lg flex flex-col items-center">
+      <div className="w-full max-w-md p-8 rounded-lg shadow-lg flex flex-col items-center gap-1">
         <svg
           width="226"
           height="64"
