@@ -200,6 +200,15 @@ export const translations = {
       xrp: "XRP is a digital asset built for payments. It is the native cryptocurrency of the XRP Ledger, a decentralized, open-source blockchain technology that can settle transactions in 3-5 seconds.",
       whatIs: "What is {coin}?",
     },
+
+    all: "All",
+    stakes: "Stakes",
+    rewards: "Rewards",
+    unstake: "Unstake",
+    unstakeAmount: "Unstake Amount",
+    stakedBalance: "Staked Balance",
+    stakableBalance: "Stakable Balance",
+    request: "Request",
   },
   ko: {
     // Header
@@ -402,6 +411,15 @@ export const translations = {
       xrp: "XRP는 결제를 위해 설계된 디지털 자산입니다. XRP Ledger의 기본 암호화폐로, 3-5초 내에 거래를 완료할 수 있는 탈중앙화 오픈소스 블록체인 기술입니다.",
       whatIs: "{coin}이란?",
     },
+
+    all: "전체",
+    stakes: "스테이킹",
+    rewards: "보상",
+    unstake: "언스테이킹",
+    unstakeAmount: "언스테이킹 금액",
+    stakedBalance: "스테이킹된 잔액",
+    stakableBalance: "스테이킹 가능한 잔액",
+    request: "요청",
   },
   jp: {
     // Header
@@ -606,5 +624,14 @@ export const translations = {
       xrp: "XRPは決済のために設計されたデジタル資産です。XRP Ledgerのネイティブ暗号通貨で、3-5秒で取引を完了できる分散型オープンソースブロックチェーン技術です。",
       whatIs: "{coin}とは？",
     },
+
+    all: "All",
+    stakes: "Stakes",
+    rewards: "Rewards",
+    unstake: "Unstake",
+    unstakeAmount: "Unstake Amount",
+    stakedBalance: "Staked Balance",
+    stakableBalance: "Stakable Balance",
+    request: "Request",
   },
 };

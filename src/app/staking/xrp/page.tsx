@@ -2,10 +2,9 @@
 
 import { Container } from "@/app/components/Container/Container";
 import { LoginScreen } from "@/app/components/Login/LoginScreen";
-import { PersonalBalance } from "@/app/components/PersonalBalance/PersonalBalance";
-import { PersonalBalanceStaked } from "@/app/components/PersonalBalance/PersonalBalanceStaked";
-import { ActivityTabs } from "@/app/components/Tabs/ActivityTabs";
-import { StakingTabs } from "@/app/components/Tabs/StakingTabs";
+import { XRPActivityTabs } from "@/app/components/XRP/XRPActivityTabs";
+import { XRPPersonalBalance } from "@/app/components/XRP/XRPPersonalBalance";
+import { XRPStakingTabs } from "@/app/components/XRP/XRPStakingTabs";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 
@@ -40,11 +39,10 @@ export default function XRPStaking() {
       {/* {connected ? ( */}
       <div className="flex flex-col gap-16">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <PersonalBalance />
-          <PersonalBalanceStaked />
+          <XRPPersonalBalance />
         </div>
-        <StakingTabs />
-        <ActivityTabs />
+        <XRPStakingTabs />
+        <XRPActivityTabs />
       </div>
       {/* ) : (
         <div className="hidden md:flex flex-1 justify-center items-center flex-col">
