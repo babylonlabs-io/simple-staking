@@ -1,6 +1,6 @@
 import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
-import { twMerge } from "tailwind-merge";
 import { usePrivy } from "@privy-io/react-auth";
+import { twMerge } from "tailwind-merge";
 
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { translations } from "@/app/translations";
@@ -23,7 +23,9 @@ export const GoogleLoginButton = ({ className }: GoogleLoginButtonProps) => {
 
   return (
     <button
-      onClick={user ? handleLogout : login}
+      onClick={() =>
+        user ? handleLogout() : login({ loginMethods: ["google"] })
+      }
       className={twMerge(
         "min-h-[2.5rem] flex items-center gap-2 border px-[32px] py-[20px] rounded-lg md:rounded text-sm font-medium text-white shadow-sm hover:bg-[#000111] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2",
         className,

@@ -38,10 +38,6 @@ export const CryptoBanner = () => {
   const { language } = useLanguage();
   const t = translations[language];
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <div
       className="border-b border-secondary-strokeLight"

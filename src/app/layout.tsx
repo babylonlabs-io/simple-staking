@@ -5,6 +5,7 @@ import { LanguageProvider } from "@/app/contexts/LanguageContext";
 import MainPage from "./components/MainPage";
 import MetaTags from "./components/Meta/MetaTags";
 import PrivyProviders from "./contexts/PrivyProvider";
+import XrpProvider from "./contexts/XrpProvider";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -26,9 +27,11 @@ export default function RootLayout({
       <body className="font-sans">
         <Providers>
           <PrivyProviders>
-            <LanguageProvider>
-              <MainPage>{children}</MainPage>
-            </LanguageProvider>
+            <XrpProvider>
+              <LanguageProvider>
+                <MainPage>{children}</MainPage>
+              </LanguageProvider>
+            </XrpProvider>
           </PrivyProviders>
         </Providers>
       </body>

@@ -21,10 +21,6 @@ export const Header = () => {
   const { language, setLanguage } = useLanguage();
   const t = translations[language];
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <header className="bg-black">
       {/* <header className="bg-primary-main h-[12.75rem]"> */}

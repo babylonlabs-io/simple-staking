@@ -1,7 +1,6 @@
 "use client";
 
 import { Container } from "@/app/components/Container/Container";
-import { LoginScreen } from "@/app/components/Login/LoginScreen";
 import { XRPActivityTabs } from "@/app/components/XRP/XRPActivityTabs";
 import { XRPPersonalBalance } from "@/app/components/XRP/XRPPersonalBalance";
 import { XRPStakingTabs } from "@/app/components/XRP/XRPStakingTabs";
@@ -25,10 +24,6 @@ export default function XRPStaking() {
   const { user } = useAuth();
   //   const { connected } = useWalletConnect();
   const { language } = useLanguage();
-
-  if (!user) {
-    return <LoginScreen />;
-  }
 
   return (
     <Container

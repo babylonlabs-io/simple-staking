@@ -31,8 +31,8 @@ export default function MainPage({ children }: { children: React.ReactNode }) {
         "main-bg-grdient",
       )}
     >
-      <Header />
-      <CryptoBanner />
+      {user && <Header />}
+      {user && <CryptoBanner />}
       {children}
       <Footer />
     </div>
