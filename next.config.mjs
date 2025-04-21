@@ -20,12 +20,14 @@ const config = withSentryConfig(nextConfig, {
   project: process.env.SENTRY_PROJECT,
   authToken: process.env.SENTRY_AUTH_TOKEN,
   sentryUrl: process.env.SENTRY_URL, // Only needed if using self-hosted Sentry
-  release: process.env.SENTRY_RELEASE,
-  dist: process.env.SENTRY_DIST,
+  release: {
+    name: process.env.SENTRY_RELEASE,
+    dist: process.env.SENTRY_DIST,
+  },
+
   sourcemaps: {
     disable: false,
     deleteSourceMapsAfterUpload: true,
-    hideSourceMaps: true
   },
 
   // Only print logs for uploading source maps in CI
