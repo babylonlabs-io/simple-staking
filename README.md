@@ -30,6 +30,12 @@ testing network related message. Default to true
 - `NEXT_PUBLIC_SIDECAR_API_URL` specifies the base URL for the sidecar API service
 - `NEXT_PUBLIC_BABY_RPC_URL` specifies the RPC to override the default values
 - `NEXT_PUBLIC_BABY_LCD_URL` specifies the LCD to override the default values
+- `NEXT_PUBLIC_COMMIT_HASH` (Optional) The git commit hash, usually injected during CI build for reference.
+- `NEXT_PUBLIC_BABYLON_EXPLORER` (Optional) specifies the URL for the Babylon block explorer.
+- `NEXT_PUBLIC_REPLAYS_RATE` (Optional) specifies the sample rate for Sentry Session Replays (0.0 to 1.0).
+- `SENTRY_ORG` (Optional) The Sentry organization slug, needed for source map uploads during build.
+- `SENTRY_PROJECT` (Optional) The Sentry project slug, needed for source map uploads during build.
+- `SENTRY_URL` (Optional) The URL to your self-hosted Sentry instance, needed for source map uploads during build.
 
 Then, to start a development server:
 

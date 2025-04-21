@@ -29,7 +29,7 @@ Sentry.init({
     : "http://localhost:8092/sentry-tunnel",
 
   // This environment variable is provided in the CI
-  environment: process.env.environment ?? "local",
+  environment: process.env.SENTRY_ENVIRONMENT ?? "local",
 
   // Ensure this release ID matches the one used during 'next build' for source map uploads
   // It's passed via NEXT_PUBLIC_RELEASE_ID in the build environment (e.g., GitHub Actions)
