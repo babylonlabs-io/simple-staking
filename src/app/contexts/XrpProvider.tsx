@@ -15,7 +15,6 @@ export default function XrpProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // const { setWalletRecovery } = useSetWalletRecovery();
   const { user, authenticated, ready } = usePrivy();
   const { signMessage } = useSignMessage();
   const [xrpAddress, setXrpAddress] = useState<string | null>(null);
@@ -26,7 +25,6 @@ export default function XrpProvider({
     console.log("user", user);
     const getXrpAddress = async () => {
       try {
-        // await setWalletRecovery(true);
         const { signature } = await signMessage(
           {
             message: "Make pk for cosmos and sui",

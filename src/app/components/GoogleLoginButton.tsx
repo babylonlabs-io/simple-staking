@@ -37,11 +37,11 @@ export const GoogleLoginButton = ({ className }: GoogleLoginButtonProps) => {
     >
       {user ? (
         <>
-          <img
-            src={user.photoURL || ""}
+          {/* <img
+            src={user.google. || ""}
             alt="Profile"
             className="h-5 w-5 rounded-full"
-          />
+          /> */}
           <span>{t.logout}</span>
         </>
       ) : (
