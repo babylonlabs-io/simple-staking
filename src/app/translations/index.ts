@@ -206,9 +206,6 @@ export const translations = {
     rewards: "Rewards",
     unstake: "Unstake",
     unstakeAmount: "Unstake Amount",
-    stakedBalance: "Staked Balance",
-    stakableBalance: "Stakable Balance",
-    request: "Request",
   },
   ko: {
     // Header
@@ -417,9 +414,6 @@ export const translations = {
     rewards: "보상",
     unstake: "언스테이킹",
     unstakeAmount: "언스테이킹 금액",
-    stakedBalance: "스테이킹된 잔액",
-    stakableBalance: "스테이킹 가능한 잔액",
-    request: "요청",
   },
   jp: {
     // Header
@@ -630,8 +624,5 @@ export const translations = {
     rewards: "Rewards",
     unstake: "Unstake",
     unstakeAmount: "Unstake Amount",
-    stakedBalance: "Staked Balance",
-    stakableBalance: "Stakable Balance",
-    request: "Request",
   },
 };

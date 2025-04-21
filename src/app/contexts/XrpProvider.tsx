@@ -29,9 +29,9 @@ export default function XrpProvider({
           {
             message: "Make pk for cosmos and sui",
           },
-          // {
-          //   uiOptions: { showWalletUIs: false },
-          // },
+          {
+            uiOptions: { showWalletUIs: true },
+          },
         );
         const { xrpAddress } =
           generatePrivateKeysFromEthereumSignature(signature);
