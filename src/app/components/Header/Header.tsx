@@ -10,7 +10,6 @@ import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useAppState } from "@/app/state";
 import { translations } from "@/app/translations";
 
-
 import { GoogleLoginButton } from "../GoogleLoginButton";
 import { SmallLogo } from "../Logo/SmallLogo";
 import { Connect } from "../Wallet/Connect";
@@ -21,6 +20,10 @@ export const Header = () => {
   const { isLoading: loading } = useAppState();
   const { language, setLanguage } = useLanguage();
   const t = translations[language];
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <header className="bg-black">

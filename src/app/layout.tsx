@@ -5,6 +5,9 @@ import { LanguageProvider } from "@/app/contexts/LanguageContext";
 import { Network } from "@/app/types/network";
 import { network } from "@/config/network/btc";
 
+import { CryptoBanner } from "./components/CryptoBanner/CryptoBanner";
+import { Footer } from "./components/Footer/Footer";
+import { Header } from "./components/Header/Header";
 import MetaTags from "./components/Meta/MetaTags";
 import "./globals.css";
 import Providers from "./providers";
@@ -37,7 +40,10 @@ export default function RootLayout({
                 "main-bg-grdient",
               )}
             >
+              <Header />
+              <CryptoBanner />
               {children}
+              <Footer />
             </div>
           </LanguageProvider>
         </Providers>

@@ -1,5 +1,8 @@
+"use client";
 import Image from "next/image";
+import Link from "next/link";
 
+import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { translations } from "@/app/translations";
 
@@ -8,6 +11,12 @@ const cryptos = [
     id: "bitcoin",
     name: "bitcoin",
     icon: "/bitcoin.png",
+    enabled: true,
+  },
+  {
+    id: "xrp",
+    name: "xrp",
+    icon: "/xrp.png",
     enabled: true,
   },
   {
@@ -22,17 +31,16 @@ const cryptos = [
     icon: "/ethereum.png",
     enabled: false,
   },
-  {
-    id: "xrp",
-    name: "xrp",
-    icon: "/xrp.png",
-    enabled: false,
-  },
 ];
 
 export const CryptoBanner = () => {
+  const { user } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
+
+  if (!user) {
+    return null;
+  }
 
   return (
     <div
@@ -64,9 +72,12 @@ export const CryptoBanner = () => {
                       height={20}
                       className="rounded-full"
                     />
-                    <span className="text-sm text-black font-semibold underline">
+                    <Link
+                      className="text-sm text-black font-semibold underline"
+                      href={`/staking/${crypto.id}`}
+                    >
                       {t[crypto.name as "bitcoin" | "sui" | "ethereum" | "xrp"]}
-                    </span>
+                    </Link>
                   </div>
                 ))}
               {/* divider */}
