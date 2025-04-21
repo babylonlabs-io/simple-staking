@@ -91,7 +91,10 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   }
 
   // If FP is slashed, only show unbond button
-  if (isSlashed) {
+  if (
+    isSlashed &&
+    intermediateState !== DelegationState.INTERMEDIATE_WITHDRAWAL
+  ) {
     return (
       <div className="flex justify-start">
         <Button
