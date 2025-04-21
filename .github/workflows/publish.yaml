@@ -68,9 +68,10 @@ jobs:
           SENTRY_URL: ${{ vars.SENTRY_URL }}
           SENTRY_RELEASE: ${{ github.sha }}
           SENTRY_DIST: ${{ github.run_id }}
+          SENTRY_ENVIRONMENT: ${{ matrix.environment }}
           NEXT_PUBLIC_RELEASE_ID: ${{ github.sha }}
           NEXT_PUBLIC_DIST_ID: ${{ github.run_id }}
-          SENTRY_ENVIRONMENT: ${{ matrix.environment }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ matrix.environment }}
 
       - name: Archive output
         run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
