@@ -5,7 +5,6 @@ import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import { useEffect } from "react";
 
 import { Container } from "../../components/Container/Container";
-import { LoginScreen } from "../../components/Login/LoginScreen";
 import { PersonalBalance } from "../../components/PersonalBalance/PersonalBalance";
 import { PersonalBalanceStaked } from "../../components/PersonalBalance/PersonalBalanceStaked";
 import { WalletNotConnected } from "../../components/Staking/Form/States/WalletNotConnected";
@@ -36,10 +35,6 @@ export default function BitcoinStaking() {
   useEffect(() => {
     initBTCCurve();
   }, []);
-
-  if (!user) {
-    return <LoginScreen />;
-  }
 
   return (
     <Container

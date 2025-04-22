@@ -1,8 +1,8 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
-import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { translations } from "@/app/translations";
 
@@ -34,9 +34,9 @@ const cryptos = [
 ];
 
 export const CryptoBanner = () => {
-  const { user } = useAuth();
   const { language } = useLanguage();
   const t = translations[language];
+  const pathname = usePathname();
 
   return (
     <div
@@ -48,9 +48,7 @@ export const CryptoBanner = () => {
     >
       <div className="container mx-auto py-2">
         <div className="flex items-center justify-center">
-          {/* <span className="text-black text-sm">{t.staking}</span> */}
           <div className="flex items-center">
-            {/* <span className="text-black text-sm">{t.selectCrypto}</span> */}
             <div className="flex items-center gap-4">
               {cryptos
                 .filter((crypto) => crypto.enabled)
@@ -69,17 +67,13 @@ export const CryptoBanner = () => {
                       className="rounded-full"
                     />
                     <Link
-                      className="text-sm text-black font-semibold underline"
+                      className={`text-sm text-black font-semibold ${pathname === `/staking/${crypto.id}` ? "underline" : ""}`}
                       href={`/staking/${crypto.id}`}
                     >
                       {t[crypto.name as "bitcoin" | "sui" | "ethereum" | "xrp"]}
                     </Link>
                   </div>
                 ))}
-              {/* divider */}
-              {/* <div className="h-4 w-px bg-secondary-strokeLight" /> */}
-              {/* coming soon */}
-              {/* <span className="text-xs text-black">{t.comingSoon}</span> */}
               {cryptos
                 .filter((crypto) => !crypto.enabled)
                 .map((crypto) => (

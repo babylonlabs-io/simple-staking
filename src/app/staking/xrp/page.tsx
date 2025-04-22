@@ -1,11 +1,18 @@
 "use client";
 
+import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
+import { usePrivy } from "@privy-io/react-auth";
+import Image from "next/image";
+import { useEffect, useState } from "react";
+
 import { Container } from "@/app/components/Container/Container";
 import { XRPActivityTabs } from "@/app/components/XRP/XRPActivityTabs";
 import { XRPPersonalBalance } from "@/app/components/XRP/XRPPersonalBalance";
 import { XRPStakingTabs } from "@/app/components/XRP/XRPStakingTabs";
-import { useAuth } from "@/app/contexts/AuthContext";
 import { useLanguage } from "@/app/contexts/LanguageContext";
+import { useXrp } from "@/app/contexts/XrpProvider";
+import { translations } from "@/app/translations";
+import walletIcon from "@/app/components/Staking/Form/States/wallet-icon-secure.svg";
 
 const getXRPDescription = (language: string) => {
   switch (language) {
@@ -21,9 +28,50 @@ const getXRPDescription = (language: string) => {
 };
 
 export default function XRPStaking() {
-  const { user } = useAuth();
-  //   const { connected } = useWalletConnect();
+  const { getXrpAddress, xrpAddress } = useXrp();
+  const { user, login } = usePrivy();
   const { language } = useLanguage();
+  const t = translations[language].walletNotConnected;
+
+  const [stakedBalance, setStakedBalance] = useState<number>(0);
+
+  const getStakedInfo = async () => {
+    if (!xrpAddress) return;
+    console.log("getStakedInfo", xrpAddress);
+    const _stakedBalance = await fetch(
+      `/api/xrp/staking-info?address=${xrpAddress}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      },
+    );
+    if (!_stakedBalance.ok) {
+      console.error(
+        "Error fetching staked balance:",
+        _stakedBalance.status,
+        _stakedBalance.statusText,
+      );
+      return;
+    }
+    const [_stakedBalanceJson] = await _stakedBalance.json();
+    const depositBalance = _stakedBalanceJson.depositBalance;
+    // TODO: 추후 추가 예정
+    // const apr = _stakedBalanceJson.apr;
+    // const depositDestinationTag = _stakedBalanceJson.depositDestinationTag;
+    // const dopplerPoint = _stakedBalanceJson.dp;
+    // const redemptionList = _stakedBalanceJson.redemptionList;
+    setStakedBalance(depositBalance);
+  };
+
+  const handleConnectXrp = () => {
+    login({ loginMethods: ["google"] });
+  };
+
+  useEffect(() => {
+    getStakedInfo();
+  }, [xrpAddress]);
 
   return (
     <Container
@@ -31,15 +79,21 @@ export default function XRPStaking() {
       // className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
       className="flex flex-col gap-12 md:gap-16 pb-20 pt-24 flex-1 justify-center"
     >
-      {/* {connected ? ( */}
-      <div className="flex flex-col gap-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <XRPPersonalBalance />
+      {user ? (
+        <div className="flex flex-col gap-16">
+          {!xrpAddress && (
+            <div className="flex flex-row gap-4">
+              <span>{xrpAddress}</span>
+              <button onClick={() => getXrpAddress()}>get xrp address</button>
+            </div>
+          )}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <XRPPersonalBalance stakedBalance={stakedBalance} />
+          </div>
+          <XRPStakingTabs />
+          <XRPActivityTabs />
         </div>
-        <XRPStakingTabs />
-        <XRPActivityTabs />
-      </div>
-      {/* ) : (
+      ) : (
         <div className="hidden md:flex flex-1 justify-center items-center flex-col">
           <div
             className="px-[404px] py-[100px]"
@@ -50,7 +104,36 @@ export default function XRPStaking() {
                 "linear-gradient(to bottom, hsla(60, 14%, 1%, 1), hsla(42, 22%, 44%, 1), hsla(30, 20%, 2%, 1)) 1",
             }}
           >
-            <WalletNotConnected />
+            <div className="flex flex-1 flex-row items-center justify-center gap-8">
+              <div>
+                <Image src={walletIcon} alt="Wallet" width={185} height={144} />
+              </div>
+
+              <div className="text-start gap-4 flex flex-col items-start">
+                <Heading
+                  variant="h5"
+                  className="text-accent-primary text-2xl mb-2"
+                >
+                  {t.title}
+                </Heading>
+                <Text
+                  variant="body1"
+                  className="text-start text-base text-accent-secondary p-0"
+                >
+                  {t.description.replace("{coinName}", "xrp")}
+                </Text>
+                <Button
+                  variant="outlined"
+                  onClick={handleConnectXrp}
+                  className="text-primary-dark"
+                  style={{
+                    border: "1px solid #EDD2A1",
+                  }}
+                >
+                  {t.button}
+                </Button>
+              </div>
+            </div>
           </div>
           <div className="gap-20 flex flex-col items-start">
             <div className="grid grid-cols-2 gap-4">
@@ -74,7 +157,7 @@ export default function XRPStaking() {
             </div>
           </div>
         </div>
-      )} */}
+      )}
     </Container>
   );
 }
