@@ -11,9 +11,7 @@ export const executeXrplStaking = async (
     if (!xrpPublicClient) return "";
 
     const wallet = Wallet.fromMnemonic(mnemonic);
-    const res = await fetch(
-      `https://api.doppler.finance/v1/xrpfi/staking-info/user/${wallet.address}`,
-    );
+    const res = await fetch(`/api/xrp/staking-info?address=${wallet.address}`);
     const dopler = await res.json();
     const depositDestinationTag = dopler[0].depositDestinationTag;
     console.log("depositDestinationTag", depositDestinationTag);
