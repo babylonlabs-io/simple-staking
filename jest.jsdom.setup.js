@@ -1,7 +1,25 @@
-const { TextEncoder, TextDecoder } = require("util");
+// Required for msw
+import { rest } from "msw";
+import { setupServer } from "msw/node";
+import { TextDecoder, TextEncoder } from "util";
 
+// Define missing Jest lifecycle functions if not available
+const beforeAll = global.beforeAll || ((fn) => fn());
+const afterEach = global.afterEach || ((fn) => fn());
+const afterAll = global.afterAll || ((fn) => fn());
+
+// Set up TextEncoder/TextDecoder
 global.TextEncoder = TextEncoder;
 global.TextDecoder = TextDecoder;
+
+// Mock BroadcastChannel for JSDOM environment
+global.BroadcastChannel = class BroadcastChannel {
+  constructor() {
+    this.onmessage = null;
+  }
+  postMessage() {}
+  close() {}
+};
 
 // Mock crypto for JSDOM environment
 Object.defineProperty(global, "crypto", {
@@ -13,26 +31,36 @@ Object.defineProperty(global, "crypto", {
   },
 });
 
-// Mock fetch API without requiring node-fetch
-if (typeof global.fetch !== "function") {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      json: () => Promise.resolve({}),
-      text: () => Promise.resolve(""),
-      blob: () => Promise.resolve(new Blob()),
-      arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-    }),
-  );
+// Define handlers
+const handlers = [
+  rest.get("*", (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+  rest.post("*", (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+  rest.put("*", (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+  rest.delete("*", (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+  rest.patch("*", (req, res, ctx) => {
+    return res(ctx.json({}));
+  }),
+];
 
-  global.Headers = jest.fn().mockImplementation(() => ({}));
-  global.Request = jest.fn().mockImplementation(() => ({}));
-  global.Response = jest.fn().mockImplementation(() => ({
-    json: () => Promise.resolve({}),
-    text: () => Promise.resolve(""),
-  }));
-}
+// Create MSW server
+const server = setupServer(...handlers);
 
-global.Headers = global.fetch.Headers;
-global.Request = global.fetch.Request;
-global.Response = global.fetch.Response;
+// Export server to allow adding specific handlers in tests
+global.mswServer = server;
+
+// Start server before all tests
+beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
+
+// Reset handlers after each test
+afterEach(() => server.resetHandlers());
+
+// Close server after all tests
+afterAll(() => server.close());
