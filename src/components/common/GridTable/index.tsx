@@ -1,5 +1,5 @@
 import { Loader } from "@babylonlabs-io/core-ui";
-import { useId } from "react";
+import React, { useId } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { twJoin, twMerge } from "tailwind-merge";
 
@@ -47,8 +47,10 @@ export function GridTable<R extends object, P extends object = {}>({
   }
 
   if (!data?.length) {
-    // @ts-ignore fallback type can be ReactNode but we're ensuring it's ReactElement or null
-    return fallback || null;
+    if (!fallback || React.isValidElement(fallback)) {
+      return fallback as React.ReactElement | null;
+    }
+    return null;
   }
 
   return (
