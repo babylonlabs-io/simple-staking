@@ -16,23 +16,14 @@ import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
 import { AppState } from "./state";
 
-const ThemeProvider: React.FC<
-  React.PropsWithChildren<{
-    defaultTheme?: string;
-    enableSystem?: boolean;
-    attribute?: string;
-  }>
-> = ({ children, ...props }) => {
-  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
-};
-
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(new QueryClient());
 
   return (
     <Suspense>
       <ScrollLocker>
-        <ThemeProvider defaultTheme="light" enableSystem attribute="class">
+        {/* @ts-ignore NextThemesProvider typing issue */}
+        <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
           <QueryClientProvider client={client}>
             <ErrorProvider>
               <BbnRpcProvider>
@@ -57,7 +48,7 @@ function Providers({ children }: React.PropsWithChildren) {
             />
           </QueryClientProvider>
           <NotificationContainer />
-        </ThemeProvider>
+        </NextThemesProvider>
       </ScrollLocker>
     </Suspense>
   );
