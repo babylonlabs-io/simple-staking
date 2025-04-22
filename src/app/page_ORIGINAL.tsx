@@ -5,6 +5,7 @@ import { useEffect } from "react";
 
 import { StakingForm } from "@/app/components/Staking/StakingForm";
 
+import { Banner } from "./components/Banner/Banner";
 import { Container } from "./components/Container/Container";
 import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
@@ -21,6 +22,7 @@ const Home = () => {
 
   return (
     <>
+      <Banner />
       <Header />
 
       <Container
