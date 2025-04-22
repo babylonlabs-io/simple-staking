@@ -4,7 +4,7 @@ import { ScrollLocker } from "@babylonlabs-io/core-ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider } from "next-themes";
 import React, { Suspense } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
@@ -23,7 +23,7 @@ function Providers({ children }: React.PropsWithChildren) {
     <Suspense>
       <ScrollLocker>
         {/* @ts-ignore NextThemesProvider typing issue */}
-        <NextThemesProvider attribute="class" defaultTheme="light" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <QueryClientProvider client={client}>
             <ErrorProvider>
               <BbnRpcProvider>
@@ -48,7 +48,7 @@ function Providers({ children }: React.PropsWithChildren) {
             />
           </QueryClientProvider>
           <NotificationContainer />
-        </NextThemesProvider>
+        </ThemeProvider>
       </ScrollLocker>
     </Suspense>
   );
