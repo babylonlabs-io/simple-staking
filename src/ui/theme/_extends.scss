@@ -1,0 +1,85 @@
+.loading-icon {
+  svg {
+    @apply w-full;
+
+    path {
+      animation: fadeIn 200ms ease;
+      @media (prefers-reduced-motion: no-preference) {
+        will-change: opacity;
+        animation-duration: 800ms;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+      }
+      &:nth-child(1) {
+        animation-delay: -700ms;
+      }
+      &:nth-child(2) {
+        animation-delay: -600ms;
+      }
+      &:nth-child(3) {
+        animation-delay: -500ms;
+      }
+      &:nth-child(4) {
+        animation-delay: -400ms;
+      }
+      &:nth-child(5) {
+        animation-delay: -300ms;
+      }
+      &:nth-child(6) {
+        animation-delay: -200ms;
+      }
+      &:nth-child(7) {
+        animation-delay: -100ms;
+      }
+      &:nth-child(8) {
+        animation-delay: 0ms;
+      }
+    }
+  }
+}
+
+.z-tabs {
+  z-index: 10;
+}
+.z-table {
+  z-index: 10;
+}
+.z-header {
+  z-index: 20;
+}
+.z-logo {
+  z-index: 22;
+}
+.z-tabsBar {
+  z-index: 30;
+}
+.z-overlay {
+  z-index: 9998;
+}
+.z-dialog {
+  z-index: 9999;
+}
+
+[data-radix-popper-content-wrapper] {
+  z-index: 10003 !important;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-size: 1rem;
+  line-height: inherit;
+  position: relative;
+  direction: ltr;
+  writing-mode: horizontal-tb;
+
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  --w3m-z-index: 99999;
+
+  @apply font-mono;
+}

@@ -17,7 +17,7 @@ export const WalletNotConnected = () => {
       </div>
 
       <div className="text-center">
-        <Heading variant="h5" className="text-accent-primary text-2xl mb-2">
+        <Heading variant="h5" className="text-h5 mb-2">
           Connect wallets to start staking
         </Heading>
         <Text

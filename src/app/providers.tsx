@@ -11,6 +11,7 @@ import { NotificationContainer } from "./components/Notification/NotificationCon
 import { ErrorProvider } from "./context/Error/ErrorProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
+import { MediaQueryContextProvider } from "./context/ui/MediaQueryContext";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
@@ -22,31 +23,41 @@ function Providers({ children }: React.PropsWithChildren) {
   return (
     <Suspense>
       <ScrollLocker>
-        <ThemeProvider defaultTheme="light" enableSystem attribute="class">
-          <QueryClientProvider client={client}>
-            <ErrorProvider>
-              <BbnRpcProvider>
-                <WalletConnectionProvider>
-                  <BTCWalletProvider>
-                    <CosmosWalletProvider>
-                      <AppState>
-                        <StakingStatsProvider>
-                          <ReactQueryStreamedHydration>
-                            {children}
-                          </ReactQueryStreamedHydration>
-                        </StakingStatsProvider>
-                      </AppState>
-                    </CosmosWalletProvider>
-                  </BTCWalletProvider>
-                </WalletConnectionProvider>
-              </BbnRpcProvider>
-            </ErrorProvider>
-            <ReactQueryDevtools
-              buttonPosition="bottom-left"
-              initialIsOpen={false}
-            />
-          </QueryClientProvider>
-          <NotificationContainer />
+        <ThemeProvider
+          defaultTheme="light"
+          enableSystem
+          attribute="class"
+          value={{
+            light: "light-theme",
+            dark: "dark-theme",
+          }}
+        >
+          <MediaQueryContextProvider>
+            <QueryClientProvider client={client}>
+              <ErrorProvider>
+                <BbnRpcProvider>
+                  <WalletConnectionProvider>
+                    <BTCWalletProvider>
+                      <CosmosWalletProvider>
+                        <AppState>
+                          <StakingStatsProvider>
+                            <ReactQueryStreamedHydration>
+                              {children}
+                            </ReactQueryStreamedHydration>
+                          </StakingStatsProvider>
+                        </AppState>
+                      </CosmosWalletProvider>
+                    </BTCWalletProvider>
+                  </WalletConnectionProvider>
+                </BbnRpcProvider>
+              </ErrorProvider>
+              <ReactQueryDevtools
+                buttonPosition="bottom-left"
+                initialIsOpen={false}
+              />
+            </QueryClientProvider>
+            <NotificationContainer />
+          </MediaQueryContextProvider>
         </ThemeProvider>
       </ScrollLocker>
     </Suspense>

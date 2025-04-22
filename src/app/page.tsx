@@ -8,11 +8,11 @@ import { StakingForm } from "@/app/components/Staking/StakingForm";
 import { Container } from "./components/Container/Container";
 import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
-import { Footer } from "./components/Footer/Footer";
-import { Header } from "./components/Header/Header";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Stats } from "./components/Stats/Stats";
+import { Footer } from "./componentsStakefish/Footer";
+import { Header } from "./componentsStakefish/Header";
 
 const Home = () => {
   useEffect(() => {
@@ -34,7 +34,7 @@ const Home = () => {
         <FAQ />
       </Container>
 
-      <Footer />
+      <Footer simple />
       <Phase2HereModal />
     </>
   );

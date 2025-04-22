@@ -1,10 +1,4 @@
-import {
-  Avatar,
-  AvatarGroup,
-  Button,
-  Text,
-  Toggle,
-} from "@babylonlabs-io/core-ui";
+import { Avatar, AvatarGroup, Text, Toggle } from "@babylonlabs-io/core-ui";
 import {
   useWalletConnect,
   useWidgetState,
@@ -13,7 +7,6 @@ import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
-import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
 import bbnIcon from "@/app/assets/bbn.svg";
@@ -24,10 +17,9 @@ import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { Button } from "@/ui";
 
 import { Hash } from "../Hash/Hash";
-import { MenuButton } from "../Menu/MenuButton";
-import { MenuContent } from "../Menu/MenuContent";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
 import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
@@ -117,32 +109,17 @@ export const Connect: React.FC<ConnectProps> = ({
     return (
       <div className="flex items-center gap-2">
         <Button
-          size="large"
+          size="sm"
+          application
           color="secondary"
-          className="h-[2.5rem] min-h-[2.5rem] rounded-full px-6 py-2 text-white text-base md:rounded"
+          variant="outline"
           onClick={onConnect}
           disabled={isLoading}
+          startIcon={{ iconKey: "connect", size: 12 }}
+          className="!py-[7px] flounder:!py-1.5"
         >
-          <PiWalletBold size={20} className="flex md:hidden" />
           <span className="hidden md:flex">Connect Wallets</span>
         </Button>
-
-        <MenuButton
-          ref={buttonRef}
-          isOpen={isMenuOpen}
-          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-        />
-        <MenuContent
-          anchorEl={buttonRef.current}
-          className="p-4"
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        >
-          <div className="min-w-[250px]">
-            <ThemeToggle />
-          </div>
-        </MenuContent>
-
         {!isApiNormal && renderApiNotAvailableTooltip}
       </div>
     );
@@ -270,20 +247,6 @@ export const Connect: React.FC<ConnectProps> = ({
             <Text variant="body1">{bech32Address.slice(0, 6)}</Text>
           </div>
         </div>
-        <MenuButton
-          ref={buttonRef}
-          isOpen={isMenuOpen}
-          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-        />
-
-        <MenuContent
-          anchorEl={buttonRef.current}
-          className="p-4 min-w-[250px]"
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        >
-          {walletContent}
-        </MenuContent>
       </div>
 
       <WalletDisconnectModal
