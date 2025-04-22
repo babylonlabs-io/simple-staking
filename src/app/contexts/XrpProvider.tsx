@@ -1,8 +1,13 @@
 "use client";
 
 import { usePrivy, useSignMessage } from "@privy-io/react-auth";
-import { createContext, useContext, useEffect, useState } from "react";
-import { useCallback } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { Client, dropsToXrp } from "xrpl";
 
 import { generatePrivateKeysFromEthereumSignature } from "@/utils/chain-keys/createKeys";
@@ -12,17 +17,27 @@ import { TransactionHistory } from "../components/XRP/XRPActivityTabs";
 const XrpContext = createContext<{
   xrpPublicClient: Client | null;
   xrpBalance: number;
+  loadingXrpBalance: boolean;
+  stakedBalance: number;
+  loadingStakedBalance: boolean;
   xrpAddress: string | null;
   getXrpAddress: () => Promise<void>;
+  getXrpBalance: () => Promise<void>;
   getMnemonic: () => Promise<string | null>;
   historyList: TransactionHistory[];
+  getStakedInfo: () => Promise<void>;
 }>({
   xrpPublicClient: null,
   xrpBalance: 0,
+  loadingXrpBalance: false,
+  stakedBalance: 0,
+  loadingStakedBalance: false,
   xrpAddress: null,
   getXrpAddress: async () => {},
+  getXrpBalance: async () => {},
   getMnemonic: async () => null,
   historyList: [],
+  getStakedInfo: async () => {},
 });
 
 export default function XrpProvider({
@@ -34,25 +49,35 @@ export default function XrpProvider({
   const { signMessage } = useSignMessage();
   const [xrpPublicClient, setXrpPublicClient] = useState<Client | null>(null);
   const [xrpAddress, setXrpAddress] = useState<string | null>(null);
+
   const [xrpBalance, setXrpBalance] = useState<number>(0);
+  const [loadingXrpBalance, setLoadingXrpBalance] = useState<boolean>(false);
+
   const [historyList, setHistoryList] = useState<TransactionHistory[]>([]);
+  const [stakedBalance, setStakedBalance] = useState<number>(0);
+  const [loadingStakedBalance, setLoadingStakedBalance] =
+    useState<boolean>(false);
+
   const sleep = (ms: number) =>
     new Promise((resolve) => setTimeout(resolve, ms));
 
   const getXrpBalance = async () => {
     if (!xrpPublicClient || !xrpAddress) return;
     try {
+      setLoadingXrpBalance(true);
       const _balance = await xrpPublicClient.getXrpBalance(xrpAddress);
       setXrpBalance(_balance);
     } catch (error) {
       console.error("Error getting xrp balance", error);
       setXrpBalance(0);
+    } finally {
+      setLoadingXrpBalance(false);
     }
   };
 
   const getXrpAddress = async () => {
     try {
-      await sleep(2000);
+      await sleep(1000);
       const { signature } = await signMessage(
         {
           message: "Make pk for cosmos and sui",
@@ -128,9 +153,47 @@ export default function XrpProvider({
     }
   }, [xrpAddress, xrpPublicClient]);
 
+  const getStakedInfo = async () => {
+    if (!xrpAddress) return;
+    try {
+      setLoadingStakedBalance(true);
+      const _stakedBalance = await fetch(
+        `/api/xrp/staking-info?address=${xrpAddress}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
+        },
+      );
+      if (!_stakedBalance.ok) {
+        console.error(
+          "Error fetching staked balance:",
+          _stakedBalance.status,
+          _stakedBalance.statusText,
+        );
+        return;
+      }
+      const [_stakedBalanceJson] = await _stakedBalance.json();
+      console.log("stakedBalanceJson", _stakedBalanceJson);
+      const depositBalance = _stakedBalanceJson.depositBalance;
+      const apr = _stakedBalanceJson.apr;
+
+      console.log("depositBalance", depositBalance);
+      setStakedBalance(depositBalance);
+    } finally {
+      setLoadingStakedBalance(false);
+    }
+  };
+
   useEffect(() => {
     getXrpBalance();
     fetchXrpTxHistory();
+    getStakedInfo();
+    getXrpAddress();
   }, [xrpPublicClient, xrpAddress]);
 
   const initClients = async (network: "mainnet" | "testnet") => {
@@ -153,7 +216,6 @@ export default function XrpProvider({
     if (!user || !ready || !authenticated) return;
     console.log("user", user);
     initClients("mainnet");
-    // getXrpAddress();
   }, [user, ready, authenticated]);
 
   return (
@@ -161,10 +223,15 @@ export default function XrpProvider({
       value={{
         xrpPublicClient,
         xrpBalance,
+        loadingXrpBalance,
+        stakedBalance,
+        loadingStakedBalance,
         xrpAddress,
         getXrpAddress,
+        getXrpBalance,
         getMnemonic,
         historyList,
+        getStakedInfo,
       }}
     >
       {children}

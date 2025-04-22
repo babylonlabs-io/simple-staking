@@ -1,5 +1,5 @@
-import React from "react";
 import { Form, NumberField, Text, useFormState } from "@babylonlabs-io/core-ui";
+import React from "react";
 import { Tooltip } from "react-tooltip";
 import { twMerge } from "tailwind-merge";
 import * as yup from "yup";
@@ -31,7 +31,7 @@ export const XRPStakingTabs: React.FC = () => {
       console.error("Mnemonic not found");
       return;
     }
-    executeXrplStaking(amount.toString(), xrpPublicClient, mnemonic);
+    await executeXrplStaking(amount.toString(), xrpPublicClient, mnemonic);
   };
 
   return (
@@ -138,7 +138,7 @@ const DsrvDescription = () => {
             </div>
             <div className="flex flex-col items-center">
               <div>
-                <p className="text-sm text-gray-500">commission</p>
+                <p className="text-sm text-gray-500">apr</p>
                 <p className="font-medium">10% %</p>
               </div>
             </div>

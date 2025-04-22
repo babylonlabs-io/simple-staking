@@ -3,16 +3,14 @@
 import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
 import { usePrivy } from "@privy-io/react-auth";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 
 import { Container } from "@/app/components/Container/Container";
+import walletIcon from "@/app/components/Staking/Form/States/wallet-icon-secure.svg";
 import { XRPActivityTabs } from "@/app/components/XRP/XRPActivityTabs";
 import { XRPPersonalBalance } from "@/app/components/XRP/XRPPersonalBalance";
 import { XRPStakingTabs } from "@/app/components/XRP/XRPStakingTabs";
 import { useLanguage } from "@/app/contexts/LanguageContext";
-import { useXrp } from "@/app/contexts/XrpProvider";
 import { translations } from "@/app/translations";
-import walletIcon from "@/app/components/Staking/Form/States/wallet-icon-secure.svg";
 
 const getXRPDescription = (language: string) => {
   switch (language) {
@@ -28,50 +26,13 @@ const getXRPDescription = (language: string) => {
 };
 
 export default function XRPStaking() {
-  const { getXrpAddress, xrpAddress } = useXrp();
   const { user, login } = usePrivy();
   const { language } = useLanguage();
   const t = translations[language].walletNotConnected;
 
-  const [stakedBalance, setStakedBalance] = useState<number>(0);
-
-  const getStakedInfo = async () => {
-    if (!xrpAddress) return;
-    console.log("getStakedInfo", xrpAddress);
-    const _stakedBalance = await fetch(
-      `/api/xrp/staking-info?address=${xrpAddress}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      },
-    );
-    if (!_stakedBalance.ok) {
-      console.error(
-        "Error fetching staked balance:",
-        _stakedBalance.status,
-        _stakedBalance.statusText,
-      );
-      return;
-    }
-    const [_stakedBalanceJson] = await _stakedBalance.json();
-    const depositBalance = _stakedBalanceJson.depositBalance;
-    // TODO: 추후 추가 예정
-    // const apr = _stakedBalanceJson.apr;
-    // const depositDestinationTag = _stakedBalanceJson.depositDestinationTag;
-    // const dopplerPoint = _stakedBalanceJson.dp;
-    // const redemptionList = _stakedBalanceJson.redemptionList;
-    setStakedBalance(depositBalance);
-  };
-
   const handleConnectXrp = () => {
     login({ loginMethods: ["google"] });
   };
-
-  useEffect(() => {
-    getStakedInfo();
-  }, [xrpAddress]);
 
   return (
     <Container
@@ -81,14 +42,15 @@ export default function XRPStaking() {
     >
       {user ? (
         <div className="flex flex-col gap-16">
-          {!xrpAddress && (
+          {/* {!xrpAddress && (
             <div className="flex flex-row gap-4">
               <span>{xrpAddress}</span>
               <button onClick={() => getXrpAddress()}>get xrp address</button>
             </div>
-          )}
+          )} */}
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <XRPPersonalBalance stakedBalance={stakedBalance} />
+            <XRPPersonalBalance />
           </div>
           <XRPStakingTabs />
           <XRPActivityTabs />
