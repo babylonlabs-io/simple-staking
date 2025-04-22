@@ -41,13 +41,7 @@ export const Phase2HereModal = ({
           The {bbnNetworkFullName} blockchain has launched, signalling the start
           of the new phase of Babylon. {networkName} stakers can now register on
           the {bbnNetworkFullName} blockchain to enhance security and earn{" "}
-          {bbnCoinSymbol}.
-        </p>
-        <p className="text-base">
-          During the initial phase of the {bbnNetworkFullName} launch,
-          eligibility criteria will be in place for stake registration. Over
-          time, access will gradually expand to allow the registration of all
-          existing stakers and the creation of new ones.{" "}
+          {bbnCoinSymbol}.{" "}
           <a href="https://babylon.foundation/blogs/babylon-phase-2-launch-official-announcement">
             Learn more here.
           </a>

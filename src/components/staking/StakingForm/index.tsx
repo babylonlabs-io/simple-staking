@@ -101,7 +101,7 @@ export function DelegationForm({
     return (
       <Message
         title="New Stakes Registration Temporarily Unavailable"
-        message="Creation of new stakes will be enabled on April 24, 10am UTC. Phase-1 Cap-1 stakers can register their stakes to Babylon using the modal below."
+        message="Creation of new stakes will be available soon. Please check the live countdown on Mintscan. Phase-1 Cap-1 stakers can register their stakes to Babylon Genesis from the Activity section once connected."
         icon={
           <Image
             src={stakingUnavailableIcon}

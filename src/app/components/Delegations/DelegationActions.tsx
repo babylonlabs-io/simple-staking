@@ -57,7 +57,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     }
 
     if (state === DelegationState.ACTIVE && !isEligibleForRegistration) {
-      return "Your finality provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check again on April 24, 10am UTC.";
+      return "Your Finality Provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check the live countdown on Mintscan.";
     }
 
     return insufficientBalanceMessage;
