@@ -47,10 +47,7 @@ export function GridTable<R extends object, P extends object = {}>({
   }
 
   if (!data?.length) {
-    if (!fallback || React.isValidElement(fallback)) {
-      return fallback as React.ReactElement | null;
-    }
-    return null;
+    return fallback as React.ReactElement | null;
   }
 
   return (
