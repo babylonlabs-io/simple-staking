@@ -15,6 +15,10 @@ import { Decimal } from "decimal.js-light";
  * maxDecimals(3.141, 3);           // returns 3.141
  * maxDecimals(3.149, 3);           // returns 3.149
  */
-export const maxDecimals = (value: number, maxDecimals: number): number => {
-  return new Decimal(value).toDecimalPlaces(maxDecimals).toNumber();
+export const maxDecimals = (
+  value: number,
+  maxDecimals: number,
+  rm?: number,
+): number => {
+  return new Decimal(value).toDecimalPlaces(maxDecimals, rm).toNumber();
 };

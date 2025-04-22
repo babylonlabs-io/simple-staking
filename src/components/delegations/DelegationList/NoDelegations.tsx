@@ -12,7 +12,7 @@ export const NoDelegations = () => (
     </div>
     <Heading variant="h4">No {bbnNetworkFullName} Stakes</Heading>
     <p className="text-base">
-      This is where your transitioned stakes will be displayed.
+      This is where your registered stakes will be displayed.
     </p>
   </div>
 );
