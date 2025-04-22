@@ -4,7 +4,7 @@ import { ScrollLocker } from "@babylonlabs-io/core-ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import React, { Suspense } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
@@ -15,6 +15,16 @@ import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
 import { AppState } from "./state";
+
+const ThemeProvider: React.FC<
+  React.PropsWithChildren<{
+    defaultTheme?: string;
+    enableSystem?: boolean;
+    attribute?: string;
+  }>
+> = ({ children, ...props }) => {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+};
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = React.useState(new QueryClient());
