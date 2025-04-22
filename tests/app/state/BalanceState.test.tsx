@@ -19,25 +19,12 @@ jest.mock("@/app/state/DelegationV2State", () => ({
 
 // Import the actual component we're testing (after mocks are defined)
 import { BalanceState, useBalanceState } from "@/app/state/BalanceState";
+import { DelegationV2StakingState } from "@/app/types/delegationsV2";
 
 // Create a test wrapper that provides the Balance state
 const TestWrapper = ({ children }: PropsWithChildren) => (
   <BalanceState>{children}</BalanceState>
 );
-
-// Mock DelegationV2StakingState enum
-const DelegationV2StakingState = {
-  ACTIVE: "ACTIVE",
-  TIMELOCK_UNBONDING: "TIMELOCK_UNBONDING",
-  EARLY_UNBONDING: "EARLY_UNBONDING",
-  TIMELOCK_WITHDRAWABLE: "TIMELOCK_WITHDRAWABLE",
-  EARLY_UNBONDING_WITHDRAWABLE: "EARLY_UNBONDING_WITHDRAWABLE",
-  TIMELOCK_SLASHING_WITHDRAWABLE: "TIMELOCK_SLASHING_WITHDRAWABLE",
-  EARLY_UNBONDING_SLASHING_WITHDRAWABLE:
-    "EARLY_UNBONDING_SLASHING_WITHDRAWABLE",
-  INTERMEDIATE_UNBONDING_SUBMITTED: "INTERMEDIATE_UNBONDING_SUBMITTED",
-  PENDING: "PENDING",
-};
 
 describe("BalanceState", () => {
   const mockReconnectRpc = jest.fn();
