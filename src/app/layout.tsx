@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { twJoin } from "tailwind-merge";
 
 import { LanguageProvider } from "@/app/contexts/LanguageContext";
-import { Network } from "@/app/types/network";
-import { network } from "@/config/network/btc";
 
+import MainPage from "./components/MainPage";
 import MetaTags from "./components/Meta/MetaTags";
+import PrivyProviders from "./contexts/PrivyProvider";
+import XrpProvider from "./contexts/XrpProvider";
 import "./globals.css";
 import Providers from "./providers";
 
@@ -26,20 +26,13 @@ export default function RootLayout({
       </head>
       <body className="font-sans">
         <Providers>
-          <LanguageProvider>
-            <div
-              className={twJoin(
-                `relative h-full min-h-svh w-full`,
-                network === Network.MAINNET
-                  ? "main-app-mainnet"
-                  : "main-app-testnet",
-                // "bg-primary-contrast",
-                "main-bg-grdient",
-              )}
-            >
-              {children}
-            </div>
-          </LanguageProvider>
+          <PrivyProviders>
+            <XrpProvider>
+              <LanguageProvider>
+                <MainPage>{children}</MainPage>
+              </LanguageProvider>
+            </XrpProvider>
+          </PrivyProviders>
         </Providers>
       </body>
     </html>

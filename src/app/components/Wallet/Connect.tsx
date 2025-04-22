@@ -8,6 +8,7 @@ import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
+import { usePrivy } from "@privy-io/react-auth";
 
 import bbnIcon from "@/app/assets/bbn.svg";
 import bitcoin from "@/app/assets/bitcoin.png";
@@ -20,6 +21,7 @@ import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { translations } from "@/app/translations";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { useXrp } from "@/app/contexts/XrpProvider";
 
 import { Hash } from "../Hash/Hash";
 import { MenuButton } from "../Menu/MenuButton";
@@ -37,6 +39,8 @@ export const Connect: React.FC<ConnectProps> = ({
   loading = false,
   onConnect,
 }) => {
+  const { xrpAddress } = useXrp();
+  const { logout: logoutPrivy } = usePrivy();
   const { language } = useLanguage();
   const t = translations[language];
   const { user, logout } = useAuth();
@@ -92,7 +96,8 @@ export const Connect: React.FC<ConnectProps> = ({
     setShowDisconnectModal(false);
     logout();
     disconnect();
-  }, [disconnect]);
+    logoutPrivy();
+  }, [disconnect, logout, logoutPrivy]);
 
   const renderApiNotAvailableTooltip = useMemo(() => {
     if (!isGeoBlocked && isApiNormal) return null;
@@ -185,10 +190,31 @@ export const Connect: React.FC<ConnectProps> = ({
           {/* <div className="min-w-[250px]">
             <ThemeToggle />
           </div> */}
+          {xrpAddress && (
+            <div className="flex flex-row gap-2 mb-2">
+              <div className="flex items-center justify-center">
+                <Image
+                  src="/xrp.png"
+                  alt="xrp"
+                  width={20}
+                  height={20}
+                  className="max-w-[40px] max-h-[40px]"
+                />
+              </div>
+              <div className="flex flex-col w-full">
+                <Text variant="body1" className="text-accent-primary text-base">
+                  XRP Address
+                </Text>
+                <Text variant="body2" className="text-accent-secondary text-sm">
+                  {xrpAddress}
+                </Text>
+              </div>
+            </div>
+          )}
           <div className="divider my-0" />
           <div
             className="flex items-center justify-start text-secondary-main cursor-pointer transition-colors w-full py-2"
-            onClick={() => logout()}
+            onClick={handleDisconnectConfirm}
           >
             <button className="text-sm w-full text-left">{t.logout}</button>
           </div>

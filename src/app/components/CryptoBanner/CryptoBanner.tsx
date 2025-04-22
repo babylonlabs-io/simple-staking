@@ -1,4 +1,7 @@
+"use client";
 import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { translations } from "@/app/translations";
@@ -8,6 +11,12 @@ const cryptos = [
     id: "bitcoin",
     name: "bitcoin",
     icon: "/bitcoin.png",
+    enabled: true,
+  },
+  {
+    id: "xrp",
+    name: "xrp",
+    icon: "/xrp.png",
     enabled: true,
   },
   {
@@ -22,17 +31,12 @@ const cryptos = [
     icon: "/ethereum.png",
     enabled: false,
   },
-  {
-    id: "xrp",
-    name: "xrp",
-    icon: "/xrp.png",
-    enabled: false,
-  },
 ];
 
 export const CryptoBanner = () => {
   const { language } = useLanguage();
   const t = translations[language];
+  const pathname = usePathname();
 
   return (
     <div
@@ -44,9 +48,7 @@ export const CryptoBanner = () => {
     >
       <div className="container mx-auto py-2">
         <div className="flex items-center justify-center">
-          {/* <span className="text-black text-sm">{t.staking}</span> */}
           <div className="flex items-center">
-            {/* <span className="text-black text-sm">{t.selectCrypto}</span> */}
             <div className="flex items-center gap-4">
               {cryptos
                 .filter((crypto) => crypto.enabled)
@@ -64,15 +66,14 @@ export const CryptoBanner = () => {
                       height={20}
                       className="rounded-full"
                     />
-                    <span className="text-sm text-black font-semibold underline">
+                    <Link
+                      className={`text-sm text-black font-semibold ${pathname === `/staking/${crypto.id}` ? "underline" : ""}`}
+                      href={`/staking/${crypto.id}`}
+                    >
                       {t[crypto.name as "bitcoin" | "sui" | "ethereum" | "xrp"]}
-                    </span>
+                    </Link>
                   </div>
                 ))}
-              {/* divider */}
-              {/* <div className="h-4 w-px bg-secondary-strokeLight" /> */}
-              {/* coming soon */}
-              {/* <span className="text-xs text-black">{t.comingSoon}</span> */}
               {cryptos
                 .filter((crypto) => !crypto.enabled)
                 .map((crypto) => (

@@ -1,3 +1,5 @@
+"use client";
+
 import { Text } from "@babylonlabs-io/core-ui";
 import {
   BsDiscord,

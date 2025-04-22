@@ -193,6 +193,19 @@ export const translations = {
       "Staking Bitcoin with DSRV offers multiple advantages: competitive rewards, robust security measures, and professional infrastructure management. Our advanced monitoring systems and experienced team ensure optimal performance and minimal downtime. Join DSRV's staking program to maximize your Bitcoin returns while maintaining the highest security standards.",
     dsrvDescription3:
       "DSRV is an integrated blockchain solutions company with the mission of enriching the crypto ecosystem via stronger connectivity. We strive to be your gateway to a suite of all-comprehensive blockchain services. Everything distributed, served complete.",
+
+    descriptions: {
+      bitcoin:
+        "Bitcoin is the world's first decentralized digital currency, enabling peer-to-peer value transfer without intermediaries.",
+      xrp: "XRP is a digital asset built for payments. It is the native cryptocurrency of the XRP Ledger, a decentralized, open-source blockchain technology that can settle transactions in 3-5 seconds.",
+      whatIs: "What is {coin}?",
+    },
+
+    all: "All",
+    stakes: "Stakes",
+    rewards: "Rewards",
+    unstake: "Unstake",
+    unstakeAmount: "Unstake Amount",
   },
   ko: {
     // Header
@@ -388,6 +401,19 @@ export const translations = {
       "DSRV와 함께 비트코인을 스테이킹하면 여러 가지 이점이 있습니다: 경쟁력 있는 보상, 강력한 보안 조치, 전문적인 인프라 관리. 고급 모니터링 시스템과 경험 많은 팀이 최적의 성능과 최소한의 다운타임을 보장합니다. 최고의 보안 기준을 유지하면서 비트코인 수익을 극대화하려면 DSRV의 스테이킹 프로그램에 참여하세요.",
     dsrvDescription3:
       "DSRV는 더 강력한 연결성을 통해 암호화폐 생태계를 풍요롭게 하는 것을 사명으로 하는 통합 블록체인 솔루션 기업입니다. 우리는 포괄적인 블록체인 서비스의 게이트웨이가 되기 위해 노력합니다. 모든 것이 분산되어 완벽하게 제공됩니다.",
+
+    descriptions: {
+      bitcoin:
+        "비트코인은 중개자 없이 P2P 가치 전송이 가능한 세계 최초의 탈중앙화 디지털 화폐입니다.",
+      xrp: "XRP는 결제를 위해 설계된 디지털 자산입니다. XRP Ledger의 기본 암호화폐로, 3-5초 내에 거래를 완료할 수 있는 탈중앙화 오픈소스 블록체인 기술입니다.",
+      whatIs: "{coin}이란?",
+    },
+
+    all: "전체",
+    stakes: "스테이킹",
+    rewards: "보상",
+    unstake: "언스테이킹",
+    unstakeAmount: "언스테이킹 금액",
   },
   jp: {
     // Header
@@ -585,5 +611,18 @@ export const translations = {
       "DSRVと共にビットコインをステーキングすることで、複数の利点があります：競争力のある報酬、堅牢なセキュリティ対策、専門的なインフラストラクチャ管理。高度なモニタリングシステムと経験豊富なチームが、最適なパフォーマンスと最小限のダウンタイムを確保します。最高のセキュリティ基準を維持しながらビットコインのリターンを最大化するために、DSRVのステーキングプログラムに参加してください。",
     dsrvDescription3:
       "DSRVは、より強力な接続性を通じて暗号資産エコシステムを豊かにすることを使命とする統合ブロックチェーンソリューション企業です。私たちは包括的なブロックチェーンサービスのゲートウェイとなることを目指しています。すべてが分散され、完全に提供されます。",
+
+    descriptions: {
+      bitcoin:
+        "ビットコインは、仲介者なしでP2Pの価値移転を可能にする世界初の分散型デジタル通貨です。",
+      xrp: "XRPは決済のために設計されたデジタル資産です。XRP Ledgerのネイティブ暗号通貨で、3-5秒で取引を完了できる分散型オープンソースブロックチェーン技術です。",
+      whatIs: "{coin}とは？",
+    },
+
+    all: "All",
+    stakes: "Stakes",
+    rewards: "Rewards",
+    unstake: "Unstake",
+    unstakeAmount: "Unstake Amount",
   },
 };
