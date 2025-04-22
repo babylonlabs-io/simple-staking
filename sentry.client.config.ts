@@ -29,11 +29,15 @@ Sentry.init({
     : "http://localhost:8092/sentry-tunnel",
 
   // This environment variable is provided in the CI
-  environment: process.env.environment ?? "local",
+  environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "local",
 
-  // This can be used to detech regression across releases
-  // Reference: https://docs.github.com/en/actions/writing-workflows/choosing-what-your-workflow-does/store-information-in-variables#default-environment-variables
-  release: process.env.GITHUB_SHA ?? "NA",
+  // Ensure this release ID matches the one used during 'next build' for source map uploads
+  // It's passed via NEXT_PUBLIC_RELEASE_ID in the build environment (e.g., GitHub Actions)
+  release: process.env.NEXT_PUBLIC_RELEASE_ID ?? "local-dev",
+
+  // Ensure this dist ID matches the one used during 'next build' for source map uploads
+  // It's passed via NEXT_PUBLIC_DIST_ID in the build environment (e.g., GitHub Actions)
+  dist: process.env.NEXT_PUBLIC_DIST_ID ?? "local",
 
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: 1,
