@@ -117,7 +117,7 @@ const DelegationState: React.FC<{
     }
 
     if (displayState === DelegationStateEnum.OVERFLOW) {
-      return "Stake is over the staking cap";
+      return "Stake was over the Phase-1 staking cap it was created in";
     }
 
     return getStateTooltip(displayState);

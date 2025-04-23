@@ -4,6 +4,7 @@ import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
 interface StatItemProps extends ListItemProps {
+  hidden?: boolean;
   loading?: boolean;
   tooltip?: string;
   loadingStyle?: LoadingStyle;
@@ -28,6 +29,7 @@ const SPINNER_RENDERERS: Record<
 };
 
 export const StatItem = ({
+  hidden = false,
   loading,
   title,
   value,
@@ -37,6 +39,9 @@ export const StatItem = ({
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
+
+  if (hidden) return null;
+
   const suffixEl =
     !suffix && tooltip ? (
       <>
