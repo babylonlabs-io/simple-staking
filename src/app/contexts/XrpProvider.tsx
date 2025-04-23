@@ -3,6 +3,8 @@
 import { usePrivy, useSignMessage } from "@privy-io/react-auth";
 import {
   createContext,
+  Dispatch,
+  SetStateAction,
   useCallback,
   useContext,
   useEffect,
@@ -25,6 +27,7 @@ const XrpContext = createContext<{
   getXrpBalance: () => Promise<void>;
   getMnemonic: () => Promise<string | null>;
   historyList: TransactionHistory[];
+  setHistoryList: Dispatch<SetStateAction<TransactionHistory[]>>;
   getStakedInfo: () => Promise<void>;
 }>({
   xrpPublicClient: null,
@@ -37,6 +40,7 @@ const XrpContext = createContext<{
   getXrpBalance: async () => {},
   getMnemonic: async () => null,
   historyList: [],
+  setHistoryList: () => {},
   getStakedInfo: async () => {},
 });
 
@@ -231,6 +235,7 @@ export default function XrpProvider({
         getXrpBalance,
         getMnemonic,
         historyList,
+        setHistoryList,
         getStakedInfo,
       }}
     >

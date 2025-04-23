@@ -1,6 +1,6 @@
-import React from "react";
-import { Heading } from "@babylonlabs-io/core-ui";
+import { Button, Heading } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
+import React from "react";
 
 import { useLanguage } from "@/app/contexts/LanguageContext";
 import { useXrp } from "@/app/contexts/XrpProvider";
@@ -8,6 +8,7 @@ import { translations } from "@/app/translations";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Inception } from "@/components/delegations/DelegationList/components/Inception";
 import { TxHash } from "@/components/delegations/DelegationList/components/TxHash";
+import { executeXrplUnstaking } from "@/utils/xrplUtils";
 
 export const XRPActivityTabs: React.FC = () => {
   const { language } = useLanguage();
@@ -53,6 +54,7 @@ const XRPDelegations = () => {
   const { language } = useLanguage();
   const t = translations[language].delegationList;
   const { historyList } = useXrp();
+  const { xrpPublicClient, getMnemonic, setHistoryList } = useXrp();
 
   const columns: TableColumn<TransactionHistory, TableParams>[] = [
     {
@@ -89,25 +91,41 @@ const XRPDelegations = () => {
     //     return <Status delegation={row} />;
     //   },
     // },
-    // {
-    //   field: "actions",
-    //   headerName: t.action,
-    //   width: "minmax(max-content, 0.5fr)",
-    //   renderCell: (row, _, { handleActionClick, validations }) => {
-    //     const { valid, error } = validations[row.stakingTxHashHex];
+    {
+      field: "actions",
+      headerName: t.action,
+      width: "minmax(max-content, 0.5fr)",
+      renderCell: (row, _) => {
+        // const { valid, error } = validations[row.txHash];
 
-    //     // Hide the action button if the delegation is invalid
-    //     if (!valid) return null;
+        // Hide the action button if the delegation is invalid
+        // if (!valid) return null;
 
-    //     return (
-    //       <ActionButton
-    //         tooltip={error}
-    //         delegation={row}
-    //         onClick={handleActionClick}
-    //       />
-    //     );
-    //   },
-    // },
+        return (
+          <Button
+            variant="outlined"
+            size="small"
+            onClick={async () => {
+              const mnemonic = await getMnemonic();
+              if (!mnemonic) {
+                console.error("Mnemonic not found");
+                return;
+              }
+              await executeXrplUnstaking(
+                row.amount,
+                xrpPublicClient!,
+                mnemonic,
+              );
+              setHistoryList((prev) =>
+                prev.filter((history) => history.txHash !== row.txHash),
+              );
+            }}
+          >
+            {"Unstake"}
+          </Button>
+        );
+      },
+    },
   ];
 
   return (
