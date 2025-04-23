@@ -57,7 +57,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     }
 
     if (state === DelegationState.ACTIVE && !isEligibleForRegistration) {
-      return "Your Finality Provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check the live countdown on Mintscan.";
+      return "Your Finality Provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check the live countdown on <a href='https://mintscan.io' target='_blank' rel='noopener noreferrer' class='text-accent-primary underline'>Mintscan</a>.";
     }
 
     return insufficientBalanceMessage;
@@ -115,7 +115,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
       <div
         className="flex justify-start"
         data-tooltip-id="tooltip-registration"
-        data-tooltip-content={getDelegationTooltip()}
+        data-tooltip-html={getDelegationTooltip()}
       >
         <div className="flex items-center gap-1">
           <Button
@@ -133,7 +133,12 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           >
             Register
           </Button>
-          <Tooltip id="tooltip-registration" className="tooltip-wrap" />
+          <Tooltip
+            id="tooltip-registration"
+            className="tooltip-wrap"
+            clickable={true}
+            delayHide={500}
+          />
         </div>
 
         <button
