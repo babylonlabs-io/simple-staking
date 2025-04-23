@@ -1,4 +1,4 @@
-import { Button, Loader } from "@babylonlabs-io/core-ui";
+import { Button, LoadingIcon } from "@/ui";
 
 interface ActionComponentProps {
   title: string;
@@ -18,12 +18,13 @@ export function ActionComponent({
   return (
     <Button
       className={className}
-      variant="outlined"
-      size="small"
+      variant="outline"
+      size="xs"
+      application
       onClick={onAction}
       disabled={isDisabled}
     >
-      {awaitingResponse ? <Loader size={16} className="text-white" /> : title}
+      {awaitingResponse ? <LoadingIcon size="goldfish" /> : title}
     </Button>
   );
 }

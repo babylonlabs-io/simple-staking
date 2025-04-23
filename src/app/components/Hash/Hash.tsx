@@ -2,9 +2,9 @@ import { Text } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import { FiCopy } from "react-icons/fi";
 import { IoIosCheckmarkCircle } from "react-icons/io";
-import { twMerge } from "tailwind-merge";
 import { useCopyToClipboard } from "usehooks-ts";
 
+import { cx } from "@/ui";
 import { trim } from "@/utils/trim";
 
 interface HashProps {
@@ -48,7 +48,7 @@ export const Hash: React.FC<HashProps> = ({
 
   return (
     <div
-      className={twMerge(
+      className={cx(
         "inline-flex min-h-[25px] cursor-pointer items-center",
         "hover:opacity-100 pointer-events-auto text-accent-primary",
         className,

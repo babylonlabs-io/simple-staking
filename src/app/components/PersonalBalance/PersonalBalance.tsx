@@ -1,21 +1,18 @@
-import { List } from "@babylonlabs-io/core-ui";
-
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
-import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ubbnToBaby } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
+import { DataWidget, StatsSection } from "@/app/componentsStakefish/DataWidget";
+import { NA_SYMBOL } from "@/ui/utils/constants";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
-import { Section } from "../Section/Section";
 import { ActionComponent } from "../Stats/ActionComponent";
-import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
@@ -42,6 +39,7 @@ export function PersonalBalance() {
     bbnBalance,
     stakableBtcBalance,
     stakedBtcBalance,
+    pendingBtcBalance,
     inscriptionsBtcBalance,
     loading: isBalanceLoading,
   } = useBalanceState();
@@ -54,78 +52,107 @@ export function PersonalBalance() {
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
+  const pendingSat = 0;
+  const withdrawableSat = 0;
+
+  const sections: StatsSection[] = [
+    {
+      title: {
+        text: "Active stake",
+        tooltip: "Your total number of active stakes",
+      },
+      value: {
+        text: pendingBtcBalance
+          ? `${`${satoshiToBtc(pendingBtcBalance)} ${coinSymbol}`}`
+          : NA_SYMBOL,
+        isLoading: isBalanceLoading,
+      },
+      className: "col-span-1 flounder:col-span-2 flex-col",
+    },
+    {
+      // TODO: not sure what to render here, pending on withdrawable or maybe both and remove stakable balance
+      title: { text: "Pending Stake" },
+      value: {
+        text: pendingSat
+          ? `${`${satoshiToBtc(pendingSat)} ${coinSymbol}`}`
+          : NA_SYMBOL,
+        isLoading: isBalanceLoading,
+      },
+      className: "flex-col whaleShark:flex-row",
+    },
+    {
+      title: {
+        text: `${isMobile ? "BABY" : bbnNetworkName} Balance`,
+      },
+      value: {
+        text: bbnBalance
+          ? `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
+          : NA_SYMBOL,
+        isLoading: isBalanceLoading,
+      },
+      className: "flex-col whaleShark:flex-row",
+    },
+    {
+      title: {
+        text: "Stakable Balance",
+        tooltip: inscriptionsBtcBalance
+          ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+          : "Stakable balance only includes confirmed Bitcoin balance of your wallet. It does not include balance stemming from pending transactions.",
+      },
+      value: {
+        text: stakableBtcBalance
+          ? `${satoshiToBtc(stakableBtcBalance).toFixed(8)} ${coinSymbol}`
+          : NA_SYMBOL,
+        isLoading: isBalanceLoading,
+      },
+      className: "flex-col whaleShark:flex-row",
+    },
+    {
+      title: { text: `${isMobile ? "BABY" : bbnNetworkName} Rewards` },
+      value: {
+        text: `${
+          formattedRewardBalance
+            ? `${formattedRewardBalance} ${bbnCoinSymbol}`
+            : NA_SYMBOL
+        }`,
+        isLoading: rewardLoading,
+      },
+      className: "flex-col whaleShark:flex-row",
+      // TODO: style modal
+      button: formattedRewardBalance ? (
+        <ActionComponent
+          className="h-6"
+          title="Claim"
+          onAction={showPreview}
+          isDisabled={!rewardBalance || processing}
+        />
+      ) : undefined,
+    },
+  ];
+
   return (
-    <AuthGuard>
-      <Section title="Wallet Balance">
-        <List orientation="adaptive" className="bg-surface">
-          <StatItem
-            loading={isBalanceLoading}
-            title="Staked Balance"
-            value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
-          />
+    <div>
+      <DataWidget label="Your staking" sections={sections} />
 
-          <StatItem
-            loading={isBalanceLoading || hasUnconfirmedUTXOs}
-            title="Stakable Balance"
-            loadingStyle={
-              hasUnconfirmedUTXOs
-                ? LoadingStyle.ShowSpinnerAndValue
-                : LoadingStyle.ShowSpinner
-            }
-            value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
-            tooltip={
-              inscriptionsBtcBalance
-                ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
-                : undefined
-            }
-          />
+      <ClaimRewardModal
+        processing={processing}
+        open={showRewardModal}
+        onClose={closeRewardModal}
+        onSubmit={claimRewards}
+        receivingValue={`${formattedRewardBalance}`}
+        address={bbnAddress}
+        transactionFee={transactionFee}
+      />
 
-          <StatItem
-            loading={isBalanceLoading || processing}
-            title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
-            value={
-              isBalanceLoading || processing
-                ? ""
-                : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
-            }
-            loadingStyle={LoadingStyle.ShowSpinner}
-          />
-
-          <StatItem
-            loading={rewardLoading}
-            title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
-            value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
-            suffix={
-              <ActionComponent
-                className="h-6"
-                title="Claim"
-                onAction={showPreview}
-                isDisabled={!rewardBalance || processing}
-              />
-            }
-          />
-        </List>
-
-        <ClaimRewardModal
-          processing={processing}
-          open={showRewardModal}
-          onClose={closeRewardModal}
-          onSubmit={claimRewards}
-          receivingValue={`${formattedRewardBalance}`}
-          address={bbnAddress}
-          transactionFee={transactionFee}
-        />
-
-        <ClaimStatusModal
-          open={showProcessingModal}
-          onClose={() => {
-            closeProcessingModal();
-            setTransactionHash("");
-          }}
-          loading={processing}
-          transactionHash={transactionHash}
-        />
-      </Section>
-    </AuthGuard>
+      <ClaimStatusModal
+        open={showProcessingModal}
+        onClose={() => {
+          closeProcessingModal();
+          setTransactionHash("");
+        }}
+        loading={processing}
+        transactionHash={transactionHash}
+      />
+    </div>
   );
 }

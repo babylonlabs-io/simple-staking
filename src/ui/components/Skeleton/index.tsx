@@ -10,11 +10,11 @@ export interface SkeletonProps extends RawSkeletonProps {
 export const Skeleton = ({ className, ...props }: SkeletonProps) => {
   return (
     <RawSkeleton
-      baseColor="rgb(var(--color-backgroundSecondaryDefault))"
-      highlightColor="rgb(var(--color-backgroundSecondaryMute))"
+      baseColor="hsl(var(--twc-backgroundSecondaryDefault) / 1)"
+      highlightColor="hsl(var(--twc-backgroundSecondaryMute) / 1)"
       borderRadius={0}
       duration={1.25}
-      className={cx("align-top h-full", className)}
+      className={cx("align-top h-full w-full", className)}
       {...props}
     />
   );

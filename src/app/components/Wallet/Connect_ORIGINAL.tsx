@@ -1,11 +1,19 @@
-import { Avatar, AvatarGroup, Text, Toggle } from "@babylonlabs-io/core-ui";
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  Text,
+  Toggle,
+} from "@babylonlabs-io/core-ui";
 import {
   useWalletConnect,
   useWidgetState,
 } from "@babylonlabs-io/wallet-connector";
 import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
+import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
+import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 
 import bbnIcon from "@/app/assets/bbn.svg";
@@ -16,12 +24,12 @@ import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { Button, Icon } from "@/ui";
 
 import { Hash } from "../Hash/Hash";
 import { MenuButton } from "../Menu/MenuButton";
 import { MenuContent } from "../Menu/MenuContent";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
 
 interface ConnectProps {
   loading?: boolean;
@@ -93,12 +101,12 @@ export const Connect: React.FC<ConnectProps> = ({
     return (
       <>
         <span
-          className="cursor-pointer text-xs pr-1.5"
+          className="cursor-pointer text-xs"
           data-tooltip-id="tooltip-connect"
           data-tooltip-content={apiMessage}
           data-tooltip-place="bottom"
         >
-          <Icon iconKey="infoCircle" size={16} />
+          <AiOutlineInfoCircle />
         </span>
         <Tooltip id="tooltip-connect" className="tooltip-wrap" />
       </>
@@ -109,18 +117,33 @@ export const Connect: React.FC<ConnectProps> = ({
     return (
       <div className="flex items-center gap-2">
         <Button
-          size="sm"
-          application
+          size="large"
           color="secondary"
-          variant="outline"
+          className="h-[2.5rem] min-h-[2.5rem] rounded-full px-6 py-2 text-white text-base md:rounded"
           onClick={onConnect}
           disabled={isLoading}
-          startIcon={{ iconKey: "connect", size: 12 }}
-          className="!py-[7px] flounder:!py-1.5"
         >
+          <PiWalletBold size={20} className="flex md:hidden" />
           <span className="hidden md:flex">Connect Wallets</span>
         </Button>
-        {!isApiNormal && !isHealthcheckLoading && renderApiNotAvailableTooltip}
+
+        <MenuButton
+          ref={buttonRef}
+          isOpen={isMenuOpen}
+          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+        />
+        <MenuContent
+          anchorEl={buttonRef.current}
+          className="p-4"
+          isOpen={isMenuOpen}
+          onClose={() => setIsMenuOpen(false)}
+        >
+          <div className="min-w-[250px]">
+            <ThemeToggle />
+          </div>
+        </MenuContent>
+
+        {!isApiNormal && renderApiNotAvailableTooltip}
       </div>
     );
   }
@@ -136,14 +159,11 @@ export const Connect: React.FC<ConnectProps> = ({
           />
         </div>
         <div className="flex flex-col w-full">
-          <Text
-            variant="body1"
-            className="text-accent-primary text-callout font-semibold"
-          >
+          <Text variant="body1" className="text-accent-primary text-base">
             Bitcoin
           </Text>
           <Hash
-            className="text-itemSecondaryDefault text-callout font-semibold"
+            className="text-accent-secondary"
             value={btcAddress}
             address
             noFade
@@ -218,6 +238,8 @@ export const Connect: React.FC<ConnectProps> = ({
       >
         <button className="text-sm w-full text-left">Disconnect Wallets</button>
       </div>
+      <div className="divider my-0" />
+      <ThemeToggle />
     </div>
   );
 
@@ -248,7 +270,6 @@ export const Connect: React.FC<ConnectProps> = ({
             <Text variant="body1">{bech32Address.slice(0, 6)}</Text>
           </div>
         </div>
-
         <MenuButton
           ref={buttonRef}
           isOpen={isMenuOpen}

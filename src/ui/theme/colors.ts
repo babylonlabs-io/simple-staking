@@ -88,7 +88,7 @@ export const colors = {
     secondary: {
       main: "#999999",
       highlight: "#F5F5F5", // backgroundPrimaryHighlight
-      contrast: "#FFFFFF", // itemInverseDefault
+      contrast: "#000000", // itemInverseDefault
       strokeLight: "#E6E6E6", // itemPrimaryMute
       strokeDark: "#333333", // itemPrimaryHighlight
     },
@@ -214,34 +214,34 @@ export const colors = {
     surface: "#1B1D21", // backgroundPrimaryDefault
     accent: {
       primary: "#FFFFFF", // itemPrimaryDefault
-      secondary: "#999999", // itemSecondaryDefault
+      secondary: "#b2b2b2", // itemSecondaryDefault
       disabled: "#333333", // itemPrimaryMute
       contrast: "#000000", // itemInverseDefault
     },
     neutral: {
-      100: "#242628", // backgroundPrimaryHighlight
-      200: "#2C2D2F", // backgroundPrimaryHighlightAlt
+      100: "#24262a", // backgroundPrimaryHighlight
+      200: "#2c2d2f", // backgroundPrimaryHighlightAlt
     },
     primary: {
       main: "#FFFFFF", // itemPrimaryDefault
-      dark: "#000000", // itemPrimaryHighlight
-      light: "#999999", // itemSecondaryDefault
+      dark: "#e6e6e6", // itemPrimaryHighlight
+      light: "#b2b2b2", // itemSecondaryDefault
       contrast: "#000000", // itemInverseDefault
     },
     secondary: {
-      main: "#999999",
+      main: "#b2b2b2",
       highlight: "#242628", // backgroundPrimaryHighlight
       contrast: "#FFFFFF", // itemInverseDefault
       strokeLight: "#333333", // itemPrimaryMute
-      strokeDark: "#000000", // itemPrimaryHighlight
+      strokeDark: "#e6e6e6", // itemPrimaryHighlight
     },
     error: {
-      main: "#FF003C", // itemErrorDefault
-      dark: "#FF4667", // itemErrorHighlight
-      light: "#26030A", // itemErrorMute
+      main: "#ff003c", // itemErrorDefault
+      dark: "#ff4667", // itemErrorHighlight
+      light: "#26030a", // itemErrorMute
     },
     warning: {
-      main: "#F25700", // itemWarningDefault
+      main: "#f25700", // itemWarningDefault
       dark: "#FFB68C", // itemWarningHighlight
       light: "#261208", // itemWarningMute
     },
