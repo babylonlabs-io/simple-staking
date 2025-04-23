@@ -18,6 +18,9 @@ export const Stats = memo(() => {
     data: {
       total_active_tvl: totalActiveTVL = 0,
       active_tvl: activeTVL = 0,
+      total_finality_providers: totalFPs = 0,
+      active_finality_providers: activeFPs = 0,
+      btc_staking_apy: stakingAPY,
     } = {},
     isLoading: isSystemStatsLoading,
   } = useSystemStats();
@@ -83,9 +86,14 @@ export const Stats = memo(() => {
       className: "flex-col whaleShark:flex-row",
     },
     {
-      title: { text: "Annualized Rewards Rate" },
-      // TODO: need value here
-      value: { text: NA_SYMBOL, isLoading: isNetworkInfoLoading },
+      title: { 
+        text: `${coinSymbol} Staking APY`,
+        tooltip: `The APY is determined with reference to the quantity of BABY reward tokens currently allocated by the Babylon Genesis chain for distribution to BTC stakers, and such quantity being converted to its BTC equivalent using market prices obtained from reputable, independent third-party data sources.`,
+      },
+      value: { 
+        text: stakingAPY ? `${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%` : NA_SYMBOL, 
+        isLoading: isSystemStatsLoading 
+      },
       className: "flex-col whaleShark:flex-row",
     },
   ];

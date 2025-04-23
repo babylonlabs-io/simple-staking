@@ -2,7 +2,7 @@ import { Heading, Text } from "@babylonlabs-io/core-ui";
 
 interface MessageProps {
   title: string;
-  message: string;
+  message: React.ReactNode;
   icon: JSX.Element;
 }
 
