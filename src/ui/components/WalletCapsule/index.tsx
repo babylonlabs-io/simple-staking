@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 import { cx } from "../../utils/cx";
 import { Button } from "../Button";
 import type { ButtonProps } from "../Button/types";
@@ -10,6 +12,7 @@ export type WalletCapsuleProps = {
   address?: string;
   connectCopy?: string;
   processingTxCopy?: string;
+  customContent?: ReactNode;
 } & ButtonProps;
 
 export const WalletCapsule = ({
@@ -18,6 +21,7 @@ export const WalletCapsule = ({
   address,
   connectCopy = "Connect wallet",
   processingTxCopy = undefined,
+  customContent,
   ...buttonProps
 }: WalletCapsuleProps) => {
   const isWarningState = state === "warning";
@@ -43,12 +47,14 @@ export const WalletCapsule = ({
         connectCopy
       ) : (
         <div className="flex gap-2 -mx-1">
-          <div className="flex items-center justify-center gap-1">
+          <div className="flex items-center justify-center gap-2">
             {balance && (
               <span className="uppercase text-desktopCallout text-itemPrimaryDefault">
                 {balance}
               </span>
             )}
+
+            {customContent}
 
             {processingTxCopy ? (
               <div className="flex items-center gap-1">

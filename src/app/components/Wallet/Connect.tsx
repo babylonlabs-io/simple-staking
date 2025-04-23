@@ -1,11 +1,10 @@
-import { Avatar, AvatarGroup, Text, Toggle } from "@babylonlabs-io/core-ui";
+import { Avatar, Text } from "@babylonlabs-io/core-ui";
 import {
   useWalletConnect,
   useWidgetState,
 } from "@babylonlabs-io/wallet-connector";
 import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
-import { FaLock, FaLockOpen } from "react-icons/fa6";
 import { Tooltip } from "react-tooltip";
 
 import bbnIcon from "@/app/assets/bbn.svg";
@@ -16,10 +15,9 @@ import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { Button, Icon } from "@/ui";
+import { Button, Icon, Switch, WalletCapsule } from "@/ui";
 
 import { Hash } from "../Hash/Hash";
-import { MenuButton } from "../Menu/MenuButton";
 import { MenuContent } from "../Menu/MenuContent";
 import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
 
@@ -75,6 +73,7 @@ export const Connect: React.FC<ConnectProps> = ({
     isConnected || !isApiNormal || loading || btcLoading || bbnLoading;
 
   const handleDisconnectClick = useCallback(() => {
+    setIsMenuOpen(false);
     setShowDisconnectModal(true);
   }, []);
 
@@ -127,70 +126,61 @@ export const Connect: React.FC<ConnectProps> = ({
 
   const walletContent = (
     <div className="flex flex-col gap-2 w-full min-w-[250px]">
-      <div className="flex flex-row gap-2 mb-2">
+      <div className="flex flex-row gap-3 mb-2">
         <div className="flex items-center justify-center">
-          <Image
-            src={bitcoin}
-            alt="bitcoin"
-            className="max-w-[40px] max-h-[40px]"
-          />
+          <Image src={bitcoin} alt="bitcoin" className="max-w-12 max-h-12" />
         </div>
         <div className="flex flex-col w-full">
           <Text
             variant="body1"
-            className="text-accent-primary text-callout font-semibold"
+            className="text-accent-primary text-body4 font-sans font-bold"
           >
             Bitcoin
           </Text>
-          <Hash
-            className="text-itemSecondaryDefault text-callout font-semibold"
-            value={btcAddress}
-            address
-            noFade
-            symbols={12}
-          />
+          <Hash value={btcAddress} address noFade symbols={12} />
         </div>
       </div>
       <div className="flex flex-row items-center justify-between">
-        <Text variant="body2" className="text-sm text-accent-primary">
+        <Text
+          variant="body2"
+          className="text-callout text-itemSecondaryDefault"
+        >
           {ordinalsExcluded ? "Not using Inscriptions" : "Using Inscriptions"}
         </Text>
         <div className="flex flex-col items-center justify-center">
-          <Toggle
-            defaultValue={!ordinalsExcluded}
-            onChange={(value) =>
+          <Switch
+            defaultChecked={!ordinalsExcluded}
+            onCheckedChange={(value) =>
               value ? includeOrdinals() : excludeOrdinals()
             }
-            inactiveIcon={<FaLock size={10} />}
-            activeIcon={<FaLockOpen size={10} />}
           />
         </div>
       </div>
       <div className="flex flex-row items-center justify-between">
-        <Text variant="body2" className="text-sm text-accent-primary">
+        <Text
+          variant="body2"
+          className="text-callout text-itemSecondaryDefault"
+        >
           Linked Wallet Stakes
         </Text>
         <div className="flex flex-col items-center justify-center">
-          <Toggle
-            value={linkedDelegationsVisibility}
-            onChange={displayLinkedDelegations}
+          <Switch
+            defaultChecked={linkedDelegationsVisibility}
+            onCheckedChange={displayLinkedDelegations}
           />
         </div>
       </div>
-      <div className="flex flex-col justify-start items-start self-stretch mb-1 gap-2">
-        <Text variant="body2" className="text-sm text-accent-primary">
+      <div className="flex flex-row justify-between items-center self-stretch mb-1 gap-2">
+        <Text
+          variant="body2"
+          className="text-callout text-itemSecondaryDefault"
+        >
           Public Key
         </Text>
-        <Hash
-          className="text-accent-secondary"
-          value={publicKeyNoCoord}
-          address
-          noFade
-          symbols={12}
-        />
+        <Hash value={publicKeyNoCoord} address noFade symbols={12} />
       </div>
-      <div className="divider my-0" />
-      <div className="flex flex-row gap-2">
+      <div className="divider my-2" />
+      <div className="flex flex-row gap-4">
         <div className="flex items-center justify-center">
           <Image
             src={bbnIcon}
@@ -199,24 +189,28 @@ export const Connect: React.FC<ConnectProps> = ({
           />
         </div>
         <div className="flex flex-col w-full">
-          <Text variant="body1" className="text-accent-primary text-base">
+          <Text
+            variant="body1"
+            className="text-accent-primary text-body4 font-sans font-bold"
+          >
             {bbnNetworkFullName}
           </Text>
-          <Hash
-            className="text-accent-secondary"
-            value={bech32Address}
-            address
-            noFade
-            symbols={12}
-          />
+          <Hash value={bech32Address} address noFade symbols={12} />
         </div>
       </div>
-      <div className="divider my-0" />
-      <div
-        className="flex items-center justify-start text-secondary-main cursor-pointer transition-colors w-full py-2"
-        onClick={handleDisconnectClick}
-      >
-        <button className="text-sm w-full text-left">Disconnect Wallets</button>
+      <div className="divider my-2" />
+
+      <div className="flex justify-end">
+        <Button
+          application
+          size="xs"
+          color="secondary"
+          variant="outline"
+          onClick={handleDisconnectClick}
+          className="px-2 py-1.5"
+        >
+          Disconnect Wallets
+        </Button>
       </div>
     </div>
   );
@@ -224,40 +218,40 @@ export const Connect: React.FC<ConnectProps> = ({
   return (
     <>
       <div className="relative flex flex-row items-center gap-2">
-        <div className="flex flex-row">
-          <AvatarGroup max={2} variant="circular">
-            <Avatar
-              alt={selectedWallets["BTC"]?.name}
-              url={selectedWallets["BTC"]?.icon}
-              size="large"
-              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
-            />
-            <Avatar
-              alt={selectedWallets["BBN"]?.name}
-              url={selectedWallets["BBN"]?.icon}
-              size="large"
-              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
-            />
-          </AvatarGroup>
-        </div>
-        <div className="hidden md:flex flex-col text-secondary-contrast">
-          <Text variant="body1">Wallet Connected</Text>
-          <div className="flex flex-row text-sm gap-2">
-            <Text variant="body1">{btcAddress.slice(0, 6)}</Text>
-            <Text variant="body1">|</Text>
-            <Text variant="body1">{bech32Address.slice(0, 6)}</Text>
-          </div>
-        </div>
-
-        <MenuButton
+        <button
+          type="button"
           ref={buttonRef}
-          isOpen={isMenuOpen}
-          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-        />
+          onClick={(e) => setIsMenuOpen(!isMenuOpen)}
+          className="flex items-center justify-center"
+        >
+          <WalletCapsule
+            as="div"
+            className="!py-[7px] flounder:!py-1.5"
+            state="connected"
+            customContent={
+              <div className="flex flex-row gap-1">
+                <Avatar
+                  alt={selectedWallets["BTC"]?.name}
+                  url={selectedWallets["BTC"]?.icon}
+                  size="tiny"
+                  className="object-contain bg-accent-contrast box-content border-px border-primary-main rounded-sm"
+                />
+                <Avatar
+                  alt={selectedWallets["BBN"]?.name}
+                  url={selectedWallets["BBN"]?.icon}
+                  size="tiny"
+                  className="object-contain bg-accent-contrast box-content border-px border-primary-main rounded-sm"
+                />
+              </div>
+            }
+            address={`${btcAddress.slice(0, 6)} | ${bech32Address.slice(0, 6)}`}
+            disabled={false}
+          />
+        </button>
 
         <MenuContent
           anchorEl={buttonRef.current}
-          className="p-4 min-w-[250px]"
+          className="p-4 min-w-[250px] flounder:min-w-[470px]"
           isOpen={isMenuOpen}
           onClose={() => setIsMenuOpen(false)}
         >
