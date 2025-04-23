@@ -109,7 +109,7 @@ export function DelegationForm({
               href="https://www.mintscan.io/babylon/block/139920"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary-light hover:underline"
+              className="text-primary-light underline hover:underline"
             >
               Mintscan
             </a>
