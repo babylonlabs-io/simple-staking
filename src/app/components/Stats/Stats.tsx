@@ -59,7 +59,7 @@ export const Stats = memo(() => {
           loading={isLoading}
           title={`${coinSymbol} Staking APY`}
           value={`${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%`}
-          tooltip="The APY is determined with reference to the quantity of BABY reward tokens currently allocated by the Babylon Genesis chain for distribution to BTC stakers, and such quantity being converted to its BTC equivalent using market prices obtained from reputable, independent third-party data sources."
+          tooltip="To determine the APY, the amount of BABY reward tokens allocated by the Babylon Genesis chain for BTC stakers is converted to its Bitcoin equivalent using market prices obtained from reliable, independent data sources. However, the APY is an approximate figure and can fluctuate, and the displayed value may not always be completely accurate."
         />
 
         <StatItem
