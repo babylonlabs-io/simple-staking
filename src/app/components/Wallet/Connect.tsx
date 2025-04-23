@@ -234,13 +234,13 @@ export const Connect: React.FC<ConnectProps> = ({
                   alt={selectedWallets["BTC"]?.name}
                   url={selectedWallets["BTC"]?.icon}
                   size="tiny"
-                  className="object-contain bg-accent-contrast box-content border-px border-primary-main rounded-sm"
+                  className="object-contain dark:bg-backgroundInverseDefault box-content rounded-[6px]"
                 />
                 <Avatar
                   alt={selectedWallets["BBN"]?.name}
                   url={selectedWallets["BBN"]?.icon}
                   size="tiny"
-                  className="object-contain bg-accent-contrast box-content border-px border-primary-main rounded-sm"
+                  className="object-contain dark:bg-backgroundInverseDefault box-content rounded-[6px]"
                 />
               </div>
             }

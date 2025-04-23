@@ -6,16 +6,28 @@ import { useAppState } from "@/app/state";
 import { Header as HeaderComponent } from "@/ui";
 import { WEBSITE_URL } from "@/utils/stakefish";
 
+import { DashboardLabel } from "./DashboardLabel";
 import { NetworkDropdown } from "./NetworkDropdown";
+import { StakeButton } from "./StakeButton";
 import { ThemeToggler } from "./ThemeToggler";
 
 export const Header = () => {
   const { isLoading: loading } = useAppState();
   const { open } = useWalletConnect();
 
+  const frontMenu = (
+    <div className="flex items-center justify-center gap-4">
+      <DashboardLabel className="hidden perch:block" />
+      <div className=" items-center justify-center gap-2 hidden flounder:flex">
+        <StakeButton />
+      </div>
+    </div>
+  );
+
   const actionContent = (
     <div className="flex items-center gap-2">
       <div className="flex items-center justify-center gap-2">
+        <StakeButton className="text-desktopCallout flounder:text-desktopCallout flounder:hidden" />
         <ThemeToggler
           buttonProps={{
             variant: "outline",
@@ -37,6 +49,7 @@ export const Header = () => {
       bordered
       pictogramOnly
       ElementLogo={Link}
+      frontMenu={frontMenu}
       actionsContent={actionContent}
       className="w-screen py-2"
       logoUrl={`${WEBSITE_URL}/`}

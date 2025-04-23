@@ -138,19 +138,24 @@
   .text-hero {
     @apply text-mobileHero flounder:text-desktopHero font-display font-bold flounder:tracking-wide;
   }
-  .text-h1 {
+  .text-h1,
+  .bbn-h1 {
     @apply text-mobileH1 flounder:text-desktopH1 font-display font-extrabold;
   }
-  .text-h2 {
+  .text-h2,
+  .bbn-h2 {
     @apply text-mobileH2 flounder:text-desktopH2 font-display font-extrabold;
   }
-  .text-h3 {
+  .text-h3,
+  .bbn-h3 {
     @apply text-mobileH3 flounder:text-desktopH3 font-display font-extrabold;
   }
-  .text-h4 {
+  .text-h4,
+  .bbn-h4 {
     @apply text-mobileH4 flounder:text-desktopH4 font-display font-bold;
   }
-  .text-h5 {
+  .text-h5,
+  .bbn-h5 {
     @apply text-mobileH5 flounder:text-desktopH5 font-display font-bold;
   }
   .text-h6 {
@@ -173,8 +178,9 @@
     @apply text-mobileBody4 flounder:text-desktopBody4;
   }
 
-  .text-callout {
-    @apply text-mobileCallout flounder:text-desktopCallout;
+  .text-callout,
+  .text-sm {
+    @apply text-mobileCallout flounder:text-desktopCallout font-mono;
   }
   .text-tag1 {
     letter-spacing: 0.145em;

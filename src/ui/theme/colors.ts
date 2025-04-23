@@ -204,9 +204,8 @@ export const colors = {
     decorationYellow: "#FCEECC",
     decorationSky: "#DCF2F2",
 
-    "eth-symbol": "#000000",
-    "main-paired-default": "#000000",
-    "main-paired-active": "#333333",
+    mainPairedDefault: "#000000",
+    mainPairedActive: "#333333",
   },
   tokensDark: {
     current: "currentColor",
@@ -347,9 +346,8 @@ export const colors = {
     itemPrimaryDefaultAlt1: "rgba(255, 255, 255, 0.8)",
     itemPrimaryDefaultAlt2: "rgba(255, 255, 255, 0.2)",
 
-    "eth-symbol": "#BCF000",
-    "main-paired-default": "#000000",
-    "main-paired-active": "#333333",
+    mainPairedDefault: "#000000",
+    mainPairedActive: "#333333",
   },
 };
 
