@@ -5,7 +5,6 @@ import { useEffect } from "react";
 
 import { StakingForm } from "@/app/components/Staking/StakingForm";
 
-import { Activity } from "./components/Delegations/Activity";
 import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Stats } from "./components/Stats/Stats";
@@ -32,7 +31,6 @@ const Home = () => {
             </div>
           </section>
           <StakingForm />
-          <Activity />
         </div>
       </main>
 

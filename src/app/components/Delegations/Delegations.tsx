@@ -319,7 +319,7 @@ export const Delegations = ({}) => {
     <>
       {combinedDelegationsData.length !== 0 && (
         <Card className="mb-6">
-          <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+          <Heading variant="h5" className="text-accent-primary mb-6">
             Pending Registration
           </Heading>
 

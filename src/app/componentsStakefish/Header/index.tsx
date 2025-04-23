@@ -18,9 +18,6 @@ export const Header = () => {
   const frontMenu = (
     <div className="flex items-center justify-center gap-4">
       <DashboardLabel className="hidden perch:block" />
-      <div className=" items-center justify-center gap-2 hidden flounder:flex">
-        <StakeButton />
-      </div>
     </div>
   );
 
