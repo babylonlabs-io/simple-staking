@@ -1,17 +1,22 @@
 import { memo } from "react";
 
 import { DataWidget, StatsSection } from "@/app/componentsStakefish/DataWidget";
+import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useSystemStats } from "@/app/hooks/client/api/useSystemStats";
+import { useStakingState } from "@/app/state/StakingState";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { NA_SYMBOL } from "@/ui/utils/constants";
 import { satoshiToBtc } from "@/utils/btc";
 import { formatBTCTvl } from "@/utils/formatBTCTvl";
-import { useStakingStats } from "@/app/context/api/StakingStatsProvider";
-import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { useStakingState } from "@/app/state/StakingState";
 
 const { coinSymbol } = getNetworkConfigBTC();
+
+const formatter = Intl.NumberFormat("en", {
+  notation: "compact",
+  maximumFractionDigits: 2,
+});
 
 export const Stats = memo(() => {
   const {
@@ -86,13 +91,15 @@ export const Stats = memo(() => {
       className: "flex-col whaleShark:flex-row",
     },
     {
-      title: { 
+      title: {
         text: `${coinSymbol} Staking APY`,
         tooltip: `The APY is determined with reference to the quantity of BABY reward tokens currently allocated by the Babylon Genesis chain for distribution to BTC stakers, and such quantity being converted to its BTC equivalent using market prices obtained from reputable, independent third-party data sources.`,
       },
-      value: { 
-        text: stakingAPY ? `${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%` : NA_SYMBOL, 
-        isLoading: isSystemStatsLoading 
+      value: {
+        text: stakingAPY
+          ? `${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%`
+          : NA_SYMBOL,
+        isLoading: isSystemStatsLoading,
       },
       className: "flex-col whaleShark:flex-row",
     },
