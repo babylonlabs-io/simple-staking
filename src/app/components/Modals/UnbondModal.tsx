@@ -1,5 +1,3 @@
-import { Text } from "@babylonlabs-io/core-ui";
-
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
@@ -46,15 +44,20 @@ export const UnbondModal = ({
       onClose={onClose}
       onSubmit={onSubmit}
     >
-      <Text variant="body1" className="pb-8 pt-4">
+      <div className="font-medium text-callout text-itemSecondaryDefault text-balance pb-8 pt-4">
         You are about to unbond your stake before its expiration. A transaction
-        fee of {unbondingFeeBtc} {coinSymbol} will be deduced from your stake by
-        the {networkName} network.
-        <br />
-        The expected unbonding time will be about {unbondingTime}. After
+        fee of{" "}
+        <span className="text-itemPrimaryDefault">
+          {unbondingFeeBtc} {coinSymbol}
+        </span>{" "}
+        will be deduced from your stake by the{" "}
+        <span className="text-itemPrimaryDefault">{networkName}</span> network.
+        <br /> <br />
+        The expected unbonding time will be about{" "}
+        <span className="text-itemPrimaryDefault">{unbondingTime}</span>. After
         unbonded, you will need to use this dashboard to withdraw your stake for
         it to appear in your wallet.
-      </Text>
+      </div>
     </ConfirmationModal>
   );
 };

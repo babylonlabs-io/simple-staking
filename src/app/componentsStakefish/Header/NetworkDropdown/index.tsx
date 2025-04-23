@@ -38,8 +38,7 @@ export const NetworkDropdown = () => {
         className="w-[180px] pointer-events-auto"
       >
         {ProtocolVariants.map((protocol, index) => {
-          const isConnected =
-            dashboardNavs[protocol].displayName === "Babylon Genesis";
+          const isConnected = dashboardNavs[protocol].displayName === "Babylon";
           return (
             <Dropdown.Item key={index} className="mb-px" asChild>
               <Button

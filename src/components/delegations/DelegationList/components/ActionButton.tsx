@@ -1,5 +1,3 @@
-import { Button } from "@babylonlabs-io/core-ui";
-
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
 import {
@@ -8,6 +6,7 @@ import {
 } from "@/app/types/delegationsV2";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
+import { Button } from "@/ui";
 
 interface ActionButtonProps {
   tooltip?: string | JSX.Element;
@@ -134,10 +133,13 @@ export function ActionButton({
   if (!buttonProps) return null;
 
   return (
-    <Hint tooltip={tooltip} attachToChildren>
+    <Hint tooltip={tooltip} attachToChildren wrapperClassName="-my-2.5">
       <Button
-        variant="outlined"
-        size="small"
+        application
+        variant="text"
+        size="sm"
+        color="primary"
+        className="block normal-case font-normal !p-2 -my-2.5 !-mx-2 tracking-normal underline-offset-1"
         onClick={() => onClick?.(buttonProps.action, delegation)}
       >
         {buttonProps.title}

@@ -22,6 +22,7 @@
 @import "../ui/theme/typography";
 @import "../ui/theme/extends";
 @import "../ui/theme/buttons";
+@import "../ui/theme/table";
 
 @media screen and (min-width: 768px) {
   :root {
@@ -116,13 +117,13 @@ body.modal-open {
 }
 
 .tooltip-wrap {
-  @apply rounded !bg-surface p-3 !text-accent-secondary !opacity-100 shadow-lg !shadow-[#000000]/20;
-
-  max-width: 25rem;
+  @apply relative max-w-64 rounded-none p-3 px-4 py-3 font-mono !text-[14px] font-medium !leading-[18px] !opacity-100;
   white-space: pre-wrap;
   word-wrap: break-word;
   height: fit-content !important;
   z-index: 9999;
+  color: #e6e6e6 !important;
+  background-color: #000 !important;
 }
 
 .tooltip-wrap[data-popper-placement*="top"] .tooltip-arrow {

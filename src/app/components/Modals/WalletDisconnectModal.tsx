@@ -45,7 +45,7 @@ export const WalletDisconnectModal = ({
 
         <h4 className="mb-2 font-sans font-bold text-h5">Disconnect Wallets</h4>
 
-        <p className="font-semibold text-callout text-itemSecondaryDefault text-pretty text-center">
+        <p className="font-medium text-callout text-itemSecondaryDefault text-pretty text-center">
           Disconnecting will log you out of both your {bbnNetworkFullName} Chain
           and {networkName} wallets. You&apos;ll need to reconnect them to
           access your staking account.

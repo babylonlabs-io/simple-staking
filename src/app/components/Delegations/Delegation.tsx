@@ -178,7 +178,7 @@ export const Delegation: React.FC<DelegationProps> = ({
 
   return (
     <>
-      <tr className="bg-surface odd:bg-secondary-highlight text-sm text-accent-primary">
+      <tr className="bg-surface app-table-row table-row">
         <DelegationCell>
           {durationTillNow(startTimestamp, currentTime)}
         </DelegationCell>

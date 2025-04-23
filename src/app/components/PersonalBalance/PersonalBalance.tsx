@@ -1,3 +1,4 @@
+import { DataWidget, StatsSection } from "@/app/componentsStakefish/DataWidget";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
@@ -5,10 +6,9 @@ import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { NA_SYMBOL } from "@/ui/utils/constants";
 import { ubbnToBaby } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
-import { DataWidget, StatsSection } from "@/app/componentsStakefish/DataWidget";
-import { NA_SYMBOL } from "@/ui/utils/constants";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
@@ -118,7 +118,6 @@ export function PersonalBalance() {
         isLoading: rewardLoading,
       },
       className: "flex-col whaleShark:flex-row",
-      // TODO: style modal
       button: formattedRewardBalance ? (
         <ActionComponent
           className="h-6"

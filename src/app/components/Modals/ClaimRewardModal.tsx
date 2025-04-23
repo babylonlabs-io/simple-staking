@@ -33,7 +33,7 @@ export const ClaimRewardModal = ({
 }: PropsWithChildren<ConfirmationModalProps>) => {
   return (
     <ConfirmationModal
-      className="w-[660px] max-w-full"
+      className="max-w-full"
       open={open}
       processing={processing}
       title="Claim tBABY"
@@ -43,7 +43,10 @@ export const ClaimRewardModal = ({
       <div className="flex flex-col mt-8 gap-10">
         <div className="flex flex-col gap-4 divide-y divide-inherit">
           <div className="flex flex-row items-center justify-between">
-            <Text variant="body1" className="text-center">
+            <Text
+              variant="body1"
+              className="text-center text-itemSecondaryDefault !font-normal"
+            >
               Receiving
             </Text>
             <Text variant="body1">
@@ -52,13 +55,21 @@ export const ClaimRewardModal = ({
           </div>
 
           <div className="flex flex-row items-center justify-between pt-4">
-            <Text variant="body1">
+            <Text
+              variant="body1"
+              className="text-itemSecondaryDefault !font-normal"
+            >
               Babylon {shouldDisplayTestingMsg() ? "Test" : ""} Chain Address
             </Text>
             <Text variant="body1">{trim(address, 14)}</Text>
           </div>
           <div className="flex flex-row items-center justify-between pt-4">
-            <Text variant="body1">Transaction Fees</Text>
+            <Text
+              variant="body1"
+              className="text-itemSecondaryDefault !font-normal"
+            >
+              Transaction Fees
+            </Text>
             {transactionFee === 0 ? (
               <LoadingSmall />
             ) : (
@@ -70,13 +81,16 @@ export const ClaimRewardModal = ({
         </div>
         <div className="flex flex-col gap-4 mb-10">
           <Heading variant="h6">Attention!</Heading>
-          <Text variant="body2">
-            Processing your claim will take approximately 2 blocks to complete.
-          </Text>
+          <p className="font-semibold text-callout text-itemSecondaryDefault text-pretty">
+            Processing your claim will take approximately{" "}
+            <span className="text-itemPrimaryDefault">2 blocks</span> to
+            complete.
+          </p>
+
           {shouldDisplayTestingMsg() && (
-            <Text variant="body2">
+            <p className="font-semibold text-callout text-itemSecondaryDefault text-pretty">
               {coinSymbol} is a test token without any real world value.
-            </Text>
+            </p>
           )}
         </div>
       </div>

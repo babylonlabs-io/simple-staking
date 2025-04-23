@@ -1,14 +1,14 @@
+import { Card, Heading } from "@babylonlabs-io/core-ui";
+
 import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
-import { AuthGuard } from "@/components/common/AuthGuard";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/config/network";
-import { Box } from "@/ui";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -16,7 +16,6 @@ import { DelegationModal } from "./components/DelegationModal";
 import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
-import { DisconectedPrompt } from "./DisconnectedPrompt";
 import { NoDelegations } from "./NoDelegations";
 
 type TableParams = {
@@ -99,10 +98,10 @@ export function DelegationList() {
   } = useDelegationService();
 
   return (
-    <Box>
-      <h4 className="font-semibold text-h6 text-pretty font-mono py-2 mb-4">
+    <Card>
+      <Heading variant="h6" className="text-accent-primary py-2 mb-6">
         {networkConfig.bbn.networkFullName} Stakes
-      </h4>
+      </Heading>
 
       <GridTable
         getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
@@ -113,24 +112,19 @@ export function DelegationList() {
         infiniteScroll={hasMoreDelegations}
         onInfiniteScroll={fetchMoreDelegations}
         classNames={{
-          headerRowClassName: "text-accent-primary app-table-header-row",
-          headerCellClassName:
-            "text-left app-table-header-col border-b border-b-itemPrimaryDefault",
-          rowClassName: "group app-table-row text-itemPrimaryDefault",
+          headerRowClassName: "text-accent-primary text-xs",
+          headerCellClassName: "p-4 text-align-left text-accent-secondary",
+          rowClassName: "group",
           wrapperClassName: "max-h-[25rem] overflow-x-auto",
           bodyClassName: "min-w-[1000px]",
           cellClassName:
-            "app-table-col leading-none flex items-center justify-start text-itemPrimaryDefault",
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
         }}
         params={{
           handleActionClick: openConfirmationModal,
           validations,
         }}
-        fallback={
-          <AuthGuard fallback={<DisconectedPrompt />}>
-            <NoDelegations />
-          </AuthGuard>
-        }
+        fallback={<NoDelegations />}
       />
 
       <DelegationModal
@@ -142,6 +136,6 @@ export function DelegationList() {
         onClose={closeConfirmationModal}
         networkConfig={networkConfig}
       />
-    </Box>
+    </Card>
   );
 }

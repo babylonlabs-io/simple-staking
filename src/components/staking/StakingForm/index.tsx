@@ -1,4 +1,4 @@
-import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
+import { HiddenField, Loader } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
@@ -10,6 +10,7 @@ import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletN
 import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { AuthGuard } from "@/components/common/AuthGuard";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { AmountField } from "./components/AmountField";
 import { BBNFeeAmount } from "./components/BBNFeeAmount";
@@ -21,6 +22,8 @@ import { FormOverlay } from "./components/Overlay";
 import { SubmitButton } from "./components/SubmitButton";
 import { TermField } from "./components/TermField";
 import { Total } from "./components/Total";
+
+const { networkName } = getNetworkConfigBTC();
 
 interface DelegationFormProps {
   loading?: boolean;
@@ -155,13 +158,9 @@ export function DelegationForm({
   return (
     <AuthGuard fallback={<WalletNotConnected />}>
       <div className="relative flex flex-1 flex-col gap-6">
-        <Heading variant="h5" className="text-accent-primary">
-          Stake now
-        </Heading>
-
-        <Text variant="body1" className="text-accent-secondary">
-          Set Staking Amount
-        </Text>
+        <h4 className="font-semibold text-h6 text-pretty font-mono">
+          {networkName} Staking
+        </h4>
 
         <InfoAlert />
 

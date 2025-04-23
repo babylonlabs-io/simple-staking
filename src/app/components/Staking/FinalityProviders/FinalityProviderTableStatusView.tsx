@@ -1,9 +1,8 @@
-import { Heading, Text } from "@babylonlabs-io/core-ui";
 import { twMerge } from "tailwind-merge";
 
 interface StatusViewProps {
   icon: React.ReactNode | string;
-  title: string;
+  title?: string;
   description?: React.ReactNode;
   className?: string;
 }
@@ -18,18 +17,12 @@ export const StatusView = ({
     className={twMerge("flex items-center justify-center h-[21rem]", className)}
   >
     <div className="flex flex-col items-center gap-4">
-      <div className="bg-primary-contrast relative w-[5.5rem] h-[5.5rem]">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          {icon}
-        </div>
-      </div>
-      <Heading variant="h6" className="text-accent-primary">
-        {title}
-      </Heading>
+      <div className="bg-primary-contrast relative">{icon}</div>
+      {title && <h4 className="mb-2 font-sans font-bold text-h6">{title}</h4>}
       {description && (
-        <Text variant="body1" className="text-accent-primary text-center">
+        <p className="font-medium text-callout text-itemSecondaryDefault text-pretty">
           {description}
-        </Text>
+        </p>
       )}
     </div>
   </div>

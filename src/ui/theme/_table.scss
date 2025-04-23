@@ -1,0 +1,26 @@
+@layer components {
+  .app-table {
+    @apply relative z-[2] block [&>*:nth-child(2)]:border-itemPrimaryDefault;
+  }
+  .app-table-col {
+    @apply text-desktopCallout relative flex h-full flex-grow-0 border-collapse items-center text-ellipsis whitespace-nowrap border-b border-l-[1px] border-itemSecondaryMute border-b-itemSecondaryMute bg-inherit px-4 py-3 text-start last:border-r-[1px];
+  }
+  .app-table-row {
+    @apply relative flex h-10 border-collapse items-center bg-backgroundPrimaryDefault hover:bg-backgroundPrimaryHighlight hover:text-backgroundPrimaryOnHighlight focus:border-b focus:border-t focus:border-itemSecondaryDefault focus:bg-backgroundPrimaryHighlight focus:text-backgroundPrimaryOnHighlight focus:outline-none focus-visible:border-b focus-visible:border-t focus-visible:border-itemSecondaryDefault focus-visible:outline-none;
+  }
+  .app-table-header {
+    @apply relative mx-auto inline-block h-10 min-w-full bg-backgroundPrimaryDefault leading-none;
+  }
+  .app-table-header-row {
+    @apply app-table-row h-full border-b border-t-0 border-b-itemSecondaryDefault focus:border-t-0 focus-visible:border-t-0 dark:border-b-neutral40;
+  }
+  .app-table-header-col {
+    @apply app-table-col border-b-0 border-t border-t-itemSecondaryMute bg-backgroundPrimaryDefault font-semibold uppercase;
+  }
+  .app-table-sort {
+    @apply cursor-pointer select-none hover:bg-backgroundPrimaryHighlight focus:bg-backgroundPrimaryHighlight;
+  }
+  .app-table-sort-active {
+    @apply bg-backgroundPrimaryActive text-backgroundPrimaryOnActive hover:bg-backgroundPrimaryActive hover:text-backgroundPrimaryOnActive;
+  }
+}

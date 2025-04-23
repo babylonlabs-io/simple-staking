@@ -9,29 +9,29 @@ export const LoadingView: React.FC<LoadingProps> = ({ text, noBorder }) => {
   return (
     <div
       className={twJoin(
-        "flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border border-neutral-content py-4 dark:border-neutral-content/20",
+        "flex flex-1 flex-col items-center justify-center gap-4 rounded-2xl border border-neutral-content py-4 dark:border-neutral-content/20 text-callout font-semibold",
         noBorder && "border-0",
       )}
     >
       <span className="loading loading-spinner loading-lg text-primary" />
-      <p>{text || "Please wait..."}</p>
+      <p>{text || "Please wait…"}</p>
     </div>
   );
 };
 
 export const LoadingTableList: React.FC<LoadingProps> = () => {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4 py-2">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 py-2 text-callout font-semibold">
       <span className="loading loading-spinner loading-lg text-primary" />
-      <p>Please wait...</p>
+      <p>Please wait…</p>
     </div>
   );
 };
 
 export const LoadingSmall: React.FC<LoadingProps> = ({ text }) => {
   return (
-    <div className="flex items-center justify-center gap-4">
-      <p>{text || "Please wait..."}</p>
+    <div className="flex items-center justify-center gap-4 text-callout font-semibold">
+      <p>{text || "Please wait…"}</p>
       <span className="loading loading-spinner loading-xs text-primary" />
     </div>
   );

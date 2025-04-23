@@ -18,14 +18,16 @@ export const EmptyPrompt = ({
 }: EmptyPromptProps) => {
   return (
     <div className={cx("flex items-center justify-center", className)}>
-      <div className="container mx-auto space-y-4 text-center">
-        <h3 className="font-sans font-bold text-body1">{title}</h3>
-        {subtitle && (
-          <p className="font-semibold text-callout text-itemSecondaryDefault text-balance">
-            {subtitle}
-          </p>
-        )}
-        {cta && <div className="mt-4">{cta}</div>}
+      <div className="container mx-auto text-center">
+        <div className="space-y-3">
+          <h3 className="font-sans font-bold text-body1">{title}</h3>
+          {subtitle && (
+            <p className="font-medium text-callout text-itemSecondaryDefault text-balance">
+              {subtitle}
+            </p>
+          )}
+        </div>
+        {cta && <div className="mt-6">{cta}</div>}
         {customSubtitle && !subtitle && customSubtitle}
       </div>
     </div>
