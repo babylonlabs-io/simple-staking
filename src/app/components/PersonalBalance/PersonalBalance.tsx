@@ -1,3 +1,4 @@
+import { DataWidget, StatsSection } from "@/app/componentsStakefish/DataWidget";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
@@ -5,10 +6,9 @@ import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { NA_SYMBOL } from "@/ui/utils/constants";
 import { ubbnToBaby } from "@/utils/bbn";
 import { satoshiToBtc } from "@/utils/btc";
-import { DataWidget, StatsSection } from "@/app/componentsStakefish/DataWidget";
-import { NA_SYMBOL } from "@/ui/utils/constants";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
@@ -52,31 +52,32 @@ export function PersonalBalance() {
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
-  const pendingSat = 0;
-  const withdrawableSat = 0;
-
   const sections: StatsSection[] = [
     {
       title: {
         text: "Active stake",
-        tooltip: "Your total number of active stakes",
+        tooltip: "Your total amount of active stake.",
       },
       value: {
-        text: pendingBtcBalance
-          ? `${`${satoshiToBtc(pendingBtcBalance)} ${coinSymbol}`}`
+        text: stakedBtcBalance
+          ? `${`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}`
           : NA_SYMBOL,
         isLoading: isBalanceLoading,
       },
       className: "col-span-1 flounder:col-span-2 flex-col",
     },
     {
-      // TODO: not sure what to render here, pending on withdrawable or maybe both and remove stakable balance
-      title: { text: "Pending Stake" },
+      title: {
+        text: "Stakable Balance",
+        tooltip: inscriptionsBtcBalance
+          ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+          : "Stakable balance only includes confirmed Bitcoin balance of your wallet. It does not include balance stemming from pending transactions.",
+      },
       value: {
-        text: pendingSat
-          ? `${`${satoshiToBtc(pendingSat)} ${coinSymbol}`}`
+        text: stakableBtcBalance
+          ? `${satoshiToBtc(stakableBtcBalance).toFixed(8)} ${coinSymbol}`
           : NA_SYMBOL,
-        isLoading: isBalanceLoading,
+        isLoading: isBalanceLoading || hasUnconfirmedUTXOs,
       },
       className: "flex-col whaleShark:flex-row",
     },
@@ -93,17 +94,10 @@ export function PersonalBalance() {
       className: "flex-col whaleShark:flex-row",
     },
     {
-      title: {
-        text: "Stakable Balance",
-        tooltip: inscriptionsBtcBalance
-          ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
-          : "Stakable balance only includes confirmed Bitcoin balance of your wallet. It does not include balance stemming from pending transactions.",
-      },
+      title: { text: "" },
       value: {
-        text: stakableBtcBalance
-          ? `${satoshiToBtc(stakableBtcBalance).toFixed(8)} ${coinSymbol}`
-          : NA_SYMBOL,
-        isLoading: isBalanceLoading,
+        text: "",
+        isLoading: false,
       },
       className: "flex-col whaleShark:flex-row",
     },
