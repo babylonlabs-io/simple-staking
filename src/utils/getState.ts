@@ -48,7 +48,7 @@ export const getStateTooltip = (state: string) => {
     case DelegationState.WITHDRAWN:
       return "Stake has been withdrawn";
     case DelegationState.OVERFLOW:
-      return "Stake is over the staking cap";
+      return "Stake was over the Phase-1 staking cap it was created in";
     case DelegationState.EXPIRED:
       return "Stake timelock has expired";
     // Intermediate local storage states

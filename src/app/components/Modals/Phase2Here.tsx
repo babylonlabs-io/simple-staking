@@ -17,7 +17,7 @@ interface Phase2HereModalProps {
   className?: string;
 }
 
-const { networkName } = getNetworkConfigBTC();
+const { networkName, coinSymbol: btcCoinSymbol } = getNetworkConfigBTC();
 const { networkFullName: bbnNetworkFullName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
 
@@ -39,15 +39,9 @@ export const Phase2HereModal = ({
         <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
         <p className="text-base">
           The {bbnNetworkFullName} blockchain has launched, signalling the start
-          of the new phase of Babylon. {networkName} stakers can now register on
-          the {bbnNetworkFullName} blockchain to enhance security and earn{" "}
-          {bbnCoinSymbol}.
-        </p>
-        <p className="text-base">
-          During the initial phase of the {bbnNetworkFullName} launch,
-          eligibility criteria will be in place for stake registration. Over
-          time, access will gradually expand to allow the registration of all
-          existing stakers and the creation of new ones.{" "}
+          of the new phase of Babylon {btcCoinSymbol} Staking protocol.{" "}
+          {networkName} stakers can now register on the {bbnNetworkFullName}{" "}
+          blockchain to enhance security and earn {bbnCoinSymbol}.{" "}
           <a href="https://babylon.foundation/blogs/babylon-phase-2-launch-official-announcement">
             Learn more here.
           </a>
