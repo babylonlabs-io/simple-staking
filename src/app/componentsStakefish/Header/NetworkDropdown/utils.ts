@@ -1,11 +1,9 @@
+import { Network } from "@/app/types/network";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { IconKeyVariant } from "@/ui";
 import { WEBSITE_URL } from "@/utils/stakefish";
 
-export const ProtocolVariants = [
-  "ethereum",
-  "babylon",
-  "babylon-genesis",
-] as const;
+export const ProtocolVariants = ["ethereum", "babylon"] as const;
 export const ChainIdVariants = [1, 560048] as const;
 
 export type ProtocolVariant = (typeof ProtocolVariants)[number];
@@ -21,6 +19,7 @@ export type DashboardNavItem = {
 };
 
 export const ExtendedNetworks = ["Babylon"];
+const { network } = getNetworkConfigBTC();
 
 export const dashboardNavs: DashboardNavs = {
   ethereum: {
@@ -28,15 +27,10 @@ export const dashboardNavs: DashboardNavs = {
     logo: "ethLogo",
     link: `${WEBSITE_URL}/dashboard`,
   },
-  "babylon-genesis": {
-    displayName: "Babylon Genesis",
-    logo: "babylonLogo",
-    link: `/`,
-  },
   babylon: {
     displayName: "Babylon",
     logo: "babylonLogo",
-    link: `${WEBSITE_URL}/babylon/dashboard`,
+    link: `https://babylon${network === Network.MAINNET ? "" : "-testnet"}.stake.fish`,
   },
 };
 
