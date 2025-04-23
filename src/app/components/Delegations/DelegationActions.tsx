@@ -57,7 +57,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     }
 
     if (state === DelegationState.ACTIVE && !isEligibleForRegistration) {
-      return "Your Finality Provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check the live countdown on <a href='https://mintscan.io' target='_blank' rel='noopener noreferrer' class='text-accent-primary underline'>Mintscan</a>.";
+      return "Your Finality Provider has registered, however, only Phase-1 Cap-1 stakes are allowed to register at the moment. Please check the live countdown on <a href='https://www.mintscan.io/babylon/block/139920' target='_blank' rel='noopener noreferrer' class='text-accent-primary underline'>Mintscan</a>.";
     }
 
     return insufficientBalanceMessage;

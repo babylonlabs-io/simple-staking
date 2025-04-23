@@ -106,7 +106,7 @@ export function DelegationForm({
             Creation of new stakes will be available soon. Please check the live
             countdown on{" "}
             <a
-              href="https://mintscan.io"
+              href="https://www.mintscan.io/babylon/block/139920"
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary-light hover:underline"
