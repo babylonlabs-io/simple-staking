@@ -1,11 +1,5 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 
-declare global {
-  interface Array<T> {
-    toSorted(compareFn?: (a: T, b: T) => number): T[];
-  }
-}
-
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 
 import { ServerError } from "../context/Error/errors";
