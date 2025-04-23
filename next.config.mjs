@@ -10,6 +10,18 @@ const nextConfig = {
   experimental: {
     forceSwcTransforms: true,
   },
+  webpack(config, { dev, isServer }) {
+    if (!dev && !isServer) {
+      config.module.rules.push({
+        test: /\.js$/,
+        enforce: "pre",
+        use: ["source-map-loader"],
+        exclude: /node_modules\/(?!@babylonlabs-io)/,
+      });
+    }
+
+    return config;
+  },
 };
 
 const config = withSentryConfig(nextConfig, {
@@ -27,7 +39,7 @@ const config = withSentryConfig(nextConfig, {
 
   sourcemaps: {
     disable: false,
-    deleteSourceMapsAfterUpload: true,
+    deleteSourceMapsAfterUpload: false,
   },
 
   // Only print logs for uploading source maps in CI
