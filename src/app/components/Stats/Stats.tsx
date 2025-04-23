@@ -24,6 +24,7 @@ export const Stats = memo(() => {
       active_tvl: activeTVL = 0,
       total_finality_providers: totalFPs = 0,
       active_finality_providers: activeFPs = 0,
+      btc_staking_apy: stakingAPY,
     } = {},
     isLoading,
   } = useSystemStats();
@@ -51,6 +52,14 @@ export const Stats = memo(() => {
           title={`Registered ${coinSymbol} TVL`}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
           tooltip="The total amount of Bitcoin that has been registered in the Babylon Genesis network"
+        />
+
+        <StatItem
+          hidden={!stakingAPY}
+          loading={isLoading}
+          title={`${coinSymbol} Staking APY`}
+          value={`${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%`}
+          tooltip="The APY is determined with reference to the quantity of BABY reward tokens currently allocated by the Babylon Genesis chain for distribution to BTC stakers, and such quantity being converted to its BTC equivalent using market prices obtained from reputable, independent third-party data sources."
         />
 
         <StatItem
