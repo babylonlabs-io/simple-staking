@@ -1,0 +1,71 @@
+@layer components {
+  .btn,
+  .bbn-btn {
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-none font-semibold outline-none transition-[color,background,box-shadow] focus-visible:outline-1 focus-visible:-outline-offset-1 focus-visible:outline-brandDefault disabled:pointer-events-none;
+  }
+  .btn-xs {
+    @apply gap-1 px-2 py-0.5 font-mono text-[clamp(10.8px,1rem+0.238095vmin,12px)] leading-none tracking-normal;
+  }
+  .btn-sm {
+    @apply text-desktopCallout text-callout flounder:text-callout text-body4 flounder:text-body4 text-callout flounder:text-callout gap-2 px-[12px] py-1.5 font-mono tracking-normal  flounder:px-[14px] flounder:py-1.5;
+  }
+  .btn-md {
+    @apply text-mobileBody3 flounder:text-desktopBody3 text-body4 flounder:text-body4 gap-2 px-4 py-[11px] font-mono tracking-normal flounder:px-7 flounder:py-3;
+  }
+  .btn-lg,
+  .bbn-btn-large {
+    @apply text-mobileBody2 flounder:text-desktopBody2 text-body4 flounder:text-body4 text-body4 flounder:text-body4 h-auto gap-1 px-5 py-3 font-mono font-semibold tracking-normal flounder:gap-2 flounder:px-8 flounder:py-4;
+  }
+
+  .btn-primary,
+  .bbn-btn-contained {
+    @apply uppercase;
+  }
+
+  .btn-primary.btn-color-primary,
+  .bbn-btn-contained.bbn-btn-primary {
+    @apply bg-backgroundInverseDefault text-backgroundInverseOnDefault hover:bg-backgroundInverseActive hover:text-backgroundInverseOnActive focus-visible:bg-backgroundInverseActive;
+  }
+  .btn-primary.btn-color-secondary {
+    @apply bg-backgroundSecondaryDefault text-backgroundSecondaryOnDefault hover:bg-backgroundPrimaryHighlight/90 hover:text-backgroundSecondaryOnActive focus-visible:bg-backgroundSecondaryActive;
+  }
+  .btn-primary.btn-color-brand {
+    @apply bg-backgroundBrandDefault text-backgroundBrandOnDefault hover:bg-backgroundBrandActive hover:text-backgroundBrandOnActive focus-visible:bg-backgroundBrandActive;
+  }
+  .btn-primary.btn-color-inverse {
+    @apply bg-mainPairedDefault text-neutral100 hover:bg-mainPairedActive hover:text-neutral100;
+  }
+  .btn-primary[disabled] {
+    @apply bg-backgroundInverseMute text-backgroundInverseOnMute hover:bg-backgroundInverseMute hover:text-backgroundInverseOnMute dark:bg-backgroundInverseMute dark:text-backgroundInverseOnMute;
+  }
+
+  .btn-outline,
+  .bbn-btn-outlined {
+    @apply border-none uppercase ring-1 ring-inset;
+  }
+  .btn-outline.btn-lg,
+  .bbn-btn-outlined.bbn-btn-large {
+    @apply ring-2;
+  }
+  .btn-outline.btn-color-primary,
+  .bbn-btn-outlined.bbn-btn-primary {
+    @apply bg-transparent text-itemPrimaryDefault ring-itemPrimaryDefault hover:bg-itemPrimaryDefault hover:text-itemInverseDefault hover:ring-itemPrimaryDefault;
+  }
+  .btn-outline.btn-color-secondary {
+    @apply ring-itemPrimaryDefaultAlt2 hover:ring-itemSecondaryDefault  disabled:bg-transparent disabled:text-backgroundPrimaryOnMute data-[state=open]:ring-itemSecondaryDefault dark:ring-itemPrimaryMute dark:hover:ring-itemSecondaryDefault;
+    &.btn-xs {
+      @apply bg-backgroundSecondaryDefault ring-itemPrimaryDefaultAlt2 hover:ring-itemPrimaryDefault data-[state=open]:ring-itemSecondaryDefault;
+    }
+  }
+  .btn-outline[disabled] {
+    @apply cursor-default bg-itemInverseDefault text-itemPrimaryMute ring-itemPrimaryMute hover:bg-itemInverseDefault hover:text-itemPrimaryMute hover:ring-itemPrimaryMute;
+  }
+
+  .btn-text {
+    @apply uppercase underline-offset-4 hover:underline;
+  }
+
+  .btn-menuItem {
+    @apply text-callout flounder:text-callout w-full justify-start bg-transparent text-start normal-case !no-underline hover:bg-backgroundPrimaryHighlight hover:text-backgroundPrimaryOnHighlight [&_span]:!m-0;
+  }
+}

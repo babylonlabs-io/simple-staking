@@ -10,7 +10,10 @@ export function ResponsiveDialog(props: DialogProps) {
   return (
     <DialogComponent
       {...props}
-      className={twMerge("w-[41.25rem] max-w-full", props.className)}
+      className={twMerge(
+        "w-[41.25rem] max-w-full [&>div]:!rounded-none",
+        props.className,
+      )}
     />
   );
 }

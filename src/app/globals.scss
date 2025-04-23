@@ -1,0 +1,146 @@
+@import "react-responsive-modal/styles.css";
+@import "react-tooltip/dist/react-tooltip.css";
+@import "react-toastify/dist/ReactToastify.css";
+@import "@babylonlabs-io/core-ui/dist/style.css";
+@import "@babylonlabs-io/wallet-connector/dist/style.css";
+@import "react-loading-skeleton/dist/skeleton.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: rgb(188, 240, 0);
+  --secondary: "#0DB7BF";
+  --toastify-toast-width: 344px;
+  --font-fallback: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans";
+  --font-primary: "Inter", var(--font-fallback), sans-serif;
+  --font-display: "InterDisplay", var(--font-fallback), sans-serif;
+}
+
+@import "../ui/theme/typography";
+@import "../ui/theme/extends";
+@import "../ui/theme/buttons";
+
+@media screen and (min-width: 768px) {
+  :root {
+    --toastify-toast-width: 671px;
+  }
+}
+
+/* disable number input arrows */
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+[data-theme="dark"] .gradient-primary {
+  background: linear-gradient(
+    97.5deg,
+    rgba(255, 124, 42, 0.2) 2.43%,
+    rgba(153, 74, 25, 0.2) 97.63%
+  );
+}
+
+[data-theme="light"] .gradient-primary {
+  background: linear-gradient(98.35deg, #fff3ea 2.4%, #fff6ef 117.66%);
+}
+
+.shadow-primary {
+  box-shadow: 1px 2px 20px 0px rgba(255, 124, 42, 0.3);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0 !important;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.fp-selected {
+  border: 1px solid var(--primary) !important;
+  filter: brightness(0.98);
+}
+
+.no-focus {
+  outline: none !important;
+}
+
+/* tabs selection */
+.tab.tab-active:not(.tab-disabled):not([disabled]),
+.tab:is(input:checked) {
+  border-color: #ff7c2a;
+}
+
+.divider {
+  @apply border-t border-secondary-strokeLight;
+}
+
+.divider:after,
+.divider:before {
+  height: 1px !important;
+  width: 1px !important;
+}
+
+[data-theme="dark"] .react-responsive-modal-modal {
+  background-color: #1e1e1e;
+  color: #fff;
+}
+
+[data-theme="light"] .react-responsive-modal-modal {
+  background-color: #fff;
+  color: #000;
+}
+
+body.modal-open {
+  overflow: hidden;
+}
+
+.tooltip-wrap {
+  @apply rounded !bg-surface p-3 !text-accent-secondary !opacity-100 shadow-lg !shadow-[#000000]/20;
+
+  max-width: 25rem;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  height: fit-content !important;
+  z-index: 9999;
+}
+
+.tooltip-wrap[data-popper-placement*="top"] .tooltip-arrow {
+  @apply border-t-surface;
+}
+
+.tooltip-wrap[data-popper-placement*="bottom"] .tooltip-arrow {
+  @apply border-b-surface;
+}
+
+.tooltip-wrap[data-popper-placement*="left"] .tooltip-arrow {
+  @apply border-l-surface;
+}
+
+.tooltip-wrap[data-popper-placement*="right"] .tooltip-arrow {
+  @apply border-r-surface;
+}
+
+body > .tomo-social {
+  z-index: 100 !important;
+}

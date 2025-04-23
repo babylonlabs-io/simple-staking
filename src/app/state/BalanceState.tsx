@@ -13,6 +13,8 @@ interface BalanceStateProps {
   stakableBtcBalance: number;
   totalBtcBalance: number;
   stakedBtcBalance: number;
+  pendingBtcBalance: number;
+  withdrawableBtcBalance: number;
   bbnBalance: number;
   inscriptionsBtcBalance: number;
   hasRpcError: boolean;
@@ -37,6 +39,8 @@ const defaultState: BalanceStateProps = {
   stakedBtcBalance: 0,
   bbnBalance: 0,
   inscriptionsBtcBalance: 0,
+  pendingBtcBalance: 0,
+  withdrawableBtcBalance: 0,
   hasRpcError: false,
   reconnectRpc: () => {},
 };
@@ -113,10 +117,34 @@ export function BalanceState({ children }: PropsWithChildren) {
       .reduce((total, amount) => total + amount, 0);
   }, [delegations]);
 
+  // TODO: @mbaranovski please review pendingBtcBalance & withdrawableBtcBalance
+  const pendingBtcBalance = useMemo(() => {
+    return delegations.reduce((total, delegation) => {
+      if (delegation.state === DelegationV2StakingState.PENDING) {
+        return total + delegation.stakingAmount;
+      }
+      return total;
+    }, 0);
+  }, [delegations]);
+
+  const withdrawableBtcBalance = useMemo(() => {
+    return delegations.reduce((total, delegation) => {
+      if (
+        delegation.state ===
+        DelegationV2StakingState.INTERMEDIATE_UNBONDING_SUBMITTED
+      ) {
+        return total + delegation.stakingAmount;
+      }
+      return total;
+    }, 0);
+  }, [delegations]);
+
   const context = useMemo(
     () => ({
       loading,
       stakableBtcBalance,
+      pendingBtcBalance,
+      withdrawableBtcBalance,
       totalBtcBalance,
       bbnBalance,
       stakedBtcBalance,
@@ -130,6 +158,8 @@ export function BalanceState({ children }: PropsWithChildren) {
       totalBtcBalance,
       bbnBalance,
       stakedBtcBalance,
+      pendingBtcBalance,
+      withdrawableBtcBalance,
       inscriptionsBtcBalance,
       hasRpcError,
       reconnectRpc,

@@ -1,8 +1,8 @@
-import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { Button } from "@/ui";
 
 import walletIcon from "./wallet-icon.svg";
 
@@ -17,19 +17,17 @@ export const WalletNotConnected = () => {
       </div>
 
       <div className="text-center">
-        <Heading variant="h5" className="text-accent-primary text-2xl mb-2">
+        <h4 className="mb-2 font-sans font-bold text-h5">
           Connect wallets to start staking
-        </Heading>
-        <Text
-          variant="body1"
-          className="text-center text-base text-accent-secondary p-0"
-        >
+        </h4>
+
+        <p className="font-semibold text-callout text-itemSecondaryDefault text-balance">
           To start staking your {coinName} first connect wallets then select a
           Finality Provider
-        </Text>
+        </p>
       </div>
 
-      <Button variant="outlined" onClick={open} className="text-primary-dark">
+      <Button application variant="outline" onClick={open}>
         Connect Wallets
       </Button>
     </div>

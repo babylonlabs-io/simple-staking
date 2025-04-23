@@ -1,10 +1,8 @@
 import { Text } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
-import { FiCopy } from "react-icons/fi";
-import { IoIosCheckmarkCircle } from "react-icons/io";
-import { twMerge } from "tailwind-merge";
 import { useCopyToClipboard } from "usehooks-ts";
 
+import { cx, Icon } from "@/ui";
 import { trim } from "@/utils/trim";
 
 interface HashProps {
@@ -48,9 +46,10 @@ export const Hash: React.FC<HashProps> = ({
 
   return (
     <div
-      className={twMerge(
+      className={cx(
         "inline-flex min-h-[25px] cursor-pointer items-center",
-        "hover:opacity-100 pointer-events-auto text-accent-primary",
+        "hover:opacity-100 pointer-events-auto",
+        "text-itemPrimaryDefault text-callout font-semibold uppercase",
         className,
         !noFade && "opacity-50",
         fullWidth && "w-full",
@@ -60,7 +59,7 @@ export const Hash: React.FC<HashProps> = ({
       <Text
         variant="body2"
         style={{
-          minWidth: small ? "3.5rem" : "5.5rem",
+          minWidth: small ? "3.5rem" : "7rem",
         }}
       >
         {copiedText || (
@@ -75,11 +74,13 @@ export const Hash: React.FC<HashProps> = ({
           </>
         )}
       </Text>
-      {copiedText ? (
-        <IoIosCheckmarkCircle className="ml-1" />
-      ) : (
-        <FiCopy className="ml-1" />
-      )}
+      <span className="text-itemSecondaryDefault">
+        <Icon
+          iconKey={copiedText ? "checkCircleFilled" : "copy"}
+          size={14}
+          className="ml-1"
+        />
+      </span>
     </div>
   );
 };

@@ -1,0 +1,169 @@
+.loading-icon {
+  svg {
+    @apply w-full;
+
+    path {
+      animation: fadeIn 200ms ease;
+      @media (prefers-reduced-motion: no-preference) {
+        will-change: opacity;
+        animation-duration: 800ms;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+      }
+      &:nth-child(1) {
+        animation-delay: -700ms;
+      }
+      &:nth-child(2) {
+        animation-delay: -600ms;
+      }
+      &:nth-child(3) {
+        animation-delay: -500ms;
+      }
+      &:nth-child(4) {
+        animation-delay: -400ms;
+      }
+      &:nth-child(5) {
+        animation-delay: -300ms;
+      }
+      &:nth-child(6) {
+        animation-delay: -200ms;
+      }
+      &:nth-child(7) {
+        animation-delay: -100ms;
+      }
+      &:nth-child(8) {
+        animation-delay: 0ms;
+      }
+    }
+  }
+}
+
+.z-tabs {
+  z-index: 10;
+}
+.z-table {
+  z-index: 10;
+}
+.z-header {
+  z-index: 20;
+}
+.z-logo {
+  z-index: 22;
+}
+.z-tabsBar {
+  z-index: 30;
+}
+.z-overlay {
+  z-index: 9998;
+}
+.z-dialog {
+  z-index: 9999;
+}
+
+[data-radix-popper-content-wrapper] {
+  z-index: 10003 !important;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-size: 1rem;
+  line-height: inherit;
+  position: relative;
+  direction: ltr;
+  writing-mode: horizontal-tb;
+
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  --w3m-z-index: 99999;
+
+  @apply font-mono;
+}
+
+.bbn-dialog {
+  @apply rounded-none;
+}
+
+.bbn-dialog-title {
+  .bbn-h5 {
+    @apply text-title;
+  }
+  .bbn-text-body1 {
+    @apply font-semibold;
+  }
+}
+
+.bbn-dialog-header {
+  &.mb-10 {
+    @apply mb-6;
+  }
+}
+
+.bbn-dialog-body {
+  @apply text-body4 font-sans;
+
+  .flex.cursor-pointer.border.rounded.p-4.mb-8 {
+    @apply bg-backgroundSecondaryDefault;
+
+    .bbn-switcher {
+      @apply mt-0.5;
+    }
+  }
+
+  .flex.border.rounded {
+    @apply -mb-px gap-2 rounded-none;
+  }
+
+  &.gap-6,
+  .grid.grid-cols-1.gap-6 {
+    @apply gap-0;
+  }
+
+  .bbn-text-body1.h-14.px-2.cursor-pointer {
+    @apply h-auto p-3;
+  }
+}
+
+.bbn-btn-icon {
+  @apply rounded-none border-none;
+}
+
+.bbn-switcher {
+  svg {
+    @apply size-5;
+  }
+}
+
+.bbn-dialog-footer {
+  &.pt-10 {
+    @apply pt-6;
+  }
+}
+
+.bbn-text-body1 {
+  @apply text-callout font-mono font-semibold;
+}
+
+.bbn-chip {
+  @apply text-callout font-normal normal-case;
+}
+
+.bbn-h1 {
+  @apply text-mobileH1 flounder:text-desktopH1 font-display font-extrabold;
+}
+.bbn-h2 {
+  @apply text-mobileH2 flounder:text-desktopH2 font-display font-extrabold;
+}
+.bbn-h3 {
+  @apply text-mobileH3 flounder:text-desktopH3 font-display font-extrabold;
+}
+.bbn-h4 {
+  @apply text-mobileH4 flounder:text-desktopH4 font-display font-bold;
+}
+.bbn-h5 {
+  @apply text-mobileH5 flounder:text-desktopH5 font-display font-bold;
+}

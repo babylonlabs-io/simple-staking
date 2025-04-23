@@ -1,0 +1,302 @@
+.font-display {
+  font-family: var(--font-display);
+  font-feature-settings:
+    "liga" 1,
+    "calt" 1;
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+.font-sans {
+  font-family: var(--font-primary);
+}
+
+@layer components {
+  /* Font Size Definitions */
+  .text-mobileHero {
+    font-size: clamp(64px, calc(1rem + 3.81vmin), 64px);
+    line-height: 1;
+  }
+  .text-desktopHero {
+    font-size: clamp(88px, calc(1rem + 6.19vmin), 120px);
+    line-height: 1;
+  }
+  .text-mobileH1 {
+    font-size: 32px;
+    line-height: 36px;
+  }
+  .text-desktopH1 {
+    font-size: 56px;
+    line-height: 64px;
+  }
+  .text-mobileH2 {
+    font-size: 28px;
+    line-height: 32px;
+  }
+  .text-desktopH2 {
+    font-size: 48px;
+    line-height: 52px;
+  }
+  .text-mobileH3 {
+    font-size: 26px;
+    line-height: 28px;
+  }
+  .text-desktopH3 {
+    font-size: 40px;
+    line-height: 44px;
+  }
+  .text-mobileH4 {
+    font-size: 24px;
+    line-height: 28px;
+  }
+  .text-desktopH4 {
+    font-size: 32px;
+    line-height: 40px;
+  }
+  .text-mobileH5 {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .text-desktopH5 {
+    font-size: 21px;
+    line-height: 24px;
+  }
+  .text-mobileH6 {
+    font-size: 16px;
+    line-height: 20px;
+  }
+  .text-desktopH6 {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .text-mobileTitle {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .text-desktopTitle {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .text-mobileBody1 {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .text-desktopBody1 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+  .text-mobileBody2 {
+    font-size: 17px;
+    line-height: 24px;
+  }
+  .text-desktopBody2 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .text-mobileBody3 {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .text-desktopBody3 {
+    font-size: 18px;
+    line-height: 28px;
+  }
+  .text-mobileBody4 {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .text-desktopBody4 {
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .text-mobileCallout {
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .text-desktopCallout {
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .text-mobileTag1 {
+    font-size: 10px;
+    line-height: 12px;
+  }
+  .text-desktopTag1 {
+    font-size: 13px;
+    line-height: 16px;
+  }
+  .text-mobileTag2 {
+    font-size: 8px;
+    line-height: 10px;
+  }
+  .text-desktopTag2 {
+    font-size: 8px;
+    line-height: 10px;
+  }
+
+  /* Component Classes */
+  .text-hero {
+    @apply text-mobileHero flounder:text-desktopHero font-display font-bold flounder:tracking-wide;
+  }
+  .text-h1,
+  .bbn-h1 {
+    @apply text-mobileH1 flounder:text-desktopH1 font-display font-extrabold;
+  }
+  .text-h2,
+  .bbn-h2 {
+    @apply text-mobileH2 flounder:text-desktopH2 font-display font-extrabold;
+  }
+  .text-h3,
+  .bbn-h3 {
+    @apply text-mobileH3 flounder:text-desktopH3 font-display font-extrabold;
+  }
+  .text-h4,
+  .bbn-h4 {
+    @apply text-mobileH4 flounder:text-desktopH4 font-display font-bold;
+  }
+  .text-h5,
+  .bbn-h5 {
+    @apply text-mobileH5 flounder:text-desktopH5 font-display font-bold;
+  }
+  .text-h6 {
+    @apply text-mobileH6 flounder:text-desktopH6 font-display font-bold;
+  }
+
+  .text-title {
+    @apply text-mobileTitle flounder:text-desktopTitle font-sans font-bold;
+  }
+  .text-body1 {
+    @apply text-mobileBody1 flounder:text-desktopBody1;
+  }
+  .text-body2 {
+    @apply text-mobileBody2 flounder:text-desktopBody2;
+  }
+  .text-body3 {
+    @apply text-mobileBody3 flounder:text-desktopBody3;
+  }
+  .text-body4 {
+    @apply text-mobileBody4 flounder:text-desktopBody4;
+  }
+
+  .text-callout,
+  .text-sm {
+    @apply text-mobileCallout flounder:text-desktopCallout font-mono;
+  }
+  .text-tag1 {
+    letter-spacing: 0.145em;
+    @apply text-mobileTag1 flounder:text-desktopTag1 font-display font-bold uppercase;
+  }
+  .text-tag2 {
+    letter-spacing: 0.1em;
+    @apply text-mobileTag2 flounder:text-desktopTag2 font-display font-bold uppercase;
+  }
+  .text-withLink {
+    a {
+      @apply underline underline-offset-2 hover:no-underline;
+    }
+  }
+  .rich-text {
+    @apply text-body3 text-balance font-sans text-itemPrimaryDefault;
+
+    h1 {
+      @apply text-h1;
+    }
+    h2 {
+      @apply text-h2 max-w-3xl;
+    }
+    h3 {
+      @apply text-h3 flounder:mt-18 mt-15 flounder:mb-15 mb-8 max-w-3xl;
+    }
+    h4 {
+      @apply text-h4 flounder:mt-15 mb-6 mt-8 flounder:mb-10;
+    }
+    h5 {
+      @apply text-h5 mb-4 mt-10 flounder:mb-6 flounder:mt-12;
+    }
+    h6 {
+      @apply text-h6 mb-4 mt-6 flounder:mb-6 flounder:mt-8;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      &:first-child {
+        margin-top: 0 !important;
+      }
+    }
+
+    a {
+      @apply underline underline-offset-2 hover:no-underline;
+    }
+
+    p,
+    ol,
+    ul {
+      + p,
+      + ol,
+      + ul {
+        @apply mt-3 flounder:mt-4;
+      }
+    }
+
+    ol {
+      @apply space-y-4 pl-5 flounder:pl-5;
+      list-style: lower-alpha;
+
+      li {
+        @apply pl-2 flounder:pl-7;
+      }
+    }
+
+    ul {
+      @apply flounder:pl-15 list-disc space-y-4 pl-8;
+    }
+
+    strong,
+    b {
+      @apply font-semibold;
+    }
+
+    table {
+      @apply mb-10 mt-4 font-mono font-medium;
+
+      thead + tbody tr:first-child td {
+        @apply pt-11 flounder:pt-14;
+      }
+
+      th {
+        @apply border-b border-b-itemPrimaryMute py-6 text-left flounder:py-8;
+      }
+
+      td {
+        @apply border-b border-b-itemPrimaryMute py-6 pr-4 align-baseline first:text-itemSecondaryDefault flounder:min-w-40;
+      }
+    }
+
+    .wide-table {
+      min-width: 991px;
+      @apply font-sans;
+
+      td:first-child {
+        color: inherit;
+      }
+    }
+
+    .highlighted-text {
+      @apply text-body2 my-4 bg-backgroundSecondaryDefault p-8 font-mono flounder:my-10 flounder:p-16;
+    }
+  }
+}
+.font-feature-number {
+  font-feature-settings: "tnum";
+}
+.clear-inline-indents {
+  font-size: 0px;
+}
+.text-marker {
+  background-color: rgb(var(--color-brandDefault));
+  padding-inline: 2px;
+}
