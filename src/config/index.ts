@@ -33,7 +33,9 @@ export const BBN_GAS_PRICE = (() => {
   return price;
 })();
 
-export const PROD_ENVS = ["mainnet", "phase-2-mainnet"];
+// PROD_ENVS defines production environments from CI matrix in GitHub workflows
+// These values match the environment names in the CI matrix configuration
+export const PROD_ENVS = ["phase-2-mainnet"];
 
 export const isProductionEnv = (): boolean => {
   const env = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "";
