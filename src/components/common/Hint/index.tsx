@@ -1,7 +1,8 @@
 import { useId, type PropsWithChildren, type ReactNode } from "react";
-import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 import { twJoin } from "tailwind-merge";
+
+import { Icon } from "@/ui";
 
 type HintStatus = "default" | "warning" | "error";
 
@@ -10,6 +11,7 @@ interface HintProps {
   status?: HintStatus;
   /** Attach tooltip to children instead of showing separate icon */
   attachToChildren?: boolean;
+  wrapperClassName?: string;
 }
 
 const STATUS_COLORS = {
@@ -29,20 +31,33 @@ export function Hint({
   tooltip,
   status = "default",
   attachToChildren = false,
+  wrapperClassName,
 }: PropsWithChildren<HintProps>) {
   const id = useId();
   const statusColor = STATUS_COLORS[status];
 
   if (!tooltip) {
     return (
-      <div className={twJoin("inline-flex items-center gap-1", statusColor)}>
+      <div
+        className={twJoin(
+          "inline-flex items-center gap-1",
+          statusColor,
+          wrapperClassName,
+        )}
+      >
         {children}
       </div>
     );
   }
 
   return (
-    <div className={twJoin("inline-flex items-center gap-1", statusColor)}>
+    <div
+      className={twJoin(
+        "inline-flex items-center gap-1",
+        statusColor,
+        wrapperClassName,
+      )}
+    >
       {attachToChildren ? (
         <span
           className="cursor-pointer"
@@ -57,6 +72,7 @@ export function Hint({
       ) : (
         <>
           {children}
+
           <span
             className={twJoin("cursor-pointer text-xs", statusColor)}
             data-tooltip-id={id}
@@ -65,7 +81,11 @@ export function Hint({
             }
             data-tooltip-place="top"
           >
-            <AiOutlineInfoCircle size={16} className={ICON_COLOR[status]} />
+            <Icon
+              iconKey="infoCircle"
+              size={14}
+              className={ICON_COLOR[status]}
+            />
           </span>
         </>
       )}

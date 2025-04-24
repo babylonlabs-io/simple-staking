@@ -1,10 +1,10 @@
-import { Loader } from "@babylonlabs-io/core-ui";
 import { useId } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { twJoin, twMerge } from "tailwind-merge";
 
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
+import { LoadingIcon } from "@/ui";
 
 import { GridCell } from "./components/TCell";
 import { GridHead } from "./components/THead";
@@ -39,9 +39,8 @@ export function GridTable<R extends object, P extends object = {}>({
   if (loading) {
     return (
       <StatusView
-        className="flex-1 h-auto"
-        icon={<Loader className="text-primary-light" />}
-        title="Please wait..."
+        className="flex-1 h-auto py-[10vh]"
+        icon={<LoadingIcon size="tilapia" />}
       />
     );
   }

@@ -4,7 +4,6 @@ import {
   DialogFooter,
   DialogHeader,
   Heading,
-  Loader,
   Radio,
   Text,
 } from "@babylonlabs-io/core-ui";
@@ -14,6 +13,7 @@ import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useStakingState } from "@/app/state/StakingState";
+import { LoadingIcon } from "@/ui";
 
 import { CustomLabel } from "./components/CustomLabel";
 import { Label } from "./components/Label";
@@ -131,8 +131,7 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
         {isLoading ? (
           <StatusView
             className="flex-1 h-auto"
-            icon={<Loader className="text-accent-primary" />}
-            title="Please wait..."
+            icon={<LoadingIcon size="tilapia" />}
           />
         ) : (
           <>

@@ -1,11 +1,11 @@
 import {
-  Button,
   DialogBody,
   DialogFooter,
   DialogHeader,
-  Loader,
 } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
+
+import { Button, cx, LoadingIcon } from "@/ui";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -27,7 +27,11 @@ export const ConfirmationModal = ({
   onClose,
   onSubmit,
 }: PropsWithChildren<ConfirmationModalProps>) => (
-  <ResponsiveDialog className={className} open={open} onClose={onClose}>
+  <ResponsiveDialog
+    className={cx("flounder:w-[440px]", className)}
+    open={open}
+    onClose={onClose}
+  >
     <DialogHeader
       title={title}
       className="text-accent-primary"
@@ -38,25 +42,20 @@ export const ConfirmationModal = ({
 
     <DialogFooter className="flex gap-4">
       <Button
-        variant="outlined"
+        variant="outline"
         color="primary"
         onClick={onClose}
-        className="flex-1"
+        className="flex-1 w-full"
       >
         Cancel
       </Button>
 
       <Button
         disabled={processing}
-        variant="contained"
         onClick={onSubmit}
-        className="flex-1"
+        className="flex-1 w-full"
       >
-        {processing ? (
-          <Loader size={16} className="text-accent-contrast" />
-        ) : (
-          "Proceed"
-        )}
+        {processing ? <LoadingIcon size="trout" /> : "Proceed"}
       </Button>
     </DialogFooter>
   </ResponsiveDialog>

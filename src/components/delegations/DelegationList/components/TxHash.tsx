@@ -15,7 +15,7 @@ export function TxHash({ value }: TxHashProps) {
       href={`${mempoolApiUrl}/tx/${value}`}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-accent-primary hover:underline"
+      className="text-accent-primary hover:underline text-callout leading-tight"
     >
       {trim(value) ?? value}
     </a>

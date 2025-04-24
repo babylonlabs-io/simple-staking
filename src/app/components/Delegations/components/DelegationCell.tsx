@@ -11,7 +11,7 @@ export const DelegationCell: React.FC<DelegationCellProps> = ({
 }) => (
   <td
     className={twMerge(
-      "h-16 px-4 whitespace-nowrap overflow-hidden text-ellipsis",
+      "whitespace-nowrap text-ellipsis app-table-col table-cell",
       className,
     )}
   >

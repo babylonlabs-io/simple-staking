@@ -1,16 +1,14 @@
-import { Card } from "@babylonlabs-io/core-ui";
+import { Card, Heading } from "@babylonlabs-io/core-ui";
 
 import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
-import { AuthGuard } from "@/components/common/AuthGuard";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/config/network";
-import { Box } from "@/ui";
 
 import { ActionButton } from "./components/ActionButton";
 import { Amount } from "./components/Amount";
@@ -18,7 +16,6 @@ import { DelegationModal } from "./components/DelegationModal";
 import { Inception } from "./components/Inception";
 import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
-import { DisconectedPrompt } from "./DisconnectedPrompt";
 import { NoDelegations } from "./NoDelegations";
 
 type TableParams = {
@@ -101,53 +98,44 @@ export function DelegationList() {
   } = useDelegationService();
 
   return (
-    <Card className="p-0">
-      <div className="-m-px">
-        <Box className="app-table-header-row">
-          <div className="app-table-header-col w-full bg-backgroundSecondaryDefault">
-            {networkConfig.bbn.networkFullName} Stakes
-          </div>
-        </Box>
+    <Card>
+      <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+        {networkConfig.bbn.networkFullName} Stakes
+      </Heading>
 
-        <GridTable
-          getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-          columns={columns}
-          data={delegations}
-          loading={isLoading}
-          isFetchingNextPage={isFetchingNextPage}
-          infiniteScroll={hasMoreDelegations}
-          onInfiniteScroll={fetchMoreDelegations}
-          classNames={{
-            headerRowClassName: "text-accent-primary app-table-header-row",
-            headerCellClassName:
-              "text-left app-table-header-col border-b border-b-itemSecondaryDefault",
-            rowClassName: "group app-table-row text-itemPrimaryDefault",
-            wrapperClassName: "max-h-[25rem] overflow-x-auto",
-            bodyClassName: "min-w-[1000px]",
-            cellClassName:
-              "app-table-col leading-none flex items-center justify-start text-itemPrimaryDefault",
-          }}
-          params={{
-            handleActionClick: openConfirmationModal,
-            validations,
-          }}
-          fallback={
-            <AuthGuard fallback={<DisconectedPrompt />}>
-              <NoDelegations />
-            </AuthGuard>
-          }
-        />
+      <GridTable
+        getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
+        columns={columns}
+        data={delegations}
+        loading={isLoading}
+        isFetchingNextPage={isFetchingNextPage}
+        infiniteScroll={hasMoreDelegations}
+        onInfiniteScroll={fetchMoreDelegations}
+        classNames={{
+          headerRowClassName: "text-accent-primary text-xs",
+          headerCellClassName: "p-4 text-align-left text-accent-secondary",
+          rowClassName: "group",
+          wrapperClassName: "max-h-[25rem] overflow-x-auto",
+          bodyClassName: "min-w-[1000px]",
+          cellClassName:
+            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
+        }}
+        params={{
+          handleActionClick: openConfirmationModal,
+          validations,
+        }}
+        fallback={<NoDelegations />}
+      />
 
-        <DelegationModal
-          action={confirmationModal?.action}
-          delegation={confirmationModal?.delegation ?? null}
-          param={confirmationModal?.param ?? null}
-          processing={processing}
-          onSubmit={executeDelegationAction}
-          onClose={closeConfirmationModal}
-          networkConfig={networkConfig}
-        />
-      </div>
+      <DelegationModal
+        action={confirmationModal?.action}
+        delegation={confirmationModal?.delegation ?? null}
+        param={confirmationModal?.param ?? null}
+        processing={processing}
+        onSubmit={executeDelegationAction}
+        onClose={closeConfirmationModal}
+        networkConfig={networkConfig}
+      />
     </Card>
   );
 }

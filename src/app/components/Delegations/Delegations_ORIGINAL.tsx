@@ -1,4 +1,4 @@
-import { Card } from "@babylonlabs-io/core-ui";
+import { Card, Heading } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
@@ -26,7 +26,6 @@ import {
   DelegationState,
 } from "@/app/types/delegations";
 import { ErrorType } from "@/app/types/errors";
-import { Box } from "@/ui";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
@@ -319,74 +318,70 @@ export const Delegations = ({}) => {
   return (
     <>
       {combinedDelegationsData.length !== 0 && (
-        <Card className="mb-6 p-0">
-          <div className="-m-px">
-            <Box className="app-table-header-row">
-              <div className="app-table-header-col w-full bg-backgroundSecondaryDefault">
-                Pending Registration
-              </div>
-            </Box>
+        <Card className="mb-6">
+          <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+            Pending Registration
+          </Heading>
 
-            <InfiniteScroll
-              className="no-scrollbar max-h-[25rem] overflow-auto"
-              dataLength={combinedDelegationsData.length}
-              next={fetchMoreDelegations}
-              hasMore={hasMoreDelegations}
-              loader={isLoading ? <LoadingTableList /> : null}
-            >
-              <table className="w-full min-w-[1000px]">
-                <thead className="sticky top-0 bg-surface">
-                  <tr className="app-table-header-row w-full table-row">
-                    <th className="text-left md:min-w-52 app-table-header-col table-cell">
-                      Inception
-                    </th>
-                    <th className="text-left app-table-header-col table-cell">
-                      Finality Provider
-                    </th>
-                    <th className="text-left app-table-header-col table-cell">
-                      Amount
-                    </th>
-                    <th className="text-left app-table-header-col table-cell">
-                      Transaction ID
-                    </th>
-                    <th className="text-left app-table-header-col table-cell">
-                      Status
-                    </th>
-                    <th className="text-left app-table-header-col table-cell">
-                      Action
-                    </th>
-                  </tr>
-                </thead>
+          <InfiniteScroll
+            className="no-scrollbar max-h-[25rem] overflow-auto"
+            dataLength={combinedDelegationsData.length}
+            next={fetchMoreDelegations}
+            hasMore={hasMoreDelegations}
+            loader={isLoading ? <LoadingTableList /> : null}
+          >
+            <table className="w-full min-w-[1000px]">
+              <thead className="sticky top-0 bg-surface">
+                <tr className="text-accent-secondary text-xs">
+                  <th className="text-left h-[52px] md:min-w-52 px-4 whitespace-nowrap font-normal">
+                    Inception
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Finality Provider
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Amount
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Transaction ID
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Status
+                  </th>
+                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                    Action
+                  </th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  {combinedDelegationsData?.map((delegation) => {
-                    if (!delegation) return null;
-                    const { stakingTx, stakingTxHashHex } = delegation;
-                    const intermediateDelegation =
-                      intermediateDelegationsLocalStorage.find(
-                        (item) => item.stakingTxHashHex === stakingTxHashHex,
-                      );
-
-                    return (
-                      <Delegation
-                        currentTime={currentTime}
-                        key={stakingTxHashHex + stakingTx.startHeight}
-                        delegation={delegation}
-                        onWithdraw={() =>
-                          handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                        }
-                        onRegistration={onRegistration}
-                        onUnbond={() =>
-                          handleModal(stakingTxHashHex, MODE_UNBOND)
-                        }
-                        intermediateState={intermediateDelegation?.state}
-                      />
+              <tbody>
+                {combinedDelegationsData?.map((delegation) => {
+                  if (!delegation) return null;
+                  const { stakingTx, stakingTxHashHex } = delegation;
+                  const intermediateDelegation =
+                    intermediateDelegationsLocalStorage.find(
+                      (item) => item.stakingTxHashHex === stakingTxHashHex,
                     );
-                  })}
-                </tbody>
-              </table>
-            </InfiniteScroll>
-          </div>
+
+                  return (
+                    <Delegation
+                      currentTime={currentTime}
+                      key={stakingTxHashHex + stakingTx.startHeight}
+                      delegation={delegation}
+                      onWithdraw={() =>
+                        handleModal(stakingTxHashHex, MODE_WITHDRAW)
+                      }
+                      onRegistration={onRegistration}
+                      onUnbond={() =>
+                        handleModal(stakingTxHashHex, MODE_UNBOND)
+                      }
+                      intermediateState={intermediateDelegation?.state}
+                    />
+                  );
+                })}
+              </tbody>
+            </table>
+          </InfiniteScroll>
         </Card>
       )}
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (

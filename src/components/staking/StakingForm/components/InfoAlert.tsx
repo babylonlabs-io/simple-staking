@@ -1,9 +1,8 @@
-import { Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
-import { MdErrorOutline } from "react-icons/md";
 
 import { InfoModal } from "@/app/components/Modals/InfoModal";
 import { useStakingState } from "@/app/state/StakingState";
+import { AlertBox, Button } from "@/ui";
 import { blocksToDisplayTime } from "@/utils/time";
 
 export function InfoAlert() {
@@ -11,29 +10,35 @@ export function InfoAlert() {
   const { stakingInfo } = useStakingState();
 
   return (
-    <div className="rounded bg-secondary-highlight flex flex-row items-start justify-between py-2 px-4">
-      <div className="py-2 pr-3">
-        <MdErrorOutline size={22} className="text-secondary-strokeDark" />
-      </div>
+    <AlertBox
+      className="flex flex-row items-start justify-between"
+      variant="neutral"
+      showIcon={false}
+      customizedContent={
+        <>
+          <div className="flex flex-col gap-1 grow">
+            <h5 className="text-[16px] font-semibold font-mono">Please note</h5>
+            <p className="text-callout font-mono text-pretty text-itemSecondaryDefault">
+              You can unbond and withdraw your stake anytime with an unbonding
+              time of {blocksToDisplayTime(stakingInfo?.unbondingTime)}.
+            </p>
+            <div className="mt-2">
+              <Button
+                size="sm"
+                variant="text"
+                color="secondary"
+                rel="noopener noreferrer"
+                className="cursor-pointer text-secondary-main/90 hover:text-secondary-main normal-case w-auto font-normal"
+                onClick={() => setShowMore(true)}
+              >
+                Learn More
+              </Button>
+            </div>
+          </div>
 
-      <div className="flex flex-col gap-1 grow">
-        <Text variant="subtitle1" className="font-medium text-accent-primary">
-          Info
-        </Text>
-        <Text variant="body1" className="text-accent-secondary">
-          You can unbond and withdraw your stake anytime with an unbonding time
-          of {blocksToDisplayTime(stakingInfo?.unbondingTime)}.
-        </Text>{" "}
-        <a
-          rel="noopener noreferrer"
-          className="cursor-pointer text-secondary-main/90 hover:text-secondary-main"
-          onClick={() => setShowMore(true)}
-        >
-          Learn More
-        </a>
-      </div>
-
-      <InfoModal open={showMore} onClose={() => setShowMore(false)} />
-    </div>
+          <InfoModal open={showMore} onClose={() => setShowMore(false)} />
+        </>
+      }
+    ></AlertBox>
   );
 }

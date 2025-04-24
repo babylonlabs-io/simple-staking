@@ -8,7 +8,6 @@ import { WEBSITE_URL } from "@/utils/stakefish";
 
 import { DashboardLabel } from "./DashboardLabel";
 import { NetworkDropdown } from "./NetworkDropdown";
-import { StakeButton } from "./StakeButton";
 import { ThemeToggler } from "./ThemeToggler";
 
 export const Header = () => {
@@ -24,7 +23,7 @@ export const Header = () => {
   const actionContent = (
     <div className="flex items-center gap-2">
       <div className="flex items-center justify-center gap-2">
-        <StakeButton className="text-desktopCallout flounder:text-desktopCallout flounder:hidden" />
+        {/* <StakeButton className="text-desktopCallout flounder:text-desktopCallout flounder:hidden" /> */}
         <ThemeToggler
           buttonProps={{
             variant: "outline",

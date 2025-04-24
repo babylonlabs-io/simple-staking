@@ -1,17 +1,9 @@
-import {
-  Button,
-  DialogBody,
-  DialogFooter,
-  Heading,
-  Text,
-} from "@babylonlabs-io/core-ui";
-import Image from "next/image";
+import { DialogBody, DialogFooter } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
-import { FiCheck, FiCopy } from "react-icons/fi";
 
-import WarningTriangle from "@/app/assets/warning-triangle.svg";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ErrorType, ShowErrorParams } from "@/app/types/errors";
+import { Box, Button, Icon } from "@/ui";
 import { getCommitHash } from "@/utils/version";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
@@ -98,37 +90,38 @@ export const ErrorModal: React.FC = () => {
 
   return (
     <ResponsiveDialog
-      className="z-[150]"
+      className="z-[150] flounder:w-[440px]"
       backdropClassName="z-[100]"
       open={isOpen}
       onClose={dismissError}
     >
-      <DialogBody className="text-accent-primary py-16 text-center">
-        <div className="inline-flex bg-primary-contrast h-20 w-20 items-center justify-center mb-6">
-          <Image src={WarningTriangle} alt="Warning" width={48} height={42} />
-        </div>
+      <DialogBody className="text-accent-primary py-6 mb-4 text-center">
+        <Box flex alignItems="center" justifyContent="center" className="mb-2">
+          <Icon
+            iconKey="warning"
+            className="text-backgroundErrorOnDefault"
+            size={20}
+          />
+        </Box>
 
-        <Heading variant="h4" className="mb-4 text-accent-primary">
-          {getErrorTitle()}
-        </Heading>
+        <h4 className="mb-2 font-sans font-bold text-h5"> {getErrorTitle()}</h4>
 
         <div className="flex flex-col gap-3">
-          <Text variant="body1" className="text-center text-accent-secondary">
+          <p className="font-medium text-callout text-itemSecondaryDefault text-pretty">
             {getErrorMessage()}
-          </Text>
+          </p>
 
           <div className="flex items-center justify-center gap-4 mt-2">
-            <button
-              className="flex items-center gap-1 text-sm text-accent-secondary hover:opacity-70"
+            <Button
+              variant="primary"
+              color="transparent"
+              size="sm"
+              className="flex items-center gap-1 hover:opacity-70 normal-case no-underline"
+              startIcon={{ iconKey: copied ? "check" : "copy", size: 14 }}
               onClick={copyErrorDetails}
             >
-              {copied ? (
-                <FiCheck className="w-4 h-4" />
-              ) : (
-                <FiCopy className="w-4 h-4" />
-              )}
               <span>{copied ? "Copied!" : "Copy error details"}</span>
-            </button>
+            </Button>
           </div>
         </div>
       </DialogBody>
@@ -136,16 +129,15 @@ export const ErrorModal: React.FC = () => {
       <DialogFooter className="flex gap-4">
         {!noCancel && ( // Only show the cancel button if noCancel is false or undefined
           <Button
-            variant="outlined"
-            fluid
-            className="px-2"
+            variant="outline"
+            className="px-2 w-full"
             onClick={dismissError}
           >
             Cancel
           </Button>
         )}
         {retryAction && (
-          <Button className="px-2" fluid onClick={handleRetry}>
+          <Button className="px-2 w-full" onClick={handleRetry}>
             Try Again
           </Button>
         )}

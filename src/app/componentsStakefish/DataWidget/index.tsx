@@ -21,7 +21,7 @@ export const DataWidget = ({ sections, label }: StatsSectionsProps) => {
   return (
     <div className="relative w-full">
       {label && (
-        <div className="w-full uppercase bg-backgroundSecondaryDefault text-neutral70 text-[12px] px-4 border-t border-itemSecondaryMute perch:border-none perch:px-1 perch:absolute perch:w-auto top-2 right-2">
+        <div className="w-full font-medium uppercase bg-backgroundSecondaryDefault text-neutral70 text-[12px] px-4 border-t border-itemSecondaryMute perch:border-none perch:px-1 perch:absolute perch:w-auto top-2 right-2">
           {label}
         </div>
       )}
@@ -31,8 +31,8 @@ export const DataWidget = ({ sections, label }: StatsSectionsProps) => {
             <div
               key={index}
               className={cx(
-                "flex justify-between border p-4 border-itemPrimaryMute gap-2",
-                index !== 0 ? "-mt-px" : "",
+                "flex justify-between border border-itemPrimaryMute gap-1.5 px-4",
+                index !== 0 ? "-mt-px py-[9px]" : "py-3.5",
                 index % 2 === 1 ? "-mr-px" : "",
                 s.className,
               )}

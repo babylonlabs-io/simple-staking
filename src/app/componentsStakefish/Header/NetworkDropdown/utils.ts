@@ -5,11 +5,11 @@ import { WEBSITE_URL } from "@/utils/stakefish";
 
 export const ProtocolVariants = ["ethereum", "babylon"] as const;
 export const ChainIdVariants = [1, 560048] as const;
+export const ExtendedNetworks = ["Babylon"];
 
 export type ProtocolVariant = (typeof ProtocolVariants)[number];
 export type ChainIdVariant = (typeof ChainIdVariants)[number];
 export type ChainType = (typeof ChainIdVariants)[number] | ExtendedNetworksType;
-export type TabNameType = keyof typeof mappedNames;
 export type ExtendedNetworksType = (typeof ExtendedNetworks)[number];
 export type DashboardNavs = Record<ProtocolVariant, DashboardNavItem>;
 export type DashboardNavItem = {
@@ -18,7 +18,6 @@ export type DashboardNavItem = {
   link: string;
 };
 
-export const ExtendedNetworks = ["Babylon"];
 const { network } = getNetworkConfigBTC();
 
 export const dashboardNavs: DashboardNavs = {
@@ -33,9 +32,3 @@ export const dashboardNavs: DashboardNavs = {
     link: `https://babylon${network === Network.MAINNET ? "" : "-testnet"}.stake.fish`,
   },
 };
-
-export const mappedNames = {
-  Mainnet: "Ethereum",
-  Hoodi: "Hoodi",
-  Babylon: "Babylon",
-} as const;

@@ -1,4 +1,4 @@
-import { Button, Popover, Text } from "@babylonlabs-io/core-ui";
+import { Popover } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
@@ -8,6 +8,16 @@ import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { DelegationState } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { Button, ButtonProps } from "@/ui";
+
+const sharedButtonProps: ButtonProps = {
+  application: true,
+  variant: "text",
+  size: "sm",
+  color: "primary",
+  className:
+    "block normal-case font-normal !p-2 -my-2.5 !-mx-2 tracking-normal underline-offset-1",
+};
 
 interface DelegationActionsProps {
   state: string;
@@ -74,11 +84,9 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     intermediateState !== DelegationState.INTERMEDIATE_WITHDRAWAL
   ) {
     return (
-      <div className="flex justify-start">
+      <div className="flex justify-start -my-2">
         <Button
-          variant="outlined"
-          size="small"
-          color="primary"
+          {...sharedButtonProps}
           onClick={() => onWithdraw(stakingTxHashHex)}
           disabled={
             intermediateState === DelegationState.INTERMEDIATE_WITHDRAWAL
@@ -96,11 +104,9 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     intermediateState !== DelegationState.INTERMEDIATE_WITHDRAWAL
   ) {
     return (
-      <div className="flex justify-start">
+      <div className="flex justify-start -my-2">
         <Button
-          variant="outlined"
-          size="small"
-          color="primary"
+          {...sharedButtonProps}
           onClick={() => onUnbond(stakingTxHashHex)}
         >
           Unbond
@@ -113,15 +119,13 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   if (state === DelegationState.ACTIVE || isEligibleForRegistration) {
     return (
       <div
-        className="flex justify-start"
+        className="flex justify-start -my-2"
         data-tooltip-id="tooltip-registration"
         data-tooltip-html={getDelegationTooltip()}
       >
         <div className="flex items-center gap-1">
           <Button
-            variant="outlined"
-            size="small"
-            color="primary"
+            {...sharedButtonProps}
             onClick={onRegistration}
             disabled={
               intermediateState ===
@@ -146,7 +150,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           onClick={() => setIsPopoverOpen(!isPopoverOpen)}
           className="ml-1 py-2 px-0 hover:bg-secondary-highlight rounded"
         >
-          <IoMdMore className="h-6 w-6" />
+          <IoMdMore className="size-4" />
         </button>
 
         <Popover
@@ -156,9 +160,10 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           onClickOutside={() => setIsPopoverOpen(false)}
           className="bg-surface p-4 rounded border border-secondary-strokeLight w-48 shadow-md"
         >
-          <Text
-            variant="body2"
-            as="button"
+          <Button
+            variant="menuItem"
+            size="xs"
+            application
             onClick={() => {
               onUnbond(stakingTxHashHex);
               setIsPopoverOpen(false);
@@ -166,7 +171,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             className="text-accent-primary transition-all hover:brightness-125"
           >
             Unbond
-          </Text>
+          </Button>
         </Popover>
       </div>
     );

@@ -45,7 +45,7 @@ export const Tooltip = ({
   const [isOpen, setOpen] = useState(open || false);
 
   return (
-    <TooltipProvider delayDuration={delayDuration ?? 0} skipDelayDuration={0}>
+    <TooltipProvider delayDuration={200} skipDelayDuration={0}>
       <TooltipRoot
         delayDuration={delayDuration ?? 0}
         open={isOpen}
@@ -88,7 +88,7 @@ export const Tooltip = ({
             {...contentProps}
             className={cx(
               "animate-in data-[state=closed]:animate-out",
-              "z-50 font-medium font-sans bg-neutral0 px-4 py-2.5 !text-callout text-neutral90 max-w-64 relative",
+              "z-50 font-medium font-mono bg-neutral0 px-4 py-2.5 !text-callout text-neutral90 max-w-64 relative",
               contentProps?.className,
               className,
             )}

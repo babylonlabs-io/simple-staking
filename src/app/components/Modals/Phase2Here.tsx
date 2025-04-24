@@ -1,15 +1,11 @@
-import {
-  Button,
-  DialogBody,
-  DialogFooter,
-  Heading,
-} from "@babylonlabs-io/core-ui";
+import { Button, DialogBody, DialogFooter } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren, useState } from "react";
 import { MdCelebration } from "react-icons/md";
 
 import { shouldDisplayTestingMsg } from "@/config";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { cx } from "@/ui";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -28,15 +24,18 @@ export const Phase2HereModal = ({
 
   return (
     <ResponsiveDialog
-      className={className}
+      className={cx(className, "flounder:w-[440px]")}
       open={showPhase2HereModal}
       onClose={() => setShowPhase2HereModal(false)}
     >
-      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 text-center items-center justify-center">
-        <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
+      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-2 text-center items-center justify-center">
+        <div className="h-20 w-20 flex items-center justify-center">
           <MdCelebration className="text-5xl text-primary-light" />
         </div>
-        <Heading variant="h4">{bbnNetworkFullName} is here!</Heading>
+        <h4 className="mb-2 font-sans font-bold text-h5">
+          {bbnNetworkFullName} is here!
+        </h4>
+
         <p className="text-base">
           The {bbnNetworkFullName} blockchain has launched, signalling the start
           of the new phase of Babylon {btcCoinSymbol} Staking protocol.{" "}

@@ -112,7 +112,6 @@ export function PersonalBalance() {
         isLoading: rewardLoading,
       },
       className: "flex-col whaleShark:flex-row",
-      // TODO: style modal
       button: formattedRewardBalance ? (
         <ActionComponent
           className="h-6"

@@ -2,11 +2,11 @@ import {
   Button,
   DialogBody,
   DialogFooter,
-  Heading,
   Loader,
-  Text,
 } from "@babylonlabs-io/core-ui";
 import type { JSX, PropsWithChildren } from "react";
+
+import { cx } from "@/ui";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
@@ -41,17 +41,20 @@ export const SubmitModal = ({
   onClose,
   onSubmit,
 }: PropsWithChildren<SubmitModalProps>) => (
-  <ResponsiveDialog className={className} open={open} onClose={onClose}>
-    <DialogBody className="text-accent-primary py-16 text-center">
-      <div className="inline-flex bg-primary-contrast h-20 w-20 items-center justify-center mb-6">
+  <ResponsiveDialog
+    className={cx("flounder:w-[440px]", className)}
+    open={open}
+    onClose={onClose}
+  >
+    <DialogBody className="text-accent-primary py-6 mb-4 text-center">
+      <div className="inline-flex bg-primary-contrast items-center justify-center size-7">
         {icon}
       </div>
 
-      <Heading variant="h4" className="mb-4">
-        {title}
-      </Heading>
-
-      <Text as="div">{children}</Text>
+      <h4 className="mb-2 font-sans font-bold text-h5">{title}</h4>
+      <div className="font-medium text-callout text-itemSecondaryDefault text-pretty">
+        {children}
+      </div>
     </DialogBody>
 
     <DialogFooter className="flex gap-4">
