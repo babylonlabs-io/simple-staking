@@ -1,3 +1,5 @@
+import { Network } from "@/app/types/network";
+import { getNetworkConfigBTC } from "@/config/network/btc";
 import { IconKeyVariant } from "@/ui";
 import { WEBSITE_URL } from "@/utils/stakefish";
 
@@ -16,6 +18,8 @@ export type DashboardNavItem = {
   link: string;
 };
 
+const { network } = getNetworkConfigBTC();
+
 export const dashboardNavs: DashboardNavs = {
   ethereum: {
     displayName: "Ethereum",
@@ -25,6 +29,6 @@ export const dashboardNavs: DashboardNavs = {
   babylon: {
     displayName: "Babylon",
     logo: "babylonLogo",
-    link: `/`,
+    link: `https://babylon${network === Network.MAINNET ? "" : "-testnet"}.stake.fish`,
   },
 };
