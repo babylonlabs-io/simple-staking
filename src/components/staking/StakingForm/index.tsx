@@ -1,4 +1,4 @@
-import { HiddenField, Loader } from "@babylonlabs-io/core-ui";
+import { HiddenField } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
@@ -11,6 +11,7 @@ import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { LoadingIcon } from "@/ui";
 
 import { AmountField } from "./components/AmountField";
 import { BBNFeeAmount } from "./components/BBNFeeAmount";
@@ -59,8 +60,7 @@ export function DelegationForm({
     return (
       <StatusView
         className="flex-1 h-auto"
-        icon={<Loader className="text-primary-light" />}
-        title="Please wait..."
+        icon={<LoadingIcon size="tilapia" />}
       />
     );
   }

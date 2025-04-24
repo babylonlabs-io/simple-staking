@@ -1,3 +1,5 @@
+import { Card } from "@babylonlabs-io/core-ui";
+
 import {
   ActionType,
   useDelegationService,
@@ -99,49 +101,53 @@ export function DelegationList() {
   } = useDelegationService();
 
   return (
-    <Box>
-      <h4 className="font-semibold text-h6 text-pretty font-mono py-2 mb-4">
-        {networkConfig.bbn.networkFullName} Stakes
-      </h4>
+    <Card className="p-0">
+      <div className="-m-px">
+        <Box className="app-table-header-row">
+          <div className="app-table-header-col w-full bg-backgroundSecondaryDefault">
+            {networkConfig.bbn.networkFullName} Stakes
+          </div>
+        </Box>
 
-      <GridTable
-        getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
-        columns={columns}
-        data={delegations}
-        loading={isLoading}
-        isFetchingNextPage={isFetchingNextPage}
-        infiniteScroll={hasMoreDelegations}
-        onInfiniteScroll={fetchMoreDelegations}
-        classNames={{
-          headerRowClassName: "text-accent-primary app-table-header-row",
-          headerCellClassName:
-            "text-left app-table-header-col border-b border-b-itemPrimaryDefault",
-          rowClassName: "group app-table-row text-itemPrimaryDefault",
-          wrapperClassName: "max-h-[25rem] overflow-x-auto",
-          bodyClassName: "min-w-[1000px]",
-          cellClassName:
-            "app-table-col leading-none flex items-center justify-start text-itemPrimaryDefault",
-        }}
-        params={{
-          handleActionClick: openConfirmationModal,
-          validations,
-        }}
-        fallback={
-          <AuthGuard fallback={<DisconectedPrompt />}>
-            <NoDelegations />
-          </AuthGuard>
-        }
-      />
+        <GridTable
+          getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
+          columns={columns}
+          data={delegations}
+          loading={isLoading}
+          isFetchingNextPage={isFetchingNextPage}
+          infiniteScroll={hasMoreDelegations}
+          onInfiniteScroll={fetchMoreDelegations}
+          classNames={{
+            headerRowClassName: "text-accent-primary app-table-header-row",
+            headerCellClassName:
+              "text-left app-table-header-col border-b border-b-itemSecondaryDefault",
+            rowClassName: "group app-table-row text-itemPrimaryDefault",
+            wrapperClassName: "max-h-[25rem] overflow-x-auto",
+            bodyClassName: "min-w-[1000px]",
+            cellClassName:
+              "app-table-col leading-none flex items-center justify-start text-itemPrimaryDefault",
+          }}
+          params={{
+            handleActionClick: openConfirmationModal,
+            validations,
+          }}
+          fallback={
+            <AuthGuard fallback={<DisconectedPrompt />}>
+              <NoDelegations />
+            </AuthGuard>
+          }
+        />
 
-      <DelegationModal
-        action={confirmationModal?.action}
-        delegation={confirmationModal?.delegation ?? null}
-        param={confirmationModal?.param ?? null}
-        processing={processing}
-        onSubmit={executeDelegationAction}
-        onClose={closeConfirmationModal}
-        networkConfig={networkConfig}
-      />
-    </Box>
+        <DelegationModal
+          action={confirmationModal?.action}
+          delegation={confirmationModal?.delegation ?? null}
+          param={confirmationModal?.param ?? null}
+          processing={processing}
+          onSubmit={executeDelegationAction}
+          onClose={closeConfirmationModal}
+          networkConfig={networkConfig}
+        />
+      </div>
+    </Card>
   );
 }

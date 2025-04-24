@@ -8,6 +8,7 @@ import { AuthGuard } from "@/components/common/AuthGuard";
 import { DelegationForm } from "@/components/staking/StakingForm";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { PromptBox } from "@/ui";
 
 const { networkName } = getNetworkConfigBTC();
 
@@ -49,7 +50,7 @@ export function StakingForm() {
       <AuthGuard
         fallback={
           <div className="flex flex-col mx-4 items-center justify-center">
-            <Card className="flex lg:w-2/5 xl:w-1/3 h-fit">
+            <PromptBox className="py-[10vh]">
               <DelegationForm
                 loading={loading}
                 available={available}
@@ -59,7 +60,7 @@ export function StakingForm() {
                 error={errorMessage}
                 stakingInfo={stakingInfo}
               />
-            </Card>
+            </PromptBox>
           </div>
         }
       >
