@@ -34,7 +34,7 @@ const Home = () => {
         </div>
       </main>
 
-      <Footer simple />
+      <Footer simple fixed />
       <Phase2HereModal />
     </>
   );

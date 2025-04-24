@@ -11,7 +11,7 @@ import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { AuthGuard } from "@/components/common/AuthGuard";
 import { getNetworkConfigBTC } from "@/config/network/btc";
-import { LoadingIcon } from "@/ui";
+import { LoadingIcon, PromptBox } from "@/ui";
 
 import { AmountField } from "./components/AmountField";
 import { BBNFeeAmount } from "./components/BBNFeeAmount";
@@ -58,10 +58,12 @@ export function DelegationForm({
 
   if (loading) {
     return (
-      <StatusView
-        className="flex-1 h-auto"
-        icon={<LoadingIcon size="tilapia" />}
-      />
+      <PromptBox className="py-[calc(10vh+16px)]">
+        <StatusView
+          className="flex-1 h-auto"
+          icon={<LoadingIcon size="tilapia" />}
+        />
+      </PromptBox>
     );
   }
 

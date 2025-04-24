@@ -6,16 +6,14 @@ export const DisconectedPrompt = () => {
 
   return (
     <PromptBox className="py-[10vh]">
-      <PromptBox>
-        <EmptyPrompt
-          title="Connect to see the dashboard"
-          cta={
-            <Button application variant="outline" onClick={open}>
-              Connect Wallets
-            </Button>
-          }
-        />
-      </PromptBox>
+      <EmptyPrompt
+        title="Connect to see the dashboard"
+        cta={
+          <Button application variant="outline" onClick={open}>
+            Connect Wallets
+          </Button>
+        }
+      />
     </PromptBox>
   );
 };
