@@ -32,3 +32,10 @@ export const BBN_GAS_PRICE = (() => {
   }
   return price;
 })();
+
+export const PROD_ENVS = ["mainnet", "phase-2-mainnet"];
+
+export const isProductionEnv = (): boolean => {
+  const env = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "";
+  return PROD_ENVS.includes(env);
+};
