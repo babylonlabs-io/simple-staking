@@ -44,14 +44,14 @@ export const Stats = memo(() => {
             coinSymbol,
             usdRate,
           )}
-          tooltip="Total number of active Bitcoins Staked"
+          tooltip="Total number of Bitcoins staked in the protocol"
         />
 
         <StatItem
           loading={isLoading}
           title={`Registered ${coinSymbol} TVL`}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
-          tooltip="The total amount of Bitcoin that has been registered in the Babylon Genesis network"
+          tooltip="Total number of Bitcoins staked to secure Babylon Genesis"
         />
 
         <StatItem
@@ -59,7 +59,7 @@ export const Stats = memo(() => {
           loading={isLoading}
           title={`${coinSymbol} Staking APY`}
           value={`${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%`}
-          tooltip="To determine the APY, the amount of BABY reward tokens allocated by the Babylon Genesis chain for BTC stakers is converted to its Bitcoin equivalent using market prices obtained from reliable, independent data sources. However, the APY is an approximate figure and can fluctuate, and the displayed value may not always be completely accurate."
+          tooltip="To determine the APY, the amount of BABY reward tokens allocated by the Babylon Genesis chain for BTC stakers is converted to its Bitcoin equivalent using market prices obtained from reliable, independent data sources. However, the APY is an approximate figure and can fluctuate, and the displayed value may not always be completely accurate"
         />
 
         <StatItem
