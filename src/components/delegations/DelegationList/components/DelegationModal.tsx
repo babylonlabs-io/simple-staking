@@ -80,6 +80,8 @@ export function DelegationModal({
       <UnbondModal
         open={action === ACTIONS.UNBOND}
         onSubmit={handleSubmit}
+        unbondingFeeSat={restProps.param?.unbondingFeeSat}
+        unbondingTimeInBlocks={restProps.param?.unbondingTime}
         {...restProps}
       />
       <WithdrawModal

@@ -5,7 +5,12 @@ import {
   getDelegationsV2,
   type PaginatedDelegations,
 } from "@/app/api/getDelegationsV2";
-import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
+import {
+  API_DEFAULT_RETRY_COUNT,
+  API_DEFAULT_RETRY_DELAY,
+  ONE_MINUTE,
+  ONE_SECOND,
+} from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 
@@ -53,9 +58,8 @@ export function useDelegationsV2(
 
       return flattenedData;
     },
-    retry: (failureCount, _error) => {
-      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
-    },
+    retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
+    retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
   });
 
   useEffect(() => {

@@ -1,6 +1,5 @@
 import { Text } from "@babylonlabs-io/core-ui";
 
-import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -13,6 +12,8 @@ interface UnbondModalProps {
   open: boolean;
   onClose: () => void;
   onSubmit: () => void;
+  unbondingFeeSat: number | undefined;
+  unbondingTimeInBlocks: number | undefined;
 }
 const { networkName, coinSymbol } = getNetworkConfigBTC();
 
@@ -21,22 +22,15 @@ export const UnbondModal = ({
   onClose,
   onSubmit,
   processing,
+  unbondingFeeSat,
+  unbondingTimeInBlocks,
 }: UnbondModalProps) => {
-  const { data: networkInfo } = useNetworkInfo();
-
-  if (!networkInfo) {
+  if (!unbondingTimeInBlocks || !unbondingFeeSat) {
     return null;
   }
 
-  const unbondingTime = blocksToDisplayTime(
-    networkInfo.params.bbnStakingParams.latestParam.unbondingTime,
-  );
-  const unbondingFeeBtc = maxDecimals(
-    satoshiToBtc(
-      networkInfo.params.bbnStakingParams.latestParam.unbondingFeeSat,
-    ),
-    8,
-  );
+  const formattedUnbondingTime = blocksToDisplayTime(unbondingTimeInBlocks);
+  const unbondingFeeBtc = maxDecimals(satoshiToBtc(unbondingFeeSat), 8);
 
   return (
     <ConfirmationModal
@@ -51,9 +45,9 @@ export const UnbondModal = ({
         fee of {unbondingFeeBtc} {coinSymbol} will be deduced from your stake by
         the {networkName} network.
         <br />
-        The expected unbonding time will be about {unbondingTime}. After
-        unbonded, you will need to use this dashboard to withdraw your stake for
-        it to appear in your wallet.
+        The expected unbonding time will be about {formattedUnbondingTime}.
+        After unbonded, you will need to use this dashboard to withdraw your
+        stake for it to appear in your wallet.
       </Text>
     </ConfirmationModal>
   );

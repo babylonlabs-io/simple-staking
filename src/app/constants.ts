@@ -2,6 +2,7 @@ export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 
 export const API_DEFAULT_RETRY_COUNT = 3;
+export const API_DEFAULT_RETRY_DELAY = 3; // seconds
 
 export const DELEGATION_ACTIONS = {
   STAKE: "STAKE",
