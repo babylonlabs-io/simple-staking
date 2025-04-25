@@ -1,4 +1,4 @@
-// import { Avatar } from "@babylonlabs-io/core-ui";
+import { Text } from "@babylonlabs-io/core-ui";
 
 import { Hash } from "@/app/components/Hash/Hash";
 import {
@@ -25,7 +25,16 @@ export const finalityProviderColumns = [
       if (!row) return null;
 
       return (
-        <span title={row.description?.moniker}>
+        <span
+          className="inline-flex gap-1 items-center"
+          title={row.description?.moniker}
+        >
+          <Text
+            as="span"
+            className="inline-flex justify-center items-center bg-secondary-main text-accent-contrast size-5 rounded-full text-[0.6rem]"
+          >
+            {row.rank}
+          </Text>
           {row.description?.moniker || "No name provided"}
         </span>
       );
@@ -42,11 +51,6 @@ export const finalityProviderColumns = [
     render: (value: unknown) => {
       if (value == null) return "Unknown";
       return mapStatus(value as FinalityProviderState);
-    },
-    sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
-      const stateA = a?.state || "unknown";
-      const stateB = b?.state || "unknown";
-      return stateA.localeCompare(stateB);
     },
   },
   {
