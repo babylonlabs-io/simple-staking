@@ -1,18 +1,16 @@
 import { Page } from "@playwright/test";
 import { rest } from "msw";
+import { setupServer } from "msw/node";
 
-// Augment Window interface to add test properties
 declare global {
   interface Window {
-    require: any; // NodeRequire type can be used if available
+    require: any;
     __e2eTestMode: boolean;
     __mockVerifyBTCAddress: () => Promise<boolean>;
   }
 }
 
-// Mock network responses using MSW
 export const handlers = [
-  // Babylon API handlers
   rest.get(
     "https://staking-api.babylonlabs.io/v1/staker/delegations*",
     (req, res, ctx) => {
@@ -224,105 +222,26 @@ export const handlers = [
   }),
 ];
 
+const server = setupServer(...handlers);
+
 export const mockVerifyBTCAddress = async (page: Page) => {
   console.log("Setting up verifyBTCAddress mock...");
 
+  server.listen({ onUnhandledRequest: "bypass" });
+
   await page.addInitScript(() => {
-    // Create a function that will be called during initialization
-    const patchVerifyBTCAddress = () => {
-      try {
-        // First approach: Try to patch the imported module directly
-        if (window.require && typeof window.require === "function") {
-          const originalRequire = window.require;
-          window.require = function (path: string) {
-            const result = originalRequire(path);
-
-            // If we're importing the verifyBTCAddress module, patch it
-            if (path.includes("verifyBTCAddress")) {
-              console.log("Intercepted verifyBTCAddress module import");
-              return async () => {
-                console.log("Mock verifyBTCAddress called, returning true");
-                return true;
-              };
-            }
-
-            return result;
-          };
-        }
-
-        // Second approach: Add a global testing flag that our test can check
-        window.__e2eTestMode = true;
-        window.__mockVerifyBTCAddress = async () => {
-          console.log("Global mock verifyBTCAddress called, returning true");
-          return true;
-        };
-
-        // Third approach: Override the fetch API for the screening endpoint
-        const originalFetch = window.fetch;
-        window.fetch = function (input, init) {
-          const url =
-            typeof input === "string"
-              ? input
-              : input instanceof URL
-                ? input.toString()
-                : (input as Request).url;
-
-          if (url.includes("/address/screening")) {
-            console.log("Intercepting /address/screening fetch request");
-            return Promise.resolve(
-              new Response(
-                JSON.stringify({
-                  data: {
-                    btc_address: {
-                      risk: "low",
-                    },
-                  },
-                }),
-                {
-                  status: 200,
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                },
-              ),
-            );
-          }
-
-          return originalFetch(input, init);
-        };
-
-        console.log("Successfully set up verifyBTCAddress mocks");
-      } catch (error) {
-        console.error("Error setting up verifyBTCAddress mock:", error);
-      }
+    window.__e2eTestMode = true;
+    window.__mockVerifyBTCAddress = async () => {
+      console.log("Global mock verifyBTCAddress called, returning true");
+      return true;
     };
 
-    // Run immediately
-    patchVerifyBTCAddress();
-
-    // Also run when DOM is fully loaded in case of timing issues
-    if (document.readyState === "complete") {
-      patchVerifyBTCAddress();
-    } else {
-      window.addEventListener("DOMContentLoaded", patchVerifyBTCAddress);
-    }
-  });
-
-  // Also set up a direct route intercept for the API call
-  await page.route("**/address/screening*", async (route) => {
-    console.log("Intercepting address screening API request");
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        data: {
-          btc_address: {
-            risk: "low",
-          },
-        },
-      }),
-    });
+    console.log("Successfully set up verifyBTCAddress mocks");
   });
 
   console.log("verifyBTCAddress mock setup complete");
+
+  return () => {
+    server.close();
+  };
 };
