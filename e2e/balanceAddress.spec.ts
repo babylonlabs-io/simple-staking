@@ -1,4 +1,6 @@
 import { expect, test } from "@playwright/test";
+import { rest } from "msw";
+import { setupServer } from "msw/node";
 
 import { dismissGenesisDialog, setupWalletConnection } from "./helper/connect";
 import {
@@ -9,7 +11,6 @@ import {
   injectBTCWallet,
   verifyWalletInjected,
 } from "./helper/injectBTCWallet";
-import { interceptRequest } from "./helper/interceptRequest";
 import { mockVerifyBTCAddress } from "./helper/mockApi";
 
 // Extend Window interface to include our mock functions
@@ -29,8 +30,238 @@ declare global {
   }
 }
 
+// Mock network responses using MSW
+const handlers = [
+  // Babylon API handlers
+  rest.get(
+    "https://staking-api.babylonlabs.io/v1/staker/delegations*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          data: [],
+          pagination: { next_key: null, total: "0" },
+        }),
+      );
+    },
+  ),
+
+  rest.get(
+    "https://staking-api.babylonlabs.io/v2/delegations*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          data: [],
+          pagination: { next_key: "", total: "0" },
+        }),
+      );
+    },
+  ),
+
+  rest.get(
+    "https://staking-api.babylonlabs.io/v2/network-info*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          data: {
+            staking_status: {
+              is_staking_open: true,
+            },
+            params: {
+              bbn: [
+                {
+                  version: 0,
+                  covenant_pks: [
+                    "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+                    "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+                    "02f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                  ],
+                  covenant_quorum: 2,
+                  min_staking_value_sat: 100000,
+                  max_staking_value_sat: 1000000,
+                  min_staking_time_blocks: 144,
+                  max_staking_time_blocks: 1440,
+                  slashing_pk_script:
+                    "76a914c96e00cdddfe208629638e394358b2770e636b2388ac",
+                  min_slashing_tx_fee_sat: 1000,
+                  slashing_rate: "0.1",
+                  unbonding_time_blocks: 144,
+                  unbonding_fee_sat: 2000,
+                  min_commission_rate: "0.05",
+                  max_active_finality_providers: 10,
+                  delegation_creation_base_gas_fee: 50000,
+                  btc_activation_height: 100,
+                  allow_list_expiration_height: 200,
+                },
+                {
+                  version: 1,
+                  covenant_pks: [
+                    "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+                    "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+                    "02f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
+                  ],
+                  covenant_quorum: 3,
+                  min_staking_value_sat: 150000,
+                  max_staking_value_sat: 1500000,
+                  min_staking_time_blocks: 288,
+                  max_staking_time_blocks: 2880,
+                  slashing_pk_script:
+                    "76a914c96e00cdddfe208629638e394358b2770e636b2388ac",
+                  min_slashing_tx_fee_sat: 1500,
+                  slashing_rate: "0.15",
+                  unbonding_time_blocks: 288,
+                  unbonding_fee_sat: 3000,
+                  min_commission_rate: "0.1",
+                  max_active_finality_providers: 15,
+                  delegation_creation_base_gas_fee: 60000,
+                  btc_activation_height: 200,
+                  allow_list_expiration_height: 300,
+                },
+              ],
+              btc: [
+                {
+                  version: 0,
+                  btc_confirmation_depth: 6,
+                },
+                {
+                  version: 1,
+                  btc_confirmation_depth: 12,
+                },
+              ],
+            },
+          },
+        }),
+      );
+    },
+  ),
+
+  rest.get(
+    "https://staking-api.babylonlabs.io/address/screening*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          data: {
+            btc_address: {
+              risk: "low",
+            },
+          },
+        }),
+      );
+    },
+  ),
+
+  rest.post(
+    "https://staking-api.babylonlabs.io/log-terms-acceptance",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          success: true,
+        }),
+      );
+    },
+  ),
+
+  rest.get(
+    "https://staking-api.babylonlabs.io/v2/balances*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          balance: {
+            bbn: "1000000",
+            stakable_btc: "12345678",
+          },
+        }),
+      );
+    },
+  ),
+
+  rest.get("https://staking-api.babylonlabs.io/v2/staked*", (req, res, ctx) => {
+    return res(
+      ctx.json({
+        staked: {
+          btc: "12345678",
+          delegated_btc: "12345678",
+        },
+      }),
+    );
+  }),
+
+  rest.get(
+    "https://staking-api.babylonlabs.io/v2/stakable-btc*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          balance: "12345678",
+        }),
+      );
+    },
+  ),
+
+  rest.get(
+    "https://staking-api.babylonlabs.io/v2/rewards*",
+    (req, res, ctx) => {
+      return res(
+        ctx.json({
+          rewards: "500000",
+        }),
+      );
+    },
+  ),
+
+  // Mempool API handlers
+  rest.get("*/api/address/*/utxo", (req, res, ctx) => {
+    return res(
+      ctx.json([
+        {
+          txid: "txid1",
+          vout: 0,
+          value: 12345678,
+          status: {
+            confirmed: true,
+          },
+        },
+      ]),
+    );
+  }),
+
+  rest.get("*/api/v1/validate-address/*", (req, res, ctx) => {
+    return res(
+      ctx.json({
+        isvalid: true,
+        scriptPubKey: "0014abcdef1234567890abcdef1234567890abcdef12",
+      }),
+    );
+  }),
+
+  rest.get("*/api/address/*", (req, res, ctx) => {
+    return res(
+      ctx.json({
+        chain_stats: {
+          funded_txo_sum: 12345678,
+          spent_txo_sum: 0,
+        },
+      }),
+    );
+  }),
+];
+
+// Set up MSW server
+const server = setupServer(...handlers);
+
 test.describe("Balance and address checks after connection", () => {
+  test.beforeAll(() => {
+    // Start the MSW server before all tests
+    server.listen();
+  });
+
+  test.afterAll(() => {
+    // Clean up after all tests are done
+    server.close();
+  });
+
   test.beforeEach(async ({ page }) => {
+    // Reset handlers between tests
+    server.resetHandlers();
+
     // Set up request logging to identify API calls
     page.on("request", (request) => {
       console.log(`>>> Request: ${request.method()} ${request.url()}`);
@@ -50,246 +281,8 @@ test.describe("Balance and address checks after connection", () => {
       }
     });
 
-    // ------------- Babylon API Mocks -------------
-
-    // Mock v1 delegations endpoint
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/v1/staker/delegations*",
-      200,
-      {
-        data: [],
-        pagination: { next_key: null, total: "0" },
-      },
-    );
-
-    // Mock v2 delegations endpoint
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/v2/delegations*",
-      200,
-      {
-        data: [],
-        pagination: { next_key: "", total: "0" },
-      },
-    );
-
-    // Let's try using a predefined mock response for the network-info endpoint
-    const mockNetworkInfo = {
-      data: {
-        staking_status: {
-          is_staking_open: true,
-        },
-        params: {
-          bbn: [
-            {
-              version: 0,
-              covenant_pks: [
-                "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-                "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
-                "02f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
-              ],
-              covenant_quorum: 2,
-              min_staking_value_sat: 100000,
-              max_staking_value_sat: 1000000,
-              min_staking_time_blocks: 144,
-              max_staking_time_blocks: 1440,
-              slashing_pk_script:
-                "76a914c96e00cdddfe208629638e394358b2770e636b2388ac",
-              min_slashing_tx_fee_sat: 1000,
-              slashing_rate: "0.1",
-              unbonding_time_blocks: 144,
-              unbonding_fee_sat: 2000,
-              min_commission_rate: "0.05",
-              max_active_finality_providers: 10,
-              delegation_creation_base_gas_fee: 50000,
-              btc_activation_height: 100,
-              allow_list_expiration_height: 200,
-            },
-            {
-              version: 1,
-              covenant_pks: [
-                "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-                "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
-                "02f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
-              ],
-              covenant_quorum: 3,
-              min_staking_value_sat: 150000,
-              max_staking_value_sat: 1500000,
-              min_staking_time_blocks: 288,
-              max_staking_time_blocks: 2880,
-              slashing_pk_script:
-                "76a914c96e00cdddfe208629638e394358b2770e636b2388ac",
-              min_slashing_tx_fee_sat: 1500,
-              slashing_rate: "0.15",
-              unbonding_time_blocks: 288,
-              unbonding_fee_sat: 3000,
-              min_commission_rate: "0.1",
-              max_active_finality_providers: 15,
-              delegation_creation_base_gas_fee: 60000,
-              btc_activation_height: 200,
-              allow_list_expiration_height: 300,
-            },
-          ],
-          btc: [
-            {
-              version: 0,
-              btc_confirmation_depth: 6,
-            },
-            {
-              version: 1,
-              btc_confirmation_depth: 12,
-            },
-          ],
-        },
-      },
-    };
-
-    await page.route(
-      "https://staking-api.babylonlabs.io/v2/network-info*",
-      async (route) => {
-        console.log("Intercepting network-info request");
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify(mockNetworkInfo),
-        });
-      },
-    );
-
-    // Also mock at the JavaScript level
-    await page.addInitScript((mockData) => {
-      // Override getNetworkInfo function
-      window.addEventListener("DOMContentLoaded", () => {
-        // Create mock response for fetch
-        const originalFetch = window.fetch;
-        window.fetch = function (input, init) {
-          const url =
-            typeof input === "string"
-              ? input
-              : input instanceof URL
-                ? input.toString()
-                : (input as Request).url;
-
-          if (url.includes("/v2/network-info")) {
-            console.log("Intercepting network-info fetch");
-            return Promise.resolve(
-              new Response(JSON.stringify(mockData), {
-                status: 200,
-                headers: {
-                  "Content-Type": "application/json",
-                },
-              }),
-            );
-          }
-
-          return originalFetch(input, init);
-        };
-      });
-    }, mockNetworkInfo);
-
-    // Mock address screening endpoint with the correct structure for verifyBTCAddress
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/address/screening*",
-      200,
-      {
-        data: {
-          btc_address: {
-            risk: "low",
-          },
-        },
-      },
-    );
-
-    // Also set up the advanced mocking for verifyBTCAddress
+    // Advanced mocking for verifyBTCAddress which may require special handling
     await mockVerifyBTCAddress(page);
-
-    // Mock terms acceptance endpoint
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/log-terms-acceptance",
-      200,
-      {
-        success: true,
-      },
-    );
-
-    // Mock balances endpoint - this is for BBN balance
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/v2/balances*",
-      200,
-      {
-        balance: {
-          bbn: "1000000",
-          stakable_btc: "12345678",
-        },
-      },
-    );
-
-    // Additional mock for the BBN staked balance and BTC balance endpoints
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/v2/staked*",
-      200,
-      {
-        staked: {
-          btc: "12345678",
-          delegated_btc: "12345678",
-        },
-      },
-    );
-
-    // Add more specific balance endpoint mocks
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/v2/stakable-btc*",
-      200,
-      {
-        balance: "12345678",
-      },
-    );
-
-    // Mock rewards endpoint - this is for BABY rewards
-    await interceptRequest(
-      page,
-      "https://staking-api.babylonlabs.io/v2/rewards*",
-      200,
-      {
-        rewards: "500000",
-      },
-    );
-
-    // ------------- Mempool API Mocks -------------
-
-    // Mock UTXO endpoint
-    await interceptRequest(page, "**/api/address/*/utxo", 200, [
-      {
-        txid: "txid1",
-        vout: 0,
-        value: 12345678,
-        status: {
-          confirmed: true,
-        },
-      },
-    ]);
-
-    // Mock address validation endpoint
-    await interceptRequest(page, "**/api/v1/validate-address/*", 200, {
-      isvalid: true,
-      scriptPubKey: "0014abcdef1234567890abcdef1234567890abcdef12",
-    });
-
-    // Mock address info endpoint
-    await interceptRequest(page, "**/api/address/*", 200, {
-      chain_stats: {
-        funded_txo_sum: 12345678,
-        spent_txo_sum: 0,
-      },
-    });
-
-    // ------------- RPC Response Mocks -------------
 
     // Add mock implementation directly in the page context
     await page.addInitScript(() => {
@@ -337,19 +330,17 @@ test.describe("Balance and address checks after connection", () => {
             };
 
             // Try to directly modify the React component's state by injecting our custom state
-            if (
-              window.React &&
-              window.React.__SECRET_INTERNALS_DO_NOT_USE_OR_YOU_WILL_BE_FIRED
-            ) {
+            if (window.React && typeof window.React === "object") {
               console.log(
-                "Found React internals, attempting to patch component state...",
+                "Found React, attempting to patch component state...",
               );
             }
 
             // Another approach - intercept hook calls globally
-            const originalUseState = window.React?.useState;
-            if (originalUseState) {
-              window.React.useState = function (initialState) {
+            if (window.React && typeof window.React.useState === "function") {
+              const originalUseState = window.React.useState;
+              // Cast to any to safely override the useState function
+              (window.React as any).useState = function (initialState: any) {
                 // If it looks like our balance state with loading: true
                 if (
                   initialState &&
