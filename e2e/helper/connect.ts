@@ -2,6 +2,7 @@ import { Page } from "@playwright/test";
 
 import { injectBBNWallet } from "./injectBBNWallet";
 import { injectBTCWallet } from "./injectBTCWallet";
+import { mockVerifyBTCAddress } from "./mockApi";
 
 // Augment window interface to fix linter errors
 declare global {
@@ -333,88 +334,15 @@ export class WalletConnectActions {
     }
   }
 
-  async interceptAddressScreening() {
-    await this.page.route(
-      "https://staking-api.babylonlabs.io/address/screening*",
-      async (route) => {
-        console.log("Intercepting address screening request");
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            data: {
-              btc_address: {
-                risk: "low",
-              },
-            },
-          }),
-        });
-      },
-    );
-  }
+  async setupMocks() {
+    // Use the existing mockVerifyBTCAddress function which handles all the mocking needed
+    console.log("Setting up API mocks...");
+    await mockVerifyBTCAddress(this.page);
 
-  async injectAddressVerificationBypass() {
-    await this.page.addInitScript(() => {
-      console.log("Setting up wallet connection hooks...");
-      // Try to patch the verification function at runtime
-      window.addEventListener("DOMContentLoaded", () => {
-        try {
-          // Add a global flag that will be checked later
-          window.__bypassBTCAddressVerification = true;
-
-          // Override the verifyBTCAddress function with a mock that always returns true
-          const originalFetch = window.fetch;
-          window.fetch = function (input, init?) {
-            const url =
-              typeof input === "string"
-                ? input
-                : input instanceof URL
-                  ? input.toString()
-                  : input.url;
-            if (url.includes("/address/screening")) {
-              console.log("Intercepting address screening fetch call");
-              return Promise.resolve({
-                ok: true,
-                status: 200,
-                json: () =>
-                  Promise.resolve({
-                    data: {
-                      btc_address: {
-                        risk: "low",
-                      },
-                    },
-                  }),
-                text: () =>
-                  Promise.resolve(
-                    JSON.stringify({
-                      data: {
-                        btc_address: {
-                          risk: "low",
-                        },
-                      },
-                    }),
-                  ),
-                headers: new Headers(),
-                redirected: false,
-                statusText: "OK",
-                type: "basic",
-                url: url,
-                clone: function () {
-                  return this;
-                },
-                body: null,
-                bodyUsed: false,
-                arrayBuffer: () => Promise.resolve(new ArrayBuffer(0)),
-                blob: () => Promise.resolve(new Blob([])),
-                formData: () => Promise.resolve(new FormData()),
-              } as Response);
-            }
-            return originalFetch(input, init);
-          };
-        } catch (e) {
-          console.error("Error setting up address verification bypass:", e);
-        }
-      });
+    // Set flags for verification bypassing (these are used by the app in test mode)
+    await this.page.evaluate(() => {
+      window.__bypassBTCAddressVerification = true;
+      window.__forceVerificationSuccess = true;
     });
   }
 
@@ -463,6 +391,9 @@ export class WalletConnectActions {
   async setupWalletConnection() {
     console.log("Starting wallet connection setup...");
 
+    console.log("Setting up API mocks...");
+    await this.setupMocks();
+
     console.log("Dismissing Genesis dialog if present...");
     await this.dismissGenesisDialog();
 
@@ -471,12 +402,6 @@ export class WalletConnectActions {
 
     console.log("Injecting BBN wallet...");
     await injectBBNWallet(this.page);
-
-    // Intercept the address screening endpoint right before connecting
-    await this.interceptAddressScreening();
-
-    // Insert a direct modification to bypass verifyBTCAddress check
-    await this.injectAddressVerificationBypass();
 
     console.log("Clicking connect button...");
     await this.clickConnectButton();
