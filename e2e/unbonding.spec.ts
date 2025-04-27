@@ -3,8 +3,8 @@ import { expect, test } from "@playwright/test";
 import { DelegationState } from "@/app/types/delegations";
 import { getState } from "@/utils/getState";
 
-import { setupWalletConnection } from "./helper/connect";
 import { interceptRequest } from "./helper/interceptRequest";
+import { setupWalletConnection } from "./middleware/connect";
 import { activeTX, unbondingTX } from "./mock/tx/unbonding";
 
 test.describe("Create unbonding transaction", () => {

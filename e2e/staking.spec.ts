@@ -5,7 +5,7 @@ import {
   STAKING_AMOUNT_SAT,
   STAKING_TX_HASH,
 } from "./constants/staking";
-import { setupWalletConnection } from "./helper/connect";
+import { setupWalletConnection } from "./middleware/connect";
 
 test.describe("Create staking transaction", () => {
   test.beforeEach(async ({ page }) => {

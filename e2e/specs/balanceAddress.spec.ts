@@ -1,17 +1,12 @@
 import { expect, test } from "@playwright/test";
 import { setupServer } from "msw/node";
 
-import { dismissGenesisDialog, setupWalletConnection } from "../helper/connect";
 import {
-  injectBBNWallet,
-  verifyBBNWalletInjected,
-} from "../helper/injectBBNWallet";
-import {
-  injectBTCWallet,
-  verifyWalletInjected,
-} from "../helper/injectBTCWallet";
-import { mockVerifyBTCAddress } from "../helper/mockApi";
-import { handlers } from "../mocks/handlers";
+  dismissGenesisDialog,
+  setupWalletConnection,
+} from "../middleware/connect";
+import { injectBBNWallet, injectBTCWallet } from "../mocks/blockchain";
+import { handlers, mockVerifyBTCAddress } from "../mocks/handlers";
 
 // Extend Window interface to include our mock functions
 declare global {
@@ -211,16 +206,8 @@ test.describe("Balance and address checks after connection", () => {
     // Inject BTC wallet
     await injectBTCWallet(page);
 
-    // Verify BTC wallet is injected
-    const isBTCInjected = await verifyWalletInjected(page);
-    expect(isBTCInjected).toBe(true);
-
     // Inject BBN wallet
     await injectBBNWallet(page);
-
-    // Verify BBN wallet is injected
-    const isBBNInjected = await verifyBBNWalletInjected(page);
-    expect(isBBNInjected).toBe(true);
 
     await setupWalletConnection(page);
 

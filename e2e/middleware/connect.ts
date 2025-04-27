@@ -1,8 +1,7 @@
 import { Page } from "@playwright/test";
 
-import { injectBBNWallet } from "./injectBBNWallet";
-import { injectBTCWallet } from "./injectBTCWallet";
-import { mockVerifyBTCAddress } from "./mockApi";
+import { injectBBNWallet, injectBTCWallet } from "../mocks/blockchain";
+import { mockVerifyBTCAddress } from "../mocks/handlers";
 
 // Augment window interface to fix linter errors
 declare global {
