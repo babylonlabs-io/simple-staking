@@ -1,17 +1,17 @@
 import { expect, test } from "@playwright/test";
 import { setupServer } from "msw/node";
 
-import { handlers } from "./mocks/handlers";
-import { dismissGenesisDialog, setupWalletConnection } from "./helper/connect";
+import { dismissGenesisDialog, setupWalletConnection } from "../helper/connect";
 import {
   injectBBNWallet,
   verifyBBNWalletInjected,
-} from "./helper/injectBBNWallet";
+} from "../helper/injectBBNWallet";
 import {
   injectBTCWallet,
   verifyWalletInjected,
-} from "./helper/injectBTCWallet";
-import { mockVerifyBTCAddress } from "./helper/mockApi";
+} from "../helper/injectBTCWallet";
+import { mockVerifyBTCAddress } from "../helper/mockApi";
+import { handlers } from "../mocks/handlers";
 
 // Extend Window interface to include our mock functions
 declare global {
