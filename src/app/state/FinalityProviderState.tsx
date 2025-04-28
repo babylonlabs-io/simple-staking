@@ -37,6 +37,13 @@ interface FinalityProviderState {
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
 }
 
+const FP_STATUSES = {
+  [FinalityProviderStateEnum.ACTIVE]: 1,
+  [FinalityProviderStateEnum.INACTIVE]: 0,
+  [FinalityProviderStateEnum.SLASHED]: 0,
+  [FinalityProviderStateEnum.JAILED]: 0,
+} as const;
+
 const SORT_DIRECTIONS = {
   undefined: "desc",
   desc: "asc",
@@ -103,18 +110,36 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const { data: dataV1 } = useFinalityProviders();
 
+  const finalityProviders = useMemo(() => {
+    if (!data?.finalityProviders) return [];
+
+    return data.finalityProviders
+      .sort((a, b) => {
+        const condition = FP_STATUSES[b.state] - FP_STATUSES[a.state];
+
+        if (condition !== 0) {
+          return condition;
+        }
+
+        return (b.activeTVLSat ?? 0) - (a.activeTVLSat ?? 0);
+      })
+      .map((fp, i) => ({
+        ...fp,
+        rank: i + 1,
+        id: fp.btcPk,
+      }));
+  }, [data?.finalityProviders]);
+
   const finalityProviderMap = useMemo(
     () =>
-      (data?.finalityProviders ?? [])
-        .sort((a, b) => (b.activeTVLSat ?? 0) - (a.activeTVLSat ?? 0))
-        .reduce((acc, fp) => {
-          if (fp.btcPk) {
-            acc.set(fp.btcPk, fp);
-          }
+      finalityProviders.reduce((acc, fp) => {
+        if (fp.btcPk) {
+          acc.set(fp.btcPk, fp);
+        }
 
-          return acc;
-        }, new Map<string, FinalityProvider>()),
-    [data?.finalityProviders],
+        return acc;
+      }, new Map<string, FinalityProvider>()),
+    [finalityProviders],
   );
 
   const providersV1Map = useMemo(
@@ -162,12 +187,10 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   }, []);
 
   const filteredFinalityProviders = useMemo(() => {
-    if (!data?.finalityProviders) return [];
-
-    return data.finalityProviders.filter((fp: FinalityProvider) =>
+    return finalityProviders.filter((fp: FinalityProvider) =>
       Object.values(FILTERS).every((filterFn) => filterFn(fp, filter)),
     );
-  }, [data?.finalityProviders, filter]);
+  }, [finalityProviders, filter]);
 
   const getRegisteredFinalityProvider = useCallback(
     (btcPkHex: string) =>

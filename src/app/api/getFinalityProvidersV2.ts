@@ -71,7 +71,7 @@ export const getFinalityProvidersV2 = async ({
     finalityProvidersAPIResponse.data;
 
   const finalityProviders = finalityProvidersAPI.map(
-    (fp: FinalityProviderAPI): FinalityProvider => ({
+    (fp: FinalityProviderAPI, i): FinalityProvider => ({
       description: {
         moniker: fp.description.moniker,
         identity: fp.description.identity,
@@ -81,6 +81,8 @@ export const getFinalityProvidersV2 = async ({
         securityContact: fp.description.security_contact,
         details: fp.description.details,
       },
+      id: fp.btc_pk,
+      rank: i + 1,
       state: fp.state,
       commission: fp.commission,
       btcPk: fp.btc_pk,
