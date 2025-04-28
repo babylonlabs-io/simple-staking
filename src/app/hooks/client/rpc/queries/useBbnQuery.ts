@@ -21,6 +21,9 @@ const BBN_BALANCE_KEY = "BBN_BALANCE";
 const BBN_REWARDS_KEY = "BBN_REWARDS";
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
 
+const isE2ETest =
+  typeof window !== "undefined" && (window as any).__e2eTestMode;
+
 /**
  * Query service for Babylon which contains all the queries for
  * interacting with Babylon RPC nodes
@@ -38,8 +41,33 @@ export const useBbnQuery = () => {
   const rewardsQuery = useClientQuery({
     queryKey: [BBN_REWARDS_KEY, bech32Address],
     queryFn: async () => {
+      if (isE2ETest) {
+        try {
+          const rewardsResp = await (window as any).mockCosmJSRewardsQuery?.(
+            bech32Address,
+          );
+          const coins =
+            rewardsResp?.rewardGauges?.[REWARD_GAUGE_KEY_BTC_DELEGATION]
+              ?.coins || [];
+          const withdrawnCoinsArr =
+            rewardsResp?.rewardGauges?.[REWARD_GAUGE_KEY_BTC_DELEGATION]
+              ?.withdrawnCoins || [];
+          const totalCoins = coins.reduce(
+            (acc: number, c: any) => acc + Number(c.amount),
+            0,
+          );
+          const totalWithdrawn = withdrawnCoinsArr.reduce(
+            (acc: number, c: any) => acc + Number(c.amount),
+            0,
+          );
+          return totalCoins - totalWithdrawn;
+        } catch {
+          return 0;
+        }
+      }
+
       if (!connected || !queryClient || !bech32Address) {
-        return undefined;
+        return 0;
       }
       const { incentive } = setupIncentiveExtension(queryClient);
       const req: incentivequery.QueryRewardGaugesRequest =
@@ -82,11 +110,12 @@ export const useBbnQuery = () => {
       );
     },
     enabled: Boolean(
-      queryClient &&
-        connected &&
-        bech32Address &&
-        !isGeoBlocked &&
-        !isHealthcheckLoading,
+      (isE2ETest && bech32Address) ||
+        (queryClient &&
+          connected &&
+          bech32Address &&
+          !isGeoBlocked &&
+          !isHealthcheckLoading),
     ),
     staleTime: ONE_MINUTE,
     refetchInterval: ONE_MINUTE,
@@ -99,6 +128,17 @@ export const useBbnQuery = () => {
   const balanceQuery = useClientQuery({
     queryKey: [BBN_BALANCE_KEY, bech32Address],
     queryFn: async () => {
+      if (isE2ETest) {
+        try {
+          const balance = await (window as any).mockCosmJSBankBalance?.(
+            bech32Address,
+          );
+          return Number(balance?.amount ?? 0);
+        } catch {
+          return 0;
+        }
+      }
+
       if (!connected || !queryClient || !bech32Address) {
         return 0;
       }
@@ -107,11 +147,12 @@ export const useBbnQuery = () => {
       return Number(balance?.amount ?? 0);
     },
     enabled: Boolean(
-      queryClient &&
-        connected &&
-        bech32Address &&
-        !isGeoBlocked &&
-        !isHealthcheckLoading,
+      (isE2ETest && bech32Address) ||
+        (queryClient &&
+          connected &&
+          bech32Address &&
+          !isGeoBlocked &&
+          !isHealthcheckLoading),
     ),
     staleTime: ONE_MINUTE,
     refetchInterval: ONE_MINUTE,

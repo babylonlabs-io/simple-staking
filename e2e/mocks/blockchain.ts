@@ -410,3 +410,34 @@ const verifyBBNWalletInjected = async (page: Page): Promise<boolean> => {
     return false;
   }
 };
+
+// Mock BBN RPC query functions used in E2E tests
+export const injectBBNQueries = async (page: Page) => {
+  console.log("Injecting BBN query mocks...");
+
+  await page.addInitScript(() => {
+    window.__e2eTestMode = true;
+
+    window.mockCosmJSBankBalance = (address) => {
+      console.log(`Mock CosmJS bank balance query for address: ${address}`);
+      return Promise.resolve({
+        amount: "1000000",
+        denom: "ubbn",
+      });
+    };
+
+    window.mockCosmJSRewardsQuery = (address) => {
+      console.log(`Mock CosmJS rewards query for address: ${address}`);
+      return Promise.resolve({
+        rewardGauges: {
+          BTC_STAKER: {
+            coins: [{ amount: "500000", denom: "ubbn" }],
+            withdrawnCoins: [],
+          },
+        },
+      });
+    };
+
+    console.log("Successfully injected BBN query mocks");
+  });
+};

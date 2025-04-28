@@ -2,14 +2,6 @@ import { Page } from "@playwright/test";
 import { rest } from "msw";
 import { setupServer } from "msw/node";
 
-declare global {
-  interface Window {
-    require: any;
-    __e2eTestMode: boolean;
-    __mockVerifyBTCAddress: () => Promise<boolean>;
-  }
-}
-
 export const handlers = [
   rest.get(
     "https://staking-api.babylonlabs.io/v1/staker/delegations*",
@@ -26,10 +18,42 @@ export const handlers = [
   rest.get(
     "https://staking-api.babylonlabs.io/v2/delegations*",
     (req, res, ctx) => {
+      const delegation = {
+        finality_provider_btc_pks_hex: [
+          "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+        ],
+        params_version: 0,
+        staker_btc_pk_hex:
+          "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+        delegation_staking: {
+          staking_tx_hex: "00",
+          staking_tx_hash_hex: "hash",
+          staking_timelock: 0,
+          staking_amount: 9876543,
+          start_height: 0,
+          end_height: 0,
+          bbn_inception_height: 0,
+          bbn_inception_time: new Date().toISOString(),
+          slashing: {
+            slashing_tx_hex: "",
+            spending_height: 0,
+          },
+        },
+        delegation_unbonding: {
+          unbonding_timelock: 0,
+          unbonding_tx: "",
+          slashing: {
+            unbonding_slashing_tx_hex: "",
+            spending_height: 0,
+          },
+        },
+        state: "ACTIVE",
+      };
+
       return res(
         ctx.json({
-          data: [],
-          pagination: { next_key: "", total: "0" },
+          data: [delegation],
+          pagination: { next_key: "", total: "1" },
         }),
       );
     },
@@ -145,7 +169,7 @@ export const handlers = [
         ctx.json({
           balance: {
             bbn: "1000000",
-            stakable_btc: "12345678",
+            stakable_btc: "12300000000",
           },
         }),
       );
@@ -156,8 +180,8 @@ export const handlers = [
     return res(
       ctx.json({
         staked: {
-          btc: "12345678",
-          delegated_btc: "12345678",
+          btc: "9876543",
+          delegated_btc: "9876543",
         },
       }),
     );
@@ -168,7 +192,7 @@ export const handlers = [
     (req, res, ctx) => {
       return res(
         ctx.json({
-          balance: "12345678",
+          balance: "12300000000",
         }),
       );
     },
@@ -192,7 +216,7 @@ export const handlers = [
         {
           txid: "txid1",
           vout: 0,
-          value: 12345678,
+          value: 12300000000,
           status: {
             confirmed: true,
           },
@@ -214,7 +238,7 @@ export const handlers = [
     return res(
       ctx.json({
         chain_stats: {
-          funded_txo_sum: 12345678,
+          funded_txo_sum: 12300000000,
           spent_txo_sum: 0,
         },
       }),
