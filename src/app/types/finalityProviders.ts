@@ -1,4 +1,6 @@
 export interface FinalityProvider {
+  id: string;
+  rank: number;
   description: Description;
   state: FinalityProviderState;
   commission: string;
