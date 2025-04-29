@@ -26,5 +26,5 @@ export function AuthGuard({
     setDisplayComponent(isConnected);
   }, [isConnected]);
 
-  return displayComponent ? children : fallback;
+  return <>{displayComponent ? children : fallback}</>;
 }

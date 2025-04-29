@@ -341,7 +341,7 @@ export const Delegations = ({}) => {
   };
 
   if (!connected || !delegationsAPI || !network) {
-    return;
+    return null;
   }
 
   // combine delegations from the API and local storage, prioritizing API data

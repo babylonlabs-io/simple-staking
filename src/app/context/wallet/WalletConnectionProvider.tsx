@@ -49,7 +49,7 @@ const config: ChainConfigArr = [
     ],
     config: getNetworkConfigBBN(),
   },
-] as const;
+];
 
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
