@@ -71,18 +71,14 @@ export function useStakingService() {
     term,
     feeRate,
   }: Omit<FormFields, "feeAmount">) => {
-    try {
-      const eoiInput = {
-        finalityProviderPkNoCoordHex: finalityProvider,
-        stakingAmountSat: btcToSatoshi(amount),
-        stakingTimelock: term,
-        feeRate: feeRate,
-      };
-      // Calculate the staking fee
-      return estimateStakingFee(eoiInput, feeRate);
-    } catch {
-      return 0;
-    }
+    const eoiInput = {
+      finalityProviderPkNoCoordHex: finalityProvider,
+      stakingAmountSat: btcToSatoshi(amount),
+      stakingTimelock: term,
+      feeRate: feeRate,
+    };
+    // Calculate the staking fee
+    return estimateStakingFee(eoiInput, feeRate);
   };
 
   const displayPreview = useCallback(
