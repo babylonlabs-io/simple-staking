@@ -51,7 +51,21 @@ export const Stats = memo(() => {
           loading={isLoading}
           title={`Registered ${coinSymbol} TVL`}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
-          tooltip="Total number of Bitcoins staked to secure Babylon Genesis"
+          tooltip={
+            <>
+              Total number of Bitcoins staked to secure Babylon Genesis. Follow
+              this{" "}
+              <a
+                href="https://babylonlabs.io/blog/phase-2-btc-staking-participation-guide"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-accent-primary underline"
+              >
+                guide
+              </a>{" "}
+              on how to transition a Phase-1 stake or register a new one.
+            </>
+          }
         />
 
         <StatItem
