@@ -5,7 +5,6 @@ import "core-js/features/array/to-sorted";
 
 import { Loader, Table, useWatch } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
-import { useMemo } from "react";
 
 import warningOctagon from "@/app/assets/warning-octagon.svg";
 import warningTriangle from "@/app/assets/warning-triangle.svg";
@@ -29,14 +28,6 @@ export const FinalityProviderTable = ({
     fetchNextPage,
     isRowSelectable,
   } = useFinalityProviderState();
-
-  const tableData = useMemo(() => {
-    if (!finalityProviders) return [];
-    return finalityProviders.map((fp) => ({
-      ...fp,
-      id: fp.btcPk,
-    }));
-  }, [finalityProviders]);
 
   const selectedFP = useWatch({ name: "finalityProvider", defaultValue: "" });
 
@@ -79,7 +70,7 @@ export const FinalityProviderTable = ({
     return loadingView;
   }
 
-  if (!isFetching && (!tableData || tableData.length === 0)) {
+  if (!isFetching && (!finalityProviders || finalityProviders.length === 0)) {
     return noMatchesView;
   }
 
@@ -87,7 +78,7 @@ export const FinalityProviderTable = ({
     <Table
       wrapperClassName="max-h-[28.5rem]"
       className="min-w-full"
-      data={tableData}
+      data={finalityProviders}
       columns={finalityProviderColumns}
       loading={isFetching}
       hasMore={hasNextPage}

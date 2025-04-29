@@ -12,6 +12,7 @@
 import * as Sentry from "@sentry/nextjs";
 
 import { REPLAYS_ON_ERROR_RATE } from "@/app/constants";
+import { isProductionEnv } from "@/config";
 import { getCommitHash } from "@/utils/version";
 
 Sentry.init({
@@ -65,7 +66,7 @@ Sentry.init({
   integrations: [
     Sentry.replayIntegration({
       // Additional Replay configuration goes in here, for example:
-      maskAllText: false,
+      maskAllText: isProductionEnv(),
       blockAllMedia: true,
     }),
   ],
