@@ -11,7 +11,6 @@ import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
-import { Phase2HereModal } from "./components/Modals/Phase2Here";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Stats } from "./components/Stats/Stats";
 
@@ -37,7 +36,6 @@ const Home = () => {
       </Container>
 
       <Footer />
-      <Phase2HereModal />
     </>
   );
 };
