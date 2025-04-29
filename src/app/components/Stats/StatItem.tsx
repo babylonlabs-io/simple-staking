@@ -1,11 +1,11 @@
 import {
-  type ListItemProps,
   Button,
   ListItem,
   Loader,
   MobileDialog,
+  type ListItemProps,
 } from "@babylonlabs-io/core-ui";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useState, type JSX } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { Tooltip } from "react-tooltip";
 
@@ -14,7 +14,7 @@ import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 interface StatItemProps extends ListItemProps {
   hidden?: boolean;
   loading?: boolean;
-  tooltip?: string;
+  tooltip?: string | JSX.Element;
   loadingStyle?: LoadingStyle;
 }
 
@@ -86,12 +86,18 @@ export const StatItem = ({
           <span
             className="block size-5 cursor-pointer text-xs"
             data-tooltip-id={tooltipId}
-            data-tooltip-content={tooltip}
-            data-tooltip-place="top"
           >
             <AiOutlineInfoCircle size={20} />
           </span>
-          <Tooltip id={tooltipId} className="tooltip-wrap" />
+          <Tooltip
+            place="top"
+            id={tooltipId}
+            delayHide={500}
+            clickable
+            className="tooltip-wrap"
+          >
+            {tooltip}
+          </Tooltip>
         </>
       )
     ) : (
