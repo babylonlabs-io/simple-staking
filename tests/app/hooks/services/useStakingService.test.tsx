@@ -199,14 +199,14 @@ describe("useStakingService", () => {
 
       const { result } = renderHook(() => useStakingService());
 
-      const fee = result.current.calculateFeeAmount({
-        finalityProvider: mockFormData.finalityProvider,
-        amount: mockFormData.amount,
-        term: mockFormData.term,
-        feeRate: mockFormData.feeRate,
-      });
-
-      expect(fee).toBe(0);
+      expect(() => {
+        const fee = result.current.calculateFeeAmount({
+          finalityProvider: mockFormData.finalityProvider,
+          amount: mockFormData.amount,
+          term: mockFormData.term,
+          feeRate: mockFormData.feeRate,
+        });
+      }).toThrow("Test error");
     });
   });
 
