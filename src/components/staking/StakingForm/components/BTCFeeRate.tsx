@@ -14,7 +14,7 @@ interface FeeFiledProps {
 export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const [visible, setVisibility] = useState(false);
   const feeRate = useWatch({ name: "feeRate" });
-  const { setValue, getValues } = useFormContext();
+  const { setValue, getValues, setError, clearErrors } = useFormContext();
   const { calculateFeeAmount } = useStakingService();
 
   useEffect(() => {
@@ -26,21 +26,29 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   }, [defaultRate, setValue]);
 
   useEffect(() => {
-    const { finalityProvider, amount, term } = getValues();
+    try {
+      const { finalityProvider, amount, term } = getValues();
 
-    const feeAmount = calculateFeeAmount({
-      finalityProvider,
-      amount,
-      term,
-      feeRate,
-    });
+      const feeAmount = calculateFeeAmount({
+        finalityProvider,
+        amount,
+        term,
+        feeRate,
+      });
 
-    setValue("feeAmount", feeAmount.toString(), {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true,
-    });
-  }, [feeRate, getValues, setValue, calculateFeeAmount]);
+      clearErrors("feeAmount");
+      setValue("feeAmount", feeAmount.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    } catch (e: any) {
+      setError("feeAmount", {
+        type: "custom",
+        message: e.message,
+      });
+    }
+  }, [feeRate, getValues, setValue, setError, clearErrors, calculateFeeAmount]);
 
   return (
     <FeeItem title="Network Fee Rate">
