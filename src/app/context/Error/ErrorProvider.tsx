@@ -146,7 +146,10 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           request: error.request || {},
           response: error.response || {},
         }),
-        type: error.type ?? ErrorType.UNKNOWN,
+        type:
+          "type" in error && error.type !== undefined
+            ? error.type
+            : ErrorType.UNKNOWN,
       };
 
       if (shouldShowModal) {

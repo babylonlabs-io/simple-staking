@@ -78,8 +78,11 @@ const config: Config = {
     "process.env.JEST_ENV": "true",
   },
 
+  // The test environment that will be used for testing
+  testEnvironment: "jsdom",
+
   // The maximum amount of workers used to run your tests. Can be specified as % or a number. E.g. maxWorkers: 10% will use 10% of your CPU amount + 1 as the maximum worker number. maxWorkers: 2 will use a maximum of 2 workers.
-  // maxWorkers: "50%",
+  maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
   // moduleDirectories: [
@@ -101,6 +104,7 @@ const config: Config = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
   },
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
@@ -145,7 +149,7 @@ const config: Config = {
   // runner: "jest-runner",
 
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  setupFiles: ["./jest.setup.ts"],
+  setupFiles: ["./jest.setup.ts", "./jest.setup.js"],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
@@ -156,8 +160,7 @@ const config: Config = {
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
   // snapshotSerializers: [],
 
-  // The test environment that will be used for testing
-  testEnvironment: "jsdom",
+  // Projects
   projects: [
     {
       displayName: "node",
@@ -168,6 +171,7 @@ const config: Config = {
       displayName: "jsdom",
       testEnvironment: "jsdom",
       testMatch: ["<rootDir>/tests/**/*.test.tsx"],
+      setupFiles: ["./jest.jsdom.setup.js"],
     },
   ],
 

@@ -2,7 +2,7 @@ import { isStakingSignReady } from "@/utils/isStakingSignReady";
 
 describe("utils/isStakingSignReady", () => {
   it("should return false with reason if fpSelected is false", () => {
-    const result = isStakingSignReady(1, 2, 3, 4, 5, 6, false, 1);
+    const result = isStakingSignReady(1, 2, 3, 4, 5, 6, false, 1, 10);
     expect(result.isReady).toBe(false);
     expect(result.reason).toBe("Please select a finality provider");
   });
@@ -45,6 +45,7 @@ describe("utils/isStakingSignReady", () => {
         6,
         true,
         1,
+        10,
       );
       expect(result.isReady).toBe(false);
       expect(result.reason).toBe("Please enter a valid stake amount");
@@ -89,6 +90,7 @@ describe("utils/isStakingSignReady", () => {
         input.time,
         true,
         1,
+        10,
       );
       expect(result.isReady).toBe(false);
       expect(result.reason).toBe("Please enter a valid staking period");
@@ -96,13 +98,13 @@ describe("utils/isStakingSignReady", () => {
   });
 
   it("should return false with reason if sufficientBalance is false", () => {
-    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true, 0);
+    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true, 0, 10);
     expect(result.isReady).toBe(false);
     expect(result.reason).toBe("Not enough funds to cover fees for staking");
   });
 
   it("should return true with empty reason if amount and time are ready", () => {
-    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true, 1);
+    const result = isStakingSignReady(1, 10, 20, 30, 5, 25, true, 1, 10);
     expect(result.isReady).toBe(true);
     expect(result.reason).toBe("");
   });
