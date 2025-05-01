@@ -1,20 +1,15 @@
 import { Page } from "@playwright/test";
 
-// BBN Wallet Types
 export type BBNWalletType = "Keplr" | "Leap" | "Cosmostation";
 
-// BTC Wallet Types
 export type BTCWalletType = "OKX" | "Unisat" | "OneKey" | "Keystone";
 
-// Sample BBN wallet implementation for E2E testing purposes
 export const injectBBNWallet = async (
   page: Page,
   walletType: BBNWalletType = "Keplr",
 ) => {
   try {
-    // Inject the wallet methods into window.bbnwallet
     await page.evaluate((walletType) => {
-      // Mock BBN wallet
       const bbnWallet = {
         connectWallet: () => {
           bbnWallet.isConnected = true;
@@ -27,7 +22,7 @@ export const injectBBNWallet = async (
             {
               address: "bbn1qpzxvj2vty4smkhkn4fjkvst0kv8zgxjumz4u0",
               algo: "secp256k1",
-              pubkey: new Uint8Array([1, 2, 3, 4, 5]), // Mock public key
+              pubkey: new Uint8Array([1, 2, 3, 4, 5]),
             },
           ],
           signDirect: async () => ({
@@ -42,9 +37,7 @@ export const injectBBNWallet = async (
             },
           }),
         }),
-        // Provide getOfflineSignerAuto for compatibility
         getOfflineSignerAuto: async () => bbnWallet.getOfflineSigner(),
-        // Provide getAddress used by Babylon connector
         getAddress: async () => "bbn1qpzxvj2vty4smkhkn4fjkvst0kv8zgxjumz4u0",
         on: (event: string, callback: Function) => {
           return () => {};
@@ -54,9 +47,7 @@ export const injectBBNWallet = async (
 
       window.bbnwallet = bbnWallet;
 
-      // Also add wallet-specific global objects to mimic actual Cosmos wallets
       if (walletType === "Keplr") {
-        // @ts-ignore - keplr is defined in the window for the test
         window.keplr = {
           enable: async (chainId: string) => {
             return true;
@@ -66,8 +57,8 @@ export const injectBBNWallet = async (
             return {
               name: "mock-keplr",
               algo: "secp256k1",
-              pubKey: new Uint8Array([1, 2, 3, 4, 5]), // Mock public key
-              address: new Uint8Array([1, 2, 3, 4, 5]), // Mock address
+              pubKey: new Uint8Array([1, 2, 3, 4, 5]),
+              address: new Uint8Array([1, 2, 3, 4, 5]),
               bech32Address: "bbn1qpzxvj2vty4smkhkn4fjkvst0kv8zgxjumz4u0",
             };
           },
@@ -116,15 +107,12 @@ export const injectBBNWallet = async (
   }
 };
 
-// Sample BTC wallet implementation for E2E testing purposes
 export const injectBTCWallet = async (
   page: Page,
   walletType: BTCWalletType = "OKX",
 ) => {
   try {
-    // Inject the wallet methods into window.btcwallet
     await page.evaluate((walletType) => {
-      // wallet
       const btcWallet = {
         connectWallet: () => {
           btcWallet.isConnected = true;
@@ -160,15 +148,11 @@ export const injectBTCWallet = async (
 
       window.btcwallet = btcWallet;
 
-      // Also add wallet-specific global objects to mimic actual extensions
       if (walletType === "OKX") {
-        // Use a type assertion for the entire object
         (window as any).okxwallet = {
-          // Add all bitcoin network providers
           bitcoin: {
             ...btcWallet,
             isOKXWallet: true,
-            // Add properties specifically required for Bitcoin support
             getNetwork: () => "mainnet",
             getPublicKey: () =>
               "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
@@ -185,7 +169,6 @@ export const injectBTCWallet = async (
             signPsbt: (psbtHex: string) => {
               return "signed_psbt_hex_string";
             },
-            // Add connect method that OKXProvider calls
             connect: async () => {
               return {
                 address:
@@ -194,11 +177,9 @@ export const injectBTCWallet = async (
                   "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
               };
             },
-            // Add getSelectedAddress method
             getSelectedAddress: () => {
               return "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd";
             },
-            // Add any other potentially necessary methods
             getKey: () => ({
               publicKey:
                 "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
@@ -207,7 +188,6 @@ export const injectBTCWallet = async (
             }),
           },
 
-          // Add testnet support
           bitcoinTestnet: {
             ...btcWallet,
             isOKXWallet: true,
@@ -235,7 +215,6 @@ export const injectBTCWallet = async (
             },
           },
 
-          // Add signet support
           bitcoinSignet: {
             ...btcWallet,
             isOKXWallet: true,
@@ -263,7 +242,6 @@ export const injectBTCWallet = async (
             },
           },
 
-          // Add enable method required by the wallet connector
           enable: async (chain = "BTC") => {
             if (chain === "BTC" || chain === "Bitcoin" || chain === "bitcoin") {
               return [
@@ -272,11 +250,9 @@ export const injectBTCWallet = async (
             }
             throw new Error(`Chain not supported: ${chain}`);
           },
-          // Add additional methods that might be needed
           request: async (params: { method: string; params?: any }) => {
             const { method, params: methodParams } = params;
 
-            // Handle different request methods
             switch (method) {
               case "btc_getAccounts":
               case "btc_accounts":
@@ -298,14 +274,11 @@ export const injectBTCWallet = async (
             }
           },
           isConnected: () => true,
-          // Indicate which networks are supported - this is explicitly required by some implementations
           supportedChains: ["BTC", "bitcoin", "Bitcoin"],
-          // Check if a specific network is supported in the format expected by the connector
           hasChain: (chain: string) =>
             ["BTC", "bitcoin", "Bitcoin"].includes(chain),
           on: (event: string, handler: Function) => {},
           off: (event: string, handler: Function) => {},
-          // Ensure these are set to show wallet is installed and ready
           isOKXWallet: true,
           version: "1.0.0",
         };
@@ -325,7 +298,6 @@ export const injectBTCWallet = async (
       }
     }, walletType);
 
-    // Verify wallet was properly injected
     const isInjected = await verifyBTCWalletInjected(page);
     if (!isInjected) {
       throw new Error("BTC wallet was not properly injected");
@@ -355,12 +327,10 @@ const verifyBBNWalletInjected = async (page: Page): Promise<boolean> => {
   }
 };
 
-// Mock BBN RPC query functions used in E2E tests
 export const injectBBNQueries = async (
   page: Page,
   rewardAmount: string = "500000",
 ) => {
-  // Precompute encoded protobuf responses in Node (outside browser)
   const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
   const {
     QueryBalanceResponse,
@@ -381,7 +351,6 @@ export const injectBBNQueries = async (
     incentivequery.QueryRewardGaugesResponse.encode(rewardGaugeProto).finish(),
   ).toString("base64");
 
-  // Build and pre-encode correct bank balance response (1 000 000 ubbn)
   const balanceProto = QueryBalanceResponse.fromPartial({
     balance: { denom: "ubbn", amount: "1000000" },
   });
@@ -390,14 +359,11 @@ export const injectBBNQueries = async (
     QueryBalanceResponse.encode(balanceProto).finish(),
   ).toString("base64");
 
-  // Sanity-check decode at build time (throws if malformed)
   QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64"));
 
   await page.addInitScript((amount) => {
-    // Enable E2E test mode so the application uses the mocked queries
     window.__e2eTestMode = true;
 
-    // Mock the bank balance query
     window.mockCosmJSBankBalance = (address) => {
       return Promise.resolve({
         amount: "1000000",
@@ -405,7 +371,6 @@ export const injectBBNQueries = async (
       });
     };
 
-    // Mock the rewards gauge query with a configurable amount
     window.mockCosmJSRewardsQuery = (address) => {
       return Promise.resolve({
         rewardGauges: {
@@ -427,7 +392,6 @@ export const injectBBNQueries = async (
       } catch (err) {}
     };
 
-    // Patch SigningStargateClient.connectWithSigner to avoid network/crypto issues
     (function patchSSC() {
       const patch = (ssc: any) => {
         if (ssc && typeof ssc.connectWithSigner === "function") {
@@ -443,7 +407,6 @@ export const injectBBNQueries = async (
       // @ts-ignore
       patch(window.SigningStargateClient);
 
-      // Then poll in case module loads later
       const id = setInterval(() => {
         // @ts-ignore
         if (window.SigningStargateClient) {
@@ -455,12 +418,10 @@ export const injectBBNQueries = async (
     })();
   }, rewardAmount);
 
-  // Intercept Tendermint ABCI queries in the browser context
   await page.route("**/abci_query?*", async (route) => {
     const url = new URL(route.request().url());
     const path = url.searchParams.get("path") || "";
 
-    // Normalize
     const decodedPath = decodeURIComponent(path).replace(/"/g, "");
     if (
       decodedPath.includes("babylon.incentive.Query/RewardGauges") ||
@@ -496,7 +457,6 @@ export const injectBBNQueries = async (
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
       } catch (e) {}
-      // Dump decoded bank balance in browser context for verification
       try {
         // @ts-ignore - page() is internal Playwright API not in type defs
         await (route as any).page().evaluate((b64: string) => {
@@ -529,11 +489,9 @@ export const injectBBNQueries = async (
       return;
     }
 
-    // Otherwise, continue normally
     await route.continue();
   });
 
-  // Intercept JSON-RPC POST requests hitting the RPC endpoint root
   await page.route("**", async (route, request) => {
     if (request.method() !== "POST") {
       return route.continue();
@@ -544,11 +502,9 @@ export const injectBBNQueries = async (
     try {
       parsed = postData ? JSON.parse(postData) : null;
     } catch {
-      // not JSON, continue
       return route.continue();
     }
 
-    // Handle status method for Tendermint34Client
     if (parsed && parsed.method === "status") {
       return route.fulfill({
         status: 200,
@@ -630,7 +586,6 @@ export const injectBBNQueries = async (
     }
 
     if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      // Dump decoded in browser
       try {
         // @ts-ignore
         await (route as any).page().evaluate((b64: string) => {
@@ -662,7 +617,6 @@ export const injectBBNQueries = async (
       });
     }
 
-    // Not one of our mocked paths
     return route.continue();
   });
 
