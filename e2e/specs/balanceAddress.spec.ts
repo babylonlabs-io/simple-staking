@@ -27,6 +27,7 @@ test.describe("Balance and address checks after connection", () => {
     server.resetHandlers();
 
     await mockVerifyBTCAddress(page);
+
     await injectBBNQueries(page);
 
     await page.goto("http://localhost:3000");
@@ -34,6 +35,7 @@ test.describe("Balance and address checks after connection", () => {
     await dismissGenesisDialog(page);
 
     await page.waitForLoadState("networkidle");
+
     await page.waitForTimeout(2000);
 
     await injectBTCWallet(page);
@@ -47,6 +49,8 @@ test.describe("Balance and address checks after connection", () => {
 
   test("balance is correct", async ({ page }) => {
     const spinners = page.locator(".bbn-list-item .bbn-loader");
+    // Wait for 60 seconds as requested
+    await page.waitForTimeout(60000);
     try {
       await spinners.waitFor({ state: "hidden", timeout: 5e3 });
     } catch (error) {

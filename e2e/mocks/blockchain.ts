@@ -45,6 +45,10 @@ export const injectBBNWallet = async (
             },
           }),
         }),
+        // Provide getOfflineSignerAuto for compatibility
+        getOfflineSignerAuto: async () => bbnWallet.getOfflineSigner(),
+        // Provide getAddress used by Babylon connector
+        getAddress: async () => "bbn1qpzxvj2vty4smkhkn4fjkvst0kv8zgxjumz4u0",
         on: (event: string, callback: Function) => {
           console.log(`Registered BBN event listener for: ${event}`);
           return () =>
@@ -178,7 +182,7 @@ export const injectBTCWallet = async (
         getInscriptions: () => [],
         signPsbt: (_psbtHex: string) => {
           console.log(`Mock ${walletType} signPsbt called`);
-          return "70736274ff0100fd040102000000028a12de07985b7d06d83d9683eb3c0a86284fa3cbb2df998aed61009d700748ba0200000000fdffffff4ca53ae433b535b660a2dca99724199b2219a617508eed2ccf88762683a622430200000000fdffffff0350c3000000000000225120cf7c40c6fb1395430816dbb5e1ba9f172ef25573a3b609efa1723559cd82d5590000000000000000496a4762626234004c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608094f5861be4128861d69ea4b66a5f974943f100f55400bf26f5cce124b4c9af7009604450000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f47340e0d000001012b50ba0000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f470108420140f94b4114bf4c77c449fefb45d60a86831a73897e58b03ba8250e1bf877912cdcc48d106fa266e8aa4085a43e9ad348652fb7b1ad0d820b6455c06edd92cadfef0001012b79510000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f470108420140e7abc0544c68c94a154e9136397ad8ab7d4dce0545c7c0db89aeb9a455e9377fb1c116ca20cdcb1c1ef4c9335a85c34499f45918ee37b010b69220626c4a8d7100000000";
+          return "70736274ff0100fd040102000000028a12de07985b7d06d83d9683eb3c0a86284fa3cbb2df998aed61009d700748ba0200000000fdffffff4ca53ae433b535b660a2dca99724199b2219a617508eed2ccf88762683a622430200000000fdffffff0350c3000000000000225120cf7c40c6fb1395430816dbb5e1ba9f172ef25573a3b609efa1723559cd82d5590000000000000000496a4762626234004c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608094f5861be4128861d69ea4b66a5f974943f100f55400bf26f5cce124b4c9af7009604450000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f47340e0d000001012b50ba0000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f470108420140f94b4114bf4c77c449fefb45d60a86831a73897e58b03ba8250e1bf877912cdcc48d106fa266e8aa4085a43e9ad348652fb7b1ad0d820b6455c06edd92cadfef00000000";
         },
         pushTx: (_txHex: string) => {
           console.log(`Mock ${walletType} pushTx called`);
@@ -412,12 +416,57 @@ const verifyBBNWalletInjected = async (page: Page): Promise<boolean> => {
 };
 
 // Mock BBN RPC query functions used in E2E tests
-export const injectBBNQueries = async (page: Page) => {
+export const injectBBNQueries = async (
+  page: Page,
+  rewardAmount: string = "500000",
+) => {
   console.log("Injecting BBN query mocks...");
 
-  await page.addInitScript(() => {
+  // Precompute encoded protobuf responses in Node (outside browser)
+  const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
+  const {
+    QueryBalanceResponse,
+  } = require("cosmjs-types/cosmos/bank/v1beta1/query");
+
+  const rewardGaugeProto = incentivequery.QueryRewardGaugesResponse.fromPartial(
+    {
+      rewardGauges: {
+        BTC_STAKER: {
+          coins: [{ amount: rewardAmount, denom: "ubbn" }],
+          withdrawnCoins: [],
+        },
+      },
+    },
+  );
+
+  const rewardGaugeBase64 = Buffer.from(
+    incentivequery.QueryRewardGaugesResponse.encode(rewardGaugeProto).finish(),
+  ).toString("base64");
+
+  console.log(
+    "[E2E] Prepared rewardGaugeBase64",
+    rewardGaugeBase64.slice(0, 20),
+    "... len",
+    rewardGaugeBase64.length,
+  );
+
+  // Build and pre-encode correct bank balance response (1 000 000 ubbn)
+  const balanceProto = QueryBalanceResponse.fromPartial({
+    balance: { denom: "ubbn", amount: "1000000" },
+  });
+
+  const balanceBase64: string = Buffer.from(
+    QueryBalanceResponse.encode(balanceProto).finish(),
+  ).toString("base64");
+
+  // Sanity-check decode at build time (throws if malformed)
+  QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64"));
+
+  await page.addInitScript((amount) => {
+    // Enable E2E test mode so the application uses the mocked queries
     window.__e2eTestMode = true;
 
+    // Mock the bank balance query
     window.mockCosmJSBankBalance = (address) => {
       console.log(`Mock CosmJS bank balance query for address: ${address}`);
       return Promise.resolve({
@@ -426,12 +475,13 @@ export const injectBBNQueries = async (page: Page) => {
       });
     };
 
+    // Mock the rewards gauge query with a configurable amount
     window.mockCosmJSRewardsQuery = (address) => {
       console.log(`Mock CosmJS rewards query for address: ${address}`);
       return Promise.resolve({
         rewardGauges: {
           BTC_STAKER: {
-            coins: [{ amount: "500000", denom: "ubbn" }],
+            coins: [{ amount, denom: "ubbn" }],
             withdrawnCoins: [],
           },
         },
@@ -439,5 +489,332 @@ export const injectBBNQueries = async (page: Page) => {
     };
 
     console.log("Successfully injected BBN query mocks");
+
+    // @ts-ignore - helper only available in E2E browser context
+    window.__decodeBank = (b64: string) => {
+      try {
+        const {
+          QueryBalanceResponse,
+        } = require("cosmjs-types/cosmos/bank/v1beta1/query");
+        const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
+        console.log("[E2E] Decoded Bank Balance in browser", decoded);
+      } catch (err) {
+        console.error("[E2E] Failed to decode bank balance", err);
+      }
+    };
+
+    // Patch SigningStargateClient.connectWithSigner to avoid network/crypto issues
+    (function patchSSC() {
+      const patch = (ssc: any) => {
+        if (ssc && typeof ssc.connectWithSigner === "function") {
+          ssc.connectWithSigner = async () => {
+            console.log("[E2E] Returning mocked SigningStargateClient");
+            return {
+              simulate: async () => ({}),
+              signAndBroadcast: async () => ({ code: 0 }),
+            } as any;
+          };
+          console.log("[E2E] Patched SigningStargateClient.connectWithSigner");
+        }
+      };
+
+      // Attempt immediately
+      // @ts-ignore
+      patch(window.SigningStargateClient);
+
+      // Then poll in case module loads later
+      const id = setInterval(() => {
+        // @ts-ignore
+        if (window.SigningStargateClient) {
+          // @ts-ignore
+          patch(window.SigningStargateClient);
+          clearInterval(id);
+        }
+      }, 50);
+    })();
+  }, rewardAmount);
+
+  // Intercept Tendermint ABCI queries in the browser context
+  await page.route("**/abci_query?*", async (route) => {
+    const url = new URL(route.request().url());
+    const path = url.searchParams.get("path") || "";
+
+    // Normalize
+    const decodedPath = decodeURIComponent(path).replace(/"/g, "");
+
+    console.log("[E2E] ABCI query intercepted", {
+      original: route.request().url(),
+      path,
+      decodedPath,
+    });
+
+    if (
+      decodedPath.includes("babylon.incentive.Query/RewardGauges") ||
+      decodedPath.includes("babylon.incentive.v1.Query/RewardGauges")
+    ) {
+      console.log("[E2E] Mocking RewardGauges response");
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: -1,
+          result: {
+            response: {
+              code: 0,
+              log: "",
+              info: "",
+              index: "0",
+              key: null,
+              value: rewardGaugeBase64,
+              proof_ops: null,
+              height: "1",
+              codespace: "",
+            },
+          },
+        }),
+      });
+      return;
+    }
+
+    if (decodedPath.includes("cosmos.bank.v1beta1.Query/Balance")) {
+      console.log("[E2E] Mocking Bank Balance response");
+      try {
+        const {
+          QueryBalanceResponse,
+        } = require("cosmjs-types/cosmos/bank/v1beta1/query");
+        console.log(
+          "[E2E] Decoded bank response Node",
+          QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64")),
+        );
+      } catch (e) {
+        console.error("[E2E] Node decode error", e);
+      }
+      // Dump decoded bank balance in browser context for verification
+      try {
+        // @ts-ignore - page() is internal Playwright API not in type defs
+        await (route as any).page().evaluate((b64: string) => {
+          // @ts-ignore
+          window.__decodeBank?.(b64);
+        }, balanceBase64);
+      } catch {}
+
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: -1,
+          result: {
+            response: {
+              code: 0,
+              log: "",
+              info: "",
+              index: "0",
+              key: null,
+              value: balanceBase64,
+              proof_ops: null,
+              height: "1",
+              codespace: "",
+            },
+          },
+        }),
+      });
+      return;
+    }
+
+    console.log("[E2E] Passing through ABCI query");
+    // Otherwise, continue normally
+    await route.continue();
+  });
+
+  // Intercept JSON-RPC POST requests hitting the RPC endpoint root
+  await page.route("**", async (route, request) => {
+    if (request.method() !== "POST") {
+      return route.continue();
+    }
+
+    const postData = request.postData();
+    let parsed: any = null;
+    try {
+      parsed = postData ? JSON.parse(postData) : null;
+    } catch {
+      // not JSON, continue
+      return route.continue();
+    }
+
+    // Handle status method for Tendermint34Client
+    if (parsed && parsed.method === "status") {
+      console.log("[E2E] Mocking status response (POST)");
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: parsed.id ?? -1,
+          result: {
+            node_info: {
+              network: "bbn-test",
+              version: "0.34.0",
+              moniker: "e2e-mock-node",
+              id: "0e0e",
+              listen_addr: "0.0.0.0:26656",
+              channels: "40202122233038606100",
+              other: {},
+              protocol_version: {
+                app: "1",
+                block: "11",
+                p2p: "7",
+              },
+            },
+            sync_info: {
+              latest_block_height: "1",
+              latest_block_time: new Date().toISOString(),
+              catching_up: false,
+              latest_block_hash:
+                "0000000000000000000000000000000000000000000000000000000000000000",
+              latest_app_hash:
+                "0000000000000000000000000000000000000000000000000000000000000000",
+            },
+            validator_info: {
+              address: "0e0e",
+              pub_key: {
+                Sum: {
+                  value: {
+                    ed25519: "AQIDBAU=",
+                  },
+                },
+              },
+              voting_power: "0",
+            },
+          },
+        }),
+      });
+    }
+
+    if (!parsed || parsed.method !== "abci_query") {
+      return route.continue();
+    }
+
+    const pathParam = parsed.params?.path || "";
+    console.log("[E2E] JSON-RPC POST body data", {
+      pathParam,
+      data: parsed.params?.data,
+    });
+    console.log("[E2E] JSON-RPC abci_query intercepted", { pathParam });
+
+    if (
+      pathParam.includes("babylon.incentive.Query/RewardGauges") ||
+      pathParam.includes("babylon.incentive.v1.Query/RewardGauges")
+    ) {
+      console.log("[E2E] Mocking RewardGauges response (POST)");
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: parsed.id ?? -1,
+          result: {
+            response: {
+              code: 0,
+              log: "",
+              info: "",
+              index: "0",
+              key: null,
+              value: rewardGaugeBase64,
+              proof_ops: null,
+              height: "1",
+              codespace: "",
+            },
+          },
+        }),
+      });
+    }
+
+    if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
+      console.log("[E2E] Mocking Bank Balance response (POST)");
+      // Dump decoded in browser
+      try {
+        // @ts-ignore
+        await (route as any).page().evaluate((b64: string) => {
+          // @ts-ignore
+          window.__decodeBank?.(b64);
+        }, balanceBase64);
+      } catch {}
+
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: parsed.id ?? -1,
+          result: {
+            response: {
+              code: 0,
+              log: "",
+              info: "",
+              index: "0",
+              key: null,
+              value: balanceBase64,
+              proof_ops: null,
+              height: "1",
+              codespace: "",
+            },
+          },
+        }),
+      });
+    }
+
+    // Not one of our mocked paths
+    return route.continue();
+  });
+
+  // Intercept Tendermint /status (HTTP GET) requests
+  await page.route("**/status*", async (route) => {
+    console.log("[E2E] Mocking Tendermint /status response (GET)");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: -1,
+        result: {
+          node_info: {
+            network: "bbn-test",
+            version: "0.34.0",
+            moniker: "e2e-mock-node",
+            id: "0e0e",
+            listen_addr: "0.0.0.0:26656",
+            channels: "40202122233038606100",
+            other: {},
+            protocol_version: {
+              app: "1",
+              block: "11",
+              p2p: "7",
+            },
+          },
+          sync_info: {
+            latest_block_height: "1",
+            latest_block_time: new Date().toISOString(),
+            catching_up: false,
+            latest_block_hash:
+              "0000000000000000000000000000000000000000000000000000000000000000",
+            latest_app_hash:
+              "0000000000000000000000000000000000000000000000000000000000000000",
+          },
+          validator_info: {
+            address: "0e0e",
+            pub_key: {
+              Sum: {
+                value: {
+                  ed25519: "AQIDBAU=",
+                },
+              },
+            },
+            voting_power: "0",
+          },
+        },
+      }),
+    });
   });
 };
