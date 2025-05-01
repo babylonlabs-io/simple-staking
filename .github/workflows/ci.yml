@@ -5,6 +5,9 @@ on:
     branches:
       - "**"
 
+permissions:
+  contents: read
+
 jobs:
   lint_test:
     uses: babylonlabs-io/.github/.github/workflows/reusable_node_lint_test.yml@v0.3.0
