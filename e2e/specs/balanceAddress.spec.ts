@@ -1,10 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { setupServer } from "msw/node";
 
-import {
-  dismissGenesisDialog,
-  setupWalletConnection,
-} from "../middleware/connect";
+import { setupWalletConnection } from "../middleware/connect";
 import {
   injectBBNQueries,
   injectBBNWallet,
@@ -31,8 +28,6 @@ test.describe("Balance and address checks after connection", () => {
     await injectBBNQueries(page);
 
     await page.goto("http://localhost:3000");
-
-    await dismissGenesisDialog(page);
 
     await page.waitForLoadState("networkidle");
 

@@ -11,15 +11,12 @@ export const injectBBNWallet = async (
   page: Page,
   walletType: BBNWalletType = "Keplr",
 ) => {
-  console.log(`Starting ${walletType} BBN wallet injection...`);
   try {
     // Inject the wallet methods into window.bbnwallet
     await page.evaluate((walletType) => {
-      console.log(`Injecting ${walletType} BBN wallet into page...`);
       // Mock BBN wallet
       const bbnWallet = {
         connectWallet: () => {
-          console.log(`Mock ${walletType} connectWallet called`);
           bbnWallet.isConnected = true;
           return bbnWallet;
         },
@@ -50,13 +47,9 @@ export const injectBBNWallet = async (
         // Provide getAddress used by Babylon connector
         getAddress: async () => "bbn1qpzxvj2vty4smkhkn4fjkvst0kv8zgxjumz4u0",
         on: (event: string, callback: Function) => {
-          console.log(`Registered BBN event listener for: ${event}`);
-          return () =>
-            console.log(`Unregistered BBN event listener for: ${event}`);
+          return () => {};
         },
-        off: (event: string, callback: Function) => {
-          console.log(`Removed BBN event listener for: ${event}`);
-        },
+        off: (event: string, callback: Function) => {},
       };
 
       window.bbnwallet = bbnWallet;
@@ -66,15 +59,10 @@ export const injectBBNWallet = async (
         // @ts-ignore - keplr is defined in the window for the test
         window.keplr = {
           enable: async (chainId: string) => {
-            console.log(
-              `Mock Keplr wallet enable called for chainId: ${chainId}`,
-            );
-            // The wallet connector expects this to return chainId, not addresses
             return true;
           },
           getOfflineSigner: () => bbnWallet.getOfflineSigner(),
           getKey: async (chainId: string) => {
-            console.log(`Mock Keplr getKey called for chainId: ${chainId}`);
             return {
               name: "mock-keplr",
               algo: "secp256k1",
@@ -99,9 +87,6 @@ export const injectBBNWallet = async (
         // @ts-ignore - leap is defined in the window for the test
         window.leap = {
           enable: async (chainId: string) => {
-            console.log(
-              `Mock Leap wallet enable called for chainId: ${chainId}`,
-            );
             return true;
           },
           getOfflineSigner: () => bbnWallet.getOfflineSigner(),
@@ -112,9 +97,6 @@ export const injectBBNWallet = async (
           providers: {
             keplr: {
               enable: async (chainId: string) => {
-                console.log(
-                  `Mock Cosmostation wallet enable called for chainId: ${chainId}`,
-                );
                 return true;
               },
               getOfflineSigner: () => bbnWallet.getOfflineSigner(),
@@ -122,21 +104,14 @@ export const injectBBNWallet = async (
           },
         };
       }
-
-      console.log(`${walletType} BBN wallet successfully injected`);
     }, walletType);
-    console.log(`${walletType} BBN wallet injection completed`);
 
     // Verify BBN wallet was properly injected
     const isBBNInjected = await verifyBBNWalletInjected(page);
-    console.log(
-      `BBN wallet injection verification: ${isBBNInjected ? "SUCCESS" : "FAILED"}`,
-    );
     if (!isBBNInjected) {
       throw new Error("BBN wallet was not properly injected");
     }
   } catch (error) {
-    console.error(`Error injecting ${walletType} BBN wallet:`, error);
     throw error;
   }
 };
@@ -146,15 +121,12 @@ export const injectBTCWallet = async (
   page: Page,
   walletType: BTCWalletType = "OKX",
 ) => {
-  console.log(`Starting ${walletType} BTC wallet injection...`);
   try {
     // Inject the wallet methods into window.btcwallet
     await page.evaluate((walletType) => {
-      console.log(`Injecting ${walletType} BTC wallet into page...`);
       // wallet
       const btcWallet = {
         connectWallet: () => {
-          console.log(`Mock ${walletType} connectWallet called`);
           btcWallet.isConnected = true;
           return btcWallet;
         },
@@ -165,11 +137,9 @@ export const injectBTCWallet = async (
         getPublicKeyHex: () =>
           "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
         on: (event: string, callback: Function) => {
-          return () => console.log(`Unregistered event listener for: ${event}`);
+          return () => {};
         },
-        off: (event: string, callback: Function) => {
-          console.log(`Removed event listener for: ${event}`);
-        },
+        off: (event: string, callback: Function) => {},
         getNetwork: () => "mainnet",
         getBTCTipHeight: () => 859568,
         getNetworkFees: () => ({
@@ -181,11 +151,9 @@ export const injectBTCWallet = async (
         }),
         getInscriptions: () => [],
         signPsbt: (_psbtHex: string) => {
-          console.log(`Mock ${walletType} signPsbt called`);
           return "70736274ff0100fd040102000000028a12de07985b7d06d83d9683eb3c0a86284fa3cbb2df998aed61009d700748ba0200000000fdffffff4ca53ae433b535b660a2dca99724199b2219a617508eed2ccf88762683a622430200000000fdffffff0350c3000000000000225120cf7c40c6fb1395430816dbb5e1ba9f172ef25573a3b609efa1723559cd82d5590000000000000000496a4762626234004c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608094f5861be4128861d69ea4b66a5f974943f100f55400bf26f5cce124b4c9af7009604450000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f47340e0d000001012b50ba0000000000002251203a24123d844b4115ac87811ec3e9acfe8a307307a4d480f04bffcae35cb80f470108420140f94b4114bf4c77c449fefb45d60a86831a73897e58b03ba8250e1bf877912cdcc48d106fa266e8aa4085a43e9ad348652fb7b1ad0d820b6455c06edd92cadfef00000000";
         },
         pushTx: (_txHex: string) => {
-          console.log(`Mock ${walletType} pushTx called`);
           return "47af61d63bcc6c513561d9a1198d082052cc07a81f50c6f130653f0a6ecc0fc1";
         },
       };
@@ -215,12 +183,10 @@ export const injectBTCWallet = async (
             isAccountActive: () => true,
             switchNetwork: (network: string) => Promise.resolve(true),
             signPsbt: (psbtHex: string) => {
-              console.log(`Mock OKX bitcoin.signPsbt called with: ${psbtHex}`);
               return "signed_psbt_hex_string";
             },
             // Add connect method that OKXProvider calls
             connect: async () => {
-              console.log("Mock OKX bitcoin.connect called");
               return {
                 address:
                   "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
@@ -230,7 +196,6 @@ export const injectBTCWallet = async (
             },
             // Add getSelectedAddress method
             getSelectedAddress: () => {
-              console.log("Mock OKX bitcoin.getSelectedAddress called");
               return "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd";
             },
             // Add any other potentially necessary methods
@@ -258,7 +223,6 @@ export const injectBTCWallet = async (
               "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
             ],
             connect: async () => {
-              console.log("Mock OKX bitcoinTestnet.connect called");
               return {
                 address:
                   "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
@@ -267,7 +231,6 @@ export const injectBTCWallet = async (
               };
             },
             getSelectedAddress: () => {
-              console.log("Mock OKX bitcoinTestnet.getSelectedAddress called");
               return "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m";
             },
           },
@@ -288,7 +251,6 @@ export const injectBTCWallet = async (
               "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
             ],
             connect: async () => {
-              console.log("Mock OKX bitcoinSignet.connect called");
               return {
                 address:
                   "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
@@ -297,18 +259,13 @@ export const injectBTCWallet = async (
               };
             },
             getSelectedAddress: () => {
-              console.log("Mock OKX bitcoinSignet.getSelectedAddress called");
               return "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m";
             },
           },
 
           // Add enable method required by the wallet connector
           enable: async (chain = "BTC") => {
-            console.log(`Mock OKX wallet enable called for chain: ${chain}`);
-            // Enable the wallet for connection
             if (chain === "BTC" || chain === "Bitcoin" || chain === "bitcoin") {
-              // The wallet connector might expect an array of addresses OR just a boolean success indicator
-              // Setting up the accounts to be retrieved by getAccounts/request methods
               return [
                 "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
               ];
@@ -317,7 +274,6 @@ export const injectBTCWallet = async (
           },
           // Add additional methods that might be needed
           request: async (params: { method: string; params?: any }) => {
-            console.log("Mock OKX wallet request called with params:", params);
             const { method, params: methodParams } = params;
 
             // Handle different request methods
@@ -338,9 +294,6 @@ export const injectBTCWallet = async (
               case "btc_signPsbt":
                 return methodParams?.psbt || "signed_psbt";
               default:
-                console.log(
-                  `Unhandled method in OKX wallet request: ${method}`,
-                );
                 return null;
             }
           },
@@ -350,12 +303,8 @@ export const injectBTCWallet = async (
           // Check if a specific network is supported in the format expected by the connector
           hasChain: (chain: string) =>
             ["BTC", "bitcoin", "Bitcoin"].includes(chain),
-          on: (event: string, handler: Function) => {
-            console.log(`OKX wallet registered event handler for: ${event}`);
-          },
-          off: (event: string, handler: Function) => {
-            console.log(`OKX wallet removed event handler for: ${event}`);
-          },
+          on: (event: string, handler: Function) => {},
+          off: (event: string, handler: Function) => {},
           // Ensure these are set to show wallet is installed and ready
           isOKXWallet: true,
           version: "1.0.0",
@@ -374,21 +323,14 @@ export const injectBTCWallet = async (
           },
         };
       }
-
-      console.log(`${walletType} BTC wallet successfully injected`);
     }, walletType);
-    console.log(`${walletType} BTC wallet injection completed`);
 
     // Verify wallet was properly injected
     const isInjected = await verifyBTCWalletInjected(page);
-    console.log(
-      `Wallet injection verification: ${isInjected ? "SUCCESS" : "FAILED"}`,
-    );
     if (!isInjected) {
       throw new Error("BTC wallet was not properly injected");
     }
   } catch (error) {
-    console.error(`Error injecting ${walletType} BTC wallet:`, error);
     throw error;
   }
 };
@@ -399,7 +341,6 @@ const verifyBTCWalletInjected = async (page: Page): Promise<boolean> => {
       return Boolean(window.btcwallet);
     });
   } catch (error) {
-    console.error("Error verifying BTC wallet injection:", error);
     return false;
   }
 };
@@ -410,7 +351,6 @@ const verifyBBNWalletInjected = async (page: Page): Promise<boolean> => {
       return Boolean(window.bbnwallet);
     });
   } catch (error) {
-    console.error("Error verifying BBN wallet injection:", error);
     return false;
   }
 };
@@ -420,8 +360,6 @@ export const injectBBNQueries = async (
   page: Page,
   rewardAmount: string = "500000",
 ) => {
-  console.log("Injecting BBN query mocks...");
-
   // Precompute encoded protobuf responses in Node (outside browser)
   const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
   const {
@@ -461,7 +399,6 @@ export const injectBBNQueries = async (
 
     // Mock the bank balance query
     window.mockCosmJSBankBalance = (address) => {
-      console.log(`Mock CosmJS bank balance query for address: ${address}`);
       return Promise.resolve({
         amount: "1000000",
         denom: "ubbn",
@@ -470,7 +407,6 @@ export const injectBBNQueries = async (
 
     // Mock the rewards gauge query with a configurable amount
     window.mockCosmJSRewardsQuery = (address) => {
-      console.log(`Mock CosmJS rewards query for address: ${address}`);
       return Promise.resolve({
         rewardGauges: {
           BTC_STAKER: {
@@ -481,8 +417,6 @@ export const injectBBNQueries = async (
       });
     };
 
-    console.log("Successfully injected BBN query mocks");
-
     // @ts-ignore - helper only available in E2E browser context
     window.__decodeBank = (b64: string) => {
       try {
@@ -490,9 +424,7 @@ export const injectBBNQueries = async (
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
         const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
-      } catch (err) {
-        console.error("Failed to decode bank balance", err);
-      }
+      } catch (err) {}
     };
 
     // Patch SigningStargateClient.connectWithSigner to avoid network/crypto issues
@@ -508,7 +440,6 @@ export const injectBBNQueries = async (
         }
       };
 
-      // Attempt immediately
       // @ts-ignore
       patch(window.SigningStargateClient);
 
@@ -564,9 +495,7 @@ export const injectBBNQueries = async (
         const {
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-      } catch (e) {
-        console.error("Node decode error", e);
-      }
+      } catch (e) {}
       // Dump decoded bank balance in browser context for verification
       try {
         // @ts-ignore - page() is internal Playwright API not in type defs
