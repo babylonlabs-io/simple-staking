@@ -74,8 +74,8 @@ export class WalletConnectActions {
 
   async acceptTermsAndConditions() {
     // Set up polling for the terms dialog
-    const maxWaitTime = 30000; // 30 seconds maximum wait time
-    const pollInterval = 1000; // 1 second between checks
+    const maxWaitTime = 10000;
+    const pollInterval = 1000;
     const startTime = Date.now();
     let termsDialogVisible = false;
 
