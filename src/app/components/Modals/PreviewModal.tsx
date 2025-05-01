@@ -57,7 +57,7 @@ export const PreviewModal = ({
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam
-      ?.btcConfirmationDepth || 10;
+      ?.btcConfirmationDepth || 30;
   const unbondingTime =
     blocksToDisplayTime(
       networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,

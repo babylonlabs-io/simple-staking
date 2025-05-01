@@ -1,16 +1,21 @@
 import {
-  type DefaultError,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
-  type QueryKey,
-  type UndefinedInitialDataOptions,
-  useQuery,
   UseQueryOptions,
   UseQueryResult,
+  useQuery,
+  type DefaultError,
+  type QueryKey,
+  type UndefinedInitialDataOptions,
 } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
+import {
+  API_DEFAULT_RETRY_COUNT,
+  API_DEFAULT_RETRY_DELAY,
+  ONE_MINUTE,
+  ONE_SECOND,
+} from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { Error } from "@/app/types/errors";
 
@@ -42,9 +47,8 @@ export function useClientQuery<
 
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
-    retry: (failureCount) => {
-      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
-    },
+    retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
+    retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
     ...options,
   });
 

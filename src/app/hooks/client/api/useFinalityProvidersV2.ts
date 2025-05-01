@@ -2,10 +2,15 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import {
-  type PaginatedFinalityProviders,
   getFinalityProvidersV2,
+  type PaginatedFinalityProviders,
 } from "@/app/api/getFinalityProvidersV2";
-import { API_DEFAULT_RETRY_COUNT, ONE_MINUTE } from "@/app/constants";
+import {
+  API_DEFAULT_RETRY_COUNT,
+  API_DEFAULT_RETRY_DELAY,
+  ONE_MINUTE,
+  ONE_SECOND,
+} from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 
 const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V2_KEY";
@@ -47,9 +52,8 @@ export function useFinalityProvidersV2({
       );
       return flattenedData;
     },
-    retry: (failureCount) => {
-      return !isOpen && failureCount <= API_DEFAULT_RETRY_COUNT;
-    },
+    retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
+    retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
   });
 
   useEffect(() => {

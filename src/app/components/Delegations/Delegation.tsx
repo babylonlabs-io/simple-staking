@@ -5,8 +5,8 @@ import { DelegationActions } from "@/app/components/Delegations/DelegationAction
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
-  type Delegation as DelegationInterface,
   DelegationState as DelegationStateEnum,
+  type Delegation as DelegationInterface,
 } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";
@@ -117,7 +117,7 @@ const DelegationState: React.FC<{
     }
 
     if (displayState === DelegationStateEnum.OVERFLOW) {
-      return "Stake is over the staking cap";
+      return "Stake was over the Phase-1 staking cap it was created in";
     }
 
     return getStateTooltip(displayState);

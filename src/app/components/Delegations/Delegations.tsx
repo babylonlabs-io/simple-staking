@@ -1,5 +1,6 @@
+import { getBabylonParamByBtcHeight } from "@babylonlabs-io/btc-staking-ts";
 import { Card, Heading } from "@babylonlabs-io/core-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -18,6 +19,7 @@ import { ServerError } from "@/app/context/Error/errors/serverError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
+import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
 import { useDelegationState } from "@/app/state/DelegationState";
@@ -52,6 +54,7 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
 };
 
 export const Delegations = ({}) => {
+  const { data: networkInfo } = useNetworkInfo();
   const { publicKeyNoCoord, connected, network } = useBTCWallet();
   const [modalOpen, setModalOpen] = useState(false);
   const [txID, setTxID] = useState("");
@@ -81,6 +84,38 @@ export const Delegations = ({}) => {
   const selectedDelegation = delegationsAPI?.delegations.find(
     (delegation) => delegation.stakingTxHashHex === txID,
   );
+
+  const selectedDelegationUnbondingTime = useMemo(() => {
+    if (
+      !selectedDelegation?.stakingTx.startHeight ||
+      !networkInfo?.params.bbnStakingParams.versions
+    ) {
+      return 0;
+    }
+    return getBabylonParamByBtcHeight(
+      selectedDelegation.stakingTx.startHeight,
+      networkInfo.params.bbnStakingParams.versions,
+    ).unbondingTime;
+  }, [
+    selectedDelegation?.stakingTx.startHeight,
+    networkInfo?.params.bbnStakingParams.versions,
+  ]);
+
+  const selectedDelegationUnbondingFeeSat = useMemo(() => {
+    if (
+      !selectedDelegation?.stakingTx.startHeight ||
+      !networkInfo?.params.bbnStakingParams.versions
+    ) {
+      return 0;
+    }
+    return getBabylonParamByBtcHeight(
+      selectedDelegation.stakingTx.startHeight,
+      networkInfo.params.bbnStakingParams.versions,
+    ).unbondingFeeSat;
+  }, [
+    selectedDelegation?.stakingTx.startHeight,
+    networkInfo?.params.bbnStakingParams.versions,
+  ]);
 
   // Local storage state for intermediate delegations (transitioning, withdrawing)
   const intermediateDelegationsLocalStorageKey =
@@ -314,7 +349,6 @@ export const Delegations = ({}) => {
     ? [...delegations, ...delegationsAPI.delegations]
     : // if no API data, fallback to using only local storage delegations
       delegations;
-
   return (
     <>
       {combinedDelegationsData.length !== 0 && (
@@ -402,6 +436,8 @@ export const Delegations = ({}) => {
             handleUnbond(txID);
           }}
           processing={awaitingWalletResponse}
+          unbondingFeeSat={selectedDelegationUnbondingFeeSat}
+          unbondingTimeInBlocks={selectedDelegationUnbondingTime}
         />
       )}
       <RegistrationStartModal

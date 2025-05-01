@@ -8,9 +8,9 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
-  type FormFields,
   StakingStep,
   useStakingState,
+  type FormFields,
 } from "@/app/state/StakingState";
 import {
   DelegationV2StakingState as DelegationState,
@@ -71,18 +71,14 @@ export function useStakingService() {
     term,
     feeRate,
   }: Omit<FormFields, "feeAmount">) => {
-    try {
-      const eoiInput = {
-        finalityProviderPkNoCoordHex: finalityProvider,
-        stakingAmountSat: btcToSatoshi(amount),
-        stakingTimelock: term,
-        feeRate: feeRate,
-      };
-      // Calculate the staking fee
-      return estimateStakingFee(eoiInput, feeRate);
-    } catch {
-      return 0;
-    }
+    const eoiInput = {
+      finalityProviderPkNoCoordHex: finalityProvider,
+      stakingAmountSat: btcToSatoshi(amount),
+      stakingTimelock: term,
+      feeRate: feeRate,
+    };
+    // Calculate the staking fee
+    return estimateStakingFee(eoiInput, feeRate);
   };
 
   const displayPreview = useCallback(
