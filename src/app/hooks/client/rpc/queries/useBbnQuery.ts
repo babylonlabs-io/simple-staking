@@ -39,7 +39,7 @@ export const useBbnQuery = () => {
     queryKey: [BBN_REWARDS_KEY, bech32Address],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
-        return 0;
+        return undefined;
       }
       const { incentive } = setupIncentiveExtension(queryClient);
       const req: incentivequery.QueryRewardGaugesRequest =
