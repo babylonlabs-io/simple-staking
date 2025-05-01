@@ -48,7 +48,8 @@ export const injectBBNWallet = async (
       window.bbnwallet = bbnWallet;
 
       if (walletType === "Keplr") {
-        window.keplr = {
+        // @ts-ignore - keplr is defined in the window for the test
+        (window as any).keplr = {
           enable: async (chainId: string) => {
             return true;
           },
