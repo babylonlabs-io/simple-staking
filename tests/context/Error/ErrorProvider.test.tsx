@@ -15,6 +15,7 @@ jest.mock("@/app/components/Modals/ErrorModal", () => ({
 jest.mock("@sentry/nextjs", () => {
   const mockSentryWithScope = jest.fn();
   const mockSentryCaptureException = jest.fn();
+  const mockAddBreadcrumb = jest.fn();
 
   return {
     withScope: mockSentryWithScope.mockImplementation((fn) => {
@@ -28,6 +29,7 @@ jest.mock("@sentry/nextjs", () => {
     captureException: mockSentryCaptureException.mockImplementation(
       () => "mock-sentry-event-id",
     ),
+    addBreadcrumb: mockAddBreadcrumb,
   };
 });
 
@@ -71,6 +73,7 @@ describe("ErrorProvider", () => {
   beforeEach(() => {
     mockedSentry.withScope.mockClear();
     mockedSentry.captureException.mockClear();
+    mockedSentry.addBreadcrumb.mockClear();
     jest.clearAllMocks();
   });
 
@@ -108,10 +111,20 @@ describe("ErrorProvider", () => {
     const metadataPassedToSentry = mockScope.setExtras.mock.calls[0][0];
 
     expect(metadataPassedToSentry).toMatchObject({
-      userPublicKey: mockWalletData.userPublicKey,
-      btcAddress: mockWalletData.btcAddress,
-      babylonAddress: mockWalletData.babylonAddress,
-      testField: "Additional test data",
+      trace: expect.any(String),
+    });
+
+    expect(mockedSentry.addBreadcrumb).toHaveBeenCalledWith({
+      category: "metadata",
+      message: "Application metadata captured",
+      level: "info",
+      data: {
+        errorSource: undefined,
+        userPublicKey: mockWalletData.userPublicKey,
+        btcAddress: mockWalletData.btcAddress,
+        babylonAddress: mockWalletData.babylonAddress,
+        testField: "Additional test data",
+      },
     });
 
     expect(mockScope.setTag).toHaveBeenCalledWith(
@@ -153,7 +166,18 @@ describe("ErrorProvider", () => {
     const metadataPassedToSentry = mockScope.setExtras.mock.calls[0][0];
 
     expect(metadataPassedToSentry).toMatchObject({
-      errorSource: undefined,
+      trace: expect.any(String),
+    });
+
+    expect(metadataPassedToSentry).not.toHaveProperty("errorSource");
+
+    expect(mockedSentry.addBreadcrumb).toHaveBeenCalledWith({
+      category: "metadata",
+      message: "Application metadata captured",
+      level: "info",
+      data: {
+        errorSource: undefined,
+      },
     });
 
     expect(mockScope.setTag).toHaveBeenCalledWith(

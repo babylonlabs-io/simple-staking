@@ -69,6 +69,17 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
     }, 300);
   }, []);
 
+  const addMetadataBreadcrumb = (metadata: Record<string, any> | undefined) => {
+    if (metadata && Object.keys(metadata).length > 0) {
+      Sentry.addBreadcrumb({
+        category: "metadata",
+        message: "Application metadata captured",
+        level: "info",
+        data: metadata,
+      });
+    }
+  };
+
   const handleError = useCallback(
     ({ error, displayOptions, metadata }: ErrorHandlerParam) => {
       if (!error) return;
@@ -101,6 +112,8 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           ? displayOptions.showModal // Explicit setting takes priority
           : !isSilentByDefault; // Otherwise use the default for this error type
 
+      addMetadataBreadcrumb(combinedMetadata);
+
       const eventId = Sentry.withScope((scope) => {
         if (error instanceof ServerError) {
           scope.setTag("errorType", ErrorType.SERVER);
@@ -111,7 +124,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
             trace: stackTrace,
             request: error.request || {},
             response: error.response || {},
-            ...combinedMetadata,
           });
         } else if (error instanceof ClientError) {
           scope.setTag("errorType", error.type ?? ErrorType.UNKNOWN);
@@ -119,13 +131,11 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
           scope.setExtras({
             trace: stackTrace,
-            ...combinedMetadata,
           });
         } else {
           scope.setTag("errorType", ErrorType.UNKNOWN);
           scope.setExtras({
             trace: stackTrace,
-            ...combinedMetadata,
           });
         }
         return Sentry.captureException(error);
