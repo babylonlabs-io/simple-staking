@@ -361,21 +361,14 @@ export const handlers = [
 const server = setupServer(...handlers);
 
 export const mockVerifyBTCAddress = async (page: Page) => {
-  console.log("Setting up verifyBTCAddress mock...");
-
   server.listen({ onUnhandledRequest: "bypass" });
 
   await page.addInitScript(() => {
     window.__e2eTestMode = true;
     window.__mockVerifyBTCAddress = async () => {
-      console.log("Global mock verifyBTCAddress called, returning true");
       return true;
     };
-
-    console.log("Successfully set up verifyBTCAddress mocks");
   });
-
-  console.log("verifyBTCAddress mock setup complete");
 
   return () => {
     server.close();

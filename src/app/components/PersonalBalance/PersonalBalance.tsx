@@ -54,14 +54,6 @@ export function PersonalBalance() {
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
-  console.log({
-    bbnBalance,
-    stakableBtcBalance,
-    stakedBtcBalance,
-    inscriptionsBtcBalance,
-    isBalanceLoading,
-  });
-
   return (
     <AuthGuard>
       <Section title="Wallet Balance">

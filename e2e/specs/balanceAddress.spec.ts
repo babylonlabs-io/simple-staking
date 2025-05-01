@@ -49,8 +49,6 @@ test.describe("Balance and address checks after connection", () => {
 
   test("balance is correct", async ({ page }) => {
     const spinners = page.locator(".bbn-list-item .bbn-loader");
-    // Wait for 60 seconds as requested
-    await page.waitForTimeout(60000);
     try {
       await spinners.waitFor({ state: "hidden", timeout: 5e3 });
     } catch (error) {
@@ -58,7 +56,6 @@ test.describe("Balance and address checks after connection", () => {
         window.dispatchEvent(new Event("resize"));
       });
     }
-
     const stakedBalance = await page
       .locator('.bbn-list-item:has-text("Staked Balance") .bbn-list-value')
       .textContent();
@@ -72,7 +69,7 @@ test.describe("Balance and address checks after connection", () => {
       .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
       .textContent();
 
-    expect(stakedBalance).toContain("0 BTC");
+    expect(stakedBalance).toContain("0.09876543 BTC");
     expect(stakableBalance).toContain("0.00074175 BTC");
     expect(babyBalance).toContain("1 BABY");
     expect(babyRewards).toContain("0.5 BABY");
