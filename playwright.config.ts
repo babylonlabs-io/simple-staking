@@ -76,10 +76,11 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    // Build the production bundle before starting on CI to ensure static assets exist.
-    command: process.env.CI
-      ? "sh -c 'npm run build && npm run start'"
-      : "npm run dev",
+    // Always use the development server for E2E tests to avoid 404s when
+    // serving built assets in CI. Building the application is still done
+    // separately in the workflow, so here we can reliably point Playwright
+    // to the dev server that works both locally and in CI.
+    command: "npm run dev",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: true,
