@@ -32,6 +32,10 @@ export default defineConfig({
     // More information: https://playwright.dev/docs/api/class-testoptions#test-options-base-url
     baseURL,
 
+    // Run tests in headful mode locally for easier debugging, but keep the
+    // default headless mode on CI.
+    headless: process.env.CI ? true : undefined,
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
@@ -84,5 +88,8 @@ export default defineConfig({
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: true,
+    env: {
+      NODE_OPTIONS: "--max-http-header-size=65536",
+    },
   },
 });
