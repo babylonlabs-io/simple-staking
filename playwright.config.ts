@@ -19,6 +19,8 @@ export default defineConfig({
   forbidOnly: false,
   /* Retry on CI only */
   retries: 2,
+  // Increase default timeout to accommodate slower CI startup and wallet setup.
+  timeout: 90 * 1000,
   /* Opt out of parallel tests on CI. */
   workers: 2,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
