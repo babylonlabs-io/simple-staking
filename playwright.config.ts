@@ -76,9 +76,10 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    // In CI, serve the pre-built static export instead of starting a Next.js server.
-    // Locally keep using the dev server with hot reload.
-    command: process.env.CI ? "npm run start" : "npm run dev",
+    // Build the production bundle before starting on CI to ensure static assets exist.
+    command: process.env.CI
+      ? "sh -c 'npm run build && npm run start'"
+      : "npm run dev",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: true,
