@@ -24,7 +24,7 @@ export const Stats = memo(() => {
       active_tvl: activeTVL = 0,
       total_finality_providers: totalFPs = 0,
       active_finality_providers: activeFPs = 0,
-      btc_staking_apy: stakingAPR,
+      btc_staking_apr: stakingAPR,
     } = {},
     isLoading,
   } = useSystemStats();
