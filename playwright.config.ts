@@ -22,7 +22,7 @@ export default defineConfig({
   // Increase default timeout to accommodate slower CI startup and wallet setup.
   timeout: 90 * 1000,
   /* Opt out of parallel tests on CI. */
-  workers: 2,
+  workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: "html",
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
