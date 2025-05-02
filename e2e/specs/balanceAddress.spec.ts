@@ -21,6 +21,16 @@ test.describe("Balance and address checks after connection", () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    // Capture browser console logs and page errors for CI debugging
+    page.on("console", (msg) => {
+      // Print all browser console messages with their type
+      console.log(`BROWSER CONSOLE [${msg.type()}]:`, msg.text());
+    });
+
+    page.on("pageerror", (err) => {
+      console.log("BROWSER PAGE ERROR:", err);
+    });
+
     server.resetHandlers();
 
     await mockVerifyBTCAddress(page);
