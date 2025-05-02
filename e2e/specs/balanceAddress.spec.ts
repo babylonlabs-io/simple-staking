@@ -51,9 +51,21 @@ test.describe("Balance and address checks after connection", () => {
         window.dispatchEvent(new Event("resize"));
       });
     }
-    const stakedBalance = await page
-      .locator('.bbn-list-item:has-text("Staked Balance") .bbn-list-value')
-      .textContent();
+    const stakedBalance = page.locator(
+      '.bbn-list-item:has-text("Staked Balance") .bbn-list-value',
+    );
+
+    const stakedCount = await stakedBalance.count();
+    // Debug output for CI to understand why the locator is not found.
+    console.log('DEBUG: "Staked Balance" locator count =', stakedCount);
+    if (stakedCount === 0) {
+      const currentUrl = page.url();
+      const pageHtmlSnippet = (await page.content()).slice(0, 1000);
+      console.log("DEBUG: Current page URL =", currentUrl);
+      console.log("DEBUG: First 1000 chars of page HTML:\n", pageHtmlSnippet);
+    }
+
+    const stakedBalanceText = await stakedBalance.textContent();
     const stakableBalance = await page
       .locator('.bbn-list-item:has-text("Stakable Balance") .bbn-list-value')
       .textContent();
@@ -64,7 +76,7 @@ test.describe("Balance and address checks after connection", () => {
       .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
       .textContent();
 
-    expect(stakedBalance).toContain("0.09876543 BTC");
+    expect(stakedBalanceText).toContain("0.09876543 BTC");
     expect(stakableBalance).toContain("0.00074175 BTC");
     expect(babyBalance).toContain("1 BABY");
     expect(babyRewards).toContain("0.5 BABY");
