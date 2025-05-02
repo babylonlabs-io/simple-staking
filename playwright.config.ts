@@ -74,7 +74,9 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "npm run dev",
+    // In CI, run the already-built production server to avoid hot-reload restarts that can
+    // close the browser page. Default to the dev server locally.
+    command: process.env.CI ? "npm run start" : "npm run dev",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: true,
