@@ -10,7 +10,7 @@ export interface SystemStats {
   active_finality_providers: number;
   total_finality_providers: number;
   total_active_tvl: number;
-  btc_staking_apy: number;
+  btc_staking_apr: number;
 }
 
 interface SystemStatsAPIResponse {
