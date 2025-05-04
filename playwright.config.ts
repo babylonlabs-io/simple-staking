@@ -84,9 +84,7 @@ export default defineConfig({
     // serving built assets in CI. Building the application is still done
     // separately in the workflow, so here we can reliably point Playwright
     // to the dev server that works both locally and in CI.
-    command: process.env.CI
-      ? "sh -c 'npm run build && NODE_OPTIONS=\"--max-http-header-size=65536\" npm run start'"
-      : "npm run dev",
+    command: "npm run dev",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: true,
