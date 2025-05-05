@@ -70,22 +70,6 @@ test.describe("Balance and address checks after connection", () => {
     });
     console.log("DEBUG: CSS present:", cssPresent);
 
-    // Add longer timeout to ensure page is fully loaded
-    await page.waitForTimeout(5000);
-
-    // Check if page loaded correctly
-    const pageTitle = await page.title();
-    console.log("DEBUG: Page title:", pageTitle);
-
-    // Retry navigation if needed
-    if (!pageTitle || pageTitle === "about:blank") {
-      console.log("DEBUG: Retrying navigation...");
-      await page.goto("/", { timeout: 30000 });
-      await page.waitForLoadState("domcontentloaded");
-      await page.waitForLoadState("networkidle");
-      await page.waitForTimeout(3000);
-    }
-
     await setupWalletConnection(page);
   });
 
@@ -97,43 +81,10 @@ test.describe("Balance and address checks after connection", () => {
       await page.evaluate(() => document.readyState),
     );
 
-    // Check if we're on the right page
-    const content = await page.content();
-    console.log("DEBUG: Page content:", content);
-    if (!content.includes("Staked Balance")) {
-      console.log(
-        "DEBUG: Page doesn't contain 'Staked Balance', attempting to force navigation again",
-      );
-      await page.goto("/", { timeout: 60000, waitUntil: "networkidle" });
-      await page.waitForTimeout(10000); // Give more time to load
-    }
-
     const spinners = page.locator(
       '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader',
     );
-    try {
-      await spinners.waitFor({ state: "hidden", timeout: 5e3 });
-    } catch (error) {
-      console.log("DEBUG: Waiting for spinners failed, forcing resize");
-      await page.evaluate(() => {
-        window.dispatchEvent(new Event("resize"));
-      });
-      // Add another wait for network traffic to complete
-      await page
-        .waitForLoadState("networkidle", { timeout: 15000 })
-        .catch((e) => {
-          console.log(
-            "DEBUG: Additional networkidle wait timed out",
-            e.message,
-          );
-        });
-    }
-
-    // Dump HTML content to see what we're actually looking at
-    console.log(
-      "DEBUG: HTML snippet:",
-      (await page.content()).substring(0, 2000),
-    );
+    await spinners.waitFor({ state: "hidden", timeout: 5e3 });
 
     // Wait specifically for the staked balance element to appear
     try {
@@ -158,20 +109,6 @@ test.describe("Balance and address checks after connection", () => {
       '[data-testid="staked-balance"] .bbn-list-value',
     );
 
-    const stakedCount = await stakedBalance.count();
-    // Debug output for CI to understand why the locator is not found.
-    console.log('DEBUG: "Staked Balance" locator count =', stakedCount);
-    if (stakedCount === 0) {
-      const currentUrl = page.url();
-      const pageHtmlSnippet = (await page.content()).slice(0, 1000);
-      console.log("DEBUG: Current page URL =", currentUrl);
-      console.log("DEBUG: First 1000 chars of page HTML:\n", pageHtmlSnippet);
-      // Throw informative error instead of implicit timeout
-      throw new Error(
-        "Staked Balance element not found in the page after multiple attempts",
-      );
-    }
-
     const stakedBalanceText = await stakedBalance.textContent();
     const stakableBalance = await page
       .locator('[data-testid="stakable-balance"] .bbn-list-value')
@@ -182,6 +119,14 @@ test.describe("Balance and address checks after connection", () => {
     const babyRewards = await page
       .locator('[data-testid="baby-rewards"] .bbn-list-value')
       .textContent();
+
+    console.log(
+      "DEBUG: VALUES!",
+      stakedBalanceText,
+      stakableBalance,
+      babyBalance,
+      babyRewards,
+    );
 
     expect(stakedBalanceText).toContain("0.09876543 BTC");
     expect(stakableBalance).toContain("0.00074175 BTC");

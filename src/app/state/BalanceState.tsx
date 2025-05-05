@@ -58,10 +58,9 @@ export function BalanceState({ children }: PropsWithChildren) {
     reconnectRpc,
   } = useBbnQuery();
 
-  const { delegations, isLoading: delegationsLoading } = useDelegationV2State();
+  const { delegations } = useDelegationV2State();
 
-  const loading =
-    isBTCBalanceLoading || isCosmosBalanceLoading || delegationsLoading;
+  const loading = isBTCBalanceLoading || isCosmosBalanceLoading;
 
   // Stakable BTC Balance which is the sum of all UTXOs that are not Ordinals
   const stakableBtcBalance = useMemo(

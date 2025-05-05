@@ -115,7 +115,13 @@ export const StatItem = ({
     />
   );
 
-  console.log("DEBUG: listItem", dataTestId, listItem);
+  console.log(
+    "DEBUG: listItem",
+    dataTestId,
+    loading,
+    SPINNER_RENDERERS[loadingStyle](value),
+    value,
+  );
 
   return dataTestId ? <div data-testid={dataTestId}>{listItem}</div> : listItem;
 };
