@@ -1,11 +1,11 @@
-import * as Sentry from "@sentry/nextjs";
+import { addBreadcrumb, captureException, SeverityLevel } from "@sentry/nextjs";
 
 type Context = Record<string, number | string | boolean> & {
   category?: string;
 };
 
 type ErrorContext = {
-  level?: Sentry.SeverityLevel;
+  level?: SeverityLevel;
   tags?: Record<string, string>;
   data?: Record<string, string | number | boolean>;
 };
@@ -18,21 +18,21 @@ interface Logger {
 
 const logger: Logger = {
   info: (message, { category, ...data } = {}) =>
-    Sentry.addBreadcrumb({
+    addBreadcrumb({
       level: "info",
       message,
       category,
       data,
     }),
   warn: (message, { category, ...data } = {}) =>
-    Sentry.addBreadcrumb({
+    addBreadcrumb({
       level: "warning",
       message,
       category,
       data,
     }),
   error: (error, { level = "error", tags, data: extra } = {}) =>
-    Sentry.captureException(error, {
+    captureException(error, {
       level,
       tags,
       extra,
