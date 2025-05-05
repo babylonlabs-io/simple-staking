@@ -6,7 +6,7 @@ export type BTCWalletType = "OKX" | "Unisat" | "OneKey" | "Keystone";
 
 export const injectBBNWallet = async (
   page: Page,
-  walletType: BBNWalletType = "Keplr",
+  walletType: BBNWalletType = "Leap",
 ) => {
   try {
     await page.evaluate((walletType) => {
@@ -82,6 +82,15 @@ export const injectBBNWallet = async (
             return true;
           },
           getOfflineSigner: () => bbnWallet.getOfflineSigner(),
+          getKey: async (chainId: string) => {
+            return {
+              name: "mock-leap",
+              algo: "secp256k1",
+              pubKey: new Uint8Array([1, 2, 3, 4, 5]),
+              address: new Uint8Array([1, 2, 3, 4, 5]),
+              bech32Address: "bbn1qpzxvj2vty4smkhkn4fjkvst0kv8zgxjumz4u0",
+            };
+          },
         };
       } else if (walletType === "Cosmostation") {
         // @ts-ignore - cosmostation is defined in the window for the test

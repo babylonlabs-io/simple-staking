@@ -2,11 +2,7 @@ import { expect, test } from "@playwright/test";
 import { setupServer } from "msw/node";
 
 import { setupWalletConnection } from "../middleware/connect";
-import {
-  injectBBNQueries,
-  injectBBNWallet,
-  injectBTCWallet,
-} from "../mocks/blockchain";
+import { injectBBNQueries } from "../mocks/blockchain";
 import { handlers, mockVerifyBTCAddress } from "../mocks/handlers";
 
 const server = setupServer(...handlers);
@@ -43,9 +39,9 @@ test.describe("Balance and address checks after connection", () => {
 
     await page.waitForTimeout(2000);
 
-    await injectBTCWallet(page);
+    // await injectBTCWallet(page);
 
-    await injectBBNWallet(page);
+    // await injectBBNWallet(page, "Leap");
 
     await setupWalletConnection(page);
 

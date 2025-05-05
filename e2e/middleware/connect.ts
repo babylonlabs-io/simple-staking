@@ -212,13 +212,13 @@ export class WalletConnectActions {
     } catch (uiError) {}
   }
 
-  async clickKeplrWalletButton() {
+  async clickGenericWalletButton(walletType: string = "Leap") {
     try {
-      const keplrButton = this.page.locator(
-        'button:has(.h-10.w-10.object-contain):has-text("Keplr")',
+      const leapButton = this.page.locator(
+        `button:has(.h-10.w-10.object-contain):has-text("${walletType}")`,
       );
-      await keplrButton.waitFor({ state: "visible", timeout: 5000 });
-      await keplrButton.click();
+      await leapButton.waitFor({ state: "visible", timeout: 5000 });
+      await leapButton.click();
     } catch (error) {}
   }
 
@@ -284,7 +284,7 @@ export class WalletConnectActions {
     await this.clickOKXWalletButton();
     await this.handleVerificationErrorIfPresent();
     await this.clickBabylonChainWalletButton();
-    await this.clickKeplrWalletButton();
+    await this.clickGenericWalletButton();
     await this.clickDoneButton();
   }
 }
@@ -321,7 +321,7 @@ export const clickBabylonChainWalletButton = async (page: Page) => {
 
 export const clickKeplrWalletButton = async (page: Page) => {
   const actions = new WalletConnectActions(page);
-  return actions.clickKeplrWalletButton();
+  return actions.clickGenericWalletButton("Keplr");
 };
 
 export const clickDoneButton = async (page: Page) => {
