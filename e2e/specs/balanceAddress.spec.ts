@@ -10,6 +10,19 @@ const server = setupServer(...handlers);
 test.describe("Balance and address checks after connection", () => {
   test.beforeAll(() => {
     server.listen();
+
+    // Log MSW request events to verify mocks are active in CI.
+    server.events.on("request:start", (req) => {
+      console.log(`MSW ▶️  ${req.method} ${req.url.href}`);
+    });
+
+    server.events.on("request:match", (req) => {
+      console.log(`MSW ✅ Matched ${req.method} ${req.url.href}`);
+    });
+
+    server.events.on("request:unhandled", (req) => {
+      console.log(`MSW ❓ Unhandled ${req.method} ${req.url.href}`);
+    });
   });
 
   test.afterAll(() => {
@@ -17,16 +30,61 @@ test.describe("Balance and address checks after connection", () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    // Configure context to ignore failed resource loads (404s) which don't affect test functionality
-    await page.route("**/*", (route) => {
-      // Always allow the main document to load
+    // Intercept requests so we can stub critical API responses while still allowing other traffic.
+    await page.route("**/*", async (route) => {
+      const url = route.request().url();
+
+      // Allow the main document to load unconditionally.
       if (route.request().resourceType() === "document") {
         return route.continue();
       }
 
-      // For other resources, try to load them but don't fail the test if they 404
-      route.continue().catch((e: unknown) => {
-        console.log(`DEBUG: Resource load ignored: ${route.request().url()}`);
+      // Inline mocks for the key balance endpoints to avoid relying on backend availability.
+      if (/\/v2\/balances/.test(url)) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            balance: {
+              bbn: "1000000",
+              stakable_btc: "74175",
+            },
+          }),
+        });
+      }
+
+      if (/\/v2\/staked/.test(url)) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            staked: {
+              btc: "9876543",
+              delegated_btc: "9876543",
+            },
+          }),
+        });
+      }
+
+      if (/\/v2\/stakable-btc/.test(url)) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ balance: "74175" }),
+        });
+      }
+
+      if (/\/v2\/rewards/.test(url)) {
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ rewards: "500000" }),
+        });
+      }
+
+      // For any other resources, attempt to continue. Ignore failures.
+      route.continue().catch(() => {
+        console.log(`DEBUG: Resource load ignored: ${url}`);
       });
     });
 
