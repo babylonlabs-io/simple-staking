@@ -7,6 +7,8 @@ const nextConfig = {
   // Disable static export to ensure dynamic server rendering during tests.
   images: { unoptimized: true },
   productionBrowserSourceMaps: true,
+  // Configure asset prefix for CI in development mode to ensure static assets are served correctly
+  assetPrefix: process.env.CI ? '' : undefined,
   experimental: {
     forceSwcTransforms: true,
   },

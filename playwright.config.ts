@@ -13,14 +13,16 @@ const baseURL = `http://localhost:${PORT}`;
 export default defineConfig({
   // Test directory
   testDir: path.join(__dirname, "e2e"),
+  // Output directory for test artifacts
+  outputDir: path.join(__dirname, "test-results"),
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: false,
   /* Retry on CI only */
   retries: 2,
-  // Increase default timeout to accommodate slower CI startup and wallet setup.
-  timeout: 90 * 1000,
+  // Use longer timeout in CI environments
+  timeout: process.env.CI ? 120 * 1000 : 90 * 1000,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -80,14 +82,15 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    // Always use the development server for E2E tests to avoid 404s when
-    // serving built assets in CI. Building the application is still done
-    // separately in the workflow, so here we can reliably point Playwright
-    // to the dev server that works both locally and in CI.
-    command: `sh -c 'npm run build && NODE_OPTIONS="--max-http-header-size=65536" PORT=${PORT} npx next start -H 0.0.0.0 -p ${PORT}'`,
+    // Use development server in CI to avoid memory issues with Next.js build
+    command: process.env.CI
+      ? `sh -c 'NODE_OPTIONS="--max-http-header-size=65536" PORT=${PORT} npx next dev -H 0.0.0.0 -p ${PORT}'`
+      : `sh -c 'npm run build && NODE_OPTIONS="--max-http-header-size=65536" PORT=${PORT} npx next start -H 0.0.0.0 -p ${PORT}'`,
     url: baseURL,
-    timeout: 120 * 1000,
-    reuseExistingServer: true,
+    // Increase timeout for CI to ensure dev server has time to fully start
+    timeout: process.env.CI ? 180 * 1000 : 120 * 1000,
+    // In CI, wait for the server to be fully ready before running tests
+    reuseExistingServer: !process.env.CI,
     env: {
       NODE_OPTIONS: "--max-http-header-size=65536",
       // Disable Sentry during E2E tests to reduce noise and improve performance
