@@ -91,6 +91,8 @@ export default defineConfig({
     reuseExistingServer: true,
     env: {
       NODE_OPTIONS: "--max-http-header-size=65536",
+      // Disable Sentry during E2E tests to reduce noise and improve performance
+      DISABLE_SENTRY: "true",
     },
   },
 });
