@@ -1,3 +1,6 @@
+/**
+ * @deprecated This enum is deprecated and will be removed in a future version.
+ */
 export enum ErrorType {
   // Server-related errors
   SERVER = "SERVER",
@@ -18,6 +21,9 @@ export enum ErrorType {
   UNKNOWN = "UNKNOWN",
 }
 
+/**
+ * @deprecated This interface is deprecated and will be removed in a future version.
+ */
 export interface Error {
   message: string;
   type?: ErrorType;
@@ -36,6 +42,9 @@ export interface Error {
   metadata?: Record<string, any>;
 }
 
+/**
+ * @deprecated This interface is deprecated and will be removed in a future version.
+ */
 export interface ErrorHandlerParam {
   error: Error | null;
   metadata?: Record<string, unknown>;
