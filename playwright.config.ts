@@ -85,7 +85,7 @@ export default defineConfig({
     // separately in the workflow, so here we can reliably point Playwright
     // to the dev server that works both locally and in CI.
     command:
-      "sh -c 'npm run build && NODE_OPTIONS=\"--max-http-header-size=65536\" npm run start'",
+      "sh -c 'NODE_OPTIONS=\"--max-http-header-size=65536\" npm run start'",
     url: baseURL,
     timeout: 120 * 1000,
     reuseExistingServer: true,
@@ -93,6 +93,7 @@ export default defineConfig({
       NODE_OPTIONS: "--max-http-header-size=65536",
       // Disable Sentry during E2E tests to reduce noise and improve performance
       DISABLE_SENTRY: "true",
+      PORT: String(PORT),
     },
   },
 });
