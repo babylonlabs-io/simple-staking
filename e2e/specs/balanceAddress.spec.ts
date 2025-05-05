@@ -30,59 +30,16 @@ test.describe("Balance and address checks after connection", () => {
   });
 
   test.beforeEach(async ({ page }) => {
-    // Intercept requests so we can stub critical API responses while still allowing other traffic.
-    await page.route("**/*", async (route) => {
+    // Intercept requests to log and ignore 404s without fulfilling responses (MSW should handle).
+    await page.route("**/*", (route) => {
       const url = route.request().url();
 
-      // Allow the main document to load unconditionally.
+      // Always allow main document.
       if (route.request().resourceType() === "document") {
         return route.continue();
       }
 
-      // Inline mocks for the key balance endpoints to avoid relying on backend availability.
-      if (/\/v2\/balances/.test(url)) {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            balance: {
-              bbn: "1000000",
-              stakable_btc: "74175",
-            },
-          }),
-        });
-      }
-
-      if (/\/v2\/staked/.test(url)) {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            staked: {
-              btc: "9876543",
-              delegated_btc: "9876543",
-            },
-          }),
-        });
-      }
-
-      if (/\/v2\/stakable-btc/.test(url)) {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({ balance: "74175" }),
-        });
-      }
-
-      if (/\/v2\/rewards/.test(url)) {
-        return route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({ rewards: "500000" }),
-        });
-      }
-
-      // For any other resources, attempt to continue. Ignore failures.
+      // Continue other resources; log failures.
       route.continue().catch(() => {
         console.log(`DEBUG: Resource load ignored: ${url}`);
       });
