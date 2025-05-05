@@ -24,8 +24,8 @@ const nextConfig = {
   },
 };
 
-// Skip Sentry in E2E tests to avoid warnings and improve performance
-const isSentryDisabled = process.env.DISABLE_SENTRY === "true";
+// Skip Sentry during CI or when the DISABLE_SENTRY flag is set to avoid warnings and speed up builds/tests
+const isSentryDisabled = process.env.CI || process.env.DISABLE_SENTRY === "true";
 
 const config = isSentryDisabled
   ? nextConfig
