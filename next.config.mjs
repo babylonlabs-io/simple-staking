@@ -32,8 +32,6 @@ const nextConfig = {
   },
   // Set environment variables to suppress warnings and improve test reliability
   env: {
-    // Suppress crypto warnings which don't affect test functionality
-    NODE_OPTIONS: "--no-warnings",
     NEXT_TELEMETRY_DISABLED: "1",
   },
 };
