@@ -40,6 +40,20 @@ test.describe("Balance and address checks after connection", () => {
       console.log("BROWSER PAGE ERROR:", err);
     });
 
+    // Log responses from important API endpoints to ensure mocks are serving data
+    page.on("response", async (response) => {
+      const url = response.url();
+      if (/\/v2\/(balances|staked|stakable-btc|rewards)/.test(url)) {
+        console.log(`DEBUG: API RESP ${response.status()} ${url}`);
+        try {
+          const json = await response.json();
+          console.log("DEBUG: API JSON", JSON.stringify(json));
+        } catch {
+          // non-JSON response
+        }
+      }
+    });
+
     server.resetHandlers();
 
     await mockVerifyBTCAddress(page);
@@ -81,10 +95,15 @@ test.describe("Balance and address checks after connection", () => {
       await page.evaluate(() => document.readyState),
     );
 
-    const spinners = page.locator(
-      '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader',
+    const spinnerSelector =
+      '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader';
+
+    // Poll for the spinners to disappear to avoid strict mode violations when multiple remain.
+    await page.waitForFunction(
+      (sel) => document.querySelectorAll(sel).length === 0,
+      spinnerSelector,
+      { timeout: 30_000 },
     );
-    await spinners.waitFor({ state: "hidden", timeout: 30_000 });
 
     // Wait specifically for the staked balance element to appear
     try {
