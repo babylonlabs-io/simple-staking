@@ -91,6 +91,7 @@ test.describe("Balance and address checks after connection", () => {
 
     // Check if we're on the right page
     const content = await page.content();
+    console.log("DEBUG: Page content:", content);
     if (!content.includes("Staked Balance")) {
       console.log(
         "DEBUG: Page doesn't contain 'Staked Balance', attempting to force navigation again",

@@ -33,7 +33,8 @@ export const apiWrapper = async <TResponseData = unknown>(
     ? `?${qs.stringify(params.query, { arrayFormat: "repeat" })}`
     : "";
 
-  const url = `${process.env.NEXT_PUBLIC_API_URL}${path}${queryString}`;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  const url = `${baseUrl}${path}${queryString}`;
 
   const options: RequestInit = {
     method,

@@ -92,6 +92,10 @@ export default defineConfig({
       NODE_OPTIONS: "--max-http-header-size=65536",
       // Disable Sentry during E2E tests to reduce noise and improve performance
       DISABLE_SENTRY: "true",
+      // Provide mock backend endpoints for tests
+      NEXT_PUBLIC_API_URL: "",
+      NEXT_PUBLIC_MEMPOOL_API: "https://fakeapi.fakeweb.abc/mempool",
+      NEXT_PUBLIC_NETWORK: "test",
       PORT: String(PORT),
     },
   },
