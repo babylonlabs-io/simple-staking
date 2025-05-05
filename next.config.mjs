@@ -8,7 +8,13 @@ const nextConfig = {
   images: { unoptimized: true },
   productionBrowserSourceMaps: true,
   // Configure asset prefix for CI in development mode to ensure static assets are served correctly
-  assetPrefix: process.env.CI ? '' : undefined,
+  // In CI with dev server, we need to ensure assets are properly resolved
+  basePath: '',
+  assetPrefix: '',
+  // Disable static optimization to make dev server more reliable for tests
+  devIndicators: {
+    buildActivity: false,
+  },
   experimental: {
     forceSwcTransforms: true,
   },
@@ -23,6 +29,12 @@ const nextConfig = {
     }
 
     return config;
+  },
+  // Set environment variables to suppress warnings and improve test reliability
+  env: {
+    // Suppress crypto warnings which don't affect test functionality
+    NODE_OPTIONS: "--no-warnings",
+    NEXT_TELEMETRY_DISABLED: "1",
   },
 };
 

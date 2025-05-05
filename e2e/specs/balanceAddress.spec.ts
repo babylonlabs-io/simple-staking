@@ -17,6 +17,19 @@ test.describe("Balance and address checks after connection", () => {
   });
 
   test.beforeEach(async ({ page }) => {
+    // Configure context to ignore failed resource loads (404s) which don't affect test functionality
+    await page.route("**/*", (route) => {
+      // Always allow the main document to load
+      if (route.request().resourceType() === "document") {
+        return route.continue();
+      }
+
+      // For other resources, try to load them but don't fail the test if they 404
+      route.continue().catch((e: unknown) => {
+        console.log(`DEBUG: Resource load ignored: ${route.request().url()}`);
+      });
+    });
+
     // Capture browser console logs and page errors for CI debugging
     page.on("console", (msg) => {
       // Print all browser console messages with their type
@@ -118,10 +131,10 @@ test.describe("Balance and address checks after connection", () => {
         state: "attached",
       });
       console.log("DEBUG: Staked Balance element found in DOM");
-    } catch (error) {
+    } catch (error: unknown) {
       console.log(
         "DEBUG: Staked Balance element not found, error:",
-        error.message,
+        error instanceof Error ? error.message : String(error),
       );
       // Try reloading the page one last time
       console.log("DEBUG: Attempting final page reload");

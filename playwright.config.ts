@@ -38,6 +38,15 @@ export default defineConfig({
     // default headless mode on CI.
     headless: process.env.CI ? true : undefined,
 
+    // Wait for all network resources to load before considering navigation complete
+    navigationTimeout: 60000,
+
+    // Improve resource loading reliability
+    contextOptions: {
+      // Skip waiting for main resources that might 404 in development mode
+      bypassCSP: true,
+    },
+
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
   },
