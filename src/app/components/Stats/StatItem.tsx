@@ -16,6 +16,7 @@ interface StatItemProps extends ListItemProps {
   loading?: boolean;
   tooltip?: string | JSX.Element;
   loadingStyle?: LoadingStyle;
+  dataTestId?: string;
 }
 
 export enum LoadingStyle {
@@ -44,6 +45,7 @@ export const StatItem = ({
   tooltip,
   suffix,
   loadingStyle = LoadingStyle.ShowSpinner,
+  dataTestId,
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
@@ -104,7 +106,7 @@ export const StatItem = ({
       suffix
     );
 
-  return (
+  const listItem = (
     <ListItem
       {...props}
       title={title}
@@ -112,4 +114,8 @@ export const StatItem = ({
       suffix={suffixEl}
     />
   );
+
+  console.log("DEBUG: listItem", dataTestId, listItem);
+
+  return dataTestId ? <div data-testid={dataTestId}>{listItem}</div> : listItem;
 };

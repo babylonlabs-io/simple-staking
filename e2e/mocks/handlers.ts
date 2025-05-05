@@ -152,7 +152,7 @@ export const handlers = [
       ctx.json({
         balance: {
           bbn: "1000000",
-          stakable_btc: "12300000000",
+          stakable_btc: "74175",
         },
       }),
     );
@@ -172,7 +172,7 @@ export const handlers = [
   rest.get("/v2/stakable-btc*", (req, res, ctx) => {
     return res(
       ctx.json({
-        balance: "12300000000",
+        balance: "74175",
       }),
     );
   }),
@@ -192,7 +192,7 @@ export const handlers = [
         {
           txid: "txid1",
           vout: 0,
-          value: 12300000000,
+          value: 74175,
           status: {
             confirmed: true,
           },
@@ -214,7 +214,7 @@ export const handlers = [
     return res(
       ctx.json({
         chain_stats: {
-          funded_txo_sum: 12300000000,
+          funded_txo_sum: 74175,
           spent_txo_sum: 0,
         },
       }),

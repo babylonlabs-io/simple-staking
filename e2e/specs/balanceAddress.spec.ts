@@ -56,6 +56,20 @@ test.describe("Balance and address checks after connection", () => {
 
     await page.waitForLoadState("networkidle");
 
+    // Verify some CSS is present (debug only, does not fail test)
+    const cssPresent = await page.evaluate(() => {
+      try {
+        return Array.from(document.styleSheets).some((sheet) =>
+          Boolean(
+            sheet.href || (sheet.ownerNode && sheet.ownerNode.textContent),
+          ),
+        );
+      } catch {
+        return false;
+      }
+    });
+    console.log("DEBUG: CSS present:", cssPresent);
+
     // Add longer timeout to ensure page is fully loaded
     await page.waitForTimeout(5000);
 
@@ -72,13 +86,7 @@ test.describe("Balance and address checks after connection", () => {
       await page.waitForTimeout(3000);
     }
 
-    // await injectBTCWallet(page);
-
-    // await injectBBNWallet(page, "Leap");
-
     await setupWalletConnection(page);
-
-    await page.waitForTimeout(5000);
   });
 
   test("balance is correct", async ({ page }) => {
@@ -100,7 +108,9 @@ test.describe("Balance and address checks after connection", () => {
       await page.waitForTimeout(10000); // Give more time to load
     }
 
-    const spinners = page.locator(".bbn-list-item .bbn-loader");
+    const spinners = page.locator(
+      '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader',
+    );
     try {
       await spinners.waitFor({ state: "hidden", timeout: 5e3 });
     } catch (error) {
@@ -127,7 +137,7 @@ test.describe("Balance and address checks after connection", () => {
 
     // Wait specifically for the staked balance element to appear
     try {
-      await page.waitForSelector('.bbn-list-item:has-text("Staked Balance")', {
+      await page.waitForSelector('[data-testid="staked-balance"]', {
         timeout: 30000,
         state: "attached",
       });
@@ -145,7 +155,7 @@ test.describe("Balance and address checks after connection", () => {
     }
 
     const stakedBalance = page.locator(
-      '.bbn-list-item:has-text("Staked Balance") .bbn-list-value',
+      '[data-testid="staked-balance"] .bbn-list-value',
     );
 
     const stakedCount = await stakedBalance.count();
@@ -164,13 +174,13 @@ test.describe("Balance and address checks after connection", () => {
 
     const stakedBalanceText = await stakedBalance.textContent();
     const stakableBalance = await page
-      .locator('.bbn-list-item:has-text("Stakable Balance") .bbn-list-value')
+      .locator('[data-testid="stakable-balance"] .bbn-list-value')
       .textContent();
     const babyBalance = await page
-      .locator('.bbn-list-item:has-text("BABY Balance") .bbn-list-value')
+      .locator('[data-testid="baby-balance"] .bbn-list-value')
       .textContent();
     const babyRewards = await page
-      .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
+      .locator('[data-testid="baby-rewards"] .bbn-list-value')
       .textContent();
 
     expect(stakedBalanceText).toContain("0.09876543 BTC");

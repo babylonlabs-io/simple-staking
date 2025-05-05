@@ -59,12 +59,14 @@ export function PersonalBalance() {
       <Section title="Wallet Balance">
         <List orientation="adaptive" className="bg-surface">
           <StatItem
+            dataTestId="staked-balance"
             loading={isBalanceLoading}
             title="Staked Balance"
             value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
           />
 
           <StatItem
+            dataTestId="stakable-balance"
             loading={isBalanceLoading || hasUnconfirmedUTXOs}
             title="Stakable Balance"
             loadingStyle={
@@ -81,6 +83,7 @@ export function PersonalBalance() {
           />
 
           <StatItem
+            dataTestId="baby-balance"
             loading={isBalanceLoading || processing}
             title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
             value={
@@ -92,6 +95,7 @@ export function PersonalBalance() {
           />
 
           <StatItem
+            dataTestId="baby-rewards"
             loading={rewardLoading}
             title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
             value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
