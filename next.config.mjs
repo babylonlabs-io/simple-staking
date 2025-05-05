@@ -4,8 +4,8 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
-  // Use static export locally and in production builds, but disable it in CI e2e environment
-  ...(process.env.CI ? {} : { output: "export" }),
+  // Enable static export only for production builds. Disable it in CI and development (including E2E test) environments.
+  ...(process.env.CI || process.env.NODE_ENV === "development" ? {} : { output: "export" }),
   images: { unoptimized: true },
   productionBrowserSourceMaps: true,
   experimental: {
