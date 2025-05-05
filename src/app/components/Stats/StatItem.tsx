@@ -45,7 +45,6 @@ export const StatItem = ({
   tooltip,
   suffix,
   loadingStyle = LoadingStyle.ShowSpinner,
-  dataTestId,
   ...props
 }: StatItemProps) => {
   const tooltipId = useId();
@@ -106,7 +105,7 @@ export const StatItem = ({
       suffix
     );
 
-  const listItem = (
+  return (
     <ListItem
       {...props}
       title={title}
@@ -114,12 +113,4 @@ export const StatItem = ({
       suffix={suffixEl}
     />
   );
-
-  console.log("DEBUG: listItem", {
-    dataTestId,
-    loading,
-    value,
-  });
-
-  return dataTestId ? <div data-testid={dataTestId}>{listItem}</div> : listItem;
 };

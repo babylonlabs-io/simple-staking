@@ -122,7 +122,7 @@ test.describe("Balance and address checks after connection", () => {
 
     // Wait specifically for the staked balance element to appear
     try {
-      await page.waitForSelector('[data-testid="staked-balance"]', {
+      await page.waitForSelector('.bbn-list-item:has-text("Staked Balance")', {
         timeout: 30000,
         state: "attached",
       });
@@ -140,18 +140,18 @@ test.describe("Balance and address checks after connection", () => {
     }
 
     const stakedBalance = page.locator(
-      '[data-testid="staked-balance"] .bbn-list-value',
+      '.bbn-list-item:has-text("Staked Balance") .bbn-list-value',
     );
 
     const stakedBalanceText = await stakedBalance.textContent();
     const stakableBalance = await page
-      .locator('[data-testid="stakable-balance"] .bbn-list-value')
+      .locator('.bbn-list-item:has-text("Stakable Balance") .bbn-list-value')
       .textContent();
     const babyBalance = await page
-      .locator('[data-testid="baby-balance"] .bbn-list-value')
+      .locator('.bbn-list-item:has-text("BABY Balance") .bbn-list-value')
       .textContent();
     const babyRewards = await page
-      .locator('[data-testid="baby-rewards"] .bbn-list-value')
+      .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
       .textContent();
 
     console.log(
