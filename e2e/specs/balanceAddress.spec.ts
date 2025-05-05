@@ -33,11 +33,31 @@ test.describe("Balance and address checks after connection", () => {
 
     await injectBBNQueries(page);
 
-    await page.goto("http://localhost:3000");
+    // Navigate using baseURL from playwright config
+    await page.goto("/");
+    // Log the page URL to debug
+    console.log("DEBUG: Initial navigation to:", page.url());
+
+    // Wait for the document to be fully loaded
+    await page.waitForLoadState("domcontentloaded");
 
     await page.waitForLoadState("networkidle");
 
-    await page.waitForTimeout(2000);
+    // Add longer timeout to ensure page is fully loaded
+    await page.waitForTimeout(5000);
+
+    // Check if page loaded correctly
+    const pageTitle = await page.title();
+    console.log("DEBUG: Page title:", pageTitle);
+
+    // Retry navigation if needed
+    if (!pageTitle || pageTitle === "about:blank") {
+      console.log("DEBUG: Retrying navigation...");
+      await page.goto("/", { timeout: 30000 });
+      await page.waitForLoadState("domcontentloaded");
+      await page.waitForLoadState("networkidle");
+      await page.waitForTimeout(3000);
+    }
 
     // await injectBTCWallet(page);
 
@@ -49,14 +69,39 @@ test.describe("Balance and address checks after connection", () => {
   });
 
   test("balance is correct", async ({ page }) => {
+    // Add diagnostic information before looking for elements
+    console.log("DEBUG: Test started, URL =", page.url());
+    console.log(
+      "DEBUG: Document readyState =",
+      await page.evaluate(() => document.readyState),
+    );
+
+    // Check if we're on the right page
+    const content = await page.content();
+    if (!content.includes("Staked Balance")) {
+      console.log(
+        "DEBUG: Page doesn't contain 'Staked Balance', attempting to force navigation again",
+      );
+      await page.goto("/", { timeout: 60000, waitUntil: "networkidle" });
+      await page.waitForTimeout(10000); // Give more time to load
+    }
+
     const spinners = page.locator(".bbn-list-item .bbn-loader");
     try {
       await spinners.waitFor({ state: "hidden", timeout: 5e3 });
     } catch (error) {
+      console.log("DEBUG: Waiting for spinners failed, forcing resize");
       await page.evaluate(() => {
         window.dispatchEvent(new Event("resize"));
       });
     }
+
+    // Dump HTML content to see what we're actually looking at
+    console.log(
+      "DEBUG: HTML snippet:",
+      (await page.content()).substring(0, 2000),
+    );
+
     const stakedBalance = page.locator(
       '.bbn-list-item:has-text("Staked Balance") .bbn-list-value',
     );

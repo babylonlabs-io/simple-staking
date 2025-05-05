@@ -330,6 +330,45 @@ export const clickDoneButton = async (page: Page) => {
 };
 
 export const setupWalletConnection = async (page: Page) => {
+  console.log("DEBUG: Starting wallet connection setup");
   const actions = new WalletConnectActions(page);
-  return actions.setupWalletConnection();
+
+  // Setup mocks first
+  await actions.setupMocks();
+  console.log("DEBUG: Mocks set up, injecting wallets");
+
+  // Inject wallet support
+  await injectBTCWallet(page);
+  await injectBBNWallet(page, "Leap");
+  console.log("DEBUG: Wallets injected, clicking connect button");
+
+  // Click the connect button
+  await actions.clickConnectButton();
+  console.log("DEBUG: Connect button clicked, checking for terms");
+
+  // Accept terms and conditions if shown
+  await actions.acceptTermsAndConditions();
+  console.log(
+    "DEBUG: Terms accepted (if shown), clicking injectable wallet button",
+  );
+
+  // Try clicking wallet buttons
+  await actions.clickInjectableWalletButton();
+  console.log("DEBUG: Injectable wallet button clicked, clicking OKX wallet");
+
+  await actions.clickOKXWalletButton();
+  console.log("DEBUG: OKX wallet clicked, clicking Babylon Chain wallet");
+
+  await actions.clickBabylonChainWalletButton();
+  console.log("DEBUG: Babylon Chain wallet clicked, clicking Leap wallet");
+
+  await actions.clickGenericWalletButton("Leap");
+  console.log("DEBUG: Leap wallet clicked, clicking Done button");
+
+  await actions.clickDoneButton();
+  console.log("DEBUG: Done button clicked, checking for verification errors");
+
+  // Handle verification errors if they appear
+  await actions.handleVerificationErrorIfPresent();
+  console.log("DEBUG: Wallet connection setup complete");
 };
