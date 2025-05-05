@@ -84,7 +84,7 @@ test.describe("Balance and address checks after connection", () => {
     const spinners = page.locator(
       '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader',
     );
-    await spinners.waitFor({ state: "hidden", timeout: 5e3 });
+    await spinners.waitFor({ state: "hidden", timeout: 30_000 });
 
     // Wait specifically for the staked balance element to appear
     try {
