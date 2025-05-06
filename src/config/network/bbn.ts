@@ -33,14 +33,6 @@ const config: Record<string, BBNConfig> = {
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
   },
-  test: {
-    chainId: bbnMainnet.chainId,
-    rpc: bbnMainnet.rpc,
-    chainData: bbnMainnet,
-    networkName: "BABY",
-    networkFullName: "Babylon Genesis",
-    coinSymbol: "BABY",
-  },
   testnet: {
     chainId: bbnTestnet.chainId,
     rpc: bbnTestnet.rpc,

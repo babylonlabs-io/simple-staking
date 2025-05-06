@@ -36,13 +36,6 @@ const config: Record<string, BTCConfig> = {
     mempoolApiUrl: `${MEMPOOL_API}/signet`,
     network: Network.SIGNET,
   },
-  test: {
-    coinName: "BTC",
-    coinSymbol: "BTC",
-    networkName: "BTC",
-    mempoolApiUrl: `${MEMPOOL_API}`,
-    network: Network.SIGNET,
-  },
 };
 
 export function getNetworkConfigBTC(): BTCConfig {
