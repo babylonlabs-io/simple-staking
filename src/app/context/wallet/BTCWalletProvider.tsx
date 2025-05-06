@@ -6,6 +6,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
+import * as Sentry from "@sentry/nextjs";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -127,6 +128,17 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setAddress(address);
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
         setLoading(false);
+
+        Sentry.addBreadcrumb({
+          level: "info",
+          message: "Connect BTC wallet",
+          data: {
+            network,
+            address,
+            publicKeyNoCoord,
+            walletName: await walletProvider.getWalletProviderName(),
+          },
+        });
       } catch (error: any) {
         handleError({
           error: new ClientError(
@@ -178,6 +190,23 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
     return () => void btcWalletProvider.off("accountChanged", cb);
   }, [btcWalletProvider, connectBTC]);
+
+  useEffect(() => {
+    if (!btcConnector) return;
+
+    const installedWallets = btcConnector.wallets
+      .filter((wallet) => wallet.installed)
+      .reduce(
+        (acc, wallet) => ({ ...acc, [wallet.id]: wallet.name }),
+        {} as Record<string, string>,
+      );
+
+    Sentry.addBreadcrumb({
+      level: "info",
+      message: "Installed BTC wallets",
+      data: installedWallets,
+    });
+  }, [btcConnector]);
 
   const btcWalletMethods = useMemo(
     () => ({

@@ -4,6 +4,9 @@ import {
 } from "../../../constants/errorMessages";
 import { ErrorType } from "../../../types/errors";
 
+/**
+ * @deprecated This class is deprecated and will be removed in a future version.
+ */
 export class ClientError extends Error {
   readonly name = "ClientError";
   readonly displayMessage: string;
@@ -16,6 +19,7 @@ export class ClientError extends Error {
    * @param category       Error category
    * @param type           Error type
    * @param metadata       Additional metadata about the error
+   * @deprecated This constructor is deprecated along with the class.
    */
   constructor(
     {
@@ -39,10 +43,16 @@ export class ClientError extends Error {
     Object.setPrototypeOf(this, ClientError.prototype);
   }
 
+  /**
+   * @deprecated This method is deprecated along with the class.
+   */
   public getDisplayMessage(): string {
     return this.displayMessage;
   }
 
+  /**
+   * @deprecated This method is deprecated along with the class.
+   */
   public getErrorCode(): ClientErrorCategory | undefined {
     return this.category;
   }
