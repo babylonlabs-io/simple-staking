@@ -138,7 +138,7 @@ export const injectBTCWallet = async (
           return () => {};
         },
         off: (event: string, callback: Function) => {},
-        getNetwork: () => "mainnet",
+        getNetwork: () => "signet",
         getBTCTipHeight: () => 859568,
         getNetworkFees: () => ({
           fastestFee: 1,
