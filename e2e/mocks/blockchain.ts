@@ -163,7 +163,7 @@ export const injectBTCWallet = async (
           bitcoin: {
             ...btcWallet,
             isOKXWallet: true,
-            getNetwork: () => "mainnet",
+            getNetwork: () => "signet",
             getPublicKey: () =>
               "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
             getBalance: () => ({
@@ -272,7 +272,7 @@ export const injectBTCWallet = async (
               case "btc_getNetwork":
               case "btc_networkVersion":
               case "wallet_getNetwork":
-                return "mainnet";
+                return "signet";
               case "wallet_switchBitcoinNetwork":
                 return true;
               case "btc_getBalance":
