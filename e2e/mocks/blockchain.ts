@@ -346,6 +346,11 @@ export const injectBBNQueries = async (
     QueryBalanceResponse,
   } = require("cosmjs-types/cosmos/bank/v1beta1/query");
 
+  // Add debugging to track when mocks are initialized
+  await page.evaluate(() => {
+    console.log("[E2E DEBUG] Starting BBN query mocks initialization");
+  });
+
   const rewardGaugeProto = incentivequery.QueryRewardGaugesResponse.fromPartial(
     {
       rewardGauges: {
@@ -373,8 +378,10 @@ export const injectBBNQueries = async (
 
   await page.addInitScript((amount) => {
     window.__e2eTestMode = true;
+    console.log("[E2E DEBUG] Initializing e2e test mode with mock handlers");
 
     window.mockCosmJSBankBalance = (address) => {
+      console.log(`[E2E DEBUG] Mocking bank balance for address ${address}`);
       return Promise.resolve({
         amount: "1000000",
         denom: "ubbn",
@@ -382,6 +389,7 @@ export const injectBBNQueries = async (
     };
 
     window.mockCosmJSRewardsQuery = (address) => {
+      console.log(`[E2E DEBUG] Mocking rewards query for address ${address}`);
       return Promise.resolve({
         rewardGauges: {
           BTC_STAKER: {
@@ -399,16 +407,27 @@ export const injectBBNQueries = async (
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
         const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
-      } catch (err) {}
+        console.log("[E2E DEBUG] Decoded bank balance:", decoded);
+      } catch (err) {
+        console.error("[E2E DEBUG] Failed to decode bank balance:", err);
+      }
     };
 
     (function patchSSC() {
       const patch = (ssc: any) => {
         if (ssc && typeof ssc.connectWithSigner === "function") {
+          console.log("[E2E DEBUG] Patching SigningStargateClient");
           ssc.connectWithSigner = async () => {
+            console.log("[E2E DEBUG] Mock SigningStargateClient connected");
             return {
-              simulate: async () => ({}),
-              signAndBroadcast: async () => ({ code: 0 }),
+              simulate: async () => {
+                console.log("[E2E DEBUG] Mock simulate called");
+                return {};
+              },
+              signAndBroadcast: async () => {
+                console.log("[E2E DEBUG] Mock signAndBroadcast called");
+                return { code: 0 };
+              },
             } as any;
           };
         }
@@ -428,15 +447,78 @@ export const injectBBNQueries = async (
     })();
   }, rewardAmount);
 
+  // Log all network requests to help debug what's happening
+  await page.route("**", async (route) => {
+    const url = route.request().url();
+    const method = route.request().method();
+    console.log(`[E2E DEBUG] Network request: ${method} ${url}`);
+
+    await route.continue();
+  });
+
+  // These routes need to be more prioritized to ensure they capture the requests
+  // Place them first, as Playwright processes routes in the order they're added
+  await page.route("**/v2/staked*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting v2/staked request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        staked: {
+          btc: "9876543",
+          delegated_btc: "9876543",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v2/balances*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting v2/balances request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        balance: {
+          bbn: "1000000",
+          stakable_btc: "74175",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v2/stakable-btc*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting v2/stakable-btc request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        balance: "74175",
+      }),
+    });
+  });
+
+  await page.route("**/v2/rewards*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting v2/rewards request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        rewards: "500000",
+      }),
+    });
+  });
+
   await page.route("**/abci_query?*", async (route) => {
     const url = new URL(route.request().url());
     const path = url.searchParams.get("path") || "";
+    console.log(`[E2E DEBUG] abci_query request with path: ${path}`);
 
     const decodedPath = decodeURIComponent(path).replace(/"/g, "");
     if (
       decodedPath.includes("babylon.incentive.Query/RewardGauges") ||
       decodedPath.includes("babylon.incentive.v1.Query/RewardGauges")
     ) {
+      console.log("[E2E DEBUG] Intercepting rewards query");
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -462,18 +544,23 @@ export const injectBBNQueries = async (
     }
 
     if (decodedPath.includes("cosmos.bank.v1beta1.Query/Balance")) {
+      console.log("[E2E DEBUG] Intercepting bank balance query");
       try {
         const {
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-      } catch (e) {}
+      } catch (e) {
+        console.error("[E2E DEBUG] Error loading QueryBalanceResponse:", e);
+      }
       try {
         // @ts-ignore - page() is internal Playwright API not in type defs
         await (route as any).page().evaluate((b64: string) => {
           // @ts-ignore
           window.__decodeBank?.(b64);
         }, balanceBase64);
-      } catch {}
+      } catch (e) {
+        console.error("[E2E DEBUG] Error in evaluate:", e);
+      }
 
       await route.fulfill({
         status: 200,
@@ -499,23 +586,33 @@ export const injectBBNQueries = async (
       return;
     }
 
+    console.log("[E2E DEBUG] Continuing with abci_query request");
     await route.continue();
   });
 
+  // Add back the JSON-RPC POST handler for handling RPC calls
   await page.route("**", async (route, request) => {
     if (request.method() !== "POST") {
       return route.continue();
     }
 
     const postData = request.postData();
+    const url = request.url();
+    console.log(`[E2E DEBUG] POST request to: ${url}`);
+
     let parsed: any = null;
     try {
       parsed = postData ? JSON.parse(postData) : null;
-    } catch {
+      console.log(
+        `[E2E DEBUG] POST data: ${JSON.stringify(parsed?.method || "unknown method")}`,
+      );
+    } catch (err) {
+      console.log(`[E2E DEBUG] Failed to parse POST data: ${err}`);
       return route.continue();
     }
 
     if (parsed && parsed.method === "status") {
+      console.log("[E2E DEBUG] Intercepting status request");
       return route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -567,11 +664,13 @@ export const injectBBNQueries = async (
     }
 
     const pathParam = parsed.params?.path || "";
+    console.log(`[E2E DEBUG] POST abci_query with path: ${pathParam}`);
 
     if (
       pathParam.includes("babylon.incentive.Query/RewardGauges") ||
       pathParam.includes("babylon.incentive.v1.Query/RewardGauges")
     ) {
+      console.log("[E2E DEBUG] Intercepting POST rewards query");
       return route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -596,13 +695,16 @@ export const injectBBNQueries = async (
     }
 
     if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
+      console.log("[E2E DEBUG] Intercepting POST bank balance query");
       try {
         // @ts-ignore
         await (route as any).page().evaluate((b64: string) => {
           // @ts-ignore
           window.__decodeBank?.(b64);
         }, balanceBase64);
-      } catch {}
+      } catch (e) {
+        console.error("[E2E DEBUG] Error in POST evaluate:", e);
+      }
 
       return route.fulfill({
         status: 200,
@@ -630,7 +732,53 @@ export const injectBBNQueries = async (
     return route.continue();
   });
 
+  // Add mock route for delegations
+  await page.route("**/v2/delegations*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting v2/delegations request");
+    const mockDelegation = {
+      finality_provider_btc_pks_hex: [
+        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+      ],
+      params_version: 0,
+      staker_btc_pk_hex:
+        "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+      delegation_staking: {
+        staking_tx_hex: "00",
+        staking_tx_hash_hex: "hash",
+        staking_timelock: 0,
+        staking_amount: 9876543,
+        start_height: 0,
+        end_height: 0,
+        bbn_inception_height: 0,
+        bbn_inception_time: new Date().toISOString(),
+        slashing: {
+          slashing_tx_hex: "",
+          spending_height: 0,
+        },
+      },
+      delegation_unbonding: {
+        unbonding_timelock: 0,
+        unbonding_tx: "",
+        slashing: {
+          unbonding_slashing_tx_hex: "",
+          spending_height: 0,
+        },
+      },
+      state: "ACTIVE",
+    };
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: [mockDelegation],
+        pagination: { next_key: "", total: "1" },
+      }),
+    });
+  });
+
+  // Add dedicated status route handler - this is important for Cosmos chain health checks
   await page.route("**/status*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting direct status GET request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -677,95 +825,9 @@ export const injectBBNQueries = async (
     });
   });
 
-  await page.route("**/v2/delegations*", async (route) => {
-    const mockDelegation = {
-      finality_provider_btc_pks_hex: [
-        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-      ],
-      params_version: 0,
-      staker_btc_pk_hex:
-        "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
-      delegation_staking: {
-        staking_tx_hex: "00",
-        staking_tx_hash_hex: "hash",
-        staking_timelock: 0,
-        staking_amount: 9876543,
-        start_height: 0,
-        end_height: 0,
-        bbn_inception_height: 0,
-        bbn_inception_time: new Date().toISOString(),
-        slashing: {
-          slashing_tx_hex: "",
-          spending_height: 0,
-        },
-      },
-      delegation_unbonding: {
-        unbonding_timelock: 0,
-        unbonding_tx: "",
-        slashing: {
-          unbonding_slashing_tx_hex: "",
-          spending_height: 0,
-        },
-      },
-      state: "ACTIVE",
-    };
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        data: [mockDelegation],
-        pagination: { next_key: "", total: "1" },
-      }),
-    });
-  });
-
-  await page.route("**/v2/balances*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        balance: {
-          bbn: "1000000",
-          stakable_btc: "74175",
-        },
-      }),
-    });
-  });
-
-  await page.route("**/v2/staked*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        staked: {
-          btc: "9876543",
-          delegated_btc: "9876543",
-        },
-      }),
-    });
-  });
-
-  await page.route("**/v2/stakable-btc*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        balance: "74175",
-      }),
-    });
-  });
-
-  await page.route("**/v2/rewards*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        rewards: "500000",
-      }),
-    });
-  });
-
+  // Add route for network info
   await page.route("**/v2/network-info*", async (route) => {
+    console.log("[E2E DEBUG] Intercepting v2/network-info request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -811,5 +873,50 @@ export const injectBBNQueries = async (
         },
       }),
     });
+  });
+
+  // Add these catch-all routes at the end
+  await page.route("**/*staked*", async (route) => {
+    console.log("[E2E DEBUG] Catch-all: Intercepting staked request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        staked: {
+          btc: "9876543",
+          delegated_btc: "9876543",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/*balance*", async (route) => {
+    console.log("[E2E DEBUG] Catch-all: Intercepting balance request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        balance: {
+          bbn: "1000000",
+          stakable_btc: "74175",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/*reward*", async (route) => {
+    console.log("[E2E DEBUG] Catch-all: Intercepting rewards request");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        rewards: "500000",
+      }),
+    });
+  });
+
+  // Signal that mocks are ready
+  await page.evaluate(() => {
+    console.log("[E2E DEBUG] BBN query mocks initialization complete");
   });
 };
