@@ -718,4 +718,50 @@ export const injectBBNQueries = async (
       }),
     });
   });
+
+  await page.route("**/v2/balances*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        balance: {
+          bbn: "1000000",
+          stakable_btc: "74175",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v2/staked*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        staked: {
+          btc: "9876543",
+          delegated_btc: "9876543",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v2/stakable-btc*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        balance: "74175",
+      }),
+    });
+  });
+
+  await page.route("**/v2/rewards*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        rewards: "500000",
+      }),
+    });
+  });
 };
