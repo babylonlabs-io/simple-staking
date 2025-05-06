@@ -113,6 +113,17 @@ export function BalanceState({ children }: PropsWithChildren) {
       .reduce((total, amount) => total + amount, 0);
   }, [delegations]);
 
+  console.log("DEBUG: stakableBtcBalance", {
+    loading,
+    stakableBtcBalance,
+    totalBtcBalance,
+    delegations,
+    bbnBalance,
+    stakedBtcBalance,
+    inscriptionsBtcBalance,
+    hasRpcError,
+  });
+
   const context = useMemo(
     () => ({
       loading,
