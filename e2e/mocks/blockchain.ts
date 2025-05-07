@@ -138,7 +138,7 @@ export const injectBTCWallet = async (
           return () => {};
         },
         off: (event: string, callback: Function) => {},
-        getNetwork: () => "signet",
+        getNetwork: () => "mainnet",
         getBTCTipHeight: () => 859568,
         getNetworkFees: () => ({
           fastestFee: 1,
@@ -163,7 +163,7 @@ export const injectBTCWallet = async (
           bitcoin: {
             ...btcWallet,
             isOKXWallet: true,
-            getNetwork: () => "signet",
+            getNetwork: () => "mainnet",
             getPublicKey: () =>
               "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
             getBalance: () => ({
