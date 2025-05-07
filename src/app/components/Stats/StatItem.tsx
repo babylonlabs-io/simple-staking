@@ -16,7 +16,6 @@ interface StatItemProps extends ListItemProps {
   loading?: boolean;
   tooltip?: string | JSX.Element;
   loadingStyle?: LoadingStyle;
-  dataTestId?: string;
 }
 
 export enum LoadingStyle {
