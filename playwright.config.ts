@@ -95,7 +95,8 @@ export default defineConfig({
       // Provide mock backend endpoints for tests
       NEXT_PUBLIC_API_URL: "",
       NEXT_PUBLIC_MEMPOOL_API: "https://fakeapi.fakeweb.abc/mempool",
-      NEXT_PUBLIC_NETWORK: "test",
+      // Use mainnet network configuration to ensure BTC symbol is used consistently across local and CI runs
+      NEXT_PUBLIC_NETWORK: "mainnet",
       PORT: String(PORT),
     },
   },
