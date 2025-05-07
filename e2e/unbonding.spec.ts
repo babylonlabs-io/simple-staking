@@ -4,7 +4,7 @@ import { DelegationState } from "@/app/types/delegations";
 import { getState } from "@/utils/getState";
 
 import { interceptRequest } from "./helper/interceptRequest";
-import { WalletConnectActions } from "./middleware/connect";
+import { WalletConnectActions } from "./middleware/wallet_connect";
 import { activeTX, unbondingTX } from "./mock/tx/unbonding";
 
 test.describe("Create unbonding transaction", () => {
