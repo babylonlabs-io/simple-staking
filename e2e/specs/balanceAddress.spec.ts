@@ -35,7 +35,7 @@ test.describe("Balance and address checks after connection", () => {
       const url = route.request().url();
 
       // Intercept and stub healthcheck to avoid geo-blocking in CI.
-      if (/\/healthcheck$/.test(url)) {
+      if (url.includes("/healthcheck")) {
         console.log(
           "DEBUG: Intercepted /healthcheck – returning 200 {data:'ok'}",
         );
@@ -43,6 +43,18 @@ test.describe("Balance and address checks after connection", () => {
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({ data: "ok" }),
+        });
+      }
+      if (url.includes("/address/screening")) {
+        console.log(
+          "DEBUG: Intercepted /address/screening – returning mocked risk low",
+        );
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            data: { btc_address: { risk: "low" } },
+          }),
         });
       }
 
