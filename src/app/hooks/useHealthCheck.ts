@@ -31,10 +31,10 @@ export const useHealthCheck = () => {
   }, [isError, error, refetch, handleError]);
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
-  let isGeoBlocked = data ? isGeoBlockedResult(data) : false;
-  if (window.__e2eTestMode) {
-    isGeoBlocked = false;
-  }
+  const isGeoBlocked = data ? isGeoBlockedResult(data) : false;
+  // if (window.__e2eTestMode) {
+  //   isGeoBlocked = false;
+  // }
   const apiMessage = data?.message;
 
   return {
