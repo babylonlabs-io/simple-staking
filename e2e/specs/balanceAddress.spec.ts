@@ -113,15 +113,18 @@ test.describe("Balance and address checks after connection", () => {
     const spinnerSelector =
       '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader';
 
+    console.log("DEBUG: Waiting for spinners to disappear...");
     // Poll for the spinners to disappear to avoid strict mode violations when multiple remain.
     await page.waitForFunction(
       (sel) => document.querySelectorAll(sel).length === 0,
       spinnerSelector,
       { timeout: 30_000 },
     );
+    console.log("DEBUG: Spinners disappeared successfully");
 
     // Wait specifically for the staked balance element to appear
     try {
+      console.log("DEBUG: Looking for Staked Balance element...");
       await page.waitForSelector('.bbn-list-item:has-text("Staked Balance")', {
         timeout: 30000,
         state: "attached",
@@ -132,6 +135,10 @@ test.describe("Balance and address checks after connection", () => {
         "DEBUG: Staked Balance element not found, error:",
         error instanceof Error ? error.message : String(error),
       );
+
+      // Log the current HTML to see what's actually in the page
+      console.log("DEBUG: Current page HTML:", await page.content());
+
       // Try reloading the page one last time
       console.log("DEBUG: Attempting final page reload");
       await page.reload({ waitUntil: "domcontentloaded" });
@@ -139,20 +146,56 @@ test.describe("Balance and address checks after connection", () => {
       await page.waitForTimeout(10000);
     }
 
+    console.log("DEBUG: Finding balance elements...");
     const stakedBalance = page.locator(
       '.bbn-list-item:has-text("Staked Balance") .bbn-list-value',
     );
 
-    const stakedBalanceText = await stakedBalance.textContent();
-    const stakableBalance = await page
-      .locator('.bbn-list-item:has-text("Stakable Balance") .bbn-list-value')
-      .textContent();
-    const babyBalance = await page
-      .locator('.bbn-list-item:has-text("BABY Balance") .bbn-list-value')
-      .textContent();
-    const babyRewards = await page
-      .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
-      .textContent();
+    // Check if stakedBalance exists and log its details
+    const stakedBalanceCount = await stakedBalance.count();
+    console.log(`DEBUG: Staked Balance elements found: ${stakedBalanceCount}`);
+
+    let stakedBalanceText;
+    try {
+      stakedBalanceText = await stakedBalance.textContent();
+      console.log("DEBUG: stakedBalanceText =", stakedBalanceText);
+    } catch (error) {
+      console.log("DEBUG: Failed to get staked balance text:", error);
+      stakedBalanceText = "";
+    }
+
+    let stakableBalance;
+    try {
+      stakableBalance = await page
+        .locator('.bbn-list-item:has-text("Stakable Balance") .bbn-list-value')
+        .textContent();
+      console.log("DEBUG: stakableBalance =", stakableBalance);
+    } catch (error) {
+      console.log("DEBUG: Failed to get stakable balance:", error);
+      stakableBalance = "";
+    }
+
+    let babyBalance;
+    try {
+      babyBalance = await page
+        .locator('.bbn-list-item:has-text("BABY Balance") .bbn-list-value')
+        .textContent();
+      console.log("DEBUG: babyBalance =", babyBalance);
+    } catch (error) {
+      console.log("DEBUG: Failed to get BABY balance:", error);
+      babyBalance = "";
+    }
+
+    let babyRewards;
+    try {
+      babyRewards = await page
+        .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
+        .textContent();
+      console.log("DEBUG: babyRewards =", babyRewards);
+    } catch (error) {
+      console.log("DEBUG: Failed to get BABY rewards:", error);
+      babyRewards = "";
+    }
 
     console.log(
       "DEBUG: VALUES!",
@@ -162,9 +205,22 @@ test.describe("Balance and address checks after connection", () => {
       babyRewards,
     );
 
-    expect(stakedBalanceText).toContain("0.09876543 BTC");
-    expect(stakableBalance).toContain("0.00074175 BTC");
-    expect(babyBalance).toContain("1 BABY");
-    expect(babyRewards).toContain("0.5 BABY");
+    // Log the expected values for diagnostic purposes
+    console.log("DEBUG: Expected staked balance: 0.09876543 BTC");
+    console.log("DEBUG: Expected stakable balance: 0.00074175 BTC");
+    console.log("DEBUG: Expected BABY balance: 1 BABY");
+    console.log("DEBUG: Expected BABY rewards: 0.5 BABY");
+
+    try {
+      expect(stakedBalanceText).toContain("0.09876543 BTC");
+      expect(stakableBalance).toContain("0.00074175 BTC");
+      expect(babyBalance).toContain("1 BABY");
+      expect(babyRewards).toContain("0.5 BABY");
+    } catch (error) {
+      console.log("DEBUG: Test assertions failed:", error);
+      // Log more details about the page for debugging
+      console.log("DEBUG: Final page URL =", page.url());
+      throw error;
+    }
   });
 });

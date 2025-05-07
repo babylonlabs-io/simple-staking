@@ -2,6 +2,8 @@ export const BBN_MAINNET_RPC_URL = process.env.NEXT_PUBLIC_BABY_RPC_URL
   ? process.env.NEXT_PUBLIC_BABY_RPC_URL
   : "https://rpc-dapp.babylonlabs.io/";
 
+console.log("DEBUG: BBN_MAINNET_RPC_URL", process.env.NEXT_PUBLIC_BABY_RPC_URL);
+
 export const BBN_MAINNET_LCD_URL = process.env.NEXT_PUBLIC_BABY_LCD_URL
   ? process.env.NEXT_PUBLIC_BABY_LCD_URL
   : "https://lcd-dapp.babylonlabs.io/";

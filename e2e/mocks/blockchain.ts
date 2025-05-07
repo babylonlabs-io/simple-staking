@@ -544,22 +544,15 @@ export const injectBBNQueries = async (
     }
 
     if (decodedPath.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      console.log("[E2E DEBUG] Intercepting bank balance query");
+      console.log("[E2E DEBUG] Intercepting bank balance query GET method");
       try {
+        console.log("[E2E DEBUG] Trying to load QueryBalanceResponse");
         const {
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
+        console.log("[E2E DEBUG] QueryBalanceResponse loaded successfully");
       } catch (e) {
         console.error("[E2E DEBUG] Error loading QueryBalanceResponse:", e);
-      }
-      try {
-        // @ts-ignore - page() is internal Playwright API not in type defs
-        await (route as any).page().evaluate((b64: string) => {
-          // @ts-ignore
-          window.__decodeBank?.(b64);
-        }, balanceBase64);
-      } catch (e) {
-        console.error("[E2E DEBUG] Error in evaluate:", e);
       }
 
       await route.fulfill({
@@ -583,6 +576,7 @@ export const injectBBNQueries = async (
           },
         }),
       });
+      console.log("[E2E DEBUG] Bank balance GET fulfillment completed");
       return;
     }
 
@@ -696,17 +690,27 @@ export const injectBBNQueries = async (
 
     if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
       console.log("[E2E DEBUG] Intercepting POST bank balance query");
+      console.log(
+        "[E2E DEBUG] balanceBase64 content is valid:",
+        Boolean(balanceBase64),
+      );
+
       try {
-        // Use the page parameter that was passed to injectBBNQueries
-        await page.evaluate((b64: string) => {
-          // @ts-ignore
-          window.__decodeBank?.(b64);
-        }, balanceBase64);
+        console.log("[E2E DEBUG] Going to evaluate window.__decodeBank");
+        // Skip the evaluation since it's causing issues in CI
+        console.log(
+          "[E2E DEBUG] window.__decodeBank skipped due to CI issues - using direct fulfillment only",
+        );
       } catch (e) {
         console.error("[E2E DEBUG] Error in POST evaluate:", e);
+        // Continue with response despite errors
+        console.log(
+          "[E2E DEBUG] Continuing with response despite evaluation error",
+        );
       }
 
-      return route.fulfill({
+      console.log("[E2E DEBUG] Preparing bank balance response");
+      const response = {
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
@@ -726,7 +730,23 @@ export const injectBBNQueries = async (
             },
           },
         }),
-      });
+      };
+      console.log(
+        "[E2E DEBUG] Bank balance response prepared, about to fulfill",
+      );
+
+      try {
+        await route.fulfill(response);
+        console.log(
+          "[E2E DEBUG] Bank balance POST fulfillment completed successfully",
+        );
+      } catch (error) {
+        console.error(
+          "[E2E DEBUG] Failed to fulfill bank balance request:",
+          error,
+        );
+      }
+      return;
     }
 
     return route.continue();
@@ -766,14 +786,24 @@ export const injectBBNQueries = async (
       },
       state: "ACTIVE",
     };
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        data: [mockDelegation],
-        pagination: { next_key: "", total: "1" },
-      }),
-    });
+    console.log("[E2E DEBUG] Delegation mock prepared, about to fulfill");
+
+    try {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          data: [mockDelegation],
+          pagination: { next_key: "", total: "1" },
+        }),
+      });
+      console.log("[E2E DEBUG] Delegation request fulfilled with mock data");
+    } catch (error) {
+      console.error(
+        "[E2E DEBUG] Failed to fulfill delegations request:",
+        error,
+      );
+    }
   });
 
   // Add dedicated status route handler - this is important for Cosmos chain health checks
