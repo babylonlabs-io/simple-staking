@@ -1,0 +1,132 @@
+import { rest } from "msw";
+
+export const blockchainHandlers = [
+  rest.get(/.*\/abci_query$/, (req, res, ctx) => {
+    const url = new URL(req.url.href);
+    let pathParam = url.searchParams.get("path");
+    console.log(`[MSW DEBUG] GET abci_query with path: ${pathParam}`);
+
+    // The path can come wrapped in quotes or URL-encoded, normalize it.
+    if (pathParam) {
+      // Remove wrapping quotes if present
+      if (pathParam.startsWith("%22") || pathParam.startsWith('"')) {
+        try {
+          pathParam = decodeURIComponent(pathParam);
+        } catch (_) {
+          // ignore
+        }
+        pathParam = pathParam.replace(/^\"|\"$/g, "");
+      }
+    }
+    console.log(`[MSW DEBUG] Normalized path: ${pathParam}`);
+
+    // ----- Reward Gauges -----
+    if (
+      pathParam?.includes("babylon.incentive.v1.Query/RewardGauges") ||
+      pathParam?.includes("babylon.incentive.Query/RewardGauges")
+    ) {
+      console.log("[MSW DEBUG] Processing incentive/RewardGauges query");
+      // Build a minimal QueryRewardGaugesResponse protobuf and encode it to base64
+      try {
+        // Dynamically import to avoid pulling the dependency when not needed
+        const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
+
+        const mockResponse =
+          incentivequery.QueryRewardGaugesResponse.fromPartial({
+            rewardGauges: {
+              BTC_STAKER: {
+                coins: [{ amount: "500000", denom: "ubbn" }],
+                withdrawnCoins: [],
+              },
+            },
+          });
+
+        const encoded =
+          incentivequery.QueryRewardGaugesResponse.encode(
+            mockResponse,
+          ).finish();
+
+        const base64Value = Buffer.from(encoded).toString("base64");
+        console.log("[MSW DEBUG] Generated reward gauges base64 response");
+
+        return res(
+          ctx.json({
+            jsonrpc: "2.0",
+            id: -1,
+            result: {
+              response: {
+                code: 0,
+                log: "",
+                info: "",
+                index: "0",
+                key: null,
+                value: base64Value,
+                proof_ops: null,
+                height: "0",
+                codespace: "",
+              },
+            },
+          }),
+        );
+      } catch (error) {
+        // If protobuf import fails, let the request passthrough so we fail fast.
+        console.error(
+          "[MSW DEBUG] Failed to build mock RewardGauges response",
+          error,
+        );
+        return req.passthrough();
+      }
+    }
+
+    // ----- Bank Balance -----
+    if (pathParam?.includes("cosmos.bank.v1beta1.Query/Balance")) {
+      console.log(
+        "[MSW DEBUG] Processing cosmos.bank.v1beta1.Query/Balance query",
+      );
+      try {
+        const {
+          QueryBalanceResponse,
+        } = require("cosmjs-types/cosmos/bank/v1beta1/query");
+        const mockResp = QueryBalanceResponse.fromPartial({
+          balance: { denom: "ubbn", amount: "1000000" },
+        });
+
+        const encoded = QueryBalanceResponse.encode(mockResp).finish();
+        const base64Value = Buffer.from(encoded).toString("base64");
+        console.log(
+          "[MSW DEBUG] Generated bank balance base64 response, amount: 1000000",
+        );
+
+        return res(
+          ctx.json({
+            jsonrpc: "2.0",
+            id: -1,
+            result: {
+              response: {
+                code: 0,
+                log: "",
+                info: "",
+                index: "0",
+                key: null,
+                value: base64Value,
+                proof_ops: null,
+                height: "0",
+                codespace: "",
+              },
+            },
+          }),
+        );
+      } catch (error) {
+        console.error(
+          "[MSW DEBUG] Failed to build mock Bank Balance response",
+          error,
+        );
+        return req.passthrough();
+      }
+    }
+
+    // For all other ABCI queries, passthrough
+    console.log("[MSW DEBUG] Unhandled abci_query, passing through");
+    return req.passthrough();
+  }),
+];
