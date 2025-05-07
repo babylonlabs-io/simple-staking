@@ -697,8 +697,8 @@ export const injectBBNQueries = async (
     if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
       console.log("[E2E DEBUG] Intercepting POST bank balance query");
       try {
-        // @ts-ignore
-        await (route as any).page().evaluate((b64: string) => {
+        // Use the page parameter that was passed to injectBBNQueries
+        await page.evaluate((b64: string) => {
           // @ts-ignore
           window.__decodeBank?.(b64);
         }, balanceBase64);
