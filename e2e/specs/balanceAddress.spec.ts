@@ -31,8 +31,20 @@ test.describe("Balance and address checks after connection", () => {
 
   test.beforeEach(async ({ page }) => {
     // Intercept requests to log and ignore 404s without fulfilling responses (MSW should handle).
-    await page.route("**/*", (route) => {
+    await page.route("**/*", async (route) => {
       const url = route.request().url();
+
+      // Intercept and stub healthcheck to avoid geo-blocking in CI.
+      if (/\/healthcheck$/.test(url)) {
+        console.log(
+          "DEBUG: Intercepted /healthcheck – returning 200 {data:'ok'}",
+        );
+        return route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({ data: "ok" }),
+        });
+      }
 
       // Always allow main document.
       if (route.request().resourceType() === "document") {
