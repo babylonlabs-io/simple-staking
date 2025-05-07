@@ -1,26 +1,29 @@
 import { Page } from "@playwright/test";
 
+import {
+  BABY_BALANCE_VALUE_SELECTOR,
+  BABY_REWARDS_VALUE_SELECTOR,
+  SPINNER_SELECTOR,
+  STAKABLE_BALANCE_VALUE_SELECTOR,
+  STAKED_BALANCE_ITEM_SELECTOR,
+  STAKED_BALANCE_VALUE_SELECTOR,
+} from "./wallet_balance.selectors";
+
 export class WalletBalanceActions {
   constructor(private page: Page) {}
 
   async waitForBalanceLoadingComplete() {
-    const spinnerSelector =
-      '[data-testid="staked-balance"] .bbn-loader, [data-testid="stakable-balance"] .bbn-loader, [data-testid="baby-balance"] .bbn-loader, [data-testid="baby-rewards"] .bbn-loader';
-
     await this.page.waitForFunction(
       (sel) => document.querySelectorAll(sel).length === 0,
-      spinnerSelector,
+      SPINNER_SELECTOR,
       { timeout: 30_000 },
     );
 
     try {
-      await this.page.waitForSelector(
-        '.bbn-list-item:has-text("Staked Balance")',
-        {
-          timeout: 30000,
-          state: "attached",
-        },
-      );
+      await this.page.waitForSelector(STAKED_BALANCE_ITEM_SELECTOR, {
+        timeout: 30000,
+        state: "attached",
+      });
     } catch (error: unknown) {
       await this.page.reload({ waitUntil: "domcontentloaded" });
       await this.page.waitForLoadState("networkidle");
@@ -29,27 +32,19 @@ export class WalletBalanceActions {
   }
 
   async getStakedBalance(): Promise<string | null> {
-    const stakedBalance = this.page.locator(
-      '.bbn-list-item:has-text("Staked Balance") .bbn-list-value',
-    );
+    const stakedBalance = this.page.locator(STAKED_BALANCE_VALUE_SELECTOR);
     return stakedBalance.textContent();
   }
 
   async getStakableBalance(): Promise<string | null> {
-    return this.page
-      .locator('.bbn-list-item:has-text("Stakable Balance") .bbn-list-value')
-      .textContent();
+    return this.page.locator(STAKABLE_BALANCE_VALUE_SELECTOR).textContent();
   }
 
   async getBabyBalance(): Promise<string | null> {
-    return this.page
-      .locator('.bbn-list-item:has-text("BABY Balance") .bbn-list-value')
-      .textContent();
+    return this.page.locator(BABY_BALANCE_VALUE_SELECTOR).textContent();
   }
 
   async getBabyRewards(): Promise<string | null> {
-    return this.page
-      .locator('.bbn-list-item:has-text("BABY Rewards") .bbn-list-value')
-      .textContent();
+    return this.page.locator(BABY_REWARDS_VALUE_SELECTOR).textContent();
   }
 }

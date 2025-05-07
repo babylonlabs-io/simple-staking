@@ -4,12 +4,12 @@ import { injectBBNWallet, injectBTCWallet } from "../mocks/blockchain";
 import { mockVerifyBTCAddress } from "../mocks/handlers";
 
 import {
-  buttonSelectors,
-  checkboxSelector,
-  connectButtonSelector,
+  BUTTON_SELECTORS,
+  CHECKBOX_SELECTOR,
+  CONNECT_BUTTON_SELECTOR,
+  DIALOG_SELECTORS,
+  WALLET_SELECTORS,
   createGenericWalletSelector,
-  dialogSelectors,
-  walletSelectors,
 } from "./wallet_connect.selectors";
 
 export class WalletConnectActions {
@@ -17,13 +17,13 @@ export class WalletConnectActions {
 
   async clickConnectButton() {
     try {
-      await this.page.waitForSelector(connectButtonSelector, {
+      await this.page.waitForSelector(CONNECT_BUTTON_SELECTOR, {
         state: "visible",
         timeout: 3000,
       });
 
       const connectButtons = await this.page
-        .locator(connectButtonSelector)
+        .locator(CONNECT_BUTTON_SELECTOR)
         .all();
 
       for (const button of connectButtons) {
@@ -46,18 +46,18 @@ export class WalletConnectActions {
     try {
       await Promise.race([
         this.page
-          .locator(dialogSelectors.termsDialogHeader)
+          .locator(DIALOG_SELECTORS.TERMS_DIALOG_HEADER)
           .waitFor({ state: "visible", timeout: 3000 })
           .catch(() => {}),
         this.page
-          .locator(dialogSelectors.anyDialog)
+          .locator(DIALOG_SELECTORS.ANY_DIALOG)
           .first()
           .waitFor({ state: "visible", timeout: 3000 })
           .catch(() => {}),
       ]);
 
       const termsDialogVisible = await this.page
-        .locator(dialogSelectors.termsDialogHeader)
+        .locator(DIALOG_SELECTORS.TERMS_DIALOG_HEADER)
         .isVisible()
         .catch(() => false);
 
@@ -66,14 +66,14 @@ export class WalletConnectActions {
         return;
       }
 
-      const checkboxes = this.page.locator(checkboxSelector);
+      const checkboxes = this.page.locator(CHECKBOX_SELECTOR);
       const count = await checkboxes.count();
 
       for (let i = 0; i < count; i++) {
         await checkboxes.nth(i).click();
       }
 
-      await this.page.locator(buttonSelectors.next).click();
+      await this.page.locator(BUTTON_SELECTORS.NEXT).click();
     } catch (error) {
       console.error("Error accepting terms and conditions:", error);
     }
@@ -81,7 +81,7 @@ export class WalletConnectActions {
 
   private async handleAlternativeDialog() {
     const anyDialog = await this.page
-      .locator(dialogSelectors.anyDialog)
+      .locator(DIALOG_SELECTORS.ANY_DIALOG)
       .first()
       .isVisible()
       .catch(() => false);
@@ -89,10 +89,10 @@ export class WalletConnectActions {
     if (!anyDialog) return;
 
     const buttonSelectorsList = [
-      buttonSelectors.next,
-      buttonSelectors.accept,
-      buttonSelectors.continue,
-      buttonSelectors.ok,
+      BUTTON_SELECTORS.NEXT,
+      BUTTON_SELECTORS.ACCEPT,
+      BUTTON_SELECTORS.CONTINUE,
+      BUTTON_SELECTORS.OK,
     ];
 
     for (const selector of buttonSelectorsList) {
@@ -106,7 +106,7 @@ export class WalletConnectActions {
     }
 
     const anyButton = this.page
-      .locator(`${dialogSelectors.anyDialog} button`)
+      .locator(`${DIALOG_SELECTORS.ANY_DIALOG} button`)
       .first();
     if (await anyButton.isVisible().catch(() => false)) {
       await anyButton
@@ -118,7 +118,7 @@ export class WalletConnectActions {
   async clickInjectableWalletButton() {
     try {
       const bitcoinWalletButton = this.page
-        .locator(walletSelectors.bitcoin)
+        .locator(WALLET_SELECTORS.BITCOIN)
         .first();
 
       await bitcoinWalletButton.waitFor({ state: "visible", timeout: 3000 });
@@ -130,7 +130,7 @@ export class WalletConnectActions {
 
   async clickConnectWalletButton() {
     try {
-      const saveButton = this.page.locator(buttonSelectors.save);
+      const saveButton = this.page.locator(BUTTON_SELECTORS.SAVE);
       await saveButton.waitFor({ state: "visible", timeout: 3000 });
       await saveButton.click();
     } catch (error) {
@@ -140,7 +140,7 @@ export class WalletConnectActions {
 
   async clickOKXWalletButton() {
     try {
-      for (const selector of walletSelectors.okx) {
+      for (const selector of WALLET_SELECTORS.OKX) {
         const okxButton = this.page.locator(selector).first();
         if (await okxButton.isVisible().catch(() => false)) {
           await okxButton.click();
@@ -156,7 +156,7 @@ export class WalletConnectActions {
 
   async clickBabylonChainWalletButton() {
     try {
-      for (const selector of walletSelectors.babylon) {
+      for (const selector of WALLET_SELECTORS.BABYLON) {
         const babylonButton = this.page.locator(selector).first();
         if (await babylonButton.isVisible().catch(() => false)) {
           await babylonButton.click();
@@ -181,7 +181,7 @@ export class WalletConnectActions {
 
   async clickDoneButton() {
     try {
-      const doneButton = this.page.locator(buttonSelectors.done);
+      const doneButton = this.page.locator(BUTTON_SELECTORS.DONE);
       await doneButton.waitFor({ state: "visible", timeout: 3000 });
       await doneButton.click();
     } catch (error) {
@@ -196,7 +196,7 @@ export class WalletConnectActions {
   async handleVerificationErrorIfPresent() {
     try {
       await this.page
-        .locator(dialogSelectors.errorDialog)
+        .locator(DIALOG_SELECTORS.ERROR_DIALOG)
         .waitFor({
           state: "visible",
           timeout: 1000,
@@ -204,20 +204,20 @@ export class WalletConnectActions {
         .catch(() => {});
 
       const isErrorVisible = await this.page
-        .locator(dialogSelectors.errorDialog)
+        .locator(DIALOG_SELECTORS.ERROR_DIALOG)
         .isVisible()
         .catch(() => false);
 
       if (isErrorVisible) {
         const doneButton = this.page.locator(
-          dialogSelectors.errorDialogDoneButton,
+          DIALOG_SELECTORS.ERROR_DIALOG_DONE_BUTTON,
         );
 
         if (await doneButton.isVisible().catch(() => false)) {
           await doneButton.click();
 
           await this.page
-            .locator(dialogSelectors.errorDialog)
+            .locator(DIALOG_SELECTORS.ERROR_DIALOG)
             .waitFor({
               state: "hidden",
               timeout: 1000,
