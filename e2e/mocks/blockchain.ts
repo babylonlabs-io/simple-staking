@@ -1,10 +1,5 @@
-// Export types
-// Export BBN queries mocking functionality
-export * from "./bbnQueries";
-// Export BBN wallet mocking functionality
-export * from "./bbnWallet";
-// Export BTC wallet mocking functionality
-export * from "./btcWallet";
-export * from "./types";
-// Export wallet verification utilities
-export * from "./verification";
+export * from "./blockchain/bbnQueries";
+export * from "./blockchain/bbnWallet";
+export * from "./blockchain/btcWallet";
+export * from "./blockchain/types";
+export * from "./blockchain/verification";

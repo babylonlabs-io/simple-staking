@@ -1,6 +1,6 @@
 import { rest } from "msw";
 
-import { mockDelegation, mockNetworkInfo } from "../constants";
+import { mockDelegation, mockNetworkInfo } from "./constants";
 
 export const delegationHandlers = [
   rest.get("/v1/staker/delegations*", (req, res, ctx) => {

@@ -20,5 +20,4 @@ export const mockVerifyBTCAddress = async (page: Page) => {
   };
 };
 
-// Re-export handlers for direct access
 export { handlers };
