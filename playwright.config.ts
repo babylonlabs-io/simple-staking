@@ -25,7 +25,7 @@ export default defineConfig({
 
   use: {
     baseURL,
-    headless: process.env.CI ? true : undefined,
+    headless: false,
     trace: "on-first-retry",
   },
 
