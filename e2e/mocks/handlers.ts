@@ -368,6 +368,16 @@ export const handlers = [
     console.log("[MSW DEBUG] Unhandled abci_query, passing through");
     return req.passthrough();
   }),
+
+  rest.get("/healthcheck*", (req, res, ctx) => {
+    console.log("[MSW DEBUG] GET /healthcheck* handler called");
+    // Simulate healthy backend response so the app is not marked as geo-blocked in CI.
+    return res(
+      ctx.json({
+        data: "ok",
+      }),
+    );
+  }),
 ];
 
 const server = setupServer(...handlers);
