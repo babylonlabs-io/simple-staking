@@ -4,7 +4,6 @@ export const blockchainHandlers = [
   rest.get(/.*\/abci_query$/, (req, res, ctx) => {
     const url = new URL(req.url.href);
     let pathParam = url.searchParams.get("path");
-    console.log(`[MSW DEBUG] GET abci_query with path: ${pathParam}`);
 
     // The path can come wrapped in quotes or URL-encoded, normalize it.
     if (pathParam) {
@@ -18,14 +17,12 @@ export const blockchainHandlers = [
         pathParam = pathParam.replace(/^\"|\"$/g, "");
       }
     }
-    console.log(`[MSW DEBUG] Normalized path: ${pathParam}`);
 
     // ----- Reward Gauges -----
     if (
       pathParam?.includes("babylon.incentive.v1.Query/RewardGauges") ||
       pathParam?.includes("babylon.incentive.Query/RewardGauges")
     ) {
-      console.log("[MSW DEBUG] Processing incentive/RewardGauges query");
       // Build a minimal QueryRewardGaugesResponse protobuf and encode it to base64
       try {
         // Dynamically import to avoid pulling the dependency when not needed
@@ -47,7 +44,6 @@ export const blockchainHandlers = [
           ).finish();
 
         const base64Value = Buffer.from(encoded).toString("base64");
-        console.log("[MSW DEBUG] Generated reward gauges base64 response");
 
         return res(
           ctx.json({
@@ -70,19 +66,13 @@ export const blockchainHandlers = [
         );
       } catch (error) {
         // If protobuf import fails, let the request passthrough so we fail fast.
-        console.error(
-          "[MSW DEBUG] Failed to build mock RewardGauges response",
-          error,
-        );
+        console.error("Failed to build mock RewardGauges response", error);
         return req.passthrough();
       }
     }
 
     // ----- Bank Balance -----
     if (pathParam?.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      console.log(
-        "[MSW DEBUG] Processing cosmos.bank.v1beta1.Query/Balance query",
-      );
       try {
         const {
           QueryBalanceResponse,
@@ -93,9 +83,6 @@ export const blockchainHandlers = [
 
         const encoded = QueryBalanceResponse.encode(mockResp).finish();
         const base64Value = Buffer.from(encoded).toString("base64");
-        console.log(
-          "[MSW DEBUG] Generated bank balance base64 response, amount: 1000000",
-        );
 
         return res(
           ctx.json({
@@ -117,16 +104,12 @@ export const blockchainHandlers = [
           }),
         );
       } catch (error) {
-        console.error(
-          "[MSW DEBUG] Failed to build mock Bank Balance response",
-          error,
-        );
+        console.error("Failed to build mock Bank Balance response", error);
         return req.passthrough();
       }
     }
 
     // For all other ABCI queries, passthrough
-    console.log("[MSW DEBUG] Unhandled abci_query, passing through");
     return req.passthrough();
   }),
 ];

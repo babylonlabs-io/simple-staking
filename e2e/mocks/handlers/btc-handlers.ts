@@ -3,7 +3,6 @@ import { rest } from "msw";
 export const btcHandlers = [
   // Mempool API handlers
   rest.get("*/api/address/*/utxo", (req, res, ctx) => {
-    console.log("[MSW DEBUG] GET */api/address/*/utxo handler called");
     const response = [
       {
         txid: "txid1",
@@ -14,12 +13,10 @@ export const btcHandlers = [
         },
       },
     ];
-    console.log("[MSW DEBUG] Returning UTXO:", JSON.stringify(response));
     return res(ctx.json(response));
   }),
 
   rest.get("*/api/v1/validate-address/*", (req, res, ctx) => {
-    console.log("[MSW DEBUG] GET */api/v1/validate-address/* handler called");
     return res(
       ctx.json({
         isvalid: true,
@@ -29,7 +26,6 @@ export const btcHandlers = [
   }),
 
   rest.get("*/api/address/*", (req, res, ctx) => {
-    console.log("[MSW DEBUG] GET */api/address/* handler called");
     return res(
       ctx.json({
         chain_stats: {

@@ -9,9 +9,6 @@ export const injectBBNQueries = async (
     QueryBalanceResponse,
   } = require("cosmjs-types/cosmos/bank/v1beta1/query");
 
-  // Add debugging to track when mocks are initialized
-  await page.evaluate(() => {});
-
   const rewardGaugeProto = incentivequery.QueryRewardGaugesResponse.fromPartial(
     {
       rewardGauges: {
@@ -65,7 +62,9 @@ export const injectBBNQueries = async (
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
         const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
-      } catch (err) {}
+      } catch (err) {
+        console.error("Failed to decode bank balance:", err);
+      }
     };
 
     (function patchSSC() {
@@ -192,7 +191,9 @@ export const injectBBNQueries = async (
         const {
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-      } catch (e) {}
+      } catch (e) {
+        console.error("Error loading QueryBalanceResponse:", e);
+      }
 
       await route.fulfill({
         status: 200,
@@ -234,6 +235,7 @@ export const injectBBNQueries = async (
     try {
       parsed = postData ? JSON.parse(postData) : null;
     } catch (err) {
+      console.error("Failed to parse POST data:", err);
       return route.continue();
     }
 
@@ -321,7 +323,7 @@ export const injectBBNQueries = async (
       try {
         // Skip the evaluation since it's causing issues in CI
       } catch (e) {
-        // Continue with response despite errors
+        console.error("Error in POST evaluate:", e);
       }
 
       const response = {
@@ -348,7 +350,9 @@ export const injectBBNQueries = async (
 
       try {
         await route.fulfill(response);
-      } catch (error) {}
+      } catch (error) {
+        console.error("Failed to fulfill bank balance request:", error);
+      }
       return;
     }
 
@@ -398,7 +402,9 @@ export const injectBBNQueries = async (
           pagination: { next_key: "", total: "1" },
         }),
       });
-    } catch (error) {}
+    } catch (error) {
+      console.error("Failed to fulfill delegations request:", error);
+    }
   });
 
   // Add dedicated status route handler - this is important for Cosmos chain health checks
@@ -534,7 +540,4 @@ export const injectBBNQueries = async (
       }),
     });
   });
-
-  // Signal that mocks are ready
-  await page.evaluate(() => {});
 };

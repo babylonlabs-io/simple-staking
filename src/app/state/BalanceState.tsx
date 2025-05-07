@@ -52,12 +52,6 @@ export function BalanceState({ children }: PropsWithChildren) {
     isLoading: isBTCBalanceLoading,
   } = useAppState();
 
-  console.log("DEBUG: appState: ", {
-    availableUTXOs,
-    allUTXOs,
-    inscriptionsUTXOs,
-  });
-
   const {
     balanceQuery: { data: bbnBalance = 0, isLoading: isCosmosBalanceLoading },
     hasRpcError,
@@ -120,17 +114,6 @@ export function BalanceState({ children }: PropsWithChildren) {
       .flat()
       .reduce((total, amount) => total + amount, 0);
   }, [delegations]);
-
-  console.log("DEBUG: stakableBtcBalance", {
-    loading,
-    stakableBtcBalance,
-    totalBtcBalance,
-    delegations,
-    bbnBalance,
-    stakedBtcBalance,
-    inscriptionsBtcBalance,
-    hasRpcError,
-  });
 
   const context = useMemo(
     () => ({

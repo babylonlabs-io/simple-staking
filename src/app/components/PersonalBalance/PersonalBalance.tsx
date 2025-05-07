@@ -46,14 +46,6 @@ export function PersonalBalance() {
     loading: isBalanceLoading,
   } = useBalanceState();
 
-  console.log("DEBUG: bbnBalance", {
-    bbnBalance,
-    stakableBtcBalance,
-    stakedBtcBalance,
-    inscriptionsBtcBalance,
-    isBalanceLoading,
-  });
-
   const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
   const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
 
