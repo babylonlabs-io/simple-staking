@@ -1,8 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { config as loadEnv } from "dotenv";
 import path from "path";
-
-loadEnv({ path: ".env.test", override: false });
 
 const PORT = process.env.PORT ?? 3000;
 const baseURL = `http://localhost:${PORT}`;
@@ -20,12 +17,12 @@ export default defineConfig({
   forbidOnly: false,
   retries: 2,
   timeout: 90_000,
-  workers: process.env.CI ? 1 : undefined,
+  workers: 1,
   reporter: "html",
 
   use: {
     baseURL,
-    headless: false,
+    headless: true,
     trace: "on-first-retry",
   },
 

@@ -136,9 +136,6 @@ test.describe("Balance and address checks after connection", () => {
         error instanceof Error ? error.message : String(error),
       );
 
-      // Log the current HTML to see what's actually in the page
-      console.log("DEBUG: Current page HTML:", await page.content());
-
       // Try reloading the page one last time
       console.log("DEBUG: Attempting final page reload");
       await page.reload({ waitUntil: "domcontentloaded" });
