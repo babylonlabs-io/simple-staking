@@ -5,7 +5,6 @@ import {
   WalletBalanceActions,
   WalletConnectActions,
 } from "../middleware";
-import { injectBBNQueries } from "../mocks/blockchain";
 
 test.describe("Balance and address checks after connection", () => {
   let connectActions: WalletConnectActions;
@@ -17,10 +16,7 @@ test.describe("Balance and address checks after connection", () => {
     balanceActions = new WalletBalanceActions(page);
     navigationActions = new PageNavigationActions(page);
 
-    await injectBBNQueries(page);
-
-    await navigationActions.navigateToHomePage();
-
+    await navigationActions.navigateToHomePage(page);
     await connectActions.setupWalletConnection();
   });
 
