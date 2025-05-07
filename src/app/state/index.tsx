@@ -64,6 +64,8 @@ export function AppState({ children }: PropsWithChildren) {
   const { lockInscriptions: ordinalsExcluded, toggleLockInscriptions } =
     useInscriptionProvider();
 
+  console.log("DEBUG: ordinalsExcluded", ordinalsExcluded);
+
   // States
   const {
     allUTXOs = [],
@@ -84,6 +86,11 @@ export function AppState({ children }: PropsWithChildren) {
     isLoading: isNetworkInfoLoading,
     isError: isNetworkInfoError,
   } = useNetworkInfo();
+
+  console.log("DEBUG: allUTXOs", allUTXOs);
+  console.log("DEBUG: confirmedUTXOs", confirmedUTXOs);
+  console.log("DEBUG: ordinals", ordinals);
+  console.log("DEBUG: networkInfo", networkInfo);
 
   // Computed
   const isLoading = isUTXOLoading || isOrdinalLoading || isNetworkInfoLoading;

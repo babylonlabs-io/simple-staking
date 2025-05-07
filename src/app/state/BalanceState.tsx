@@ -52,6 +52,12 @@ export function BalanceState({ children }: PropsWithChildren) {
     isLoading: isBTCBalanceLoading,
   } = useAppState();
 
+  console.log("DEBUG: appState: ", {
+    availableUTXOs,
+    allUTXOs,
+    inscriptionsUTXOs,
+  });
+
   const {
     balanceQuery: { data: bbnBalance = 0, isLoading: isCosmosBalanceLoading },
     hasRpcError,
