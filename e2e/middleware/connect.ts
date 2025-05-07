@@ -330,15 +330,10 @@ export const clickDoneButton = async (page: Page) => {
 };
 
 export const setupWalletConnection = async (page: Page) => {
-  console.log("DEBUG: Starting wallet connection setup");
   const actions = new WalletConnectActions(page);
 
   // Log environment info
   try {
-    console.log("DEBUG: Current ENV variables:");
-    console.log("NODE_ENV:", process.env.NODE_ENV);
-    console.log("NEXT_PUBLIC_NETWORK:", process.env.NEXT_PUBLIC_NETWORK);
-
     // Try to get network info from the page
     const networkInfo = await page.evaluate(() => {
       // Check for Next.js embedded env vars
@@ -370,104 +365,80 @@ export const setupWalletConnection = async (page: Page) => {
 
       return { nextDataEnv, metaTags, windowEnv };
     });
-
-    console.log("DEBUG: Network info from page:", networkInfo);
   } catch (error) {
-    console.error("DEBUG: Error getting environment info:", error);
+    console.error("Error getting environment info:", error);
   }
 
   // Setup mocks first
   try {
     await actions.setupMocks();
-    console.log("DEBUG: Mocks set up successfully");
   } catch (error) {
-    console.error("DEBUG: Error setting up mocks:", error);
+    console.error("Error setting up mocks:", error);
   }
-  console.log("DEBUG: Mocks set up, injecting wallets");
 
   // Inject wallet support
   try {
     await injectBTCWallet(page);
-    console.log("DEBUG: BTC wallet injected successfully");
   } catch (error) {
-    console.error("DEBUG: Error injecting BTC wallet:", error);
+    console.error("Error injecting BTC wallet:", error);
   }
 
   try {
     await injectBBNWallet(page, "Leap");
-    console.log("DEBUG: BBN wallet injected successfully");
   } catch (error) {
-    console.error("DEBUG: Error injecting BBN wallet:", error);
+    console.error("Error injecting BBN wallet:", error);
   }
-  console.log("DEBUG: Wallets injected, clicking connect button");
 
   // Click the connect button
   try {
     await actions.clickConnectButton();
-    console.log("DEBUG: Connect button clicked successfully");
   } catch (error) {
-    console.error("DEBUG: Error clicking connect button:", error);
+    console.error("Error clicking connect button:", error);
   }
-  console.log("DEBUG: Connect button clicked, checking for terms");
 
   // Accept terms and conditions if shown
   try {
     await actions.acceptTermsAndConditions();
-    console.log("DEBUG: Terms accepted successfully (if shown)");
   } catch (error) {
-    console.error("DEBUG: Error accepting terms:", error);
+    console.error("Error accepting terms:", error);
   }
-  console.log(
-    "DEBUG: Terms accepted (if shown), clicking injectable wallet button",
-  );
 
   // Try clicking wallet buttons
   try {
     await actions.clickInjectableWalletButton();
-    console.log("DEBUG: Injectable wallet button clicked successfully");
   } catch (error) {
-    console.error("DEBUG: Error clicking injectable wallet button:", error);
+    console.error("Error clicking injectable wallet button:", error);
   }
-  console.log("DEBUG: Injectable wallet button clicked, clicking OKX wallet");
 
   try {
     await actions.clickOKXWalletButton();
-    console.log("DEBUG: OKX wallet button clicked successfully");
   } catch (error) {
-    console.error("DEBUG: Error clicking OKX wallet button:", error);
+    console.error("Error clicking OKX wallet button:", error);
   }
-  console.log("DEBUG: OKX wallet clicked, clicking Babylon Chain wallet");
 
   try {
     await actions.clickBabylonChainWalletButton();
-    console.log("DEBUG: Babylon Chain wallet button clicked successfully");
   } catch (error) {
-    console.error("DEBUG: Error clicking Babylon Chain wallet button:", error);
+    console.error("Error clicking Babylon Chain wallet button:", error);
   }
-  console.log("DEBUG: Babylon Chain wallet clicked, clicking Leap wallet");
 
   try {
     await actions.clickGenericWalletButton("Leap");
-    console.log("DEBUG: Leap wallet button clicked successfully");
   } catch (error) {
-    console.error("DEBUG: Error clicking Leap wallet button:", error);
+    console.error("Error clicking Leap wallet button:", error);
   }
-  console.log("DEBUG: Leap wallet clicked, clicking Done button");
 
   try {
     await actions.clickDoneButton();
-    console.log("DEBUG: Done button clicked successfully");
   } catch (error) {
-    console.error("DEBUG: Error clicking Done button:", error);
+    console.error("Error clicking Done button:", error);
   }
-  console.log("DEBUG: Done button clicked, checking for verification errors");
 
   // Handle verification errors if they appear
   try {
     await actions.handleVerificationErrorIfPresent();
-    console.log("DEBUG: Verification errors handled successfully");
   } catch (error) {
-    console.error("DEBUG: Error handling verification errors:", error);
+    console.error("Error handling verification errors:", error);
   }
 
   // Log window state
@@ -484,10 +455,7 @@ export const setupWalletConnection = async (page: Page) => {
         }),
       };
     });
-    console.log("DEBUG: Wallet state:", walletState);
   } catch (error) {
-    console.error("DEBUG: Error getting wallet state:", error);
+    console.error("Error getting wallet state:", error);
   }
-
-  console.log("DEBUG: Wallet connection setup complete");
 };

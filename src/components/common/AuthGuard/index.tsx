@@ -21,8 +21,6 @@ export function AuthGuard({
   const { connected } = useWalletConnect();
   const { isGeoBlocked, isLoading } = useHealthCheck();
 
-  console.log("DEBUG: AuthGuard", { connected, isGeoBlocked, isLoading });
-
   const isConnected = connected && !isGeoBlocked && !isLoading;
 
   useEffect(() => {

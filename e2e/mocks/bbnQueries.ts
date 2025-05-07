@@ -10,9 +10,7 @@ export const injectBBNQueries = async (
   } = require("cosmjs-types/cosmos/bank/v1beta1/query");
 
   // Add debugging to track when mocks are initialized
-  await page.evaluate(() => {
-    console.log("[E2E DEBUG] Starting BBN query mocks initialization");
-  });
+  await page.evaluate(() => {});
 
   const rewardGaugeProto = incentivequery.QueryRewardGaugesResponse.fromPartial(
     {
@@ -41,10 +39,8 @@ export const injectBBNQueries = async (
 
   await page.addInitScript((amount) => {
     window.__e2eTestMode = true;
-    console.log("[E2E DEBUG] Initializing e2e test mode with mock handlers");
 
     window.mockCosmJSBankBalance = (address) => {
-      console.log(`[E2E DEBUG] Mocking bank balance for address ${address}`);
       return Promise.resolve({
         amount: "1000000",
         denom: "ubbn",
@@ -52,7 +48,6 @@ export const injectBBNQueries = async (
     };
 
     window.mockCosmJSRewardsQuery = (address) => {
-      console.log(`[E2E DEBUG] Mocking rewards query for address ${address}`);
       return Promise.resolve({
         rewardGauges: {
           BTC_STAKER: {
@@ -70,25 +65,18 @@ export const injectBBNQueries = async (
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
         const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
-        console.log("[E2E DEBUG] Decoded bank balance:", decoded);
-      } catch (err) {
-        console.error("[E2E DEBUG] Failed to decode bank balance:", err);
-      }
+      } catch (err) {}
     };
 
     (function patchSSC() {
       const patch = (ssc: any) => {
         if (ssc && typeof ssc.connectWithSigner === "function") {
-          console.log("[E2E DEBUG] Patching SigningStargateClient");
           ssc.connectWithSigner = async () => {
-            console.log("[E2E DEBUG] Mock SigningStargateClient connected");
             return {
               simulate: async () => {
-                console.log("[E2E DEBUG] Mock simulate called");
                 return {};
               },
               signAndBroadcast: async () => {
-                console.log("[E2E DEBUG] Mock signAndBroadcast called");
                 return { code: 0 };
               },
             } as any;
@@ -114,7 +102,6 @@ export const injectBBNQueries = async (
   await page.route("**", async (route) => {
     const url = route.request().url();
     const method = route.request().method();
-    console.log(`[E2E DEBUG] Network request: ${method} ${url}`);
 
     await route.continue();
   });
@@ -122,7 +109,6 @@ export const injectBBNQueries = async (
   // These routes need to be more prioritized to ensure they capture the requests
   // Place them first, as Playwright processes routes in the order they're added
   await page.route("**/v2/staked*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting v2/staked request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -136,7 +122,6 @@ export const injectBBNQueries = async (
   });
 
   await page.route("**/v2/balances*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting v2/balances request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -150,7 +135,6 @@ export const injectBBNQueries = async (
   });
 
   await page.route("**/v2/stakable-btc*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting v2/stakable-btc request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -161,7 +145,6 @@ export const injectBBNQueries = async (
   });
 
   await page.route("**/v2/rewards*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting v2/rewards request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -174,14 +157,12 @@ export const injectBBNQueries = async (
   await page.route("**/abci_query?*", async (route) => {
     const url = new URL(route.request().url());
     const path = url.searchParams.get("path") || "";
-    console.log(`[E2E DEBUG] abci_query request with path: ${path}`);
 
     const decodedPath = decodeURIComponent(path).replace(/"/g, "");
     if (
       decodedPath.includes("babylon.incentive.Query/RewardGauges") ||
       decodedPath.includes("babylon.incentive.v1.Query/RewardGauges")
     ) {
-      console.log("[E2E DEBUG] Intercepting rewards query");
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -207,16 +188,11 @@ export const injectBBNQueries = async (
     }
 
     if (decodedPath.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      console.log("[E2E DEBUG] Intercepting bank balance query GET method");
       try {
-        console.log("[E2E DEBUG] Trying to load QueryBalanceResponse");
         const {
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-        console.log("[E2E DEBUG] QueryBalanceResponse loaded successfully");
-      } catch (e) {
-        console.error("[E2E DEBUG] Error loading QueryBalanceResponse:", e);
-      }
+      } catch (e) {}
 
       await route.fulfill({
         status: 200,
@@ -239,11 +215,9 @@ export const injectBBNQueries = async (
           },
         }),
       });
-      console.log("[E2E DEBUG] Bank balance GET fulfillment completed");
       return;
     }
 
-    console.log("[E2E DEBUG] Continuing with abci_query request");
     await route.continue();
   });
 
@@ -255,21 +229,15 @@ export const injectBBNQueries = async (
 
     const postData = request.postData();
     const url = request.url();
-    console.log(`[E2E DEBUG] POST request to: ${url}`);
 
     let parsed: any = null;
     try {
       parsed = postData ? JSON.parse(postData) : null;
-      console.log(
-        `[E2E DEBUG] POST data: ${JSON.stringify(parsed?.method || "unknown method")}`,
-      );
     } catch (err) {
-      console.log(`[E2E DEBUG] Failed to parse POST data: ${err}`);
       return route.continue();
     }
 
     if (parsed && parsed.method === "status") {
-      console.log("[E2E DEBUG] Intercepting status request");
       return route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -321,13 +289,11 @@ export const injectBBNQueries = async (
     }
 
     const pathParam = parsed.params?.path || "";
-    console.log(`[E2E DEBUG] POST abci_query with path: ${pathParam}`);
 
     if (
       pathParam.includes("babylon.incentive.Query/RewardGauges") ||
       pathParam.includes("babylon.incentive.v1.Query/RewardGauges")
     ) {
-      console.log("[E2E DEBUG] Intercepting POST rewards query");
       return route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -352,27 +318,12 @@ export const injectBBNQueries = async (
     }
 
     if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      console.log("[E2E DEBUG] Intercepting POST bank balance query");
-      console.log(
-        "[E2E DEBUG] balanceBase64 content is valid:",
-        Boolean(balanceBase64),
-      );
-
       try {
-        console.log("[E2E DEBUG] Going to evaluate window.__decodeBank");
         // Skip the evaluation since it's causing issues in CI
-        console.log(
-          "[E2E DEBUG] window.__decodeBank skipped due to CI issues - using direct fulfillment only",
-        );
       } catch (e) {
-        console.error("[E2E DEBUG] Error in POST evaluate:", e);
         // Continue with response despite errors
-        console.log(
-          "[E2E DEBUG] Continuing with response despite evaluation error",
-        );
       }
 
-      console.log("[E2E DEBUG] Preparing bank balance response");
       const response = {
         status: 200,
         contentType: "application/json",
@@ -394,21 +345,10 @@ export const injectBBNQueries = async (
           },
         }),
       };
-      console.log(
-        "[E2E DEBUG] Bank balance response prepared, about to fulfill",
-      );
 
       try {
         await route.fulfill(response);
-        console.log(
-          "[E2E DEBUG] Bank balance POST fulfillment completed successfully",
-        );
-      } catch (error) {
-        console.error(
-          "[E2E DEBUG] Failed to fulfill bank balance request:",
-          error,
-        );
-      }
+      } catch (error) {}
       return;
     }
 
@@ -417,7 +357,6 @@ export const injectBBNQueries = async (
 
   // Add mock route for delegations
   await page.route("**/v2/delegations*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting v2/delegations request");
     const mockDelegation = {
       finality_provider_btc_pks_hex: [
         "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
@@ -449,7 +388,6 @@ export const injectBBNQueries = async (
       },
       state: "ACTIVE",
     };
-    console.log("[E2E DEBUG] Delegation mock prepared, about to fulfill");
 
     try {
       await route.fulfill({
@@ -460,18 +398,11 @@ export const injectBBNQueries = async (
           pagination: { next_key: "", total: "1" },
         }),
       });
-      console.log("[E2E DEBUG] Delegation request fulfilled with mock data");
-    } catch (error) {
-      console.error(
-        "[E2E DEBUG] Failed to fulfill delegations request:",
-        error,
-      );
-    }
+    } catch (error) {}
   });
 
   // Add dedicated status route handler - this is important for Cosmos chain health checks
   await page.route("**/status*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting direct status GET request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -520,7 +451,6 @@ export const injectBBNQueries = async (
 
   // Add route for network info
   await page.route("**/v2/network-info*", async (route) => {
-    console.log("[E2E DEBUG] Intercepting v2/network-info request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -570,7 +500,6 @@ export const injectBBNQueries = async (
 
   // Add these catch-all routes at the end
   await page.route("**/*staked*", async (route) => {
-    console.log("[E2E DEBUG] Catch-all: Intercepting staked request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -584,7 +513,6 @@ export const injectBBNQueries = async (
   });
 
   await page.route("**/*balance*", async (route) => {
-    console.log("[E2E DEBUG] Catch-all: Intercepting balance request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -598,7 +526,6 @@ export const injectBBNQueries = async (
   });
 
   await page.route("**/*reward*", async (route) => {
-    console.log("[E2E DEBUG] Catch-all: Intercepting rewards request");
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -609,7 +536,5 @@ export const injectBBNQueries = async (
   });
 
   // Signal that mocks are ready
-  await page.evaluate(() => {
-    console.log("[E2E DEBUG] BBN query mocks initialization complete");
-  });
+  await page.evaluate(() => {});
 };
