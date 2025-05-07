@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
+    "build:e2e": "NEXT_PUBLIC_MEMPOOL_API=https://mempool.space NEXT_PUBLIC_API_URL=https://staking-api.babylonlabs.io NEXT_PUBLIC_NETWORK=mainnet NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=false NEXT_PUBLIC_FIXED_STAKING_TERM=true NEXT_PUBLIC_BBN_GAS_PRICE=0.007 NEXT_PUBLIC_DEFAULT_FP_FILTER=inactive NEXT_PUBLIC_BABY_RPC_URL=https://babylon-rpc.polkachu.com/ NEXT_PUBLIC_BABY_LCD_URL=https://babylon-api.polkachu.com/ npm run build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check .",
@@ -16,11 +17,10 @@
     "sort-imports": "eslint --fix .",
     "test": "node --trace-deprecation ./node_modules/.bin/jest",
     "test:watch": "jest --watch",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test e2e/specs/",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report",
-    "test:e2e:specs": "playwright test e2e/specs/"
+    "test:e2e:report": "playwright show-report"
   },
   "engines": {
     "node": "22.3.0"
