@@ -94,10 +94,16 @@ export default defineConfig({
       DISABLE_SENTRY: "true",
       // Provide mock backend endpoints for tests
       NEXT_PUBLIC_API_URL: "",
-      NEXT_PUBLIC_MEMPOOL_API: "https://fakeapi.fakeweb.abc/mempool",
+      NEXT_PUBLIC_MEMPOOL_API: "https://mempool.space",
       // Use mainnet network configuration to ensure BTC symbol is used consistently across local and CI runs
       NEXT_PUBLIC_NETWORK: "mainnet",
       PORT: String(PORT),
+      NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES: "false",
+      NEXT_PUBLIC_FIXED_STAKING_TERM: "true",
+      NEXT_PUBLIC_BBN_GAS_PRICE: "0.007",
+      NEXT_PUBLIC_DEFAULT_FP_FILTER: "inactive",
+      NEXT_PUBLIC_BABY_RPC_URL: "https://babylon-rpc.polkachu.com/",
+      NEXT_PUBLIC_BABY_LCD_URL: "https://babylon-api.polkachu.com/",
     },
   },
 });
