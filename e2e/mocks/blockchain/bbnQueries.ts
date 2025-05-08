@@ -34,61 +34,10 @@ export const injectBBNQueries = async (
 
   QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64"));
 
-  await page.addInitScript((amount) => {
+  await page.addInitScript(() => {
     window.__e2eTestMode = true;
-
-    // @ts-ignore - helper only available in E2E browser context
-    window.__decodeBank = (b64: string) => {
-      try {
-        const {
-          QueryBalanceResponse,
-        } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-        const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
-      } catch (err) {
-        console.error("Failed to decode bank balance:", err);
-      }
-    };
-
-    (function patchSSC() {
-      const patch = (ssc: any) => {
-        if (ssc && typeof ssc.connectWithSigner === "function") {
-          ssc.connectWithSigner = async () => {
-            return {
-              simulate: async () => {
-                return {};
-              },
-              signAndBroadcast: async () => {
-                return { code: 0 };
-              },
-            } as any;
-          };
-        }
-      };
-
-      // @ts-ignore
-      patch(window.SigningStargateClient);
-
-      const id = setInterval(() => {
-        // @ts-ignore
-        if (window.SigningStargateClient) {
-          // @ts-ignore
-          patch(window.SigningStargateClient);
-          clearInterval(id);
-        }
-      }, 50);
-    })();
-  }, rewardAmount);
-
-  // Log all network requests to help debug what's happening
-  await page.route("**", async (route) => {
-    const url = route.request().url();
-    const method = route.request().method();
-
-    await route.continue();
   });
 
-  // These routes need to be more prioritized to ensure they capture the requests
-  // Place them first, as Playwright processes routes in the order they're added
   await page.route("**/v2/staked*", async (route) => {
     await route.fulfill({
       status: 200,
