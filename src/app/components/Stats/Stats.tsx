@@ -24,7 +24,7 @@ export const Stats = memo(() => {
       active_tvl: activeTVL = 0,
       total_finality_providers: totalFPs = 0,
       active_finality_providers: activeFPs = 0,
-      btc_staking_apy: stakingAPY,
+      btc_staking_apr: stakingAPR,
     } = {},
     isLoading,
   } = useSystemStats();
@@ -63,17 +63,17 @@ export const Stats = memo(() => {
               >
                 guide
               </a>{" "}
-              on how to transition a Phase-1 stake or register a new one.
+              on how to transition a Phase-1 stake or register a new one
             </>
           }
         />
 
         <StatItem
-          hidden={!stakingAPY}
+          hidden={!stakingAPR}
           loading={isLoading}
-          title={`${coinSymbol} Staking APY`}
-          value={`${formatter.format(stakingAPY ? stakingAPY * 100 : 0)}%`}
-          tooltip="To determine the APY, the amount of BABY reward tokens allocated by the Babylon Genesis chain for BTC stakers is converted to its Bitcoin equivalent using market prices obtained from reliable, independent data sources. However, the APY is an approximate figure and can fluctuate, and the displayed value may not always be completely accurate"
+          title={`${coinSymbol} Staking APR`}
+          value={`${formatter.format(stakingAPR ? stakingAPR * 100 : 0)}%`}
+          tooltip="Annual Percentage Reward (APR) is a dynamic estimate of the annualized staking reward rate based on current network conditions, and it refers to staking rewards rather than traditional lending interest. Rewards are distributed in BABY tokens but shown as a Bitcoin-equivalent rate relative to the Bitcoin initially staked. APR is calculated using U.S. dollar values for Bitcoin and BABY from independent, reputable sources. The APR shown is an approximate figure that can fluctuate, and the displayed value may not always be completely accurate. Actual rewards are not guaranteed and may vary over time. Staking carries exposure to slashing and other risks"
         />
 
         <StatItem

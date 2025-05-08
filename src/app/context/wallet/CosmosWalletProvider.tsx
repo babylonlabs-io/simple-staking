@@ -7,6 +7,7 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
+import * as Sentry from "@sentry/nextjs";
 import {
   createContext,
   useCallback,
@@ -93,6 +94,16 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
         setLoading(false);
+
+        Sentry.addBreadcrumb({
+          level: "info",
+          message: "Connect Babylon wallet",
+          data: {
+            chainId,
+            address,
+            walletName: await provider.getWalletProviderName(),
+          },
+        });
       } catch (error: any) {
         handleError({
           error: new ClientError(
@@ -164,6 +175,23 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
 
     return unsubscribe;
   }, [bbnConnector, connectCosmos]);
+
+  useEffect(() => {
+    if (!bbnConnector) return;
+
+    const installedWallets = bbnConnector.wallets
+      .filter((wallet) => wallet.installed)
+      .reduce(
+        (acc, wallet) => ({ ...acc, [wallet.id]: wallet.name }),
+        {} as Record<string, string>,
+      );
+
+    Sentry.addBreadcrumb({
+      level: "info",
+      message: "Installed BTC wallets",
+      data: installedWallets,
+    });
+  }, [bbnConnector]);
 
   return (
     <CosmosWalletContext.Provider value={cosmosContextValue}>
