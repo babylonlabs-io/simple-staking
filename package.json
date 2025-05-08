@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -H 0.0.0.0",
     "build": "next build",
-    "build:e2e": "NEXT_PUBLIC_MEMPOOL_API=https://mempool.space NEXT_PUBLIC_API_URL=https://staking-api.babylonlabs.io NEXT_PUBLIC_NETWORK=mainnet NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES=false NEXT_PUBLIC_FIXED_STAKING_TERM=true NEXT_PUBLIC_BBN_GAS_PRICE=0.007 NEXT_PUBLIC_DEFAULT_FP_FILTER=inactive NEXT_PUBLIC_BABY_RPC_URL=https://babylon-rpc.polkachu.com/ NEXT_PUBLIC_BABY_LCD_URL=https://babylon-api.polkachu.com/ npm run build",
+    "build:e2e": "env-cmd -f .env.test next build",
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --check .",
@@ -80,7 +80,9 @@
     "babel-jest": "^29.7.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "daisyui": "^4.11.1",
+    "dotenv-cli": "^8.0.0",
     "ecpair": "^2.1.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.1.3",
     "eslint-config-prettier": "^9.1.0",
