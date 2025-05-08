@@ -4,17 +4,9 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
-  // Disable static export to ensure dynamic server rendering during tests.
+  output: "export",
   images: { unoptimized: true },
   productionBrowserSourceMaps: true,
-  // Configure asset prefix for CI in development mode to ensure static assets are served correctly
-  // In CI with dev server, we need to ensure assets are properly resolved
-  basePath: '',
-  assetPrefix: '',
-  // Disable static optimization to make dev server more reliable for tests
-  devIndicators: {
-    buildActivity: false,
-  },
   experimental: {
     forceSwcTransforms: true,
   },
