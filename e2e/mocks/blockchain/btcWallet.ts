@@ -44,153 +44,171 @@ export const injectBTCWallet = async (
 
       window.btcwallet = btcWallet;
 
-      if (walletType === "OKX") {
-        (window as any).okxwallet = {
-          bitcoin: {
-            ...btcWallet,
-            isOKXWallet: true,
-            getNetwork: () => "mainnet",
-            getPublicKey: () =>
-              "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-            getBalance: () => ({
-              confirmed: 12345678,
-              unconfirmed: 0,
-              total: 12345678,
-            }),
-            getAccounts: () => [
-              "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
-            ],
-            isAccountActive: () => true,
-            switchNetwork: (network: string) => Promise.resolve(true),
-            signPsbt: (psbtHex: string) => {
-              return "signed_psbt_hex_string";
-            },
-            connect: async () => {
-              return {
+      const walletStrategies: Record<string, () => void> = {
+        OKX: () => {
+          (window as any).okxwallet = {
+            bitcoin: {
+              ...btcWallet,
+              isOKXWallet: true,
+              getNetwork: () => "mainnet",
+              getPublicKey: () =>
+                "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
+              getBalance: () => ({
+                confirmed: 12345678,
+                unconfirmed: 0,
+                total: 12345678,
+              }),
+              getAccounts: () => [
+                "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
+              ],
+              isAccountActive: () => true,
+              switchNetwork: (network: string) => Promise.resolve(true),
+              signPsbt: (psbtHex: string) => {
+                return "signed_psbt_hex_string";
+              },
+              connect: async () => {
+                return {
+                  address:
+                    "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
+                  compressedPublicKey:
+                    "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
+                };
+              },
+              getSelectedAddress: () => {
+                return "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd";
+              },
+              getKey: () => ({
+                publicKey:
+                  "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
                 address:
                   "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
-                compressedPublicKey:
-                  "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-              };
+              }),
             },
-            getSelectedAddress: () => {
-              return "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd";
-            },
-            getKey: () => ({
-              publicKey:
+
+            bitcoinTestnet: {
+              ...btcWallet,
+              isOKXWallet: true,
+              getNetwork: () => "testnet",
+              getPublicKey: () =>
                 "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-              address:
-                "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
-            }),
-          },
-
-          bitcoinTestnet: {
-            ...btcWallet,
-            isOKXWallet: true,
-            getNetwork: () => "testnet",
-            getPublicKey: () =>
-              "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-            getBalance: () => ({
-              confirmed: 12345678,
-              unconfirmed: 0,
-              total: 12345678,
-            }),
-            getAccounts: () => [
-              "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
-            ],
-            connect: async () => {
-              return {
-                address:
-                  "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
-                compressedPublicKey:
-                  "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-              };
+              getBalance: () => ({
+                confirmed: 12345678,
+                unconfirmed: 0,
+                total: 12345678,
+              }),
+              getAccounts: () => [
+                "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
+              ],
+              connect: async () => {
+                return {
+                  address:
+                    "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
+                  compressedPublicKey:
+                    "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
+                };
+              },
+              getSelectedAddress: () => {
+                return "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m";
+              },
             },
-            getSelectedAddress: () => {
-              return "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m";
-            },
-          },
 
-          bitcoinSignet: {
-            ...btcWallet,
-            isOKXWallet: true,
-            getNetwork: () => "signet",
-            getPublicKey: () =>
-              "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-            getBalance: () => ({
-              confirmed: 12345678,
-              unconfirmed: 0,
-              total: 12345678,
-            }),
-            getAccounts: () => [
-              "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
-            ],
-            connect: async () => {
-              return {
-                address:
-                  "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
-                compressedPublicKey:
-                  "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
-              };
+            bitcoinSignet: {
+              ...btcWallet,
+              isOKXWallet: true,
+              getNetwork: () => "signet",
+              getPublicKey: () =>
+                "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
+              getBalance: () => ({
+                confirmed: 12345678,
+                unconfirmed: 0,
+                total: 12345678,
+              }),
+              getAccounts: () => [
+                "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
+              ],
+              connect: async () => {
+                return {
+                  address:
+                    "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m",
+                  compressedPublicKey:
+                    "024c6e2954c75bcb53aa13b7cd5d8bcdb4c9a4dd0784d68b115bd4408813b45608",
+                };
+              },
+              getSelectedAddress: () => {
+                return "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m";
+              },
             },
-            getSelectedAddress: () => {
-              return "tb1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cparslrnj4m";
-            },
-          },
 
-          enable: async (chain = "BTC") => {
-            if (chain === "BTC" || chain === "Bitcoin" || chain === "bitcoin") {
-              return [
-                "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
-              ];
-            }
-            throw new Error(`Chain not supported: ${chain}`);
-          },
-          request: async (params: { method: string; params?: any }) => {
-            const { method, params: methodParams } = params;
-
-            switch (method) {
-              case "btc_getAccounts":
-              case "btc_accounts":
+            enable: async (chain = "BTC") => {
+              if (
+                chain === "BTC" ||
+                chain === "Bitcoin" ||
+                chain === "bitcoin"
+              ) {
                 return [
                   "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
                 ];
-              case "btc_getNetwork":
-              case "btc_networkVersion":
-              case "wallet_getNetwork":
-                return "signet";
-              case "wallet_switchBitcoinNetwork":
-                return true;
-              case "btc_getBalance":
-                return { confirmed: 12345678, unconfirmed: 0, total: 12345678 };
-              case "btc_signPsbt":
-                return methodParams?.psbt || "signed_psbt";
-              default:
-                return null;
-            }
-          },
-          isConnected: () => true,
-          supportedChains: ["BTC", "bitcoin", "Bitcoin"],
-          hasChain: (chain: string) =>
-            ["BTC", "bitcoin", "Bitcoin"].includes(chain),
-          on: (event: string, handler: Function) => {},
-          off: (event: string, handler: Function) => {},
-          isOKXWallet: true,
-          version: "1.0.0",
-        };
-      } else if (walletType === "Unisat") {
-        // @ts-ignore - unisat is defined in the window for the test
-        window.unisat = {
-          ...btcWallet,
-          isUnisatWallet: true,
-        };
-      } else if (walletType === "OneKey") {
-        window.$onekey = {
-          bitcoin: {
+              }
+              throw new Error(`Chain not supported: ${chain}`);
+            },
+            request: async (params: { method: string; params?: any }) => {
+              const { method, params: methodParams } = params;
+
+              switch (method) {
+                case "btc_getAccounts":
+                case "btc_accounts":
+                  return [
+                    "bc1p8gjpy0vyfdq3tty8sy0v86dvl69rquc85n2gpuztll9wxh9cpars7r97sd",
+                  ];
+                case "btc_getNetwork":
+                case "btc_networkVersion":
+                case "wallet_getNetwork":
+                  return "signet";
+                case "wallet_switchBitcoinNetwork":
+                  return true;
+                case "btc_getBalance":
+                  return {
+                    confirmed: 12345678,
+                    unconfirmed: 0,
+                    total: 12345678,
+                  };
+                case "btc_signPsbt":
+                  return methodParams?.psbt || "signed_psbt";
+                default:
+                  return null;
+              }
+            },
+            isConnected: () => true,
+            supportedChains: ["BTC", "bitcoin", "Bitcoin"],
+            hasChain: (chain: string) =>
+              ["BTC", "bitcoin", "Bitcoin"].includes(chain),
+            on: (event: string, handler: Function) => {},
+            off: (event: string, handler: Function) => {},
+            isOKXWallet: true,
+            version: "1.0.0",
+          };
+        },
+        Unisat: () => {
+          // @ts-ignore - unisat is defined in the window for the test
+          window.unisat = {
             ...btcWallet,
-            isOneKey: true,
-          },
-        };
+            isUnisatWallet: true,
+          };
+        },
+        OneKey: () => {
+          window.$onekey = {
+            bitcoin: {
+              ...btcWallet,
+              isOneKey: true,
+            },
+          };
+        },
+      };
+
+      // Execute the appropriate strategy
+      const strategy = walletStrategies[walletType];
+      if (strategy) {
+        strategy();
       }
     }, walletType);
 
