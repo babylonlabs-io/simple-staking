@@ -1,5 +1,7 @@
 import { rest } from "msw";
 
+import { MOCK_VALUES } from "./constants";
+
 export const blockchainHandlers = [
   rest.get(/.*\/abci_query$/, (req, res, ctx) => {
     const url = new URL(req.url.href);
@@ -32,7 +34,7 @@ export const blockchainHandlers = [
           incentivequery.QueryRewardGaugesResponse.fromPartial({
             rewardGauges: {
               BTC_STAKER: {
-                coins: [{ amount: "500000", denom: "ubbn" }],
+                coins: [{ amount: MOCK_VALUES.REWARDS, denom: "ubbn" }],
                 withdrawnCoins: [],
               },
             },
@@ -78,7 +80,7 @@ export const blockchainHandlers = [
           QueryBalanceResponse,
         } = require("cosmjs-types/cosmos/bank/v1beta1/query");
         const mockResp = QueryBalanceResponse.fromPartial({
-          balance: { denom: "ubbn", amount: "1000000" },
+          balance: { denom: "ubbn", amount: MOCK_VALUES.BBN_BALANCE },
         });
 
         const encoded = QueryBalanceResponse.encode(mockResp).finish();

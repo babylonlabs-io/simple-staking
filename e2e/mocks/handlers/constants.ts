@@ -99,3 +99,11 @@ export const mockNetworkInfo = {
     },
   },
 };
+
+// Common mock values used across handlers
+export const MOCK_VALUES = {
+  BBN_BALANCE: "1000000",
+  STAKABLE_BTC: "74175",
+  STAKED_BTC: "9876543",
+  REWARDS: "500000",
+};
