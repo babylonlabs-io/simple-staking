@@ -20,7 +20,6 @@ export function AuthGuard({
 
   const { connected } = useWalletConnect();
   const { isGeoBlocked, isLoading } = useHealthCheck();
-
   const isConnected = connected && !isGeoBlocked && !isLoading;
 
   useEffect(() => {
