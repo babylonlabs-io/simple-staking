@@ -4,7 +4,7 @@ import { withSentryConfig } from "@sentry/nextjs";
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: false,
-  output: "export",
+  output: process.env.CI ? undefined : "export",
   images: { unoptimized: true },
   productionBrowserSourceMaps: true,
   experimental: {
