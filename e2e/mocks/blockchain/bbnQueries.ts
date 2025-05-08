@@ -37,24 +37,6 @@ export const injectBBNQueries = async (
   await page.addInitScript((amount) => {
     window.__e2eTestMode = true;
 
-    window.mockCosmJSBankBalance = (address) => {
-      return Promise.resolve({
-        amount: "1000000",
-        denom: "ubbn",
-      });
-    };
-
-    window.mockCosmJSRewardsQuery = (address) => {
-      return Promise.resolve({
-        rewardGauges: {
-          BTC_STAKER: {
-            coins: [{ amount, denom: "ubbn" }],
-            withdrawnCoins: [],
-          },
-        },
-      });
-    };
-
     // @ts-ignore - helper only available in E2E browser context
     window.__decodeBank = (b64: string) => {
       try {
