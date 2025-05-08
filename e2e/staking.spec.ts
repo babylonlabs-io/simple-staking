@@ -5,7 +5,7 @@ import {
   STAKING_AMOUNT_SAT,
   STAKING_TX_HASH,
 } from "./constants/staking";
-import { WalletConnectActions } from "./middleware/wallet_connect";
+import { WalletConnectActions } from "./fixtures/wallet_connect";
 
 test.describe("Create staking transaction", () => {
   let actions: WalletConnectActions;

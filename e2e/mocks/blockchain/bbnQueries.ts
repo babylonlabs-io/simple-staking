@@ -34,79 +34,6 @@ export const injectBBNQueries = async (
 
   QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64"));
 
-  await page.addInitScript((amount) => {
-    window.__e2eTestMode = true;
-
-    window.mockCosmJSBankBalance = (address) => {
-      return Promise.resolve({
-        amount: "1000000",
-        denom: "ubbn",
-      });
-    };
-
-    window.mockCosmJSRewardsQuery = (address) => {
-      return Promise.resolve({
-        rewardGauges: {
-          BTC_STAKER: {
-            coins: [{ amount, denom: "ubbn" }],
-            withdrawnCoins: [],
-          },
-        },
-      });
-    };
-
-    // @ts-ignore - helper only available in E2E browser context
-    window.__decodeBank = (b64: string) => {
-      try {
-        const {
-          QueryBalanceResponse,
-        } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-        const decoded = QueryBalanceResponse.decode(Buffer.from(b64, "base64"));
-      } catch (err) {
-        console.error("Failed to decode bank balance:", err);
-      }
-    };
-
-    (function patchSSC() {
-      const patch = (ssc: any) => {
-        if (ssc && typeof ssc.connectWithSigner === "function") {
-          ssc.connectWithSigner = async () => {
-            return {
-              simulate: async () => {
-                return {};
-              },
-              signAndBroadcast: async () => {
-                return { code: 0 };
-              },
-            } as any;
-          };
-        }
-      };
-
-      // @ts-ignore
-      patch(window.SigningStargateClient);
-
-      const id = setInterval(() => {
-        // @ts-ignore
-        if (window.SigningStargateClient) {
-          // @ts-ignore
-          patch(window.SigningStargateClient);
-          clearInterval(id);
-        }
-      }, 50);
-    })();
-  }, rewardAmount);
-
-  // Log all network requests to help debug what's happening
-  await page.route("**", async (route) => {
-    const url = route.request().url();
-    const method = route.request().method();
-
-    await route.continue();
-  });
-
-  // These routes need to be more prioritized to ensure they capture the requests
-  // Place them first, as Playwright processes routes in the order they're added
   await page.route("**/v2/staked*", async (route) => {
     await route.fulfill({
       status: 200,
@@ -158,71 +85,89 @@ export const injectBBNQueries = async (
     const path = url.searchParams.get("path") || "";
 
     const decodedPath = decodeURIComponent(path).replace(/"/g, "");
-    if (
-      decodedPath.includes("babylon.incentive.Query/RewardGauges") ||
-      decodedPath.includes("babylon.incentive.v1.Query/RewardGauges")
-    ) {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: -1,
-          result: {
-            response: {
-              code: 0,
-              log: "",
-              info: "",
-              index: "0",
-              key: null,
-              value: rewardGaugeBase64,
-              proof_ops: null,
-              height: "1",
-              codespace: "",
-            },
-          },
-        }),
-      });
-      return;
-    }
 
-    if (decodedPath.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      try {
-        const {
-          QueryBalanceResponse,
-        } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-      } catch (e) {
-        console.error("Error loading QueryBalanceResponse:", e);
+    const pathHandlers = {
+      "babylon.incentive": async () => {
+        if (
+          decodedPath.includes("Query/RewardGauges") ||
+          decodedPath.includes("v1.Query/RewardGauges")
+        ) {
+          await route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: -1,
+              result: {
+                response: {
+                  code: 0,
+                  log: "",
+                  info: "",
+                  index: "0",
+                  key: null,
+                  value: rewardGaugeBase64,
+                  proof_ops: null,
+                  height: "1",
+                  codespace: "",
+                },
+              },
+            }),
+          });
+          return true;
+        }
+        return false;
+      },
+      "cosmos.bank.v1beta1.Query/Balance": async () => {
+        try {
+          const {
+            QueryBalanceResponse,
+          } = require("cosmjs-types/cosmos/bank/v1beta1/query");
+        } catch (e) {
+          console.error("Error loading QueryBalanceResponse:", e);
+        }
+
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: -1,
+            result: {
+              response: {
+                code: 0,
+                log: "",
+                info: "",
+                index: "0",
+                key: null,
+                value: balanceBase64,
+                proof_ops: null,
+                height: "1",
+                codespace: "",
+              },
+            },
+          }),
+        });
+        return true;
+      },
+    };
+
+    for (const [pathKey, handler] of Object.entries(pathHandlers)) {
+      if (decodedPath.includes(pathKey)) {
+        const handled = await handler();
+        if (handled) return;
       }
-
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: -1,
-          result: {
-            response: {
-              code: 0,
-              log: "",
-              info: "",
-              index: "0",
-              key: null,
-              value: balanceBase64,
-              proof_ops: null,
-              height: "1",
-              codespace: "",
-            },
-          },
-        }),
-      });
-      return;
     }
 
-    await route.continue();
+    try {
+      await route.continue();
+    } catch (error) {
+      console.error(
+        "Failed to continue route, it may have been handled already:",
+        error,
+      );
+    }
   });
 
-  // Add back the JSON-RPC POST handler for handling RPC calls
   await page.route("**", async (route, request) => {
     if (request.method() !== "POST") {
       return route.continue();
@@ -292,74 +237,86 @@ export const injectBBNQueries = async (
 
     const pathParam = parsed.params?.path || "";
 
-    if (
-      pathParam.includes("babylon.incentive.Query/RewardGauges") ||
-      pathParam.includes("babylon.incentive.v1.Query/RewardGauges")
-    ) {
-      return route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: parsed.id ?? -1,
-          result: {
-            response: {
-              code: 0,
-              log: "",
-              info: "",
-              index: "0",
-              key: null,
-              value: rewardGaugeBase64,
-              proof_ops: null,
-              height: "1",
-              codespace: "",
+    const pathHandlers = {
+      "babylon.incentive": async () => {
+        if (
+          pathParam.includes("Query/RewardGauges") ||
+          pathParam.includes("v1.Query/RewardGauges")
+        ) {
+          return route.fulfill({
+            status: 200,
+            contentType: "application/json",
+            body: JSON.stringify({
+              jsonrpc: "2.0",
+              id: parsed.id ?? -1,
+              result: {
+                response: {
+                  code: 0,
+                  log: "",
+                  info: "",
+                  index: "0",
+                  key: null,
+                  value: rewardGaugeBase64,
+                  proof_ops: null,
+                  height: "1",
+                  codespace: "",
+                },
+              },
+            }),
+          });
+        }
+        return false;
+      },
+      "cosmos.bank.v1beta1.Query/Balance": async () => {
+        try {
+          // Skip the evaluation since it's causing issues in CI
+        } catch (e) {
+          console.error("Error in POST evaluate:", e);
+        }
+
+        const response = {
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            jsonrpc: "2.0",
+            id: parsed.id ?? -1,
+            result: {
+              response: {
+                code: 0,
+                log: "",
+                info: "",
+                index: "0",
+                key: null,
+                value: balanceBase64,
+                proof_ops: null,
+                height: "1",
+                codespace: "",
+              },
             },
-          },
-        }),
-      });
+          }),
+        };
+
+        try {
+          await route.fulfill(response);
+        } catch (error) {
+          console.error("Failed to fulfill bank balance request:", error);
+        }
+        return true;
+      },
+    };
+
+    for (const [pathKey, handler] of Object.entries(pathHandlers)) {
+      if (pathParam.includes(pathKey)) {
+        const handled = await handler();
+        if (handled) return;
+      }
     }
 
-    if (pathParam.includes("cosmos.bank.v1beta1.Query/Balance")) {
-      try {
-        // Skip the evaluation since it's causing issues in CI
-      } catch (e) {
-        console.error("Error in POST evaluate:", e);
-      }
-
-      const response = {
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: parsed.id ?? -1,
-          result: {
-            response: {
-              code: 0,
-              log: "",
-              info: "",
-              index: "0",
-              key: null,
-              value: balanceBase64,
-              proof_ops: null,
-              height: "1",
-              codespace: "",
-            },
-          },
-        }),
-      };
-
-      try {
-        await route.fulfill(response);
-      } catch (error) {
-        console.error("Failed to fulfill bank balance request:", error);
-      }
-      return;
-    }
-
-    return route.continue();
+    try {
+      await route.continue();
+    } catch (error) {}
   });
 
-  // Add mock route for delegations
   await page.route("**/v2/delegations*", async (route) => {
     const mockDelegation = {
       finality_provider_btc_pks_hex: [
@@ -407,7 +364,6 @@ export const injectBBNQueries = async (
     }
   });
 
-  // Add dedicated status route handler - this is important for Cosmos chain health checks
   await page.route("**/status*", async (route) => {
     await route.fulfill({
       status: 200,
@@ -455,7 +411,6 @@ export const injectBBNQueries = async (
     });
   });
 
-  // Add route for network info
   await page.route("**/v2/network-info*", async (route) => {
     await route.fulfill({
       status: 200,

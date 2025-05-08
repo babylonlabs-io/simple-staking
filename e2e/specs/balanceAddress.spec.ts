@@ -4,7 +4,7 @@ import {
   PageNavigationActions,
   WalletBalanceActions,
   WalletConnectActions,
-} from "../middleware";
+} from "../fixtures";
 
 test.describe("Balance and address checks after connection", () => {
   let connectActions: WalletConnectActions;
