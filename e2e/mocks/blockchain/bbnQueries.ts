@@ -503,41 +503,4 @@ export const injectBBNQueries = async (
       }),
     });
   });
-
-  // Add these catch-all routes at the end
-  await page.route("**/*staked*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        staked: {
-          btc: "9876543",
-          delegated_btc: "9876543",
-        },
-      }),
-    });
-  });
-
-  await page.route("**/*balance*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        balance: {
-          bbn: "1000000",
-          stakable_btc: "74175",
-        },
-      }),
-    });
-  });
-
-  await page.route("**/*reward*", async (route) => {
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        rewards: "500000",
-      }),
-    });
-  });
 };
