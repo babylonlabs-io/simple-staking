@@ -5,6 +5,7 @@ import { Tooltip } from "react-tooltip";
 
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
+import { useStakingState } from "@/app/state/StakingState";
 import { DelegationState } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
@@ -35,6 +36,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
+  const { disabled } = useStakingState();
 
   const {
     balanceQuery: { data: bbnBalance = 0 },
@@ -54,6 +56,10 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const getDelegationTooltip = () => {
     if (!isFpRegistered) {
       return "Registration is not available as your finality provider has not yet registered to Babylon Genesis.";
+    }
+
+    if (disabled) {
+      return disabled.title;
     }
 
     if (state === DelegationState.ACTIVE && !isEligibleForRegistration) {
@@ -124,6 +130,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             color="primary"
             onClick={onRegistration}
             disabled={
+              Boolean(disabled) ||
               intermediateState ===
                 DelegationState.INTERMEDIATE_TRANSITIONING ||
               (state === DelegationState.ACTIVE &&

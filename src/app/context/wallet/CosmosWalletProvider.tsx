@@ -35,6 +35,7 @@ interface CosmosWalletContextProps {
   disconnect: () => void;
   open: () => void;
   signingStargateClient: SigningStargateClient | undefined;
+  walletName: string;
 }
 
 const CosmosWalletContext = createContext<CosmosWalletContextProps>({
@@ -44,6 +45,7 @@ const CosmosWalletContext = createContext<CosmosWalletContextProps>({
   disconnect: () => {},
   open: () => {},
   signingStargateClient: undefined,
+  walletName: "",
 });
 
 export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
@@ -55,6 +57,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const [signingStargateClient, setSigningStargateClient] = useState<
     SigningStargateClient | undefined
   >();
+  const [walletName, setWalletName] = useState("");
 
   const { handleError } = useError();
   const { open = () => {} } = useWalletConnect();
@@ -82,6 +85,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         if (offlineSigner.chainId && offlineSigner.chainId !== chainId) return;
 
         const address = await provider.getAddress();
+        const walletName = await provider.getWalletProviderName();
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
           offlineSigner as OfflineSigner,
@@ -94,6 +98,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setBBNWalletProvider(provider);
         setCosmosBech32Address(address);
         setLoading(false);
+        setWalletName(walletName);
 
         Sentry.addBreadcrumb({
           level: "info",
@@ -118,11 +123,12 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           },
           metadata: {
             babylonAddress: cosmosBech32Address,
+            walletName,
           },
         });
       }
     },
-    [handleError, cosmosBech32Address],
+    [handleError, cosmosBech32Address, walletName],
   );
 
   // Listen for Babylon account changes
@@ -149,6 +155,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       disconnect: cosmosDisconnect,
       open,
       signingStargateClient,
+      walletName,
     }),
     [
       loading,
@@ -157,6 +164,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       cosmosDisconnect,
       open,
       signingStargateClient,
+      walletName,
     ],
   );
 
