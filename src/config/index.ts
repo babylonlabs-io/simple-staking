@@ -41,3 +41,12 @@ export const isProductionEnv = (): boolean => {
   const env = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "";
   return PROD_ENVS.includes(env);
 };
+
+// Disable the wallet by their name in the event of incident. split by comma.
+// You can find the wallet name from the wallet provider.
+export const getDisabledWallets = (): string[] => {
+  return (
+    process.env.NEXT_PUBLIC_DISABLED_WALLETS?.split(",").map((w) => w.trim()) ||
+    []
+  );
+};

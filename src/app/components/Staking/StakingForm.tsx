@@ -18,7 +18,6 @@ export function StakingForm() {
     stakingInfo,
     hasError,
     blocked,
-    available,
     disabled,
     errorMessage,
   } = useStakingState();
@@ -40,7 +39,6 @@ export function StakingForm() {
           <Card className="flex lg:w-2/5 xl:w-1/3">
             <DelegationForm
               loading={loading}
-              available={available}
               blocked={blocked}
               disabled={disabled}
               hasError={hasError}
