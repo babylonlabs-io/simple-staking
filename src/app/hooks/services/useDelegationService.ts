@@ -41,6 +41,7 @@ interface TxProps {
     unbondingSlashingTxHex: string;
     spendingHeight: number;
   };
+  unbondingTimelock?: number;
 }
 
 type DelegationCommand = (props: TxProps) => Promise<void>;
@@ -142,10 +143,31 @@ export function useDelegationService() {
         stakingTxHex,
         unbondingTxHex,
         covenantUnbondingSignatures,
+        unbondingTimelock,
       }: TxProps) => {
         if (!covenantUnbondingSignatures) {
           throw new ClientError({
             message: "Covenant unbonding signatures not found",
+            category: ClientErrorCategory.CLIENT_TRANSACTION,
+            type: ErrorType.UNBONDING,
+          });
+        }
+
+        // TODO remove
+        console.log("unbondingTimelock", unbondingTimelock);
+        console.log(
+          "unbonding timelock from params",
+          networkInfo?.params.bbnStakingParams.latestParam.unbondingTime,
+        );
+
+        // Get the unbonding timelock from props or network params
+        const finalUnbondingTimelock =
+          unbondingTimelock ||
+          networkInfo?.params.bbnStakingParams.latestParam.unbondingTime;
+
+        if (!finalUnbondingTimelock) {
+          throw new ClientError({
+            message: "Unbonding timelock not found",
             category: ClientErrorCategory.CLIENT_TRANSACTION,
             type: ErrorType.UNBONDING,
           });
@@ -160,6 +182,7 @@ export function useDelegationService() {
             btcPkHex: sig.covenantBtcPkHex,
             sigHex: sig.signatureHex,
           })),
+          finalUnbondingTimelock,
         );
 
         updateDelegationStatus(
@@ -263,6 +286,7 @@ export function useDelegationService() {
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,
       submitSlashingWithdrawalTx,
+      networkInfo?.params.bbnStakingParams.latestParam.unbondingTime,
     ],
   );
 
@@ -306,6 +330,7 @@ export function useDelegationService() {
         unbondingTxHex,
         covenantUnbondingSignatures,
         state,
+        unbondingTimelock,
         slashing,
       } = delegation;
 
@@ -330,6 +355,7 @@ export function useDelegationService() {
           state,
           stakingInput,
           slashing,
+          unbondingTimelock,
         });
 
         closeConfirmationModal();
