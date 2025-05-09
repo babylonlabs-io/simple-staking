@@ -15,28 +15,6 @@ import { REPLAYS_ON_ERROR_RATE } from "@/app/constants";
 import { isProductionEnv } from "@/config";
 import { getCommitHash } from "@/utils/version";
 
-function getErrorCodeForSentryFingerprint(exception: any): string | undefined {
-  if (!(exception && typeof exception === "object")) {
-    return undefined;
-  }
-
-  // If 'cause' exists, is an object, and has a string 'code' property, use that.
-  if (
-    exception.cause &&
-    typeof exception.cause === "object" &&
-    typeof exception.cause.code === "string"
-  ) {
-    return exception.cause.code;
-  }
-
-  // If the exception itself has a string 'code' property, use that.
-  if (typeof exception.code === "string") {
-    return exception.code;
-  }
-
-  return undefined;
-}
-
 Sentry.init({
   enabled: Boolean(
     process.env.NEXT_PUBLIC_SIDECAR_API_URL &&
@@ -99,11 +77,10 @@ Sentry.init({
       version: getCommitHash(),
     };
 
-    const exception = hint?.originalException;
-    const errorCode = getErrorCodeForSentryFingerprint(exception);
+    const exception = hint?.originalException as any;
 
-    if (errorCode) {
-      event.fingerprint = ["{{ default }}", errorCode];
+    if (exception?.code) {
+      event.fingerprint = ["{{ default }}", exception?.code];
     }
 
     return event;
