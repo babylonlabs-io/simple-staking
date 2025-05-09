@@ -9,6 +9,7 @@ jest.mock("@/app/state", () => ({
 
 jest.mock("@/config", () => ({
   IS_FIXED_TERM_FIELD: false,
+  getDisabledWallets: () => [],
 }));
 
 const mockUseHealthCheck = jest.fn();
