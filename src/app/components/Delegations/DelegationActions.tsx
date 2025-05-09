@@ -59,7 +59,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
     }
 
     if (disabled) {
-      return disabled.message;
+      return disabled.title;
     }
 
     if (state === DelegationState.ACTIVE && !isEligibleForRegistration) {

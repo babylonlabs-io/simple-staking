@@ -211,8 +211,8 @@ export function StakingState({ children }: PropsWithChildren) {
       getDisabledWallets().includes(cosmosWalletName)
     ) {
       return {
-        title: `${cosmosWalletName} Wallet is temporarily disabled`,
-        message: `Staking registration is temporarily disabled for ${cosmosWalletName} wallet.`,
+        title: `Staking registration is temporarily disabled for ${cosmosWalletName} wallet.`,
+        message: "Please try again later.",
       };
     }
 
