@@ -3,11 +3,13 @@ import { expect, test } from "@playwright/test";
 import { DelegationState } from "@/app/types/delegations";
 import { getState } from "@/utils/getState";
 
-import { setupWalletConnection } from "./helper/connect";
+import { WalletConnectActions } from "./fixtures/wallet_connect";
 import { interceptRequest } from "./helper/interceptRequest";
 import { unbondedTX } from "./mock/tx/withdrawing";
 
 test.describe("Create withdrawing transaction", () => {
+  let actions: WalletConnectActions;
+
   test("prepare the withdrawing", async ({ page }) => {
     // Intercept the GET request for delegations
     await interceptRequest(page, "**/v1/staker/delegations**", 200, unbondedTX);
@@ -16,7 +18,8 @@ test.describe("Create withdrawing transaction", () => {
       tx: "536af306eac15c7d87d852c601f52a23c2242f53c8c5f803c11befce090c3616",
     });
     await page.goto("/");
-    await setupWalletConnection(page);
+    actions = new WalletConnectActions(page);
+    await actions.setupWalletConnection();
 
     // withdraw -> proceed
     await page.getByRole("button", { name: "Withdraw" }).click();
@@ -52,7 +55,8 @@ test.describe("Create withdrawing transaction", () => {
     // Intercept the GET request for updated delegation
     await interceptRequest(page, "**/v1/staker/delegations**", 200, updatedTX);
     await page.goto("/");
-    await setupWalletConnection(page);
+    actions = new WalletConnectActions(page);
+    await actions.setupWalletConnection();
     await expect(page.getByText("Withdrawn")).toBeVisible();
 
     // check for local storage

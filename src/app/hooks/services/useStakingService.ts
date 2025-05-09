@@ -8,9 +8,9 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
-  type FormFields,
   StakingStep,
   useStakingState,
+  type FormFields,
 } from "@/app/state/StakingState";
 import {
   DelegationV2StakingState as DelegationState,

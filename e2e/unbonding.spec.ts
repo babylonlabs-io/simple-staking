@@ -3,11 +3,13 @@ import { expect, test } from "@playwright/test";
 import { DelegationState } from "@/app/types/delegations";
 import { getState } from "@/utils/getState";
 
-import { setupWalletConnection } from "./helper/connect";
+import { WalletConnectActions } from "./fixtures/wallet_connect";
 import { interceptRequest } from "./helper/interceptRequest";
 import { activeTX, unbondingTX } from "./mock/tx/unbonding";
 
 test.describe("Create unbonding transaction", () => {
+  let actions: WalletConnectActions;
+
   test("prepare the unbonding", async ({ page }) => {
     // Intercept the GET request for delegations
     await interceptRequest(page, "**/v1/staker/delegations**", 200, activeTX);
@@ -18,7 +20,8 @@ test.describe("Create unbonding transaction", () => {
       message: "Request accepted",
     });
     await page.goto("/");
-    await setupWalletConnection(page);
+    actions = new WalletConnectActions(page);
+    await actions.setupWalletConnection();
 
     // unbond -> proceed
     await page.getByRole("button", { name: "Unbond" }).click();
@@ -54,7 +57,8 @@ test.describe("Create unbonding transaction", () => {
     // Intercept the GET request for updated delegation
     await interceptRequest(page, "**/v1/staker/delegations**", 200, updatedTX);
     await page.goto("/");
-    await setupWalletConnection(page);
+    actions = new WalletConnectActions(page);
+    await actions.setupWalletConnection();
     await expect(page.getByText("Unbonding Requested")).toBeVisible();
 
     // check for local storage
@@ -82,7 +86,8 @@ test.describe("Create unbonding transaction", () => {
     // Intercept the GET request for updated delegation
     await interceptRequest(page, "**/v1/staker/delegations**", 200, updatedTX);
     await page.goto("/");
-    await setupWalletConnection(page);
+    actions = new WalletConnectActions(page);
+    await actions.setupWalletConnection();
     await expect(page.getByText("Unbonded", { exact: true })).toBeVisible();
   });
 });
