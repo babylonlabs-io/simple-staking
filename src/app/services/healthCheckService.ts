@@ -11,10 +11,20 @@ import {
 } from "../types/services/healthCheck";
 
 export const getHealthCheck = async (): Promise<HealthCheckResult> => {
+  // In e2e test mode we bypass the real health-check call to avoid
+  // geo-blocking (451) responses that only occur on CI runners.
+  if (
+    typeof window !== "undefined" &&
+    // The flag is set by e2e mocks (see mockVerifyBTCAddress in tests)
+    (window as any).__e2eTestMode
+  ) {
+    return {
+      status: HealthCheckStatus.Normal,
+      message: "ok",
+    };
+  }
   try {
-    console.log("getHealthCheck");
     const healthCheckAPIResponse = await fetchHealthCheck();
-    console.log("healthCheckAPIResponse", healthCheckAPIResponse);
 
     if (healthCheckAPIResponse.data) {
       return {

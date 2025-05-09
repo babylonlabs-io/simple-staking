@@ -23,7 +23,6 @@ export const utilityHandlers = [
 
   rest.get("/healthcheck*", (req, res, ctx) => {
     // Simulate healthy backend response so the app is not marked as geo-blocked in CI.
-    console.log("E2E:healthcheck is returned");
     return res(
       ctx.json({
         data: "ok",
