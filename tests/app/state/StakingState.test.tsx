@@ -27,6 +27,11 @@ jest.mock("@/app/context/wallet/BTCWalletProvider", () => ({
   useBTCWallet: () => mockUseBTCWallet(),
 }));
 
+const mockUseCosmosWallet = jest.fn();
+jest.mock("@/app/context/wallet/CosmosWalletProvider", () => ({
+  useCosmosWallet: () => mockUseCosmosWallet(),
+}));
+
 // Mock useLocalStorage
 const mockSetSuccessModalShown = jest.fn();
 const mockSetCancelModalShown = jest.fn();
@@ -123,6 +128,11 @@ describe("StakingState", () => {
 
     mockUseBTCWallet.mockReturnValue({
       publicKeyNoCoord: "mock-public-key",
+    });
+
+    mockUseCosmosWallet.mockReturnValue({
+      bech32Address: "mock-cosmos-address",
+      // Potentially add disabled: [] here if needed for tests
     });
   });
 
