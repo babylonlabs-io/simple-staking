@@ -1,4 +1,4 @@
-import { addBreadcrumb, captureException, SeverityLevel } from "@sentry/nextjs";
+import { SeverityLevel, addBreadcrumb, captureException } from "@sentry/nextjs";
 
 type Context = Record<string, number | string | boolean> & {
   category?: string;
