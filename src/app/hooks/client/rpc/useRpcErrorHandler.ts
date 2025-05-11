@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 /**
  * Hook that handles RPC connection errors by showing an error modal
@@ -13,6 +14,7 @@ import { ClientError, ERROR_CODES } from "@/errors";
 export function useRpcErrorHandler() {
   const { error, isLoading, reconnect } = useBbnRpc();
   const { handleError } = useError();
+  const logger = useLogger();
 
   useEffect(() => {
     if (error && !isLoading) {
@@ -21,6 +23,8 @@ export function useRpcErrorHandler() {
         error.message,
         { cause: error as Error },
       );
+
+      logger.error(clientError);
 
       handleError({
         error: clientError,
@@ -33,7 +37,7 @@ export function useRpcErrorHandler() {
         },
       });
     }
-  }, [error, isLoading, handleError, reconnect]);
+  }, [error, isLoading, handleError, reconnect, logger]);
 
   return {
     hasRpcError: Boolean(error) && !isLoading,

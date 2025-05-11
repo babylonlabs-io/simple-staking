@@ -21,6 +21,7 @@ import {
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
@@ -58,6 +59,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const [walletName, setWalletName] = useState("");
 
   const { handleError } = useError();
+  const logger = useLogger();
   const { open = () => {} } = useWalletConnect();
   const bbnConnector = useChainConnector("BBN");
 
@@ -116,12 +118,14 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           },
         });
       } catch (error: any) {
+        const clientError = new ClientError(
+          ERROR_CODES.WALLET_ACTION_FAILED,
+          error.message,
+          { cause: error as Error },
+        );
+        logger.error(clientError);
         handleError({
-          error: new ClientError(
-            ERROR_CODES.WALLET_ACTION_FAILED,
-            error.message,
-            { cause: error as Error },
-          ),
+          error: clientError,
           displayOptions: {
             retryAction: () => connectCosmos(provider),
           },
@@ -132,7 +136,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError, cosmosBech32Address, walletName],
+    [handleError, cosmosBech32Address, walletName, logger],
   );
 
   // Listen for Babylon account changes

@@ -12,6 +12,7 @@ import {
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { validateDelegation } from "@/utils/delegations";
 import { getBbnParamByVersion } from "@/utils/params";
 
@@ -55,6 +56,7 @@ export function useDelegationService() {
   const [processingDelegations, setProcessingDelegations] = useState<
     Record<string, boolean>
   >({});
+  const logger = useLogger();
 
   const { availableUTXOs = [], networkInfo } = useAppState();
   const {
@@ -142,10 +144,14 @@ export function useDelegationService() {
         covenantUnbondingSignatures,
       }: TxProps) => {
         if (!covenantUnbondingSignatures) {
-          throw new ClientError(
+          const clientError = new ClientError(
             ERROR_CODES.VALIDATION_ERROR,
             "Covenant unbonding signatures not found",
           );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
         }
 
         await submitUnbondingTx(
@@ -190,10 +196,14 @@ export function useDelegationService() {
         slashing,
       }) => {
         if (!slashing.unbondingSlashingTxHex) {
-          throw new ClientError(
+          const clientError = new ClientError(
             ERROR_CODES.VALIDATION_ERROR,
             "Unbonding slashing tx not found, can't submit withdrawal",
           );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
         }
 
         await submitSlashingWithdrawalTx(
@@ -233,10 +243,14 @@ export function useDelegationService() {
         slashing,
       }) => {
         if (!slashing.stakingSlashingTxHex) {
-          throw new ClientError(
+          const clientError = new ClientError(
             ERROR_CODES.VALIDATION_ERROR,
             "Slashing tx not found, can't submit withdrawal",
           );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
         }
 
         await submitSlashingWithdrawalTx(

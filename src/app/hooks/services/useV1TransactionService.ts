@@ -12,6 +12,7 @@ import { postUnbonding } from "@/app/api/postUnbonding";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { validateStakingInput } from "@/utils/delegations";
 import { txFeeSafetyCheck } from "@/utils/delegations/fee";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
@@ -27,6 +28,7 @@ export function useV1TransactionService() {
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const { networkInfo } = useAppState();
+  const logger = useLogger();
 
   const stakerBtcInfo = useMemo(
     () => ({
@@ -65,16 +67,19 @@ export function useV1TransactionService() {
         stakingInput,
         stakerBtcInfo,
         versionedParams,
+        logger,
       );
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
       // Check if this staking transaction is eligible for unbonding
       const eligibility = await getUnbondingEligibility(stakingTx.getId());
       if (!eligibility) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           "Transaction not eligible for unbonding",
         );
+        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        throw clientError;
       }
 
       // Get the param version based on height
@@ -100,14 +105,16 @@ export function useV1TransactionService() {
           signedUnbondingTx.toHex(),
         );
       } catch (error) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
           `Error submitting unbonding transaction: ${error instanceof Error ? error.message : String(error)}`,
           { cause: error as Error },
         );
+        logger.error(clientError);
+        throw clientError;
       }
     },
-    [createBtcStakingManager, stakerBtcInfo, versionedParams],
+    [createBtcStakingManager, stakerBtcInfo, versionedParams, logger],
   );
 
   /**
@@ -135,6 +142,7 @@ export function useV1TransactionService() {
         stakingInput,
         stakerBtcInfo,
         versionedParams,
+        logger,
       );
       // Get the param version based on height
       const { version: paramVersion } = getBbnParamByBtcHeight(
@@ -176,6 +184,7 @@ export function useV1TransactionService() {
       pushTx,
       stakerBtcInfo,
       versionedParams,
+      logger,
     ],
   );
 
@@ -196,24 +205,31 @@ const validateCommonInputs = (
   stakingInput: BtcStakingInputs,
   stakerBtcInfo: { address: string; publicKeyNoCoordHex: string },
   versionedParams?: VersionedStakingParams[],
+  logger?: ReturnType<typeof useLogger>,
 ) => {
   validateStakingInput(stakingInput);
   if (!btcStakingManager) {
-    throw new ClientError(
+    const clientError = new ClientError(
       ERROR_CODES.INITIALIZATION_ERROR,
       "BTC Staking Manager not initialized",
     );
+    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    throw clientError;
   }
   if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
-    throw new ClientError(
+    const clientError = new ClientError(
       ERROR_CODES.INITIALIZATION_ERROR,
       "Staker info not initialized",
     );
+    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    throw clientError;
   }
   if (!versionedParams?.length) {
-    throw new ClientError(
+    const clientError = new ClientError(
       ERROR_CODES.INITIALIZATION_ERROR,
       "Staking params not loaded",
     );
+    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    throw clientError;
   }
 };

@@ -13,6 +13,7 @@ import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
 
@@ -53,6 +54,7 @@ const config: ChainConfigArr = [
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
   const { theme } = useTheme();
+  const logger = useLogger();
 
   const onError = useCallback(
     (error: Error) => {
@@ -60,15 +62,17 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
         return;
       }
 
+      const clientError = new ClientError(
+        ERROR_CODES.WALLET_ACTION_FAILED,
+        error.message,
+        { cause: error as Error },
+      );
+      logger.error(clientError);
       handleError({
-        error: new ClientError(
-          ERROR_CODES.WALLET_ACTION_FAILED,
-          error.message,
-          { cause: error as Error },
-        ),
+        error: clientError,
       });
     },
-    [handleError],
+    [handleError, logger],
   );
 
   return (

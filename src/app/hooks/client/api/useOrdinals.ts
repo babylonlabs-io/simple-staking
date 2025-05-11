@@ -6,6 +6,7 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useClientQuery } from "@/app/hooks/client/useClient";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { wait } from "@/utils";
 import { filterDust } from "@/utils/wallet";
 
@@ -17,6 +18,7 @@ export function useOrdinals(
   { enabled = true }: { enabled?: boolean } = {},
 ) {
   const { getInscriptions, address } = useBTCWallet();
+  const logger = useLogger();
 
   const fetchOrdinals = async (): Promise<InscriptionIdentifier[]> => {
     try {
@@ -38,13 +40,15 @@ export function useOrdinals(
     } catch (error) {
       // For client errors (like from getInscriptions)
       if (!(error instanceof ClientError)) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
           error instanceof Error
             ? error.message
             : "Error fetching ordinals data",
           { cause: error as Error },
         );
+        logger.error(clientError);
+        throw clientError;
       }
 
       // For server errors, the postFilterOrdinals already added the metadata

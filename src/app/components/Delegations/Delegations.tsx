@@ -23,6 +23,7 @@ import {
   DelegationState,
 } from "@/app/types/delegations";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
@@ -55,6 +56,7 @@ export const Delegations = ({}) => {
   const [txID, setTxID] = useState("");
   const [modalMode, setModalMode] = useState<MODE>();
   const { handleError } = useError();
+  const logger = useLogger();
   const [awaitingWalletResponse, setAwaitingWalletResponse] = useState(false);
   const { data: delegationsAPI } = useDelegations();
   const [currentTime, setCurrentTime] = useState(Date.now());
@@ -161,10 +163,12 @@ export const Delegations = ({}) => {
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for unbonding",
         );
+        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        throw clientError;
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
@@ -203,19 +207,23 @@ export const Delegations = ({}) => {
     try {
       if (!networkFees) {
         // system error
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.MISSING_DATA_ERROR,
           "Network fees not found",
         );
+        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        throw clientError;
       }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
 
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for withdrawal",
         );
+        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        throw clientError;
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =

@@ -11,6 +11,7 @@ import {
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { retry } from "@/utils";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
@@ -57,6 +58,7 @@ export function useRegistrationService() {
     useDelegationV2State();
   const { sendBbnTx } = useBbnTransaction();
   const { handleError } = useError();
+  const logger = useLogger();
 
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
@@ -74,11 +76,13 @@ export function useRegistrationService() {
     setStep("registration-staking-slashing");
 
     if (!selectedDelegation) {
+      const clientError = new ClientError(
+        ERROR_CODES.VALIDATION_ERROR,
+        "No delegation selected for registration",
+      );
+      logger.warn(clientError.message, { errorCode: clientError.errorCode });
       handleError({
-        error: new ClientError(
-          ERROR_CODES.VALIDATION_ERROR,
-          "No delegation selected for registration",
-        ),
+        error: clientError,
       });
       return;
     }
@@ -144,6 +148,7 @@ export function useRegistrationService() {
     refetchV1Delegations,
     refetchV2Delegations,
     reset,
+    logger,
   ]);
 
   return { registerPhase1Delegation };

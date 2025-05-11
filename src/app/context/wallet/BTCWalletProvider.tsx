@@ -22,6 +22,7 @@ import { useError } from "@/app/context/Error/ErrorProvider";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import {
   getAddressBalance,
   getNetworkFees,
@@ -91,6 +92,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
   const btcConnector = useChainConnector("BTC");
   const { open = () => {}, connected } = useWalletConnect();
+  const logger = useLogger();
 
   const btcDisconnect = useCallback(() => {
     setBTCWalletProvider(undefined);
@@ -117,10 +119,14 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
-          throw new ClientError(
+          const clientError = new ClientError(
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             supportedNetworkMessage,
           );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
         }
 
         const publicKeyNoCoord = getPublicKeyNoCoord(
@@ -148,12 +154,14 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           },
         });
       } catch (error: any) {
+        const clientError = new ClientError(
+          ERROR_CODES.WALLET_ACTION_FAILED,
+          error.message,
+          { cause: error as Error },
+        );
+        logger.error(clientError);
         handleError({
-          error: new ClientError(
-            ERROR_CODES.WALLET_ACTION_FAILED,
-            error.message,
-            { cause: error as Error },
-          ),
+          error: clientError,
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
           },
@@ -164,7 +172,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError, publicKeyNoCoord, address],
+    [handleError, publicKeyNoCoord, address, logger],
   );
 
   useEffect(() => {
@@ -232,16 +240,20 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       getBTCTipHeight: async () => getTipHeight(),
       getInscriptions: async (): Promise<InscriptionIdentifier[]> => {
         if (!btcWalletProvider?.getInscriptions) {
-          throw new ClientError(
+          const clientError = new ClientError(
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "`getInscriptions` method is not provided by the wallet",
           );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
         }
 
         return btcWalletProvider.getInscriptions();
       },
     }),
-    [btcWalletProvider],
+    [btcWalletProvider, logger],
   );
 
   const btcContextValue = useMemo(
