@@ -5,6 +5,7 @@ import {
   WalletBalanceActions,
   WalletConnectActions,
 } from "../fixtures";
+import { setupConsoleLogger } from "../helper/console-logger";
 
 test.describe("Balance and address checks after connection", () => {
   let connectActions: WalletConnectActions;
@@ -12,6 +13,9 @@ test.describe("Balance and address checks after connection", () => {
   let navigationActions: PageNavigationActions;
 
   test.beforeEach(async ({ page }) => {
+    // Set up console logger to capture browser console logs
+    setupConsoleLogger(page);
+
     connectActions = new WalletConnectActions(page);
     balanceActions = new WalletBalanceActions(page);
     navigationActions = new PageNavigationActions(page);

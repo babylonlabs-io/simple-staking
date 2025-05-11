@@ -44,4 +44,6 @@ export default defineConfig({
     reuseExistingServer: true,
     env: effectiveEnv,
   },
+
+  globalSetup: path.join(__dirname, "e2e/global-setup.ts"),
 });
