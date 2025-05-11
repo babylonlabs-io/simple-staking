@@ -21,7 +21,7 @@ export const utilityHandlers = [
     );
   }),
 
-  rest.get("/healthcheck*", (req, res, ctx) => {
+  rest.get("*/healthcheck*", (req, res, ctx) => {
     console.log("E2E: healthcheck simulated");
     return res(
       ctx.json({
