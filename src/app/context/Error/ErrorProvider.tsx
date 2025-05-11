@@ -1,4 +1,3 @@
-import * as Sentry from "@sentry/nextjs";
 import React, {
   ReactNode,
   createContext,
@@ -101,39 +100,8 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           ? displayOptions.showModal // Explicit setting takes priority
           : !isSilentByDefault; // Otherwise use the default for this error type
 
-      const eventId = Sentry.withScope((scope) => {
-        if (error instanceof ServerError) {
-          scope.setTag("errorType", ErrorType.SERVER);
-          scope.setTag("status", error.status);
-          scope.setTag("endpoint", error.endpoint);
-
-          scope.setExtras({
-            trace: stackTrace,
-            request: error.request || {},
-            response: error.response || {},
-            ...combinedMetadata,
-          });
-        } else if (error instanceof ClientError) {
-          scope.setTag("errorType", error.type ?? ErrorType.UNKNOWN);
-          scope.setTag("errorCategory", error.category);
-
-          scope.setExtras({
-            trace: stackTrace,
-            ...combinedMetadata,
-          });
-        } else {
-          scope.setTag("errorType", ErrorType.UNKNOWN);
-          scope.setExtras({
-            trace: stackTrace,
-            ...combinedMetadata,
-          });
-        }
-        return Sentry.captureException(error);
-      });
-
       const errorData = {
         message: error.message,
-        sentryEventId: eventId,
         trace: stackTrace,
         ...combinedMetadata,
         ...(error instanceof ClientError && {
