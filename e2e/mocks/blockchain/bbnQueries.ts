@@ -1,8 +1,10 @@
 import { Page } from "@playwright/test";
 
+import mockData from "./constants";
+
 export const injectBBNQueries = async (
   page: Page,
-  rewardAmount: string = "500000",
+  rewardAmount: string = mockData.bbnQueries.rewardAmount,
 ) => {
   const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
   const {
@@ -25,7 +27,7 @@ export const injectBBNQueries = async (
   ).toString("base64");
 
   const balanceProto = QueryBalanceResponse.fromPartial({
-    balance: { denom: "ubbn", amount: "1000000" },
+    balance: { denom: "ubbn", amount: mockData.bbnQueries.bbnBalance },
   });
 
   const balanceBase64: string = Buffer.from(
@@ -44,8 +46,8 @@ export const injectBBNQueries = async (
       contentType: "application/json",
       body: JSON.stringify({
         staked: {
-          btc: "9876543",
-          delegated_btc: "9876543",
+          btc: mockData.bbnQueries.stakedBtc,
+          delegated_btc: mockData.bbnQueries.stakedBtc,
         },
       }),
     });
@@ -57,8 +59,8 @@ export const injectBBNQueries = async (
       contentType: "application/json",
       body: JSON.stringify({
         balance: {
-          bbn: "1000000",
-          stakable_btc: "74175",
+          bbn: mockData.bbnQueries.bbnBalance,
+          stakable_btc: mockData.bbnQueries.stakableBtc,
         },
       }),
     });
@@ -69,7 +71,7 @@ export const injectBBNQueries = async (
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        balance: "74175",
+        balance: mockData.bbnQueries.stakableBtc,
       }),
     });
   });
@@ -79,7 +81,7 @@ export const injectBBNQueries = async (
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
-        rewards: "500000",
+        rewards: mockData.bbnQueries.rewardAmount,
       }),
     });
   });
@@ -323,17 +325,21 @@ export const injectBBNQueries = async (
 
   await page.route("**/v2/delegations*", async (route) => {
     const mockDelegation = {
-      finality_provider_btc_pks_hex: [
-        "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-      ],
-      params_version: 0,
-      staker_btc_pk_hex:
-        "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+      finality_provider_btc_pks_hex:
+        mockData.bbnQueries.mockDelegation.finality_provider_btc_pks_hex,
+      params_version: mockData.bbnQueries.mockDelegation.params_version,
+      staker_btc_pk_hex: mockData.bbnQueries.mockDelegation.staker_btc_pk_hex,
       delegation_staking: {
-        staking_tx_hex: "00",
-        staking_tx_hash_hex: "hash",
-        staking_timelock: 0,
-        staking_amount: 9876543,
+        staking_tx_hex:
+          mockData.bbnQueries.mockDelegation.delegation_staking.staking_tx_hex,
+        staking_tx_hash_hex:
+          mockData.bbnQueries.mockDelegation.delegation_staking
+            .staking_tx_hash_hex,
+        staking_timelock:
+          mockData.bbnQueries.mockDelegation.delegation_staking
+            .staking_timelock,
+        staking_amount:
+          mockData.bbnQueries.mockDelegation.delegation_staking.staking_amount,
         start_height: 0,
         end_height: 0,
         bbn_inception_height: 0,
@@ -351,7 +357,7 @@ export const injectBBNQueries = async (
           spending_height: 0,
         },
       },
-      state: "ACTIVE",
+      state: mockData.bbnQueries.mockDelegation.state,
     };
 
     try {
@@ -428,14 +434,13 @@ export const injectBBNQueries = async (
             bbn: [
               {
                 version: 0,
-                covenant_pks: [
-                  "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
-                  "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
-                  "02f9308a019258c31049344f85f89d5229b531c845836f99b08601f113bce036f9",
-                ],
-                covenant_quorum: 2,
-                min_staking_value_sat: 100000,
-                max_staking_value_sat: 1000000,
+                covenant_pks: mockData.bbnQueries.networkInfo.covenant_pks,
+                covenant_quorum:
+                  mockData.bbnQueries.networkInfo.covenant_quorum,
+                min_staking_value_sat:
+                  mockData.bbnQueries.networkInfo.min_staking_value_sat,
+                max_staking_value_sat:
+                  mockData.bbnQueries.networkInfo.max_staking_value_sat,
                 min_staking_time_blocks: 144,
                 max_staking_time_blocks: 1440,
                 slashing_pk_script:
