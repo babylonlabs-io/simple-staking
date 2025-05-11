@@ -1,10 +1,8 @@
 import { useEffect } from "react";
 
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 /**
  * Hook that handles RPC connection errors by showing an error modal
@@ -18,11 +16,11 @@ export function useRpcErrorHandler() {
 
   useEffect(() => {
     if (error && !isLoading) {
-      const clientError = new ClientError({
-        message: error.message,
-        category: ClientErrorCategory.RPC_NODE,
-        type: ErrorType.SERVER,
-      });
+      const clientError = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        error.message,
+        { cause: error as Error },
+      );
 
       handleError({
         error: clientError,

@@ -2,16 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import {
   API_DEFAULT_RETRY_COUNT,
   API_DEFAULT_RETRY_DELAY,
   ONE_SECOND,
 } from "@/app/constants";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 import { useError } from "../Error/ErrorProvider";
-import { ServerError } from "../Error/errors/serverError";
 
 export interface StakingStats {
   activeTVLSat: number;
@@ -54,11 +53,16 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
   useEffect(() => {
     if (isError && error) {
       handleError({
-        error: new ServerError({
-          message: error.message,
-          status: HttpStatusCode.InternalServerError,
-          endpoint: API_ENDPOINTS.NETWORK_INFO,
-        }),
+        error: new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          error.message,
+          {
+            cause: error as Error,
+            metadata: {
+              endpoint: API_ENDPOINTS.NETWORK_INFO,
+            },
+          },
+        ),
         displayOptions: {
           retryAction: refetch,
         },

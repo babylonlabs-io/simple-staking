@@ -3,12 +3,9 @@ import { InscriptionIdentifier } from "@babylonlabs-io/wallet-connector";
 
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
-import { ERROR_SOURCES } from "@/app/context/Error/ErrorProvider";
-import { ClientError, ServerError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useClientQuery } from "@/app/hooks/client/useClient";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { wait } from "@/utils";
 import { filterDust } from "@/utils/wallet";
 
@@ -40,18 +37,14 @@ export function useOrdinals(
       return verifiedUTXOs.filter((utxo) => utxo.inscription);
     } catch (error) {
       // For client errors (like from getInscriptions)
-      if (!(error instanceof ServerError)) {
-        throw new ClientError({
-          message:
-            error instanceof Error
-              ? error.message
-              : "Error fetching ordinals data",
-          category: ClientErrorCategory.CLIENT_UNKNOWN,
-          type: ErrorType.WALLET,
-          metadata: {
-            errorSource: ERROR_SOURCES.ORDINALS,
-          },
-        });
+      if (!(error instanceof ClientError)) {
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          error instanceof Error
+            ? error.message
+            : "Error fetching ordinals data",
+          { cause: error as Error },
+        );
       }
 
       // For server errors, the postFilterOrdinals already added the metadata

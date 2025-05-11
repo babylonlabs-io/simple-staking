@@ -9,11 +9,9 @@ import { useCallback, useMemo } from "react";
 
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
-import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useAppState } from "@/app/state";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { validateStakingInput } from "@/utils/delegations";
 import { txFeeSafetyCheck } from "@/utils/delegations/fee";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
@@ -73,11 +71,10 @@ export function useV1TransactionService() {
       // Check if this staking transaction is eligible for unbonding
       const eligibility = await getUnbondingEligibility(stakingTx.getId());
       if (!eligibility) {
-        throw new ClientError({
-          message: "Transaction not eligible",
-          category: ClientErrorCategory.CLIENT_TRANSACTION,
-          type: ErrorType.UNBONDING,
-        });
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Transaction not eligible for unbonding",
+        );
       }
 
       // Get the param version based on height
@@ -103,7 +100,11 @@ export function useV1TransactionService() {
           signedUnbondingTx.toHex(),
         );
       } catch (error) {
-        throw new Error(`Error submitting unbonding transaction: ${error}`);
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          `Error submitting unbonding transaction: ${error instanceof Error ? error.message : String(error)}`,
+          { cause: error as Error },
+        );
       }
     },
     [createBtcStakingManager, stakerBtcInfo, versionedParams],
@@ -198,12 +199,21 @@ const validateCommonInputs = (
 ) => {
   validateStakingInput(stakingInput);
   if (!btcStakingManager) {
-    throw new Error("BTC Staking Manager not initialized");
+    throw new ClientError(
+      ERROR_CODES.INITIALIZATION_ERROR,
+      "BTC Staking Manager not initialized",
+    );
   }
   if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
-    throw new Error("Staker info not initialized");
+    throw new ClientError(
+      ERROR_CODES.INITIALIZATION_ERROR,
+      "Staker info not initialized",
+    );
   }
   if (!versionedParams?.length) {
-    throw new Error("Staking params not loaded");
+    throw new ClientError(
+      ERROR_CODES.INITIALIZATION_ERROR,
+      "Staking params not loaded",
+    );
   }
 };

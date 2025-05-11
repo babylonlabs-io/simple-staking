@@ -2,9 +2,9 @@ import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
-import { ServerError } from "@/app/context/Error/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { fetchApi } from "@/utils/fetch";
 
 const { mempoolApiUrl } = getNetworkConfigBTC();
@@ -167,11 +167,17 @@ export async function getTipHeight(): Promise<number> {
 
   const height = Number(result);
   if (Number.isNaN(height)) {
-    throw new ServerError({
-      message: "Invalid result returned",
-      status: HttpStatusCode.BadRequest,
-      endpoint: btcTipHeightUrl().toString(),
-    });
+    throw new ClientError(
+      ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+      "Invalid tip height result returned from mempool API",
+      {
+        metadata: {
+          rawValue: result,
+          endpoint: btcTipHeightUrl().toString(),
+          httpStatus: HttpStatusCode.BadRequest,
+        },
+      },
+    );
   }
   return height;
 }
@@ -204,11 +210,17 @@ export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
   const { isvalid, scriptPubKey } = addressInfo;
 
   if (!isvalid) {
-    throw new ServerError({
-      message: "Invalid address",
-      status: HttpStatusCode.BadRequest,
-      endpoint: validateAddressUrl(address).toString(),
-    });
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      "Invalid address provided for UTXO lookup or mempool API validation failed",
+      {
+        metadata: {
+          address,
+          endpoint: validateAddressUrl(address).toString(),
+          httpStatus: HttpStatusCode.BadRequest,
+        },
+      },
+    );
   }
 
   return sortedUTXOs.map((s) => ({
@@ -266,12 +278,22 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
   }>(txMerkleProofUrl(txId));
 
   const { block_height, merkle, pos } = response;
+
+  // Check if the response or the merkle proof is empty.
+  // An empty merkle proof usually means the transaction is not found or not confirmed yet.
   if (!block_height || !merkle.length || !pos) {
-    throw new ServerError({
-      message: "Invalid transaction merkle proof result returned",
-      status: HttpStatusCode.InternalServerError,
-      endpoint: txMerkleProofUrl(txId).toString(),
-    });
+    throw new ClientError(
+      ERROR_CODES.TRANSACTION_VERIFICATION_ERROR,
+      "Transaction not found or not confirmed when fetching Merkle proof",
+      {
+        metadata: {
+          txId,
+          endpoint: txMerkleProofUrl(txId).toString(),
+          httpStatus: HttpStatusCode.NotFound,
+          responseReceived: response ? JSON.stringify(response) : "undefined",
+        },
+      },
+    );
   }
 
   return {

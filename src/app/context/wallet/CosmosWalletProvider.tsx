@@ -19,12 +19,10 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
-
-import { ClientError } from "../Error/errors";
 
 const { chainId, rpc } = getNetworkConfigBBN();
 
@@ -120,11 +118,9 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
       } catch (error: any) {
         handleError({
           error: new ClientError(
-            {
-              message: error.message,
-              type: ErrorType.WALLET,
-            },
-            { cause: error },
+            ERROR_CODES.WALLET_ACTION_FAILED,
+            error.message,
+            { cause: error as Error },
           ),
           displayOptions: {
             retryAction: () => connectCosmos(provider),

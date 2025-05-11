@@ -3,16 +3,14 @@ import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError } from "@/app/context/Error/errors";
 import {
   RegistrationStep,
   useDelegationState,
 } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { retry } from "@/utils";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
@@ -77,11 +75,10 @@ export function useRegistrationService() {
 
     if (!selectedDelegation) {
       handleError({
-        error: new ClientError({
-          message: "No delegation selected for registration",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          type: ErrorType.REGISTRATION,
-        }),
+        error: new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "No delegation selected for registration",
+        ),
       });
       return;
     }

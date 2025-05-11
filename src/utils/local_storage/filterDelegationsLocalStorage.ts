@@ -2,6 +2,7 @@ import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ServerError } from "@/app/context/Error/errors";
 import { Delegation } from "@/app/types/delegations";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 import { getTxInfo } from "../mempool_api";
 
@@ -47,15 +48,28 @@ export const filterDelegationsLocalStorage = async (
       try {
         const fetchedTx = await getTxInfo(localDelegation.stakingTxHashHex);
         if (!fetchedTx) {
-          throw new ServerError({
-            message: "Transaction not found in the mempool",
-            status: HttpStatusCode.NotFound,
-            endpoint: API_ENDPOINTS.MEMPOOL.TX,
-          });
+          throw new ClientError(
+            ERROR_CODES.TRANSACTION_VERIFICATION_ERROR,
+            "Transaction not found in the mempool while filtering local storage delegations",
+            {
+              metadata: {
+                txHash: localDelegation.stakingTxHashHex,
+                endpoint: API_ENDPOINTS.MEMPOOL.TX,
+                httpStatus: HttpStatusCode.NotFound,
+              },
+            },
+          );
         }
       } catch (err) {
-        if ((err as ServerError).status === HttpStatusCode.NotFound) {
+        if (
+          err instanceof ClientError &&
+          err.errorCode === ERROR_CODES.TRANSACTION_VERIFICATION_ERROR
+        ) {
           isInMempool = false;
+        } else if ((err as ServerError).status === HttpStatusCode.NotFound) {
+          isInMempool = false;
+        } else {
+          throw err;
         }
       }
 

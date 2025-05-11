@@ -3,6 +3,7 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { useCallback } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 /**
  * Hook for signing and broadcasting transactions with the Cosmos wallet
@@ -19,7 +20,10 @@ export const useSigningStargateClient = () => {
     <T>(msg: { typeUrl: string; value: T }): Promise<number> => {
       if (!signingStargateClient || !bech32Address) {
         // wallet error
-        throw new Error("Wallet not connected");
+        throw new ClientError(
+          ERROR_CODES.WALLET_NOT_CONNECTED,
+          "Wallet not connected",
+        );
       }
 
       // estimate gas
@@ -51,7 +55,10 @@ export const useSigningStargateClient = () => {
     }> => {
       if (!signingStargateClient || !bech32Address) {
         // wallet error
-        throw new Error("Wallet not connected");
+        throw new ClientError(
+          ERROR_CODES.WALLET_NOT_CONNECTED,
+          "Wallet not connected",
+        );
       }
 
       const res = await signingStargateClient.signAndBroadcast(
@@ -62,8 +69,14 @@ export const useSigningStargateClient = () => {
 
       if (res.code !== 0) {
         // wallet error
-        throw new Error(
+        throw new ClientError(
+          ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
           `Failed to send ${msg.typeUrl} transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
+          {
+            cause: new Error(
+              res.events.map((event) => event.attributes).join("\n"),
+            ),
+          },
         );
       }
       return {
@@ -90,7 +103,10 @@ export const useSigningStargateClient = () => {
     ): Promise<Uint8Array> => {
       if (!signingStargateClient || !bech32Address) {
         // wallet error
-        throw new Error("Wallet not connected");
+        throw new ClientError(
+          ERROR_CODES.WALLET_NOT_CONNECTED,
+          "Wallet not connected",
+        );
       }
 
       const res = await signingStargateClient.sign(
@@ -119,14 +135,23 @@ export const useSigningStargateClient = () => {
     }> => {
       if (!signingStargateClient || !bech32Address) {
         // wallet error
-        throw new Error("Wallet not connected");
+        throw new ClientError(
+          ERROR_CODES.WALLET_NOT_CONNECTED,
+          "Wallet not connected",
+        );
       }
 
       const res = await signingStargateClient.broadcastTx(tx);
       if (res.code !== 0) {
         // wallet error
-        throw new Error(
+        throw new ClientError(
+          ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
           `Failed to send transaction, code: ${res.code}, txHash: ${res.transactionHash}`,
+          {
+            cause: new Error(
+              res.events.map((event) => event.attributes).join("\n"),
+            ),
+          },
         );
       }
       return {

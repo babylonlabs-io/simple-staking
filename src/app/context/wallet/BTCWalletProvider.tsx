@@ -19,9 +19,9 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { ClientError, ERROR_CODES } from "@/errors";
 import {
   getAddressBalance,
   getNetworkFees,
@@ -33,8 +33,6 @@ import {
   isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet";
-
-import { ClientError } from "../Error/errors";
 
 const btcConfig = getNetworkConfigBTC();
 
@@ -119,8 +117,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         const address = await walletProvider.getAddress();
         const supported = isSupportedAddressType(address);
         if (!supported) {
-          // wallet error
-          throw new Error(supportedNetworkMessage);
+          throw new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            supportedNetworkMessage,
+          );
         }
 
         const publicKeyNoCoord = getPublicKeyNoCoord(
@@ -150,11 +150,9 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       } catch (error: any) {
         handleError({
           error: new ClientError(
-            {
-              message: error.message,
-              type: ErrorType.WALLET,
-            },
-            { cause: error },
+            ERROR_CODES.WALLET_ACTION_FAILED,
+            error.message,
+            { cause: error as Error },
           ),
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
@@ -234,7 +232,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       getBTCTipHeight: async () => getTipHeight(),
       getInscriptions: async (): Promise<InscriptionIdentifier[]> => {
         if (!btcWalletProvider?.getInscriptions) {
-          throw new Error("`getInscriptions` method is not provided");
+          throw new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "`getInscriptions` method is not provided by the wallet",
+          );
         }
 
         return btcWalletProvider.getInscriptions();

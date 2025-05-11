@@ -1,4 +1,5 @@
 interface ClientErrorOptions extends ErrorOptions {
+  cause?: Error;
   metadata?: Record<string, any>;
 }
 
@@ -11,3 +12,5 @@ export class ClientError extends Error {
     super(message, options);
   }
 }
+
+export * from "./codes";

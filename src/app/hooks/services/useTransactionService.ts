@@ -5,12 +5,10 @@ import {
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
 
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
-import { ClientError } from "@/app/context/Error/errors";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { validateStakingInput } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
@@ -73,7 +71,10 @@ export const useTransactionService = () => {
       );
 
       if (!availableUTXOs) {
-        throw new Error("Available UTXOs not initialized");
+        throw new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
       }
 
       const { stakingTx, signedBabylonTx } =
@@ -116,7 +117,10 @@ export const useTransactionService = () => {
         stakerInfo,
       );
       if (!availableUTXOs) {
-        throw new Error("Available UTXOs not initialized");
+        throw new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
       }
       return btcStakingManager!.estimateBtcStakingFee(
         stakerInfo,
@@ -194,7 +198,10 @@ export const useTransactionService = () => {
         stakerInfo,
       );
       if (!availableUTXOs) {
-        throw new Error("Available UTXOs not initialized");
+        throw new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
       }
 
       const signedStakingTx =
@@ -207,11 +214,10 @@ export const useTransactionService = () => {
         );
 
       if (signedStakingTx.getId() !== expectedTxHashHex) {
-        throw new ClientError({
-          message: `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
-          category: ClientErrorCategory.CLIENT_TRANSACTION,
-          type: ErrorType.STAKING,
-        });
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
+        );
       }
       await pushTx(signedStakingTx.toHex());
       refetchUTXOs();
@@ -438,12 +444,21 @@ const validateCommonInputs = (
 ) => {
   validateStakingInput(stakingInput);
   if (!btcStakingManager) {
-    throw new Error("BTC Staking Manager not initialized");
+    throw new ClientError(
+      ERROR_CODES.INITIALIZATION_ERROR,
+      "BTC Staking Manager not initialized",
+    );
   }
   if (!tipHeight) {
-    throw new Error("Tip height not initialized");
+    throw new ClientError(
+      ERROR_CODES.INITIALIZATION_ERROR,
+      "Tip height not initialized",
+    );
   }
   if (!stakerInfo.address || !stakerInfo.publicKeyNoCoordHex) {
-    throw new Error("Staker info not initialized");
+    throw new ClientError(
+      ERROR_CODES.INITIALIZATION_ERROR,
+      "Staker info not initialized",
+    );
   }
 };

@@ -10,12 +10,11 @@ import { useCallback, type PropsWithChildren } from "react";
 
 import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
-import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 import { useError } from "../Error/ErrorProvider";
-import { ClientError } from "../Error/errors";
 
 const context = typeof window !== "undefined" ? window : {};
 
@@ -63,11 +62,9 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
 
       handleError({
         error: new ClientError(
-          {
-            message: error.message,
-            type: ErrorType.WALLET,
-          },
-          { cause: error },
+          ERROR_CODES.WALLET_ACTION_FAILED,
+          error.message,
+          { cause: error as Error },
         ),
       });
     },

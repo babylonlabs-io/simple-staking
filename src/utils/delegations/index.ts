@@ -6,6 +6,7 @@ import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 /**
  * Clears the signatures from a transaction.
@@ -59,9 +60,20 @@ export const uint8ArrayToHex = (uint8Array: Uint8Array): string => {
  */
 export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
   if (!stakingInput.finalityProviderPkNoCoordHex)
-    throw new Error("Finality provider not selected");
-  if (!stakingInput.stakingAmountSat) throw new Error("Staking amount not set");
-  if (!stakingInput.stakingTimelock) throw new Error("Staking time not set");
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      "Finality provider public key (finalityProviderPkNoCoordHex) is required for staking input.",
+    );
+  if (!stakingInput.stakingAmountSat)
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      "Staking amount (stakingAmountSat) is required for staking input.",
+    );
+  if (!stakingInput.stakingTimelock)
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      "Staking timelock (stakingTimelock) is required for staking input.",
+    );
 };
 
 /**

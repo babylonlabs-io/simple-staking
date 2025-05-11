@@ -1,4 +1,5 @@
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 /*
   Get the BBN param by BTC height
@@ -20,7 +21,19 @@ export const getBbnParamByBtcHeight = (
     (param) => height >= param.btcActivationHeight,
   );
   // system error
-  if (!param) throw new Error(`BBN param not found for height ${height}`);
+  if (!param)
+    throw new ClientError(
+      ERROR_CODES.CONFIGURATION_ERROR,
+      `BBN param not found for BTC height ${height}`,
+      {
+        metadata: {
+          height,
+          availableActivationHeights: sortedParams.map(
+            (p) => p.btcActivationHeight,
+          ),
+        },
+      },
+    );
   return param;
 };
 
@@ -35,6 +48,16 @@ export const getBbnParamByVersion = (
   bbnParams: BbnStakingParamsVersion[],
 ): BbnStakingParamsVersion => {
   const param = bbnParams.find((param) => param.version === version);
-  if (!param) throw new Error(`BBN param not found for version ${version}`);
+  if (!param)
+    throw new ClientError(
+      ERROR_CODES.CONFIGURATION_ERROR,
+      `BBN param not found for version ${version}`,
+      {
+        metadata: {
+          version,
+          availableVersions: bbnParams.map((p) => p.version),
+        },
+      },
+    );
   return param;
 };

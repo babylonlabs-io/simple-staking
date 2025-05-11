@@ -4,18 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { RegistrationEndModal } from "@/app/components/Modals/RegistrationModal/RegistrationEndModal";
 import { RegistrationStartModal } from "@/app/components/Modals/RegistrationModal/RegistrationStartModal";
 import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { ONE_MINUTE } from "@/app/constants";
-import { API_ENDPOINTS } from "@/app/constants/endpoints";
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError } from "@/app/context/Error/errors/clientError";
-import { ServerError } from "@/app/context/Error/errors/serverError";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
@@ -27,7 +22,7 @@ import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 
@@ -166,11 +161,10 @@ export const Delegations = ({}) => {
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new ClientError({
-          message: "Wrong delegation selected for unbonding",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          type: ErrorType.UNBONDING,
-        });
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Wrong delegation selected for unbonding",
+        );
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat } =
@@ -209,17 +203,19 @@ export const Delegations = ({}) => {
     try {
       if (!networkFees) {
         // system error
-        throw new Error("Network fees not found");
+        throw new ClientError(
+          ERROR_CODES.MISSING_DATA_ERROR,
+          "Network fees not found",
+        );
       }
       // Prevent the modal from closing
       setAwaitingWalletResponse(true);
 
       if (selectedDelegation?.stakingTxHashHex != id) {
-        throw new ClientError({
-          message: "Wrong delegation selected for withdrawal",
-          category: ClientErrorCategory.CLIENT_VALIDATION,
-          type: ErrorType.WITHDRAW,
-        });
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Wrong delegation selected for withdrawal",
+        );
       }
       // Sign the withdrawal transaction
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
@@ -311,11 +307,10 @@ export const Delegations = ({}) => {
   useEffect(() => {
     if (modalOpen && !selectedDelegation) {
       handleError({
-        error: new ServerError({
-          message: "Delegation not found",
-          status: HttpStatusCode.NotFound,
-          endpoint: API_ENDPOINTS.STAKER_DELEGATIONS,
-        }),
+        error: new ClientError(
+          ERROR_CODES.MISSING_DATA_ERROR,
+          "Delegation not found when modal is open",
+        ),
         displayOptions: {
           noCancel: false,
         },
