@@ -14,6 +14,9 @@ const effectiveEnv = {
   ...process.env,
 };
 
+// Enable debug logs for Playwright
+process.env.DEBUG = "pw:api,pw:browser*";
+
 export default defineConfig({
   testDir: path.join(__dirname, "e2e"),
   fullyParallel: true,
@@ -21,7 +24,7 @@ export default defineConfig({
   retries: 2,
   timeout: 90_000,
   workers: 1,
-  reporter: "html",
+  reporter: [["html"], ["list"]],
 
   use: {
     baseURL,
