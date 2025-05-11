@@ -11,27 +11,19 @@ import {
 } from "../types/services/healthCheck";
 
 export const getHealthCheck = async (): Promise<HealthCheckResult> => {
-  // In e2e test mode we bypass the real health-check call to avoid
-  // geo-blocking (451) responses that only occur on CI runners.
-  if (
-    typeof window !== "undefined" &&
-    // The flag is set by e2e mocks (see mockVerifyBTCAddress in tests)
-    (window as any).__e2eTestMode
-  ) {
-    return {
-      status: HealthCheckStatus.Normal,
-      message: "ok",
-    };
-  }
+  console.log("E2E: healthcheck service");
   try {
     const healthCheckAPIResponse = await fetchHealthCheck();
+    console.log("E2E: healthcheck service response", healthCheckAPIResponse);
 
     if (healthCheckAPIResponse.data) {
+      console.log("E2E: healthcheck service data", healthCheckAPIResponse.data);
       return {
         status: HealthCheckStatus.Normal,
         message: healthCheckAPIResponse.data,
       };
     } else {
+      console.log("E2E: healthcheck service error");
       throw new ServerError({
         message: API_ERROR_MESSAGE,
         endpoint: API_ENDPOINTS.HEALTHCHECK,
@@ -39,6 +31,7 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
       });
     }
   } catch (error: any) {
+    console.log("E2E: healthcheck service error 2", { error });
     if (isError451(error)) {
       return {
         status: HealthCheckStatus.GeoBlocked,

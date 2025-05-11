@@ -5,6 +5,8 @@ type HealthCheckResponse = {
 };
 
 export const fetchHealthCheck = async (): Promise<HealthCheckResponse> => {
+  console.log("E2E: healthcheck fetched");
+
   const response = await apiWrapper<HealthCheckResponse>(
     "GET",
     "/healthcheck",
