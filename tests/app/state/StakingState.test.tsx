@@ -7,9 +7,9 @@ jest.mock("@/app/state", () => ({
   useAppState: () => mockUseAppState(),
 }));
 
-// Mock IS_FIXED_TERM_FIELD
 jest.mock("@/config", () => ({
   IS_FIXED_TERM_FIELD: false,
+  getDisabledWallets: () => [],
 }));
 
 const mockUseHealthCheck = jest.fn();
@@ -30,6 +30,11 @@ jest.mock("@/app/state/BalanceState", () => ({
 const mockUseBTCWallet = jest.fn();
 jest.mock("@/app/context/wallet/BTCWalletProvider", () => ({
   useBTCWallet: () => mockUseBTCWallet(),
+}));
+
+const mockUseCosmosWallet = jest.fn();
+jest.mock("@/app/context/wallet/CosmosWalletProvider", () => ({
+  useCosmosWallet: () => mockUseCosmosWallet(),
 }));
 
 // Mock useLocalStorage
@@ -128,6 +133,11 @@ describe("StakingState", () => {
 
     mockUseBTCWallet.mockReturnValue({
       publicKeyNoCoord: "mock-public-key",
+    });
+
+    mockUseCosmosWallet.mockReturnValue({
+      bech32Address: "mock-cosmos-address",
+      // Potentially add disabled: [] here if needed for tests
     });
   });
 

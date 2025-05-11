@@ -71,11 +71,18 @@ Sentry.init({
     }),
   ],
 
-  beforeSend(event) {
+  beforeSend(event, hint) {
     event.extra = {
-      ...event.extra,
+      ...(event.extra || {}),
       version: getCommitHash(),
     };
+
+    const exception = hint?.originalException as any;
+
+    if (exception?.code) {
+      event.fingerprint = ["{{ default }}", exception?.code];
+    }
+
     return event;
   },
 });

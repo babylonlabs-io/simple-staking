@@ -1,4 +1,4 @@
-import { type PropsWithChildren, useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { number, object, ObjectSchema, string } from "yup";
 
@@ -8,13 +8,14 @@ import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
-import { IS_FIXED_TERM_FIELD } from "@/config";
+import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/config";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 
 import { STAKING_DISABLED } from "../constants";
+import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
 
 import { useBalanceState } from "./BalanceState";
 
@@ -50,7 +51,6 @@ export interface StakingState {
   hasError: boolean;
   blocked: boolean;
   available: boolean;
-  disabled: boolean;
   loading: boolean;
   processing: boolean;
   errorMessage?: string;
@@ -75,6 +75,10 @@ export interface StakingState {
   setFormData: (formData?: FormFields) => void;
   setVerifiedDelegation: (value?: DelegationV2) => void;
   reset: () => void;
+  disabled?: {
+    title: string;
+    message: string;
+  };
 }
 
 const { StateProvider, useState: useStakingState } =
@@ -82,7 +86,7 @@ const { StateProvider, useState: useStakingState } =
     hasError: false,
     blocked: false,
     available: false,
-    disabled: false,
+    disabled: undefined,
     loading: false,
     processing: false,
     errorMessage: "",
@@ -146,6 +150,7 @@ export function StakingState({ children }: PropsWithChildren) {
   const { stakableBtcBalance, loading: isBalanceLoading } = useBalanceState();
 
   const { publicKeyNoCoord } = useBTCWallet();
+  const { walletName: cosmosWalletName } = useCosmosWallet();
 
   const loading =
     isStateLoading || isCheckLoading || isFeeLoading || isBalanceLoading;
@@ -189,6 +194,31 @@ export function StakingState({ children }: PropsWithChildren) {
       unbondingTime,
     };
   }, [latestParam, mempoolFeeRates]);
+
+  const isDisabled = useMemo(() => {
+    // System wide staking disabled
+    if (STAKING_DISABLED) {
+      return {
+        title: "Staking Currently Unavailable",
+        message:
+          "Staking is temporarily disabled due to network downtime. New stakes are paused until the network resumes.",
+      };
+    }
+    // Disable wallet by their name in the event of incident
+    // TODO: Add support for BTC wallet in the future
+    if (
+      cosmosWalletName != "" &&
+      getDisabledWallets().includes(cosmosWalletName)
+    ) {
+      return {
+        title: `Staking registration is temporarily disabled for ${cosmosWalletName} wallet.`,
+        message: "Please try again later.",
+      };
+    }
+
+    // If the staking is not disabled, return undefined
+    return undefined;
+  }, [cosmosWalletName]);
 
   const validationSchema = useMemo(
     () =>
@@ -304,7 +334,7 @@ export function StakingState({ children }: PropsWithChildren) {
       hasError,
       blocked,
       available,
-      disabled: STAKING_DISABLED,
+      disabled: isDisabled,
       loading,
       processing,
       errorMessage,
@@ -323,6 +353,7 @@ export function StakingState({ children }: PropsWithChildren) {
       hasError,
       blocked,
       available,
+      isDisabled,
       loading,
       processing,
       errorMessage,
@@ -331,8 +362,6 @@ export function StakingState({ children }: PropsWithChildren) {
       formData,
       currentStep,
       verifiedDelegation,
-      setVerifiedDelegation,
-      setFormData,
       goToStep,
       setProcessing,
       reset,
