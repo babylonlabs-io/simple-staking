@@ -1,5 +1,6 @@
 import qs from "qs";
 
+import { getApiBaseUrl } from "../../config";
 import { ServerError } from "../context/Error/errors/serverError";
 
 import { HttpStatusCode } from "./httpStatusCodes";
@@ -33,7 +34,7 @@ export const apiWrapper = async <TResponseData = unknown>(
     ? `?${qs.stringify(params.query, { arrayFormat: "repeat" })}`
     : "";
 
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+  const baseUrl = getApiBaseUrl();
   const url = `${baseUrl}${path}${queryString}`;
 
   const options: RequestInit = {
