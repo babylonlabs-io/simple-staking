@@ -114,7 +114,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           data: {
             chainId,
             address,
-            walletName: await provider.getWalletProviderName(),
+            walletName,
           },
         });
       } catch (error: any) {
