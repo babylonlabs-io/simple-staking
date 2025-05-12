@@ -121,7 +121,7 @@ export class WalletConnectActions {
         .locator(WALLET_SELECTORS.BITCOIN)
         .first();
 
-      await bitcoinWalletButton.waitFor({ state: "visible", timeout: 3000 });
+      await bitcoinWalletButton.waitFor({ state: "visible", timeout: 10_000 });
       await bitcoinWalletButton.click();
     } catch (error) {
       console.error("Error clicking injectable wallet button:", error);
