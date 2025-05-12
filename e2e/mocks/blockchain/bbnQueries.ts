@@ -467,4 +467,14 @@ export const injectBBNQueries = async (
       }),
     });
   });
+
+  await page.route("**/healthcheck*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: "ok",
+      }),
+    });
+  });
 };
