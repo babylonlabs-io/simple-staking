@@ -6,7 +6,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
-import * as Sentry from "@sentry/nextjs";
+import { addBreadcrumb, setUser } from "@sentry/nextjs";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -99,6 +99,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     setNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
+
+    setUser({
+      btcAddress: null,
+    });
   }, []);
 
   const connectBTC = useCallback(
@@ -129,7 +133,11 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
         setLoading(false);
 
-        Sentry.addBreadcrumb({
+        setUser({
+          btcAddress: address,
+        });
+
+        addBreadcrumb({
           level: "info",
           message: "Connect BTC wallet",
           data: {
@@ -201,7 +209,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         {} as Record<string, string>,
       );
 
-    Sentry.addBreadcrumb({
+    addBreadcrumb({
       level: "info",
       message: "Installed BTC wallets",
       data: installedWallets,

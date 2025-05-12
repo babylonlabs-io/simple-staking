@@ -7,7 +7,7 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import * as Sentry from "@sentry/nextjs";
+import { addBreadcrumb, setUser } from "@sentry/nextjs";
 import {
   createContext,
   useCallback,
@@ -67,6 +67,10 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     setBBNWalletProvider(undefined);
     setCosmosBech32Address("");
     setSigningStargateClient(undefined);
+
+    setUser({
+      babylonAddress: null,
+    });
   }, []);
 
   const connectCosmos = useCallback(
@@ -100,13 +104,17 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setLoading(false);
         setWalletName(walletName);
 
-        Sentry.addBreadcrumb({
+        setUser({
+          babylonAddress: address,
+        });
+
+        addBreadcrumb({
           level: "info",
           message: "Connect Babylon wallet",
           data: {
             chainId,
             address,
-            walletName: await provider.getWalletProviderName(),
+            walletName,
           },
         });
       } catch (error: any) {
@@ -194,7 +202,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         {} as Record<string, string>,
       );
 
-    Sentry.addBreadcrumb({
+    addBreadcrumb({
       level: "info",
       message: "Installed BTC wallets",
       data: installedWallets,
