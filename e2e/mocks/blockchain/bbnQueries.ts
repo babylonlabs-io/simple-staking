@@ -175,8 +175,21 @@ export const injectBBNQueries = async (
   });
 
   await page.route("**", async (route, request) => {
-    if (request.method() !== "POST") {
+    if (request.method() !== "POST" && request.method() !== "OPTIONS") {
       return route.continue();
+    }
+
+    // For OPTIONS preflight, respond with basic CORS headers and 200
+    if (request.method() === "OPTIONS") {
+      return route.fulfill({
+        status: 200,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "POST, GET, OPTIONS",
+          "Access-Control-Allow-Headers": "content-type",
+        },
+        body: "",
+      });
     }
 
     const postData = request.postData();
@@ -237,7 +250,27 @@ export const injectBBNQueries = async (
       });
     }
 
-    if (!parsed || parsed.method !== "abci_query") {
+    if (!parsed) {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ result: {} }),
+      });
+    }
+
+    if (parsed.method && !["abci_query", "status"].includes(parsed.method)) {
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: parsed.id ?? -1,
+          result: {},
+        }),
+      });
+    }
+
+    if (parsed.method !== "abci_query") {
       return route.continue();
     }
 
@@ -634,6 +667,20 @@ export const injectBBNQueries = async (
       body: JSON.stringify({
         data: {
           status: true,
+        },
+      }),
+    });
+  });
+
+  // Intercept LCD bank balance by denom
+  await page.route("**/cosmos/bank/v1beta1/balances/**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        balance: {
+          denom: "ubbn",
+          amount: "1000000",
         },
       }),
     });

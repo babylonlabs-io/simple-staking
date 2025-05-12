@@ -1,10 +1,16 @@
-export const BBN_CANARY_RPC_URL = process.env.NEXT_PUBLIC_BABY_RPC_URL
-  ? process.env.NEXT_PUBLIC_BABY_RPC_URL
-  : "https://rpc.btc-mainnet.babylonlabs.io/";
+export const BBN_CANARY_RPC_URL =
+  process.env.NEXT_PUBLIC_BABY_RPC_URL &&
+  process.env.NEXT_PUBLIC_BABY_RPC_URL !== "/"
+    ? process.env.NEXT_PUBLIC_BABY_RPC_URL
+    : process.env.CI || process.env.NEXT_BUILD_E2E
+      ? "http://localhost:3000"
+      : "https://rpc.btc-mainnet.babylonlabs.io/";
 
-export const BBN_CANARY_LCD_URL = process.env.NEXT_PUBLIC_BABY_LCD_URL
-  ? process.env.NEXT_PUBLIC_BABY_LCD_URL
-  : "https://lcd.btc-mainnet.babylonlabs.io/";
+export const BBN_CANARY_LCD_URL =
+  process.env.NEXT_PUBLIC_BABY_LCD_URL &&
+  process.env.NEXT_PUBLIC_BABY_LCD_URL !== "/"
+    ? process.env.NEXT_PUBLIC_BABY_LCD_URL
+    : "http://localhost:1317/";
 
 export const bbnCanary = {
   chainId: "bbn-priv-main-1",
