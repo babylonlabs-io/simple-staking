@@ -16,67 +16,59 @@ export class WalletConnectActions {
   constructor(private page: Page) {}
 
   async clickConnectButton() {
-    try {
-      await this.page.waitForSelector(CONNECT_BUTTON_SELECTOR, {
-        state: "visible",
-        timeout: 3000,
-      });
+    await this.page.waitForSelector(CONNECT_BUTTON_SELECTOR, {
+      state: "visible",
+      timeout: 3000,
+    });
 
-      const connectButtons = await this.page
-        .locator(CONNECT_BUTTON_SELECTOR)
-        .all();
+    const connectButtons = await this.page
+      .locator(CONNECT_BUTTON_SELECTOR)
+      .all();
 
-      for (const button of connectButtons) {
-        const isDisabled = await button.isDisabled();
-        if (!isDisabled) {
-          await button.click({ force: true });
-          return;
-        }
+    for (const button of connectButtons) {
+      const isDisabled = await button.isDisabled();
+      if (!isDisabled) {
+        await button.click({ force: true });
+        return;
       }
+    }
 
-      if (connectButtons.length > 0) {
-        await connectButtons[0].click({ force: true });
-      }
-    } catch (error) {
-      console.error("Error clicking connect button:", error);
+    if (connectButtons.length > 0) {
+      await connectButtons[0].click({ force: true });
     }
   }
 
   async acceptTermsAndConditions() {
-    try {
-      await Promise.race([
-        this.page
-          .locator(DIALOG_SELECTORS.TERMS_DIALOG_HEADER)
-          .waitFor({ state: "visible", timeout: 3000 })
-          .catch(() => {}),
-        this.page
-          .locator(DIALOG_SELECTORS.ANY_DIALOG)
-          .first()
-          .waitFor({ state: "visible", timeout: 3000 })
-          .catch(() => {}),
-      ]);
-
-      const termsDialogVisible = await this.page
+    await Promise.race([
+      this.page
         .locator(DIALOG_SELECTORS.TERMS_DIALOG_HEADER)
-        .isVisible()
-        .catch(() => false);
+        .waitFor({ state: "visible", timeout: 3000 })
+        .catch(() => {}),
+      this.page
+        .locator(DIALOG_SELECTORS.ANY_DIALOG)
+        .first()
+        .waitFor({ state: "visible", timeout: 3000 })
+        .catch(() => {}),
+    ]);
 
-      if (!termsDialogVisible) {
-        await this.handleAlternativeDialog();
-        return;
-      }
+    const termsDialogVisible = await this.page
+      .locator(DIALOG_SELECTORS.TERMS_DIALOG_HEADER)
+      .isVisible()
+      .catch(() => false);
 
-      const checkboxes = this.page.locator(CHECKBOX_SELECTOR);
-      const count = await checkboxes.count();
-
-      for (let i = 0; i < count; i++) {
-        await checkboxes.nth(i).click();
-      }
-
-      await this.page.locator(BUTTON_SELECTORS.NEXT).click();
-    } catch (error) {
-      console.error("Error accepting terms and conditions:", error);
+    if (!termsDialogVisible) {
+      await this.handleAlternativeDialog();
+      return;
     }
+
+    const checkboxes = this.page.locator(CHECKBOX_SELECTOR);
+    const count = await checkboxes.count();
+
+    for (let i = 0; i < count; i++) {
+      await checkboxes.nth(i).click();
+    }
+
+    await this.page.locator(BUTTON_SELECTORS.NEXT).click();
   }
 
   private async handleAlternativeDialog() {
@@ -116,77 +108,53 @@ export class WalletConnectActions {
   }
 
   async clickInjectableWalletButton() {
-    try {
-      const bitcoinWalletButton = this.page
-        .locator(WALLET_SELECTORS.BITCOIN)
-        .first();
+    const bitcoinWalletButton = this.page
+      .locator(WALLET_SELECTORS.BITCOIN)
+      .first();
 
-      await bitcoinWalletButton.waitFor({ state: "visible", timeout: 3000 });
-      await bitcoinWalletButton.click();
-    } catch (error) {
-      console.error("Error clicking injectable wallet button:", error);
-    }
+    await bitcoinWalletButton.waitFor({ state: "visible", timeout: 3000 });
+    await bitcoinWalletButton.click();
   }
 
   async clickConnectWalletButton() {
-    try {
-      const saveButton = this.page.locator(BUTTON_SELECTORS.SAVE);
-      await saveButton.waitFor({ state: "visible", timeout: 3000 });
-      await saveButton.click();
-    } catch (error) {
-      console.error("Error clicking connect wallet button:", error);
-    }
+    const saveButton = this.page.locator(BUTTON_SELECTORS.SAVE);
+    await saveButton.waitFor({ state: "visible", timeout: 3000 });
+    await saveButton.click();
   }
 
   async clickOKXWalletButton() {
-    try {
-      for (const selector of WALLET_SELECTORS.OKX) {
-        const okxButton = this.page.locator(selector).first();
-        if (await okxButton.isVisible().catch(() => false)) {
-          await okxButton.click();
-          break;
-        }
+    for (const selector of WALLET_SELECTORS.OKX) {
+      const okxButton = this.page.locator(selector).first();
+      if (await okxButton.isVisible().catch(() => false)) {
+        await okxButton.click();
+        break;
       }
-
-      await this.clickConnectWalletButton();
-    } catch (error) {
-      console.error("Error clicking OKX wallet button:", error);
     }
+
+    await this.clickConnectWalletButton();
   }
 
   async clickBabylonChainWalletButton() {
-    try {
-      for (const selector of WALLET_SELECTORS.BABYLON) {
-        const babylonButton = this.page.locator(selector).first();
-        if (await babylonButton.isVisible().catch(() => false)) {
-          await babylonButton.click();
-          break;
-        }
+    for (const selector of WALLET_SELECTORS.BABYLON) {
+      const babylonButton = this.page.locator(selector).first();
+      if (await babylonButton.isVisible().catch(() => false)) {
+        await babylonButton.click();
+        break;
       }
-    } catch (error) {
-      console.error("Error clicking Babylon Chain wallet button:", error);
     }
   }
 
   async clickGenericWalletButton(walletType: string = "Leap") {
-    try {
-      const walletSelector = createGenericWalletSelector(walletType);
-      const walletButton = this.page.locator(walletSelector);
-      await walletButton.waitFor({ state: "visible", timeout: 3000 });
-      await walletButton.click();
-    } catch (error) {
-      console.error(`Error clicking ${walletType} wallet button:`, error);
-    }
+    const walletSelector = createGenericWalletSelector(walletType);
+    const walletButton = this.page.locator(walletSelector);
+    await walletButton.waitFor({ state: "visible", timeout: 3000 });
+    await walletButton.click();
   }
 
   async clickDoneButton() {
-    try {
-      const doneButton = this.page.locator(BUTTON_SELECTORS.DONE);
-      await doneButton.waitFor({ state: "visible", timeout: 3000 });
-      await doneButton.click();
-    } catch (error) {
-      console.error("Error clicking Done button:", error);
-    }
+    const doneButton = this.page.locator(BUTTON_SELECTORS.DONE);
+    await doneButton.waitFor({ state: "visible", timeout: 3000 });
+    await doneButton.click();
   }
 
   async setupMocks() {
@@ -194,39 +162,35 @@ export class WalletConnectActions {
   }
 
   async handleVerificationErrorIfPresent() {
-    try {
-      await this.page
-        .locator(DIALOG_SELECTORS.ERROR_DIALOG)
-        .waitFor({
-          state: "visible",
-          timeout: 1000,
-        })
-        .catch(() => {});
+    await this.page
+      .locator(DIALOG_SELECTORS.ERROR_DIALOG)
+      .waitFor({
+        state: "visible",
+        timeout: 1000,
+      })
+      .catch(() => {});
 
-      const isErrorVisible = await this.page
-        .locator(DIALOG_SELECTORS.ERROR_DIALOG)
-        .isVisible()
-        .catch(() => false);
+    const isErrorVisible = await this.page
+      .locator(DIALOG_SELECTORS.ERROR_DIALOG)
+      .isVisible()
+      .catch(() => false);
 
-      if (isErrorVisible) {
-        const doneButton = this.page.locator(
-          DIALOG_SELECTORS.ERROR_DIALOG_DONE_BUTTON,
-        );
+    if (isErrorVisible) {
+      const doneButton = this.page.locator(
+        DIALOG_SELECTORS.ERROR_DIALOG_DONE_BUTTON,
+      );
 
-        if (await doneButton.isVisible().catch(() => false)) {
-          await doneButton.click();
+      if (await doneButton.isVisible().catch(() => false)) {
+        await doneButton.click();
 
-          await this.page
-            .locator(DIALOG_SELECTORS.ERROR_DIALOG)
-            .waitFor({
-              state: "hidden",
-              timeout: 1000,
-            })
-            .catch(() => {});
-        }
+        await this.page
+          .locator(DIALOG_SELECTORS.ERROR_DIALOG)
+          .waitFor({
+            state: "hidden",
+            timeout: 1000,
+          })
+          .catch(() => {});
       }
-    } catch (error) {
-      console.error("Error handling verification error:", error);
     }
   }
 
