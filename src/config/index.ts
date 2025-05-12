@@ -9,15 +9,8 @@ export const getApiBaseUrl = (): string => {
     throw new Error("NEXT_PUBLIC_API_URL environment variable is not defined");
   }
 
-  // Convert a solitary slash ("/") to an empty string so that path concatenation
-  // doesn't produce a protocol-relative URL like "//v2/..."
   if (apiUrl === "/") {
     apiUrl = "";
-  }
-
-  // Remove trailing slash to avoid duplicate slashes when joining paths
-  if (apiUrl.endsWith("/") && apiUrl.length > 1) {
-    apiUrl = apiUrl.slice(0, -1);
   }
 
   return apiUrl;
