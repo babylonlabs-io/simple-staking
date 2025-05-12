@@ -20,16 +20,4 @@ export const utilityHandlers = [
       }),
     );
   }),
-
-  rest.get("*", (req, res, ctx) => {
-    const url = req.url.toString();
-    if (url.includes("/healthcheck")) {
-      return res(
-        ctx.json({
-          data: "ok",
-        }),
-      );
-    }
-    return res(ctx.status(404));
-  }),
 ];
