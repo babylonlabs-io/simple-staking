@@ -477,4 +477,165 @@ export const injectBBNQueries = async (
       }),
     });
   });
+
+  await page.route("**/v2/prices*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: {
+          BABY: 0.09868765127511409,
+          BTC: 104126.79433684294,
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v2/stats*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: {
+          active_tvl: 3238664649941,
+          active_delegations: 21906,
+          active_finality_providers: 60,
+          total_finality_providers: 114,
+          total_active_tvl: 4956159209022,
+          total_active_delegations: 43478,
+          btc_staking_apy: 0.011705617401439945,
+          btc_staking_apr: 0.011705617401439945,
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v2/finality-providers*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: [
+          {
+            btc_pk:
+              "e8a3ef3ca40ade56bd986663f24d5ab3bcc3cd18a88a10a8cd25d8af42314f62",
+            state: "FINALITY_PROVIDER_STATUS_INACTIVE",
+            description: {
+              moniker: "PRO Delegators",
+              identity: "44771D06A00DD695",
+              website: "https://pro-delegators.com",
+              security_contact: "contact@pro-delegators.com",
+              details: "Advanced Node Services for Professional Delegators",
+            },
+            commission: "0.030000000000000000",
+            active_tvl: 2500000,
+            active_delegations: 4,
+          },
+        ],
+        pagination: {
+          next_key: "",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v1/finality-providers*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: [
+          {
+            btc_pk:
+              "e8a3ef3ca40ade56bd986663f24d5ab3bcc3cd18a88a10a8cd25d8af42314f62",
+            state: "FINALITY_PROVIDER_STATUS_INACTIVE",
+            description: {
+              moniker: "PRO Delegators",
+              identity: "44771D06A00DD695",
+              website: "https://pro-delegators.com",
+              security_contact: "contact@pro-delegators.com",
+              details: "Advanced Node Services for Professional Delegators",
+            },
+            commission: "0.030000000000000000",
+            active_tvl: 2500000,
+            total_tvl: 2500000,
+            active_delegations: 4,
+            total_delegations: 4,
+          },
+        ],
+        pagination: {
+          next_key: "",
+        },
+      }),
+    });
+  });
+
+  await page.route("**/v1/staker/delegations*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: [
+          {
+            finality_provider_btc_pks_hex: [
+              "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",
+            ],
+            params_version: 0,
+            staker_btc_pk_hex:
+              "02c6047f9441ed7d6d3045406e95c07cd85c778e4b8cef3ca7abac09b95c709ee5",
+            delegation_staking: {
+              staking_tx_hex: "00",
+              staking_tx_hash_hex: "hash",
+              staking_timelock: 0,
+              staking_amount: 9876543,
+              start_height: 0,
+              end_height: 0,
+              bbn_inception_height: 0,
+              bbn_inception_time: new Date().toISOString(),
+              slashing: {
+                slashing_tx_hex: "",
+                spending_height: 0,
+              },
+            },
+            delegation_unbonding: {
+              unbonding_timelock: 0,
+              unbonding_tx: "",
+              slashing: {
+                unbonding_slashing_tx_hex: "",
+                spending_height: 0,
+              },
+            },
+            state: "ACTIVE",
+          },
+        ],
+        pagination: { next_key: "", total: "1" },
+      }),
+    });
+  });
+
+  await page.route("**/address/screening*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: {
+          btc_address: {
+            risk: "low",
+          },
+        },
+      }),
+    });
+  });
+
+  await page.route("**/log-terms-acceptance", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: {
+          status: true,
+        },
+      }),
+    });
+  });
 };
