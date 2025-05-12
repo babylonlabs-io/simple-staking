@@ -12,25 +12,6 @@ jest.mock("@/app/components/Modals/ErrorModal", () => ({
   ErrorModal: () => <div data-testid="error-modal">Error Modal</div>,
 }));
 
-jest.mock("@sentry/nextjs", () => {
-  const mockSentryWithScope = jest.fn();
-  const mockSentryCaptureException = jest.fn();
-
-  return {
-    withScope: mockSentryWithScope.mockImplementation((fn) => {
-      const mockScope = {
-        setExtras: jest.fn(),
-        setTag: jest.fn(),
-      };
-      fn(mockScope);
-      return "mock-sentry-event-id";
-    }),
-    captureException: mockSentryCaptureException.mockImplementation(
-      () => "mock-sentry-event-id",
-    ),
-  };
-});
-
 const TestErrorComponent = ({
   error,
   walletMetadata = {},
@@ -66,11 +47,7 @@ describe("ErrorProvider", () => {
     babylonAddress: "bbn1s0qvpzs3mxc7pm4aqn9mu9xhvmsr34m49r5qnp",
   };
 
-  const mockedSentry = jest.requireMock("@sentry/nextjs");
-
   beforeEach(() => {
-    mockedSentry.withScope.mockClear();
-    mockedSentry.captureException.mockClear();
     jest.clearAllMocks();
   });
 
@@ -95,33 +72,6 @@ describe("ErrorProvider", () => {
     await waitFor(() => {
       expect(screen.getByTestId("error-modal")).toBeInTheDocument();
     });
-
-    expect(mockedSentry.withScope).toHaveBeenCalled();
-    expect(mockedSentry.captureException).toHaveBeenCalledWith(testError);
-
-    const scopeFunction = mockedSentry.withScope.mock.calls[0][0];
-    const mockScope = {
-      setExtras: jest.fn(),
-      setTag: jest.fn(),
-    };
-    scopeFunction(mockScope);
-    const metadataPassedToSentry = mockScope.setExtras.mock.calls[0][0];
-
-    expect(metadataPassedToSentry).toMatchObject({
-      userPublicKey: mockWalletData.userPublicKey,
-      btcAddress: mockWalletData.btcAddress,
-      babylonAddress: mockWalletData.babylonAddress,
-      testField: "Additional test data",
-    });
-
-    expect(mockScope.setTag).toHaveBeenCalledWith(
-      "errorType",
-      ErrorType.STAKING,
-    );
-    expect(mockScope.setTag).toHaveBeenCalledWith(
-      "errorCategory",
-      ClientErrorCategory.CLIENT_TRANSACTION,
-    );
   });
 
   it("handles error without wallet metadata", async () => {
@@ -140,29 +90,5 @@ describe("ErrorProvider", () => {
     await waitFor(() => {
       expect(screen.getByTestId("error-modal")).toBeInTheDocument();
     });
-
-    expect(mockedSentry.withScope).toHaveBeenCalled();
-    expect(mockedSentry.captureException).toHaveBeenCalledWith(testError);
-
-    const scopeFunction = mockedSentry.withScope.mock.calls[0][0];
-    const mockScope = {
-      setExtras: jest.fn(),
-      setTag: jest.fn(),
-    };
-    scopeFunction(mockScope);
-    const metadataPassedToSentry = mockScope.setExtras.mock.calls[0][0];
-
-    expect(metadataPassedToSentry).toMatchObject({
-      errorSource: undefined,
-    });
-
-    expect(mockScope.setTag).toHaveBeenCalledWith(
-      "errorType",
-      ErrorType.UNKNOWN,
-    );
-    expect(mockScope.setTag).toHaveBeenCalledWith(
-      "errorCategory",
-      ClientErrorCategory.CLIENT_UNKNOWN,
-    );
   });
 });

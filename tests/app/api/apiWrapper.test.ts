@@ -1,6 +1,5 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
-import { ServerError } from "@/app/context/Error/errors/serverError";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -170,7 +169,7 @@ describe("apiWrapper", () => {
     await promise;
   });
 
-  it("should throw ServerError when response is not ok", async () => {
+  it("should throw ClientError when response is not ok", async () => {
     const errorText = "Resource not found";
     const mockResponse = createMockResponse({
       ok: false,
@@ -186,15 +185,18 @@ describe("apiWrapper", () => {
 
     await expect(
       apiWrapper("GET", "/test", "Failed to fetch data"),
-    ).rejects.toThrow(ServerError);
+    ).rejects.toThrow(ClientError);
 
     try {
       await apiWrapper("GET", "/test", "Failed to fetch data");
     } catch (error) {
-      expect(error).toBeInstanceOf(ServerError);
-      expect((error as ServerError).status).toBe(404);
-      expect((error as ServerError).message).toBe(errorText);
-      expect((error as ServerError).endpoint).toBe("/test");
+      expect(error).toBeInstanceOf(ClientError);
+      if (error instanceof ClientError) {
+        expect(error.errorCode).toBe(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE);
+        expect(error.message).toBe("Failed to fetch data");
+        expect(error.metadata?.endpoint).toBe("/test");
+        expect(error.metadata?.response.body).toBe(errorText);
+      }
     }
   });
 
@@ -214,14 +216,16 @@ describe("apiWrapper", () => {
 
     await expect(
       apiWrapper("GET", "/test", "General error message"),
-    ).rejects.toThrow(ServerError);
+    ).rejects.toThrow(ClientError);
 
     try {
       await apiWrapper("GET", "/test", "General error message");
     } catch (error) {
-      expect(error).toBeInstanceOf(ServerError);
-      expect((error as ServerError).status).toBe(500);
-      expect((error as ServerError).message).toBe("General error message");
+      expect(error).toBeInstanceOf(ClientError);
+      if (error instanceof ClientError) {
+        expect(error.errorCode).toBe(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE);
+        expect(error.message).toBe("General error message");
+      }
     }
   });
 
@@ -233,16 +237,16 @@ describe("apiWrapper", () => {
 
     await expect(
       apiWrapper("GET", "/test", "Failed to fetch data"),
-    ).rejects.toThrow(ServerError);
+    ).rejects.toThrow(ClientError);
 
     try {
       await apiWrapper("GET", "/test", "Failed to fetch data");
     } catch (error) {
-      expect(error).toBeInstanceOf(ServerError);
-      expect((error as ServerError).status).toBe(
-        HttpStatusCode.ServiceUnavailable,
-      );
-      expect((error as ServerError).message).toBe("Network error occurred");
+      expect(error).toBeInstanceOf(ClientError);
+      if (error instanceof ClientError) {
+        expect(error.errorCode).toBe(ERROR_CODES.CONNECTION_ERROR);
+        expect(error.message).toBe("Network error occurred");
+      }
     }
   });
 
@@ -252,16 +256,16 @@ describe("apiWrapper", () => {
 
     await expect(
       apiWrapper("GET", "/test", "General error message"),
-    ).rejects.toThrow(ServerError);
+    ).rejects.toThrow(ClientError);
 
     try {
       await apiWrapper("GET", "/test", "General error message");
     } catch (error) {
-      expect(error).toBeInstanceOf(ServerError);
-      expect((error as ServerError).status).toBe(
-        HttpStatusCode.InternalServerError,
-      );
-      expect((error as ServerError).message).toBe("General error message");
+      expect(error).toBeInstanceOf(ClientError);
+      if (error instanceof ClientError) {
+        expect(error.errorCode).toBe(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE);
+        expect(error.message).toBe("Some other error");
+      }
     }
   });
 });
