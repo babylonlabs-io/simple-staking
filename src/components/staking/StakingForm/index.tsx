@@ -25,8 +25,6 @@ import { Total } from "./components/Total";
 interface DelegationFormProps {
   loading?: boolean;
   blocked?: boolean;
-  available?: boolean;
-  disabled?: boolean;
   hasError?: boolean;
   error?: string;
   stakingInfo?: {
@@ -39,13 +37,16 @@ interface DelegationFormProps {
     maxStakingAmountSat: number;
     defaultStakingTimeBlocks?: number;
   };
+  disabled?: {
+    title: string;
+    message: string;
+  };
 }
 
 export function DelegationForm({
   loading,
   blocked,
-  available,
-  disabled = false,
+  disabled,
   hasError,
   error,
   stakingInfo,
@@ -83,44 +84,12 @@ export function DelegationForm({
   if (disabled) {
     return (
       <Message
-        title="Staking Currently Unavailable"
-        message="Staking is temporarily disabled due to network downtime. New stakes are paused until the network resumes."
+        title={disabled.title}
+        message={disabled.message}
         icon={
           <Image
             src={stakingUnavailableIcon}
             alt="Staking Unavailable"
-            width={120}
-            height={122}
-          />
-        }
-      />
-    );
-  }
-
-  if (!available) {
-    return (
-      <Message
-        title="New Stakes Registration Temporarily Unavailable"
-        message={
-          <>
-            Creation of new stakes will be available soon. Please check the live
-            countdown on{" "}
-            <a
-              href="https://www.mintscan.io/babylon/block/139920"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary-light underline hover:underline"
-            >
-              Mintscan
-            </a>
-            . Phase-1 Cap-1 stakers can register their stakes to Babylon Genesis
-            from the Activity section once connected.
-          </>
-        }
-        icon={
-          <Image
-            src={stakingUnavailableIcon}
-            alt="Staking Not Started"
             width={120}
             height={122}
           />
