@@ -68,22 +68,11 @@ export const apiWrapper = async <TResponseData = unknown>(
         .text()
         .catch(() => generalErrorMessage);
 
-      throw new ClientError(
+      const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         generalErrorMessage,
-        {
-          metadata: {
-            endpoint: path,
-            request: requestData,
-            response: {
-              status: response.status,
-              statusText: response.statusText,
-              headers: Object.fromEntries(response.headers.entries()),
-              body: responseText,
-            },
-          },
-        },
       );
+      throw clientError;
     }
 
     const data = await response.json();
@@ -94,31 +83,23 @@ export const apiWrapper = async <TResponseData = unknown>(
     }
 
     if (error instanceof TypeError && error.message.includes("NetworkError")) {
-      throw new ClientError(
+      const clientError = new ClientError(
         ERROR_CODES.CONNECTION_ERROR,
         "Network error occurred",
         {
           cause: error,
-          metadata: {
-            endpoint: path,
-            request: requestData,
-          },
         },
       );
+      throw clientError;
     }
 
-    throw new ClientError(
+    const clientError = new ClientError(
       ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
       error instanceof Error ? error.message : generalErrorMessage,
       {
         cause: error as Error,
-        metadata: {
-          endpoint: path,
-          request: requestData,
-          response:
-            error instanceof Error ? { error: error.message } : undefined,
-        },
       },
     );
+    throw clientError;
   }
 };

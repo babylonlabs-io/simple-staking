@@ -16,13 +16,9 @@ export const toNetwork = (network: Network): networks.Network => {
     case Network.SIGNET:
       return networks.testnet;
     default:
-      // wallet error
       throw new ClientError(
         ERROR_CODES.WALLET_CONFIGURATION_ERROR,
-        "Unsupported network provided to toNetwork function",
-        {
-          metadata: { providedNetwork: network },
-        },
+        `Unsupported network provided to toNetwork function: ${network}`,
       );
   }
 };

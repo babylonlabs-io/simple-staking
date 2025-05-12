@@ -163,11 +163,21 @@ export const Delegations = ({}) => {
   const handleUnbond = async (id: string) => {
     try {
       if (selectedDelegation?.stakingTxHashHex != id) {
+        if (selectedDelegation?.stakingTxHashHex) {
+          logger.info("Unbond attempt for delegation", {
+            delegationId: selectedDelegation.stakingTxHashHex,
+          });
+        }
         const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for unbonding",
         );
-        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            action: "unbond",
+          },
+        });
         throw clientError;
       }
       // Sign the withdrawal transaction
@@ -206,12 +216,16 @@ export const Delegations = ({}) => {
   const handleWithdraw = async (id: string) => {
     try {
       if (!networkFees) {
-        // system error
         const clientError = new ClientError(
           ERROR_CODES.MISSING_DATA_ERROR,
           "Network fees not found",
         );
-        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "Delegations:handleWithdraw",
+          },
+        });
         throw clientError;
       }
       // Prevent the modal from closing
@@ -222,7 +236,12 @@ export const Delegations = ({}) => {
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for withdrawal",
         );
-        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            action: "withdraw",
+          },
+        });
         throw clientError;
       }
       // Sign the withdrawal transaction
@@ -244,6 +263,12 @@ export const Delegations = ({}) => {
         DelegationState.INTERMEDIATE_WITHDRAWAL,
       );
     } catch (error: Error | any) {
+      logger.error(error, {
+        tags: {
+          errorCode: error.errorCode,
+          action: "withdraw",
+        },
+      });
       handleError({
         error,
         displayOptions: {
@@ -314,11 +339,12 @@ export const Delegations = ({}) => {
 
   useEffect(() => {
     if (modalOpen && !selectedDelegation) {
+      const clientError = new ClientError(
+        ERROR_CODES.MISSING_DATA_ERROR,
+        "Delegation not found when modal is open",
+      );
       handleError({
-        error: new ClientError(
-          ERROR_CODES.MISSING_DATA_ERROR,
-          "Delegation not found when modal is open",
-        ),
+        error: clientError,
         displayOptions: {
           noCancel: false,
         },

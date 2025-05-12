@@ -12,6 +12,7 @@ import { ClientError, ERROR_CODES } from "@/errors";
 import { validateStakingInput } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
@@ -35,6 +36,7 @@ export const useTransactionService = () => {
 
   const { bech32Address } = useCosmosWallet();
   const { publicKeyNoCoord, address: btcAddress, pushTx } = useBTCWallet();
+  const logger = useLogger();
 
   const stakerInfo = useMemo(
     () => ({
@@ -61,6 +63,10 @@ export const useTransactionService = () => {
    */
   const createDelegationEoi = useCallback(
     async (stakingInput: BtcStakingInputs, feeRate: number) => {
+      logger.info("Creating delegation EOI", {
+        stakingInput: JSON.stringify(stakingInput),
+        feeRate,
+      });
       const btcStakingManager = createBtcStakingManager();
 
       validateCommonInputs(
@@ -71,10 +77,17 @@ export const useTransactionService = () => {
       );
 
       if (!availableUTXOs) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.INITIALIZATION_ERROR,
           "Available UTXOs not initialized",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useTransactionService:createDelegationEoi",
+          },
+        });
+        throw clientError;
       }
 
       const { stakingTx, signedBabylonTx } =
@@ -86,6 +99,9 @@ export const useTransactionService = () => {
           feeRate,
           bech32Address,
         );
+      logger.info("Delegation EOI created successfully", {
+        stakingTxHash: stakingTx.getId(),
+      });
       return {
         stakingTxHash: stakingTx.getId(),
         signedBabylonTx,
@@ -109,6 +125,10 @@ export const useTransactionService = () => {
    */
   const estimateStakingFee = useCallback(
     (stakingInput: BtcStakingInputs, feeRate: number): number => {
+      logger.info("Estimating staking fee", {
+        stakingInput: JSON.stringify(stakingInput),
+        feeRate,
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -117,18 +137,27 @@ export const useTransactionService = () => {
         stakerInfo,
       );
       if (!availableUTXOs) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.INITIALIZATION_ERROR,
           "Available UTXOs not initialized",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useTransactionService:estimateStakingFee",
+          },
+        });
+        throw clientError;
       }
-      return btcStakingManager!.estimateBtcStakingFee(
+      const fee = btcStakingManager!.estimateBtcStakingFee(
         stakerInfo,
         tipHeight,
         stakingInput,
         availableUTXOs,
         feeRate,
       );
+      logger.info("Staking fee estimated", { fee });
+      return fee;
     },
     [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs],
   );
@@ -146,6 +175,10 @@ export const useTransactionService = () => {
       stakingHeight: number,
       stakingInput: BtcStakingInputs,
     ) => {
+      logger.info("Transitioning delegation to phase 1", {
+        stakingHeight,
+        stakingInput: JSON.stringify(stakingInput),
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -167,6 +200,9 @@ export const useTransactionService = () => {
           bech32Address,
         );
 
+      logger.info("Delegation transitioned to phase 1 successfully", {
+        stakingTxHash: stakingTx.getId(),
+      });
       return {
         stakingTxHash: stakingTx.getId(),
         signedBabylonTx,
@@ -190,6 +226,10 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       unsignedStakingTxHex: string,
     ) => {
+      logger.info("Submitting staking transaction", {
+        paramVersion,
+        expectedTxHashHex,
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -198,10 +238,17 @@ export const useTransactionService = () => {
         stakerInfo,
       );
       if (!availableUTXOs) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.INITIALIZATION_ERROR,
           "Available UTXOs not initialized",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useTransactionService:submitStakingTx",
+          },
+        });
+        throw clientError;
       }
 
       const signedStakingTx =
@@ -214,10 +261,21 @@ export const useTransactionService = () => {
         );
 
       if (signedStakingTx.getId() !== expectedTxHashHex) {
-        throw new ClientError(
+        logger.info("Staking transaction hash mismatch", {
+          expectedTxHashHex,
+          actualTxHash: signedStakingTx.getId(),
+        });
+        const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useTransactionService:submitStakingTx",
+          },
+        });
+        throw clientError;
       }
       await pushTx(signedStakingTx.toHex());
       refetchUTXOs();

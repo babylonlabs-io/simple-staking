@@ -2,8 +2,6 @@ import { ClientError, ERROR_CODES } from "@/errors";
 
 import { isError451 } from "../api/error";
 import { fetchHealthCheck } from "../api/healthCheckClient";
-import { HttpStatusCode } from "../api/httpStatusCodes";
-import { API_ENDPOINTS } from "../constants/endpoints";
 import {
   API_ERROR_MESSAGE,
   GEO_BLOCK_MESSAGE,
@@ -24,12 +22,6 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
       throw new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         API_ERROR_MESSAGE,
-        {
-          metadata: {
-            endpoint: API_ENDPOINTS.HEALTHCHECK,
-            httpStatus: HttpStatusCode.InternalServerError,
-          },
-        },
       );
     }
   } catch (error: any) {

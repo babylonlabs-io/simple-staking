@@ -7,7 +7,7 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import { addBreadcrumb, setUser } from "@sentry/nextjs";
+import { setUser } from "@sentry/nextjs";
 import {
   createContext,
   useCallback,
@@ -108,14 +108,10 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           babylonAddress: address,
         });
 
-        addBreadcrumb({
-          level: "info",
-          message: "Connect Babylon wallet",
-          data: {
-            chainId,
-            address,
-            walletName,
-          },
+        logger.info("Babylon wallet connected", {
+          babylonAddress: address || "",
+          walletName: walletName || "",
+          chainId,
         });
       } catch (error: any) {
         const clientError = new ClientError(
@@ -123,7 +119,11 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           error.message,
           { cause: error as Error },
         );
-        logger.error(clientError);
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+          },
+        });
         handleError({
           error: clientError,
           displayOptions: {
@@ -202,10 +202,8 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         {} as Record<string, string>,
       );
 
-    addBreadcrumb({
-      level: "info",
-      message: "Installed BTC wallets",
-      data: installedWallets,
+    logger.info("Installed Babylon wallets", {
+      installedWallets: Object.values(installedWallets).join(", ") || "",
     });
   }, [bbnConnector]);
 

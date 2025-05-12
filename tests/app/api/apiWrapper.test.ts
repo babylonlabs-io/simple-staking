@@ -194,8 +194,6 @@ describe("apiWrapper", () => {
       if (error instanceof ClientError) {
         expect(error.errorCode).toBe(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE);
         expect(error.message).toBe("Failed to fetch data");
-        expect(error.metadata?.endpoint).toBe("/test");
-        expect(error.metadata?.response.body).toBe(errorText);
       }
     }
   });

@@ -1,5 +1,4 @@
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
-import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ServerError } from "@/app/context/Error/errors";
 import { Delegation } from "@/app/types/delegations";
 import { ClientError, ERROR_CODES } from "@/errors";
@@ -51,13 +50,6 @@ export const filterDelegationsLocalStorage = async (
           throw new ClientError(
             ERROR_CODES.TRANSACTION_VERIFICATION_ERROR,
             "Transaction not found in the mempool while filtering local storage delegations",
-            {
-              metadata: {
-                txHash: localDelegation.stakingTxHashHex,
-                endpoint: API_ENDPOINTS.MEMPOOL.TX,
-                httpStatus: HttpStatusCode.NotFound,
-              },
-            },
           );
         }
       } catch (err) {

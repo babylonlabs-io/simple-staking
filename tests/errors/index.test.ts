@@ -10,20 +10,37 @@ describe("ClientError", () => {
     expect(error).toBeInstanceOf(ClientError);
     expect(error.errorCode).toBe(errorCode);
     expect(error.message).toBe(message);
-    expect(error.metadata).toBeUndefined();
+    expect(error.cause).toBeUndefined();
     expect(error.name).toBe("Error"); // Standard behavior for extended errors
   });
 
-  it("should correctly instantiate with both metadata and cause", () => {
+  it("should correctly instantiate with cause", () => {
     const errorCode = ERROR_CODES.INITIALIZATION_ERROR;
-    const message = "Test error has some errors";
-    const metadata = { walletName: "Test Wallet" };
-    const cause = new Error("Wallet not found");
-    const error = new ClientError(errorCode, message, { metadata, cause });
+    const message = "Test error message";
+    const cause = new Error("Original cause");
 
+    const error = new ClientError(errorCode, message, {
+      cause,
+    });
+
+    expect(error).toBeInstanceOf(ClientError);
     expect(error.errorCode).toBe(errorCode);
     expect(error.message).toBe(message);
-    expect(error.metadata).toEqual(metadata);
+    expect(error.cause).toBe(cause);
+  });
+
+  it("should correctly instantiate with cause", () => {
+    const errorCode = ERROR_CODES.INITIALIZATION_ERROR;
+    const message = "Test error message";
+    const cause = new Error("Original cause");
+
+    const error = new ClientError(errorCode, message, {
+      cause,
+    });
+
+    expect(error).toBeInstanceOf(ClientError);
+    expect(error.errorCode).toBe(errorCode);
+    expect(error.message).toBe(message);
     expect(error.cause).toBe(cause);
   });
 });

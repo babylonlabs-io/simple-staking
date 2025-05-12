@@ -1,6 +1,5 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -169,14 +168,7 @@ export async function getTipHeight(): Promise<number> {
   if (Number.isNaN(height)) {
     throw new ClientError(
       ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-      "Invalid tip height result returned from mempool API",
-      {
-        metadata: {
-          rawValue: result,
-          endpoint: btcTipHeightUrl().toString(),
-          httpStatus: HttpStatusCode.BadRequest,
-        },
-      },
+      `Invalid tip height result returned from mempool API: ${result}`,
     );
   }
   return height;
@@ -212,14 +204,7 @@ export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
   if (!isvalid) {
     throw new ClientError(
       ERROR_CODES.VALIDATION_ERROR,
-      "Invalid address provided for UTXO lookup or mempool API validation failed",
-      {
-        metadata: {
-          address,
-          endpoint: validateAddressUrl(address).toString(),
-          httpStatus: HttpStatusCode.BadRequest,
-        },
-      },
+      `Invalid address provided for UTXO lookup or mempool API validation failed: ${address}`,
     );
   }
 
@@ -284,15 +269,7 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
   if (!block_height || !merkle.length || !pos) {
     throw new ClientError(
       ERROR_CODES.TRANSACTION_VERIFICATION_ERROR,
-      "Transaction not found or not confirmed when fetching Merkle proof",
-      {
-        metadata: {
-          txId,
-          endpoint: txMerkleProofUrl(txId).toString(),
-          httpStatus: HttpStatusCode.NotFound,
-          responseReceived: response ? JSON.stringify(response) : "undefined",
-        },
-      },
+      `Transaction not found or not confirmed when fetching Merkle proof: ${txId}`,
     );
   }
 

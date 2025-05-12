@@ -7,11 +7,10 @@ import {
   API_DEFAULT_RETRY_DELAY,
   ONE_SECOND,
 } from "@/app/constants";
-import { API_ENDPOINTS } from "@/app/constants/endpoints";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
-
 export interface StakingStats {
   activeTVLSat: number;
   totalTVLSat: number;
@@ -49,20 +48,23 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
     retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
     retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
   });
+  const logger = useLogger();
 
   useEffect(() => {
     if (isError && error) {
+      const clientError = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        error.message,
+        { cause: error as Error },
+      );
+      logger.error(clientError, {
+        tags: {
+          errorCode: clientError.errorCode,
+          errorSource: "StakingStatsProvider",
+        },
+      });
       handleError({
-        error: new ClientError(
-          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-          error.message,
-          {
-            cause: error as Error,
-            metadata: {
-              endpoint: API_ENDPOINTS.NETWORK_INFO,
-            },
-          },
-        ),
+        error: clientError,
         displayOptions: {
           retryAction: refetch,
         },

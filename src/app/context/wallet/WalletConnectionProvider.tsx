@@ -67,7 +67,12 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
         error.message,
         { cause: error as Error },
       );
-      logger.error(clientError);
+      logger.error(clientError, {
+        tags: {
+          errorCode: clientError.errorCode,
+          errorSource: "WalletConnection",
+        },
+      });
       handleError({
         error: clientError,
       });

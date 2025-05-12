@@ -13,25 +13,29 @@ export const useSigningStargateClient = () => {
   const { signingStargateClient, bech32Address } = useCosmosWallet();
   const logger = useLogger();
 
-  const handleTransactionError = (
-    res: DeliverTxResponse,
-    txType: string,
-    originalError?: any,
-  ) => {
+  const handleTransactionError = (res: DeliverTxResponse, txType: string) => {
     const errorMessage = `Failed to send ${txType} transaction, code: ${res.code}, txHash: ${res.transactionHash}`;
     const causeError = new Error(
       res.rawLog ||
         "Transaction failed with non-zero code and no raw log provided.",
     );
-
+    logger.info("Transaction submission error", {
+      txType: txType || "",
+      code: res.code,
+      txHash: res.transactionHash || "",
+      rawLog: res.rawLog || "",
+    });
     const clientError = new ClientError(
       ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
       errorMessage,
       { cause: causeError },
     );
-
-    logger.error(clientError);
-
+    logger.error(clientError, {
+      tags: {
+        errorCode: clientError.errorCode,
+        txType,
+      },
+    });
     return clientError; // Return it to be thrown by the caller
   };
 
@@ -43,13 +47,21 @@ export const useSigningStargateClient = () => {
   const simulate = useCallback(
     <T>(msg: { typeUrl: string; value: T }): Promise<number> => {
       if (!signingStargateClient || !bech32Address) {
-        // wallet error
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useSigningStargateClient:simulate",
+          },
+        });
+        throw clientError;
       }
-
+      if (bech32Address) {
+        logger.info("Using Cosmos address for simulation", { bech32Address });
+      }
       // estimate gas
       return signingStargateClient.simulate(
         bech32Address,
@@ -78,12 +90,23 @@ export const useSigningStargateClient = () => {
       gasUsed: string;
     }> => {
       if (!signingStargateClient || !bech32Address) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useSigningStargateClient:signAndBroadcast",
+          },
+        });
+        throw clientError;
       }
-
+      if (bech32Address) {
+        logger.info("Using Cosmos address for signAndBroadcast", {
+          bech32Address,
+        });
+      }
       const res = await signingStargateClient.signAndBroadcast(
         bech32Address,
         [msg],
@@ -116,11 +139,17 @@ export const useSigningStargateClient = () => {
       fee: StdFee,
     ): Promise<Uint8Array> => {
       if (!signingStargateClient || !bech32Address) {
-        // wallet error
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useSigningStargateClient:signTx",
+          },
+        });
+        throw clientError;
       }
 
       const res = await signingStargateClient.sign(
@@ -148,10 +177,17 @@ export const useSigningStargateClient = () => {
       gasUsed: string;
     }> => {
       if (!signingStargateClient || !bech32Address) {
-        throw new ClientError(
+        const clientError = new ClientError(
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "useSigningStargateClient:broadcastTx",
+          },
+        });
+        throw clientError;
       }
 
       const res = await signingStargateClient.broadcastTx(tx);

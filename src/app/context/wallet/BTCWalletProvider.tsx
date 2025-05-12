@@ -6,7 +6,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
-import { addBreadcrumb, setUser } from "@sentry/nextjs";
+import { setUser } from "@sentry/nextjs";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -143,15 +143,11 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           btcAddress: address,
         });
 
-        addBreadcrumb({
-          level: "info",
-          message: "Connect BTC wallet",
-          data: {
-            network,
-            address,
-            publicKeyNoCoord,
-            walletName: await walletProvider.getWalletProviderName(),
-          },
+        logger.info("BTC wallet connected", {
+          network,
+          userPublicKey: publicKeyNoCoord?.toString() || "",
+          btcAddress: address || "",
+          walletName: await walletProvider.getWalletProviderName(),
         });
       } catch (error: any) {
         const clientError = new ClientError(
@@ -159,7 +155,11 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           error.message,
           { cause: error as Error },
         );
-        logger.error(clientError);
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+          },
+        });
         handleError({
           error: clientError,
           displayOptions: {
@@ -215,10 +215,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         {} as Record<string, string>,
       );
 
-    addBreadcrumb({
-      level: "info",
-      message: "Installed BTC wallets",
-      data: installedWallets,
+    logger.info("Installed BTC wallets", {
+      installedWallets: Object.values(installedWallets).join(", "),
     });
   }, [btcConnector]);
 

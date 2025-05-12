@@ -21,6 +21,9 @@ export function useOrdinals(
   const logger = useLogger();
 
   const fetchOrdinals = async (): Promise<InscriptionIdentifier[]> => {
+    if (address) {
+      logger.info("Fetching ordinals for address", { btcAddress: address });
+    }
     try {
       const inscriptions = await Promise.race([
         getInscriptions().catch(() => null),
@@ -47,7 +50,12 @@ export function useOrdinals(
             : "Error fetching ordinals data",
           { cause: error as Error },
         );
-        logger.error(clientError);
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            errorSource: "ORDINALS",
+          },
+        });
         throw clientError;
       }
 

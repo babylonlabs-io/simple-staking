@@ -61,6 +61,10 @@ export function useV1TransactionService() {
       stakingHeight: number,
       stakingTxHex: string,
     ) => {
+      logger.info("Starting unbonding transaction submission", {
+        stakingHeight,
+      });
+
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -71,8 +75,14 @@ export function useV1TransactionService() {
       );
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
+      logger.info("Submitting unbonding transaction", {
+        stakingTxHash: stakingTx.getId?.() || "",
+      });
+
       // Check if this staking transaction is eligible for unbonding
       const eligibility = await getUnbondingEligibility(stakingTx.getId());
+      logger.info("Unbonding eligibility check completed", { eligibility });
+
       if (!eligibility) {
         const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
@@ -88,6 +98,11 @@ export function useV1TransactionService() {
         versionedParams!,
       );
 
+      logger.info("Creating unbonding transaction", {
+        paramsVersion,
+        stakingHeight,
+      });
+
       const { transaction: signedUnbondingTx } =
         await btcStakingManager!.createPartialSignedBtcUnbondingTransaction(
           stakerBtcInfo,
@@ -95,22 +110,42 @@ export function useV1TransactionService() {
           paramsVersion,
           stakingTx,
         );
+
+      logger.info("Unbonding transaction created successfully", {
+        unbondingTxId: signedUnbondingTx.getId(),
+      });
+
       const stakerSignatureHex =
         getUnbondingTxStakerSignature(signedUnbondingTx);
+
       try {
-        await postUnbonding(
+        logger.info("Submitting unbonding transaction to API", {
+          stakingTxId: stakingTx.getId(),
+          unbondingTxId: signedUnbondingTx.getId(),
+        });
+
+        const unbondingTxHash = await postUnbonding(
           stakerSignatureHex,
           stakingTx.getId(),
           signedUnbondingTx.getId(),
           signedUnbondingTx.toHex(),
         );
+
+        logger.info("Unbonding transaction submitted successfully", {
+          unbondingTxHash,
+        });
       } catch (error) {
         const clientError = new ClientError(
           ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
           `Error submitting unbonding transaction: ${error instanceof Error ? error.message : String(error)}`,
           { cause: error as Error },
         );
-        logger.error(clientError);
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+            action: "submitUnbondingTx",
+          },
+        });
         throw clientError;
       }
     },
@@ -136,6 +171,11 @@ export function useV1TransactionService() {
       stakingTxHex: string,
       earlyUnbondingTxHex?: string,
     ) => {
+      logger.info("Starting withdrawal transaction submission", {
+        stakingHeight,
+        hasEarlyUnbonding: Boolean(earlyUnbondingTxHex),
+      });
+
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -144,6 +184,7 @@ export function useV1TransactionService() {
         versionedParams,
         logger,
       );
+
       // Get the param version based on height
       const { version: paramVersion } = getBbnParamByBtcHeight(
         stakingHeight,
@@ -152,7 +193,9 @@ export function useV1TransactionService() {
 
       validateStakingInput(stakingInput);
       let result: TransactionResult;
+
       if (earlyUnbondingTxHex) {
+        logger.info("Creating withdrawal from early unbonding transaction");
         const earlyUnbondingTx = Transaction.fromHex(earlyUnbondingTxHex);
         result =
           await btcStakingManager!.createSignedBtcWithdrawEarlyUnbondedTransaction(
@@ -163,6 +206,7 @@ export function useV1TransactionService() {
             defaultFeeRate,
           );
       } else {
+        logger.info("Creating withdrawal from expired staking transaction");
         result =
           await btcStakingManager!.createSignedBtcWithdrawStakingExpiredTransaction(
             stakerBtcInfo,
@@ -173,10 +217,18 @@ export function useV1TransactionService() {
           );
       }
 
+      logger.info("Withdrawal transaction created", {
+        txId: JSON.stringify(result.transaction),
+        fee: result.fee,
+      });
+
       // Perform a safety check on the estimated transaction fee
       txFeeSafetyCheck(result.transaction, defaultFeeRate, result.fee);
 
-      await pushTx(result.transaction.toHex());
+      const txHash = await pushTx(result.transaction.toHex());
+      logger.info("Withdrawal transaction pushed successfully", {
+        txHash,
+      });
     },
     [
       createBtcStakingManager,
