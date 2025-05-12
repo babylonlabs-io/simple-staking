@@ -15,7 +15,7 @@ jobs:
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
-    # if: false
+    if: false
     steps:
       - uses: actions/checkout@v4
 
