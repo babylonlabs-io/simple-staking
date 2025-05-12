@@ -22,10 +22,8 @@ export const utilityHandlers = [
   }),
 
   rest.get("*", (req, res, ctx) => {
-    console.log("E2E: healthcheck intercepted:", req.url.toString());
     const url = req.url.toString();
     if (url.includes("/healthcheck")) {
-      console.log("E2E: healthcheck intercepted:", url);
       return res(
         ctx.json({
           data: "ok",

@@ -11,19 +11,15 @@ import {
 } from "../types/services/healthCheck";
 
 export const getHealthCheck = async (): Promise<HealthCheckResult> => {
-  console.log("E2E: healthcheck service");
   try {
     const healthCheckAPIResponse = await fetchHealthCheck();
-    console.log("E2E: healthcheck service response", healthCheckAPIResponse);
 
     if (healthCheckAPIResponse.data) {
-      console.log("E2E: healthcheck service data", healthCheckAPIResponse.data);
       return {
         status: HealthCheckStatus.Normal,
         message: healthCheckAPIResponse.data,
       };
     } else {
-      console.log("E2E: healthcheck service error");
       throw new ServerError({
         message: API_ERROR_MESSAGE,
         endpoint: API_ENDPOINTS.HEALTHCHECK,
@@ -31,7 +27,6 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
       });
     }
   } catch (error: any) {
-    console.log("E2E: healthcheck service error 2", { error });
     if (isError451(error)) {
       return {
         status: HealthCheckStatus.GeoBlocked,
