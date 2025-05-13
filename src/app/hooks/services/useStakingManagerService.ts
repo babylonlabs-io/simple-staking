@@ -41,6 +41,15 @@ export const useStakingManagerService = () => {
       !versionedParams ||
       versionedParams.length === 0
     ) {
+      console.log("createBtcStakingManager", {
+        btcNetwork,
+        cosmosConnected,
+        btcConnected,
+        signPsbt,
+        signMessage,
+        signBbnTx,
+        versionedParams,
+      });
       return null;
     }
 
