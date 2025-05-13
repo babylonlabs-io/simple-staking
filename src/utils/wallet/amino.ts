@@ -1,6 +1,8 @@
 import { btcstakingtx, incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { AminoTypes } from "@cosmjs/stargate";
 
+import { ClientError, ERROR_CODES } from "@/errors";
+
 import { BBN_REGISTRY_TYPE_URLS } from "./bbnRegistry";
 
 const msgCreateBTCDelegationConverter = {
@@ -9,7 +11,10 @@ const msgCreateBTCDelegationConverter = {
     toAmino: (msg: btcstakingtx.MsgCreateBTCDelegation) => {
       const pop = msg.pop;
       if (!pop) {
-        throw new Error("proof of possession is undefined");
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "proof of possession is undefined",
+        );
       }
       return {
         staker_addr: msg.stakerAddr,

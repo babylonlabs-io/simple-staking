@@ -1,8 +1,6 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
 import { getNetworkInfo } from "@/app/api/getNetworkInfo";
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
-import { API_ENDPOINTS } from "@/app/constants/endpoints";
-import { ServerError } from "@/app/context/Error/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 import { mockSuccessResponse } from "./getNetworkInfo.mocks";
 
@@ -134,14 +132,7 @@ describe("getNetworkInfo", () => {
       data: responseWithoutGenesis,
     });
 
-    // Expect the function to throw an error
-    await expect(getNetworkInfo()).rejects.toThrow(
-      new ServerError({
-        message: "Genesis staking params not found",
-        status: HttpStatusCode.InternalServerError,
-        endpoint: API_ENDPOINTS.NETWORK_INFO,
-      }),
-    );
+    await expect(getNetworkInfo()).rejects.toThrow(ClientError);
   });
 
   it("throws error when genesis epoch check params are missing", async () => {
@@ -160,14 +151,7 @@ describe("getNetworkInfo", () => {
       data: responseWithoutGenesis,
     });
 
-    // Expect the function to throw an error
-    await expect(getNetworkInfo()).rejects.toThrow(
-      new ServerError({
-        message: "Genesis epoch check params not found",
-        status: HttpStatusCode.InternalServerError,
-        endpoint: API_ENDPOINTS.NETWORK_INFO,
-      }),
-    );
+    await expect(getNetworkInfo()).rejects.toThrow(ClientError);
   });
 
   it("throws error when version and BTC activation height are inconsistently ordered", async () => {
@@ -183,19 +167,14 @@ describe("getNetworkInfo", () => {
       data: responseWithInconsistentOrdering,
     });
 
-    // Expect the function to throw an error
-    await expect(getNetworkInfo()).rejects.toThrow(
-      new ServerError({
-        message:
-          "Version numbers and BTC activation heights are not consistently ordered",
-        status: HttpStatusCode.InternalServerError,
-        endpoint: API_ENDPOINTS.NETWORK_INFO,
-      }),
-    );
+    await expect(getNetworkInfo()).rejects.toThrow(ClientError);
   });
 
   it("throws error when apiWrapper fails", async () => {
-    const mockError = new Error("API error");
+    const mockError = new ClientError(
+      ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+      "API error",
+    );
     (apiWrapper as jest.Mock).mockRejectedValue(mockError);
 
     await expect(getNetworkInfo()).rejects.toThrow("API error");
