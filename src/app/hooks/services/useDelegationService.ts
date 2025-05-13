@@ -40,6 +40,7 @@ interface TxProps {
     unbondingSlashingTxHex: string;
     spendingHeight: number;
   };
+  unbondingTimelock?: number;
 }
 
 type DelegationCommand = (props: TxProps) => Promise<void>;
@@ -142,6 +143,7 @@ export function useDelegationService() {
         stakingTxHex,
         unbondingTxHex,
         covenantUnbondingSignatures,
+        unbondingTimelock,
       }: TxProps) => {
         if (!covenantUnbondingSignatures) {
           const clientError = new ClientError(
@@ -154,6 +156,20 @@ export function useDelegationService() {
           throw clientError;
         }
 
+        // TODO remove
+        console.log("unbondingTimelock", unbondingTimelock);
+        console.log(
+          "unbonding timelock from params",
+          networkInfo?.params.bbnStakingParams.latestParam.unbondingTime,
+        );
+
+        // Get the unbonding timelock from props or network params
+        const finalUnbondingTimelock =
+          unbondingTimelock ||
+          networkInfo?.params.bbnStakingParams.latestParam.unbondingTime;
+
+        console.log("finalUnbondingTimelock", finalUnbondingTimelock);
+
         await submitUnbondingTx(
           stakingInput,
           paramsVersion,
@@ -163,6 +179,7 @@ export function useDelegationService() {
             btcPkHex: sig.covenantBtcPkHex,
             sigHex: sig.signatureHex,
           })),
+          finalUnbondingTimelock!,
         );
 
         updateDelegationStatus(
@@ -272,6 +289,7 @@ export function useDelegationService() {
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,
       submitSlashingWithdrawalTx,
+      networkInfo?.params.bbnStakingParams.latestParam.unbondingTime,
     ],
   );
 
@@ -316,7 +334,14 @@ export function useDelegationService() {
         covenantUnbondingSignatures,
         state,
         slashing,
+        unbondingTimelock,
       } = delegation;
+
+      console.log(
+        "unboding timelock in executeDelegationAction",
+        unbondingTimelock,
+      );
+      console.log("delegation", delegation);
 
       const finalityProviderPk = finalityProviderBtcPksHex[0];
       const stakingInput = {
@@ -339,6 +364,7 @@ export function useDelegationService() {
           state,
           stakingInput,
           slashing,
+          unbondingTimelock,
         });
 
         closeConfirmationModal();

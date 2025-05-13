@@ -25,6 +25,29 @@ interface SignModalProps {
 const { coinSymbol } = getNetworkConfigBTC();
 const { coinSymbol: bbnCoinSymbol } = getNetworkConfigBBN();
 
+// TODO delete
+
+const step1Details = {
+  "Slashing Rate": "90 days",
+  "Slashing Public Key Script Hex":
+    "njeankjaegnjkgneajkneagjkleanlgjknjgealnjkeagnljkn",
+  "Slashing Fee (Sat)": "5,000",
+  "Slashing Rate1": "90 days",
+  "Slashing Public Key Script Hex1":
+    "njeankjaegnjkgneajkneagjkleanlgjknjgealnjkeagnljkn",
+  "Slashing Fee (Sat)1": "5,000",
+  "Slashing Rate2": "90 days",
+  "Slashing Public Key Script Hex2":
+    "njeankjaegnjkgneajkneagjkleanlgjknjgealnjkeagnljkn",
+  "Slashing Fee (Sat)2": "5,000",
+};
+
+const step2Details = {
+  "Unbonding Timelock": "90 days",
+  "Unbonding Fee (Sat)": "3,000",
+  "Slashing Rate": "5%",
+};
+
 export const SignModal = ({
   processing = false,
   open,
@@ -46,10 +69,10 @@ export const SignModal = ({
       </Text>
 
       <div className="py-4 flex flex-col items-start gap-6">
-        <Step step={1} currentStep={step}>
+        <Step step={1} currentStep={step} details={step1Details}>
           Consent to slashing
         </Step>
-        <Step step={2} currentStep={step}>
+        <Step step={2} currentStep={step} details={step2Details}>
           Consent to slashing during unbonding
         </Step>
         <Step step={3} currentStep={step}>
