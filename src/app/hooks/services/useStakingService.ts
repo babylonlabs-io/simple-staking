@@ -4,6 +4,7 @@ import { useCallback, useEffect } from "react";
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { useTransaction } from "@/app/context/transaction/TransactionProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
@@ -53,9 +54,11 @@ export function useStakingService() {
   const { handleError } = useError();
   const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
+  const { setTransactionData, resetTransactionData } = useTransaction();
 
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
+      setTransactionData({ currentStep: step });
       const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
       if (stepName) {
         goToStep(stepName);
@@ -63,7 +66,7 @@ export function useStakingService() {
     });
 
     return unsubscribe;
-  }, [subscribeToSigningSteps, goToStep]);
+  }, [subscribeToSigningSteps, goToStep, setTransactionData]);
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -84,9 +87,14 @@ export function useStakingService() {
   const displayPreview = useCallback(
     (formFields: FormFields) => {
       setFormData(formFields);
+      setTransactionData({
+        finalityProviderPK: formFields.finalityProvider,
+        stakingAmount: formFields.amount,
+        stakingTimelock: formFields.term,
+      });
       goToStep(StakingStep.PREVIEW);
     },
-    [setFormData, goToStep],
+    [setFormData, setTransactionData, goToStep],
   );
 
   const createEOI = useCallback(
@@ -136,6 +144,7 @@ export function useStakingService() {
             babylonAddress: bech32Address,
           },
         });
+        resetTransactionData();
         reset();
       }
     },
@@ -152,6 +161,7 @@ export function useStakingService() {
       publicKeyNoCoord,
       btcAddress,
       bech32Address,
+      resetTransactionData,
     ],
   );
 
