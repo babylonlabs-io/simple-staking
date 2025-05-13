@@ -4,7 +4,11 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { DelegationWithFP } from "@/app/types/delegationsV2";
+import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
+import {
+  DelegationV2StakingState,
+  DelegationWithFP,
+} from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
@@ -21,66 +25,10 @@ import { NoDelegations } from "./NoDelegations";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void;
+  isUnbondDisabled: boolean;
 };
 
 const networkConfig = getNetworkConfig();
-
-const columns: TableColumn<DelegationWithFP, TableParams>[] = [
-  {
-    field: "Inception",
-    headerName: "Inception",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
-  },
-  {
-    field: "finalityProvider",
-    headerName: "Finality Provider",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <FinalityProviderMoniker value={row.fp} />,
-  },
-  {
-    field: "stakingAmount",
-    headerName: "Amount",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <Amount value={row.stakingAmount} />,
-  },
-  {
-    field: "stakingTxHashHex",
-    headerName: "Transaction ID",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
-  },
-  {
-    field: "state",
-    headerName: "Status",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row, _, { validations }) => {
-      const { valid, error } = validations[row.stakingTxHashHex];
-      if (!valid) return <Hint tooltip={error}>Unavailable</Hint>;
-
-      return <Status delegation={row} />;
-    },
-  },
-  {
-    field: "actions",
-    headerName: "Action",
-    width: "minmax(max-content, 0.5fr)",
-    renderCell: (row, _, { handleActionClick, validations }) => {
-      const { valid, error } = validations[row.stakingTxHashHex];
-
-      // Hide the action button if the delegation is invalid
-      if (!valid) return null;
-
-      return (
-        <ActionButton
-          tooltip={error}
-          delegation={row}
-          onClick={handleActionClick}
-        />
-      );
-    },
-  },
-];
 
 export function DelegationList() {
   const {
@@ -96,6 +44,74 @@ export function DelegationList() {
     openConfirmationModal,
     closeConfirmationModal,
   } = useDelegationService();
+
+  const { createBtcStakingManager } = useStakingManagerService();
+  const isStakingManagerReady = Boolean(createBtcStakingManager());
+
+  const columns: TableColumn<DelegationWithFP, TableParams>[] = [
+    {
+      field: "Inception",
+      headerName: "Inception",
+      width: "minmax(max-content, 1fr)",
+      renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
+    },
+    {
+      field: "finalityProvider",
+      headerName: "Finality Provider",
+      width: "minmax(max-content, 1fr)",
+      renderCell: (row) => <FinalityProviderMoniker value={row.fp} />,
+    },
+    {
+      field: "stakingAmount",
+      headerName: "Amount",
+      width: "minmax(max-content, 1fr)",
+      renderCell: (row) => <Amount value={row.stakingAmount} />,
+    },
+    {
+      field: "stakingTxHashHex",
+      headerName: "Transaction ID",
+      width: "minmax(max-content, 1fr)",
+      renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
+    },
+    {
+      field: "state",
+      headerName: "Status",
+      width: "minmax(max-content, 1fr)",
+      renderCell: (row, _, { validations }) => {
+        const { valid, error } = validations[row.stakingTxHashHex];
+        if (!valid) return <Hint tooltip={error}>Unavailable</Hint>;
+
+        return <Status delegation={row} />;
+      },
+    },
+    {
+      field: "actions",
+      headerName: "Action",
+      width: "minmax(max-content, 0.5fr)",
+      renderCell: (
+        row,
+        _,
+        { handleActionClick, validations, isUnbondDisabled },
+      ) => {
+        const { valid, error } = validations[row.stakingTxHashHex];
+
+        // Hide the action button if the delegation is invalid
+        if (!valid) return null;
+
+        const isUnbondButton = row.state === DelegationV2StakingState.ACTIVE;
+        const isDisabled = isUnbondButton && isUnbondDisabled;
+
+        return (
+          <ActionButton
+            tooltip={error}
+            delegation={row}
+            onClick={handleActionClick}
+            disabled={isDisabled}
+          />
+        );
+      },
+    },
+  ];
 
   return (
     <Card>
@@ -123,6 +139,7 @@ export function DelegationList() {
         params={{
           handleActionClick: openConfirmationModal,
           validations,
+          isUnbondDisabled: !isStakingManagerReady,
         }}
         fallback={<NoDelegations />}
       />

@@ -13,6 +13,7 @@ interface ActionButtonProps {
   tooltip?: string | JSX.Element;
   delegation: DelegationWithFP;
   onClick?: (action: ActionType, delegation: DelegationWithFP) => void;
+  disabled?: boolean;
 }
 
 type Actions = Record<
@@ -127,6 +128,7 @@ export function ActionButton({
   delegation,
   tooltip,
   onClick,
+  disabled = false,
 }: ActionButtonProps) {
   const buttonProps =
     ACTION_BUTTON_PROPS[delegation.fp?.state]?.[delegation.state];
@@ -139,6 +141,7 @@ export function ActionButton({
         variant="outlined"
         size="small"
         onClick={() => onClick?.(buttonProps.action, delegation)}
+        disabled={disabled}
       >
         {buttonProps.title}
       </Button>
