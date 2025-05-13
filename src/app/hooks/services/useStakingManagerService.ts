@@ -9,6 +9,7 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
 import { useAppState } from "@/app/state";
+import { useLogger } from "@/hooks/useLogger";
 
 const stakingManagerEvents = {
   SIGNING: "signing",
@@ -17,6 +18,7 @@ const stakingManagerEvents = {
 export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
+  const logger = useLogger();
 
   const { connected: cosmosConnected } = useCosmosWallet();
   const {
@@ -41,14 +43,14 @@ export const useStakingManagerService = () => {
       !versionedParams ||
       versionedParams.length === 0
     ) {
-      console.log("createBtcStakingManager", {
-        btcNetwork,
+      logger.info("createBtcStakingManager", {
         cosmosConnected,
         btcConnected,
-        signPsbt,
-        signMessage,
-        signBbnTx,
-        versionedParams,
+        btcNetwork: Boolean(btcNetwork),
+        signPsbt: Boolean(signPsbt),
+        signMessage: Boolean(signMessage),
+        signBbnTx: Boolean(signBbnTx),
+        versionedParams: Boolean(versionedParams),
       });
       return null;
     }
