@@ -13,8 +13,8 @@ export const BBN_DEVNET_LCD_URL = getUrlFromEnv(
 );
 
 export const bbnDevnet = {
-  chainId: "devnet-11",
-  chainName: "Babylon Devnet 11",
+  chainId: "devnet-12",
+  chainName: "Babylon Devnet 12",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
   rpc: BBN_DEVNET_RPC_URL,

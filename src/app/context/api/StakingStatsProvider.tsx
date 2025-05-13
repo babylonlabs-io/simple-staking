@@ -2,17 +2,15 @@ import { useQuery } from "@tanstack/react-query";
 import React, { ReactNode, createContext, useContext, useEffect } from "react";
 
 import { getStats } from "@/app/api/getStats";
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import {
   API_DEFAULT_RETRY_COUNT,
   API_DEFAULT_RETRY_DELAY,
   ONE_SECOND,
 } from "@/app/constants";
-import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
-import { ServerError } from "../Error/errors/serverError";
-
 export interface StakingStats {
   activeTVLSat: number;
   totalTVLSat: number;
@@ -50,15 +48,23 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
     retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
     retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
   });
+  const logger = useLogger();
 
   useEffect(() => {
     if (isError && error) {
+      const clientError = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        error.message,
+        { cause: error as Error },
+      );
+      logger.error(clientError, {
+        tags: {
+          errorCode: clientError.errorCode,
+          errorSource: "StakingStatsProvider",
+        },
+      });
       handleError({
-        error: new ServerError({
-          message: error.message,
-          status: HttpStatusCode.InternalServerError,
-          endpoint: API_ENDPOINTS.NETWORK_INFO,
-        }),
+        error: clientError,
         displayOptions: {
           retryAction: refetch,
         },

@@ -41,7 +41,7 @@ describe("Transaction Validation", () => {
       };
 
       expect(() => validateStakingInput(invalidInput)).toThrow(
-        "Finality provider not selected",
+        "Finality provider public key (finalityProviderPkNoCoordHex) is required for staking input.",
       );
     });
 
@@ -54,7 +54,7 @@ describe("Transaction Validation", () => {
       };
 
       expect(() => validateStakingInput(invalidInput)).toThrow(
-        "Staking amount not set",
+        "Staking amount (stakingAmountSat) is required for staking input.",
       );
     });
 
@@ -67,7 +67,7 @@ describe("Transaction Validation", () => {
       };
 
       expect(() => validateStakingInput(invalidInput)).toThrow(
-        "Staking time not set",
+        "Staking timelock (stakingTimelock) is required for staking input.",
       );
     });
   });

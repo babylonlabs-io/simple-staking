@@ -1,8 +1,7 @@
+import { ClientError, ERROR_CODES } from "@/errors";
+
 import { isError451 } from "../api/error";
 import { fetchHealthCheck } from "../api/healthCheckClient";
-import { HttpStatusCode } from "../api/httpStatusCodes";
-import { API_ENDPOINTS } from "../constants/endpoints";
-import { ServerError } from "../context/Error/errors/serverError";
 import {
   API_ERROR_MESSAGE,
   GEO_BLOCK_MESSAGE,
@@ -20,11 +19,10 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
         message: healthCheckAPIResponse.data,
       };
     } else {
-      throw new ServerError({
-        message: API_ERROR_MESSAGE,
-        endpoint: API_ENDPOINTS.HEALTHCHECK,
-        status: HttpStatusCode.InternalServerError,
-      });
+      throw new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        API_ERROR_MESSAGE,
+      );
     }
   } catch (error: any) {
     if (isError451(error)) {

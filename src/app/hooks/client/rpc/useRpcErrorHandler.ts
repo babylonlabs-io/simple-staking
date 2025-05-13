@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError } from "@/app/context/Error/errors/clientError";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 /**
  * Hook that handles RPC connection errors by showing an error modal
@@ -15,13 +14,21 @@ import { ErrorType } from "@/app/types/errors";
 export function useRpcErrorHandler() {
   const { error, isLoading, reconnect } = useBbnRpc();
   const { handleError } = useError();
+  const logger = useLogger();
 
   useEffect(() => {
     if (error && !isLoading) {
-      const clientError = new ClientError({
-        message: error.message,
-        category: ClientErrorCategory.RPC_NODE,
-        type: ErrorType.SERVER,
+      const clientError = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        error.message,
+        { cause: error as Error },
+      );
+
+      logger.error(clientError, {
+        tags: {
+          errorCode: clientError.errorCode,
+          errorSource: "RPC_CONNECTION",
+        },
       });
 
       handleError({
@@ -35,7 +42,7 @@ export function useRpcErrorHandler() {
         },
       });
     }
-  }, [error, isLoading, handleError, reconnect]);
+  }, [error, isLoading, handleError, reconnect, logger]);
 
   return {
     hasRpcError: Boolean(error) && !isLoading,

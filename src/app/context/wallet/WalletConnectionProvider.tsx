@@ -10,12 +10,12 @@ import { useCallback, type PropsWithChildren } from "react";
 
 import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
-import { ErrorType } from "@/app/types/errors";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
-import { ClientError } from "../Error/errors";
 
 const context = typeof window !== "undefined" ? window : {};
 
@@ -54,6 +54,7 @@ const config: ChainConfigArr = [
 export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
   const { theme } = useTheme();
+  const logger = useLogger();
 
   const onError = useCallback(
     (error: Error) => {
@@ -61,17 +62,22 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
         return;
       }
 
+      const clientError = new ClientError(
+        ERROR_CODES.WALLET_ACTION_FAILED,
+        error.message,
+        { cause: error as Error },
+      );
+      logger.error(clientError, {
+        tags: {
+          errorCode: clientError.errorCode,
+          errorSource: "WalletConnection",
+        },
+      });
       handleError({
-        error: new ClientError(
-          {
-            message: error.message,
-            type: ErrorType.WALLET,
-          },
-          { cause: error },
-        ),
+        error: clientError,
       });
     },
-    [handleError],
+    [handleError, logger],
   );
 
   return (

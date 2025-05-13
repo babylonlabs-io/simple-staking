@@ -1,4 +1,4 @@
-import { ClientError } from "@/app/context/Error/errors/clientError";
+import { ClientError } from "@/errors";
 import { txFeeSafetyCheck } from "@/utils/delegations/fee";
 
 describe("txFeeSafetyCheck", () => {

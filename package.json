@@ -76,6 +76,7 @@
     "@types/qs": "^6.9.17",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.0.1",
     "babel-jest": "^29.7.0",
     "babel-plugin-module-resolver": "^5.0.2",
