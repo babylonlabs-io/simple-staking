@@ -115,8 +115,29 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const network = await walletProvider.getNetwork();
-        if (network !== btcConfig.network) return;
+        if (network !== btcConfig.network) {
+          const networkMismatchError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            `BTC wallet network (${network}) does not match configured network (${btcConfig.network}).`,
+          );
+          logger.error(networkMismatchError, {
+            tags: { errorCode: networkMismatchError.errorCode },
+          });
+          throw networkMismatchError;
+        }
+
         const address = await walletProvider.getAddress();
+        if (!address) {
+          const noAddressError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "BTC wallet provider returned an empty address.",
+          );
+          logger.error(noAddressError, {
+            tags: { errorCode: noAddressError.errorCode },
+          });
+          throw noAddressError;
+        }
+
         const supported = isSupportedAddressType(address);
         if (!supported) {
           const clientError = new ClientError(
@@ -129,14 +150,36 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           throw clientError;
         }
 
-        const publicKeyNoCoord = getPublicKeyNoCoord(
-          await walletProvider.getPublicKeyHex(),
-        );
+        const publicKeyHex = await walletProvider.getPublicKeyHex();
+        if (!publicKeyHex) {
+          const noPubKeyError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "BTC wallet provider returned an empty public key.",
+          );
+          logger.error(noPubKeyError, {
+            tags: { errorCode: noPubKeyError.errorCode },
+          });
+          throw noPubKeyError;
+        }
+
+        const publicKeyBuffer = getPublicKeyNoCoord(publicKeyHex);
+        const publicKeyNoCoordHex = publicKeyBuffer.toString("hex");
+
+        if (!publicKeyNoCoordHex) {
+          const emptyProcessedPubKeyError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "Processed BTC public key (no coordinates) is empty.",
+          );
+          logger.error(emptyProcessedPubKeyError, {
+            tags: { errorCode: emptyProcessedPubKeyError.errorCode },
+          });
+          throw emptyProcessedPubKeyError;
+        }
 
         setBTCWalletProvider(walletProvider);
         setNetwork(toNetwork(network));
         setAddress(address);
-        setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+        setPublicKeyNoCoord(publicKeyNoCoordHex);
         setLoading(false);
 
         setUser({
@@ -145,8 +188,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
         logger.info("BTC wallet connected", {
           network,
-          userPublicKey: publicKeyNoCoord?.toString() || "",
-          btcAddress: address || "",
+          userPublicKey: publicKeyNoCoordHex,
+          btcAddress: address,
           walletName: await walletProvider.getWalletProviderName(),
         });
       } catch (error: any) {

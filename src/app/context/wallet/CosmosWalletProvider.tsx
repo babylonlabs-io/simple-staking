@@ -86,10 +86,41 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             await provider.getOfflineSigner();
 
         // @ts-ignore - chainId is missing in keplr types
-        if (offlineSigner.chainId && offlineSigner.chainId !== chainId) return;
+        if (offlineSigner.chainId && offlineSigner.chainId !== chainId) {
+          const networkMismatchError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            `Cosmos wallet chain ID does not match configured chain ID (${chainId}).`,
+          );
+          logger.error(networkMismatchError, {
+            tags: { errorCode: networkMismatchError.errorCode },
+          });
+          throw networkMismatchError;
+        }
 
-        const address = await provider.getAddress();
-        const walletName = await provider.getWalletProviderName();
+        const bech32Address = await provider.getAddress();
+        if (!bech32Address) {
+          const noAddressError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "Cosmos wallet provider returned an empty address.",
+          );
+          logger.error(noAddressError, {
+            tags: { errorCode: noAddressError.errorCode },
+          });
+          throw noAddressError;
+        }
+
+        const walletNameStr = await provider.getWalletProviderName();
+        if (!walletNameStr) {
+          const noWalletNameError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "Cosmos wallet provider returned an empty wallet name.",
+          );
+          logger.error(noWalletNameError, {
+            tags: { errorCode: noWalletNameError.errorCode },
+          });
+          throw noWalletNameError;
+        }
+
         const client = await SigningStargateClient.connectWithSigner(
           rpc,
           offlineSigner as OfflineSigner,
@@ -100,17 +131,17 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         );
         setSigningStargateClient(client);
         setBBNWalletProvider(provider);
-        setCosmosBech32Address(address);
+        setCosmosBech32Address(bech32Address);
         setLoading(false);
-        setWalletName(walletName);
+        setWalletName(walletNameStr || "Unknown Wallet");
 
         setUser({
-          babylonAddress: address,
+          babylonAddress: bech32Address,
         });
 
         logger.info("Babylon wallet connected", {
-          babylonAddress: address || "",
-          walletName: walletName || "",
+          babylonAddress: bech32Address,
+          walletName: walletNameStr || "Unknown Wallet",
           chainId,
         });
       } catch (error: any) {
