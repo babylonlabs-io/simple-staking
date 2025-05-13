@@ -40,6 +40,7 @@ interface TxProps {
     unbondingSlashingTxHex: string;
     spendingHeight: number;
   };
+  unbondingTimelock?: number;
 }
 
 type DelegationCommand = (props: TxProps) => Promise<void>;
@@ -142,6 +143,7 @@ export function useDelegationService() {
         stakingTxHex,
         unbondingTxHex,
         covenantUnbondingSignatures,
+        unbondingTimelock,
       }: TxProps) => {
         if (!covenantUnbondingSignatures) {
           const clientError = new ClientError(
@@ -154,6 +156,12 @@ export function useDelegationService() {
           throw clientError;
         }
 
+        // TODO important logic to check
+        // Get the unbonding timelock from props or network params
+        const finalUnbondingTimelock =
+          unbondingTimelock ||
+          networkInfo?.params.bbnStakingParams.latestParam.unbondingTime;
+
         await submitUnbondingTx(
           stakingInput,
           paramsVersion,
@@ -163,6 +171,7 @@ export function useDelegationService() {
             btcPkHex: sig.covenantBtcPkHex,
             sigHex: sig.signatureHex,
           })),
+          finalUnbondingTimelock!,
         );
 
         updateDelegationStatus(
@@ -272,6 +281,7 @@ export function useDelegationService() {
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,
       submitSlashingWithdrawalTx,
+      networkInfo?.params.bbnStakingParams.latestParam.unbondingTime,
     ],
   );
 
@@ -316,6 +326,7 @@ export function useDelegationService() {
         covenantUnbondingSignatures,
         state,
         slashing,
+        unbondingTimelock,
       } = delegation;
 
       const finalityProviderPk = finalityProviderBtcPksHex[0];
@@ -339,6 +350,7 @@ export function useDelegationService() {
           state,
           stakingInput,
           slashing,
+          unbondingTimelock,
         });
 
         closeConfirmationModal();

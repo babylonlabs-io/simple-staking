@@ -67,7 +67,12 @@ export const useTransactionService = () => {
         stakingInput: JSON.stringify(stakingInput),
         feeRate,
       });
-      const btcStakingManager = createBtcStakingManager();
+      const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
+
+      const btcStakingManager = createBtcStakingManager(
+        finalityProviderPkNoCoordHex,
+        stakingTimelock,
+      );
 
       validateCommonInputs(
         btcStakingManager,
@@ -230,7 +235,12 @@ export const useTransactionService = () => {
         paramVersion,
         expectedTxHashHex,
       });
-      const btcStakingManager = createBtcStakingManager();
+      const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
+
+      const btcStakingManager = createBtcStakingManager(
+        finalityProviderPkNoCoordHex,
+        stakingTimelock,
+      );
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -298,6 +308,7 @@ export const useTransactionService = () => {
    * @param stakingTxHex - The staking transaction hex
    * @param unbondingTxHex - The unbonding transaction hex
    * @param covenantUnbondingSignatures - The covenant unbonding signatures
+   * @param unbondingTimelock - The unbonding timelock
    */
   const submitUnbondingTx = useCallback(
     async (
@@ -309,8 +320,16 @@ export const useTransactionService = () => {
         btcPkHex: string;
         sigHex: string;
       }[],
+      unbondingTimelock: number,
     ) => {
-      const btcStakingManager = createBtcStakingManager();
+      const { finalityProviderPkNoCoordHex, stakingTimelock } = stakingInput;
+
+      const btcStakingManager = createBtcStakingManager(
+        finalityProviderPkNoCoordHex,
+        stakingTimelock,
+        unbondingTimelock,
+      );
+
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
