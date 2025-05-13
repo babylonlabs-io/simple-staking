@@ -2,6 +2,8 @@ import qs from "qs";
 
 import { ClientError, ERROR_CODES } from "@/errors";
 
+import { getApiBaseUrl } from "../../config";
+
 type QueryParamValue =
   | string
   | number
@@ -31,7 +33,8 @@ export const apiWrapper = async <TResponseData = unknown>(
     ? `?${qs.stringify(params.query, { arrayFormat: "repeat" })}`
     : "";
 
-  const url = `${process.env.NEXT_PUBLIC_API_URL}${path}${queryString}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl}${path}${queryString}`;
 
   const options: RequestInit = {
     method,

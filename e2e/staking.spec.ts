@@ -5,12 +5,15 @@ import {
   STAKING_AMOUNT_SAT,
   STAKING_TX_HASH,
 } from "./constants/staking";
-import { setupWalletConnection } from "./helper/connect";
+import { WalletConnectActions } from "./fixtures/wallet_connect";
 
 test.describe("Create staking transaction", () => {
+  let actions: WalletConnectActions;
+
   test.beforeEach(async ({ page }) => {
     await page.goto("/");
-    await setupWalletConnection(page);
+    actions = new WalletConnectActions(page);
+    await actions.setupWalletConnection();
   });
 
   test("prepare the staking", async ({ page }) => {

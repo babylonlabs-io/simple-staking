@@ -9,10 +9,10 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useAppState } from "@/app/state";
 import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import { validateStakingInput } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
 import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
-import { useLogger } from "@/hooks/useLogger";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
