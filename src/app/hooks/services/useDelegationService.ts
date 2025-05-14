@@ -123,6 +123,10 @@ export function useDelegationService() {
         stakingTxHashHex,
         stakingTxHex,
       }: TxProps) => {
+        logger.info("Executing delegation command: STAKE", {
+          stakingTxHashHex,
+          paramsVersion,
+        });
         await submitStakingTx(
           stakingInput,
           paramsVersion,
@@ -133,6 +137,9 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
         );
+        logger.info("Delegation command: STAKE completed", {
+          stakingTxHashHex,
+        });
       },
 
       [ACTIONS.UNBOND]: async ({
@@ -143,6 +150,10 @@ export function useDelegationService() {
         unbondingTxHex,
         covenantUnbondingSignatures,
       }: TxProps) => {
+        logger.info("Executing delegation command: UNBOND", {
+          stakingTxHashHex,
+          paramsVersion,
+        });
         if (!covenantUnbondingSignatures) {
           const clientError = new ClientError(
             ERROR_CODES.VALIDATION_ERROR,
@@ -169,6 +180,9 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_UNBONDING_SUBMITTED,
         );
+        logger.info("Delegation command: UNBOND completed", {
+          stakingTxHashHex,
+        });
       },
 
       [ACTIONS.WITHDRAW_ON_EARLY_UNBONDING]: async ({
@@ -177,6 +191,10 @@ export function useDelegationService() {
         paramsVersion,
         unbondingTxHex,
       }: TxProps) => {
+        logger.info(
+          "Executing delegation command: WITHDRAW_ON_EARLY_UNBONDING",
+          { stakingTxHashHex, paramsVersion },
+        );
         await submitEarlyUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
@@ -187,6 +205,10 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED,
         );
+        logger.info(
+          "Delegation command: WITHDRAW_ON_EARLY_UNBONDING completed",
+          { stakingTxHashHex },
+        );
       },
 
       [ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING]: async ({
@@ -195,6 +217,10 @@ export function useDelegationService() {
         paramsVersion,
         slashing,
       }) => {
+        logger.info(
+          "Executing delegation command: WITHDRAW_ON_EARLY_UNBONDING_SLASHING",
+          { stakingTxHashHex, paramsVersion },
+        );
         if (!slashing.unbondingSlashingTxHex) {
           const clientError = new ClientError(
             ERROR_CODES.VALIDATION_ERROR,
@@ -216,6 +242,10 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_EARLY_UNBONDING_SLASHING_WITHDRAWAL_SUBMITTED,
         );
+        logger.info(
+          "Delegation command: WITHDRAW_ON_EARLY_UNBONDING_SLASHING completed",
+          { stakingTxHashHex },
+        );
       },
 
       [ACTIONS.WITHDRAW_ON_TIMELOCK]: async ({
@@ -224,6 +254,10 @@ export function useDelegationService() {
         stakingTxHashHex,
         stakingTxHex,
       }: TxProps) => {
+        logger.info("Executing delegation command: WITHDRAW_ON_TIMELOCK", {
+          stakingTxHashHex,
+          paramsVersion,
+        });
         await submitTimelockUnbondedWithdrawalTx(
           stakingInput,
           paramsVersion,
@@ -234,6 +268,9 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_TIMELOCK_WITHDRAWAL_SUBMITTED,
         );
+        logger.info("Delegation command: WITHDRAW_ON_TIMELOCK completed", {
+          stakingTxHashHex,
+        });
       },
 
       [ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING]: async ({
@@ -242,6 +279,10 @@ export function useDelegationService() {
         stakingTxHashHex,
         slashing,
       }) => {
+        logger.info(
+          "Executing delegation command: WITHDRAW_ON_TIMELOCK_SLASHING",
+          { stakingTxHashHex, paramsVersion },
+        );
         if (!slashing.stakingSlashingTxHex) {
           const clientError = new ClientError(
             ERROR_CODES.VALIDATION_ERROR,
@@ -263,6 +304,10 @@ export function useDelegationService() {
           stakingTxHashHex,
           State.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED,
         );
+        logger.info(
+          "Delegation command: WITHDRAW_ON_TIMELOCK_SLASHING completed",
+          { stakingTxHashHex },
+        );
       },
     }),
     [
@@ -278,6 +323,10 @@ export function useDelegationService() {
 
   const openConfirmationModal = useCallback(
     (action: ActionType, delegation: DelegationWithFP) => {
+      logger.info("Executing openConfirmationModal", {
+        action,
+        delegationId: delegation.stakingTxHashHex,
+      });
       const param = getBbnParamByVersion(
         delegation.paramsVersion,
         networkInfo?.params.bbnStakingParams.versions || [],
@@ -289,13 +338,13 @@ export function useDelegationService() {
         param,
       });
     },
-    [networkInfo],
+    [networkInfo, logger],
   );
 
-  const closeConfirmationModal = useCallback(
-    () => void setConfirmationModal(null),
-    [],
-  );
+  const closeConfirmationModal = useCallback(() => {
+    logger.info("Executing closeConfirmationModal");
+    void setConfirmationModal(null);
+  }, [logger]);
 
   const toggleProcessingDelegation = useCallback(
     (id: string, processing: boolean) => {
@@ -306,6 +355,10 @@ export function useDelegationService() {
 
   const executeDelegationAction = useCallback(
     async (action: string, delegation: DelegationV2) => {
+      logger.info("Executing executeDelegationAction", {
+        action,
+        delegationId: delegation.stakingTxHashHex,
+      });
       const {
         stakingTxHashHex,
         stakingTxHex,
@@ -343,11 +396,15 @@ export function useDelegationService() {
         });
 
         closeConfirmationModal();
+        logger.info("executeDelegationAction completed successfully", {
+          action,
+          delegationId: delegation.stakingTxHashHex,
+        });
       } finally {
         toggleProcessingDelegation(stakingTxHashHex, false);
       }
     },
-    [COMMANDS, closeConfirmationModal, toggleProcessingDelegation],
+    [COMMANDS, closeConfirmationModal, toggleProcessingDelegation, logger],
   );
 
   return {

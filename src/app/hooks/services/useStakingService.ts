@@ -16,6 +16,9 @@ import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
+import { useLogger } from "@/hooks/useLogger";
 import { retry } from "@/utils";
 import { btcToSatoshi } from "@/utils/btc";
 
@@ -53,6 +56,7 @@ export function useStakingService() {
   const { handleError } = useError();
   const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
+  const logger = useLogger();
 
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
@@ -71,6 +75,12 @@ export function useStakingService() {
     term,
     feeRate,
   }: Omit<FormFields, "feeAmount">) => {
+    logger.info("Calculating fee amount for EOI", {
+      finalityProvider,
+      amount,
+      term,
+      feeRate,
+    });
     const eoiInput = {
       finalityProviderPkNoCoordHex: finalityProvider,
       stakingAmountSat: btcToSatoshi(amount),
@@ -78,19 +88,31 @@ export function useStakingService() {
       feeRate: feeRate,
     };
     // Calculate the staking fee
-    return estimateStakingFee(eoiInput, feeRate);
+    const feeAmount = estimateStakingFee(eoiInput, feeRate);
+    logger.info("Fee amount calculated", { feeAmount });
+    return feeAmount;
   };
 
   const displayPreview = useCallback(
     (formFields: FormFields) => {
+      logger.info("Displaying staking preview", {
+        formFields: JSON.stringify(formFields),
+      });
       setFormData(formFields);
       goToStep(StakingStep.PREVIEW);
+      logger.info("Staking preview step set");
     },
-    [setFormData, goToStep],
+    [setFormData, goToStep, logger],
   );
 
   const createEOI = useCallback(
     async ({ finalityProvider, amount, term, feeRate }: FormFields) => {
+      logger.info("Starting EOI creation process", {
+        finalityProvider,
+        amount,
+        term,
+        feeRate,
+      });
       try {
         const eoiInput = {
           finalityProviderPkNoCoordHex: finalityProvider,
@@ -126,8 +148,21 @@ export function useStakingService() {
         setVerifiedDelegation(delegation as DelegationV2);
         refetchDelegations();
         goToStep(StakingStep.VERIFIED);
+        logger.info("EOI creation process successful, delegation verified", {
+          verifiedDelegationId: delegation?.stakingTxHashHex || "",
+        });
         setProcessing(false);
       } catch (error: any) {
+        const clientError = new ClientError(
+          ERROR_CODES.TRANSACTION_PREPARATION_ERROR,
+          "Error creating EOI",
+          { cause: error },
+        );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+          },
+        });
         handleError({
           error,
           metadata: {
@@ -152,11 +187,15 @@ export function useStakingService() {
       publicKeyNoCoord,
       btcAddress,
       bech32Address,
+      logger,
     ],
   );
 
   const stakeDelegation = useCallback(
     async (delegation: DelegationV2) => {
+      logger.info("Starting stake delegation process", {
+        delegationTxHash: delegation.stakingTxHashHex,
+      });
       try {
         setProcessing(true);
 
@@ -183,10 +222,20 @@ export function useStakingService() {
           stakingTxHashHex,
           DelegationState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
         );
-
+        logger.info("Stake delegation process successful");
         reset();
         goToStep(StakingStep.FEEDBACK_SUCCESS);
       } catch (error: any) {
+        const clientError = new ClientError(
+          ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
+          "Error submitting staking transaction",
+          { cause: error },
+        );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+          },
+        });
         reset();
         handleError({
           error,
@@ -212,6 +261,7 @@ export function useStakingService() {
       publicKeyNoCoord,
       btcAddress,
       bech32Address,
+      logger,
     ],
   );
 

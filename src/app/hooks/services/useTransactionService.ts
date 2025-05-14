@@ -227,9 +227,11 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       unsignedStakingTxHex: string,
     ) => {
-      logger.info("Submitting staking transaction", {
+      logger.info("Executing submitStakingTx", {
+        stakingInput: JSON.stringify(stakingInput),
         paramVersion,
         expectedTxHashHex,
+        unsignedStakingTxHex,
       });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
@@ -280,6 +282,7 @@ export const useTransactionService = () => {
       }
       await pushTx(signedStakingTx.toHex());
       refetchUTXOs();
+      logger.info("submitStakingTx completed", { expectedTxHashHex });
     },
     [
       availableUTXOs,
@@ -312,6 +315,13 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
+      logger.info("Executing submitUnbondingTx", {
+        stakingInput: JSON.stringify(stakingInput),
+        paramVersion,
+        stakingTxHex,
+        unbondingTxHex,
+        covenantUnbondingSignaturesCount: covenantUnbondingSignatures.length,
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -333,8 +343,11 @@ export const useTransactionService = () => {
         );
 
       await pushTx(signedUnbondingTx.toHex());
+      logger.info("submitUnbondingTx completed", {
+        unbondingTxId: signedUnbondingTx.getId(),
+      });
     },
-    [createBtcStakingManager, pushTx, stakerInfo, tipHeight],
+    [createBtcStakingManager, pushTx, stakerInfo, tipHeight, logger],
   );
 
   /**
@@ -350,6 +363,11 @@ export const useTransactionService = () => {
       paramVersion: number,
       earlyUnbondingTxHex: string,
     ) => {
+      logger.info("Executing submitEarlyUnbondedWithdrawalTx", {
+        stakingInput: JSON.stringify(stakingInput),
+        paramVersion,
+        earlyUnbondingTxHex,
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -367,8 +385,18 @@ export const useTransactionService = () => {
           defaultFeeRate,
         );
       await pushTx(signedWithdrawalTx.toHex());
+      logger.info("submitEarlyUnbondedWithdrawalTx completed", {
+        withdrawalTxId: signedWithdrawalTx.getId(),
+      });
     },
-    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+    [
+      createBtcStakingManager,
+      defaultFeeRate,
+      pushTx,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
   );
 
   /**
@@ -384,6 +412,11 @@ export const useTransactionService = () => {
       paramVersion: number,
       stakingTxHex: string,
     ) => {
+      logger.info("Executing submitTimelockUnbondedWithdrawalTx", {
+        stakingInput: JSON.stringify(stakingInput),
+        paramVersion,
+        stakingTxHex,
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -401,8 +434,18 @@ export const useTransactionService = () => {
           defaultFeeRate,
         );
       await pushTx(signedWithdrawalTx.toHex());
+      logger.info("submitTimelockUnbondedWithdrawalTx completed", {
+        withdrawalTxId: signedWithdrawalTx.getId(),
+      });
     },
-    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+    [
+      createBtcStakingManager,
+      defaultFeeRate,
+      pushTx,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
   );
 
   /**
@@ -418,6 +461,11 @@ export const useTransactionService = () => {
       paramVersion: number,
       slashingTxHex: string,
     ) => {
+      logger.info("Executing submitSlashingWithdrawalTx", {
+        stakingInput: JSON.stringify(stakingInput),
+        paramVersion,
+        slashingTxHex,
+      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -435,8 +483,18 @@ export const useTransactionService = () => {
           defaultFeeRate,
         );
       await pushTx(signedWithdrawalTx.toHex());
+      logger.info("submitSlashingWithdrawalTx completed", {
+        withdrawalTxId: signedWithdrawalTx.getId(),
+      });
     },
-    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
+    [
+      createBtcStakingManager,
+      defaultFeeRate,
+      pushTx,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
   );
 
   /**
