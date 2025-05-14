@@ -128,6 +128,10 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
   });
 
   it("should handle local storage delegations exactly on the max duration boundary", async () => {
+    // Freeze time so that Date.now() returns a fixed value during the whole test run.
+    const fixedTime = new Date("2023-01-01T00:00:00Z").getTime();
+    jest.useFakeTimers().setSystemTime(fixedTime);
+
     const boundaryDelegation: Delegation = generateMockDelegation(
       "hash10",
       "staker10",
@@ -137,12 +141,16 @@ describe("utils/local_storage/filterDelegationsLocalStorage", () => {
     );
 
     const delegationsLocalStorage = [boundaryDelegation];
+
     const result = await filterDelegationsLocalStorage(
       delegationsLocalStorage,
       mockDelegationsAPI,
     );
 
     expect(result).toEqual([boundaryDelegation]);
+
+    // Restore real timers to avoid side-effects on other tests.
+    jest.useRealTimers();
   });
 
   it("should handle no API data but local storage items are present", async () => {
