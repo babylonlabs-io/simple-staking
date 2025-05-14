@@ -18,7 +18,6 @@ test.describe("Balance and address checks after connection", () => {
 
     await navigationActions.navigateToHomePage(page);
     await connectActions.setupWalletConnection();
-    await page.waitForTimeout(1e3);
   });
 
   test("balance is correct", async () => {
