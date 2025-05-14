@@ -70,7 +70,7 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
         },
       });
     }
-  }, [isError, error, handleError, refetch]);
+  }, [isError, error, handleError, refetch, logger]);
 
   return (
     <StakingStatsContext.Provider value={{ data, isLoading }}>

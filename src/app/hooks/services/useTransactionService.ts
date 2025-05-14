@@ -113,6 +113,7 @@ export const useTransactionService = () => {
       createBtcStakingManager,
       stakerInfo,
       tipHeight,
+      logger,
     ],
   );
 
@@ -159,7 +160,7 @@ export const useTransactionService = () => {
       logger.info("Staking fee estimated", { fee });
       return fee;
     },
-    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs],
+    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs, logger],
   );
 
   /**
@@ -208,7 +209,7 @@ export const useTransactionService = () => {
         signedBabylonTx,
       };
     },
-    [bech32Address, createBtcStakingManager, stakerInfo, tipHeight],
+    [bech32Address, createBtcStakingManager, stakerInfo, tipHeight, logger],
   );
 
   /**
@@ -287,6 +288,7 @@ export const useTransactionService = () => {
       refetchUTXOs,
       stakerInfo,
       tipHeight,
+      logger,
     ],
   );
 
