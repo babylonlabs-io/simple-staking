@@ -272,6 +272,7 @@ export function useDelegationService() {
       submitEarlyUnbondedWithdrawalTx,
       submitTimelockUnbondedWithdrawalTx,
       submitSlashingWithdrawalTx,
+      logger,
     ],
   );
 
