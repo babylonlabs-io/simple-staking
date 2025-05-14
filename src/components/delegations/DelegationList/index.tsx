@@ -1,4 +1,4 @@
-import { Card, Heading } from "@babylonlabs-io/core-ui";
+import { Button, Card, Heading, Loader } from "@babylonlabs-io/core-ui";
 
 import {
   ActionType,
@@ -25,7 +25,7 @@ import { NoDelegations } from "./NoDelegations";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void;
-  isUnbondDisabled: boolean;
+  isStakingManagerReady: boolean;
 };
 
 const networkConfig = getNetworkConfig();
@@ -91,22 +91,22 @@ export function DelegationList() {
       renderCell: (
         row,
         _,
-        { handleActionClick, validations, isUnbondDisabled },
+        { handleActionClick, validations, isStakingManagerReady },
       ) => {
         const { valid, error } = validations[row.stakingTxHashHex];
 
         // Hide the action button if the delegation is invalid
         if (!valid) return null;
 
-        const isUnbondButton = row.state === DelegationV2StakingState.ACTIVE;
-        const isDisabled = isUnbondButton && isUnbondDisabled;
+        const isUnbondDisabled = row.state === DelegationV2StakingState.ACTIVE && isStakingManagerReady;
 
         return (
           <ActionButton
             tooltip={error}
             delegation={row}
             onClick={handleActionClick}
-            disabled={isDisabled}
+            disabled={isUnbondDisabled}
+            showLoader={isUnbondDisabled}
           />
         );
       },
@@ -139,7 +139,7 @@ export function DelegationList() {
         params={{
           handleActionClick: openConfirmationModal,
           validations,
-          isUnbondDisabled: !isStakingManagerReady,
+          isStakingManagerReady: !isStakingManagerReady,
         }}
         fallback={<NoDelegations />}
       />

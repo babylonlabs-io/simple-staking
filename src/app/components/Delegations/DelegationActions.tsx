@@ -1,4 +1,4 @@
-import { Button, Popover, Text } from "@babylonlabs-io/core-ui";
+import { Button, Popover, Text, Loader } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
@@ -112,8 +112,12 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           color="primary"
           onClick={() => onUnbond(stakingTxHashHex)}
           disabled={!isStakingManagerReady}
+          className="flex items-center gap-1"
         >
           Unbond
+          {!isStakingManagerReady && (
+            <Loader size={12} className="text-accent-primary" />
+          )}
         </Button>
       </div>
     );
@@ -136,7 +140,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             disabled={
               Boolean(disabled) ||
               intermediateState ===
-                DelegationState.INTERMEDIATE_TRANSITIONING ||
+              DelegationState.INTERMEDIATE_TRANSITIONING ||
               (state === DelegationState.ACTIVE &&
                 !isEligibleForRegistration) ||
               hasInsufficientBalance
@@ -176,13 +180,15 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
                 setIsPopoverOpen(false);
               }
             }}
-            className={`text-accent-primary transition-all ${
-              isStakingManagerReady
+            className={`flex items-center gap-1 text-accent-primary transition-all ${isStakingManagerReady
                 ? "hover:brightness-125"
                 : "opacity-50 cursor-not-allowed"
-            }`}
+              }`}
           >
             Unbond
+            {!isStakingManagerReady && (
+              <Loader size={12} className="text-accent-primary ml-1" />
+            )}
           </Text>
         </Popover>
       </div>
