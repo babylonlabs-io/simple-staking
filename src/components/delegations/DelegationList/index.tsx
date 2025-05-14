@@ -1,10 +1,10 @@
-import { Button, Card, Heading, Loader } from "@babylonlabs-io/core-ui";
+import { Card, Heading } from "@babylonlabs-io/core-ui";
 
 import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
+import { useStakingManagerReady } from "@/app/hooks/services/useStakingManagerReady";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
@@ -45,8 +45,7 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const { createBtcStakingManager } = useStakingManagerService();
-  const isStakingManagerReady = Boolean(createBtcStakingManager());
+  const isStakingManagerReady = useStakingManagerReady();
 
   const columns: TableColumn<DelegationWithFP, TableParams>[] = [
     {
@@ -98,7 +97,9 @@ export function DelegationList() {
         // Hide the action button if the delegation is invalid
         if (!valid) return null;
 
-        const isUnbondDisabled = row.state === DelegationV2StakingState.ACTIVE && isStakingManagerReady;
+        const isUnbondDisabled =
+          row.state === DelegationV2StakingState.ACTIVE &&
+          !isStakingManagerReady;
 
         return (
           <ActionButton
@@ -139,7 +140,7 @@ export function DelegationList() {
         params={{
           handleActionClick: openConfirmationModal,
           validations,
-          isStakingManagerReady: !isStakingManagerReady,
+          isStakingManagerReady,
         }}
         fallback={<NoDelegations />}
       />
