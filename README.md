@@ -47,3 +47,20 @@ npm run dev
 
 Instructions for wallet integration can be found in the
 [bbn-wallet-connect documentation](https://github.com/babylonlabs-io/bbn-wallet-connect).
+
+## E2E Tests
+
+To build the E2E tests, run:
+```bash
+npm run build:e2e
+```
+
+To run the E2E tests, run:
+```bash
+npm run test:e2e
+```
+
+Note that the E2E tests use the environment variables specified in the `.env.test` file.
+
+The E2E tests are located in the `e2e/specs` directory.
+
