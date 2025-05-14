@@ -685,4 +685,48 @@ export const injectBBNQueries = async (
       }),
     });
   });
+
+  await page.route("**/api/address/*/utxo", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          txid: "txid1",
+          vout: 0,
+          value: Number(mockData.bbnQueries.stakableBtc),
+          status: {
+            confirmed: true,
+          },
+        },
+      ]),
+    });
+  });
+
+  await page.route("**/api/v1/validate-address/*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        isvalid: true,
+        scriptPubKey: "0014abcdef1234567890abcdef1234567890abcdef12",
+      }),
+    });
+  });
+
+  await page.route("**/api/address/*", async (route) => {
+    if (route.request().url().includes("/utxo")) {
+      return route.continue();
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        chain_stats: {
+          funded_txo_sum: Number(mockData.bbnQueries.stakableBtc),
+          spent_txo_sum: 0,
+        },
+      }),
+    });
+  });
 };
