@@ -236,7 +236,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     logger.info("Installed Babylon wallets", {
       installedWallets: Object.values(installedWallets).join(", ") || "",
     });
-  }, [bbnConnector]);
+  }, [bbnConnector, logger]);
 
   return (
     <CosmosWalletContext.Provider value={cosmosContextValue}>
