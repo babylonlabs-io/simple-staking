@@ -11,6 +11,7 @@ import { NotificationContainer } from "./components/Notification/NotificationCon
 import { ErrorProvider } from "./context/Error/ErrorProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
+import { TransactionProvider } from "./context/transaction/TransactionProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
@@ -32,9 +33,11 @@ function Providers({ children }: React.PropsWithChildren) {
                     <CosmosWalletProvider>
                       <AppState>
                         <StakingStatsProvider>
-                          <ReactQueryStreamedHydration>
-                            {children}
-                          </ReactQueryStreamedHydration>
+                          <TransactionProvider>
+                            <ReactQueryStreamedHydration>
+                              {children}
+                            </ReactQueryStreamedHydration>
+                          </TransactionProvider>
                         </StakingStatsProvider>
                       </AppState>
                     </CosmosWalletProvider>
