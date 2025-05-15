@@ -34,6 +34,7 @@ export const useHealthCheck = () => {
         tags: {
           errorCode: clientError.errorCode,
           errorSource: "useHealthCheck",
+          isGeoblocked: isGeoBlocked ? "true" : "false",
         },
       });
 
