@@ -19,14 +19,14 @@ jest.mock("@uidotdev/usehooks", () => ({
 
 // Import after mocks
 import { act, renderHook } from "@testing-library/react";
-import { PropsWithChildren } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { ClientErrorCategory } from "@/app/constants/errorMessages";
-import { useError } from "@/app/context/Error/ErrorProvider";
+import { ErrorProvider, useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError } from "@/app/context/Error/errors/clientError";
 import { ServerError } from "@/app/context/Error/errors/serverError";
+import { TransactionProvider } from "@/app/context/transaction/TransactionProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
@@ -65,7 +65,14 @@ jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
 }));
 
 // Create a test wrapper
-const TestWrapper = ({ children }: PropsWithChildren) => <>{children}</>;
+const TestWrapper: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <ErrorProvider>
+    <TransactionProvider>
+      {/* Your existing wrapper providers */}
+      {children}
+    </TransactionProvider>
+  </ErrorProvider>
+);
 
 // Mock data for tests
 const mockFormData = {
