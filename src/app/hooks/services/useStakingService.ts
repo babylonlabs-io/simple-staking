@@ -95,12 +95,8 @@ export function useStakingService() {
 
   const displayPreview = useCallback(
     (formFields: FormFields) => {
-      logger.info("Displaying staking preview", {
-        formFields: JSON.stringify(formFields),
-      });
       setFormData(formFields);
       goToStep(StakingStep.PREVIEW);
-      logger.info("Staking preview step set");
     },
     [setFormData, goToStep, logger],
   );

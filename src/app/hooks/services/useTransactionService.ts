@@ -364,7 +364,6 @@ export const useTransactionService = () => {
       earlyUnbondingTxHex: string,
     ) => {
       logger.info("Executing submitEarlyUnbondedWithdrawalTx", {
-        stakingInput: JSON.stringify(stakingInput),
         paramVersion,
         earlyUnbondingTxHex,
       });
