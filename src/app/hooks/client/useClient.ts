@@ -1,12 +1,12 @@
 import {
-  type DefaultError,
   DefinedInitialDataOptions,
   DefinedUseQueryResult,
-  type QueryKey,
-  type UndefinedInitialDataOptions,
-  useQuery,
   UseQueryOptions,
   UseQueryResult,
+  useQuery,
+  type DefaultError,
+  type QueryKey,
+  type UndefinedInitialDataOptions,
 } from "@tanstack/react-query";
 import { useEffect } from "react";
 
@@ -17,7 +17,8 @@ import {
   ONE_SECOND,
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { Error } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 
 export function useClientQuery<
   TQueryFnData = unknown,
@@ -44,6 +45,7 @@ export function useClientQuery<
   options: UseQueryOptions<TQueryFnData, TError, TData, TQueryKey>,
 ): UseQueryResult<TData, TError> {
   const { isOpen, handleError } = useError();
+  const logger = useLogger();
 
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
@@ -54,7 +56,17 @@ export function useClientQuery<
 
   useEffect(() => {
     if (data.isError) {
-      const error = data.error as Error;
+      const error = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        (data.error as Error).message || "Unknown error",
+        { cause: data.error },
+      );
+      logger.error(error, {
+        tags: {
+          errorCode: error.errorCode,
+          errorSource: "useClientQuery",
+        },
+      });
       handleError({
         error,
         displayOptions: {
@@ -62,7 +74,14 @@ export function useClientQuery<
         },
       });
     }
-  }, [handleError, data.error, data.isError, data.refetch]);
+  }, [
+    handleError,
+    data.error,
+    data.isError,
+    data.refetch,
+    logger,
+    options.queryKey,
+  ]);
 
   return data;
 }

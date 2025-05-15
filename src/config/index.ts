@@ -1,6 +1,21 @@
 // Default gas price for BABY
 const DEFAULT_BBN_GAS_PRICE = 0.002;
 
+// API URL configuration
+export const getApiBaseUrl = (): string => {
+  let apiUrl = process.env.NEXT_PUBLIC_API_URL;
+
+  if (!apiUrl) {
+    throw new Error("NEXT_PUBLIC_API_URL environment variable is not defined");
+  }
+
+  if (apiUrl === "/") {
+    apiUrl = "";
+  }
+
+  return apiUrl;
+};
+
 // shouldDisplayTestingMsg function is used to check if the application is running in testing mode or not.
 // Default to true if the environment variable is not set.
 export const shouldDisplayTestingMsg = (): boolean => {

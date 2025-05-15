@@ -5,8 +5,8 @@ import { DelegationActions } from "@/app/components/Delegations/DelegationAction
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
-  type Delegation as DelegationInterface,
   DelegationState as DelegationStateEnum,
+  type Delegation as DelegationInterface,
 } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { Hint } from "@/components/common/Hint";

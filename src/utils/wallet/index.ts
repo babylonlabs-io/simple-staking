@@ -2,6 +2,7 @@ import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { networks } from "bitcoinjs-lib";
 
 import { Network } from "@/app/types/network";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;
@@ -15,8 +16,10 @@ export const toNetwork = (network: Network): networks.Network => {
     case Network.SIGNET:
       return networks.testnet;
     default:
-      // wallet error
-      throw new Error("Unsupported network");
+      throw new ClientError(
+        ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+        `Unsupported network provided to toNetwork function: ${network}`,
+      );
   }
 };
 

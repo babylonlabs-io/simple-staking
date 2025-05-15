@@ -2,8 +2,8 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import {
-  type PaginatedFinalityProviders,
   getFinalityProvidersV2,
+  type PaginatedFinalityProviders,
 } from "@/app/api/getFinalityProvidersV2";
 import {
   API_DEFAULT_RETRY_COUNT,

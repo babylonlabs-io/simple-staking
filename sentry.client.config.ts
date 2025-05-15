@@ -10,10 +10,13 @@
  */
 
 import * as Sentry from "@sentry/nextjs";
+import { v4 as uuidv4 } from "uuid";
 
 import { REPLAYS_ON_ERROR_RATE } from "@/app/constants";
 import { isProductionEnv } from "@/config";
 import { getCommitHash } from "@/utils/version";
+
+const SENTRY_DEVICE_ID_KEY = "sentry_device_id";
 
 Sentry.init({
   enabled: Boolean(
@@ -86,3 +89,14 @@ Sentry.init({
     return event;
   },
 });
+
+try {
+  let deviceId = localStorage.getItem(SENTRY_DEVICE_ID_KEY);
+  if (!deviceId) {
+    deviceId = uuidv4();
+    localStorage.setItem(SENTRY_DEVICE_ID_KEY, deviceId);
+  }
+  Sentry.setUser({ id: deviceId });
+} catch (e) {
+  Sentry.setUser({ id: uuidv4() });
+}

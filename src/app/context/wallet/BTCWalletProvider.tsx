@@ -6,7 +6,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
-import * as Sentry from "@sentry/nextjs";
+import { setUser } from "@sentry/nextjs";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -19,9 +19,10 @@ import {
 } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ErrorType } from "@/app/types/errors";
 import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { ClientError, ERROR_CODES } from "@/errors";
+import { useLogger } from "@/hooks/useLogger";
 import {
   getAddressBalance,
   getNetworkFees,
@@ -33,8 +34,6 @@ import {
   isSupportedAddressType,
   toNetwork,
 } from "@/utils/wallet";
-
-import { ClientError } from "../Error/errors";
 
 const btcConfig = getNetworkConfigBTC();
 
@@ -93,12 +92,17 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
   const btcConnector = useChainConnector("BTC");
   const { open = () => {}, connected } = useWalletConnect();
+  const logger = useLogger();
 
   const btcDisconnect = useCallback(() => {
     setBTCWalletProvider(undefined);
     setNetwork(undefined);
     setPublicKeyNoCoord("");
     setAddress("");
+
+    setUser({
+      btcAddress: null,
+    });
   }, []);
 
   const connectBTC = useCallback(
@@ -111,43 +115,96 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
 
       try {
         const network = await walletProvider.getNetwork();
-        if (network !== btcConfig.network) return;
-        const address = await walletProvider.getAddress();
-        const supported = isSupportedAddressType(address);
-        if (!supported) {
-          // wallet error
-          throw new Error(supportedNetworkMessage);
+        if (network !== btcConfig.network) {
+          const networkMismatchError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            `BTC wallet network (${network}) does not match configured network (${btcConfig.network}).`,
+          );
+          logger.error(networkMismatchError, {
+            tags: { errorCode: networkMismatchError.errorCode },
+          });
+          throw networkMismatchError;
         }
 
-        const publicKeyNoCoord = getPublicKeyNoCoord(
-          await walletProvider.getPublicKeyHex(),
-        );
+        const address = await walletProvider.getAddress();
+        if (!address) {
+          const noAddressError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "BTC wallet provider returned an empty address.",
+          );
+          logger.error(noAddressError, {
+            tags: { errorCode: noAddressError.errorCode },
+          });
+          throw noAddressError;
+        }
+
+        const supported = isSupportedAddressType(address);
+        if (!supported) {
+          const clientError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            supportedNetworkMessage,
+          );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
+        }
+
+        const publicKeyHex = await walletProvider.getPublicKeyHex();
+        if (!publicKeyHex) {
+          const noPubKeyError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "BTC wallet provider returned an empty public key.",
+          );
+          logger.error(noPubKeyError, {
+            tags: { errorCode: noPubKeyError.errorCode },
+          });
+          throw noPubKeyError;
+        }
+
+        const publicKeyBuffer = getPublicKeyNoCoord(publicKeyHex);
+        const publicKeyNoCoordHex = publicKeyBuffer.toString("hex");
+
+        if (!publicKeyNoCoordHex) {
+          const emptyProcessedPubKeyError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "Processed BTC public key (no coordinates) is empty.",
+          );
+          logger.error(emptyProcessedPubKeyError, {
+            tags: { errorCode: emptyProcessedPubKeyError.errorCode },
+          });
+          throw emptyProcessedPubKeyError;
+        }
 
         setBTCWalletProvider(walletProvider);
         setNetwork(toNetwork(network));
         setAddress(address);
-        setPublicKeyNoCoord(publicKeyNoCoord.toString("hex"));
+        setPublicKeyNoCoord(publicKeyNoCoordHex);
         setLoading(false);
 
-        Sentry.addBreadcrumb({
-          level: "info",
-          message: "Connect BTC wallet",
-          data: {
-            network,
-            address,
-            publicKeyNoCoord,
-            walletName: await walletProvider.getWalletProviderName(),
-          },
+        setUser({
+          btcAddress: address,
+        });
+
+        logger.info("BTC wallet connected", {
+          network,
+          userPublicKey: publicKeyNoCoordHex,
+          btcAddress: address,
+          walletName: await walletProvider.getWalletProviderName(),
         });
       } catch (error: any) {
+        const clientError = new ClientError(
+          ERROR_CODES.WALLET_ACTION_FAILED,
+          error.message,
+          { cause: error as Error },
+        );
+        logger.error(clientError, {
+          tags: {
+            errorCode: clientError.errorCode,
+          },
+        });
         handleError({
-          error: new ClientError(
-            {
-              message: error.message,
-              type: ErrorType.WALLET,
-            },
-            { cause: error },
-          ),
+          error: clientError,
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
           },
@@ -158,7 +215,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError, publicKeyNoCoord, address],
+    [handleError, publicKeyNoCoord, address, logger],
   );
 
   useEffect(() => {
@@ -201,10 +258,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         {} as Record<string, string>,
       );
 
-    Sentry.addBreadcrumb({
-      level: "info",
-      message: "Installed BTC wallets",
-      data: installedWallets,
+    logger.info("Installed BTC wallets", {
+      installedWallets: Object.values(installedWallets).join(", "),
     });
   }, [btcConnector]);
 
@@ -226,13 +281,20 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
       getBTCTipHeight: async () => getTipHeight(),
       getInscriptions: async (): Promise<InscriptionIdentifier[]> => {
         if (!btcWalletProvider?.getInscriptions) {
-          throw new Error("`getInscriptions` method is not provided");
+          const clientError = new ClientError(
+            ERROR_CODES.WALLET_CONFIGURATION_ERROR,
+            "`getInscriptions` method is not provided by the wallet",
+          );
+          logger.warn(clientError.message, {
+            errorCode: clientError.errorCode,
+          });
+          throw clientError;
         }
 
         return btcWalletProvider.getInscriptions();
       },
     }),
-    [btcWalletProvider],
+    [btcWalletProvider, logger],
   );
 
   const btcContextValue = useMemo(

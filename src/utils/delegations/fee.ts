@@ -1,8 +1,6 @@
 import { Transaction } from "bitcoinjs-lib";
 
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
-import { ClientError } from "@/app/context/Error/errors/clientError";
-import { ErrorType } from "@/app/types/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 const FEE_TOLERANCE_COEFFICIENT = 2;
 
@@ -29,16 +27,14 @@ export const txFeeSafetyCheck = (
   const upperBound = txFee * FEE_TOLERANCE_COEFFICIENT;
 
   if (estimatedFee > upperBound) {
-    throw new ClientError({
-      message: "Estimated fee is too high",
-      category: ClientErrorCategory.CLIENT_VALIDATION,
-      type: ErrorType.STAKING,
-    });
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      "Estimated fee is too high",
+    );
   } else if (estimatedFee < lowerBound) {
-    throw new ClientError({
-      message: "Estimated fee is too low",
-      category: ClientErrorCategory.CLIENT_VALIDATION,
-      type: ErrorType.STAKING,
-    });
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      "Estimated fee is too low",
+    );
   }
 };

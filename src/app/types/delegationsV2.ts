@@ -1,7 +1,5 @@
-import { ClientErrorCategory } from "@/app/constants/errorMessages";
-import { ClientError } from "@/app/context/Error/errors";
+import { ClientError, ERROR_CODES } from "@/errors";
 
-import { ErrorType } from "./errors";
 import { FinalityProvider } from "./finalityProviders";
 
 export interface DelegationLike {
@@ -109,11 +107,10 @@ export const getDelegationV2StakingState = (
   );
 
   if (!validState) {
-    throw new ClientError({
-      message: `Invalid delegation state: ${state}`,
-      category: ClientErrorCategory.CLIENT_VALIDATION,
-      type: ErrorType.DELEGATIONS,
-    });
+    throw new ClientError(
+      ERROR_CODES.VALIDATION_ERROR,
+      `Invalid delegation state: ${state}`,
+    );
   }
 
   return validState;

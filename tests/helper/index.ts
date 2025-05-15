@@ -3,6 +3,8 @@ import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
 import { getPublicKeyNoCoord } from "@/utils/wallet";
 
 // Initialize the ECC library
@@ -49,7 +51,10 @@ export class DataGenerator {
     const keyPair = ECPair.makeRandom({ network: this.network });
     const { privateKey, publicKey } = keyPair;
     if (!privateKey || !publicKey) {
-      throw new Error("Failed to generate random key pair");
+      throw new ClientError(
+        ERROR_CODES.INITIALIZATION_ERROR,
+        "Failed to generate random key pair",
+      );
     }
     let pk = publicKey.toString("hex");
     return {
@@ -126,7 +131,8 @@ export class DataGenerator {
    */
   getRandomIntegerBetween = (min: number, max: number): number => {
     if (min > max) {
-      throw new Error(
+      throw new ClientError(
+        ERROR_CODES.VALIDATION_ERROR,
         "The minimum number should be less than or equal to the maximum number.",
       );
     }
@@ -151,7 +157,8 @@ export class DataGenerator {
       network: this.network,
     });
     if (!address || !scriptPubKey) {
-      throw new Error(
+      throw new ClientError(
+        ERROR_CODES.INITIALIZATION_ERROR,
         "Failed to generate taproot address or script from public key",
       );
     }
@@ -163,7 +170,8 @@ export class DataGenerator {
 
   private getNativeSegwitAddress = (publicKey: string) => {
     if (publicKey.length != COMPRESSED_PUBLIC_KEY_HEX_LENGTH) {
-      throw new Error(
+      throw new ClientError(
+        ERROR_CODES.VALIDATION_ERROR,
         "Invalid public key length for generating native segwit address",
       );
     }
@@ -173,7 +181,8 @@ export class DataGenerator {
       network: this.network,
     });
     if (!address || !scriptPubKey) {
-      throw new Error(
+      throw new ClientError(
+        ERROR_CODES.INITIALIZATION_ERROR,
         "Failed to generate native segwit address or script from public key",
       );
     }
