@@ -72,6 +72,9 @@ export function useRegistrationService() {
   }, [subscribeToSigningSteps, setStep]);
 
   const registerPhase1Delegation = useCallback(async () => {
+    logger.info("Executing registerPhase1Delegation", {
+      selectedDelegationId: selectedDelegation?.stakingTxHashHex ?? "undefined",
+    });
     // set the step to staking-slashing
     setStep("registration-staking-slashing");
 
@@ -131,6 +134,11 @@ export function useRegistrationService() {
         refetchV2Delegations();
       }
       setProcessing(false);
+      logger.info("registerPhase1Delegation completed", {
+        selectedDelegationId:
+          selectedDelegation?.stakingTxHashHex ?? "undefined",
+        finalState: delegation?.state ?? "undefined",
+      });
     } catch (error: any) {
       handleError({
         error,

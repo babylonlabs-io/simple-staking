@@ -98,6 +98,7 @@ export const useStakingManagerService = () => {
     signBbnTx,
     versionedParams,
     eventEmitter,
+    logger,
   ]);
 
   const on = useCallback(

@@ -34,6 +34,7 @@ export const useHealthCheck = () => {
         tags: {
           errorCode: clientError.errorCode,
           errorSource: "useHealthCheck",
+          isGeoblocked: isGeoBlocked ? "true" : "false",
         },
       });
 
@@ -44,7 +45,7 @@ export const useHealthCheck = () => {
         },
       });
     }
-  }, [isError, error, refetch, handleError]);
+  }, [isError, error, refetch, handleError, logger]);
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
   const isGeoBlocked = data ? isGeoBlockedResult(data) : false;

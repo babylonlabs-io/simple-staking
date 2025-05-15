@@ -261,7 +261,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     logger.info("Installed BTC wallets", {
       installedWallets: Object.values(installedWallets).join(", "),
     });
-  }, [btcConnector]);
+  }, [btcConnector, logger]);
 
   const btcWalletMethods = useMemo(
     () => ({
