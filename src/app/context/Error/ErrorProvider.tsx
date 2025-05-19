@@ -8,13 +8,7 @@ import React, {
 } from "react";
 
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
-import {
-  Error as AppError,
-  ErrorHandlerParam,
-  ErrorType,
-} from "@/app/types/errors";
-
-import { ClientError, ServerError } from "./errors";
+import { Error as AppError, ErrorHandlerParam } from "@/app/types/errors";
 
 // Error source identifiers
 export const ERROR_SOURCES = {
@@ -77,12 +71,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
 
       // Get error source from metadata if available
       const paramErrorSource = metadata?.errorSource as string | undefined;
-      const clientErrorSource =
-        error instanceof ClientError && error.metadata?.errorSource;
-      const serverErrorSource =
-        error instanceof ServerError && error.metadata?.errorSource;
-      const errorSource: string | undefined =
-        serverErrorSource || paramErrorSource || clientErrorSource;
+      const errorSource: string | undefined = paramErrorSource;
 
       const combinedMetadata = {
         errorSource: errorSource,
@@ -104,20 +93,6 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         message: error.message,
         trace: stackTrace,
         ...combinedMetadata,
-        ...(error instanceof ClientError && {
-          displayMessage: error.displayMessage,
-          category: error.category,
-        }),
-        ...(error instanceof ServerError && {
-          endpoint: error.endpoint,
-          displayMessage: error.displayMessage,
-          request: error.request || {},
-          response: error.response || {},
-        }),
-        type:
-          "type" in error && error.type !== undefined
-            ? error.type
-            : ErrorType.UNKNOWN,
       };
 
       if (shouldShowModal) {

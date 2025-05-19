@@ -60,7 +60,6 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
       logger.error(clientError, {
         tags: {
           errorCode: clientError.errorCode,
-          errorSource: "StakingStatsProvider",
         },
       });
       handleError({
