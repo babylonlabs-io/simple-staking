@@ -64,7 +64,6 @@ export function useClientQuery<
       logger.error(error, {
         tags: {
           errorCode: error.errorCode,
-          errorSource: "useClientQuery",
         },
       });
       handleError({

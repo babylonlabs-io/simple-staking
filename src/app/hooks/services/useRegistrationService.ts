@@ -52,7 +52,7 @@ export function useRegistrationService() {
     resetRegistration: reset,
     refetch: refetchV1Delegations,
   } = useDelegationState();
-  const { transitionPhase1Delegation, subscribeToSigningSteps } =
+  const { transitionPhase1Delegation, subscribeToSigningSteps, tipHeight } =
     useTransactionService();
   const { addDelegation, refetch: refetchV2Delegations } =
     useDelegationV2State();
@@ -100,6 +100,12 @@ export function useRegistrationService() {
           stakingTimelock: selectedDelegation.stakingTx.timelock,
         },
       };
+
+      logger.info("Executing registration action", {
+        selectedDelegationId: selectedDelegation?.stakingTxHashHex,
+        stakingTxHex: registrationData.stakingTxHex,
+        stakingHeight: registrationData.startHeight,
+      });
 
       const { signedBabylonTx } = await transitionPhase1Delegation(
         registrationData.stakingTxHex,

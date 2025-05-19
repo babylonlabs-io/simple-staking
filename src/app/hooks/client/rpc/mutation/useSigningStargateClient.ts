@@ -20,12 +20,6 @@ export const useSigningStargateClient = () => {
         res.rawLog ||
           "Transaction failed with non-zero code and no raw log provided.",
       );
-      logger.info("Transaction submission error", {
-        txType: txType || "",
-        code: res.code,
-        txHash: res.transactionHash || "",
-        rawLog: res.rawLog || "",
-      });
       const clientError = new ClientError(
         ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
         errorMessage,
@@ -34,7 +28,12 @@ export const useSigningStargateClient = () => {
       logger.error(clientError, {
         tags: {
           errorCode: clientError.errorCode,
+        },
+        data: {
           txType,
+          code: res.code,
+          txHash: res.transactionHash,
+          rawLog: res.rawLog || "",
         },
       });
       return clientError; // Return it to be thrown by the caller
@@ -57,7 +56,6 @@ export const useSigningStargateClient = () => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:simulate",
           },
         });
         throw clientError;
@@ -100,7 +98,6 @@ export const useSigningStargateClient = () => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:signAndBroadcast",
           },
         });
         throw clientError;
@@ -149,7 +146,6 @@ export const useSigningStargateClient = () => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:signTx",
           },
         });
         throw clientError;
@@ -187,7 +183,6 @@ export const useSigningStargateClient = () => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:broadcastTx",
           },
         });
         throw clientError;

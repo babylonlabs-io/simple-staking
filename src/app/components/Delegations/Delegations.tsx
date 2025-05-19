@@ -175,7 +175,6 @@ export const Delegations = ({}) => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            action: "unbond",
           },
         });
         throw clientError;
@@ -223,7 +222,6 @@ export const Delegations = ({}) => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            errorSource: "Delegations:handleWithdraw",
           },
         });
         throw clientError;
@@ -239,7 +237,6 @@ export const Delegations = ({}) => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            action: "withdraw",
           },
         });
         throw clientError;
@@ -266,7 +263,6 @@ export const Delegations = ({}) => {
       logger.error(error, {
         tags: {
           errorCode: error.errorCode,
-          action: "withdraw",
         },
       });
       handleError({

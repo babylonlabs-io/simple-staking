@@ -27,7 +27,6 @@ export function useRpcErrorHandler() {
       logger.error(clientError, {
         tags: {
           errorCode: clientError.errorCode,
-          errorSource: "RPC_CONNECTION",
         },
       });
 

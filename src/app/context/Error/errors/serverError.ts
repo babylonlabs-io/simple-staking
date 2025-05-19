@@ -1,6 +1,9 @@
 import { HttpStatusCode } from "@/app/api/httpStatusCodes";
 import { ErrorType } from "@/app/types/errors";
 
+/**
+ * @deprecated This class is deprecated and will be removed in a future version.
+ */
 export class ServerError extends Error {
   readonly name = "ServerError";
   readonly displayMessage: string;
@@ -41,10 +44,16 @@ export class ServerError extends Error {
     Object.setPrototypeOf(this, ServerError.prototype);
   }
 
+  /**
+   * @deprecated This method is deprecated along with the class.
+   */
   public getDisplayMessage(): string {
     return this.displayMessage;
   }
 
+  /**
+   * @deprecated This method is deprecated along with the class.
+   */
   public getStatusCode(): number {
     return this.status;
   }

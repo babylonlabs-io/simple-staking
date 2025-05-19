@@ -53,7 +53,6 @@ export function useOrdinals(
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
-            errorSource: "ORDINALS",
           },
         });
         throw clientError;
