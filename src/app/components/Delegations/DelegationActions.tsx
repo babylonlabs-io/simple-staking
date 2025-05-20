@@ -2,6 +2,7 @@ import { Button, Loader, Popover, Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
+import { twJoin } from "tailwind-merge";
 
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useStakingManagerReady } from "@/app/hooks/services/useStakingManagerReady";
@@ -179,11 +180,12 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
                 setIsPopoverOpen(false);
               }
             }}
-            className={`flex items-center gap-1 text-accent-primary transition-all ${
+            className={twJoin(
+              "flex items-center gap-1 text-accent-primary transition-all",
               isStakingManagerReady
                 ? "hover:brightness-125"
-                : "opacity-50 cursor-not-allowed"
-            }`}
+                : "opacity-50 cursor-not-allowed",
+            )}
           >
             Unbond
             {!isStakingManagerReady && (

@@ -4,15 +4,14 @@ import { useStakingManagerService } from "./useStakingManagerService";
 
 export function useStakingManagerReady() {
   const { createBtcStakingManager } = useStakingManagerService();
-  const [ready, setReady] = useState<boolean>(() =>
-    Boolean(createBtcStakingManager()),
-  );
+  const [ready, setReady] = useState<boolean>(false);
 
   useEffect(() => {
-    if (!ready && createBtcStakingManager()) {
+    const stakingManager = createBtcStakingManager();
+    if (stakingManager) {
       setReady(true);
     }
-  }, [ready, createBtcStakingManager]);
+  }, [createBtcStakingManager]);
 
   return ready;
 }
