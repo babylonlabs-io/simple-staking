@@ -3,7 +3,7 @@ import {
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
 import { EventEmitter } from "events";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
@@ -33,23 +33,19 @@ export const useStakingManagerService = () => {
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
   const { current: eventEmitter } = useRef<EventEmitter>(new EventEmitter());
-  const [stakingManager, setStakingManager] =
-    useState<BabylonBtcStakingManager | null>(null);
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const isLoading =
+    !btcNetwork ||
+    !cosmosConnected ||
+    !btcConnected ||
+    !signPsbt ||
+    !signMessage ||
+    !signBbnTx ||
+    !versionedParams ||
+    versionedParams.length === 0;
 
   const createBtcStakingManager = useCallback(() => {
-    if (stakingManager) return stakingManager;
-
-    if (
-      !btcNetwork ||
-      !cosmosConnected ||
-      !btcConnected ||
-      !signPsbt ||
-      !signMessage ||
-      !signBbnTx ||
-      !versionedParams ||
-      versionedParams.length === 0
-    ) {
+    if (isLoading) {
       logger.info("createBtcStakingManager", {
         cosmosConnected,
         btcConnected,
@@ -90,53 +86,24 @@ export const useStakingManagerService = () => {
       },
     };
 
-    const manager = new BabylonBtcStakingManager(
+    return new BabylonBtcStakingManager(
       btcNetwork,
       versionedParams,
       btcProvider,
       bbnProvider,
     );
-
-    setStakingManager(manager);
-    return manager;
   }, [
+    isLoading,
     btcNetwork,
+    versionedParams,
+    logger,
     cosmosConnected,
     btcConnected,
     signPsbt,
     signMessage,
     signBbnTx,
-    versionedParams,
     eventEmitter,
-    stakingManager,
   ]);
-
-  useEffect(() => {
-    const attemptCreateManager = () => {
-      const manager = createBtcStakingManager();
-
-      if (manager) {
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-          timeoutRef.current = null;
-        }
-      } else {
-        timeoutRef.current = setTimeout(() => {
-          attemptCreateManager();
-        }, RETRY_DELAY);
-      }
-    };
-
-    if (!stakingManager) {
-      attemptCreateManager();
-    }
-
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
-      }
-    };
-  }, [createBtcStakingManager, logger, stakingManager]);
 
   const on = useCallback(
     (callback: (step: SigningStep) => void) => {
@@ -153,8 +120,8 @@ export const useStakingManagerService = () => {
   );
 
   return {
+    isLoading,
     createBtcStakingManager,
-    stakingManager,
     on,
     off,
   };

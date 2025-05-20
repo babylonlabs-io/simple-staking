@@ -30,7 +30,7 @@ type TableParams = {
 
 const networkConfig = getNetworkConfig();
 
-const getColumns = (): TableColumn<DelegationWithFP, TableParams>[] => [
+const columns: TableColumn<DelegationWithFP, TableParams>[] = [
   {
     field: "Inception",
     headerName: "Inception",
@@ -110,10 +110,8 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const { stakingManager } = useStakingManagerService();
-  const isStakingManagerReady = Boolean(stakingManager);
-
-  const columns = getColumns();
+  const { isLoading: isStakingManagerLoading } = useStakingManagerService();
+  const isStakingManagerReady = !isStakingManagerLoading;
 
   return (
     <Card>
