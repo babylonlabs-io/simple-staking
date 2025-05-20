@@ -20,11 +20,9 @@ export type FeatureFlag = "MULTISTAKING";
  * @returns True if the feature is enabled, false otherwise
  */
 export function isFeatureEnabled(flag: FeatureFlag): boolean {
-  const envKey = `FF_${flag}`;
+  const envKey = `NEXT_PUBLIC_FF_${flag}`;
   const flagValue = process.env[envKey]?.toLowerCase();
-
-  // Default to false if not explicitly set to "true"
-  return flagValue === "true";
+  return flagValue == "true";
 }
 
 /**

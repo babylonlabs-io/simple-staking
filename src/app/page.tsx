@@ -1,7 +1,7 @@
 "use client";
 
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { StakingForm } from "@/app/components/Staking/StakingForm";
 
@@ -12,11 +12,15 @@ import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
+import { MultistakingForm } from "./components/Staking/MultistakingForm";
 import { Stats } from "./components/Stats/Stats";
 
 const Home = () => {
+  const [showMultistaking, setShowMultistaking] = useState(true);
+
   useEffect(() => {
     initBTCCurve();
+    // setShowMultistaking(true);
   }, []);
 
   return (
@@ -30,7 +34,7 @@ const Home = () => {
       >
         <Stats />
         <PersonalBalance />
-        <StakingForm />
+        {showMultistaking ? <MultistakingForm /> : <StakingForm />}
         <Activity />
         <FAQ />
       </Container>
