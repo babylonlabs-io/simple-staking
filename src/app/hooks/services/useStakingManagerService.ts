@@ -1,5 +1,6 @@
 import {
   BabylonBtcStakingManager,
+  SignPsbtOptions,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
 import { EventEmitter } from "events";
@@ -56,9 +57,13 @@ export const useStakingManagerService = () => {
     }
 
     const btcProvider = {
-      signPsbt: async (signingStep: SigningStep, psbt: string) => {
+      signPsbt: async (
+        signingStep: SigningStep,
+        psbt: string,
+        options: SignPsbtOptions,
+      ) => {
         eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
-        return signPsbt(psbt);
+        return signPsbt(psbt, options);
       },
       signMessage: async (
         signingStep: SigningStep,
