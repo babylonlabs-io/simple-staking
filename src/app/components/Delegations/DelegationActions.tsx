@@ -39,8 +39,8 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { disabled } = useStakingState();
-  const { stakingManager } = useStakingManagerService();
-  const isStakingManagerReady = Boolean(stakingManager);
+  const { isLoading } = useStakingManagerService();
+  const isStakingManagerReady = !isLoading;
 
   const {
     balanceQuery: { data: bbnBalance = 0 },
