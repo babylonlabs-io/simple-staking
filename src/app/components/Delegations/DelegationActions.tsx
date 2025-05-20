@@ -5,7 +5,7 @@ import { Tooltip } from "react-tooltip";
 import { twJoin } from "tailwind-merge";
 
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
-import { useStakingManagerReady } from "@/app/hooks/services/useStakingManagerReady";
+import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
 import { DelegationState } from "@/app/types/delegations";
@@ -39,7 +39,8 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { disabled } = useStakingState();
-  const isStakingManagerReady = useStakingManagerReady();
+  const { stakingManager } = useStakingManagerService();
+  const isStakingManagerReady = Boolean(stakingManager);
 
   const {
     balanceQuery: { data: bbnBalance = 0 },

@@ -4,7 +4,7 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { useStakingManagerReady } from "@/app/hooks/services/useStakingManagerReady";
+import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
@@ -110,7 +110,8 @@ export function DelegationList() {
     closeConfirmationModal,
   } = useDelegationService();
 
-  const isStakingManagerReady = useStakingManagerReady();
+  const { stakingManager } = useStakingManagerService();
+  const isStakingManagerReady = Boolean(stakingManager);
 
   const columns = getColumns();
 
