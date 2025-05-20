@@ -15,8 +15,6 @@ const stakingManagerEvents = {
   SIGNING: "signing",
 } as const;
 
-const RETRY_DELAY = 2000;
-
 export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
