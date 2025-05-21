@@ -176,10 +176,9 @@ export const useTransactionService = () => {
       const stakingTx = Transaction.fromHex(stakingTxHex);
       const inclusionProof = await getInclusionProof(stakingTx);
 
-      logger.info("Transitioning delegation to phase 1", {
+      logger.info("Transitioning delegation", {
         stakingHeight,
         stakingTxId: stakingTx.getId(),
-        stakingTxHex,
       });
 
       const { signedBabylonTx } =
@@ -237,14 +236,6 @@ export const useTransactionService = () => {
 
       const unsignedStakingTx = Transaction.fromHex(unsignedStakingTxHex);
 
-      logger.info("Submitting staking transaction", {
-        paramVersion,
-        expectedTxHashHex,
-        unsignedStakingTxHex,
-        unsignedStakingTxId: unsignedStakingTx.getId(),
-        availableUTXOsLength: availableUTXOs.length,
-      });
-
       const signedStakingTx =
         await btcStakingManager!.createSignedBtcStakingTransaction(
           stakerInfo,
@@ -255,10 +246,6 @@ export const useTransactionService = () => {
         );
 
       if (signedStakingTx.getId() !== expectedTxHashHex) {
-        logger.info("Staking transaction hash mismatch", {
-          expectedTxHashHex,
-          actualTxHash: signedStakingTx.getId(),
-        });
         const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
@@ -266,6 +253,10 @@ export const useTransactionService = () => {
         logger.error(clientError, {
           tags: {
             errorCode: clientError.errorCode,
+          },
+          data: {
+            expectedTxHashHex,
+            unsignedStakingTxHex,
           },
         });
         throw clientError;
@@ -304,11 +295,6 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
-      logger.info("Executing submitUnbondingTx", {
-        paramVersion,
-        stakingTxHex,
-        unbondingTxHex,
-      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -394,7 +380,7 @@ export const useTransactionService = () => {
     ) => {
       logger.info("Executing submitTimelockUnbondedWithdrawalTx", {
         paramVersion,
-        stakingTxHex,
+        stakingTxHash: Transaction.fromHex(stakingTxHex).getId(),
       });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
@@ -437,10 +423,6 @@ export const useTransactionService = () => {
       paramVersion: number,
       slashingTxHex: string,
     ) => {
-      logger.info("Executing submitSlashingWithdrawalTx", {
-        paramVersion,
-        slashingTxHex,
-      });
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,

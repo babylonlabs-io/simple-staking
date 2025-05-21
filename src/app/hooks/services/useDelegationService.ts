@@ -320,11 +320,7 @@ export function useDelegationService() {
         action,
         delegationState: state,
         stakingTxHashHex,
-        stakingTxHex,
-        unbondingTxHex,
         paramsVersion,
-        stakingSlashingTxHex: slashing?.stakingSlashingTxHex,
-        unbondingSlashingTxHex: slashing?.unbondingSlashingTxHex,
         slashingSpendingHeight: slashing?.spendingHeight,
       });
 
