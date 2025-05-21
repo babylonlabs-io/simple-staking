@@ -91,9 +91,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             `Cosmos wallet chain ID does not match configured chain ID (${chainId}).`,
           );
-          logger.error(networkMismatchError, {
-            tags: { errorCode: networkMismatchError.errorCode },
-          });
+          logger.error(networkMismatchError);
           throw networkMismatchError;
         }
 
@@ -103,9 +101,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "Cosmos wallet provider returned an empty address.",
           );
-          logger.error(noAddressError, {
-            tags: { errorCode: noAddressError.errorCode },
-          });
+          logger.error(noAddressError);
           throw noAddressError;
         }
 
@@ -115,9 +111,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "Cosmos wallet provider returned an empty wallet name.",
           );
-          logger.error(noWalletNameError, {
-            tags: { errorCode: noWalletNameError.errorCode },
-          });
+          logger.error(noWalletNameError);
           throw noWalletNameError;
         }
 
@@ -150,11 +144,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           error.message,
           { cause: error as Error },
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         handleError({
           error: clientError,
           displayOptions: {

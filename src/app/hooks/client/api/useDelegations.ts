@@ -73,7 +73,6 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       );
       logger.error(clientError, {
         tags: {
-          errorCode: clientError.errorCode,
           isGeoblocked: isGeoBlocked ? "true" : "false",
         },
         data: {

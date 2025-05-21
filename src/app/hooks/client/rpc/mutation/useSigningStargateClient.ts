@@ -26,9 +26,6 @@ export const useSigningStargateClient = () => {
         { cause: causeError },
       );
       logger.error(clientError, {
-        tags: {
-          errorCode: clientError.errorCode,
-        },
         data: {
           txType,
           code: res.code,
@@ -53,11 +50,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
       if (bech32Address) {
@@ -95,11 +88,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
       if (bech32Address) {
@@ -143,11 +132,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
 
@@ -180,11 +165,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
 

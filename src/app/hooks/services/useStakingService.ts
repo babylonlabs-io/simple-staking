@@ -150,11 +150,7 @@ export function useStakingService() {
           "Error creating EOI",
           { cause: error },
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         handleError({
           error,
           metadata: {
@@ -219,11 +215,7 @@ export function useStakingService() {
           "Error submitting staking transaction",
           { cause: error },
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         reset();
         handleError({
           error,
