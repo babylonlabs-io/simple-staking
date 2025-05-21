@@ -52,7 +52,7 @@ export function useRegistrationService() {
     resetRegistration: reset,
     refetch: refetchV1Delegations,
   } = useDelegationState();
-  const { transitionPhase1Delegation, subscribeToSigningSteps, tipHeight } =
+  const { transitionPhase1Delegation, subscribeToSigningSteps } =
     useTransactionService();
   const { addDelegation, refetch: refetchV2Delegations } =
     useDelegationV2State();
