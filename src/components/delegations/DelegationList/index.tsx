@@ -4,7 +4,11 @@ import {
   ActionType,
   useDelegationService,
 } from "@/app/hooks/services/useDelegationService";
-import { DelegationWithFP } from "@/app/types/delegationsV2";
+import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
+import {
+  DelegationV2StakingState,
+  DelegationWithFP,
+} from "@/app/types/delegationsV2";
 import { GridTable, type TableColumn } from "@/components/common/GridTable";
 import { Hint } from "@/components/common/Hint";
 import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
@@ -21,6 +25,7 @@ import { NoDelegations } from "./NoDelegations";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void;
+  isStakingManagerReady: boolean;
 };
 
 const networkConfig = getNetworkConfig();
@@ -65,17 +70,25 @@ const columns: TableColumn<DelegationWithFP, TableParams>[] = [
     field: "actions",
     headerName: "Action",
     width: "minmax(max-content, 0.5fr)",
-    renderCell: (row, _, { handleActionClick, validations }) => {
+    renderCell: (
+      row,
+      _,
+      { handleActionClick, validations, isStakingManagerReady },
+    ) => {
       const { valid, error } = validations[row.stakingTxHashHex];
 
-      // Hide the action button if the delegation is invalid
       if (!valid) return null;
+
+      const isUnbondDisabled =
+        row.state === DelegationV2StakingState.ACTIVE && !isStakingManagerReady;
 
       return (
         <ActionButton
           tooltip={error}
           delegation={row}
           onClick={handleActionClick}
+          disabled={isUnbondDisabled}
+          showLoader={isUnbondDisabled}
         />
       );
     },
@@ -96,6 +109,9 @@ export function DelegationList() {
     openConfirmationModal,
     closeConfirmationModal,
   } = useDelegationService();
+
+  const { isLoading: isStakingManagerLoading } = useStakingManagerService();
+  const isStakingManagerReady = !isStakingManagerLoading;
 
   return (
     <Card>
@@ -123,6 +139,7 @@ export function DelegationList() {
         params={{
           handleActionClick: openConfirmationModal,
           validations,
+          isStakingManagerReady,
         }}
         fallback={<NoDelegations />}
       />
