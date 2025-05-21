@@ -172,7 +172,6 @@ export const Delegations = ({}) => {
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for unbonding",
         );
-        logger.error(clientError);
         throw clientError;
       }
       // Sign the withdrawal transaction
@@ -193,7 +192,8 @@ export const Delegations = ({}) => {
         selectedDelegation,
         DelegationState.INTERMEDIATE_UNBONDING,
       );
-    } catch (error: Error | any) {
+    } catch (error: any) {
+      logger.error(error);
       handleError({
         error,
       });

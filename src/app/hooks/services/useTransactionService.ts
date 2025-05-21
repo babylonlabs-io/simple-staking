@@ -302,7 +302,7 @@ export const useTransactionService = () => {
 
       await pushTx(signedUnbondingTx.toHex());
     },
-    [createBtcStakingManager, pushTx, stakerInfo, tipHeight, logger],
+    [createBtcStakingManager, pushTx, stakerInfo, tipHeight],
   );
 
   /**
@@ -426,14 +426,7 @@ export const useTransactionService = () => {
         );
       await pushTx(signedWithdrawalTx.toHex());
     },
-    [
-      createBtcStakingManager,
-      defaultFeeRate,
-      pushTx,
-      stakerInfo,
-      tipHeight,
-      logger,
-    ],
+    [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
   /**

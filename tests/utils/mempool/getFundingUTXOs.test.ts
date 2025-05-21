@@ -1,3 +1,5 @@
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
 import { getUTXOs } from "@/utils/mempool_api";
 
 // Mocking fetch globally
@@ -135,6 +137,11 @@ describe("getFundingUTXOs", () => {
         }
       });
 
-    await expect(getUTXOs("testAddress")).rejects.toThrow("Invalid address");
+    await expect(getUTXOs("testAddress")).rejects.toThrow(
+      new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        "Error getting UTXOs",
+      ),
+    );
   });
 });

@@ -17,7 +17,7 @@ import {
   ONE_SECOND,
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 
 export function useClientQuery<
@@ -56,14 +56,9 @@ export function useClientQuery<
 
   useEffect(() => {
     if (data.isError) {
-      const error = new ClientError(
-        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        (data.error as Error).message || "Unknown error",
-        { cause: data.error },
-      );
-      logger.error(error);
+      logger.error(data.error as ClientError);
       handleError({
-        error,
+        error: data.error as ClientError,
         displayOptions: {
           retryAction: data.refetch,
         },

@@ -12,6 +12,8 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
 
 import { useClientQuery } from "../../useClient";
 import { useRpcErrorHandler } from "../useRpcErrorHandler";
@@ -60,7 +62,10 @@ export const useBbnQuery = () => {
         ) {
           return 0;
         }
-        throw error;
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          "Error getting rewards",
+        );
       }
       if (!rewards) {
         return 0;
