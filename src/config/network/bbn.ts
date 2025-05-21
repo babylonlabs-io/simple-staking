@@ -6,7 +6,7 @@ import { bbnMainnet } from "./bbn/mainnet";
 import { bbnTestnet } from "./bbn/testnet";
 
 const defaultNetwork = "devnet";
-export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
+export const network = import.meta.env.VITE_NETWORK ?? defaultNetwork;
 
 const config: Record<string, BBNConfig> = {
   mainnet: {

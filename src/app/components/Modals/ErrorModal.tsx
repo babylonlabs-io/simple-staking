@@ -77,7 +77,7 @@ export const ErrorModal: React.FC = () => {
         device: navigator.userAgent,
         version,
         release: version,
-        environment: process.env.NODE_ENV,
+        environment: import.meta.env.NODE_ENV,
         ...error,
       },
       null,
