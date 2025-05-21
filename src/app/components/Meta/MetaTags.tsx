@@ -1,6 +1,7 @@
 import { getNetworkAppUrl } from "@/config";
 import { getCommitHash } from "@/utils/version";
 
+//TODO: migrate to Vite
 export default function MetaTags() {
   const commitHash = getCommitHash();
 

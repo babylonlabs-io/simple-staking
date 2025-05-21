@@ -5,7 +5,6 @@ import {
   Heading,
   Text,
 } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { FiCheck, FiCopy } from "react-icons/fi";
 
@@ -105,7 +104,7 @@ export const ErrorModal: React.FC = () => {
     >
       <DialogBody className="text-accent-primary py-16 text-center">
         <div className="inline-flex bg-primary-contrast h-20 w-20 items-center justify-center mb-6">
-          <Image src={WarningTriangle} alt="Warning" width={48} height={42} />
+          <img src={WarningTriangle} alt="Warning" width={48} height={42} />
         </div>
 
         <Heading variant="h4" className="mb-4 text-accent-primary">

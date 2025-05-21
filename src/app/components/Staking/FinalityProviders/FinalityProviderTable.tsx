@@ -4,7 +4,6 @@
 import "core-js/features/array/to-sorted";
 
 import { Loader, Table, useWatch } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
 
 import warningOctagon from "@/app/assets/warning-octagon.svg";
 import warningTriangle from "@/app/assets/warning-triangle.svg";
@@ -33,9 +32,7 @@ export const FinalityProviderTable = ({
 
   const errorView = (
     <StatusView
-      icon={
-        <Image src={warningTriangle} alt="Warning" width={88} height={88} />
-      }
+      icon={<img src={warningTriangle} alt="Warning" width={88} height={88} />}
       title="Failed to Load"
       description={
         <>
@@ -55,9 +52,7 @@ export const FinalityProviderTable = ({
 
   const noMatchesView = (
     <StatusView
-      icon={
-        <Image src={warningOctagon} alt="Warning" width={160} height={160} />
-      }
+      icon={<img src={warningOctagon} alt="Warning" width={160} height={160} />}
       title="No Matches Found"
     />
   );

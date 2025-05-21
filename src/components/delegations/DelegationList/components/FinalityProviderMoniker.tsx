@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import {
   FinalityProvider,
@@ -25,13 +23,13 @@ const STATUSES: Record<
     tooltip: (
       <span>
         This finality provider has been jailed.{" "}
-        <Link
+        <a
           className="text-secondary-main"
           target="_blank"
           href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
         >
           Learn more
-        </Link>
+        </a>
       </span>
     ),
   },
@@ -39,13 +37,13 @@ const STATUSES: Record<
     tooltip: (
       <span>
         This finality provider has been slashed.{" "}
-        <Link
+        <a
           className="text-secondary-main"
           target="_blank"
           href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
         >
           Learn more
-        </Link>
+        </a>
       </span>
     ),
     status: "error",

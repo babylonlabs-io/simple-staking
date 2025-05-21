@@ -9,7 +9,6 @@
     "lint": "eslint ./src",
     "preview": "vite preview",
     "build:e2e": "env-cmd -f .env.test next build",
-    "start": "next start",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "clean": "rm -r node_modules",
@@ -108,9 +107,6 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --quiet --fix"
-    ],
     "*.{js,jsx,ts,tsx,json,css,scss,md,yml,yaml}": [
       "prettier --write --ignore-unknown"
     ]
