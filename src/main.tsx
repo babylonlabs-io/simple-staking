@@ -5,8 +5,7 @@ import "./app/globals.css";
 import Layout from "@/app/layout";
 import HomePage from "@/app/page";
 
-console.log(import.meta.env);
-
+//TODO: fix eslint
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Layout>
