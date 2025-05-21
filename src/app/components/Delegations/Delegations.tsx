@@ -215,7 +215,6 @@ export const Delegations = ({}) => {
           ERROR_CODES.MISSING_DATA_ERROR,
           "Network fees not found",
         );
-        logger.error(clientError);
         throw clientError;
       }
       // Prevent the modal from closing
@@ -226,7 +225,6 @@ export const Delegations = ({}) => {
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for withdrawal",
         );
-        logger.error(clientError);
         throw clientError;
       }
       // Sign the withdrawal transaction
@@ -247,7 +245,7 @@ export const Delegations = ({}) => {
         selectedDelegation,
         DelegationState.INTERMEDIATE_WITHDRAWAL,
       );
-    } catch (error: Error | any) {
+    } catch (error: any) {
       logger.error(error);
       handleError({
         error,

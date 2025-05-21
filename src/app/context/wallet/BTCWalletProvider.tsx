@@ -120,7 +120,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             `BTC wallet network (${network}) does not match configured network (${btcConfig.network}).`,
           );
-          logger.error(networkMismatchError);
           throw networkMismatchError;
         }
 
@@ -130,7 +129,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "BTC wallet provider returned an empty address.",
           );
-          logger.error(noAddressError);
           throw noAddressError;
         }
 
@@ -150,7 +148,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "BTC wallet provider returned an empty public key.",
           );
-          logger.error(noPubKeyError);
           throw noPubKeyError;
         }
 
@@ -162,7 +159,6 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "Processed BTC public key (no coordinates) is empty.",
           );
-          logger.error(emptyProcessedPubKeyError);
           throw emptyProcessedPubKeyError;
         }
 
@@ -183,14 +179,9 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           walletName: await walletProvider.getWalletProviderName(),
         });
       } catch (error: any) {
-        const clientError = new ClientError(
-          ERROR_CODES.WALLET_ACTION_FAILED,
-          error.message,
-          { cause: error as Error },
-        );
-        logger.error(clientError);
+        logger.error(error);
         handleError({
-          error: clientError,
+          error,
           displayOptions: {
             retryAction: () => connectBTC(walletProvider),
           },
