@@ -80,7 +80,7 @@ export function useV1TransactionService() {
           ERROR_CODES.VALIDATION_ERROR,
           "Transaction not eligible for unbonding",
         );
-        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        logger.warn(clientError.message);
         throw clientError;
       }
 
@@ -124,11 +124,7 @@ export function useV1TransactionService() {
           `Error submitting unbonding transaction: ${error instanceof Error ? error.message : String(error)}`,
           { cause: error as Error },
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
     },
@@ -238,7 +234,7 @@ const validateCommonInputs = (
       ERROR_CODES.INITIALIZATION_ERROR,
       "BTC Staking Manager not initialized",
     );
-    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    logger?.warn(clientError.message);
     throw clientError;
   }
   if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
@@ -246,7 +242,7 @@ const validateCommonInputs = (
       ERROR_CODES.INITIALIZATION_ERROR,
       "Staker info not initialized",
     );
-    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    logger?.warn(clientError.message);
     throw clientError;
   }
   if (!versionedParams?.length) {
@@ -254,7 +250,7 @@ const validateCommonInputs = (
       ERROR_CODES.INITIALIZATION_ERROR,
       "Staking params not loaded",
     );
-    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    logger?.warn(clientError.message);
     throw clientError;
   }
 };

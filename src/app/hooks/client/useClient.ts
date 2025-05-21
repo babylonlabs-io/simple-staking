@@ -61,11 +61,7 @@ export function useClientQuery<
         (data.error as Error).message || "Unknown error",
         { cause: data.error },
       );
-      logger.error(error, {
-        tags: {
-          errorCode: error.errorCode,
-        },
-      });
+      logger.error(error);
       handleError({
         error,
         displayOptions: {

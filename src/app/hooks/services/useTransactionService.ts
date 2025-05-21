@@ -77,11 +77,7 @@ export const useTransactionService = () => {
           ERROR_CODES.INITIALIZATION_ERROR,
           "Available UTXOs not initialized",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
 
@@ -133,11 +129,7 @@ export const useTransactionService = () => {
           ERROR_CODES.INITIALIZATION_ERROR,
           "Available UTXOs not initialized",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
       const fee = btcStakingManager!.estimateBtcStakingFee(
@@ -226,11 +218,7 @@ export const useTransactionService = () => {
           ERROR_CODES.INITIALIZATION_ERROR,
           "Available UTXOs not initialized",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
 
@@ -251,9 +239,6 @@ export const useTransactionService = () => {
           `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
         );
         logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
           data: {
             expectedTxHashHex,
             unsignedStakingTxHex,

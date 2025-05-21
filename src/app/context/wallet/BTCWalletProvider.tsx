@@ -120,9 +120,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             `BTC wallet network (${network}) does not match configured network (${btcConfig.network}).`,
           );
-          logger.error(networkMismatchError, {
-            tags: { errorCode: networkMismatchError.errorCode },
-          });
+          logger.error(networkMismatchError);
           throw networkMismatchError;
         }
 
@@ -132,9 +130,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "BTC wallet provider returned an empty address.",
           );
-          logger.error(noAddressError, {
-            tags: { errorCode: noAddressError.errorCode },
-          });
+          logger.error(noAddressError);
           throw noAddressError;
         }
 
@@ -144,9 +140,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             supportedNetworkMessage,
           );
-          logger.warn(clientError.message, {
-            errorCode: clientError.errorCode,
-          });
+          logger.warn(clientError.message);
           throw clientError;
         }
 
@@ -156,9 +150,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "BTC wallet provider returned an empty public key.",
           );
-          logger.error(noPubKeyError, {
-            tags: { errorCode: noPubKeyError.errorCode },
-          });
+          logger.error(noPubKeyError);
           throw noPubKeyError;
         }
 
@@ -170,9 +162,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "Processed BTC public key (no coordinates) is empty.",
           );
-          logger.error(emptyProcessedPubKeyError, {
-            tags: { errorCode: emptyProcessedPubKeyError.errorCode },
-          });
+          logger.error(emptyProcessedPubKeyError);
           throw emptyProcessedPubKeyError;
         }
 
@@ -198,11 +188,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
           error.message,
           { cause: error as Error },
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(clientError);
         handleError({
           error: clientError,
           displayOptions: {
@@ -285,9 +271,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "`getInscriptions` method is not provided by the wallet",
           );
-          logger.warn(clientError.message, {
-            errorCode: clientError.errorCode,
-          });
+          logger.warn(clientError.message);
           throw clientError;
         }
 
