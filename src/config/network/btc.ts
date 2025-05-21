@@ -5,7 +5,7 @@ import { Network } from "@/app/types/network";
 import { ClientError, ERROR_CODES } from "@/errors";
 
 const defaultNetwork = "devnet";
-export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
+export const network = import.meta.env.VITE_NETWORK ?? defaultNetwork;
 
 const config: Record<string, BTCConfig> = {
   mainnet: {

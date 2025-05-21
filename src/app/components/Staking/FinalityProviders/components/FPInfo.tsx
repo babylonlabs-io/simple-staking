@@ -1,4 +1,3 @@
-import Image from "next/image";
 import { FiExternalLink } from "react-icons/fi";
 
 import blue from "@/app/assets/blue-check.svg";
@@ -15,7 +14,7 @@ export const FPInfo = ({ moniker, website }: FPInfoProps) => {
 
   return (
     <div className="flex items-center gap-1">
-      <Image src={blue} alt="verified" />
+      <img src={blue} alt="verified" />
       <span>
         {moniker}
         {website && (

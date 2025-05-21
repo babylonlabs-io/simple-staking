@@ -1,5 +1,3 @@
-import { ValueOf } from "next/dist/shared/lib/constants";
-
 export const ClientErrorCategory = {
   CLIENT_VALIDATION: "CLIENT_VALIDATION",
   CLIENT_TRANSACTION: "CLIENT_TRANSACTION",
@@ -9,7 +7,8 @@ export const ClientErrorCategory = {
   COMPLIANCE: "COMPLIANCE_ERROR",
 } as const;
 
-export type ClientErrorCategory = ValueOf<typeof ClientErrorCategory>;
+export type ClientErrorCategory =
+  (typeof ClientErrorCategory)[keyof typeof ClientErrorCategory];
 
 // Client error messages mapping
 const CLIENT_ERROR_MESSAGES: Record<ClientErrorCategory, string> = {

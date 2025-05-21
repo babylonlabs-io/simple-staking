@@ -1,7 +1,6 @@
 "use client";
 
 import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
 
 import BitcoinBlock from "@/app/assets/bitcoin-block.svg";
 import { Container } from "@/app/components/Container/Container";
@@ -28,7 +27,7 @@ export default function GenericError({
 
       <Container className="py-12 px-6">
         <div className="flex flex-col items-center justify-center gap-8">
-          <Image
+          <img
             src={image}
             alt="Generic Error"
             className="w-full h-auto max-w-[120px]"
