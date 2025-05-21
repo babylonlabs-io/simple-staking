@@ -33,17 +33,18 @@ export const useStakingManagerService = () => {
 
   const { current: eventEmitter } = useRef<EventEmitter>(new EventEmitter());
 
+  const isLoading =
+    !btcNetwork ||
+    !cosmosConnected ||
+    !btcConnected ||
+    !signPsbt ||
+    !signMessage ||
+    !signBbnTx ||
+    !versionedParams ||
+    versionedParams.length === 0;
+
   const createBtcStakingManager = useCallback(() => {
-    if (
-      !btcNetwork ||
-      !cosmosConnected ||
-      !btcConnected ||
-      !signPsbt ||
-      !signMessage ||
-      !signBbnTx ||
-      !versionedParams ||
-      versionedParams.length === 0
-    ) {
+    if (isLoading) {
       logger.info("createBtcStakingManager", {
         cosmosConnected,
         btcConnected,
@@ -95,13 +96,15 @@ export const useStakingManagerService = () => {
       bbnProvider,
     );
   }, [
+    isLoading,
     btcNetwork,
+    versionedParams,
+    logger,
     cosmosConnected,
     btcConnected,
     signPsbt,
     signMessage,
     signBbnTx,
-    versionedParams,
     eventEmitter,
   ]);
 
@@ -120,6 +123,7 @@ export const useStakingManagerService = () => {
   );
 
   return {
+    isLoading,
     createBtcStakingManager,
     on,
     off,

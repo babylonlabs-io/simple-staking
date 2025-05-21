@@ -1,4 +1,4 @@
-import { Button } from "@babylonlabs-io/core-ui";
+import { Button, Loader } from "@babylonlabs-io/core-ui";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
@@ -13,6 +13,8 @@ interface ActionButtonProps {
   tooltip?: string | JSX.Element;
   delegation: DelegationWithFP;
   onClick?: (action: ActionType, delegation: DelegationWithFP) => void;
+  disabled?: boolean;
+  showLoader?: boolean;
 }
 
 type Actions = Record<
@@ -127,6 +129,8 @@ export function ActionButton({
   delegation,
   tooltip,
   onClick,
+  disabled = false,
+  showLoader = false,
 }: ActionButtonProps) {
   const buttonProps =
     ACTION_BUTTON_PROPS[delegation.fp?.state]?.[delegation.state];
@@ -139,8 +143,11 @@ export function ActionButton({
         variant="outlined"
         size="small"
         onClick={() => onClick?.(buttonProps.action, delegation)}
+        disabled={disabled}
+        className="flex items-center gap-1"
       >
         {buttonProps.title}
+        {showLoader && <Loader size={12} className="text-accent-primary" />}
       </Button>
     </Hint>
   );

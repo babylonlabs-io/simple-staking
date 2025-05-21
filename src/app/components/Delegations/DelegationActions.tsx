@@ -1,9 +1,11 @@
-import { Button, Popover, Text } from "@babylonlabs-io/core-ui";
+import { Button, Loader, Popover, Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
+import { twJoin } from "tailwind-merge";
 
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
+import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
 import { DelegationState } from "@/app/types/delegations";
@@ -37,6 +39,8 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { disabled } = useStakingState();
+  const { isLoading } = useStakingManagerService();
+  const isStakingManagerReady = !isLoading;
 
   const {
     balanceQuery: { data: bbnBalance = 0 },
@@ -108,8 +112,13 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           size="small"
           color="primary"
           onClick={() => onUnbond(stakingTxHashHex)}
+          disabled={!isStakingManagerReady}
+          className="flex items-center gap-1"
         >
           Unbond
+          {!isStakingManagerReady && (
+            <Loader size={12} className="text-accent-primary" />
+          )}
         </Button>
       </div>
     );
@@ -167,12 +176,22 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             variant="body2"
             as="button"
             onClick={() => {
-              onUnbond(stakingTxHashHex);
-              setIsPopoverOpen(false);
+              if (isStakingManagerReady) {
+                onUnbond(stakingTxHashHex);
+                setIsPopoverOpen(false);
+              }
             }}
-            className="text-accent-primary transition-all hover:brightness-125"
+            className={twJoin(
+              "flex items-center gap-1 text-accent-primary transition-all",
+              isStakingManagerReady
+                ? "hover:brightness-125"
+                : "opacity-50 cursor-not-allowed",
+            )}
           >
             Unbond
+            {!isStakingManagerReady && (
+              <Loader size={12} className="text-accent-primary ml-1" />
+            )}
           </Text>
         </Popover>
       </div>
