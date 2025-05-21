@@ -3,10 +3,10 @@ const DEFAULT_BBN_GAS_PRICE = 0.002;
 
 // API URL configuration
 export const getApiBaseUrl = (): string => {
-  let apiUrl = process.env.NEXT_PUBLIC_API_URL;
+  let apiUrl = import.meta.env.VITE_API_URL;
 
   if (!apiUrl) {
-    throw new Error("NEXT_PUBLIC_API_URL environment variable is not defined");
+    throw new Error("VITE_API_URL environment variable is not defined");
   }
 
   if (apiUrl === "/") {
@@ -19,9 +19,7 @@ export const getApiBaseUrl = (): string => {
 // shouldDisplayTestingMsg function is used to check if the application is running in testing mode or not.
 // Default to true if the environment variable is not set.
 export const shouldDisplayTestingMsg = (): boolean => {
-  return (
-    process.env.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES?.toString() !== "false"
-  );
+  return import.meta.env.VITE_DISPLAY_TESTING_MESSAGES?.toString() !== "false";
 };
 
 // getNetworkAppUrl function is used to get the network app url based on the environment
@@ -32,16 +30,14 @@ export const getNetworkAppUrl = (): string => {
 };
 
 export const DEFAULT_FILTER_VALUE: "active" | "inactive" =
-  process.env.NEXT_PUBLIC_DEFAULT_FP_FILTER === "inactive"
-    ? "inactive"
-    : "active";
+  import.meta.env.VITE_DEFAULT_FP_FILTER === "inactive" ? "inactive" : "active";
 
 export const IS_FIXED_TERM_FIELD =
-  process.env.NEXT_PUBLIC_FIXED_STAKING_TERM === "true";
+  import.meta.env.VITE_FIXED_STAKING_TERM === "true";
 
 // BBN_GAS_PRICE is used to get the gas price for BABY
 export const BBN_GAS_PRICE = (() => {
-  const price = parseFloat(process.env.NEXT_PUBLIC_BBN_GAS_PRICE || "");
+  const price = parseFloat(import.meta.env.VITE_BBN_GAS_PRICE || "");
   if (isNaN(price) || price <= 0 || price >= 1) {
     return DEFAULT_BBN_GAS_PRICE; // fallback to default if invalid
   }
@@ -53,7 +49,7 @@ export const BBN_GAS_PRICE = (() => {
 export const PROD_ENVS = ["phase-2-mainnet"];
 
 export const isProductionEnv = (): boolean => {
-  const env = process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "";
+  const env = import.meta.env.VITE_SENTRY_ENVIRONMENT ?? "";
   return PROD_ENVS.includes(env);
 };
 
@@ -61,7 +57,6 @@ export const isProductionEnv = (): boolean => {
 // You can find the wallet name from the wallet provider.
 export const getDisabledWallets = (): string[] => {
   return (
-    process.env.NEXT_PUBLIC_DISABLED_WALLETS?.split(",").map((w) => w.trim()) ||
-    []
+    import.meta.env.VITE_DISABLED_WALLETS?.split(",").map((w) => w.trim()) || []
   );
 };

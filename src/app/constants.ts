@@ -40,16 +40,16 @@ export const DOCUMENTATION_LINKS = {
     "https://babylonlabs.io/blog/technical-preliminaries-of-bitcoin-staking",
 } as const;
 
-export const BBN_FEE_AMOUNT = process.env.NEXT_PUBLIC_BBN_FEE_AMOUNT;
+export const BBN_FEE_AMOUNT = import.meta.env.VITE_BBN_FEE_AMOUNT;
 
 export const MEMPOOL_API =
-  process.env.NEXT_PUBLIC_MEMPOOL_API || "https://mempool.space";
+  import.meta.env.VITE_MEMPOOL_API || "https://mempool.space";
 
 export const STAKING_DISABLED =
-  process.env.NEXT_PUBLIC_STAKING_DISABLED === "true";
+  import.meta.env.VITE_STAKING_DISABLED === "true";
 
-export const BABYLON_EXPLORER = process.env.NEXT_PUBLIC_BABYLON_EXPLORER ?? "";
+export const BABYLON_EXPLORER = import.meta.env.VITE_BABYLON_EXPLORER ?? "";
 
 export const REPLAYS_ON_ERROR_RATE = parseFloat(
-  process.env.NEXT_PUBLIC_REPLAYS_RATE ?? "0.05",
+  import.meta.env.VITE_REPLAYS_RATE ?? "0.05",
 );
