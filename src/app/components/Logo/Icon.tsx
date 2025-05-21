@@ -1,5 +1,4 @@
 import { useTheme } from "next-themes";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 import darkIcon from "@/app/assets/icon-black.svg";
@@ -25,7 +24,7 @@ export const Icon: React.FC<IconProps> = () => {
 
   return (
     <span className="inline-block mx-2">
-      <Image
+      <img
         src={lightSelected ? darkIcon : lightIcon}
         alt="Babylon"
         width={24}

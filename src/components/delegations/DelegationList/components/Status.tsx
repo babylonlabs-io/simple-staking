@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useMemo, type JSX } from "react";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
@@ -144,13 +143,13 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
         <>
           This Finality Provider has been slashed and is no longer available for
           staking.{" "}
-          <Link
+          <a
             className="text-secondary-main"
             target="_blank"
             href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
           >
             Learn more
-          </Link>
+          </a>
         </>
       ),
     }),
