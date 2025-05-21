@@ -28,8 +28,8 @@ const nextConfig = {
   },
 };
 
-// Skip Sentry during CI or when the DISABLE_SENTRY flag is set to avoid warnings and speed up builds/tests
-const isSentryDisabled = process.env.CI || process.env.DISABLE_SENTRY === "true";
+// Skip Sentry during the E2E build or when the DISABLE_SENTRY flag is set to avoid warnings and speed up builds/tests
+const isSentryDisabled = process.env.NEXT_BUILD_E2E || process.env.DISABLE_SENTRY === "true";
 
 const config = isSentryDisabled
   ? nextConfig
