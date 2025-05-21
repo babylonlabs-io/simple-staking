@@ -20,28 +20,27 @@ const SENTRY_DEVICE_ID_KEY = "sentry_device_id";
 
 Sentry.init({
   enabled: Boolean(
-    process.env.NEXT_PUBLIC_SIDECAR_API_URL &&
-      process.env.NEXT_PUBLIC_SENTRY_DSN,
+    import.meta.env.VITE_SIDECAR_API_URL && import.meta.env.VITE_SENTRY_DSN,
   ),
   // This is pointing to the DSN (Data Source Name) for my local instance.
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  dsn: import.meta.env.VITE_SENTRY_DSN,
 
   // Tunnel endpoint for proxying Sentry events through our own server
   // This helps avoid ad-blockers and CSP issues
-  tunnel: process.env.NEXT_PUBLIC_SIDECAR_API_URL
-    ? `${process.env.NEXT_PUBLIC_SIDECAR_API_URL}/sentry-tunnel`
+  tunnel: import.meta.env.VITE_SIDECAR_API_URL
+    ? `${import.meta.env.VITE_SIDECAR_API_URL}/sentry-tunnel`
     : "http://localhost:8092/sentry-tunnel",
 
   // This environment variable is provided in the CI
-  environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "local",
+  environment: import.meta.env.VITE_SENTRY_ENVIRONMENT ?? "local",
 
   // Ensure this release ID matches the one used during 'next build' for source map uploads
-  // It's passed via NEXT_PUBLIC_RELEASE_ID in the build environment (e.g., GitHub Actions)
-  release: process.env.NEXT_PUBLIC_RELEASE_ID ?? "local-dev",
+  // It's passed via VITE_RELEASE_ID in the build environment (e.g., GitHub Actions)
+  release: import.meta.env.VITE_RELEASE_ID ?? "local-dev",
 
   // Ensure this dist ID matches the one used during 'next build' for source map uploads
-  // It's passed via NEXT_PUBLIC_DIST_ID in the build environment (e.g., GitHub Actions)
-  dist: process.env.NEXT_PUBLIC_DIST_ID ?? "local",
+  // It's passed via VITE_DIST_ID in the build environment (e.g., GitHub Actions)
+  dist: import.meta.env.VITE_DIST_ID ?? "local",
 
   // Adjust this value in production, or use tracesSampler for greater control
   tracesSampleRate: 1,
