@@ -1,8 +1,8 @@
 import {
   BabylonBtcStakingManager,
-  SignPsbtOptions,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { EventEmitter } from "events";
 import { useCallback, useRef } from "react";
 
