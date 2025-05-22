@@ -22,6 +22,7 @@ import cosmos from "@/app/assets/cosmos.png";
 import ethereum from "@/app/assets/ethereum.png";
 import sui from "@/app/assets/sui.png";
 import { KeybaseImage } from "@/app/components/KeybaseImage/KeybaseImage";
+import { MultistakingPreviewModal } from "@/app/components/Modals/MultistakingModal/MultistakingStartModal";
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { Section } from "@/app/components/Section/Section";
 import { BBN_FEE_AMOUNT } from "@/app/constants";
@@ -35,7 +36,6 @@ import { BBNFeeAmount } from "@/components/staking/StakingForm/components/BBNFee
 import { BTCFeeAmount } from "@/components/staking/StakingForm/components/BTCFeeAmount";
 import { BTCFeeRate } from "@/components/staking/StakingForm/components/BTCFeeRate";
 import { Total } from "@/components/staking/StakingForm/components/Total";
-import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
@@ -446,6 +446,8 @@ export function MultistakingForm() {
   const [selectedChain, setSelectedChain] = useState<string>("babylon");
   const [counter, setCounter] = useState(0);
   const { finalityProviders } = useFinalityProviderState();
+  const { step, processing, reset } = useStakingState();
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const handleSelectProvider = (selectedProviderKey: string) => {
     if (selectedProviderKey) {
@@ -463,13 +465,17 @@ export function MultistakingForm() {
     setIsModalOpen(false);
   };
 
+  const handlePreview = (data: any) => {
+    setPreviewModalOpen(true);
+  };
+
   return (
     <Section title={`${networkName} Staking`}>
       <Form
         schema={validationSchema}
         mode="onChange"
         reValidateMode="onChange"
-        onSubmit={displayPreview}
+        onSubmit={handlePreview}
       >
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
@@ -517,7 +523,16 @@ export function MultistakingForm() {
               </div>
             </SubSection>
             <FeesSection />
-            <Button className="w-full" style={{ marginTop: "8px" }}>
+            <Button
+              //@ts-ignore - fix type issue in core-ui
+              type="submit"
+              className="w-full"
+              style={{ marginTop: "8px" }}
+              onClick={(e) => {
+                e.preventDefault();
+                setPreviewModalOpen(true);
+              }}
+            >
               Preview
             </Button>
           </Card>
@@ -548,8 +563,70 @@ export function MultistakingForm() {
           )}
         </ResponsiveDialog>
 
-        <StakingModal />
+        <FormValuesConsumer
+          selectedProviders={selectedProviders}
+          previewModalOpen={previewModalOpen}
+          setPreviewModalOpen={setPreviewModalOpen}
+        />
       </Form>
     </Section>
   );
 }
+
+const FormValuesConsumer = ({
+  selectedProviders,
+  previewModalOpen,
+  setPreviewModalOpen,
+}: {
+  selectedProviders: Array<any>;
+  previewModalOpen: boolean;
+  setPreviewModalOpen: (open: boolean) => void;
+}) => {
+  // Use form context hooks to get values
+  const btcAmount = useWatch({ name: "amount", defaultValue: "0" });
+  const feeRate = useWatch({ name: "feeRate", defaultValue: "1" });
+  const feeAmount = useWatch({ name: "feeAmount", defaultValue: "0" });
+  const { coinSymbol } = getNetworkConfigBTC();
+
+  return (
+    <MultistakingPreviewModal
+      open={previewModalOpen}
+      processing={false}
+      onClose={() => setPreviewModalOpen(false)}
+      onProceed={() => {
+        // Handle proceeding to the next step
+        setPreviewModalOpen(false);
+      }}
+      bsns={[
+        {
+          icon: <Image src={babylon} alt="babylon" className="w-6 h-6" />,
+          name: "Babylon Genesis",
+        },
+      ]}
+      finalityProviders={selectedProviders.map((provider) => ({
+        icon: (
+          <KeybaseImage
+            identity={provider.description?.identity}
+            moniker={provider.description?.moniker}
+            size="small"
+          />
+        ),
+        name:
+          provider.description?.moniker ||
+          trim(provider.btcPk, 8) ||
+          "Selected FP",
+      }))}
+      details={{
+        stakeAmount: `${parseFloat(btcAmount) || 0} ${coinSymbol}`,
+        feeRate: `${feeRate} sat/vB`,
+        transactionFees: `${parseFloat(feeAmount) || 0} ${coinSymbol}`,
+        term: {
+          blocks: "5000 blocks",
+          duration: "~ 35 days",
+        },
+        onDemandBonding: "Enabled (~ 7 days unbonding time)",
+        unbondingFee: "0.0001 BTC",
+      }}
+    />
+  );
+};
