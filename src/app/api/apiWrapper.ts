@@ -54,22 +54,11 @@ export const apiWrapper = async <TResponseData = unknown>(
     options.signal = AbortSignal.timeout(timeout);
   }
 
-  const requestData = {
-    method,
-    url,
-    path,
-    queryParams: params?.query,
-    body: params?.body,
-    timeout,
-  };
-
   try {
     const response = await fetch(url, options);
 
     if (!response.ok) {
-      const responseText = await response
-        .text()
-        .catch(() => generalErrorMessage);
+      await response.text().catch(() => generalErrorMessage);
 
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,

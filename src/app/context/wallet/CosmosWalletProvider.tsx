@@ -85,7 +85,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           : // otherwise, use `getOfflineSigner` for direct signer
             await provider.getOfflineSigner();
 
-        // @ts-ignore - chainId is missing in keplr types
+        // @ts-expect-error - chainId is missing in keplr types
         if (offlineSigner.chainId && offlineSigner.chainId !== chainId) {
           const networkMismatchError = new ClientError(
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,

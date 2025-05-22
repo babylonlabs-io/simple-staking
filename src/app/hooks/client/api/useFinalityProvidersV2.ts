@@ -31,7 +31,7 @@ export function useFinalityProvidersV2({
   const { isOpen, handleError } = useError();
 
   const query = useInfiniteQuery({
-    queryKey: [FINALITY_PROVIDERS_KEY],
+    queryKey: [FINALITY_PROVIDERS_KEY, pk, sortBy, order, name],
     queryFn: ({ pageParam = "" }) =>
       getFinalityProvidersV2({ key: pageParam, pk, sortBy, order, name }),
     getNextPageParam: (lastPage) =>
