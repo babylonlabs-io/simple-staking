@@ -1,9 +1,9 @@
 "use client";
-import { SignPsbtOptions } from "@babylonlabs-io/btc-staking-ts";
 import {
   IBTCProvider,
   InscriptionIdentifier,
   Network,
+  SignPsbtOptions,
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
