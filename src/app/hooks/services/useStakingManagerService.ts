@@ -99,7 +99,6 @@ export const useStakingManagerService = () => {
     isLoading,
     btcNetwork,
     versionedParams,
-    logger,
     cosmosConnected,
     btcConnected,
     signPsbt,
