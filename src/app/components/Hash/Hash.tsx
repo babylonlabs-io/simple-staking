@@ -26,7 +26,7 @@ export const Hash: React.FC<HashProps> = ({
   className,
   symbols = 8,
 }) => {
-  const [_value, copy] = useCopyToClipboard();
+  const [, copy] = useCopyToClipboard();
   const [copiedText, setCopiedText] = useState("");
 
   const handleCopy = () => {
