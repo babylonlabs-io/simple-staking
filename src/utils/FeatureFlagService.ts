@@ -20,7 +20,7 @@ class FeatureFlagService {
    * @param flagName The feature flag name to check
    * @returns True if the feature is enabled, false otherwise
    */
-  private static getFlagValue(flagName: string): boolean {
+  private static getFlagValue(flagName: FeatureFlag): boolean {
     const envKey = `FF_${flagName.toUpperCase()}`;
     const value = process.env[envKey]?.toLowerCase();
     return value === "true";
