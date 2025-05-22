@@ -172,12 +172,6 @@ export const Delegations = ({}) => {
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for unbonding",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            action: "unbond",
-          },
-        });
         throw clientError;
       }
       // Sign the withdrawal transaction
@@ -198,7 +192,8 @@ export const Delegations = ({}) => {
         selectedDelegation,
         DelegationState.INTERMEDIATE_UNBONDING,
       );
-    } catch (error: Error | any) {
+    } catch (error: any) {
+      logger.error(error);
       handleError({
         error,
       });
@@ -220,12 +215,6 @@ export const Delegations = ({}) => {
           ERROR_CODES.MISSING_DATA_ERROR,
           "Network fees not found",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            errorSource: "Delegations:handleWithdraw",
-          },
-        });
         throw clientError;
       }
       // Prevent the modal from closing
@@ -236,12 +225,6 @@ export const Delegations = ({}) => {
           ERROR_CODES.VALIDATION_ERROR,
           "Wrong delegation selected for withdrawal",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            action: "withdraw",
-          },
-        });
         throw clientError;
       }
       // Sign the withdrawal transaction
@@ -262,13 +245,8 @@ export const Delegations = ({}) => {
         selectedDelegation,
         DelegationState.INTERMEDIATE_WITHDRAWAL,
       );
-    } catch (error: Error | any) {
-      logger.error(error, {
-        tags: {
-          errorCode: error.errorCode,
-          action: "withdraw",
-        },
-      });
+    } catch (error: any) {
+      logger.error(error);
       handleError({
         error,
         displayOptions: {
