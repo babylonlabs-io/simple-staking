@@ -1,12 +1,27 @@
-import { Button, Card, Form } from "@babylonlabs-io/core-ui";
+import {
+  Button,
+  Card,
+  DialogBody,
+  DialogFooter,
+  DialogHeader,
+  Form,
+  Text,
+} from "@babylonlabs-io/core-ui";
 import Image from "next/image";
-import { useState } from "react";
+import { PropsWithChildren, useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
+import { MdOutlineInfo } from "react-icons/md";
+import { twMerge } from "tailwind-merge";
 
 import bitcoin from "@/app/assets/bitcoin.png";
+import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { Section } from "@/app/components/Section/Section";
 import { useStakingService } from "@/app/hooks/services/useStakingService";
 import { useStakingState } from "@/app/state/StakingState";
+import { BBNFeeAmount } from "@/components/staking/StakingForm/components/BBNFeeAmount";
+import { BTCFeeAmount } from "@/components/staking/StakingForm/components/BTCFeeAmount";
+import { BTCFeeRate } from "@/components/staking/StakingForm/components/BTCFeeRate";
+import { Total } from "@/components/staking/StakingForm/components/Total";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -56,9 +71,129 @@ const AmountSubsection = () => {
     </SubSection>
   );
 };
+interface ChainButtonProps extends PropsWithChildren {
+  className?: string;
+  disabled?: boolean;
+  logo?: string | JSX.Element;
+  title?: string | JSX.Element;
+  alt?: string;
+  onClick?: () => void;
+}
+
+export function ChainButton({
+  className,
+  disabled,
+  alt,
+  logo,
+  title,
+  children,
+  onClick,
+}: ChainButtonProps) {
+  return (
+    <Text
+      disabled={disabled}
+      as={disabled ? "div" : "button"}
+      style={{
+        backgroundColor: "#F9F9F9",
+        width: "100%",
+        padding: "14px 24px 14px 14px",
+        borderRadius: "4px",
+        border: disabled ? "1px solid transparent" : "1px solid #CE6533",
+        opacity: disabled ? 0.5 : 1,
+      }}
+      className={twMerge(
+        disabled ? "pointer-events-none" : "pointer-events-auto",
+        disabled ? "cursor-default" : "cursor-pointer",
+        className,
+      )}
+      onClick={onClick}
+    >
+      <div
+        className="flex w-full items-center"
+        style={{ justifyContent: "space-between" }}
+      >
+        <div className="flex items-center" style={{ fontSize: "16px" }}>
+          <Image
+            src={bitcoin}
+            alt="bitcoin"
+            className="max-w-[40px] max-h-[40px]"
+            style={{ marginRight: "8px" }}
+          />
+          {title}
+        </div>
+        <div style={{ fontSize: "12px" }}>TVL: 48531.13 BTC ($5.01B)</div>
+      </div>
+    </Text>
+  );
+}
+
+const FinalityProviderModal = ({
+  open,
+  onClose,
+  onSelect,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSelect: (id: string) => void;
+}) => {
+  return (
+    <ResponsiveDialog open={open} onClose={onClose}>
+      <DialogHeader
+        title="Select Available BSN"
+        onClose={onClose}
+        className="text-accent-primary"
+      />
+
+      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
+        <div>
+          Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake chains secured
+          by Bitcoin staking. Select a network to delegate your stake and earn
+          rewards.
+        </div>
+        <div
+          className="overflow-x-auto"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            marginTop: "40px",
+          }}
+        >
+          <ChainButton title="Babylon Genesis" />
+          <ChainButton title="Cosmos" disabled />
+          <ChainButton title="Ethereum" disabled />
+          <ChainButton title="Sui" disabled />
+        </div>
+        <SubSection style={{ fontSize: "16px", color: "#387085" }}>
+          <div>
+            <MdOutlineInfo size={24} />
+          </div>
+          <div>
+            Babylon must be the first BSN you add before selecting others. Once
+            added, you can choose additional BSNs to multistake.
+          </div>
+        </SubSection>
+      </DialogBody>
+
+      <DialogFooter className="flex justify-end">
+        <Button variant="outlined" onClick={onClose}>
+          Cancel
+        </Button>
+      </DialogFooter>
+    </ResponsiveDialog>
+  );
+};
 
 const StakingSubsection = () => {
   const [counter, setCounter] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleSelectProvider = (id: string) => {
+    // Add the selected provider
+    setCounter((prev) => prev + 1);
+    setIsModalOpen(false);
+  };
+
   return (
     <SubSection>
       <div className="flex flex-col w-full" style={{ gap: "16px" }}>
@@ -70,7 +205,7 @@ const StakingSubsection = () => {
             {counter < MAX_FINALITY_PROVIDERS && (
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-[#12495E] ${counter > 0 ? "rounded-r-none" : "rounded"} cursor-pointer`}
-                onClick={() => setCounter(counter + 1)}
+                onClick={() => setIsModalOpen(true)}
               >
                 <AiOutlinePlus size={20} />
               </div>
@@ -93,6 +228,11 @@ const StakingSubsection = () => {
           />
         ))}
       </div>
+      <FinalityProviderModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSelect={handleSelectProvider}
+      />
     </SubSection>
   );
 };
@@ -120,6 +260,18 @@ const FinalityProviderItem = ({ onRemove }: { onRemove: () => void }) => {
   );
 };
 
+const FeesSection = () => {
+  return (
+    <div className="flex flex-col gap-6 p-4">
+      <BTCFeeRate defaultRate={25} />
+      <BTCFeeAmount />
+      <BBNFeeAmount />
+      <div className="divider my-4" />
+      <Total />
+    </div>
+  );
+};
+
 export function MultistakingForm() {
   const { validationSchema } = useStakingState();
   const { displayPreview } = useStakingService();
@@ -136,7 +288,10 @@ export function MultistakingForm() {
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
             <AmountSubsection />
             <StakingSubsection />
-            <Button className="w-full">Preview</Button>
+            <FeesSection />
+            <Button className="w-full" style={{ marginTop: "8px" }}>
+              Preview
+            </Button>
           </Card>
         </div>
 

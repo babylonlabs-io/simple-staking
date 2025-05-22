@@ -13,7 +13,8 @@ export function Total() {
   const [amount, feeAmount] = useWatch({ name: ["amount", "feeAmount"] });
 
   const total = useMemo(
-    () => maxDecimals(parseFloat(amount || "0") + satoshiToBtc(feeAmount), 8),
+    () =>
+      maxDecimals(parseFloat(amount || "0") + satoshiToBtc(feeAmount || 0), 8),
     [amount, feeAmount],
   );
 
