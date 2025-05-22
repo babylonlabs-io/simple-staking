@@ -1,6 +1,5 @@
-import { Text } from "@babylonlabs-io/core-ui";
-
 import { Hash } from "@/app/components/Hash/Hash";
+import { KeybaseImage } from "@/app/components/KeybaseImage/KeybaseImage";
 import {
   FinalityProvider,
   FinalityProviderState,
@@ -26,15 +25,14 @@ export const finalityProviderColumns = [
 
       return (
         <span
-          className="inline-flex gap-1 items-center"
+          className="inline-flex gap-2 items-center"
           title={row.description?.moniker}
         >
-          <Text
-            as="span"
-            className="inline-flex justify-center items-center bg-secondary-main text-accent-contrast size-5 rounded-full text-[0.6rem]"
-          >
-            {row.rank}
-          </Text>
+          <KeybaseImage
+            identity={row.description?.identity}
+            moniker={row.description?.moniker}
+            size="small"
+          />
           {row.description?.moniker || "No name provided"}
         </span>
       );

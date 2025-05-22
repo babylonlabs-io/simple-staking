@@ -7,6 +7,7 @@ import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experime
 import { ThemeProvider } from "next-themes";
 import React, { Suspense } from "react";
 
+import { KeybaseCacheProvider } from "./components/KeybaseImage/KeybaseImage";
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
 import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
@@ -30,13 +31,15 @@ function Providers({ children }: React.PropsWithChildren) {
                 <WalletConnectionProvider>
                   <BTCWalletProvider>
                     <CosmosWalletProvider>
-                      <AppState>
-                        <StakingStatsProvider>
-                          <ReactQueryStreamedHydration>
-                            {children}
-                          </ReactQueryStreamedHydration>
-                        </StakingStatsProvider>
-                      </AppState>
+                      <KeybaseCacheProvider>
+                        <AppState>
+                          <StakingStatsProvider>
+                            <ReactQueryStreamedHydration>
+                              {children}
+                            </ReactQueryStreamedHydration>
+                          </StakingStatsProvider>
+                        </AppState>
+                      </KeybaseCacheProvider>
                     </CosmosWalletProvider>
                   </BTCWalletProvider>
                 </WalletConnectionProvider>

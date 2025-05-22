@@ -9,7 +9,9 @@ interface FeeStatsProps {
 const { coinSymbol } = getNetworkConfigBBN();
 export function BBNFeeAmount({ amount = "0" }: FeeStatsProps) {
   const bbnInUsd = usePrice(coinSymbol);
-  const feeInUsd = calculateTokenValueInCurrency(parseFloat(amount), bbnInUsd);
+  const feeInUsd = calculateTokenValueInCurrency(parseFloat(amount), bbnInUsd, {
+    zeroDisplay: "$0.00",
+  });
 
   return (
     <FeeItem title={`${coinSymbol} Network Fee`} hint={feeInUsd}>

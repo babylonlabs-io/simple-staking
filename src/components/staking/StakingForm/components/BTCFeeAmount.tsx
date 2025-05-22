@@ -13,15 +13,17 @@ export function BTCFeeAmount() {
   const feeAmount = useWatch({ name: "feeAmount" });
 
   const btcInUsd = usePrice(coinSymbol);
-  const formattedFeeAmount = parseFloat(feeAmount);
-  const feeInUsd = calculateTokenValueInCurrency(
-    satoshiToBtc(formattedFeeAmount),
-    btcInUsd,
-  );
+  const formattedFeeAmount = feeAmount ? parseFloat(feeAmount) : 0;
+  const btcAmount = isNaN(formattedFeeAmount)
+    ? 0
+    : satoshiToBtc(formattedFeeAmount);
+  const feeInUsd = calculateTokenValueInCurrency(btcAmount, btcInUsd, {
+    zeroDisplay: "$0.00",
+  });
 
   return (
     <FeeItem title={`${coinSymbol} Network Fee`} hint={feeInUsd}>
-      {satoshiToBtc(formattedFeeAmount)} {coinSymbol}
+      {btcAmount} {coinSymbol}
     </FeeItem>
   );
 }

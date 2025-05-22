@@ -5,7 +5,6 @@ const FIELDS = ["finalityProvider", "term", "amount"];
 
 export const FeeSection = ({ children }: PropsWithChildren) => {
   const fieldStates = useFieldState(FIELDS);
-
   if (fieldStates.some((field) => field.invalid || !field.isDirty)) {
     return null;
   }
