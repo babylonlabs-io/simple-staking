@@ -181,40 +181,47 @@ export async function getTipHeight(): Promise<number> {
  * @returns A promise that resolves into a list of UTXOs.
  */
 export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
-  // Get all UTXOs for the given address
-  const utxos = await fetchApi<
-    {
-      txid: string;
-      vout: number;
-      value: number;
-      status: {
-        confirmed: boolean;
-      };
-    }[]
-  >(utxosInfoUrl(address));
+  try {
+    // Get all UTXOs for the given address
+    const utxos = await fetchApi<
+      {
+        txid: string;
+        vout: number;
+        value: number;
+        status: {
+          confirmed: boolean;
+        };
+      }[]
+    >(utxosInfoUrl(address));
 
-  const sortedUTXOs = utxos.sort((a, b) => b.value - a.value);
+    const sortedUTXOs = utxos.sort((a, b) => b.value - a.value);
 
-  const addressInfo = await fetchApi<{
-    isvalid: boolean;
-    scriptPubKey: string;
-  }>(validateAddressUrl(address));
-  const { isvalid, scriptPubKey } = addressInfo;
+    const addressInfo = await fetchApi<{
+      isvalid: boolean;
+      scriptPubKey: string;
+    }>(validateAddressUrl(address));
+    const { isvalid, scriptPubKey } = addressInfo;
 
-  if (!isvalid) {
+    if (!isvalid) {
+      throw new ClientError(
+        ERROR_CODES.VALIDATION_ERROR,
+        `Invalid address provided for UTXO lookup or mempool API validation failed: ${address}`,
+      );
+    }
+
+    return sortedUTXOs.map((s) => ({
+      txid: s.txid,
+      vout: s.vout,
+      value: s.value,
+      scriptPubKey: scriptPubKey,
+      confirmed: s.status.confirmed,
+    }));
+  } catch (error) {
     throw new ClientError(
-      ERROR_CODES.VALIDATION_ERROR,
-      `Invalid address provided for UTXO lookup or mempool API validation failed: ${address}`,
+      ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+      "Error getting UTXOs",
     );
   }
-
-  return sortedUTXOs.map((s) => ({
-    txid: s.txid,
-    vout: s.vout,
-    value: s.value,
-    scriptPubKey: scriptPubKey,
-    confirmed: s.status.confirmed,
-  }));
 }
 
 /**

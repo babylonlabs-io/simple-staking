@@ -57,12 +57,7 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
         error.message,
         { cause: error as Error },
       );
-      logger.error(clientError, {
-        tags: {
-          errorCode: clientError.errorCode,
-          errorSource: "StakingStatsProvider",
-        },
-      });
+      logger.error(clientError);
       handleError({
         error: clientError,
         displayOptions: {
@@ -70,7 +65,7 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
         },
       });
     }
-  }, [isError, error, handleError, refetch]);
+  }, [isError, error, handleError, refetch, logger]);
 
   return (
     <StakingStatsContext.Provider value={{ data, isLoading }}>

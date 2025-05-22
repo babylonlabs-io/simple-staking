@@ -148,9 +148,6 @@ export function useDelegationService() {
             ERROR_CODES.VALIDATION_ERROR,
             "Covenant unbonding signatures not found",
           );
-          logger.warn(clientError.message, {
-            errorCode: clientError.errorCode,
-          });
           throw clientError;
         }
 
@@ -200,9 +197,6 @@ export function useDelegationService() {
             ERROR_CODES.VALIDATION_ERROR,
             "Unbonding slashing tx not found, can't submit withdrawal",
           );
-          logger.warn(clientError.message, {
-            errorCode: clientError.errorCode,
-          });
           throw clientError;
         }
 
@@ -247,9 +241,6 @@ export function useDelegationService() {
             ERROR_CODES.VALIDATION_ERROR,
             "Slashing tx not found, can't submit withdrawal",
           );
-          logger.warn(clientError.message, {
-            errorCode: clientError.errorCode,
-          });
           throw clientError;
         }
 
@@ -325,6 +316,14 @@ export function useDelegationService() {
         stakingTimelock,
       };
 
+      logger.info("Executing delegation action", {
+        action,
+        delegationState: state,
+        stakingTxHashHex,
+        paramsVersion,
+        slashingSpendingHeight: slashing?.spendingHeight,
+      });
+
       const execute = COMMANDS[action as ActionType];
 
       try {
@@ -346,7 +345,7 @@ export function useDelegationService() {
         toggleProcessingDelegation(stakingTxHashHex, false);
       }
     },
-    [COMMANDS, closeConfirmationModal, toggleProcessingDelegation],
+    [COMMANDS, closeConfirmationModal, toggleProcessingDelegation, logger],
   );
 
   return {

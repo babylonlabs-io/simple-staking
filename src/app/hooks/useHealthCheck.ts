@@ -22,6 +22,10 @@ export const useHealthCheck = () => {
     refetchOnWindowFocus: false,
   });
 
+  const isApiNormal = data?.status === HealthCheckStatus.Normal;
+  const isGeoBlocked = data ? isGeoBlockedResult(data) : false;
+  const apiMessage = data?.message;
+
   useEffect(() => {
     if (isError) {
       const clientError = new ClientError(
@@ -32,8 +36,7 @@ export const useHealthCheck = () => {
 
       logger.error(clientError, {
         tags: {
-          errorCode: clientError.errorCode,
-          errorSource: "useHealthCheck",
+          isGeoblocked: isGeoBlocked ? "true" : "false",
         },
       });
 
@@ -44,11 +47,7 @@ export const useHealthCheck = () => {
         },
       });
     }
-  }, [isError, error, refetch, handleError]);
-
-  const isApiNormal = data?.status === HealthCheckStatus.Normal;
-  const isGeoBlocked = data ? isGeoBlockedResult(data) : false;
-  const apiMessage = data?.message;
+  }, [isError, error, refetch, handleError, logger, isGeoBlocked]);
 
   return {
     isApiNormal,
