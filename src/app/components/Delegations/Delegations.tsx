@@ -32,10 +32,9 @@ import { VerificationModal } from "../Modals/VerificationModal";
 
 import { Delegation } from "./Delegation";
 
-const MODE_TRANSITION = "transition";
 const MODE_WITHDRAW = "withdraw";
 const MODE_UNBOND = "unbond";
-type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW | typeof MODE_UNBOND;
+type MODE = "transition" | "withdraw" | "unbond";
 // step index
 const REGISTRATION_INDEXES: Record<string, number> = {
   "registration-staking-slashing": 1,
@@ -49,7 +48,7 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   "registration-verifying": 2,
 };
 
-export const Delegations = ({}) => {
+export const Delegations = () => {
   const { data: networkInfo } = useNetworkInfo();
   const { publicKeyNoCoord, connected, network } = useBTCWallet();
   const [modalOpen, setModalOpen] = useState(false);

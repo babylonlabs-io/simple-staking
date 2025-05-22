@@ -32,7 +32,7 @@ export function SubmitButton() {
       data-tooltip-place="top"
     >
       <Button
-        //@ts-ignore - fix type issue in core-ui
+        //@ts-expect-error - fix type issue in core-ui
         type="submit"
         disabled={invalid}
         size="large"

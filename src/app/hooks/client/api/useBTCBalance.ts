@@ -12,7 +12,7 @@ export function useBTCBalance() {
   } = useBTCWallet();
 
   return useClientQuery({
-    queryKey: [BTC_BALANCE_KEY],
+    queryKey: [BTC_BALANCE_KEY, address],
     queryFn: () => getBTCBalance(address),
     enabled: btcConnected,
   });
