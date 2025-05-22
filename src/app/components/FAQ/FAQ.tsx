@@ -6,9 +6,7 @@ import { getNetworkConfigBTC } from "@/config/network/btc";
 import { questions } from "./data/questions";
 import { Section } from "./Section";
 
-interface FAQProps {}
-
-export const FAQ: React.FC<FAQProps> = () => {
+export const FAQ = () => {
   const { coinName } = getNetworkConfigBTC();
 
   return (

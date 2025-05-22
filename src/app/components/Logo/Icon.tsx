@@ -4,9 +4,7 @@ import { useEffect, useState } from "react";
 import darkIcon from "@/app/assets/icon-black.svg";
 import lightIcon from "@/app/assets/icon-white.svg";
 
-interface IconProps {}
-
-export const Icon: React.FC<IconProps> = () => {
+export const Icon = () => {
   const [mounted, setMounted] = useState(false);
   const { resolvedTheme } = useTheme();
   const lightSelected = resolvedTheme === "light";
