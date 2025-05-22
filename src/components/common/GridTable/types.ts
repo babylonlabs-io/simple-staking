@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export interface TableColumn<R extends object, P extends object = {}> {
+export interface TableColumn<R extends object, P extends object = object> {
   field: string;
   headerName: ReactNode;
   cellClassName?: string;
@@ -26,7 +26,7 @@ type CellClassNameCreator<R extends object, P extends object> = (
   param: P,
 ) => string;
 
-export interface TableProps<R extends object, P extends object = {}> {
+export interface TableProps<R extends object, P extends object = object> {
   loading?: boolean;
   isFetchingNextPage?: boolean;
   classNames?: {
