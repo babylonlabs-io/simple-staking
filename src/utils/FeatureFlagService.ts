@@ -12,7 +12,7 @@
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
 
-export type FeatureFlag = "MULTISTAKING";
+type FeatureFlag = "MULTISTAKING";
 
 class FeatureFlagService {
   /**
