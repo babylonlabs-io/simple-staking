@@ -91,9 +91,6 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             `Cosmos wallet chain ID does not match configured chain ID (${chainId}).`,
           );
-          logger.error(networkMismatchError, {
-            tags: { errorCode: networkMismatchError.errorCode },
-          });
           throw networkMismatchError;
         }
 
@@ -103,9 +100,6 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "Cosmos wallet provider returned an empty address.",
           );
-          logger.error(noAddressError, {
-            tags: { errorCode: noAddressError.errorCode },
-          });
           throw noAddressError;
         }
 
@@ -115,9 +109,6 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
             ERROR_CODES.WALLET_CONFIGURATION_ERROR,
             "Cosmos wallet provider returned an empty wallet name.",
           );
-          logger.error(noWalletNameError, {
-            tags: { errorCode: noWalletNameError.errorCode },
-          });
           throw noWalletNameError;
         }
 
@@ -145,18 +136,9 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
           chainId,
         });
       } catch (error: any) {
-        const clientError = new ClientError(
-          ERROR_CODES.WALLET_ACTION_FAILED,
-          error.message,
-          { cause: error as Error },
-        );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-          },
-        });
+        logger.error(error);
         handleError({
-          error: clientError,
+          error,
           displayOptions: {
             retryAction: () => connectCosmos(provider),
           },
@@ -236,7 +218,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
     logger.info("Installed Babylon wallets", {
       installedWallets: Object.values(installedWallets).join(", ") || "",
     });
-  }, [bbnConnector]);
+  }, [bbnConnector, logger]);
 
   return (
     <CosmosWalletContext.Provider value={cosmosContextValue}>

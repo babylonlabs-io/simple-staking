@@ -13,31 +13,30 @@ export const useSigningStargateClient = () => {
   const { signingStargateClient, bech32Address } = useCosmosWallet();
   const logger = useLogger();
 
-  const handleTransactionError = (res: DeliverTxResponse, txType: string) => {
-    const errorMessage = `Failed to send ${txType} transaction, code: ${res.code}, txHash: ${res.transactionHash}`;
-    const causeError = new Error(
-      res.rawLog ||
-        "Transaction failed with non-zero code and no raw log provided.",
-    );
-    logger.info("Transaction submission error", {
-      txType: txType || "",
-      code: res.code,
-      txHash: res.transactionHash || "",
-      rawLog: res.rawLog || "",
-    });
-    const clientError = new ClientError(
-      ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
-      errorMessage,
-      { cause: causeError },
-    );
-    logger.error(clientError, {
-      tags: {
-        errorCode: clientError.errorCode,
-        txType,
-      },
-    });
-    return clientError; // Return it to be thrown by the caller
-  };
+  const handleTransactionError = useCallback(
+    (res: DeliverTxResponse, txType: string) => {
+      const errorMessage = `Failed to send ${txType} transaction, code: ${res.code}, txHash: ${res.transactionHash}`;
+      const causeError = new Error(
+        res.rawLog ||
+          "Transaction failed with non-zero code and no raw log provided.",
+      );
+      const clientError = new ClientError(
+        ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
+        errorMessage,
+        { cause: causeError },
+      );
+      logger.error(clientError, {
+        data: {
+          txType,
+          code: res.code,
+          txHash: res.transactionHash,
+          rawLog: res.rawLog || "",
+        },
+      });
+      return clientError; // Return it to be thrown by the caller
+    },
+    [logger],
+  );
 
   /**
    * Simulates a transaction to estimate the gas fee
@@ -51,12 +50,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:simulate",
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
       if (bech32Address) {
@@ -69,7 +63,7 @@ export const useSigningStargateClient = () => {
         `estimate transaction fee for ${msg.typeUrl}`,
       );
     },
-    [signingStargateClient, bech32Address],
+    [signingStargateClient, bech32Address, logger],
   );
 
   /**
@@ -94,12 +88,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:signAndBroadcast",
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
       if (bech32Address) {
@@ -121,7 +110,7 @@ export const useSigningStargateClient = () => {
         gasUsed: res.gasUsed.toString(),
       };
     },
-    [signingStargateClient, bech32Address, logger],
+    [signingStargateClient, bech32Address, logger, handleTransactionError],
   );
 
   /**
@@ -143,12 +132,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:signTx",
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
 
@@ -161,7 +145,7 @@ export const useSigningStargateClient = () => {
       return TxRaw.encode(res).finish();
     },
 
-    [signingStargateClient, bech32Address],
+    [signingStargateClient, bech32Address, logger],
   );
 
   /**
@@ -181,12 +165,7 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            errorSource: "useSigningStargateClient:broadcastTx",
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
 
@@ -199,7 +178,7 @@ export const useSigningStargateClient = () => {
         txHash: res.transactionHash,
       };
     },
-    [signingStargateClient, bech32Address, logger],
+    [signingStargateClient, bech32Address, logger, handleTransactionError],
   );
 
   return { simulate, signAndBroadcast, signTx, broadcastTx };

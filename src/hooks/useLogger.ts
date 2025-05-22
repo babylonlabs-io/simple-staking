@@ -1,5 +1,7 @@
 import { SeverityLevel, addBreadcrumb, captureException } from "@sentry/nextjs";
 
+import { ClientError } from "@/errors";
+
 type Context = Record<string, number | string | boolean> & {
   category?: string;
 };
@@ -13,6 +15,7 @@ type ErrorContext = {
 interface Logger {
   info(message: string, context?: Context): void;
   warn(message: string, context?: Context): void;
+  error(error: ClientError, context?: ErrorContext): string;
   error(error: Error, context?: ErrorContext): string;
 }
 
@@ -34,7 +37,9 @@ const logger: Logger = {
   error: (error, { level = "error", tags, data: extra } = {}) =>
     captureException(error, {
       level,
-      tags,
+      tags: Reflect.has(error, "errorCode")
+        ? { ...tags, errorCode: (error as ClientError).errorCode }
+        : tags,
       extra,
     }),
 };

@@ -92,7 +92,7 @@ const { StateProvider, useState: useFpState } =
 
 export function FinalityProviderState({ children }: PropsWithChildren) {
   const searchParams = useSearchParams();
-  const fpParam = searchParams.get("fp");
+  const fpParam = searchParams?.get("fp");
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",

@@ -13,6 +13,9 @@ import {
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useHealthCheck } from "../../useHealthCheck";
 
@@ -29,6 +32,7 @@ export function useDelegationsV2(
   const { isGeoBlocked, isLoading } = useHealthCheck();
   const { publicKeyNoCoord } = useBTCWallet();
   const { isOpen, handleError } = useError();
+  const logger = useLogger();
 
   const query = useInfiniteQuery({
     queryKey: [DELEGATIONS_V2_KEY, publicKeyNoCoord, babylonAddress],
@@ -64,6 +68,19 @@ export function useDelegationsV2(
 
   useEffect(() => {
     if (query.isError) {
+      const clientError = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        "Error fetching delegations",
+      );
+      logger.error(clientError, {
+        tags: {
+          isGeoblocked: isGeoBlocked ? "true" : "false",
+        },
+        data: {
+          userPublicKey: publicKeyNoCoord,
+          babylonAddress: babylonAddress || "",
+        },
+      });
       handleError({
         error: query.error,
         displayOptions: {
@@ -82,6 +99,8 @@ export function useDelegationsV2(
     handleError,
     publicKeyNoCoord,
     babylonAddress,
+    logger,
+    isGeoBlocked,
   ]);
 
   return query;

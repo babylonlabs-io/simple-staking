@@ -1,7 +1,6 @@
-import { HttpStatusCode } from "@/app/api/httpStatusCodes";
-import { ServerError } from "@/app/context/Error/errors";
 import { Delegation } from "@/app/types/delegations";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
 
 import { getTxInfo } from "../mempool_api";
 
@@ -53,12 +52,7 @@ export const filterDelegationsLocalStorage = async (
           );
         }
       } catch (err) {
-        if (
-          err instanceof ClientError &&
-          err.errorCode === ERROR_CODES.TRANSACTION_VERIFICATION_ERROR
-        ) {
-          isInMempool = false;
-        } else if ((err as ServerError).status === HttpStatusCode.NotFound) {
+        if (err instanceof ClientError) {
           isInMempool = false;
         } else {
           throw err;
