@@ -35,8 +35,8 @@ interface MultistakingPreviewModalProps {
   processing?: boolean;
   onClose: () => void;
   onProceed: () => void;
-  bsn: Info;
-  finalityProvider: Info;
+  bsns: Info[];
+  finalityProviders: Info[];
   details: StakingDetails;
 }
 
@@ -45,8 +45,8 @@ export const MultistakingPreviewModal = ({
   processing = false,
   onClose,
   onProceed,
-  bsn,
-  finalityProvider,
+  bsns,
+  finalityProviders,
   details,
 }: PropsWithChildren<MultistakingPreviewModalProps>) => {
   const fields = [
@@ -76,8 +76,8 @@ export const MultistakingPreviewModal = ({
         onClose={onClose}
         className="text-accent-primary"
       />
-      <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4">
-        <Card className="pt-4 pb-6 px-8">
+      <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4 overflow-y-auto no-scrollbar max-h-[calc(100vh-12rem)]">
+        <Card className="p-6 pt-4">
           <div className="flex flex-col">
             <div className="grid grid-cols-2 gap-4 items-center pb-4">
               <Text variant="caption" className="text-secondary text-center">
@@ -88,17 +88,31 @@ export const MultistakingPreviewModal = ({
               </Text>
             </div>
             <div className="grid grid-cols-2 gap-4 bg-primary-contrast rounded p-4">
-              <div className="flex items-center justify-center gap-2 w-full py-1">
-                {bsn.icon}
-                <Text variant="body2" className="font-medium">
-                  {bsn.name}
-                </Text>
+              <div className="flex flex-col gap-3">
+                {bsns.map((bsnItem, index) => (
+                  <div
+                    key={`bsn-${index}`}
+                    className="flex items-center justify-center gap-2 w-full py-1"
+                  >
+                    {bsnItem.icon}
+                    <Text variant="body2" className="font-medium">
+                      {bsnItem.name}
+                    </Text>
+                  </div>
+                ))}
               </div>
-              <div className="flex items-center justify-center gap-2 w-full py-1">
-                {finalityProvider.icon}
-                <Text variant="body2" className="font-medium">
-                  {finalityProvider.name}
-                </Text>
+              <div className="flex flex-col gap-3">
+                {finalityProviders.map((fpItem, index) => (
+                  <div
+                    key={`fp-${index}`}
+                    className="flex items-center justify-center gap-2 w-full py-1"
+                  >
+                    {fpItem.icon}
+                    <Text variant="body2" className="font-medium">
+                      {fpItem.name}
+                    </Text>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
