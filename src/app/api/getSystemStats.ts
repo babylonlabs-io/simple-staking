@@ -1,3 +1,6 @@
+import { ClientError } from "@/errors";
+import { ERROR_CODES } from "@/errors/codes";
+
 import { apiWrapper } from "./apiWrapper";
 
 export interface SystemStats {
@@ -18,13 +21,20 @@ interface SystemStatsAPIResponse {
 }
 
 export const getSystemStats = async (): Promise<SystemStats> => {
-  const response = await apiWrapper<SystemStatsAPIResponse>(
-    "GET",
-    "/v2/stats",
-    "Error getting system stats",
-  );
+  try {
+    const response = await apiWrapper<SystemStatsAPIResponse>(
+      "GET",
+      "/v2/stats",
+      "Error getting system stats",
+    );
 
-  const systemStatsAPIResponse: SystemStatsAPIResponse = response.data;
+    const systemStatsAPIResponse: SystemStatsAPIResponse = response.data;
 
-  return systemStatsAPIResponse.data;
+    return systemStatsAPIResponse.data;
+  } catch (error) {
+    throw new ClientError(
+      ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+      "Error getting system stats",
+    );
+  }
 };

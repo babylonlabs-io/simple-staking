@@ -12,25 +12,30 @@
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
 
-export type FeatureFlag = "MULTISTAKING";
+type FeatureFlag = "MULTISTAKING";
 
-/**
- * Checks if a specific feature flag is enabled
- * @param flag The feature flag to check
- * @returns True if the feature is enabled, false otherwise
- */
-export function isFeatureEnabled(flag: FeatureFlag): boolean {
-  const envKey = `NEXT_PUBLIC_FF_${flag}`;
-  const flagValue = process.env[envKey]?.toLowerCase();
-  return flagValue == "true";
+class FeatureFlagService {
+  /**
+   * Gets the value of a feature flag from environment variables
+   * @param flagName The feature flag name to check
+   * @returns True if the feature is enabled, false otherwise
+   */
+  private static getFlagValue(flagName: FeatureFlag): boolean {
+    const envKey = `FF_${flagName.toUpperCase()}`;
+    const value = process.env[envKey]?.toLowerCase();
+    return value === "true";
+  }
+
+  /**
+   * MULTISTAKING feature flag
+   *
+   * Purpose: Enables multi-staking functionality
+   * Why needed: To gradually roll out multi-staking capabilities
+   * ETA for removal: TBD - Will be removed once multi-staking is fully released
+   */
+  static get IsMultiStakingEnabled(): boolean {
+    return this.getFlagValue("MULTISTAKING");
+  }
 }
 
-/**
- * MULTISTAKING feature flag
- *
- * Purpose: Enables multi-staking functionality
- * Why needed: To gradually roll out multi-staking capabilities
- * ETA for removal: TBD - Will be removed once multi-staking is fully released
- */
-export const isMultistakingEnabled = (): boolean =>
-  isFeatureEnabled("MULTISTAKING");
+export default FeatureFlagService;
