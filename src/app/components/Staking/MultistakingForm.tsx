@@ -78,15 +78,14 @@ interface ChainButtonProps extends PropsWithChildren {
   title?: string | JSX.Element;
   alt?: string;
   onClick?: () => void;
+  selected?: boolean;
 }
 
 export function ChainButton({
   className,
   disabled,
-  alt,
-  logo,
   title,
-  children,
+  selected,
   onClick,
 }: ChainButtonProps) {
   return (
@@ -98,7 +97,7 @@ export function ChainButton({
         width: "100%",
         padding: "14px 24px 14px 14px",
         borderRadius: "4px",
-        border: disabled ? "1px solid transparent" : "1px solid #CE6533",
+        border: selected ? "1px solid #CE6533" : "1px solid transparent",
         opacity: disabled ? 0.5 : 1,
       }}
       className={twMerge(
@@ -127,69 +126,12 @@ export function ChainButton({
   );
 }
 
-const FinalityProviderModal = ({
-  open,
-  onClose,
-  onSelect,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onSelect: (id: string) => void;
-}) => {
-  return (
-    <ResponsiveDialog open={open} onClose={onClose}>
-      <DialogHeader
-        title="Select Available BSN"
-        onClose={onClose}
-        className="text-accent-primary"
-      />
-
-      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
-        <div>
-          Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake chains secured
-          by Bitcoin staking. Select a network to delegate your stake and earn
-          rewards.
-        </div>
-        <div
-          className="overflow-x-auto"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "40px",
-          }}
-        >
-          <ChainButton title="Babylon Genesis" />
-          <ChainButton title="Cosmos" disabled />
-          <ChainButton title="Ethereum" disabled />
-          <ChainButton title="Sui" disabled />
-        </div>
-        <SubSection style={{ fontSize: "16px", color: "#387085" }}>
-          <div>
-            <MdOutlineInfo size={24} />
-          </div>
-          <div>
-            Babylon must be the first BSN you add before selecting others. Once
-            added, you can choose additional BSNs to multistake.
-          </div>
-        </SubSection>
-      </DialogBody>
-
-      <DialogFooter className="flex justify-end">
-        <Button variant="outlined" onClick={onClose}>
-          Cancel
-        </Button>
-      </DialogFooter>
-    </ResponsiveDialog>
-  );
-};
-
 const StakingSubsection = () => {
   const [counter, setCounter] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [stakingModalPage, setStakingModalPage] = useState(0);
 
   const handleSelectProvider = (id: string) => {
-    // Add the selected provider
     setCounter((prev) => prev + 1);
     setIsModalOpen(false);
   };
@@ -205,7 +147,10 @@ const StakingSubsection = () => {
             {counter < MAX_FINALITY_PROVIDERS && (
               <div
                 className={`w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-[#12495E] ${counter > 0 ? "rounded-r-none" : "rounded"} cursor-pointer`}
-                onClick={() => setIsModalOpen(true)}
+                onClick={() => {
+                  setStakingModalPage(0);
+                  setIsModalOpen(true);
+                }}
               >
                 <AiOutlinePlus size={20} />
               </div>
@@ -228,13 +173,113 @@ const StakingSubsection = () => {
           />
         ))}
       </div>
-      <FinalityProviderModal
+      <ResponsiveDialog
         open={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSelect={handleSelectProvider}
-      />
+      >
+        {stakingModalPage === 0 && (
+          <BSNSelectionModal
+            onNext={() => setStakingModalPage(1)}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
+        {stakingModalPage === 1 && (
+          <FinalityProviderSelectionModal
+            // onNext={() => setStakingModalPage(2)}
+            onClose={() => setIsModalOpen(false)}
+          />
+        )}
+      </ResponsiveDialog>
     </SubSection>
   );
+};
+
+const BSNSelectionModal = ({
+  onNext,
+  onClose,
+}: {
+  onNext: () => void;
+  onClose: () => void;
+}) => {
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <>
+      <DialogHeader
+        title="Select Available BSN"
+        onClose={onClose}
+        className="text-accent-primary"
+      />
+
+      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
+        <div>
+          Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake chains secured
+          by Bitcoin staking. Select a network to delegate your stake and earn
+          rewards.
+        </div>
+        <div
+          className="overflow-x-auto"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "8px",
+            marginTop: "40px",
+          }}
+        >
+          <ChainButton
+            title="Babylon Genesis"
+            selected={selected === "babylon"}
+            onClick={() => setSelected("babylon")}
+          />
+          <ChainButton
+            title="Cosmos"
+            disabled
+            onClick={() => setSelected("cosmos")}
+          />
+          <ChainButton
+            title="Ethereum"
+            disabled
+            onClick={() => setSelected("ethereum")}
+          />
+          <ChainButton
+            title="Sui"
+            disabled
+            onClick={() => setSelected("sui")}
+          />
+        </div>
+        <SubSection
+          style={{
+            fontSize: "16px",
+            color: "#387085",
+            gap: "12px",
+            display: "flex",
+            flexDirection: "row",
+            marginTop: "16px",
+          }}
+        >
+          <div>
+            <MdOutlineInfo size={22} />
+          </div>
+          <div>
+            Babylon must be the first BSN you add before selecting others. Once
+            added, you can choose additional BSNs to multistake.
+          </div>
+        </SubSection>
+      </DialogBody>
+      <DialogFooter className="flex justify-end">
+        <Button variant="contained" onClick={onNext} disabled={!selected}>
+          Next
+        </Button>
+      </DialogFooter>
+    </>
+  );
+};
+
+const FinalityProviderSelectionModal = ({
+  onClose,
+}: {
+  onClose: () => void;
+}) => {
+  return <div>Finality Provider Selection Modal</div>;
 };
 
 const FinalityProviderItem = ({ onRemove }: { onRemove: () => void }) => {
