@@ -49,19 +49,19 @@ jobs:
       - name: Build project
         run: npm run build
         env:
-          VITE_MEMPOOL_API: ${{ vars.VITE_MEMPOOL_API }}
-          VITE_API_URL: ${{ vars.VITE_API_URL }}
-          VITE_NETWORK: ${{ vars.VITE_NETWORK }}
-          VITE_DISPLAY_TESTING_MESSAGES: ${{ vars.VITE_DISPLAY_TESTING_MESSAGES }}
-          VITE_SENTRY_DSN: ${{ vars.VITE_SENTRY_DSN }}
-          VITE_FIXED_STAKING_TERM: ${{ vars.VITE_FIXED_STAKING_TERM }}
-          VITE_COMMIT_HASH: ${{ github.sha }}
-          VITE_BBN_GAS_PRICE: ${{ vars.VITE_BBN_GAS_PRICE }}
-          VITE_SIDECAR_API_URL: ${{ vars.VITE_SIDECAR_API_URL }}
-          VITE_BABYLON_EXPLORER: ${{ vars.VITE_BABYLON_EXPLORER }}
-          VITE_REPLAYS_RATE: ${{ vars.VITE_REPLAYS_RATE }}
-          VITE_STAKING_DISABLED: ${{ vars.VITE_STAKING_DISABLED}}
-          VITE_DISABLED_WALLETS: ${{ vars.VITE_DISABLED_WALLETS }}
+          NEXT_PUBLIC_MEMPOOL_API: ${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_NETWORK: ${{ vars.NEXT_PUBLIC_NETWORK }}
+          NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES: ${{ vars.NEXT_PUBLIC_DISPLAY_TESTING_MESSAGES }}
+          NEXT_PUBLIC_SENTRY_DSN: ${{ vars.NEXT_PUBLIC_SENTRY_DSN }}
+          NEXT_PUBLIC_FIXED_STAKING_TERM: ${{ vars.NEXT_PUBLIC_FIXED_STAKING_TERM }}
+          NEXT_PUBLIC_COMMIT_HASH: ${{ github.sha }}
+          NEXT_PUBLIC_BBN_GAS_PRICE: ${{ vars.NEXT_PUBLIC_BBN_GAS_PRICE }}
+          NEXT_PUBLIC_SIDECAR_API_URL: ${{ vars.NEXT_PUBLIC_SIDECAR_API_URL }}
+          NEXT_PUBLIC_BABYLON_EXPLORER: ${{ vars.NEXT_PUBLIC_BABYLON_EXPLORER }}
+          NEXT_PUBLIC_REPLAYS_RATE: ${{ vars.NEXT_PUBLIC_REPLAYS_RATE }}
+          NEXT_PUBLIC_STAKING_DISABLED: ${{ vars.NEXT_PUBLIC_STAKING_DISABLED}}
+          NEXT_PUBLIC_DISABLED_WALLETS: ${{ vars.NEXT_PUBLIC_DISABLED_WALLETS }}
           S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
@@ -70,9 +70,9 @@ jobs:
           SENTRY_RELEASE: ${{ github.sha }}
           SENTRY_DIST: ${{ github.run_id }}
           SENTRY_ENVIRONMENT: ${{ matrix.environment }}
-          VITE_RELEASE_ID: ${{ github.sha }}
-          VITE_DIST_ID: ${{ github.run_id }}
-          VITE_SENTRY_ENVIRONMENT: ${{ matrix.environment }}
+          NEXT_PUBLIC_RELEASE_ID: ${{ github.sha }}
+          NEXT_PUBLIC_DIST_ID: ${{ github.run_id }}
+          NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ matrix.environment }}
 
       - name: Archive output
         run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
