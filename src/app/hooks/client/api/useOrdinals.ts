@@ -41,26 +41,11 @@ export function useOrdinals(
 
       return verifiedUTXOs.filter((utxo) => utxo.inscription);
     } catch (error) {
-      // For client errors (like from getInscriptions)
-      if (!(error instanceof ClientError)) {
-        const clientError = new ClientError(
-          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-          error instanceof Error
-            ? error.message
-            : "Error fetching ordinals data",
-          { cause: error as Error },
-        );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            errorSource: "ORDINALS",
-          },
-        });
-        throw clientError;
-      }
-
-      // For server errors, the postFilterOrdinals already added the metadata
-      throw error;
+      throw new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        "Error fetching ordinals data",
+        { cause: error },
+      );
     }
   };
 

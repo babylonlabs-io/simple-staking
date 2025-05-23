@@ -80,7 +80,7 @@ export function useRegistrationService() {
         ERROR_CODES.VALIDATION_ERROR,
         "No delegation selected for registration",
       );
-      logger.warn(clientError.message, { errorCode: clientError.errorCode });
+      logger.warn(clientError.message);
       handleError({
         error: clientError,
       });
@@ -100,6 +100,12 @@ export function useRegistrationService() {
           stakingTimelock: selectedDelegation.stakingTx.timelock,
         },
       };
+
+      logger.info("Executing registration action", {
+        selectedDelegationId: selectedDelegation?.stakingTxHashHex,
+        stakingTxHex: registrationData.stakingTxHex,
+        stakingHeight: registrationData.startHeight,
+      });
 
       const { signedBabylonTx } = await transitionPhase1Delegation(
         registrationData.stakingTxHex,

@@ -61,10 +61,6 @@ export function useV1TransactionService() {
       stakingHeight: number,
       stakingTxHex: string,
     ) => {
-      logger.info("Starting unbonding transaction submission", {
-        stakingHeight,
-      });
-
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
@@ -75,20 +71,16 @@ export function useV1TransactionService() {
       );
 
       const stakingTx = Transaction.fromHex(stakingTxHex);
-      logger.info("Submitting unbonding transaction", {
-        stakingTxHash: stakingTx.getId?.() || "",
-      });
 
       // Check if this staking transaction is eligible for unbonding
       const eligibility = await getUnbondingEligibility(stakingTx.getId());
-      logger.info("Unbonding eligibility check completed", { eligibility });
 
       if (!eligibility) {
         const clientError = new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           "Transaction not eligible for unbonding",
         );
-        logger.warn(clientError.message, { errorCode: clientError.errorCode });
+        logger.warn(clientError.message);
         throw clientError;
       }
 
@@ -111,10 +103,6 @@ export function useV1TransactionService() {
           stakingTx,
         );
 
-      logger.info("Unbonding transaction created successfully", {
-        unbondingTxId: signedUnbondingTx.getId(),
-      });
-
       const stakerSignatureHex =
         getUnbondingTxStakerSignature(signedUnbondingTx);
 
@@ -124,28 +112,19 @@ export function useV1TransactionService() {
           unbondingTxId: signedUnbondingTx.getId(),
         });
 
-        const unbondingTxHash = await postUnbonding(
+        await postUnbonding(
           stakerSignatureHex,
           stakingTx.getId(),
           signedUnbondingTx.getId(),
           signedUnbondingTx.toHex(),
         );
-
-        logger.info("Unbonding transaction submitted successfully", {
-          unbondingTxHash,
-        });
       } catch (error) {
         const clientError = new ClientError(
           ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
           `Error submitting unbonding transaction: ${error instanceof Error ? error.message : String(error)}`,
           { cause: error as Error },
         );
-        logger.error(clientError, {
-          tags: {
-            errorCode: clientError.errorCode,
-            action: "submitUnbondingTx",
-          },
-        });
+        logger.error(clientError);
         throw clientError;
       }
     },
@@ -195,7 +174,6 @@ export function useV1TransactionService() {
       let result: TransactionResult;
 
       if (earlyUnbondingTxHex) {
-        logger.info("Creating withdrawal from early unbonding transaction");
         const earlyUnbondingTx = Transaction.fromHex(earlyUnbondingTxHex);
         result =
           await btcStakingManager!.createSignedBtcWithdrawEarlyUnbondedTransaction(
@@ -206,7 +184,6 @@ export function useV1TransactionService() {
             defaultFeeRate,
           );
       } else {
-        logger.info("Creating withdrawal from expired staking transaction");
         result =
           await btcStakingManager!.createSignedBtcWithdrawStakingExpiredTransaction(
             stakerBtcInfo,
@@ -217,18 +194,10 @@ export function useV1TransactionService() {
           );
       }
 
-      logger.info("Withdrawal transaction created", {
-        txId: JSON.stringify(result.transaction),
-        fee: result.fee,
-      });
-
       // Perform a safety check on the estimated transaction fee
       txFeeSafetyCheck(result.transaction, defaultFeeRate, result.fee);
 
-      const txHash = await pushTx(result.transaction.toHex());
-      logger.info("Withdrawal transaction pushed successfully", {
-        txHash,
-      });
+      await pushTx(result.transaction.toHex());
     },
     [
       createBtcStakingManager,
@@ -265,7 +234,7 @@ const validateCommonInputs = (
       ERROR_CODES.INITIALIZATION_ERROR,
       "BTC Staking Manager not initialized",
     );
-    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    logger?.warn(clientError.message);
     throw clientError;
   }
   if (!stakerBtcInfo.address || !stakerBtcInfo.publicKeyNoCoordHex) {
@@ -273,7 +242,7 @@ const validateCommonInputs = (
       ERROR_CODES.INITIALIZATION_ERROR,
       "Staker info not initialized",
     );
-    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    logger?.warn(clientError.message);
     throw clientError;
   }
   if (!versionedParams?.length) {
@@ -281,7 +250,7 @@ const validateCommonInputs = (
       ERROR_CODES.INITIALIZATION_ERROR,
       "Staking params not loaded",
     );
-    logger?.warn(clientError.message, { errorCode: clientError.errorCode });
+    logger?.warn(clientError.message);
     throw clientError;
   }
 };
