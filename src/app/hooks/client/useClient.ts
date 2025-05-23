@@ -57,6 +57,7 @@ export function useClientQuery<
   useEffect(() => {
     if (data.isError) {
       logger.error(data.error as ClientError);
+
       handleError({
         error: data.error as ClientError,
         displayOptions: {
@@ -64,14 +65,7 @@ export function useClientQuery<
         },
       });
     }
-  }, [
-    handleError,
-    data.error,
-    data.isError,
-    data.refetch,
-    logger,
-    options.queryKey,
-  ]);
+  }, [handleError, data.error, data.isError, data.refetch, logger]);
 
   return data;
 }

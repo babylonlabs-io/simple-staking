@@ -1,4 +1,5 @@
 import { SeverityLevel, addBreadcrumb, captureException } from "@sentry/nextjs";
+import { useMemo } from "react";
 
 import { ClientError } from "@/errors";
 
@@ -45,5 +46,5 @@ const logger: Logger = {
 };
 
 export function useLogger(): Logger {
-  return logger;
+  return useMemo(() => logger, []);
 }
