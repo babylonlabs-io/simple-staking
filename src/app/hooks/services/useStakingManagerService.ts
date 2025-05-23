@@ -61,7 +61,7 @@ export const useStakingManagerService = () => {
       signPsbt: async (
         signingStep: SigningStep,
         psbt: string,
-        options: SignPsbtOptions,
+        options?: SignPsbtOptions,
       ) => {
         eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
         return signPsbt(psbt, options);
