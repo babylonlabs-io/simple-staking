@@ -3,13 +3,13 @@ import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
-import { AmountSubsection } from "@/app/components/Multistaking/AmountSubsection";
 import { ChainSelectionModal } from "@/app/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
-import { FeesSection } from "@/app/components/Multistaking/FeesSection";
-import { FinalityProviderItem } from "@/app/components/Multistaking/FinalityProviderItem";
 import { FinalityProviderModal } from "@/app/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
-import { FormValuesConsumer } from "@/app/components/Multistaking/FormValuesConsumer";
-import { SubSection } from "@/app/components/Multistaking/SubSection";
+import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm/AmountSubsection";
+import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
+import { FinalityProviderItem } from "@/app/components/Multistaking/MultistakingForm/FinalityProviderItem";
+import { FormValuesConsumer } from "@/app/components/Multistaking/MultistakingForm/FormValuesConsumer";
+import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
