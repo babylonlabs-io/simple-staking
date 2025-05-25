@@ -26,7 +26,7 @@ export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
   const { isOpen, handleError } = useError();
 
   const query = useInfiniteQuery({
-    queryKey: [FINALITY_PROVIDERS_KEY],
+    queryKey: [FINALITY_PROVIDERS_KEY, pk, sortBy, order, name],
     queryFn: ({ pageParam = "" }) =>
       getFinalityProviders({ key: pageParam, pk, sortBy, order, name }),
     getNextPageParam: (lastPage) =>
