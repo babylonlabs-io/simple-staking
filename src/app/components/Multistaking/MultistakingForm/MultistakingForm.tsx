@@ -1,20 +1,14 @@
 import {
   Button,
   Card,
-  DialogBody,
-  DialogFooter,
-  DialogHeader,
   Form,
   NumberField,
-  Text,
   useFormContext,
   useWatch,
 } from "@babylonlabs-io/core-ui";
-import Image, { StaticImageData } from "next/image";
-import { PropsWithChildren, useState } from "react";
+import Image from "next/image";
+import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
-import { MdOutlineInfo } from "react-icons/md";
-import { twMerge } from "tailwind-merge";
 
 import babylon from "@/app/assets/babylon-genesis.png";
 import bitcoin from "@/app/assets/bitcoin.png";
@@ -41,8 +35,9 @@ import { satoshiToBtc } from "@/utils/btc";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { trim } from "@/utils/trim";
+import { ChainSelectionModal } from "@/app/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
+import { FinalityProviderModal } from "@/app/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
 
-import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 const { networkName } = getNetworkConfigBTC();
 
 const MAX_FINALITY_PROVIDERS = 1;
@@ -55,16 +50,14 @@ const SubSection = ({
   children: React.ReactNode;
   style?: React.CSSProperties;
   className?: string;
-}) => {
-  return (
-    <div
-      className={`flex bg-secondary-highlight text-[#12495E] p-4 ${className}`}
-      style={style}
-    >
-      {children}
-    </div>
-  );
-};
+}) => (
+  <div
+    className={`flex bg-secondary-highlight text-[#12495E] p-4 ${className}`}
+    style={style}
+  >
+    {children}
+  </div>
+);
 
 const AmountSubsection = () => {
   const { totalBtcBalance } = useBalanceState();
@@ -149,207 +142,6 @@ const AmountSubsection = () => {
   );
 };
 
-interface ChainButtonProps extends PropsWithChildren {
-  className?: string;
-  disabled?: boolean;
-  logo?: string | StaticImageData;
-  title?: string | JSX.Element;
-  alt?: string;
-  selected?: boolean;
-  onClick?: () => void;
-}
-
-export function ChainButton({
-  className,
-  disabled,
-  title,
-  logo,
-  selected,
-  onClick,
-}: ChainButtonProps) {
-  return (
-    <Text
-      disabled={disabled}
-      as={disabled ? "div" : "button"}
-      style={{
-        backgroundColor: "#F9F9F9",
-        width: "100%",
-        padding: "14px 24px 14px 14px",
-        borderRadius: "4px",
-        border: selected ? "1px solid #CE6533" : "1px solid transparent",
-        opacity: disabled ? 0.5 : 1,
-      }}
-      className={twMerge(
-        disabled ? "pointer-events-none" : "pointer-events-auto",
-        disabled ? "cursor-default" : "cursor-pointer",
-        className,
-      )}
-      onClick={onClick}
-    >
-      <div
-        className="flex w-full items-center"
-        style={{ justifyContent: "space-between" }}
-      >
-        <div className="flex items-center" style={{ fontSize: "16px" }}>
-          {logo && (
-            <Image
-              src={logo}
-              alt="bitcoin"
-              className="max-w-[40px] max-h-[40px]"
-              style={{ marginRight: "8px", borderRadius: "50%" }}
-            />
-          )}
-          {title}
-        </div>
-        <div style={{ fontSize: "12px" }}>TVL: X BTC ($Y)</div>
-      </div>
-    </Text>
-  );
-}
-
-const BSNSelectionModal = ({
-  onNext,
-  onClose,
-}: {
-  onNext: (selectedChain: string) => void;
-  onClose: () => void;
-}) => {
-  const [selected, setSelected] = useState<string | null>(null);
-  return (
-    <>
-      <DialogHeader
-        title="Select Available BSN"
-        onClose={onClose}
-        className="text-accent-primary"
-      />
-
-      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
-        <div>
-          Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake chains secured
-          by Bitcoin staking. Select a network to delegate your stake and earn
-          rewards.
-        </div>
-        <div
-          className="overflow-x-auto"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "40px",
-          }}
-        >
-          <ChainButton
-            logo={babylon}
-            title="Babylon Genesis"
-            selected={selected === "babylon"}
-            onClick={() => setSelected("babylon")}
-          />
-          <ChainButton
-            logo={cosmos}
-            title="Cosmos"
-            disabled
-            onClick={() => setSelected("cosmos")}
-          />
-          <ChainButton
-            logo={ethereum}
-            title="Ethereum"
-            disabled
-            onClick={() => setSelected("ethereum")}
-          />
-          <ChainButton
-            logo={sui}
-            title="Sui"
-            disabled
-            onClick={() => setSelected("sui")}
-          />
-        </div>
-        <SubSection
-          style={{
-            fontSize: "16px",
-            color: "#387085",
-            gap: "12px",
-            display: "flex",
-            flexDirection: "row",
-            marginTop: "16px",
-          }}
-        >
-          <div>
-            <MdOutlineInfo size={22} />
-          </div>
-          <div>
-            Babylon must be the first BSN you add before selecting others. Once
-            added, you can choose additional BSNs to multistake.
-          </div>
-        </SubSection>
-      </DialogBody>
-      <DialogFooter className="flex justify-end">
-        <Button
-          variant="contained"
-          onClick={() => selected && onNext(selected)}
-          disabled={!selected}
-        >
-          Next
-        </Button>
-      </DialogFooter>
-    </>
-  );
-};
-
-const FinalityProviderSelectionModal = ({
-  onClose,
-  onAdd,
-  onBack,
-}: {
-  onClose: () => void;
-  onAdd: (selectedProviderKey: string) => void;
-  onBack: () => void;
-}) => {
-  const selectedFinalityProvider = useWatch({
-    name: "finalityProvider",
-    defaultValue: "",
-  });
-  return (
-    <>
-      <DialogHeader
-        title="Select Babylon Genesis Finality Provider"
-        onClose={onClose}
-        className="text-accent-primary"
-      />
-
-      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
-        <div>
-          Finality Providers play a key role in securing Proof-of-Stake networks
-          by validating and finalising transactions. Select one to delegate your
-          stake and earn rewards.
-        </div>
-        <div
-          className="overflow-x-auto"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "40px",
-          }}
-        >
-          <FinalityProviders />
-        </div>
-      </DialogBody>
-      <DialogFooter className="flex justify-between">
-        <Button variant="outlined" onClick={onBack}>
-          Back
-        </Button>
-        <Button
-          variant="contained"
-          onClick={() => onAdd(selectedFinalityProvider)}
-          disabled={!selectedFinalityProvider}
-        >
-          Add
-        </Button>
-      </DialogFooter>
-    </>
-  );
-};
-
 const FinalityProviderItem = ({
   provider,
   chainType,
@@ -407,7 +199,7 @@ const FinalityProviderItem = ({
             <div className="text-xs text-[#387085]">{getChainName()}</div>
           </div>
           <div className="text-[#12495E]">
-            {provider.description.moniker ||
+            {provider.description?.moniker ||
               trim(provider.btcPk, 8) ||
               "Selected FP"}
           </div>
@@ -544,7 +336,7 @@ export function MultistakingForm() {
           className="w-[52rem]"
         >
           {stakingModalPage === 0 && (
-            <BSNSelectionModal
+            <ChainSelectionModal
               onNext={(chain) => {
                 setSelectedChain(chain);
                 setStakingModalPage(1);
@@ -553,7 +345,7 @@ export function MultistakingForm() {
             />
           )}
           {stakingModalPage === 1 && (
-            <FinalityProviderSelectionModal
+            <FinalityProviderModal
               onBack={() => setStakingModalPage(0)}
               onAdd={(selectedProviderKey) =>
                 handleSelectProvider(selectedProviderKey)
@@ -582,7 +374,6 @@ const FormValuesConsumer = ({
   previewModalOpen: boolean;
   setPreviewModalOpen: (open: boolean) => void;
 }) => {
-  // Use form context hooks to get values
   const btcAmount = useWatch({ name: "amount", defaultValue: "0" });
   const feeRate = useWatch({ name: "feeRate", defaultValue: "1" });
   const feeAmount = useWatch({ name: "feeAmount", defaultValue: "0" });
@@ -594,7 +385,6 @@ const FormValuesConsumer = ({
       processing={false}
       onClose={() => setPreviewModalOpen(false)}
       onProceed={() => {
-        // Handle proceeding to the next step
         setPreviewModalOpen(false);
       }}
       bsns={[
