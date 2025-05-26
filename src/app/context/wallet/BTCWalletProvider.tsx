@@ -3,6 +3,7 @@ import {
   IBTCProvider,
   InscriptionIdentifier,
   Network,
+  SignPsbtOptions,
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
@@ -47,8 +48,11 @@ interface BTCWalletContextProps {
   open: () => void;
   getAddress: () => Promise<string>;
   getPublicKeyHex: () => Promise<string>;
-  signPsbt: (psbtHex: string) => Promise<string>;
-  signPsbts: (psbtsHexes: string[]) => Promise<string[]>;
+  signPsbt: (psbtHex: string, options?: SignPsbtOptions) => Promise<string>;
+  signPsbts: (
+    psbtsHexes: string[],
+    options?: SignPsbtOptions[],
+  ) => Promise<string[]>;
   getNetwork: () => Promise<Network>;
   signMessage: (
     message: string,
@@ -244,10 +248,10 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     () => ({
       getAddress: async () => btcWalletProvider?.getAddress() ?? "",
       getPublicKeyHex: async () => btcWalletProvider?.getPublicKeyHex() ?? "",
-      signPsbt: async (psbtHex: string) =>
-        btcWalletProvider?.signPsbt(psbtHex) ?? "",
-      signPsbts: async (psbtsHexes: string[]) =>
-        btcWalletProvider?.signPsbts(psbtsHexes) ?? [],
+      signPsbt: async (psbtHex: string, options?: SignPsbtOptions) =>
+        btcWalletProvider?.signPsbt(psbtHex, options) ?? "",
+      signPsbts: async (psbtsHexes: string[], options?: SignPsbtOptions[]) =>
+        btcWalletProvider?.signPsbts(psbtsHexes, options) ?? [],
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
       signMessage: async (message: string, type: "ecdsa" | "bip322-simple") =>
