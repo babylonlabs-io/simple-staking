@@ -54,6 +54,14 @@ const config = isSentryDisabled
     // Only print logs for uploading source maps in CI
     silent: !process.env.CI,
 
+    // Don't fail the build if Sentry operations fail
+    unstable_sentryWebpackPluginOptions: {
+      errorHandler: (err) => {
+        console.warn('⚠️ Sentry encountered an error during build:');
+        console.warn('⚠️', err.message);
+      },
+    },
+
     // For all available options, see:
     // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
 
