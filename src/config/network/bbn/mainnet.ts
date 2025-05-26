@@ -1,13 +1,13 @@
 import { getUrlFromEnv } from "./urlUtils";
 
 export const BBN_MAINNET_RPC_URL = getUrlFromEnv(
-  import.meta.env.VITE_BABY_RPC_URL,
+  process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
   "https://rpc-dapp.babylonlabs.io/",
 );
 
 export const BBN_MAINNET_LCD_URL = getUrlFromEnv(
-  import.meta.env.VITE_BABY_LCD_URL,
+  process.env.NEXT_PUBLIC_BABY_LCD_URL,
   "http://localhost:1317",
   "https://lcd-dapp.babylonlabs.io/",
 );

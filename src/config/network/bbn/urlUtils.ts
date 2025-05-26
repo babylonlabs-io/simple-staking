@@ -15,7 +15,7 @@ export const getUrlFromEnv = (
     return envVar;
   }
 
-  if (import.meta.env.CI || import.meta.env.NEXT_BUILD_E2E) {
+  if (process.env.CI || process.env.NEXT_BUILD_E2E) {
     return localUrl;
   }
 
