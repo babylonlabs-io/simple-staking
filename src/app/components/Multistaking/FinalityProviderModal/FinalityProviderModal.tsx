@@ -36,15 +36,7 @@ export const FinalityProviderModal = ({
           by validating and finalising transactions. Select one to delegate your
           stake and earn rewards.
         </div>
-        <div
-          className="overflow-x-auto"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "40px",
-          }}
-        >
+        <div className="overflow-x-auto flex flex-col gap-2 mt-10">
           <FinalityProviders />
         </div>
       </DialogBody>
