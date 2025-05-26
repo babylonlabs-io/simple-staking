@@ -28,7 +28,11 @@ export const AmountSubsection = () => {
   const formattedBalance = satoshiToBtc(totalBtcBalance);
 
   const handleSetMaxBalance = () => {
-    setValue("amount", formattedBalance.toString());
+    setValue("amount", formattedBalance.toString(), {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   const handleValueClick = () => {
@@ -36,7 +40,11 @@ export const AmountSubsection = () => {
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue("amount", e.target.value);
+    setValue("amount", e.target.value, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
   };
 
   const handleInputBlur = () => {

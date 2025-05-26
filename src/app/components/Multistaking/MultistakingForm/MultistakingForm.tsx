@@ -1,4 +1,4 @@
-import { Button, Card, Form } from "@babylonlabs-io/core-ui";
+import { Button, Card, Form, useFormState } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 
@@ -6,6 +6,7 @@ import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/app/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/app/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
 import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm/AmountSubsection";
+import { DynamicHiddenFields } from "@/app/components/Multistaking/MultistakingForm/DynamicHiddenFields";
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { FinalityProviderItem } from "@/app/components/Multistaking/MultistakingForm/FinalityProviderItem";
 import { FormValuesConsumer } from "@/app/components/Multistaking/MultistakingForm/FormValuesConsumer";
@@ -19,15 +20,21 @@ const { networkName } = getNetworkConfigBTC();
 
 const MAX_FINALITY_PROVIDERS = 1;
 
+enum StakingModalPage {
+  CHAIN_SELECTION = 0,
+  FINALITY_PROVIDER = 1,
+}
+
 export function MultistakingForm() {
-  const { validationSchema } = useStakingState();
+  const { validationSchema, stakingInfo } = useStakingState();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [stakingModalPage, setStakingModalPage] = useState(0);
+  const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
+    StakingModalPage.FINALITY_PROVIDER,
+  );
   const [selectedProviders, setSelectedProviders] = useState<Array<any>>([]);
   const [selectedChain, setSelectedChain] = useState<string>("babylon");
   const [counter, setCounter] = useState(0);
   const { finalityProviders } = useFinalityProviderState();
-  const { step, processing, reset } = useStakingState();
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const handleSelectProvider = (selectedProviderKey: string) => {
@@ -50,6 +57,25 @@ export function MultistakingForm() {
     setPreviewModalOpen(true);
   };
 
+  const PreviewSubmitButton = () => {
+    const { isValid, errors } = useFormState();
+
+    return (
+      <>
+        {/* {errors.amount && <div className="text-red-500 text-right">{errors?.amount?.message}</div>} */}
+        <Button
+          //@ts-ignore - fix type issue in core-ui
+          type="submit"
+          className="w-full"
+          style={{ marginTop: "8px" }}
+          disabled={!isValid}
+        >
+          Preview
+        </Button>
+      </>
+    );
+  };
+
   return (
     <Section title={`${networkName} Staking`}>
       <Form
@@ -58,6 +84,7 @@ export function MultistakingForm() {
         reValidateMode="onChange"
         onSubmit={handlePreview}
       >
+        <DynamicHiddenFields stakingInfo={stakingInfo} />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
             <AmountSubsection />
@@ -72,14 +99,16 @@ export function MultistakingForm() {
                       <div
                         className={`w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-[#12495E] ${counter > 0 ? "rounded-r-none" : "rounded"} cursor-pointer`}
                         onClick={() => {
-                          setStakingModalPage(0);
+                          setStakingModalPage(
+                            StakingModalPage.FINALITY_PROVIDER,
+                          );
                           setIsModalOpen(true);
                         }}
                       >
                         <AiOutlinePlus size={20} />
                       </div>
                     )}
-                    {counter > 0 && MAX_FINALITY_PROVIDERS > 1 && (
+                    {0 < counter && 1 < MAX_FINALITY_PROVIDERS && (
                       <div
                         className={`px-4 h-10 flex items-center border border-[#12495E] ${counter === MAX_FINALITY_PROVIDERS ? "rounded-md" : "border-l-0 rounded-r-md"} cursor-pointer`}
                       >
@@ -104,18 +133,7 @@ export function MultistakingForm() {
               </div>
             </SubSection>
             <FeesSection />
-            <Button
-              //@ts-ignore - fix type issue in core-ui
-              type="submit"
-              className="w-full"
-              style={{ marginTop: "8px" }}
-              onClick={(e) => {
-                e.preventDefault();
-                setPreviewModalOpen(true);
-              }}
-            >
-              Preview
-            </Button>
+            <PreviewSubmitButton />
           </Card>
         </div>
 
@@ -124,18 +142,17 @@ export function MultistakingForm() {
           onClose={() => setIsModalOpen(false)}
           className="w-[52rem]"
         >
-          {stakingModalPage === 0 && (
+          {stakingModalPage === StakingModalPage.CHAIN_SELECTION && (
             <ChainSelectionModal
               onNext={(chain) => {
                 setSelectedChain(chain);
-                setStakingModalPage(1);
+                setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
               }}
               onClose={() => setIsModalOpen(false)}
             />
           )}
-          {stakingModalPage === 1 && (
+          {stakingModalPage === StakingModalPage.FINALITY_PROVIDER && (
             <FinalityProviderModal
-              onBack={() => setStakingModalPage(0)}
               onAdd={(selectedProviderKey) =>
                 handleSelectProvider(selectedProviderKey)
               }

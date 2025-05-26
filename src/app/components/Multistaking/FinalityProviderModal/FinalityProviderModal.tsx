@@ -15,7 +15,7 @@ export const FinalityProviderModal = ({
 }: {
   onClose: () => void;
   onAdd: (selectedProviderKey: string) => void;
-  onBack: () => void;
+  onBack?: () => void;
 }) => {
   const selectedFinalityProvider = useWatch({
     name: "finalityProvider",
@@ -50,9 +50,13 @@ export const FinalityProviderModal = ({
       </DialogBody>
 
       <DialogFooter className="flex justify-between">
-        <Button variant="outlined" onClick={onBack}>
-          Back
-        </Button>
+        {onBack ? (
+          <Button variant="outlined" onClick={onBack}>
+            Back
+          </Button>
+        ) : (
+          <div />
+        )}
         <Button
           variant="contained"
           onClick={() => onAdd(selectedFinalityProvider)}

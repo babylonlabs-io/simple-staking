@@ -1,5 +1,6 @@
-import { useWatch } from "@babylonlabs-io/core-ui";
+import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
+import { useEffect } from "react";
 
 import babylon from "@/app/assets/babylon-genesis.png";
 import { KeybaseImage } from "@/app/components/KeybaseImage/KeybaseImage";
@@ -20,6 +21,28 @@ export const FormValuesConsumer = ({
   const feeRate = useWatch({ name: "feeRate", defaultValue: "1" });
   const feeAmount = useWatch({ name: "feeAmount", defaultValue: "0" });
   const { coinSymbol } = getNetworkConfigBTC();
+
+  const { setValue, getValues } = useFormContext();
+
+  useEffect(() => {
+    if (selectedProviders.length > 0) {
+      setValue("finalityProvider", selectedProviders[0].btcPk ?? "selected", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+
+      const currentFeeRate = getValues("feeRate");
+      setValue("feeRate", currentFeeRate, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    } else {
+      setValue("finalityProvider", "", {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [selectedProviders, setValue, getValues]);
 
   return (
     <MultistakingPreviewModal
