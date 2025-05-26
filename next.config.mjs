@@ -55,6 +55,9 @@ const config = isSentryDisabled
     silent: !process.env.CI,
 
     // Don't fail the build if Sentry operations fail
+    // - If Sentry fails: App still works perfectly, we just lose error tracking temporarily
+    // - If build fails: Deployment continues, preserving existing app functionality while allowing Sentry config fixes in subsequent deployments
+    // - We can fix Sentry config and redeploy later without affecting user experience and deployment
     unstable_sentryWebpackPluginOptions: {
       errorHandler: (err) => {
         console.warn('⚠️ Sentry encountered an error during build:');
