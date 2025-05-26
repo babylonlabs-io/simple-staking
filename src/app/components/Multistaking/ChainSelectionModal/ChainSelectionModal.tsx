@@ -15,7 +15,6 @@ import cosmos from "@/app/assets/cosmos.png";
 import ethereum from "@/app/assets/ethereum.png";
 import sui from "@/app/assets/sui.png";
 
-// Local reusable subsection container
 const SubSection = ({
   children,
   style,
@@ -57,25 +56,18 @@ const ChainButton = ({
   <Text
     disabled={disabled}
     as={disabled ? "div" : "button"}
-    style={{
-      backgroundColor: "#F9F9F9",
-      width: "100%",
-      padding: "14px 24px 14px 14px",
-      borderRadius: "4px",
-      border: selected ? "1px solid #CE6533" : "1px solid transparent",
-      opacity: disabled ? 0.5 : 1,
-    }}
     className={twMerge(
-      disabled ? "pointer-events-none cursor-default" : "cursor-pointer",
+      "bg-[#F9F9F9] w-full py-[14px] px-6 pl-[14px] rounded border",
+      selected ? "border-[#CE6533]" : "border-transparent",
+      disabled
+        ? "opacity-50 pointer-events-none cursor-default"
+        : "cursor-pointer",
       className,
     )}
     onClick={onClick}
   >
-    <div
-      className="flex w-full items-center"
-      style={{ justifyContent: "space-between" }}
-    >
-      <div className="flex items-center" style={{ fontSize: "16px" }}>
+    <div className="flex w-full items-center justify-between">
+      <div className="flex items-center text-base">
         {logo && (
           <Image
             src={logo}
@@ -85,7 +77,7 @@ const ChainButton = ({
         )}
         {title}
       </div>
-      <div style={{ fontSize: "12px" }}>TVL: X BTC ($Y)</div>
+      <div className="text-xs">TVL: X BTC ($Y)</div>
     </div>
   </Text>
 );
@@ -113,15 +105,7 @@ export const ChainSelectionModal = ({
           by Bitcoin staking. Select a network to delegate your stake and earn
           rewards.
         </div>
-        <div
-          className="overflow-x-auto"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            gap: "8px",
-            marginTop: "40px",
-          }}
-        >
+        <div className="overflow-x-auto flex flex-col gap-2 mt-10">
           <ChainButton
             logo={babylon}
             title="Babylon Genesis"
@@ -147,16 +131,7 @@ export const ChainSelectionModal = ({
             onClick={() => setSelected("sui")}
           />
         </div>
-        <SubSection
-          style={{
-            fontSize: "16px",
-            color: "#387085",
-            gap: "12px",
-            display: "flex",
-            flexDirection: "row",
-            marginTop: "16px",
-          }}
-        >
+        <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
           <div>
             <MdOutlineInfo size={22} />
           </div>
