@@ -3,12 +3,12 @@ import { createRoot } from "react-dom/client";
 import "./app/globals.css";
 
 import Layout from "@/app/layout";
-import HomePage from "@/app/page";
+import NotFound from "@/app/not-found";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Layout>
-      <HomePage />
+      <NotFound />
     </Layout>
   </StrictMode>,
 );
