@@ -1,5 +1,3 @@
-"use client";
-
 import { ScrollLocker } from "@babylonlabs-io/core-ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";

@@ -164,7 +164,7 @@ describe("Core Services Error Handling", () => {
     (getDelegationV2 as jest.Mock).mockResolvedValue(mockDelegation);
 
     // Mock retry utility
-    (retry as jest.Mock).mockImplementation((fn, predicate, interval) => {
+    (retry as jest.Mock).mockImplementation((fn) => {
       return fn();
     });
   });

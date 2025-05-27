@@ -49,13 +49,13 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
         tooltip={
           <span>
             This finality provider has been slashed.{" "}
-            <Link
+            <a
               className="text-error-main"
               target="_blank"
               href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
             >
               Learn more
-            </Link>
+            </a>
           </span>
         }
         status="error"
@@ -104,13 +104,13 @@ const DelegationState: React.FC<{
       return (
         <span>
           This finality provider has been slashed.{" "}
-          <Link
+          <a
             className="text-secondary-main"
             target="_blank"
             href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
           >
             Learn more
-          </Link>
+          </a>
         </span>
       );
     }

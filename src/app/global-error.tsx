@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect } from "react";
 
 import GenericError from "@/app/components/Error/GenericError";
