@@ -89,9 +89,10 @@ const defaultState: FinalityProviderState = {
 const { StateProvider, useState: useFpState } =
   createStateUtils<FinalityProviderState>(defaultState);
 
+const params = new URLSearchParams(window.location.search);
+
 export function FinalityProviderState({ children }: PropsWithChildren) {
-  // TODO: fix for vite
-  const fpParam = undefined;
+  const fpParam = params.get("fp");
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
