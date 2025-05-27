@@ -31,7 +31,6 @@
     "@babylonlabs-io/core-ui": "1.1.1",
     "@babylonlabs-io/wallet-connector": "1.4.2",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
-    "@bitcoinerlab/secp256k1": "^1.1.1",
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmjs/stargate": "^0.32.4",
     "@sentry/nextjs": "^8.30.0",
