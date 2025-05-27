@@ -1,10 +1,6 @@
 import Image from "next/image";
 
-import babylon from "@/app/assets/babylon-genesis.png";
-import cosmos from "@/app/assets/cosmos.png";
-import ethereum from "@/app/assets/ethereum.png";
-import sui from "@/app/assets/sui.png";
-import { KeybaseImage } from "@/app/components/KeybaseImage/KeybaseImage";
+import { chainLogos } from "@/app/assets/chains";
 import { trim } from "@/utils/trim";
 
 export const FinalityProviderItem = ({
@@ -19,15 +15,15 @@ export const FinalityProviderItem = ({
   const getChainLogo = () => {
     switch (chainType) {
       case "babylon":
-        return babylon;
+        return chainLogos.babylon;
       case "cosmos":
-        return cosmos;
+        return chainLogos.cosmos;
       case "ethereum":
-        return ethereum;
+        return chainLogos.ethereum;
       case "sui":
-        return sui;
+        return chainLogos.sui;
       default:
-        return babylon;
+        return chainLogos.placeholder;
     }
   };
 
@@ -42,18 +38,21 @@ export const FinalityProviderItem = ({
       case "sui":
         return "Sui";
       default:
-        return "BSN";
+        return "Unknown Chain";
     }
   };
 
   return (
     <div className="flex flex-row justify-between items-center">
       <div className="h-10 flex flex-row gap-2">
-        <KeybaseImage
-          identity={provider.description?.identity}
-          moniker={provider.description?.moniker}
-          size="large"
-        />
+        {/* Replace with KeybaseImage */}
+        <div
+          className={`w-10 h-10 text-sm flex items-center justify-center rounded-full bg-secondary-main text-accent-contrast`}
+        >
+          {provider.description?.moniker
+            ? provider.description?.moniker[0].toUpperCase()
+            : "?"}
+        </div>
         <div>
           <div className="flex flex-row gap-1 items-center">
             <Image

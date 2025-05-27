@@ -37,7 +37,7 @@ export const FinalityProviderModal = ({
           stake and earn rewards.
         </div>
         <div className="overflow-x-auto flex flex-col gap-2 mt-10">
-          <FinalityProviders />
+          <FinalityProviders showHeader={false} showFilter={false} />
         </div>
       </DialogBody>
 

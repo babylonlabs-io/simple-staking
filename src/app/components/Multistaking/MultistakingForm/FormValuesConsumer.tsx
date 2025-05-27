@@ -2,8 +2,7 @@ import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import Image from "next/image";
 import { useEffect } from "react";
 
-import babylon from "@/app/assets/babylon-genesis.png";
-import { KeybaseImage } from "@/app/components/KeybaseImage/KeybaseImage";
+import { chainLogos } from "@/app/assets/chains";
 import { MultistakingPreviewModal } from "@/app/components/Modals/MultistakingModal/MultistakingStartModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { trim } from "@/utils/trim";
@@ -54,17 +53,22 @@ export const FormValuesConsumer = ({
       }}
       bsns={[
         {
-          icon: <Image src={babylon} alt="babylon" className="w-6 h-6" />,
+          icon: (
+            <Image src={chainLogos.babylon} alt="babylon" className="w-6 h-6" />
+          ),
           name: "Babylon Genesis",
         },
       ]}
       finalityProviders={selectedProviders.map((provider) => ({
         icon: (
-          <KeybaseImage
-            identity={provider.description?.identity}
-            moniker={provider.description?.moniker}
-            size="small"
-          />
+          // Replace with KeybaseImage
+          <div
+            className={`w-6 h-6 text-[0.6rem] flex items-center justify-center rounded-full bg-secondary-main text-accent-contrast`}
+          >
+            {provider.description?.moniker
+              ? provider.description?.moniker[0].toUpperCase()
+              : "?"}
+          </div>
         ),
         name:
           provider.description?.moniker ||

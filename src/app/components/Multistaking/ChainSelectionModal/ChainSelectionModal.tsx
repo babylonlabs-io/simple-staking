@@ -10,10 +10,7 @@ import { PropsWithChildren, useState } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
-import babylon from "@/app/assets/babylon-genesis.png";
-import cosmos from "@/app/assets/cosmos.png";
-import ethereum from "@/app/assets/ethereum.png";
-import sui from "@/app/assets/sui.png";
+import { chainLogos } from "@/app/assets/chains";
 
 const SubSection = ({
   children,
@@ -107,25 +104,25 @@ export const ChainSelectionModal = ({
         </div>
         <div className="overflow-x-auto flex flex-col gap-2 mt-10">
           <ChainButton
-            logo={babylon}
+            logo={chainLogos.babylon}
             title="Babylon Genesis"
             selected={selected === "babylon"}
             onClick={() => setSelected("babylon")}
           />
           <ChainButton
-            logo={cosmos}
+            logo={chainLogos.cosmos}
             title="Cosmos"
             disabled
             onClick={() => setSelected("cosmos")}
           />
           <ChainButton
-            logo={ethereum}
+            logo={chainLogos.ethereum}
             title="Ethereum"
             disabled
             onClick={() => setSelected("ethereum")}
           />
           <ChainButton
-            logo={sui}
+            logo={chainLogos.sui}
             title="Sui"
             disabled
             onClick={() => setSelected("sui")}
