@@ -71,7 +71,7 @@ export const FormValuesConsumer = ({
         name:
           provider.description?.moniker ||
           trim(provider.btcPk, 8) ||
-          "Selected FP",
+          "Selected Finality Provider",
       }))}
       details={{
         stakeAmount: `${parseFloat(btcAmount) || 0} ${coinSymbol}`,
