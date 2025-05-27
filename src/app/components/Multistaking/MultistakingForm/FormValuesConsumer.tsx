@@ -65,9 +65,7 @@ export const FormValuesConsumer = ({
           <div
             className={`w-6 h-6 text-[0.6rem] flex items-center justify-center rounded-full bg-secondary-main text-accent-contrast`}
           >
-            {provider.description?.moniker
-              ? provider.description?.moniker[0].toUpperCase()
-              : "?"}
+            {provider.rank}
           </div>
         ),
         name:

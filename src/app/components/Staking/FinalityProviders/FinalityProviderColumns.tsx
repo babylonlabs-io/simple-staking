@@ -29,6 +29,7 @@ export const finalityProviderColumns = [
           className="inline-flex gap-1 items-center"
           title={row.description?.moniker}
         >
+          {/* Replace with KeybaseImage */}
           <Text
             as="span"
             className="inline-flex justify-center items-center bg-secondary-main text-accent-contrast size-5 rounded-full text-[0.6rem]"

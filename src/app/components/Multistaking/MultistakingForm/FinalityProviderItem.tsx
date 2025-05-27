@@ -49,9 +49,7 @@ export const FinalityProviderItem = ({
         <div
           className={`w-10 h-10 text-sm flex items-center justify-center rounded-full bg-secondary-main text-accent-contrast`}
         >
-          {provider.description?.moniker
-            ? provider.description?.moniker[0].toUpperCase()
-            : "?"}
+          {provider.rank}
         </div>
         <div>
           <div className="flex flex-row gap-1 items-center">
