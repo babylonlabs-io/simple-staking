@@ -2,6 +2,9 @@
   "extends": ["next/core-web-vitals", "prettier"],
   "plugins": ["@tanstack/query", "import"],
   "rules": {
+    "react-hooks/exhaustive-deps": "error",
+    "react-hooks/rules-of-hooks": "error",
+    "@tanstack/query/exhaustive-deps": "error",
     "import/order": [
       "error",
       {
