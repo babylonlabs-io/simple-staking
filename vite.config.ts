@@ -22,7 +22,7 @@ export default defineConfig({
     react(),
     tsconfigPaths(),
     nodePolyfills({ include: ["buffer"] }),
-    EnvironmentPlugin("all"),
+    EnvironmentPlugin("all", { prefix: "NEXT_PUBLIC_" }),
   ],
   define: {
     "import.meta.env.NEXT_PUBLIC_COMMIT_HASH": JSON.stringify(
