@@ -1,5 +1,3 @@
-"use client";
-
 import type { DetailedHTMLProps, HTMLAttributes } from "react";
 import { twJoin } from "tailwind-merge";
 
