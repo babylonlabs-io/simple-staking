@@ -153,7 +153,7 @@ describe("useRegistrationService", () => {
     (getDelegationV2 as jest.Mock).mockResolvedValue(mockDelegationV2);
 
     // Mock retry utility
-    (retry as jest.Mock).mockImplementation((fn, predicate, interval) => {
+    (retry as jest.Mock).mockImplementation((fn) => {
       return fn();
     });
 
@@ -308,7 +308,7 @@ describe("useRegistrationService", () => {
 
     it("should handle successful validation but wait for active state", async () => {
       // Mock retry to simulate waiting for active state
-      (retry as jest.Mock).mockImplementation((fn, predicate, interval) => {
+      (retry as jest.Mock).mockImplementation((_, predicate) => {
         // First call returns pending, second call returns active
         const pendingDelegation = {
           ...mockDelegationV2,

@@ -1,5 +1,3 @@
-"use client";
-
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
