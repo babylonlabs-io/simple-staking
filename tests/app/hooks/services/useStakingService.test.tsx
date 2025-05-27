@@ -156,7 +156,7 @@ describe("useStakingService", () => {
     (getDelegationV2 as jest.Mock).mockResolvedValue(mockDelegation);
 
     // Mock retry utility
-    (retry as jest.Mock).mockImplementation((fn, predicate, interval) => {
+    (retry as jest.Mock).mockImplementation((fn) => {
       return fn();
     });
 
@@ -200,7 +200,7 @@ describe("useStakingService", () => {
       const { result } = renderHook(() => useStakingService());
 
       expect(() => {
-        const fee = result.current.calculateFeeAmount({
+        result.current.calculateFeeAmount({
           finalityProvider: mockFormData.finalityProvider,
           amount: mockFormData.amount,
           term: mockFormData.term,

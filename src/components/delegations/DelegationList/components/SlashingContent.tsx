@@ -88,13 +88,13 @@ export const SlashingContent = ({
       </b>{" "}
       being deducted from your delegation due to the finality provider double
       voting.{" "}
-      <Link
+      <a
         className="text-secondary-main"
         target="_blank"
         href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
       >
         Learn more
-      </Link>
+      </a>
     </>
   );
 };

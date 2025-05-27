@@ -1,5 +1,3 @@
-"use client";
-
 import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
 
 import BitcoinBlock from "@/app/assets/bitcoin-block.svg";
