@@ -6,12 +6,6 @@ import { network } from "@/config/network/btc";
 import "./globals.css";
 import Providers from "./providers";
 
-// TODO: find alternative solution for vite
-export const metadata = {
-  title: "Babylon - Staking Dashboard",
-  description: "BTC Staking Dashboard",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
