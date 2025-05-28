@@ -57,9 +57,10 @@ export const apiWrapper = async <TResponseData = unknown>(
   try {
     const response = await fetch(url, options);
 
-    const responseText = await response.text().catch(() => generalErrorMessage);
-
     if (!response.ok) {
+      const responseText = await response
+        .text()
+        .catch(() => generalErrorMessage);
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         responseText,
