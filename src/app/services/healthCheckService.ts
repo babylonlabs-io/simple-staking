@@ -25,7 +25,7 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
       );
     }
   } catch (error: any) {
-    if (isError451(error)) {
+    if (isError451(error.cause)) {
       return {
         status: HealthCheckStatus.GeoBlocked,
         message: GEO_BLOCK_MESSAGE,
