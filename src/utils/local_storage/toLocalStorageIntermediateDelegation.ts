@@ -3,7 +3,7 @@ import { Delegation } from "@/app/types/delegations";
 export const toLocalStorageIntermediateDelegation = (
   stakingTxHashHex: string,
   stakerPkHex: string,
-  finalityProviderPkHex: string,
+  finalityProviderPksHex: string[],
   stakingValueSat: number,
   stakingTxHex: string,
   timelock: number,
@@ -11,7 +11,7 @@ export const toLocalStorageIntermediateDelegation = (
 ): Delegation => ({
   stakingTxHashHex,
   stakerPkHex,
-  finalityProviderPkHex,
+  finalityProviderPksHex,
   state,
   stakingValueSat,
   stakingTx: {

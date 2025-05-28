@@ -1,7 +1,7 @@
 export interface Delegation {
   stakingTxHashHex: string;
   stakerPkHex: string;
-  finalityProviderPkHex: string;
+  finalityProviderPksHex: string[];
   state: string;
   stakingValueSat: number;
   stakingTx: StakingTx;

@@ -81,8 +81,9 @@ export function useStakingService() {
       term,
       feeRate,
     });
+    // TODO: hardcode the example BSN FPs for now
     const eoiInput = {
-      finalityProviderPkNoCoordHex: finalityProvider,
+      finalityProviderPksNoCoordHex: [finalityProvider],
       stakingAmountSat: btcToSatoshi(amount),
       stakingTimelock: term,
       feeRate: feeRate,
@@ -109,8 +110,9 @@ export function useStakingService() {
         feeRate,
       });
       try {
+        // TODO: hardcode the example BSN FPs for now
         const eoiInput = {
-          finalityProviderPkNoCoordHex: finalityProvider,
+          finalityProviderPksNoCoordHex: [finalityProvider],
           stakingAmountSat: amount,
           stakingTimelock: term,
           feeRate: feeRate,
@@ -198,7 +200,7 @@ export function useStakingService() {
 
         await submitStakingTx(
           {
-            finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+            finalityProviderPksNoCoordHex: finalityProviderBtcPksHex,
             stakingAmountSat: stakingAmount,
             stakingTimelock,
           },

@@ -22,7 +22,7 @@ interface RegistrationData {
   stakingTxHex: string;
   startHeight: number;
   stakingInput: {
-    finalityProviderPkNoCoordHex: string;
+    finalityProviderPksNoCoordHex: string[];
     stakingAmountSat: number;
     stakingTimelock: number;
   };
@@ -93,8 +93,9 @@ export function useRegistrationService() {
         stakingTxHex: selectedDelegation.stakingTx.txHex,
         startHeight: selectedDelegation.stakingTx.startHeight,
         stakingInput: {
-          finalityProviderPkNoCoordHex:
-            selectedDelegation.finalityProviderPkHex,
+          // Note: phase-1 only support single finality provider
+          finalityProviderPksNoCoordHex:
+            selectedDelegation.finalityProviderPksHex,
           stakingAmountSat: selectedDelegation.stakingValueSat,
           stakingTimelock: selectedDelegation.stakingTx.timelock,
         },
