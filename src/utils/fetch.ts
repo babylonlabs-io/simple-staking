@@ -30,7 +30,13 @@ export const fetchApi = async <T>(
         (await response.text()) || JSON.stringify(await response.json());
       const message = options.formatErrorResponse?.(errorText) || errorText;
       throw new ClientError(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE, message, {
-        cause: response,
+        cause: {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          ok: response.ok,
+          type: response.type,
+        },
       });
     }
 
