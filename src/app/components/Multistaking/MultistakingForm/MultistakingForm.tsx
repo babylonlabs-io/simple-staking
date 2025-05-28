@@ -60,9 +60,16 @@ export function MultistakingForm() {
   const PreviewSubmitButton = () => {
     const { isValid, errors } = useFormState();
 
+    const errorKeys = Object.keys(errors);
+    const errorMessages = errorKeys.map((key) => errors[key]?.message);
+
     return (
       <>
-        {/* {errors.amount && <div className="text-red-500 text-right">{errors?.amount?.message}</div>} */}
+        {errorMessages.map((message, index) => (
+          <div key={index} className="text-red-500 text-right">
+            {message?.toString()}
+          </div>
+        ))}
         <Button
           //@ts-ignore - fix type issue in core-ui
           type="submit"

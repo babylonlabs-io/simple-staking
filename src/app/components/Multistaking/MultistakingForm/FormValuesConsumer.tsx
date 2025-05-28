@@ -4,7 +4,11 @@ import { useEffect } from "react";
 
 import { chainLogos } from "@/app/assets/chains";
 import { MultistakingPreviewModal } from "@/app/components/Modals/MultistakingModal/MultistakingStartModal";
+import { useStakingState } from "@/app/state/StakingState";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+import { satoshiToBtc } from "@/utils/btc";
+import { maxDecimals } from "@/utils/maxDecimals";
+import { blocksToDisplayTime } from "@/utils/time";
 import { trim } from "@/utils/trim";
 
 export const FormValuesConsumer = ({
@@ -19,9 +23,12 @@ export const FormValuesConsumer = ({
   const btcAmount = useWatch({ name: "amount", defaultValue: "0" });
   const feeRate = useWatch({ name: "feeRate", defaultValue: "1" });
   const feeAmount = useWatch({ name: "feeAmount", defaultValue: "0" });
+  const term = useWatch({ name: "term", defaultValue: "0" });
   const { coinSymbol } = getNetworkConfigBTC();
 
   const { setValue, getValues } = useFormContext();
+
+  const { stakingInfo } = useStakingState();
 
   useEffect(() => {
     if (selectedProviders.length > 0) {
@@ -74,15 +81,20 @@ export const FormValuesConsumer = ({
           "Selected Finality Provider",
       }))}
       details={{
-        stakeAmount: `${parseFloat(btcAmount) || 0} ${coinSymbol}`,
+        stakeAmount: `${maxDecimals(parseFloat(btcAmount) || 0, 8)} ${coinSymbol}`,
         feeRate: `${feeRate} sat/vB`,
-        transactionFees: `${parseFloat(feeAmount) || 0} ${coinSymbol}`,
+        transactionFees: `${maxDecimals(satoshiToBtc(parseFloat(feeAmount) || 0), 8)} ${coinSymbol}`,
         term: {
-          blocks: "5000 blocks",
-          duration: "~ 35 days",
+          blocks: `${term} blocks`,
+          duration: `~ ${blocksToDisplayTime(Number(term))}`,
         },
-        onDemandBonding: "Enabled (~ 7 days unbonding time)",
-        unbondingFee: "0.0001 BTC",
+        onDemandBonding: `Enabled (~ ${blocksToDisplayTime(
+          stakingInfo?.unbondingTime,
+        )} unbonding time)`,
+        unbondingFee: `${maxDecimals(
+          satoshiToBtc(stakingInfo?.unbondingFeeSat || 0),
+          8,
+        )} ${coinSymbol}`,
       }}
     />
   );
