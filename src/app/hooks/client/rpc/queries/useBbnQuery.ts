@@ -65,6 +65,7 @@ export const useBbnQuery = () => {
         throw new ClientError(
           ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
           "Error getting rewards",
+          { cause: error as Error },
         );
       }
       if (!rewards) {

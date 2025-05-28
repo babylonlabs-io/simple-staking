@@ -141,6 +141,11 @@ describe("getFundingUTXOs", () => {
       new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error getting UTXOs",
+        {
+          cause: new Error(
+            "Invalid address provided for UTXO lookup or mempool API validation failed: testAddress",
+          ),
+        },
       ),
     );
   });
