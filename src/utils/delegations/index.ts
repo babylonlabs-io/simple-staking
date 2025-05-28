@@ -59,10 +59,10 @@ export const uint8ArrayToHex = (uint8Array: Uint8Array): string => {
  * @throws An error if the staking input is invalid.
  */
 export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
-  if (!stakingInput.finalityProviderPkNoCoordHex) {
+  if (!stakingInput.finalityProviderPksNoCoordHex.length) {
     throw new ClientError(
       ERROR_CODES.VALIDATION_ERROR,
-      "Finality provider public key (finalityProviderPkNoCoordHex) is required for staking input.",
+      "Finality provider public keys (finalityProviderPksNoCoordHex) are required for staking input.",
     );
   }
   if (!stakingInput.stakingAmountSat) {

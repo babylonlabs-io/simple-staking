@@ -145,7 +145,7 @@ export const Delegations = ({}) => {
           toLocalStorageIntermediateDelegation(
             newTxId,
             publicKeyNoCoord,
-            delegation.finalityProviderPkHex,
+            delegation.finalityProviderPksHex,
             delegation.stakingValueSat,
             delegation.stakingTx.txHex,
             delegation.stakingTx.timelock,
@@ -175,13 +175,13 @@ export const Delegations = ({}) => {
         throw clientError;
       }
       // Sign the withdrawal transaction
-      const { stakingTx, finalityProviderPkHex, stakingValueSat } =
+      const { stakingTx, finalityProviderPksHex, stakingValueSat } =
         selectedDelegation;
       setAwaitingWalletResponse(true);
       await submitUnbondingTx(
         {
           stakingTimelock: stakingTx.timelock,
-          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          finalityProviderPksNoCoordHex: finalityProviderPksHex,
           stakingAmountSat: stakingValueSat,
         },
         stakingTx.startHeight,
@@ -228,12 +228,16 @@ export const Delegations = ({}) => {
         throw clientError;
       }
       // Sign the withdrawal transaction
-      const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
-        selectedDelegation;
+      const {
+        stakingTx,
+        finalityProviderPksHex,
+        stakingValueSat,
+        unbondingTx,
+      } = selectedDelegation;
       await submitWithdrawalTx(
         {
           stakingTimelock: stakingTx.timelock,
-          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          finalityProviderPksNoCoordHex: finalityProviderPksHex,
           stakingAmountSat: stakingValueSat,
         },
         stakingTx.startHeight,
