@@ -148,7 +148,7 @@ export function useStakingService() {
         const clientError = new ClientError(
           ERROR_CODES.TRANSACTION_PREPARATION_ERROR,
           "Error creating EOI",
-          { cause: error },
+          { cause: error as Error },
         );
         logger.error(clientError);
         handleError({
@@ -213,7 +213,7 @@ export function useStakingService() {
         const clientError = new ClientError(
           ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
           "Error submitting staking transaction",
-          { cause: error },
+          { cause: error as Error },
         );
         logger.error(clientError);
         reset();

@@ -29,7 +29,9 @@ export const fetchApi = async <T>(
       const errorText =
         (await response.text()) || JSON.stringify(await response.json());
       const message = options.formatErrorResponse?.(errorText) || errorText;
-      throw new ClientError(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE, message);
+      throw new ClientError(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE, message, {
+        cause: response,
+      });
     }
 
     const data =
