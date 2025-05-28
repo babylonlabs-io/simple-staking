@@ -14,6 +14,7 @@ import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSe
 import { Section } from "@/app/components/Section/Section";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
+import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 const { networkName } = getNetworkConfigBTC();
@@ -173,6 +174,8 @@ export function MultistakingForm() {
           previewModalOpen={previewModalOpen}
           setPreviewModalOpen={setPreviewModalOpen}
         />
+
+        <StakingModal />
       </Form>
     </Section>
   );

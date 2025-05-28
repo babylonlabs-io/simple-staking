@@ -4,9 +4,11 @@ import { useEffect } from "react";
 
 import { chainLogos } from "@/app/assets/chains";
 import { MultistakingPreviewModal } from "@/app/components/Modals/MultistakingModal/MultistakingStartModal";
+import { useStakingService } from "@/app/hooks/services/useStakingService";
+import type { FormFields } from "@/app/state/StakingState";
 import { useStakingState } from "@/app/state/StakingState";
 import { getNetworkConfigBTC } from "@/config/network/btc";
-import { satoshiToBtc } from "@/utils/btc";
+import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/utils/time";
 import { trim } from "@/utils/trim";
@@ -27,6 +29,7 @@ export const FormValuesConsumer = ({
   const { coinSymbol } = getNetworkConfigBTC();
 
   const { setValue, getValues } = useFormContext();
+  const { createEOI } = useStakingService();
 
   const { stakingInfo } = useStakingState();
 
@@ -55,8 +58,26 @@ export const FormValuesConsumer = ({
       open={previewModalOpen}
       processing={false}
       onClose={() => setPreviewModalOpen(false)}
-      onProceed={() => {
+      onProceed={async () => {
         setPreviewModalOpen(false);
+
+        const {
+          finalityProvider,
+          amount: amountValue,
+          term: termValue,
+          feeRate: feeRateValue,
+          feeAmount: feeAmountValue,
+        } = getValues();
+
+        const formFields: FormFields = {
+          finalityProvider,
+          amount: btcToSatoshi(Number(amountValue)),
+          term: Number(termValue),
+          feeRate: Number(feeRateValue),
+          feeAmount: Number(feeAmountValue),
+        };
+
+        await createEOI(formFields);
       }}
       bsns={[
         {
