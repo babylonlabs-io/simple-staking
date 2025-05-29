@@ -1,4 +1,4 @@
-import { NumberField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
@@ -60,9 +60,7 @@ export const AmountSubsection = () => {
           className="text-lg bg-transparent text-right w-24 outline-none"
         />
       </div>
-      <div className="sr-only">
-        <NumberField name="amount" />
-      </div>
+      <HiddenField name="amount" />
 
       <AuthGuard>
         <div className="flex text-sm flex-row justify-between w-full content-center">
