@@ -1,3 +1,17 @@
+import babylon from "@/app/assets/chains/babylon-genesis.png";
+import cosmos from "@/app/assets/chains/cosmos.png";
+import ethereum from "@/app/assets/chains/ethereum.png";
+import placeholder from "@/app/assets/chains/placeholder.svg";
+import sui from "@/app/assets/chains/sui.png";
+
+export const chainLogos = {
+  babylon,
+  cosmos,
+  ethereum,
+  sui,
+  placeholder,
+} as const;
+
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 

@@ -10,7 +10,7 @@ import { PropsWithChildren, useState } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
-import { chainLogos } from "@/app/components/Multistaking/chainLogos";
+import { chainLogos } from "@/app/constants";
 
 const SubSection = ({
   children,

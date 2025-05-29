@@ -3,7 +3,7 @@ import Image from "next/image";
 import { useEffect } from "react";
 
 import { MultistakingPreviewModal } from "@/app/components/Modals/MultistakingModal/MultistakingStartModal";
-import { chainLogos } from "@/app/components/Multistaking/chainLogos";
+import { chainLogos } from "@/app/constants";
 import { useStakingService } from "@/app/hooks/services/useStakingService";
 import type { FormFields } from "@/app/state/StakingState";
 import { useStakingState } from "@/app/state/StakingState";
