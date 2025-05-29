@@ -1,5 +1,6 @@
 import { Text } from "@babylonlabs-io/core-ui";
 
+import { useStakingState } from "@/app/state/StakingState";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
@@ -25,6 +26,8 @@ export const UnbondModal = ({
   unbondingFeeSat,
   unbondingTimeInBlocks,
 }: UnbondModalProps) => {
+  const { currentStepOptions } = useStakingState();
+
   if (!unbondingTimeInBlocks || !unbondingFeeSat) {
     return null;
   }

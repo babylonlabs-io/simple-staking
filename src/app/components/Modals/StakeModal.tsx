@@ -1,5 +1,6 @@
 import { BiSolidBadgeCheck } from "react-icons/bi";
 
+import { useStakingState } from "@/app/state/StakingState";
 import { getNetworkConfig } from "@/config/network";
 
 import { SubmitModal } from "./SubmitModal";
@@ -18,7 +19,9 @@ export const StakeModal = ({
   open,
   onSubmit,
   onClose,
-}: StakeModalProps) => (
+}: StakeModalProps) => {
+  const { currentStepOptions } = useStakingState();
+
   <SubmitModal
     processing={processing}
     open={open}
@@ -35,5 +38,5 @@ export const StakeModal = ({
   >
     Your request has been verified by the {bbn.networkFullName}. You can now
     stake!
-  </SubmitModal>
-);
+  </SubmitModal>;
+};

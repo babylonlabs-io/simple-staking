@@ -1,3 +1,4 @@
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { number, object, ObjectSchema, string } from "yup";
@@ -79,6 +80,8 @@ export interface StakingState {
     title: string;
     message: string;
   };
+  currentStepOptions: SignPsbtOptions | undefined;
+  setCurrentStepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useStakingState } =
@@ -115,10 +118,14 @@ const { StateProvider, useState: useStakingState } =
     setFormData: () => {},
     setProcessing: () => {},
     reset: () => {},
+    currentStepOptions: undefined,
+    setCurrentStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
+  const [currentStepOptions, setCurrentStepOptions] =
+    useState<SignPsbtOptions>();
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
   const [verifiedDelegation, setVerifiedDelegation] = useState<DelegationV2>();
@@ -312,6 +319,7 @@ export function StakingState({ children }: PropsWithChildren) {
         }
       }
       setCurrentStep(stepName);
+      setCurrentStepOptions(undefined);
     },
     [
       successModalShown,
@@ -326,6 +334,7 @@ export function StakingState({ children }: PropsWithChildren) {
     setVerifiedDelegation(undefined);
     setFormData(undefined);
     setCurrentStep(undefined);
+    setCurrentStepOptions(undefined);
     setProcessing(false);
   }, [setVerifiedDelegation, setFormData, setCurrentStep, setProcessing]);
 
@@ -348,6 +357,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
+      currentStepOptions,
+      setCurrentStepOptions,
     }),
     [
       hasError,
@@ -365,6 +376,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
+      currentStepOptions,
+      setCurrentStepOptions,
     ],
   );
 
