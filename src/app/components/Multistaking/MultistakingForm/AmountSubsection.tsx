@@ -1,6 +1,4 @@
 import { NumberField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
-import { useState } from "react";
 
 import bitcoin from "@/app/assets/bitcoin.png";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
@@ -19,7 +17,6 @@ export const AmountSubsection = () => {
   const { coinSymbol } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
   const { setValue } = useFormContext();
-  const [isEditing, setIsEditing] = useState(false);
 
   const btcAmountValue = parseFloat(btcAmount || 0);
   const btcAmountUsd = calculateTokenValueInCurrency(btcAmountValue, btcInUsd, {
@@ -35,10 +32,6 @@ export const AmountSubsection = () => {
     });
   };
 
-  const handleValueClick = () => {
-    setIsEditing(true);
-  };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue("amount", e.target.value, {
       shouldValidate: true,
@@ -47,42 +40,25 @@ export const AmountSubsection = () => {
     });
   };
 
-  const handleInputBlur = () => {
-    setIsEditing(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      setIsEditing(false);
-    }
-  };
-
   return (
     <SubSection className="flex flex-col justify-between w-full content-center gap-4">
       <div className="font-normal items-center flex flex-row justify-between w-full content-center">
         <div className="flex items-center gap-2">
-          <Image
-            src={bitcoin}
+          <img
+            src={bitcoin.src}
             alt="bitcoin"
             className="max-w-[40px] max-h-[40px]"
           />
           <div className="text-lg">Bitcoin</div>
         </div>
-        {isEditing ? (
-          <input
-            type="number"
-            value={btcAmount || ""}
-            onChange={handleInputChange}
-            onBlur={handleInputBlur}
-            onKeyDown={handleKeyDown}
-            autoFocus
-            className="text-lg bg-transparent text-right w-24 outline-none"
-          />
-        ) : (
-          <div className="text-lg" onClick={handleValueClick}>
-            {btcAmount || 0}
-          </div>
-        )}
+        <input
+          type="number"
+          value={btcAmount || ""}
+          onChange={handleInputChange}
+          placeholder="0"
+          autoFocus
+          className="text-lg bg-transparent text-right w-24 outline-none"
+        />
       </div>
       <div className="sr-only">
         <NumberField name="amount" />
