@@ -7,7 +7,6 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
-import { setUser } from "@sentry/nextjs";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
@@ -24,6 +23,7 @@ import { Fees } from "@/app/types/fee";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
+import { useSentryUser } from "@/hooks/useSentryUser";
 import {
   getAddressBalance,
   getNetworkFees,
@@ -97,6 +97,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   const btcConnector = useChainConnector("BTC");
   const { open = () => {}, connected } = useWalletConnect();
   const logger = useLogger();
+  const { updateUser } = useSentryUser();
 
   const btcDisconnect = useCallback(() => {
     setBTCWalletProvider(undefined);
@@ -104,10 +105,8 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     setPublicKeyNoCoord("");
     setAddress("");
 
-    setUser({
-      btcAddress: null,
-    });
-  }, []);
+    updateUser({ btcAddress: null });
+  }, [updateUser]);
 
   const connectBTC = useCallback(
     async (walletProvider: IBTCProvider | null) => {
@@ -172,9 +171,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         setPublicKeyNoCoord(publicKeyNoCoordHex);
         setLoading(false);
 
-        setUser({
-          btcAddress: address,
-        });
+        updateUser({ btcAddress: address });
 
         logger.info("BTC wallet connected", {
           network,
@@ -196,7 +193,7 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError, publicKeyNoCoord, address, logger],
+    [handleError, publicKeyNoCoord, address, logger, updateUser],
   );
 
   useEffect(() => {

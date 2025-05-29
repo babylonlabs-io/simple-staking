@@ -7,7 +7,6 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import { setUser } from "@sentry/nextjs";
 import {
   createContext,
   useCallback,
@@ -22,6 +21,7 @@ import { useError } from "@/app/context/Error/ErrorProvider";
 import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
+import { useSentryUser } from "@/hooks/useSentryUser";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";
 import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
 
@@ -62,16 +62,15 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   const logger = useLogger();
   const { open = () => {} } = useWalletConnect();
   const bbnConnector = useChainConnector("BBN");
+  const { updateUser } = useSentryUser();
 
   const cosmosDisconnect = useCallback(() => {
     setBBNWalletProvider(undefined);
     setCosmosBech32Address("");
     setSigningStargateClient(undefined);
 
-    setUser({
-      babylonAddress: null,
-    });
-  }, []);
+    updateUser({ babylonAddress: null });
+  }, [updateUser]);
 
   const connectCosmos = useCallback(
     async (provider: IBBNProvider | null) => {
@@ -126,9 +125,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         setLoading(false);
         setWalletName(walletNameStr || "Unknown Wallet");
 
-        setUser({
-          babylonAddress: bech32Address,
-        });
+        updateUser({ babylonAddress: bech32Address });
 
         logger.info("Babylon wallet connected", {
           babylonAddress: bech32Address,
@@ -149,7 +146,7 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
         });
       }
     },
-    [handleError, cosmosBech32Address, walletName, logger],
+    [handleError, cosmosBech32Address, walletName, logger, updateUser],
   );
 
   // Listen for Babylon account changes
