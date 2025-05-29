@@ -13,7 +13,7 @@ export function DynamicHiddenFields({ stakingInfo }: Props) {
     <>
       <HiddenField
         name="term"
-        defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString() || "1"}
+        defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
       />
       <HiddenField name="feeRate" defaultValue="0" />
       <HiddenField name="feeAmount" defaultValue="0" />
