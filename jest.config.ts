@@ -104,6 +104,8 @@ const config: Config = {
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
+    "\\.(png|jpg|jpeg|gif|webp|avif|bmp)$":
+      "<rootDir>/tests/__mocks__/svgMock.js",
     "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
   },
 
@@ -166,12 +168,24 @@ const config: Config = {
       displayName: "node",
       testEnvironment: "node",
       testMatch: ["<rootDir>/tests/**/*.test.ts"],
+      moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/src/$1",
+        "\\.(png|jpg|jpeg|gif|webp|avif|bmp)$":
+          "<rootDir>/tests/__mocks__/svgMock.js",
+        "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
+      },
     },
     {
       displayName: "jsdom",
       testEnvironment: "jsdom",
       testMatch: ["<rootDir>/tests/**/*.test.tsx"],
       setupFiles: ["./jest.jsdom.setup.js"],
+      moduleNameMapper: {
+        "^@/(.*)$": "<rootDir>/src/$1",
+        "\\.(png|jpg|jpeg|gif|webp|avif|bmp)$":
+          "<rootDir>/tests/__mocks__/svgMock.js",
+        "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
+      },
     },
   ],
 
