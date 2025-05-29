@@ -6,7 +6,7 @@ import {
   useWatch,
 } from "@babylonlabs-io/core-ui";
 
-import { FinalityProviders } from "@/app/components/Staking/FinalityProviders/FinalityProviders";
+import { FinalityProviders } from "@/app/components/Multistaking/FinalityProviderModal/FinalityProviders";
 
 export const FinalityProviderModal = ({
   onClose,
