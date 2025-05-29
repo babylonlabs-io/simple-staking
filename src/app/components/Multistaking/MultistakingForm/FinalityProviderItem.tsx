@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-import { chainLogos } from "@/app/assets/chains";
+import { chainLogos } from "@/app/components/Multistaking/chainLogos";
 import { trim } from "@/utils/trim";
 
 export const FinalityProviderItem = ({
