@@ -1,4 +1,5 @@
 import React from "react";
+import { twJoin } from "tailwind-merge";
 
 export const SubSection = ({
   children,
@@ -10,7 +11,10 @@ export const SubSection = ({
   className?: string;
 }) => (
   <div
-    className={`flex bg-secondary-highlight text-[#12495E] p-4 ${className}`}
+    className={twJoin(
+      "flex bg-secondary-highlight text-[#12495E] p-4",
+      className,
+    )}
     style={style}
   >
     {children}
