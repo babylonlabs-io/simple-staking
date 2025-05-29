@@ -34,7 +34,7 @@ class FeatureFlagService {
    * ETA for removal: TBD - Will be removed once multi-staking is fully released
    */
   static get IsMultiStakingEnabled(): boolean {
-    return true;
+    return this.getFlagValue("MULTISTAKING");
   }
 }
 
