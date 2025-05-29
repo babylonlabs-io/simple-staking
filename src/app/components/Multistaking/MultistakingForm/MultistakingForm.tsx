@@ -1,4 +1,10 @@
-import { Button, Card, Form, useFormState } from "@babylonlabs-io/core-ui";
+import {
+  Button,
+  Card,
+  Form,
+  HiddenField,
+  useFormState,
+} from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 
@@ -6,7 +12,6 @@ import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/app/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/app/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
 import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm/AmountSubsection";
-import { DynamicHiddenFields } from "@/app/components/Multistaking/MultistakingForm/DynamicHiddenFields";
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { FinalityProviderItem } from "@/app/components/Multistaking/MultistakingForm/FinalityProviderItem";
 import { FormValuesConsumer } from "@/app/components/Multistaking/MultistakingForm/FormValuesConsumer";
@@ -92,7 +97,13 @@ export function MultistakingForm() {
         reValidateMode="onChange"
         onSubmit={handlePreview}
       >
-        <DynamicHiddenFields stakingInfo={stakingInfo} />
+        <HiddenField
+          name="term"
+          defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
+        />
+        <HiddenField name="feeRate" defaultValue="0" />
+        <HiddenField name="feeAmount" defaultValue="0" />
+        <HiddenField name="finalityProvider" defaultValue="" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
             <AmountSubsection />
