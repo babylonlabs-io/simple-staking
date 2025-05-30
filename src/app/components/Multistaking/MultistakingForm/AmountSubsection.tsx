@@ -23,7 +23,7 @@ export const AmountSubsection = () => {
       <div className="font-normal items-center flex flex-row justify-between w-full content-center">
         <div className="flex items-center gap-2">
           <img
-            src={bitcoin.src}
+            src={bitcoin}
             alt="bitcoin"
             className="max-w-[2.5rem] max-h-[2.5rem]"
           />

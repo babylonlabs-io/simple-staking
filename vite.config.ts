@@ -33,15 +33,14 @@ export default defineConfig({
       },
       output: {
         manualChunks: (id) => {
-          if (id.includes("@babylonlabs-io")) {
-            return "libs";
+          if (id.includes("@babylonlabs-io/wallet-connector")) {
+            return;
           }
 
           if (id.includes("node_modules")) {
             return "vendor";
           }
         },
-        inlineDynamicImports: false,
       },
     },
   },
