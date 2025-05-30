@@ -1,4 +1,4 @@
-import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
@@ -9,19 +9,16 @@ import { satoshiToBtc } from "@/utils/btc";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";
 
-import { AmountField } from "./AmountField";
 import { SubSection } from "./SubSection";
 
 export const AmountSubsection = () => {
   const { totalBtcBalance } = useBalanceState();
-
   const btcAmount = useWatch({ name: "amount", defaultValue: "0" });
-  const { setValue } = useFormContext();
-
   const { coinSymbol } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
+  const { setValue } = useFormContext();
 
-  const btcAmountValue = parseFloat(btcAmount || "0");
+  const btcAmountValue = parseFloat(btcAmount || 0);
   const btcAmountUsd = calculateTokenValueInCurrency(btcAmountValue, btcInUsd, {
     zeroDisplay: "$0.00",
   });
@@ -29,6 +26,14 @@ export const AmountSubsection = () => {
 
   const handleSetMaxBalance = () => {
     setValue("amount", formattedBalance.toString(), {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setValue("amount", e.target.value, {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true,
@@ -46,8 +51,16 @@ export const AmountSubsection = () => {
           />
           <div className="text-lg">Bitcoin</div>
         </div>
-        <AmountField autoFocus />
+        <input
+          type="number"
+          value={btcAmount || ""}
+          onChange={handleInputChange}
+          placeholder="0"
+          autoFocus
+          className="text-lg bg-transparent text-right w-24 outline-none"
+        />
       </div>
+      <HiddenField name="amount" />
 
       <AuthGuard>
         <div className="flex text-sm flex-row justify-between w-full content-center">
