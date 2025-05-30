@@ -28,21 +28,17 @@ export const useBbnTransaction = () => {
    */
   const estimateBbnGasFee = useCallback(
     async <T>(msg: { typeUrl: string; value: T }): Promise<BbnGasFee> => {
-      try {
-        const gasEstimate = await simulate(msg);
-        const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
-        return {
-          amount: [
-            {
-              denom: GAS_DENOM,
-              amount: (gasWanted * BBN_GAS_PRICE).toFixed(0),
-            },
-          ],
-          gas: gasWanted.toString(),
-        };
-      } catch (error: any) {
-        throw error;
-      }
+      const gasEstimate = await simulate(msg);
+      const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
+      return {
+        amount: [
+          {
+            denom: GAS_DENOM,
+            amount: (gasWanted * BBN_GAS_PRICE).toFixed(0),
+          },
+        ],
+        gas: gasWanted.toString(),
+      };
     },
     [simulate],
   );
@@ -62,14 +58,10 @@ export const useBbnTransaction = () => {
         category: "transaction",
       });
 
-      try {
-        // estimate gas
-        const fee = await estimateBbnGasFee(msg);
-        // sign it
-        return signTx(msg, fee);
-      } catch (error: any) {
-        throw error;
-      }
+      // estimate gas
+      const fee = await estimateBbnGasFee(msg);
+      // sign it
+      return signTx(msg, fee);
     },
     [estimateBbnGasFee, signTx, logger],
   );
@@ -86,11 +78,7 @@ export const useBbnTransaction = () => {
         category: "transaction",
       });
 
-      try {
-        return broadcastTx(tx);
-      } catch (error: any) {
-        throw error;
-      }
+      return broadcastTx(tx);
     },
     [broadcastTx, logger],
   );

@@ -35,28 +35,34 @@ export const useRewardsService = () => {
    * @returns {Promise<number>} The gas fee for claiming rewards.
    */
   const estimateClaimRewardsGas = useCallback(async (): Promise<number> => {
-    try {
-      const withdrawRewardMsg = createWithdrawRewardMsg(bbnAddress);
-      const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
-      return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
-    } catch (error: any) {
-      logger.error(error);
-      throw error;
-    }
-  }, [bbnAddress, estimateBbnGasFee, logger]);
+    const withdrawRewardMsg = createWithdrawRewardMsg(bbnAddress);
+    const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
+    return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
+  }, [bbnAddress, estimateBbnGasFee]);
 
   const showPreview = useCallback(async () => {
     setTransactionFee(0);
     setProcessing(true);
     openRewardModal();
-    const fee = await estimateClaimRewardsGas();
-    setTransactionFee(fee);
-    setProcessing(false);
+    try {
+      const fee = await estimateClaimRewardsGas();
+      setTransactionFee(fee);
+    } catch (error: any) {
+      logger.error(error, {
+        tags: { bbnAddress },
+      });
+      handleError({ error });
+    } finally {
+      setProcessing(false);
+    }
   }, [
     estimateClaimRewardsGas,
     setProcessing,
     openRewardModal,
     setTransactionFee,
+    logger,
+    handleError,
+    bbnAddress,
   ]);
 
   /**
@@ -88,15 +94,7 @@ export const useRewardsService = () => {
       closeProcessingModal();
       setTransactionHash("");
       logger.error(error, {
-        tags: {
-          operation: "claimRewards",
-          msgType: BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward,
-          bbnAddress,
-        },
-        data: {
-          hasBalance: Boolean(balanceQuery.data),
-          userAddress: bbnAddress,
-        },
+        tags: { bbnAddress },
       });
       handleError({ error });
     } finally {
