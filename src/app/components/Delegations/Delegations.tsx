@@ -1,6 +1,6 @@
 import { getBabylonParamByBtcHeight } from "@babylonlabs-io/btc-staking-ts";
 import { Card, Heading } from "@babylonlabs-io/core-ui";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useLocalStorage } from "usehooks-ts";
 
@@ -18,6 +18,7 @@ import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
 import { useDelegationState } from "@/app/state/DelegationState";
+import { useStakingState } from "@/app/state/StakingState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
@@ -74,6 +75,7 @@ export const Delegations = ({}) => {
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
+  const { setCurrentStepOptions } = useStakingState();
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
@@ -198,12 +200,17 @@ export const Delegations = ({}) => {
         error,
       });
     } finally {
-      setModalOpen(false);
+      handleCloseModal();
       setTxID("");
       setModalMode(undefined);
       setAwaitingWalletResponse(false);
     }
   };
+
+  const handleCloseModal = useCallback(() => {
+    setModalOpen(false);
+    setCurrentStepOptions(undefined);
+  }, [setCurrentStepOptions]);
 
   // Handles withdrawing requests for delegations that have expired timelocks
   // It constructs a withdrawal transaction, creates a signature for it,
@@ -254,7 +261,7 @@ export const Delegations = ({}) => {
         },
       });
     } finally {
-      setModalOpen(false);
+      handleCloseModal();
       setTxID("");
       setModalMode(undefined);
       setAwaitingWalletResponse(false);
@@ -265,6 +272,7 @@ export const Delegations = ({}) => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
+    setCurrentStepOptions(undefined);
   };
 
   useEffect(() => {
@@ -327,11 +335,11 @@ export const Delegations = ({}) => {
           noCancel: false,
         },
       });
-      setModalOpen(false);
+      handleCloseModal();
       setTxID("");
       setModalMode(undefined);
     }
-  }, [modalOpen, selectedDelegation, handleError]);
+  }, [modalOpen, selectedDelegation, handleError, handleCloseModal]);
 
   useEffect(() => {
     const timerId = setInterval(() => setCurrentTime(Date.now()), ONE_MINUTE);
@@ -428,7 +436,7 @@ export const Delegations = ({}) => {
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleCloseModal}
           onSubmit={() => {
             handleWithdraw(txID);
           }}
@@ -438,7 +446,7 @@ export const Delegations = ({}) => {
       {modalMode === MODE_UNBOND && (
         <UnbondModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleCloseModal}
           onSubmit={() => {
             handleUnbond(txID);
           }}
@@ -459,6 +467,7 @@ export const Delegations = ({}) => {
           title="Transition to Phase 2"
           step={REGISTRATION_INDEXES[step]}
           processing={processing}
+          onClose={handleCloseModal}
         />
       )}
 

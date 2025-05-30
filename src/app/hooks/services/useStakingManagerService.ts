@@ -10,6 +10,7 @@ import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
 import { useAppState } from "@/app/state";
+import { useStakingState } from "@/app/state/StakingState";
 import { useLogger } from "@/hooks/useLogger";
 
 const stakingManagerEvents = {
@@ -20,7 +21,7 @@ export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
   const logger = useLogger();
-
+  const { setCurrentStepOptions } = useStakingState();
   const { connected: cosmosConnected } = useCosmosWallet();
   const {
     network: btcNetwork,
@@ -64,6 +65,7 @@ export const useStakingManagerService = () => {
         options?: SignPsbtOptions,
       ) => {
         eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
+        setCurrentStepOptions(options);
         return signPsbt(psbt, options);
       },
       signMessage: async (
@@ -106,6 +108,7 @@ export const useStakingManagerService = () => {
     signBbnTx,
     eventEmitter,
     logger,
+    setCurrentStepOptions,
   ]);
 
   const on = useCallback(
