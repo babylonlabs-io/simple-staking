@@ -59,22 +59,7 @@ export const FormValuesConsumer = ({
       onClose={() => setPreviewModalOpen(false)}
       onProceed={handleProceed}
       bsns={bsns}
-      details={{
-        stakeAmount: `${maxDecimals(parseFloat(btcAmount) || 0, 8)} ${coinSymbol}`,
-        feeRate: `${feeRate} sat/vB`,
-        transactionFees: `${maxDecimals(satoshiToBtc(parseFloat(feeAmount) || 0), 8)} ${coinSymbol}`,
-        term: {
-          blocks: `${term} blocks`,
-          duration: `~ ${blocksToDisplayTime(Number(term))}`,
-        },
-        onDemandBonding: `Enabled (~ ${blocksToDisplayTime(
-          stakingInfo?.unbondingTime,
-        )} unbonding time)`,
-        unbondingFee: `${maxDecimals(
-          satoshiToBtc(stakingInfo?.unbondingFeeSat || 0),
-          8,
-        )} ${coinSymbol}`,
-      }}
+      details={details}
     />
   );
 };
