@@ -64,12 +64,13 @@ const formatDisplayValue = (key: string, value: any): ReactNode => {
       </div>
     );
   }
-  // Public keys or addresses
-  if (
-    typeof value === "string" &&
-    (key.toLowerCase().includes("pk") || key.toLowerCase().includes("address"))
-  ) {
+  // Public keys
+  if (typeof value === "string" && key.toLowerCase().includes("pk")) {
     return <Hash value={value} small noFade />;
+  }
+  // Addresses
+  if (typeof value === "string" && key.toLowerCase().includes("address")) {
+    return <Hash value={value} small noFade address />;
   }
   // Default case for other values
   return (
