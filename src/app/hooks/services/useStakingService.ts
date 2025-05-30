@@ -145,19 +145,22 @@ export function useStakingService() {
         goToStep(StakingStep.VERIFIED);
         setProcessing(false);
       } catch (error: any) {
+        const metadata = {
+          userPublicKey: publicKeyNoCoord,
+          btcAddress: btcAddress,
+          babylonAddress: bech32Address,
+        };
         const clientError = new ClientError(
           ERROR_CODES.TRANSACTION_PREPARATION_ERROR,
           "Error creating EOI",
           { cause: error },
         );
-        logger.error(clientError);
+        logger.error(clientError, {
+          data: metadata,
+        });
         handleError({
           error,
-          metadata: {
-            userPublicKey: publicKeyNoCoord,
-            btcAddress: btcAddress,
-            babylonAddress: bech32Address,
-          },
+          metadata,
         });
         reset();
       }

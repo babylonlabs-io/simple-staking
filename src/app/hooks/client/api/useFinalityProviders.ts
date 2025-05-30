@@ -12,6 +12,7 @@ import {
   ONE_SECOND,
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { useLogger } from "@/hooks/useLogger";
 
 const FINALITY_PROVIDERS_KEY = "GET_FINALITY_PROVIDERS_V1_KEY";
 
@@ -24,6 +25,7 @@ interface Params {
 
 export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
   const { isOpen, handleError } = useError();
+  const logger = useLogger();
 
   const query = useInfiniteQuery({
     queryKey: [FINALITY_PROVIDERS_KEY, pk, sortBy, order, name],
@@ -53,6 +55,7 @@ export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
 
   useEffect(() => {
     if (query.isError) {
+      logger.error(query.error);
       handleError({
         error: query.error,
         displayOptions: {
@@ -60,7 +63,7 @@ export function useFinalityProviders({ pk, sortBy, order, name }: Params = {}) {
         },
       });
     }
-  }, [query.isError, query.error, query.refetch, handleError]);
+  }, [query.isError, query.error, query.refetch, handleError, logger]);
 
   return query;
 }

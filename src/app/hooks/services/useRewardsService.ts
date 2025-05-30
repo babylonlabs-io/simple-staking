@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useRewardsState } from "@/app/state/RewardState";
+import { useLogger } from "@/hooks/useLogger";
 import { retry } from "@/utils";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
@@ -26,6 +27,7 @@ export const useRewardsService = () => {
   } = useRewardsState();
   const { balanceQuery } = useBbnQuery();
   const { handleError } = useError();
+  const logger = useLogger();
   const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
 
   /**
@@ -33,10 +35,15 @@ export const useRewardsService = () => {
    * @returns {Promise<number>} The gas fee for claiming rewards.
    */
   const estimateClaimRewardsGas = useCallback(async (): Promise<number> => {
-    const withdrawRewardMsg = createWithdrawRewardMsg(bbnAddress);
-    const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
-    return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
-  }, [bbnAddress, estimateBbnGasFee]);
+    try {
+      const withdrawRewardMsg = createWithdrawRewardMsg(bbnAddress);
+      const gasFee = await estimateBbnGasFee(withdrawRewardMsg);
+      return gasFee.amount.reduce((acc, coin) => acc + Number(coin.amount), 0);
+    } catch (error: any) {
+      logger.error(error);
+      throw error;
+    }
+  }, [bbnAddress, estimateBbnGasFee, logger]);
 
   const showPreview = useCallback(async () => {
     setTransactionFee(0);
@@ -77,12 +84,21 @@ export const useRewardsService = () => {
         ONE_SECOND,
         MAX_RETRY_ATTEMPTS,
       );
-    } catch (error: Error | any) {
+    } catch (error: any) {
       closeProcessingModal();
       setTransactionHash("");
-      handleError({
-        error,
+      logger.error(error, {
+        tags: {
+          operation: "claimRewards",
+          msgType: BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward,
+          bbnAddress,
+        },
+        data: {
+          hasBalance: Boolean(balanceQuery.data),
+          userAddress: bbnAddress,
+        },
       });
+      handleError({ error });
     } finally {
       setProcessing(false);
     }
@@ -98,6 +114,7 @@ export const useRewardsService = () => {
     setTransactionHash,
     closeProcessingModal,
     handleError,
+    logger,
   ]);
 
   return {

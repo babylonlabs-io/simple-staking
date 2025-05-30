@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import { BBN_GAS_PRICE } from "@/config";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useSigningStargateClient } from "./useSigningStargateClient";
 
@@ -18,6 +19,7 @@ export interface BbnGasFee {
  */
 export const useBbnTransaction = () => {
   const { simulate, signTx, broadcastTx } = useSigningStargateClient();
+  const logger = useLogger();
 
   /**
    * Estimates the gas fee for a transaction.
@@ -26,14 +28,21 @@ export const useBbnTransaction = () => {
    */
   const estimateBbnGasFee = useCallback(
     async <T>(msg: { typeUrl: string; value: T }): Promise<BbnGasFee> => {
-      const gasEstimate = await simulate(msg);
-      const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
-      return {
-        amount: [
-          { denom: GAS_DENOM, amount: (gasWanted * BBN_GAS_PRICE).toFixed(0) },
-        ],
-        gas: gasWanted.toString(),
-      };
+      try {
+        const gasEstimate = await simulate(msg);
+        const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
+        return {
+          amount: [
+            {
+              denom: GAS_DENOM,
+              amount: (gasWanted * BBN_GAS_PRICE).toFixed(0),
+            },
+          ],
+          gas: gasWanted.toString(),
+        };
+      } catch (error: any) {
+        throw error;
+      }
     },
     [simulate],
   );
@@ -48,12 +57,21 @@ export const useBbnTransaction = () => {
       typeUrl: string;
       value: T;
     }): Promise<Uint8Array> => {
-      // estimate gas
-      const fee = await estimateBbnGasFee(msg);
-      // sign it
-      return signTx(msg, fee);
+      logger.info("Starting BBN transaction signing", {
+        msgType: msg.typeUrl,
+        category: "transaction",
+      });
+
+      try {
+        // estimate gas
+        const fee = await estimateBbnGasFee(msg);
+        // sign it
+        return signTx(msg, fee);
+      } catch (error: any) {
+        throw error;
+      }
     },
-    [estimateBbnGasFee, signTx],
+    [estimateBbnGasFee, signTx, logger],
   );
 
   /**
@@ -63,9 +81,18 @@ export const useBbnTransaction = () => {
    */
   const sendBbnTx = useCallback(
     async (tx: Uint8Array) => {
-      return broadcastTx(tx);
+      logger.info("Broadcasting BBN transaction", {
+        txSize: tx.length,
+        category: "transaction",
+      });
+
+      try {
+        return broadcastTx(tx);
+      } catch (error: any) {
+        throw error;
+      }
     },
-    [broadcastTx],
+    [broadcastTx, logger],
   );
 
   return {

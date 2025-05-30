@@ -6,7 +6,6 @@ import {
   isGeoBlockedResult,
 } from "@/app/services/healthCheckService";
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../context/Error/ErrorProvider";
@@ -28,13 +27,7 @@ export const useHealthCheck = () => {
 
   useEffect(() => {
     if (isError) {
-      const clientError = new ClientError(
-        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        (error as Error).message || "Unknown error",
-        { cause: error },
-      );
-
-      logger.error(clientError, {
+      logger.error(error, {
         tags: {
           isGeoblocked: isGeoBlocked ? "true" : "false",
         },
