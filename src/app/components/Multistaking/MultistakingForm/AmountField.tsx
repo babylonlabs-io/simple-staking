@@ -37,7 +37,8 @@ export function AmountField({
       placeholder="0"
       autoFocus={autoFocus}
       className={
-        className ?? "text-lg bg-transparent text-right w-24 outline-none"
+        className ??
+        "text-lg bg-transparent text-right w-24 outline-none border-transparent focus:border-transparent"
       }
     />
   );
