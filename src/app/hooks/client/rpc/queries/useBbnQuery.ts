@@ -38,7 +38,7 @@ export const useBbnQuery = () => {
    * @returns {Promise<number>} - The rewards from the user's account.
    */
   const rewardsQuery = useClientQuery({
-    queryKey: [BBN_REWARDS_KEY, bech32Address, connected, queryClient],
+    queryKey: [BBN_REWARDS_KEY, bech32Address, connected],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
         return undefined;
@@ -103,7 +103,7 @@ export const useBbnQuery = () => {
    * @returns {Promise<Object>} - The balance of the user's account.
    */
   const balanceQuery = useClientQuery({
-    queryKey: [BBN_BALANCE_KEY, bech32Address, connected, queryClient],
+    queryKey: [BBN_BALANCE_KEY, bech32Address, connected],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
         return 0;
@@ -128,7 +128,7 @@ export const useBbnQuery = () => {
    * @returns {Promise<Object>} - The tip of the Bitcoin blockchain.
    */
   const btcTipQuery = useClientQuery({
-    queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY, queryClient],
+    queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY],
     queryFn: async () => {
       if (!queryClient) {
         return undefined;
@@ -149,6 +149,7 @@ export const useBbnQuery = () => {
     btcTipQuery,
     hasRpcError,
     reconnectRpc: reconnect,
+    queryClient,
   };
 };
 
