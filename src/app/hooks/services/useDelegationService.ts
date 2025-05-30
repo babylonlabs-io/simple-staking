@@ -15,6 +15,7 @@ import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { validateDelegation } from "@/utils/delegations";
 import { getBbnParamByVersion } from "@/utils/params";
+import { useStakingState } from "@/app/state/StakingState";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -75,6 +76,8 @@ export function useDelegationService() {
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
   } = useTransactionService();
+
+  const { setCurrentStepOptions } = useStakingState();
 
   const { isFetching: isFPLoading, finalityProviderMap } =
     useFinalityProviderState();
@@ -282,10 +285,10 @@ export function useDelegationService() {
     [networkInfo],
   );
 
-  const closeConfirmationModal = useCallback(
-    () => void setConfirmationModal(null),
-    [],
-  );
+  const closeConfirmationModal = useCallback(() => {
+    setCurrentStepOptions(undefined);
+    setConfirmationModal(null);
+  }, [setCurrentStepOptions]);
 
   const toggleProcessingDelegation = useCallback(
     (id: string, processing: boolean) => {
