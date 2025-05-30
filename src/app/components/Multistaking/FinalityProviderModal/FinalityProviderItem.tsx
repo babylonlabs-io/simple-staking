@@ -1,5 +1,3 @@
-import Image from "next/image";
-
 import { chainLogos, chainNames } from "@/app/constants";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { trim } from "@/utils/trim";
@@ -30,7 +28,7 @@ export const FinalityProviderItem = ({
         </div>
         <div>
           <div className="flex flex-row gap-1 items-center">
-            <Image
+            <img
               src={getChainLogo(chainType)}
               alt={getChainName(chainType)}
               className="w-4 h-4 rounded-[2px]"
