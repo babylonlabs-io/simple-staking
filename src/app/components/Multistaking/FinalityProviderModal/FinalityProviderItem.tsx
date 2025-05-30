@@ -1,8 +1,14 @@
 import Image from "next/image";
 
-import { chainLogos } from "@/app/constants";
+import { chainLogos, chainNames } from "@/app/constants";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { trim } from "@/utils/trim";
+
+const getChainLogo = (chainType: string) =>
+  chainLogos[chainType as keyof typeof chainLogos] ?? chainLogos.placeholder;
+
+const getChainName = (chainType: string) =>
+  chainNames[chainType as keyof typeof chainNames] ?? chainNames.unknown;
 
 export const FinalityProviderItem = ({
   provider,
@@ -13,23 +19,6 @@ export const FinalityProviderItem = ({
   chainType: string;
   onRemove: () => void;
 }) => {
-  const getChainLogo = (chainType: string) => chainLogos[chainType] ?? chainLogos.placeholder;
-
-  const getChainName = () => {
-    switch (chainType) {
-      case "babylon":
-        return "Babylon Genesis";
-      case "cosmos":
-        return "Cosmos";
-      case "ethereum":
-        return "Ethereum";
-      case "sui":
-        return "Sui";
-      default:
-        return "Unknown Chain";
-    }
-  };
-
   return (
     <div className="flex flex-row justify-between items-center">
       <div className="h-10 flex flex-row gap-2">
@@ -42,11 +31,13 @@ export const FinalityProviderItem = ({
         <div>
           <div className="flex flex-row gap-1 items-center">
             <Image
-              src={getChainLogo()}
-              alt={getChainName()}
+              src={getChainLogo(chainType)}
+              alt={getChainName(chainType)}
               className="w-4 h-4 rounded-[2px]"
             />
-            <div className="text-xs text-[#387085]">{getChainName()}</div>
+            <div className="text-xs text-[#387085]">
+              {getChainName(chainType)}
+            </div>
           </div>
           <div className="text-[#12495E]">
             {provider.description?.moniker ||
