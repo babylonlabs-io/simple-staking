@@ -1,4 +1,4 @@
-import { getIsolationScope, setUser } from "@sentry/nextjs";
+import { getIsolationScope, setUser } from "@sentry/react";
 import { useCallback } from "react";
 
 export const useSentryUser = () => {
