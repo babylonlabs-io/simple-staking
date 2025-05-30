@@ -13,14 +13,14 @@ import { ChainSelectionModal } from "@/app/components/Multistaking/ChainSelectio
 import { FinalityProviderModal } from "@/app/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
 import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
-import { FinalityProviderItem } from "@/app/components/Multistaking/MultistakingForm/FinalityProviderItem";
-import { FormValuesConsumer } from "@/app/components/Multistaking/MultistakingForm/FormValuesConsumer";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
+
+import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
 const { networkName } = getNetworkConfigBTC();
 
@@ -179,12 +179,6 @@ export function MultistakingForm() {
             />
           )}
         </ResponsiveDialog>
-
-        <FormValuesConsumer
-          selectedProviders={selectedProviders}
-          previewModalOpen={previewModalOpen}
-          setPreviewModalOpen={setPreviewModalOpen}
-        />
 
         <StakingModal />
       </Form>
