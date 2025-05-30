@@ -1,4 +1,4 @@
-import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
@@ -9,16 +9,19 @@ import { satoshiToBtc } from "@/utils/btc";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";
 
+import { AmountField } from "./AmountField";
 import { SubSection } from "./SubSection";
 
 export const AmountSubsection = () => {
   const { totalBtcBalance } = useBalanceState();
+
   const btcAmount = useWatch({ name: "amount", defaultValue: "0" });
-  const { coinSymbol } = getNetworkConfigBTC();
-  const btcInUsd = usePrice(coinSymbol);
   const { setValue } = useFormContext();
 
-  const btcAmountValue = parseFloat(btcAmount || 0);
+  const { coinSymbol } = getNetworkConfigBTC();
+  const btcInUsd = usePrice(coinSymbol);
+
+  const btcAmountValue = parseFloat(btcAmount || "0");
   const btcAmountUsd = calculateTokenValueInCurrency(btcAmountValue, btcInUsd, {
     zeroDisplay: "$0.00",
   });
@@ -32,17 +35,19 @@ export const AmountSubsection = () => {
     });
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue("amount", e.target.value, {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true,
-    });
-  };
-
   return (
     <SubSection className="flex flex-col justify-between w-full content-center gap-4">
-      <AmountField />
+      <div className="font-normal items-center flex flex-row justify-between w-full content-center">
+        <div className="flex items-center gap-2">
+          <img
+            src={bitcoin.src}
+            alt="bitcoin"
+            className="max-w-[40px] max-h-[40px]"
+          />
+          <div className="text-lg">Bitcoin</div>
+        </div>
+        <AmountField autoFocus />
+      </div>
 
       <AuthGuard>
         <div className="flex text-sm flex-row justify-between w-full content-center">
