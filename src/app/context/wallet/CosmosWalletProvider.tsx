@@ -5,7 +5,7 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { OfflineSigner } from "@cosmjs/proto-signing";
 import { SigningStargateClient } from "@cosmjs/stargate";
-import { setUser } from "@sentry/nextjs";
+import { setUser } from "@sentry/react";
 import {
   createContext,
   useCallback,

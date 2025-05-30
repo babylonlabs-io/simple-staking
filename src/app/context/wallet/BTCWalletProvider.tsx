@@ -5,7 +5,7 @@ import {
   useChainConnector,
   useWalletConnect,
 } from "@babylonlabs-io/wallet-connector";
-import { setUser } from "@sentry/nextjs";
+import { setUser } from "@sentry/react";
 import type { networks } from "bitcoinjs-lib";
 import {
   createContext,
