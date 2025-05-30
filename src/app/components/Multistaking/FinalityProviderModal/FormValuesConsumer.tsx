@@ -57,27 +57,7 @@ export const FormValuesConsumer = ({
       open={previewModalOpen}
       processing={false}
       onClose={() => setPreviewModalOpen(false)}
-      onProceed={async () => {
-        setPreviewModalOpen(false);
-
-        const {
-          finalityProvider,
-          amount: amountValue,
-          term: termValue,
-          feeRate: feeRateValue,
-          feeAmount: feeAmountValue,
-        } = getValues();
-
-        const formFields: FormFields = {
-          finalityProvider,
-          amount: btcToSatoshi(Number(amountValue)),
-          term: Number(termValue),
-          feeRate: Number(feeRateValue),
-          feeAmount: Number(feeAmountValue),
-        };
-
-        await createEOI(formFields);
-      }}
+      onProceed={handleProceed}
       bsns={[
         {
           icon: (
