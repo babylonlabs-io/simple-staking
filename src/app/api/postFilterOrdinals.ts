@@ -2,8 +2,6 @@ import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 
 import { chunkArray } from "@/utils/chunkArray";
 
-import { ERROR_SOURCES } from "../context/Error/ErrorProvider";
-
 import { apiWrapper } from "./apiWrapper";
 
 export interface UtxoInfo {
@@ -47,11 +45,6 @@ export const postVerifyUtxoOrdinals = async (
 
     return responses.flatMap((response) => response.data.data);
   } catch (error) {
-    if (error && typeof error === "object") {
-      const serverError = error as any;
-      if (!serverError.metadata) serverError.metadata = {};
-      serverError.metadata.errorSource = ERROR_SOURCES.ORDINALS;
-    }
     throw error;
   }
 };
