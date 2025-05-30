@@ -25,11 +25,23 @@ const enableSentryPlugin =
 // https://vite.dev/config/
 export default defineConfig({
   build: {
-    sourcemap: enableSentryPlugin,
+    sourcemap: true,
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
         404: resolve(__dirname, "404.html"),
+      },
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("@babylonlabs-io")) {
+            return "libs";
+          }
+
+          if (id.includes("node_modules")) {
+            return "vendor";
+          }
+        },
+        inlineDynamicImports: false,
       },
     },
   },
