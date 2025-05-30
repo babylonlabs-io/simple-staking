@@ -13,20 +13,7 @@ export const FinalityProviderItem = ({
   chainType: string;
   onRemove: () => void;
 }) => {
-  const getChainLogo = () => {
-    switch (chainType) {
-      case "babylon":
-        return chainLogos.babylon;
-      case "cosmos":
-        return chainLogos.cosmos;
-      case "ethereum":
-        return chainLogos.ethereum;
-      case "sui":
-        return chainLogos.sui;
-      default:
-        return chainLogos.placeholder;
-    }
-  };
+  const getChainLogo = (chainType: string) => chainLogos[chainType] ?? chainLogos.placeholder;
 
   const getChainName = () => {
     switch (chainType) {
