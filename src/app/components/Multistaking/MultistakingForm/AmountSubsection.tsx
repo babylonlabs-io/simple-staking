@@ -42,25 +42,7 @@ export const AmountSubsection = () => {
 
   return (
     <SubSection className="flex flex-col justify-between w-full content-center gap-4">
-      <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-        <div className="flex items-center gap-2">
-          <img
-            src={bitcoin.src}
-            alt="bitcoin"
-            className="max-w-[40px] max-h-[40px]"
-          />
-          <div className="text-lg">Bitcoin</div>
-        </div>
-        <input
-          type="number"
-          value={btcAmount || ""}
-          onChange={handleInputChange}
-          placeholder="0"
-          autoFocus
-          className="text-lg bg-transparent text-right w-24 outline-none"
-        />
-      </div>
-      <HiddenField name="amount" />
+      <AmountField />
 
       <AuthGuard>
         <div className="flex text-sm flex-row justify-between w-full content-center">
