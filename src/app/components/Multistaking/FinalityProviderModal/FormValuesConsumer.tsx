@@ -58,32 +58,7 @@ export const FormValuesConsumer = ({
       processing={false}
       onClose={() => setPreviewModalOpen(false)}
       onProceed={handleProceed}
-      bsns={[
-        {
-          icon: (
-            <img
-              src={chainLogos.babylon.src}
-              alt="babylon"
-              className="w-6 h-6"
-            />
-          ),
-          name: "Babylon Genesis",
-        },
-      ]}
-      finalityProviders={selectedProviders.map((provider) => ({
-        icon: (
-          // Replace with KeybaseImage
-          <div
-            className={`w-6 h-6 text-[0.6rem] flex items-center justify-center rounded-full bg-secondary-main text-accent-contrast`}
-          >
-            {provider.rank}
-          </div>
-        ),
-        name:
-          provider.description?.moniker ||
-          trim(provider.btcPk, 8) ||
-          "Selected Finality Provider",
-      }))}
+      bsns={bsns}
       details={{
         stakeAmount: `${maxDecimals(parseFloat(btcAmount) || 0, 8)} ${coinSymbol}`,
         feeRate: `${feeRate} sat/vB`,
