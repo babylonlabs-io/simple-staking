@@ -7,7 +7,6 @@ import {
   API_DEFAULT_RETRY_DELAY,
   ONE_SECOND,
 } from "@/app/constants";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
@@ -52,14 +51,9 @@ export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
 
   useEffect(() => {
     if (isError && error) {
-      const clientError = new ClientError(
-        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        error.message,
-        { cause: error as Error },
-      );
-      logger.error(clientError);
+      logger.error(error);
       handleError({
-        error: clientError,
+        error,
         displayOptions: {
           retryAction: refetch,
         },

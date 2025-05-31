@@ -2,7 +2,6 @@ import { useEffect } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 
 /**
@@ -18,22 +17,12 @@ export function useRpcErrorHandler() {
 
   useEffect(() => {
     if (error && !isLoading) {
-      const clientError = new ClientError(
-        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        error.message,
-        { cause: error as Error },
-      );
-
-      logger.error(clientError);
-
+      logger.error(error);
       handleError({
-        error: clientError,
+        error,
         displayOptions: {
           showModal: true,
           retryAction: reconnect,
-        },
-        metadata: {
-          errorSource: "RPC_CONNECTION",
         },
       });
     }

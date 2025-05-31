@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 
 import { BBN_GAS_PRICE } from "@/config";
+import { useLogger } from "@/hooks/useLogger";
 
 import { useSigningStargateClient } from "./useSigningStargateClient";
 
@@ -18,6 +19,7 @@ export interface BbnGasFee {
  */
 export const useBbnTransaction = () => {
   const { simulate, signTx, broadcastTx } = useSigningStargateClient();
+  const logger = useLogger();
 
   /**
    * Estimates the gas fee for a transaction.
@@ -30,7 +32,10 @@ export const useBbnTransaction = () => {
       const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
       return {
         amount: [
-          { denom: GAS_DENOM, amount: (gasWanted * BBN_GAS_PRICE).toFixed(0) },
+          {
+            denom: GAS_DENOM,
+            amount: (gasWanted * BBN_GAS_PRICE).toFixed(0),
+          },
         ],
         gas: gasWanted.toString(),
       };
@@ -48,12 +53,17 @@ export const useBbnTransaction = () => {
       typeUrl: string;
       value: T;
     }): Promise<Uint8Array> => {
+      logger.info("Starting BBN transaction signing", {
+        msgType: msg.typeUrl,
+        category: "transaction",
+      });
+
       // estimate gas
       const fee = await estimateBbnGasFee(msg);
       // sign it
       return signTx(msg, fee);
     },
-    [estimateBbnGasFee, signTx],
+    [estimateBbnGasFee, signTx, logger],
   );
 
   /**
@@ -63,9 +73,14 @@ export const useBbnTransaction = () => {
    */
   const sendBbnTx = useCallback(
     async (tx: Uint8Array) => {
+      logger.info("Broadcasting BBN transaction", {
+        txSize: tx.length,
+        category: "transaction",
+      });
+
       return broadcastTx(tx);
     },
-    [broadcastTx],
+    [broadcastTx, logger],
   );
 
   return {
