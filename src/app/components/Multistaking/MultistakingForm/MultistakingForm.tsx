@@ -1,10 +1,4 @@
-import {
-  Button,
-  Card,
-  Form,
-  HiddenField,
-  useFormState,
-} from "@babylonlabs-io/core-ui";
+import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { AiOutlinePlus } from "react-icons/ai";
 import { twJoin } from "tailwind-merge";
 
@@ -16,7 +10,6 @@ import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/Fees
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
 import {
-  MultistakingState as MultistakingStateProvider,
   StakingModalPage,
   useMultistakingState,
 } from "@/app/state/MultistakingState";
@@ -26,9 +19,11 @@ import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
+import { PreviewButton } from "./PreviewButton";
+
 const { networkName } = getNetworkConfigBTC();
 
-function MultistakingFormContent() {
+export function MultistakingForm() {
   const { validationSchema, stakingInfo } = useStakingState();
 
   const {
@@ -45,32 +40,6 @@ function MultistakingFormContent() {
     handlePreview,
     MAX_FINALITY_PROVIDERS,
   } = useMultistakingState();
-
-  const PreviewSubmitButton = () => {
-    const { isValid, errors } = useFormState();
-
-    const errorKeys = Object.keys(errors);
-    const errorMessages = errorKeys.map((key) => errors[key]?.message);
-
-    return (
-      <>
-        {errorMessages.map((message, index) => (
-          <div key={index} className="text-red-500 text-right">
-            {message?.toString()}
-          </div>
-        ))}
-        <Button
-          //@ts-ignore - fix type issue in core-ui
-          type="submit"
-          className="w-full"
-          style={{ marginTop: "8px" }}
-          disabled={!isValid}
-        >
-          Preview
-        </Button>
-      </>
-    );
-  };
 
   return (
     <Section title={`${networkName} Staking`}>
@@ -136,7 +105,7 @@ function MultistakingFormContent() {
               </div>
             </SubSection>
             <FeesSection />
-            <PreviewSubmitButton />
+            <PreviewButton />
           </Card>
         </div>
 
@@ -167,13 +136,5 @@ function MultistakingFormContent() {
         <StakingModal />
       </Form>
     </Section>
-  );
-}
-
-export function MultistakingForm() {
-  return (
-    <MultistakingStateProvider>
-      <MultistakingFormContent />
-    </MultistakingStateProvider>
   );
 }
