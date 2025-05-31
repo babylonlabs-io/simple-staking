@@ -44,7 +44,7 @@ export function useOrdinals(
       throw new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching ordinals data",
-        { cause: error },
+        { cause: error as Error },
       );
     }
   };
