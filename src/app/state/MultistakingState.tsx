@@ -8,7 +8,7 @@ export enum StakingModalPage {
   CHAIN_SELECTION = 0,
   FINALITY_PROVIDER = 1,
 }
-
+// TODO: This will be controlled by params
 const MAX_FINALITY_PROVIDERS = 1;
 
 interface MultistakingState {
