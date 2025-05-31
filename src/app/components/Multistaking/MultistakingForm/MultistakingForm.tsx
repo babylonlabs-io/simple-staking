@@ -9,11 +9,11 @@ import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
+import { useStakingState } from "@/app/state/StakingState";
 import {
   StakingModalPage,
   useMultistakingState,
-} from "@/app/state/MultistakingState";
-import { useStakingState } from "@/app/state/StakingState";
+} from "@/app/state/StakingV2State";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
