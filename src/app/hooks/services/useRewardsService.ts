@@ -4,6 +4,7 @@ import { useCallback } from "react";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useRewardsState } from "@/app/state/RewardState";
+import { useLogger } from "@/hooks/useLogger";
 import { retry } from "@/utils";
 import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
 
@@ -26,6 +27,7 @@ export const useRewardsService = () => {
   } = useRewardsState();
   const { balanceQuery } = useBbnQuery();
   const { handleError } = useError();
+  const logger = useLogger();
   const { estimateBbnGasFee, sendBbnTx, signBbnTx } = useBbnTransaction();
 
   /**
@@ -42,14 +44,25 @@ export const useRewardsService = () => {
     setTransactionFee(0);
     setProcessing(true);
     openRewardModal();
-    const fee = await estimateClaimRewardsGas();
-    setTransactionFee(fee);
-    setProcessing(false);
+    try {
+      const fee = await estimateClaimRewardsGas();
+      setTransactionFee(fee);
+    } catch (error: any) {
+      logger.error(error, {
+        tags: { bbnAddress },
+      });
+      handleError({ error });
+    } finally {
+      setProcessing(false);
+    }
   }, [
     estimateClaimRewardsGas,
     setProcessing,
     openRewardModal,
     setTransactionFee,
+    logger,
+    handleError,
+    bbnAddress,
   ]);
 
   /**
@@ -77,12 +90,13 @@ export const useRewardsService = () => {
         ONE_SECOND,
         MAX_RETRY_ATTEMPTS,
       );
-    } catch (error: Error | any) {
+    } catch (error: any) {
       closeProcessingModal();
       setTransactionHash("");
-      handleError({
-        error,
+      logger.error(error, {
+        tags: { bbnAddress },
       });
+      handleError({ error });
     } finally {
       setProcessing(false);
     }
@@ -98,6 +112,7 @@ export const useRewardsService = () => {
     setTransactionHash,
     closeProcessingModal,
     handleError,
+    logger,
   ]);
 
   return {

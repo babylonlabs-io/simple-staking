@@ -10,16 +10,6 @@ import React, {
 import { ErrorModal } from "@/app/components/Modals/ErrorModal";
 import { Error as AppError, ErrorHandlerParam } from "@/app/types/errors";
 
-// Error source identifiers
-export const ERROR_SOURCES = {
-  ORDINALS: "ORDINALS_ERROR",
-};
-
-// Configuration for errors that shouldn't show a modal by default
-const SILENT_ERROR_CONFIG = {
-  sources: [ERROR_SOURCES.ORDINALS],
-};
-
 const ErrorContext = createContext<ErrorContextType>({
   isOpen: false,
   error: {
@@ -78,16 +68,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
         ...metadata,
       };
 
-      // Determine if this error should be silent by default
-      const isSilentByDefault =
-        // Check if error source is in the silent list
-        errorSource &&
-        SILENT_ERROR_CONFIG.sources.includes(errorSource as string);
-
-      const shouldShowModal =
-        displayOptions?.showModal !== undefined
-          ? displayOptions.showModal // Explicit setting takes priority
-          : !isSilentByDefault; // Otherwise use the default for this error type
+      const shouldShowModal = displayOptions?.showModal ?? true;
 
       const errorData = {
         message: error.message,
