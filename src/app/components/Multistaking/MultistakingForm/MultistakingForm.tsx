@@ -6,6 +6,7 @@ import {
   useFormState,
 } from "@babylonlabs-io/core-ui";
 import { AiOutlinePlus } from "react-icons/ai";
+import { twJoin } from "tailwind-merge";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/app/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
@@ -111,19 +112,25 @@ function MultistakingFormContent() {
                     )}
                     {0 < counter && 1 < MAX_FINALITY_PROVIDERS && (
                       <div
-                        className={`px-4 h-10 flex items-center border border-[#12495E] ${counter === MAX_FINALITY_PROVIDERS ? "rounded-md" : "border-l-0 rounded-r-md"} cursor-pointer`}
+                        className={twJoin(
+                          "px-4 h-10 flex items-center border border-[#12495E]",
+                          counter === MAX_FINALITY_PROVIDERS
+                            ? "rounded-md"
+                            : "border-l-0 rounded-r-md",
+                          "cursor-pointer",
+                        )}
                       >
                         {counter}/{MAX_FINALITY_PROVIDERS}
                       </div>
                     )}
                   </div>
                 </div>
-                {selectedProviders.map((provider, index) => (
+                {selectedProviders.map((provider) => (
                   <FinalityProviderItem
-                    key={index}
+                    key={provider.id}
                     provider={provider}
                     chainType={provider.chainType || selectedChain}
-                    onRemove={() => removeProvider(index)}
+                    onRemove={() => removeProvider(provider.id)}
                   />
                 ))}
               </div>

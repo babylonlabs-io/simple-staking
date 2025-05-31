@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
+import { FinalityProvider } from "@/app/types/finalityProviders";
 import { createStateUtils } from "@/utils/createStateUtils";
 
 import { useFinalityProviderState } from "./FinalityProviderState";
@@ -12,19 +13,23 @@ export enum StakingModalPage {
 // TODO: This will be controlled by params
 const MAX_FINALITY_PROVIDERS = 1;
 
+interface SelectedProvider extends FinalityProvider {
+  chainType: string;
+}
+
 interface MultistakingState {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
-  selectedProviders: Array<any>;
+  selectedProviders: SelectedProvider[];
   counter: number;
   selectedChain: string;
   setSelectedChain: (chain: string) => void;
   previewModalOpen: boolean;
   handleSelectProvider: (selectedProviderKey: string) => void;
   handlePreview: (data: any) => void;
-  removeProvider: (index: number) => void;
+  removeProvider: (providerId: string) => void;
   MAX_FINALITY_PROVIDERS: number;
 }
 
@@ -52,7 +57,9 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.FINALITY_PROVIDER,
   );
-  const [selectedProviders, setSelectedProviders] = useState<Array<any>>([]);
+  const [selectedProviders, setSelectedProviders] = useState<
+    SelectedProvider[]
+  >([]);
   const [selectedChain, setSelectedChain] = useState<string>("babylon");
   const [counter, setCounter] = useState(0);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
@@ -82,10 +89,13 @@ export function MultistakingState({ children }: PropsWithChildren) {
     setPreviewModalOpen(true);
   }, []);
 
-  const removeProvider = useCallback((index: number) => {
+  const removeProvider = useCallback((providerId: string) => {
     setSelectedProviders((prev) => {
       const updated = [...prev];
-      updated.splice(index, 1);
+      updated.splice(
+        updated.findIndex((provider) => provider.id === providerId),
+        1,
+      );
       return updated;
     });
     setCounter((prev) => prev - 1);
