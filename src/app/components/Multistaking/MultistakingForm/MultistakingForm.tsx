@@ -5,7 +5,6 @@ import {
   HiddenField,
   useFormState,
 } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 
 import { ResponsiveDialog } from "@/app/components/Modals/ResponsiveDialog";
@@ -32,6 +31,8 @@ function MultistakingFormContent() {
   const { validationSchema, stakingInfo } = useStakingState();
 
   const {
+    isModalOpen,
+    setIsModalOpen,
     stakingModalPage,
     setStakingModalPage,
     selectedProviders,
@@ -43,8 +44,6 @@ function MultistakingFormContent() {
     handlePreview,
     MAX_FINALITY_PROVIDERS,
   } = useMultistakingState();
-
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const PreviewSubmitButton = () => {
     const { isValid, errors } = useFormState();
@@ -150,10 +149,9 @@ function MultistakingFormContent() {
           )}
           {stakingModalPage === StakingModalPage.FINALITY_PROVIDER && (
             <FinalityProviderModal
-              onAdd={(selectedProviderKey) => {
-                handleSelectProvider(selectedProviderKey);
-                setIsModalOpen(false);
-              }}
+              onAdd={(selectedProviderKey) =>
+                handleSelectProvider(selectedProviderKey)
+              }
               onClose={() => setIsModalOpen(false)}
             />
           )}

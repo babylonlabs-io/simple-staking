@@ -8,10 +8,12 @@ export enum StakingModalPage {
   CHAIN_SELECTION = 0,
   FINALITY_PROVIDER = 1,
 }
-// TODO: This will be controlled by params
+
 const MAX_FINALITY_PROVIDERS = 1;
 
 interface MultistakingState {
+  isModalOpen: boolean;
+  setIsModalOpen: (value: boolean) => void;
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
   selectedProviders: Array<any>;
@@ -26,6 +28,8 @@ interface MultistakingState {
 }
 
 const defaultState: MultistakingState = {
+  isModalOpen: false,
+  setIsModalOpen: () => {},
   stakingModalPage: StakingModalPage.FINALITY_PROVIDER,
   setStakingModalPage: () => {},
   selectedProviders: [],
@@ -43,6 +47,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>(defaultState);
 
 export function MultistakingState({ children }: PropsWithChildren) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.FINALITY_PROVIDER,
   );
@@ -67,6 +72,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
           setCounter((prev) => prev + 1);
         }
       }
+      setIsModalOpen(false);
     },
     [finalityProviders, selectedChain],
   );
@@ -86,6 +92,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
 
   const context = useMemo(
     () => ({
+      isModalOpen,
+      setIsModalOpen,
       stakingModalPage,
       setStakingModalPage,
       selectedProviders,
@@ -99,6 +107,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
       MAX_FINALITY_PROVIDERS,
     }),
     [
+      isModalOpen,
       stakingModalPage,
       selectedProviders,
       counter,
