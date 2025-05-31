@@ -1,5 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
-import path from "path";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const PORT = process.env.PORT ?? 3000;
 const baseURL = `http://localhost:${PORT}`;
@@ -35,7 +38,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    command: `sh -c 'NODE_OPTIONS="--max-http-header-size=65536" PORT=${PORT} npx next start -H 0.0.0.0 -p ${PORT}'`,
+    command: `sh -c 'NODE_OPTIONS="--max-http-header-size=65536" PORT=${PORT} npx vite preview --host 0.0.0.0 --port ${PORT}'`,
     url: baseURL,
     timeout: 120_000,
     reuseExistingServer: true,

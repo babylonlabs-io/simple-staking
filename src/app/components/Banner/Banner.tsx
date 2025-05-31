@@ -3,9 +3,7 @@ import { PiWarningOctagonFill } from "react-icons/pi";
 
 import { shouldDisplayTestingMsg } from "@/config";
 
-interface Props {}
-
-export const Banner = ({}: Props) => {
+export const Banner = () => {
   if (!shouldDisplayTestingMsg()) {
     return null;
   }

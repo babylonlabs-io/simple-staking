@@ -1,5 +1,4 @@
 import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -13,7 +12,7 @@ export const WalletNotConnected = () => {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-8">
       <div className="rotate-12">
-        <Image src={walletIcon} alt="Wallet" width={120} height={122} />
+        <img src={walletIcon} alt="Wallet" width={120} height={122} />
       </div>
 
       <div className="text-center">
