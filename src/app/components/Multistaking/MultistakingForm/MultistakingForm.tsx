@@ -15,7 +15,11 @@ import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
-import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
+import {
+  MultistakingState as MultistakingStateProvider,
+  StakingModalPage,
+  useMultistakingState,
+} from "@/app/state/MultistakingState";
 import { useStakingState } from "@/app/state/StakingState";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
@@ -24,44 +28,23 @@ import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderI
 
 const { networkName } = getNetworkConfigBTC();
 
-const MAX_FINALITY_PROVIDERS = 1;
-
-enum StakingModalPage {
-  CHAIN_SELECTION = 0,
-  FINALITY_PROVIDER = 1,
-}
-
-export function MultistakingForm() {
+function MultistakingFormContent() {
   const { validationSchema, stakingInfo } = useStakingState();
+
+  const {
+    stakingModalPage,
+    setStakingModalPage,
+    selectedProviders,
+    selectedChain,
+    counter,
+    handleSelectProvider,
+    removeProvider,
+    setSelectedChain,
+    handlePreview,
+    MAX_FINALITY_PROVIDERS,
+  } = useMultistakingState();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
-    StakingModalPage.FINALITY_PROVIDER,
-  );
-  const [selectedProviders, setSelectedProviders] = useState<Array<any>>([]);
-  const [selectedChain, setSelectedChain] = useState<string>("babylon");
-  const [counter, setCounter] = useState(0);
-  const { finalityProviders } = useFinalityProviderState();
-  const [previewModalOpen, setPreviewModalOpen] = useState(false);
-
-  const handleSelectProvider = (selectedProviderKey: string) => {
-    if (selectedProviderKey) {
-      const providerData = finalityProviders?.find(
-        (provider) => provider.btcPk === selectedProviderKey,
-      );
-      if (providerData) {
-        setSelectedProviders([
-          ...selectedProviders,
-          { ...providerData, chainType: selectedChain },
-        ]);
-        setCounter((prev) => prev + 1);
-      }
-    }
-    setIsModalOpen(false);
-  };
-
-  const handlePreview = (data: any) => {
-    setPreviewModalOpen(true);
-  };
 
   const PreviewSubmitButton = () => {
     const { isValid, errors } = useFormState();
@@ -141,12 +124,7 @@ export function MultistakingForm() {
                     key={index}
                     provider={provider}
                     chainType={provider.chainType || selectedChain}
-                    onRemove={() => {
-                      const updatedProviders = [...selectedProviders];
-                      updatedProviders.splice(index, 1);
-                      setSelectedProviders(updatedProviders);
-                      setCounter(counter - 1);
-                    }}
+                    onRemove={() => removeProvider(index)}
                   />
                 ))}
               </div>
@@ -172,9 +150,10 @@ export function MultistakingForm() {
           )}
           {stakingModalPage === StakingModalPage.FINALITY_PROVIDER && (
             <FinalityProviderModal
-              onAdd={(selectedProviderKey) =>
-                handleSelectProvider(selectedProviderKey)
-              }
+              onAdd={(selectedProviderKey) => {
+                handleSelectProvider(selectedProviderKey);
+                setIsModalOpen(false);
+              }}
               onClose={() => setIsModalOpen(false)}
             />
           )}
@@ -183,5 +162,13 @@ export function MultistakingForm() {
         <StakingModal />
       </Form>
     </Section>
+  );
+}
+
+export function MultistakingForm() {
+  return (
+    <MultistakingStateProvider>
+      <MultistakingFormContent />
+    </MultistakingStateProvider>
   );
 }
