@@ -25,17 +25,9 @@ export const useSigningStargateClient = () => {
         errorMessage,
         { cause: causeError },
       );
-      logger.error(clientError, {
-        data: {
-          txType,
-          code: res.code,
-          txHash: res.transactionHash,
-          rawLog: res.rawLog || "",
-        },
-      });
       return clientError; // Return it to be thrown by the caller
     },
-    [logger],
+    [],
   );
 
   /**
@@ -48,9 +40,8 @@ export const useSigningStargateClient = () => {
       if (!signingStargateClient || !bech32Address) {
         const clientError = new ClientError(
           ERROR_CODES.WALLET_NOT_CONNECTED,
-          "Wallet not connected",
+          "Wallet not connected for simulation",
         );
-        logger.error(clientError);
         throw clientError;
       }
       if (bech32Address) {
@@ -86,7 +77,7 @@ export const useSigningStargateClient = () => {
       if (!signingStargateClient || !bech32Address) {
         const clientError = new ClientError(
           ERROR_CODES.WALLET_NOT_CONNECTED,
-          "Wallet not connected",
+          "Wallet not connected for signAndBroadcast",
         );
         logger.error(clientError);
         throw clientError;
@@ -132,7 +123,6 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError);
         throw clientError;
       }
 
@@ -145,7 +135,7 @@ export const useSigningStargateClient = () => {
       return TxRaw.encode(res).finish();
     },
 
-    [signingStargateClient, bech32Address, logger],
+    [signingStargateClient, bech32Address],
   );
 
   /**
@@ -165,7 +155,6 @@ export const useSigningStargateClient = () => {
           ERROR_CODES.WALLET_NOT_CONNECTED,
           "Wallet not connected",
         );
-        logger.error(clientError);
         throw clientError;
       }
 
@@ -178,7 +167,7 @@ export const useSigningStargateClient = () => {
         txHash: res.transactionHash,
       };
     },
-    [signingStargateClient, bech32Address, logger, handleTransactionError],
+    [signingStargateClient, bech32Address, handleTransactionError],
   );
 
   return { simulate, signAndBroadcast, signTx, broadcastTx };

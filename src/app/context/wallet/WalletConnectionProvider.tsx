@@ -64,7 +64,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
 
       const clientError = new ClientError(
         ERROR_CODES.WALLET_ACTION_FAILED,
-        error.message,
+        "Error connecting to wallet",
         { cause: error as Error },
       );
       logger.error(clientError);

@@ -80,10 +80,9 @@ export function useRegistrationService() {
         ERROR_CODES.VALIDATION_ERROR,
         "No delegation selected for registration",
       );
+      // log the error but don't throw it
       logger.warn(clientError.message);
-      handleError({
-        error: clientError,
-      });
+      handleError({ error: clientError });
       return;
     }
 
@@ -138,9 +137,8 @@ export function useRegistrationService() {
       }
       setProcessing(false);
     } catch (error: any) {
-      handleError({
-        error,
-      });
+      logger.error(error);
+      handleError({ error });
       reset();
     }
   }, [
