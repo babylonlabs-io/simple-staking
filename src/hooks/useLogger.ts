@@ -16,7 +16,6 @@ type ErrorContext = {
 interface Logger {
   info(message: string, context?: Context): void;
   warn(message: string, context?: Context): void;
-  error(error: ClientError, context?: ErrorContext): string;
   error(error: Error, context?: ErrorContext): string;
 }
 

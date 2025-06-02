@@ -9,6 +9,7 @@ import {
 } from "react";
 
 import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { ClientError, ERROR_CODES } from "@/errors";
 
 interface BbnRpcContextType {
   queryClient: QueryClient | undefined;
@@ -38,7 +39,12 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err : new Error("Failed to connect"));
+      const clientError = new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        "Failed to connect RPC Provider",
+        { cause: err as Error },
+      );
+      setError(clientError);
       setIsLoading(false);
     }
   }, [rpc]);

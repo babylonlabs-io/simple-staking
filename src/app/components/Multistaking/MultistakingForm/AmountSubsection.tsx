@@ -35,7 +35,7 @@ export const AmountSubsection = () => {
           onChange={handleInputChange}
           placeholder="0"
           autoFocus
-          className="text-lg bg-transparent text-right w-24 outline-none"
+          className="text-lg bg-transparent text-right w-2/3 outline-none"
         />
       </div>
       <HiddenField name="amount" />
