@@ -66,6 +66,10 @@ export function useClientQuery<
       const isGeoBlocked =
         (error as ClientError).errorCode === ERROR_CODES.GEO_BLOCK;
 
+      if (isGeoBlocked) {
+        return;
+      }
+
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching data from the API",
@@ -74,11 +78,10 @@ export function useClientQuery<
       logger.error(clientError);
 
       handleError({
-        error: isGeoBlocked ? error : clientError,
+        error: clientError,
         displayOptions: {
-          retryAction: isGeoBlocked ? undefined : data.refetch,
+          retryAction: data.refetch,
         },
-        metadata: { isGeoblocked: isGeoBlocked },
       });
     }
   }, [handleError, data.error, data.isError, data.refetch, logger]);

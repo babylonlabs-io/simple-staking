@@ -33,29 +33,18 @@ export const useHealthCheck = () => {
 
   useEffect(() => {
     if (isError) {
-      logger.error(error, {
-        tags: {
-          isGeoblocked: isGeoBlocked ? "true" : "false",
+      if (isGeoBlocked) {
+        return;
+      }
+
+      logger.error(error);
+
+      handleError({
+        error,
+        displayOptions: {
+          retryAction: refetch,
         },
       });
-
-      // If the error is geoblocked, don't retry
-      if (isGeoBlocked) {
-        handleError({
-          error,
-          displayOptions: {
-            retryAction: undefined,
-          },
-          metadata: { isGeoblocked: true },
-        });
-      } else {
-        handleError({
-          error,
-          displayOptions: {
-            retryAction: refetch,
-          },
-        });
-      }
     }
   }, [isError, error, refetch, handleError, logger, isGeoBlocked]);
 
