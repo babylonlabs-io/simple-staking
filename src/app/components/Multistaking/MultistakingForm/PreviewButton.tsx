@@ -61,7 +61,7 @@ export function PreviewButton() {
       }
     >
       <Button
-        //@ts-ignore - fix type issue in core-ui
+        //@ts-expect-error - fix type issue in core-ui
         type="submit"
         className={twJoin(
           "w-full mt-2 capitalize",
