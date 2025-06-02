@@ -1,14 +1,23 @@
 import { test } from "@playwright/test";
 
-import { FormActions, PageNavigationActions } from "../fixtures";
+import {
+  FormActions,
+  PageNavigationActions,
+  WalletConnectActions,
+} from "../fixtures";
 
 test.describe("Feature Flag - Multistaking", () => {
   let navigationActions: PageNavigationActions;
   let formActions: FormActions;
+  let connectActions: WalletConnectActions;
 
   test.beforeEach(async ({ page }) => {
     navigationActions = new PageNavigationActions(page);
+    connectActions = new WalletConnectActions(page);
     formActions = new FormActions(page);
+
+    await navigationActions.navigateToHomePage(page);
+    await connectActions.setupWalletConnection();
   });
 
   test("should ensure correct component is rendered when the feature flag is set", async ({
@@ -16,12 +25,7 @@ test.describe("Feature Flag - Multistaking", () => {
   }) => {
     process.env.FF_MULTISTAKING = "false";
 
-    await navigationActions.navigateToHomePage(page);
-
-    // Verify MultistakingForm elements are not visible
     await formActions.verifyMultistakingFormNotVisible();
-
-    // Verify StakingForm elements are visible
     await formActions.verifyStakingFormVisible();
   });
 });
