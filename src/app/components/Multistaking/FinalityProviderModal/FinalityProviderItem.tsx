@@ -29,7 +29,7 @@ export const FinalityProviderItem = ({
         <div>
           <div className="flex flex-row gap-1 items-center">
             <img
-              src={getChainLogo(chainType).src}
+              src={getChainLogo(chainType)}
               alt={getChainName(chainType)}
               className="w-4 h-4 rounded-[2px]"
             />
