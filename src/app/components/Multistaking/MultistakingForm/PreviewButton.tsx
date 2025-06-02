@@ -1,5 +1,4 @@
-import { Button } from "@babylonlabs-io/core-ui";
-import { useFormState } from "@babylonlabs-io/core-ui";
+import { Button, useFormState } from "@babylonlabs-io/core-ui";
 
 export function PreviewButton() {
   const { isValid, errors } = useFormState();
@@ -15,7 +14,7 @@ export function PreviewButton() {
         </div>
       ))}
       <Button
-        //@ts-ignore - fix type issue in core-ui
+        //@ts-expect-error - fix type issue in core-ui
         type="submit"
         className="w-full"
         style={{ marginTop: "8px" }}

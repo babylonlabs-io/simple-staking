@@ -21,7 +21,8 @@
     "test:e2e": "playwright test e2e/specs/",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report",
+    "visualizer": "npx vite-bundle-visualizer"
   },
   "engines": {
     "node": "22.3.0"

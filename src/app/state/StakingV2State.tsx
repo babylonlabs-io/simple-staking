@@ -85,7 +85,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
     [finalityProviders, selectedChain],
   );
 
-  const handlePreview = useCallback((data: any) => {
+  const handlePreview = useCallback(() => {
     setPreviewModalOpen(true);
   }, []);
 
