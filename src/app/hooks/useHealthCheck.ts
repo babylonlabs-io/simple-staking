@@ -19,6 +19,10 @@ export const useHealthCheck = () => {
     queryFn: getHealthCheck,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    retry: (_, error) => {
+      // Prevent retries for geoblocked errors
+      return (error as ClientError).errorCode !== ERROR_CODES.GEO_BLOCK;
+    },
   });
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
@@ -35,12 +39,23 @@ export const useHealthCheck = () => {
         },
       });
 
-      handleError({
-        error,
-        displayOptions: {
-          retryAction: refetch,
-        },
-      });
+      // If the error is geoblocked, don't retry
+      if (isGeoBlocked) {
+        handleError({
+          error,
+          displayOptions: {
+            retryAction: undefined,
+          },
+          metadata: { isGeoblocked: true },
+        });
+      } else {
+        handleError({
+          error,
+          displayOptions: {
+            retryAction: refetch,
+          },
+        });
+      }
     }
   }, [isError, error, refetch, handleError, logger, isGeoBlocked]);
 

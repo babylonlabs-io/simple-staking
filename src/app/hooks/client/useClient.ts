@@ -49,7 +49,13 @@ export function useClientQuery<
 
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
-    retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
+    retry: (failureCount, error) => {
+      // Prevent retries for geoblocked errors
+      if ((error as ClientError).errorCode === ERROR_CODES.GEO_BLOCK) {
+        return false;
+      }
+      return !isOpen && failureCount < API_DEFAULT_RETRY_COUNT;
+    },
     retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
     ...options,
   });
@@ -57,6 +63,9 @@ export function useClientQuery<
   useEffect(() => {
     if (data.isError) {
       const error = data.error as Error;
+      const isGeoBlocked =
+        (error as ClientError).errorCode === ERROR_CODES.GEO_BLOCK;
+
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching data from the API",
@@ -65,10 +74,11 @@ export function useClientQuery<
       logger.error(clientError);
 
       handleError({
-        error: clientError,
+        error: isGeoBlocked ? error : clientError,
         displayOptions: {
-          retryAction: data.refetch,
+          retryAction: isGeoBlocked ? undefined : data.refetch,
         },
+        metadata: { isGeoblocked: isGeoBlocked },
       });
     }
   }, [handleError, data.error, data.isError, data.refetch, logger]);
