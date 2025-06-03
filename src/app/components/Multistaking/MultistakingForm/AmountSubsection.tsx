@@ -25,7 +25,7 @@ export const AmountSubsection = () => {
           <img
             src={bitcoin.src}
             alt="bitcoin"
-            className="max-w-[40px] max-h-[40px]"
+            className="max-w-[2.5rem] max-h-[2.5rem]"
           />
           <div className="text-lg">Bitcoin</div>
         </div>
