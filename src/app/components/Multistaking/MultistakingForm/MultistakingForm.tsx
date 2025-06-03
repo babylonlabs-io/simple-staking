@@ -48,6 +48,7 @@ export function MultistakingForm() {
         mode="onChange"
         reValidateMode="onChange"
         onSubmit={handlePreview}
+        defaultValues={{ amount: "" }}
       >
         <HiddenField
           name="term"
