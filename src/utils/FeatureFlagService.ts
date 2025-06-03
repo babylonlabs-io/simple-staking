@@ -3,11 +3,11 @@
  *
  * This module provides methods for checking feature flags
  * defined in the environment variables. All feature flag environment
- * variables should be prefixed with FF_
+ * variables should be prefixed with NEXT_PUBLIC_FF_
  *
  * Rules:
  * 1. All feature flags must be defined in this file for easy maintenance
- * 2. All feature flags must start with FF_ prefix
+ * 2. All feature flags must start with NEXT_PUBLIC_FF_ prefix
  * 3. Default value for all feature flags is false
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
@@ -21,7 +21,7 @@ class FeatureFlagService {
    * @returns True if the feature is enabled, false otherwise
    */
   private static getFlagValue(flagName: FeatureFlag): boolean {
-    const envKey = `FF_${flagName.toUpperCase()}`;
+    const envKey = `NEXT_PUBLIC_FF_${flagName.toUpperCase()}`;
     const value = process.env[envKey]?.toLowerCase();
     return value === "true";
   }
