@@ -274,11 +274,6 @@ export function useDelegationService() {
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps(
       (_step: SigningStep, options?: SignPsbtOptions) => {
-        console.log(
-          "useDelegationService v2 subscribeToSigningSteps",
-          _step,
-          options,
-        );
         setCurrentDelegationV2StepOptions(options);
       },
     );
