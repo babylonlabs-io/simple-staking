@@ -48,7 +48,6 @@ export function MultistakingForm() {
         mode="onChange"
         reValidateMode="onChange"
         onSubmit={handlePreview}
-        defaultValues={{ amount: "" }}
       >
         <HiddenField
           name="term"
@@ -69,7 +68,10 @@ export function MultistakingForm() {
                   <div className="flex">
                     {counter < MAX_FINALITY_PROVIDERS && (
                       <div
-                        className={`w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-accent-primary ${counter > 0 ? "rounded-r-none" : "rounded"} cursor-pointer`}
+                        className={twJoin(
+                          "w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-accent-primary cursor-pointer",
+                          counter > 0 ? "rounded-r-none" : "rounded",
+                        )}
                         onClick={() => {
                           setStakingModalPage(
                             StakingModalPage.FINALITY_PROVIDER,

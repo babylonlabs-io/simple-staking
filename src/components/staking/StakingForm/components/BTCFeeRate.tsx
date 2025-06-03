@@ -29,6 +29,15 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
     try {
       const { finalityProvider, amount, term } = getValues();
 
+      if (!finalityProvider || !amount || !term || !feeRate) {
+        setValue("feeAmount", "0", {
+          shouldValidate: false,
+          shouldDirty: false,
+          shouldTouch: false,
+        });
+        return;
+      }
+
       const feeAmount = calculateFeeAmount({
         finalityProvider,
         amount,
@@ -43,6 +52,11 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
         shouldTouch: true,
       });
     } catch (e: any) {
+      setValue("feeAmount", "0", {
+        shouldValidate: false,
+        shouldDirty: false,
+        shouldTouch: false,
+      });
       setError("feeAmount", {
         type: "custom",
         message: e.message,

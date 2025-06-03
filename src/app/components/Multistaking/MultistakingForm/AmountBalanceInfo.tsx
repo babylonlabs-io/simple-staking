@@ -10,7 +10,7 @@ import { maxDecimals } from "@/utils/maxDecimals";
 export const AmountBalanceInfo = () => {
   const { totalBtcBalance } = useBalanceState();
 
-  const btcAmount = useWatch({ name: "amount" });
+  const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
 
   const { coinSymbol } = getNetworkConfigBTC();
