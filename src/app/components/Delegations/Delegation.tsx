@@ -154,7 +154,7 @@ export const Delegation: React.FC<DelegationProps> = ({
     state,
     stakingValueSat,
     isOverflow,
-    finalityProviderPkHex,
+    finalityProviderPksHex,
     isEligibleForTransition,
   } = delegation;
 
@@ -163,9 +163,11 @@ export const Delegation: React.FC<DelegationProps> = ({
   const { getRegisteredFinalityProvider, getFinalityProviderName } =
     useFinalityProviderState();
 
-  const finalityProvider = getRegisteredFinalityProvider(finalityProviderPkHex);
+  const finalityProvider = getRegisteredFinalityProvider(
+    finalityProviderPksHex[0],
+  );
   const fpState = finalityProvider?.state;
-  const fpName = getFinalityProviderName(finalityProviderPkHex) ?? "-";
+  const fpName = getFinalityProviderName(finalityProviderPksHex[0]) ?? "-";
   const isActive = state === DelegationStateEnum.ACTIVE;
   const isFpRegistered = finalityProvider !== null;
   const isSlashed = fpState === FinalityProviderState.SLASHED;
@@ -229,7 +231,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             isEligibleForRegistration={isEligibleForTransition}
             isFpRegistered={isFpRegistered}
             stakingTxHashHex={stakingTxHashHex}
-            finalityProviderPkHex={finalityProviderPkHex}
+            finalityProviderPkHex={finalityProviderPksHex[0]}
             onRegistration={() => onRegistration(delegation)}
             onUnbond={onUnbond}
             onWithdraw={onWithdraw}

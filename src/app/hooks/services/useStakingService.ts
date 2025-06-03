@@ -26,6 +26,9 @@ import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
 import { useTransactionService } from "./useTransactionService";
 
+const HARD_CODED_BSN_FINALITY_PROVIDER_PK =
+  "b488ba28d2e46c3692fbed61b94ccf34b11b1dc73d0294dfbff4a5412f054557";
+
 type StakingSigningStep = Extract<
   SigningStep,
   | "staking-slashing"
@@ -83,7 +86,10 @@ export function useStakingService() {
     });
     // TODO: hardcode the example BSN FPs for now
     const eoiInput = {
-      finalityProviderPksNoCoordHex: [finalityProvider],
+      finalityProviderPksNoCoordHex: [
+        finalityProvider,
+        HARD_CODED_BSN_FINALITY_PROVIDER_PK,
+      ],
       stakingAmountSat: btcToSatoshi(amount),
       stakingTimelock: term,
       feeRate: feeRate,
@@ -112,7 +118,10 @@ export function useStakingService() {
       try {
         // TODO: hardcode the example BSN FPs for now
         const eoiInput = {
-          finalityProviderPksNoCoordHex: [finalityProvider],
+          finalityProviderPksNoCoordHex: [
+            finalityProvider,
+            HARD_CODED_BSN_FINALITY_PROVIDER_PK,
+          ],
           stakingAmountSat: amount,
           stakingTimelock: term,
           feeRate: feeRate,
@@ -197,7 +206,7 @@ export function useStakingService() {
           stakingTxHashHex,
           stakingTxHex,
         } = delegation;
-
+        console.log("finalityProviderBtcPksHex", finalityProviderBtcPksHex);
         await submitStakingTx(
           {
             finalityProviderPksNoCoordHex: finalityProviderBtcPksHex,

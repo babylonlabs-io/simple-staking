@@ -3,18 +3,18 @@ import { getUrlFromEnv } from "./urlUtils";
 export const BBN_DEVNET_RPC_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
-  "https://rpc-euphrates.devnet.babylonlabs.io/",
+  "https://rpc.v4-devnet.babylonlabs.io/",
 );
 
 export const BBN_DEVNET_LCD_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_LCD_URL,
   "http://localhost:1317",
-  "https://lcd-euphrates.devnet.babylonlabs.io/",
+  "https://lcd.v4-devnet.babylonlabs.io/",
 );
 
 export const bbnDevnet = {
-  chainId: "euphrates-0.6.0",
-  chainName: "Babylon Devnet Euphrates",
+  chainId: "v4-devnet-1",
+  chainName: "Babylon Devnet v4",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
   rpc: BBN_DEVNET_RPC_URL,

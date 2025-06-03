@@ -1,12 +1,8 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
-import {
-  InscriptionIdentifier,
-  useInscriptionProvider,
-} from "@babylonlabs-io/wallet-connector";
+import { useInscriptionProvider } from "@babylonlabs-io/wallet-connector";
 import { useTheme } from "next-themes";
 import { useCallback, useMemo, type PropsWithChildren } from "react";
 
-import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { createStateUtils } from "@/utils/createStateUtils";
 import { filterDust } from "@/utils/wallet";
@@ -30,6 +26,8 @@ const STATE_LIST = [
   StakingState,
   RewardsState,
 ];
+
+const ordinalMap: any = {};
 
 export interface AppState {
   theme?: string;
@@ -76,9 +74,11 @@ export function AppState({ children }: PropsWithChildren) {
     data: ordinals = [],
     isLoading: isOrdinalLoading,
     isError: isOrdinalError,
-  } = useOrdinals(confirmedUTXOs, {
-    enabled: !isUTXOLoading,
-  });
+  } = {
+    data: [],
+    isLoading: false,
+    isError: false,
+  };
   const {
     data: networkInfo,
     isLoading: isNetworkInfoLoading,
@@ -89,18 +89,18 @@ export function AppState({ children }: PropsWithChildren) {
   const isLoading = isUTXOLoading || isOrdinalLoading || isNetworkInfoLoading;
   const isError = isUTXOError || isOrdinalError || isNetworkInfoError;
 
-  const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
-    () =>
-      ordinals.reduce(
-        (acc, ordinal) => ({ ...acc, [ordinal.txid]: ordinal }),
-        {},
-      ),
-    [ordinals],
-  );
+  // const ordinalMap: Record<string, InscriptionIdentifier> = useMemo(
+  //   () =>
+  //     ordinals.reduce(
+  //       (acc, ordinal) => ({ ...acc, [ordinal.txid]: ordinal }),
+  //       {},
+  //     ),
+  //   [ordinals],
+  // );
 
   const inscriptionsUTXOs = useMemo(() => {
     return confirmedUTXOs.filter((utxo) => ordinalMap[utxo.txid]);
-  }, [confirmedUTXOs, ordinalMap]);
+  }, [confirmedUTXOs]);
 
   const availableUTXOs = useMemo(() => {
     if (isLoading) return [];
@@ -108,7 +108,7 @@ export function AppState({ children }: PropsWithChildren) {
     return ordinalsExcluded
       ? filterDust(confirmedUTXOs).filter((utxo) => !ordinalMap[utxo.txid])
       : confirmedUTXOs;
-  }, [isLoading, ordinalsExcluded, confirmedUTXOs, ordinalMap]);
+  }, [isLoading, ordinalsExcluded, confirmedUTXOs]);
 
   // Handlers
   const includeOrdinals = useCallback(
