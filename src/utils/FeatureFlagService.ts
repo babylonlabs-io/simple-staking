@@ -3,27 +3,30 @@
  *
  * This module provides methods for checking feature flags
  * defined in the environment variables. All feature flag environment
- * variables should be prefixed with FF_
+ * variables should be prefixed with NEXT_PUBLIC_FF_
  *
  * Rules:
  * 1. All feature flags must be defined in this file for easy maintenance
- * 2. All feature flags must start with FF_ prefix
+ * 2. All feature flags must start with NEXT_PUBLIC_FF_ prefix
  * 3. Default value for all feature flags is false
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
 
 type FeatureFlag = "MULTISTAKING";
 
+const FEATURE_FLAGS = {
+  MULTISTAKING: process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true",
+} as const;
+
 class FeatureFlagService {
   /**
-   * Gets the value of a feature flag from environment variables
+   * Gets the value of a feature flag from compile-time constants
    * @param flagName The feature flag name to check
    * @returns True if the feature is enabled, false otherwise
    */
   private static getFlagValue(flagName: FeatureFlag): boolean {
-    const envKey = `FF_${flagName.toUpperCase()}`;
-    const value = process.env[envKey]?.toLowerCase();
-    return value === "true";
+    const result = FEATURE_FLAGS[flagName];
+    return result;
   }
 
   /**
