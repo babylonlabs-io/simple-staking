@@ -75,7 +75,7 @@ export const Delegations = ({}) => {
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
-  const { setCurrentStepOptions } = useStakingState();
+  const { setCurrentStakingStepOptions } = useStakingState();
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
@@ -209,8 +209,8 @@ export const Delegations = ({}) => {
 
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
-    setCurrentStepOptions(undefined);
-  }, [setCurrentStepOptions]);
+    setCurrentStakingStepOptions(undefined);
+  }, [setCurrentStakingStepOptions]);
 
   // Handles withdrawing requests for delegations that have expired timelocks
   // It constructs a withdrawal transaction, creates a signature for it,
@@ -272,7 +272,7 @@ export const Delegations = ({}) => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
-    setCurrentStepOptions(undefined);
+    setCurrentStakingStepOptions(undefined);
   };
 
   useEffect(() => {

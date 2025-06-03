@@ -35,7 +35,7 @@ export const SignModal = ({
   onClose,
   onSubmit,
 }: SignModalProps) => {
-  const { currentStepOptions } = useStakingState();
+  const { currentStakingStepOptions } = useStakingState();
   const { bech32Address } = useCosmosWallet();
 
   return (
@@ -50,10 +50,10 @@ export const SignModal = ({
           Please sign the following messages
         </Text>
         <div className="py-4 flex flex-col items-start gap-6">
-          <Step step={1} currentStep={step} details={currentStepOptions}>
+          <Step step={1} currentStep={step} details={currentStakingStepOptions}>
             Consent to slashing
           </Step>
-          <Step step={2} currentStep={step} details={currentStepOptions}>
+          <Step step={2} currentStep={step} details={currentStakingStepOptions}>
             Consent to slashing during unbonding
           </Step>
           <Step

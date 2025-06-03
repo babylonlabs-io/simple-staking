@@ -21,7 +21,7 @@ export const StakeModal = ({
   onSubmit,
   onClose,
 }: StakeModalProps) => {
-  const { currentStepOptions } = useStakingState();
+  const { currentStakingStepOptions } = useStakingState();
 
   return (
     <SubmitModal
@@ -40,9 +40,9 @@ export const StakeModal = ({
     >
       Your request has been verified by the {bbn.networkFullName}. You can now
       stake!
-      {currentStepOptions && (
+      {currentStakingStepOptions && (
         <div className="border border-secondary-strokeLight p-4 mt-4 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4">
-          <SignDetails details={currentStepOptions} />
+          <SignDetails details={currentStakingStepOptions} />
         </div>
       )}
     </SubmitModal>

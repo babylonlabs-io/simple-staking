@@ -27,7 +27,7 @@ export const UnbondModal = ({
   unbondingFeeSat,
   unbondingTimeInBlocks,
 }: UnbondModalProps) => {
-  const { currentStepOptions } = useStakingState();
+  const { currentStakingStepOptions } = useStakingState();
 
   if (!unbondingTimeInBlocks || !unbondingFeeSat) {
     return null;
@@ -53,9 +53,9 @@ export const UnbondModal = ({
         After unbonded, you will need to use this dashboard to withdraw your
         stake for it to appear in your wallet.
       </Text>
-      {currentStepOptions && (
+      {currentStakingStepOptions && (
         <div className="border border-secondary-strokeLight p-4 mb-8 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4">
-          <SignDetails details={currentStepOptions} />
+          <SignDetails details={currentStakingStepOptions} />
         </div>
       )}
     </ConfirmationModal>

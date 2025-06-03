@@ -71,7 +71,7 @@ export interface StakingState {
   formData?: FormFields;
   step?: StakingStep;
   verifiedDelegation?: DelegationV2;
-  goToStep: (name: StakingStep) => void;
+  goToStep: (name: StakingStep, options?: SignPsbtOptions) => void;
   setProcessing: (value: boolean) => void;
   setFormData: (formData?: FormFields) => void;
   setVerifiedDelegation: (value?: DelegationV2) => void;
@@ -80,8 +80,8 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  currentStepOptions: SignPsbtOptions | undefined;
-  setCurrentStepOptions: (options?: SignPsbtOptions) => void;
+  currentStakingStepOptions: SignPsbtOptions | undefined;
+  setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useStakingState } =
@@ -118,14 +118,15 @@ const { StateProvider, useState: useStakingState } =
     setFormData: () => {},
     setProcessing: () => {},
     reset: () => {},
-    currentStepOptions: undefined,
-    setCurrentStepOptions: () => {},
+    currentStakingStepOptions: undefined,
+    setCurrentStakingStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
-  const [currentStepOptions, setCurrentStepOptions] =
+  const [currentStakingStepOptions, setCurrentStakingStepOptions] =
     useState<SignPsbtOptions>();
+
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
   const [verifiedDelegation, setVerifiedDelegation] = useState<DelegationV2>();
@@ -302,7 +303,7 @@ export function StakingState({ children }: PropsWithChildren) {
   );
 
   const goToStep = useCallback(
-    (stepName: StakingStep) => {
+    (stepName: StakingStep, options?: SignPsbtOptions) => {
       if (stepName === StakingStep.FEEDBACK_SUCCESS) {
         if (successModalShown) {
           return;
@@ -319,6 +320,7 @@ export function StakingState({ children }: PropsWithChildren) {
         }
       }
       setCurrentStep(stepName);
+      setCurrentStakingStepOptions(options);
     },
     [
       successModalShown,
@@ -333,14 +335,14 @@ export function StakingState({ children }: PropsWithChildren) {
     setVerifiedDelegation(undefined);
     setFormData(undefined);
     setCurrentStep(undefined);
-    setCurrentStepOptions(undefined);
+    setCurrentStakingStepOptions(undefined);
     setProcessing(false);
   }, [
     setVerifiedDelegation,
     setFormData,
     setCurrentStep,
     setProcessing,
-    setCurrentStepOptions,
+    setCurrentStakingStepOptions,
   ]);
 
   const context = useMemo(
@@ -362,8 +364,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      currentStepOptions,
-      setCurrentStepOptions,
+      currentStakingStepOptions,
+      setCurrentStakingStepOptions,
     }),
     [
       hasError,
@@ -381,8 +383,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      currentStepOptions,
-      setCurrentStepOptions,
+      currentStakingStepOptions,
+      setCurrentStakingStepOptions,
     ],
   );
 

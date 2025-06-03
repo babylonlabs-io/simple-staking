@@ -1,4 +1,5 @@
 import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -61,12 +62,19 @@ export function useRegistrationService() {
   const logger = useLogger();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
-      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
-      if (stepName) {
-        setStep(stepName);
-      }
-    });
+    const unsubscribe = subscribeToSigningSteps(
+      (step: SigningStep, options?: SignPsbtOptions) => {
+        console.log(
+          "useRegistrationService subscribeToSigningSteps",
+          step,
+          options,
+        );
+        const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
+        if (stepName) {
+          setStep(stepName, options);
+        }
+      },
+    );
 
     return unsubscribe;
   }, [subscribeToSigningSteps, setStep]);
