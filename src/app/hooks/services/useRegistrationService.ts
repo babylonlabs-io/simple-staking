@@ -61,14 +61,12 @@ export function useRegistrationService() {
   const logger = useLogger();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps(
-      (step: SigningStep, options) => {
-        const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
-        if (stepName) {
-          setStep(stepName);
-        }
-      },
-    );
+    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
+      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
+      if (stepName) {
+        setStep(stepName);
+      }
+    });
 
     return unsubscribe;
   }, [subscribeToSigningSteps, setStep]);
