@@ -7,7 +7,7 @@ import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
 
 export const AmountSubsection = () => {
-  const btcAmount = useWatch({ name: "amount", defaultValue: "" });
+  const btcAmount = useWatch({ name: "amount" });
   const { setValue } = useFormContext();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
