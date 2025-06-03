@@ -14,16 +14,19 @@
 
 type FeatureFlag = "MULTISTAKING";
 
+const FEATURE_FLAGS = {
+  MULTISTAKING: process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true",
+} as const;
+
 class FeatureFlagService {
   /**
-   * Gets the value of a feature flag from environment variables
+   * Gets the value of a feature flag from compile-time constants
    * @param flagName The feature flag name to check
    * @returns True if the feature is enabled, false otherwise
    */
   private static getFlagValue(flagName: FeatureFlag): boolean {
-    const envKey = `NEXT_PUBLIC_FF_${flagName.toUpperCase()}`;
-    const value = process.env[envKey]?.toLowerCase();
-    return value === "true";
+    const result = FEATURE_FLAGS[flagName];
+    return result;
   }
 
   /**
