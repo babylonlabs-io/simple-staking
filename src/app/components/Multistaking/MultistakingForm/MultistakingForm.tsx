@@ -60,7 +60,7 @@ export function MultistakingForm() {
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
             <AmountSubsection />
             <SubSection>
-              <div className="flex flex-col w-full" style={{ gap: "16px" }}>
+              <div className="flex flex-col w-full gap-4">
                 <div className="flex flex-row">
                   <div className="font-normal items-center flex flex-row justify-between w-full content-center">
                     View BSNs and Finality Provider
@@ -68,7 +68,7 @@ export function MultistakingForm() {
                   <div className="flex">
                     {counter < MAX_FINALITY_PROVIDERS && (
                       <div
-                        className={`w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-[#12495E] ${counter > 0 ? "rounded-r-none" : "rounded"} cursor-pointer`}
+                        className={`w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-accent-primary ${counter > 0 ? "rounded-r-none" : "rounded"} cursor-pointer`}
                         onClick={() => {
                           setStakingModalPage(
                             StakingModalPage.FINALITY_PROVIDER,
@@ -82,7 +82,7 @@ export function MultistakingForm() {
                     {0 < counter && 1 < MAX_FINALITY_PROVIDERS && (
                       <div
                         className={twJoin(
-                          "px-4 h-10 flex items-center border border-[#12495E]",
+                          "px-4 h-10 flex items-center border border-accent-primary",
                           counter === MAX_FINALITY_PROVIDERS
                             ? "rounded-md"
                             : "border-l-0 rounded-r-md",

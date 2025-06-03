@@ -12,7 +12,7 @@ export const SubSection = ({
 }) => (
   <div
     className={twJoin(
-      "flex bg-secondary-highlight text-[#12495E] p-4",
+      "flex bg-secondary-highlight text-accent-primary p-4",
       className,
     )}
     style={style}
