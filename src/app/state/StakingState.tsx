@@ -1,3 +1,4 @@
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { number, object, ObjectSchema, string } from "yup";
@@ -77,7 +78,7 @@ export interface StakingState {
   formData?: FormFields;
   step?: StakingStep;
   verifiedDelegation?: DelegationV2;
-  goToStep: (name: StakingStep) => void;
+  goToStep: (name: StakingStep, options?: SignPsbtOptions) => void;
   setProcessing: (value: boolean) => void;
   setFormData: (formData?: FormFields) => void;
   setVerifiedDelegation: (value?: DelegationV2) => void;
@@ -96,6 +97,8 @@ export interface StakingState {
   selectedChain: string;
   setSelectedChain: (chain: string) => void;
   MAX_FINALITY_PROVIDERS: number;
+  currentStakingStepOptions: SignPsbtOptions | undefined;
+  setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useStakingState } =
@@ -142,10 +145,15 @@ const { StateProvider, useState: useStakingState } =
     selectedChain: "babylon",
     setSelectedChain: () => {},
     MAX_FINALITY_PROVIDERS: 1,
+    currentStakingStepOptions: undefined,
+    setCurrentStakingStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
+  const [currentStakingStepOptions, setCurrentStakingStepOptions] =
+    useState<SignPsbtOptions>();
+
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
   const [verifiedDelegation, setVerifiedDelegation] = useState<DelegationV2>();
@@ -322,7 +330,7 @@ export function StakingState({ children }: PropsWithChildren) {
   );
 
   const goToStep = useCallback(
-    (stepName: StakingStep) => {
+    (stepName: StakingStep, options?: SignPsbtOptions) => {
       if (stepName === StakingStep.FEEDBACK_SUCCESS) {
         if (successModalShown) {
           return;
@@ -339,6 +347,7 @@ export function StakingState({ children }: PropsWithChildren) {
         }
       }
       setCurrentStep(stepName);
+      setCurrentStakingStepOptions(options);
     },
     [
       successModalShown,
@@ -353,8 +362,15 @@ export function StakingState({ children }: PropsWithChildren) {
     setVerifiedDelegation(undefined);
     setFormData(undefined);
     setCurrentStep(undefined);
+    setCurrentStakingStepOptions(undefined);
     setProcessing(false);
-  }, [setVerifiedDelegation, setFormData, setCurrentStep, setProcessing]);
+  }, [
+    setVerifiedDelegation,
+    setFormData,
+    setCurrentStep,
+    setProcessing,
+    setCurrentStakingStepOptions,
+  ]);
 
   /* ---------------- StakingV2 UI state ---------------- */
   const [isModalOpenV2, setIsModalOpenV2] = useState(false);
@@ -424,6 +440,8 @@ export function StakingState({ children }: PropsWithChildren) {
       selectedChain: selectedChainV2,
       setSelectedChain: setSelectedChainV2,
       MAX_FINALITY_PROVIDERS,
+      currentStakingStepOptions,
+      setCurrentStakingStepOptions,
     }),
     [
       hasError,
@@ -451,6 +469,8 @@ export function StakingState({ children }: PropsWithChildren) {
       selectedChainV2,
       setSelectedChainV2,
       MAX_FINALITY_PROVIDERS,
+      currentStakingStepOptions,
+      setCurrentStakingStepOptions,
     ],
   );
 
