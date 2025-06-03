@@ -25,6 +25,8 @@ const nextConfig = {
   // Set environment variables to suppress warnings and improve test reliability
   env: {
     NEXT_TELEMETRY_DISABLED: "1",
+    // Feature flags
+    FF_MULTISTAKING: process.env.FF_MULTISTAKING || "false",
   },
 };
 

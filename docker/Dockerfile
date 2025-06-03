@@ -69,6 +69,9 @@ ENV SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
 ARG SENTRY_URL
 ENV SENTRY_URL=${SENTRY_URL}
 
+ARG FF_MULTISTAKING
+ENV FF_MULTISTAKING=${FF_MULTISTAKING}
+
 RUN npm run build
 
 # Step 2. Production image, copy all the files and run next
