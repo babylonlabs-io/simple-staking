@@ -22,12 +22,7 @@ export function PreviewButton() {
   return (
     <AuthGuard
       fallback={
-        <Button
-          //@ts-ignore - fix type issue in core-ui
-          type="submit"
-          onClick={open}
-          className={"w-full mt-2"}
-        >
+        <Button onClick={open} className={"w-full mt-2"}>
           Connect Wallet
         </Button>
       }
