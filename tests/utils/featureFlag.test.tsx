@@ -3,6 +3,10 @@ import { render } from "@testing-library/react";
 
 import Home from "@/app/page";
 
+jest.mock("@uidotdev/usehooks", () => ({
+  useDebounce: jest.fn((value) => value),
+}));
+
 jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
   initBTCCurve: jest.fn(),
 }));
