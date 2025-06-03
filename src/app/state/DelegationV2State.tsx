@@ -1,4 +1,5 @@
-import { useCallback, useMemo, type PropsWithChildren } from "react";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
@@ -25,6 +26,7 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
+  setCurrentDelegationV2StepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useDelegationV2State } =
@@ -40,6 +42,7 @@ const { StateProvider, useState: useDelegationV2State } =
     findDelegationByTxHash: () => undefined,
     refetch: () => Promise.resolve(),
     displayLinkedDelegations: () => {},
+    setCurrentDelegationV2StepOptions: () => {},
   });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
@@ -49,6 +52,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   );
   const { publicKeyNoCoord } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
+  const [currentDelegationV2StepOptions, setCurrentDelegationV2StepOptions] =
+    useState<SignPsbtOptions>();
 
   const {
     data,
@@ -87,6 +92,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       refetch: async () => {
         await refetch();
       },
+      currentDelegationV2StepOptions,
+      setCurrentDelegationV2StepOptions,
     }),
     [
       delegations,
@@ -100,6 +107,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchNextPage,
       setLinkedDelegations,
       refetch,
+      currentDelegationV2StepOptions,
+      setCurrentDelegationV2StepOptions,
     ],
   );
 
