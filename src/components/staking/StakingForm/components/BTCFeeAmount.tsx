@@ -13,7 +13,7 @@ export function BTCFeeAmount() {
   const feeAmount = useWatch({ name: "feeAmount" });
 
   const btcInUsd = usePrice(coinSymbol);
-  const formattedFeeAmount = parseFloat(feeAmount);
+  const formattedFeeAmount = parseFloat(feeAmount || "0");
   const feeInUsd = calculateTokenValueInCurrency(
     satoshiToBtc(formattedFeeAmount),
     btcInUsd,

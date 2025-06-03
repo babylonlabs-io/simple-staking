@@ -33,11 +33,11 @@ export const FinalityProviderItem = ({
               alt={getChainName(chainType)}
               className="w-4 h-4 rounded-[2px]"
             />
-            <div className="text-xs text-[#387085]">
+            <div className="text-xs text-accent-secondary">
               {getChainName(chainType)}
             </div>
           </div>
-          <div className="text-[#12495E]">
+          <div className="text-accent-primary">
             {provider.description?.moniker ||
               trim(provider.btcPk, 8) ||
               "Selected FP"}
@@ -46,7 +46,7 @@ export const FinalityProviderItem = ({
       </div>
       <div
         onClick={onRemove}
-        className="text-[#12495E] text-xs tracking-[0.4px] bg-[#38708533] px-2 py-0.5 rounded cursor-pointer"
+        className="text-accent-primary text-xs tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
       >
         Remove
       </div>

@@ -7,7 +7,7 @@ import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
 
 export const AmountSubsection = () => {
-  const btcAmount = useWatch({ name: "amount", defaultValue: "0" });
+  const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,13 +25,13 @@ export const AmountSubsection = () => {
           <img
             src={bitcoin.src}
             alt="bitcoin"
-            className="max-w-[40px] max-h-[40px]"
+            className="max-w-[2.5rem] max-h-[2.5rem]"
           />
           <div className="text-lg">Bitcoin</div>
         </div>
         <input
           type="number"
-          value={btcAmount || ""}
+          value={btcAmount}
           onChange={handleInputChange}
           placeholder="0"
           autoFocus
