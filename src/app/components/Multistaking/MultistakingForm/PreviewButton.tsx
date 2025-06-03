@@ -1,28 +1,32 @@
-import { Button } from "@babylonlabs-io/core-ui";
-import { useFormState } from "@babylonlabs-io/core-ui";
+import { Button, useFormState } from "@babylonlabs-io/core-ui";
+import { twJoin } from "tailwind-merge";
 
 export function PreviewButton() {
   const { isValid, errors } = useFormState();
-
   const errorKeys = Object.keys(errors);
   const errorMessages = errorKeys.map((key) => errors[key]?.message);
+  const hasError = errorMessages.length > 0;
+
+  const renderButtonContent = () => {
+    if (hasError) {
+      return errorMessages[0]?.toString();
+    }
+
+    return "Preview";
+  };
 
   return (
-    <>
-      {errorMessages.map((message, index) => (
-        <div key={index} className="text-red-500 text-right">
-          {message?.toString()}
-        </div>
-      ))}
-      <Button
-        //@ts-ignore - fix type issue in core-ui
-        type="submit"
-        className="w-full"
-        style={{ marginTop: "8px" }}
-        disabled={!isValid}
-      >
-        Preview
-      </Button>
-    </>
+    <Button
+      //@ts-ignore - fix type issue in core-ui
+      type="submit"
+      className={twJoin(
+        "w-full mt-2",
+        hasError &&
+          "!text-[#12495E] !bg-[#EBF1F3] hover:!bg-[#EBF1F3] !brightness-100",
+      )}
+      disabled={!isValid}
+    >
+      {renderButtonContent()}
+    </Button>
   );
 }
