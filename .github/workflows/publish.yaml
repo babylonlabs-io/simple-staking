@@ -23,16 +23,11 @@ jobs:
       matrix:
         environment:
           [
-            devnet,
             phase-2-devnet,
-            testnet,
             phase-2-testnet,
-            mainnet-private,
-            phase-2-staging,
-            mainnet,
             phase-2-mainnet,
-            mock-mainnet,
-            v4-devnet,
+            staging,
+            v4-devnet
           ]
     environment: ${{ matrix.environment }}
     steps:
