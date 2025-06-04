@@ -157,6 +157,9 @@ export function StakingState({ children }: PropsWithChildren) {
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
   const [verifiedDelegation, setVerifiedDelegation] = useState<DelegationV2>();
+  const [selectedProvidersV2, setSelectedProvidersV2] = useState<
+    (FinalityProvider & { chainType: string })[]
+  >([]);
   const [successModalShown, setSuccessModalShown] = useLocalStorage<boolean>(
     "bbn-staking-successFeedbackModalOpened",
     false,
@@ -364,22 +367,20 @@ export function StakingState({ children }: PropsWithChildren) {
     setCurrentStep(undefined);
     setCurrentStakingStepOptions(undefined);
     setProcessing(false);
+    setSelectedProvidersV2([]);
   }, [
     setVerifiedDelegation,
     setFormData,
     setCurrentStep,
     setProcessing,
     setCurrentStakingStepOptions,
+    setSelectedProvidersV2,
   ]);
 
   /* ---------------- StakingV2 UI state ---------------- */
   const [isModalOpenV2, setIsModalOpenV2] = useState(false);
   const [stakingModalPageV2, setStakingModalPageV2] =
     useState<StakingModalPage>(StakingModalPage.FINALITY_PROVIDER);
-
-  const [selectedProvidersV2, setSelectedProvidersV2] = useState<
-    (FinalityProvider & { chainType: string })[]
-  >([]);
 
   const [selectedChainV2, setSelectedChainV2] = useState("babylon");
 
