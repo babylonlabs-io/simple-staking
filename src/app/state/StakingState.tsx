@@ -177,8 +177,8 @@ export function StakingState({ children }: PropsWithChildren) {
   const {
     isApiNormal,
     isGeoBlocked,
-    apiMessage,
     isLoading: isCheckLoading,
+    error: healthCheckError,
   } = useHealthCheck();
   const {
     data: mempoolFeeRates,
@@ -195,7 +195,7 @@ export function StakingState({ children }: PropsWithChildren) {
   const hasError = isStateError || isNetworkFeeError || !isApiNormal;
   const blocked = isGeoBlocked;
   const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
-  const errorMessage = apiMessage;
+  const errorMessage = healthCheckError?.message;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
   const stakingInfo = useMemo(() => {
