@@ -27,13 +27,6 @@ export function PreviewButton() {
   const hasError = errorMessages.length > 0;
 
   const renderButtonContent = () => {
-    /**
-     * Add Finality Provider
-     * Insufficient BABY
-     */
-
-    console.log({ errors, isValidating, isLoading });
-
     if (isValidating) {
       return "Calculating...";
     }
