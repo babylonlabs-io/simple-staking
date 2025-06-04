@@ -14,8 +14,8 @@ import {
   StakingModalPage,
   StakingStep,
   useStakingState,
+  type FormFields,
 } from "@/app/state/StakingState";
-import { FinalityProvider } from "@/app/types/finalityProviders";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -24,10 +24,6 @@ import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderI
 import { PreviewButton } from "./PreviewButton";
 
 const { networkName } = getNetworkConfigBTC();
-
-interface SelectedProvider extends FinalityProvider {
-  chainType: string;
-}
 
 export function MultistakingForm() {
   const {
@@ -50,7 +46,7 @@ export function MultistakingForm() {
   const counter = selectedProviders.length;
 
   const handlePreview = useCallback(
-    (formValues: any) => {
+    (formValues: FormFields) => {
       // Persist form values into global staking state
       setFormData({
         finalityProvider: formValues.finalityProvider,

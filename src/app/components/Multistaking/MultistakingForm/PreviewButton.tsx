@@ -32,8 +32,7 @@ export function PreviewButton() {
         type="submit"
         className={twJoin(
           "w-full mt-2 capitalize",
-          hasError &&
-            "!text-[#12495E] !bg-[#EBF1F3] hover:!bg-[#EBF1F3] !brightness-100",
+          hasError && "!text-accent-primary !bg-accent-primary/10",
         )}
         disabled={!isValid}
       >
