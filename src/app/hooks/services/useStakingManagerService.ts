@@ -109,14 +109,14 @@ export const useStakingManagerService = () => {
   ]);
 
   const on = useCallback(
-    (callback: (step: SigningStep) => void) => {
+    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
       eventEmitter.on(stakingManagerEvents.SIGNING, callback);
     },
     [eventEmitter],
   );
 
   const off = useCallback(
-    (callback: (step: SigningStep) => void) => {
+    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
       eventEmitter.off(stakingManagerEvents.SIGNING, callback);
     },
     [eventEmitter],

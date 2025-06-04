@@ -365,6 +365,7 @@ describe("useStakingService", () => {
       // Verify the step was updated
       expect(mockGoToStep).toHaveBeenCalledWith(
         StakingStep.EOI_STAKING_SLASHING,
+        undefined,
       );
     });
   });
