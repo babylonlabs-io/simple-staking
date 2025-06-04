@@ -2,8 +2,9 @@ import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useStakingState } from "@/app/state/StakingState";
 import { BBNFeeAmount } from "@/components/staking/StakingForm/components/BBNFeeAmount";
 import { BTCFeeAmount } from "@/components/staking/StakingForm/components/BTCFeeAmount";
-import { BTCFeeRate } from "@/components/staking/StakingForm/components/BTCFeeRate";
 import { Total } from "@/components/staking/StakingForm/components/Total";
+
+import { BTCFeeRate } from "./BTCFeeRate";
 
 export const FeesSection = () => {
   const { stakingInfo } = useStakingState();

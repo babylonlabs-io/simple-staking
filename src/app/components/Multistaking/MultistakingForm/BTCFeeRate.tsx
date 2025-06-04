@@ -4,8 +4,7 @@ import { FaPen } from "react-icons/fa6";
 
 import { useStakingService } from "@/app/hooks/services/useStakingService";
 import { FeeModal } from "@/components/staking/FeeModal";
-
-import { FeeItem } from "./FeeItem";
+import { FeeItem } from "@/components/staking/StakingForm/components/FeeItem";
 
 interface FeeFiledProps {
   defaultRate?: number;
@@ -14,8 +13,12 @@ interface FeeFiledProps {
 export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const [visible, setVisibility] = useState(false);
   const feeRate = useWatch({ name: "feeRate" });
-  const { setValue, getValues, setError, clearErrors } = useFormContext();
+  const { setValue, setError, clearErrors } = useFormContext();
   const { calculateFeeAmount } = useStakingService();
+
+  const amount = useWatch({ name: "amount" });
+  const term = useWatch({ name: "term" });
+  const finalityProvider = useWatch({ name: "finalityProvider" });
 
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {
@@ -26,43 +29,64 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   }, [defaultRate, setValue]);
 
   useEffect(() => {
-    try {
-      const { finalityProvider, amount, term } = getValues();
+    let cancelled = false;
 
-      if (!finalityProvider || !amount || !term || !feeRate) {
+    const run = () => {
+      try {
+        if (!finalityProvider || !amount || !term || !feeRate) {
+          if (cancelled) return;
+          setValue("feeAmount", "0", {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          });
+          return;
+        }
+
+        const feeAmount = calculateFeeAmount({
+          finalityProvider,
+          amount: Number(amount),
+          term: Number(term),
+          feeRate: Number(feeRate),
+        });
+
+        if (cancelled) return;
+
+        clearErrors("feeAmount");
+        setValue("feeAmount", feeAmount.toString(), {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+      } catch (e: any) {
+        if (cancelled) return;
         setValue("feeAmount", "0", {
           shouldValidate: false,
           shouldDirty: false,
           shouldTouch: false,
         });
-        return;
+        setError("feeAmount", {
+          type: "custom",
+          message: e.message,
+        });
       }
+    };
 
-      const feeAmount = calculateFeeAmount({
-        finalityProvider,
-        amount,
-        term,
-        feeRate,
-      });
+    Promise.resolve().then(run);
 
-      clearErrors("feeAmount");
-      setValue("feeAmount", feeAmount.toString(), {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    } catch (e: any) {
-      setValue("feeAmount", "0", {
-        shouldValidate: false,
-        shouldDirty: false,
-        shouldTouch: false,
-      });
-      setError("feeAmount", {
-        type: "custom",
-        message: e.message,
-      });
-    }
-  }, [feeRate, getValues, setValue, setError, clearErrors, calculateFeeAmount]);
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    feeRate,
+    amount,
+    term,
+    finalityProvider,
+    setValue,
+    setError,
+    clearErrors,
+    calculateFeeAmount,
+  ]);
 
   return (
     <FeeItem title="Network Fee Rate">
