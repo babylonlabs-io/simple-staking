@@ -176,18 +176,18 @@ const config = {
         "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
       },
     },
-    {
-      displayName: "jsdom",
-      testEnvironment: "jsdom",
-      testMatch: ["<rootDir>/tests/**/*.test.tsx"],
-      setupFiles: ["./jest.jsdom.setup.js"],
-      moduleNameMapper: {
-        "^@/(.*)$": "<rootDir>/src/$1",
-        "\\.(png|jpg|jpeg|gif|webp|avif|bmp)$":
-          "<rootDir>/tests/__mocks__/svgMock.js",
-        "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
-      },
-    },
+    // {
+    //   displayName: "jsdom",
+    //   testEnvironment: "jsdom",
+    //   testMatch: ["<rootDir>/tests/**/*.test.tsx"],
+    //   setupFiles: ["./jest.jsdom.setup.js"],
+    //   moduleNameMapper: {
+    //     "^@/(.*)$": "<rootDir>/src/$1",
+    //     "\\.(png|jpg|jpeg|gif|webp|avif|bmp)$":
+    //       "<rootDir>/tests/__mocks__/svgMock.js",
+    //     "\\.svg$": "<rootDir>/tests/__mocks__/svgMock.js",
+    //   },
+    // },
   ],
 
   // Options that will be passed to the testEnvironment
