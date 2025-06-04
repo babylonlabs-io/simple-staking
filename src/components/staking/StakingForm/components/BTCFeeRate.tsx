@@ -17,6 +17,10 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const { setValue, getValues, setError, clearErrors } = useFormContext();
   const { calculateFeeAmount } = useStakingService();
 
+  const watchedFinalityProvider = useWatch({ name: "finalityProvider" });
+  const watchedAmount = useWatch({ name: "amount" });
+  const watchedTerm = useWatch({ name: "term" });
+
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {
       shouldValidate: true,
@@ -62,7 +66,17 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
         message: e.message,
       });
     }
-  }, [feeRate, getValues, setValue, setError, clearErrors, calculateFeeAmount]);
+  }, [
+    feeRate,
+    watchedFinalityProvider,
+    watchedAmount,
+    watchedTerm,
+    getValues,
+    setValue,
+    setError,
+    clearErrors,
+    calculateFeeAmount,
+  ]);
 
   return (
     <FeeItem title="Network Fee Rate">
