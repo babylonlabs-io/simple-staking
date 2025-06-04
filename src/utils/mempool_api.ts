@@ -220,6 +220,9 @@ export async function getUTXOs(address: string): Promise<MempoolUTXO[]> {
     throw new ClientError(
       ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
       "Error getting UTXOs",
+      {
+        cause: error as Error,
+      },
     );
   }
 }
