@@ -294,7 +294,7 @@ describe("StakingState", () => {
     const testErrorMessage = "Test API error message";
     mockUseHealthCheck.mockReturnValue({
       ...mockUseHealthCheck(),
-      apiMessage: testErrorMessage,
+      error: { message: testErrorMessage },
     });
 
     const { result } = renderHook(() => useStakingState(), {
