@@ -358,20 +358,6 @@ export function StakingState({ children }: PropsWithChildren) {
     ],
   );
 
-  const reset = useCallback(() => {
-    setVerifiedDelegation(undefined);
-    setFormData(undefined);
-    setCurrentStep(undefined);
-    setCurrentStakingStepOptions(undefined);
-    setProcessing(false);
-  }, [
-    setVerifiedDelegation,
-    setFormData,
-    setCurrentStep,
-    setProcessing,
-    setCurrentStakingStepOptions,
-  ]);
-
   /* ---------------- StakingV2 UI state ---------------- */
   const [isModalOpenV2, setIsModalOpenV2] = useState(false);
   const [stakingModalPageV2, setStakingModalPageV2] =
@@ -382,6 +368,27 @@ export function StakingState({ children }: PropsWithChildren) {
   >([]);
 
   const [selectedChainV2, setSelectedChainV2] = useState("babylon");
+
+  const reset = useCallback(() => {
+    setVerifiedDelegation(undefined);
+    setFormData(undefined);
+    setCurrentStep(undefined);
+    setCurrentStakingStepOptions(undefined);
+    setProcessing(false);
+    // reset for v2
+    setSelectedProvidersV2([]);
+    setSelectedChainV2("babylon");
+    setIsModalOpenV2(false);
+  }, [
+    setVerifiedDelegation,
+    setFormData,
+    setCurrentStep,
+    setProcessing,
+    setCurrentStakingStepOptions,
+    setSelectedProvidersV2,
+    setSelectedChainV2,
+    setIsModalOpenV2,
+  ]);
 
   const MAX_FINALITY_PROVIDERS = 1;
 
