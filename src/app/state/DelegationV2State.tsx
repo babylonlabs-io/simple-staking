@@ -26,7 +26,7 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
-  setCurrentDelegationV2StepOptions: (options?: SignPsbtOptions) => void;
+  setCurrentStepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useDelegationV2State } =
@@ -42,7 +42,7 @@ const { StateProvider, useState: useDelegationV2State } =
     findDelegationByTxHash: () => undefined,
     refetch: () => Promise.resolve(),
     displayLinkedDelegations: () => {},
-    setCurrentDelegationV2StepOptions: () => {},
+    setCurrentStepOptions: () => {},
   });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
@@ -52,7 +52,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   );
   const { publicKeyNoCoord } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
-  const [currentDelegationV2StepOptions, setCurrentDelegationV2StepOptions] =
+  const [currentStepOptions, setCurrentStepOptions] =
     useState<SignPsbtOptions>();
 
   const {
@@ -92,8 +92,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       refetch: async () => {
         await refetch();
       },
-      currentDelegationV2StepOptions,
-      setCurrentDelegationV2StepOptions,
+      currentStepOptions,
+      setCurrentStepOptions,
     }),
     [
       delegations,
@@ -107,8 +107,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchNextPage,
       setLinkedDelegations,
       refetch,
-      currentDelegationV2StepOptions,
-      setCurrentDelegationV2StepOptions,
+      currentStepOptions,
+      setCurrentStepOptions,
     ],
   );
 

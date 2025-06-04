@@ -68,7 +68,7 @@ export function useDelegationService() {
     isLoading: isDelegationLoading,
     isFetchingNextPage,
     updateDelegationStatus,
-    setCurrentDelegationV2StepOptions,
+    setCurrentStepOptions,
   } = useDelegationV2State();
 
   const {
@@ -274,12 +274,12 @@ export function useDelegationService() {
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps(
       (_step: SigningStep, options?: SignPsbtOptions) => {
-        setCurrentDelegationV2StepOptions(options);
+        setCurrentStepOptions(options);
       },
     );
 
     return unsubscribe;
-  }, [subscribeToSigningSteps, setCurrentDelegationV2StepOptions]);
+  }, [subscribeToSigningSteps, setCurrentStepOptions]);
 
   const openConfirmationModal = useCallback(
     (action: ActionType, delegation: DelegationWithFP) => {
@@ -299,8 +299,8 @@ export function useDelegationService() {
 
   const closeConfirmationModal = useCallback(() => {
     setConfirmationModal(null);
-    setCurrentDelegationV2StepOptions(undefined);
-  }, [setCurrentDelegationV2StepOptions]);
+    setCurrentStepOptions(undefined);
+  }, [setCurrentStepOptions]);
 
   const toggleProcessingDelegation = useCallback(
     (id: string, processing: boolean) => {
