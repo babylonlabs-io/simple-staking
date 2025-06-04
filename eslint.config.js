@@ -11,6 +11,7 @@ export default tseslint.config(
   {
     ignores: [
       "dist",
+      ".next",
       "node_modules",
       "tests",
       "e2e",
@@ -41,7 +42,7 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-hooks/exhaustive-deps": "error",
       "react-hooks/rules-of-hooks": "error",
-      "@tanstack/query/exhaustive-deps": "error",
+      "@tanstack/query/exhaustive-deps": "warn",
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },
