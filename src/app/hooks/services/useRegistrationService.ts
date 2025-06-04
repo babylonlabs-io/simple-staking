@@ -1,16 +1,11 @@
-import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useLogger } from "@/app/hooks/useLogger";
-import {
-  RegistrationStep,
-  useDelegationState,
-} from "@/app/state/DelegationState";
+import { useDelegationState } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
 import { retry } from "@/app/utils";
@@ -29,22 +24,6 @@ interface RegistrationData {
   };
 }
 
-type RegistrationSigningStep = Extract<
-  SigningStep,
-  | "staking-slashing"
-  | "unbonding-slashing"
-  | "proof-of-possession"
-  | "create-btc-delegation-msg"
->;
-
-const REGISTRATION_STEP_MAP: Record<RegistrationSigningStep, RegistrationStep> =
-  {
-    [SigningStep.STAKING_SLASHING]: "registration-staking-slashing",
-    [SigningStep.UNBONDING_SLASHING]: "registration-unbonding-slashing",
-    [SigningStep.PROOF_OF_POSSESSION]: "registration-proof-of-possession",
-    [SigningStep.CREATE_BTC_DELEGATION_MSG]: "registration-sign-bbn",
-  };
-
 export function useRegistrationService() {
   const {
     setRegistrationStep: setStep,
@@ -53,26 +32,12 @@ export function useRegistrationService() {
     resetRegistration: reset,
     refetch: refetchV1Delegations,
   } = useDelegationState();
-  const { transitionPhase1Delegation, subscribeToSigningSteps } =
-    useTransactionService();
+  const { transitionPhase1Delegation } = useTransactionService();
   const { addDelegation, refetch: refetchV2Delegations } =
     useDelegationV2State();
   const { sendBbnTx } = useBbnTransaction();
   const { handleError } = useError();
   const logger = useLogger();
-
-  useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps(
-      (step: SigningStep, options?: SignPsbtOptions) => {
-        const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
-        if (stepName) {
-          setStep(stepName, options);
-        }
-      },
-    );
-
-    return unsubscribe;
-  }, [subscribeToSigningSteps, setStep]);
 
   const registerPhase1Delegation = useCallback(async () => {
     // set the step to staking-slashing

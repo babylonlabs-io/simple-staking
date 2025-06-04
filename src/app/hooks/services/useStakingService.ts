@@ -1,6 +1,4 @@
-import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
@@ -27,50 +25,18 @@ import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
 import { useTransactionService } from "./useTransactionService";
 
-type StakingSigningStep = Extract<
-  SigningStep,
-  | "staking-slashing"
-  | "unbonding-slashing"
-  | "proof-of-possession"
-  | "create-btc-delegation-msg"
->;
-
-const STAKING_SIGNING_STEP_MAP: Record<StakingSigningStep, StakingStep> = {
-  "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
-  "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
-  "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
-  "create-btc-delegation-msg": StakingStep.EOI_SIGN_BBN,
-};
-
 export function useStakingService() {
   const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingState();
   const { sendBbnTx } = useBbnTransaction();
   const { refetch: refetchDelegations } = useDelegationV2State();
   const { addDelegation, updateDelegationStatus } = useDelegationV2State();
-  const {
-    estimateStakingFee,
-    createDelegationEoi,
-    submitStakingTx,
-    subscribeToSigningSteps,
-  } = useTransactionService();
+  const { estimateStakingFee, createDelegationEoi, submitStakingTx } =
+    useTransactionService();
   const { handleError } = useError();
   const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
   const logger = useLogger();
-
-  useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps(
-      (step: SigningStep, options?: SignPsbtOptions) => {
-        const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
-        if (stepName) {
-          goToStep(stepName, options);
-        }
-      },
-    );
-
-    return unsubscribe;
-  }, [subscribeToSigningSteps, goToStep]);
 
   const calculateFeeAmount = ({
     finalityProvider,

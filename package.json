@@ -43,6 +43,7 @@
     "core-js": "^3.41.0",
     "date-fns": "^3.6.0",
     "decimal.js-light": "^2.5.1",
+    "nanoevents": "^9.1.0",
     "next-themes": "^0.3.0",
     "qs": "^6.13.1",
     "react": "^18",
