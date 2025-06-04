@@ -107,7 +107,6 @@ export function DelegationForm({
             alt="Staking is not available"
             width={120}
             height={122}
-            className="rotate-12"
           />
         }
         title="Staking is not available"

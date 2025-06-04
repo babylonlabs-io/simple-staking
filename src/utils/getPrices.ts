@@ -18,6 +18,9 @@ export const getPrices = async (): Promise<Record<string, number>> => {
     throw new ClientError(
       ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
       "Error getting prices",
+      {
+        cause: error as Error,
+      },
     );
   }
 };
