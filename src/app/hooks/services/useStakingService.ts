@@ -59,18 +59,34 @@ export function useStakingService() {
   const { bech32Address } = useCosmosWallet();
   const logger = useLogger();
 
+  // TODO remove
+  const { setCurrentStepOptions } = useDelegationV2State();
+
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps(
       (step: SigningStep, options?: SignPsbtOptions) => {
+        // TODO remove
+        console.log("useStakingService", step, options);
         const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
         if (stepName) {
+          // This is not called for the "staking" transaction after the EOI
+          // even though it will trigger the subscription
           goToStep(stepName, options);
+        }
+        // TODO remove using the proper event emitter
+        if (step === SigningStep.STAKING) {
+          setCurrentStepOptions(options);
         }
       },
     );
 
     return unsubscribe;
-  }, [subscribeToSigningSteps, goToStep]);
+  }, [
+    subscribeToSigningSteps,
+    goToStep,
+    // TODO remove
+    setCurrentStepOptions,
+  ]);
 
   const calculateFeeAmount = ({
     finalityProvider,

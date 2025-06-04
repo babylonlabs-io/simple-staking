@@ -27,6 +27,7 @@ interface DelegationV2State {
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
   setCurrentStepOptions: (options?: SignPsbtOptions) => void;
+  currentStepOptions?: SignPsbtOptions;
 }
 
 const { StateProvider, useState: useDelegationV2State } =
@@ -43,6 +44,7 @@ const { StateProvider, useState: useDelegationV2State } =
     refetch: () => Promise.resolve(),
     displayLinkedDelegations: () => {},
     setCurrentStepOptions: () => {},
+    currentStepOptions: undefined,
   });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
