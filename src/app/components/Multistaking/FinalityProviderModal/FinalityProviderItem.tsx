@@ -1,3 +1,5 @@
+import { useFormContext } from "@babylonlabs-io/core-ui";
+
 import { chainLogos, chainNames } from "@/app/constants";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { trim } from "@/utils/trim";
@@ -17,6 +19,8 @@ export const FinalityProviderItem = ({
   chainType: string;
   onRemove: () => void;
 }) => {
+  const { setValue } = useFormContext();
+
   return (
     <div className="flex flex-row justify-between items-center">
       <div className="h-10 flex flex-row gap-2">
@@ -45,7 +49,14 @@ export const FinalityProviderItem = ({
         </div>
       </div>
       <div
-        onClick={onRemove}
+        onClick={() => {
+          setValue("finalityProvider", "", {
+            shouldValidate: true,
+            shouldDirty: true,
+            shouldTouch: true,
+          });
+          onRemove();
+        }}
         className="text-accent-primary text-xs tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
       >
         Remove

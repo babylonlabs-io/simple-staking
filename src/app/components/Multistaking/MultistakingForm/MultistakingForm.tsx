@@ -61,6 +61,10 @@ export function MultistakingForm() {
     [setFormData, goToStep],
   );
 
+  if (!stakingInfo) {
+    return null;
+  }
+
   return (
     <Section title={`${networkName} Staking`}>
       <Form
