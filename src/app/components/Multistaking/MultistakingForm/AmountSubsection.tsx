@@ -31,6 +31,8 @@ export const AmountSubsection = () => {
         </div>
         <input
           type="number"
+          min="0"
+          step="any"
           value={btcAmount}
           onChange={handleInputChange}
           placeholder="0"
