@@ -25,6 +25,7 @@ const enableSentryPlugin =
 // https://vite.dev/config/
 export default defineConfig({
   build: {
+    outDir: "out",
     sourcemap: true,
     rollupOptions: {
       input: {
