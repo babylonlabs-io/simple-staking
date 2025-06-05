@@ -4,17 +4,17 @@ import { twJoin } from "tailwind-merge";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { AuthGuard } from "@/components/common/AuthGuard";
 
-function beautifyErrorMessages(error: string) {
-  switch (error.toLowerCase()) {
-    case "Insufficient funds: unable to gather enough UTXOs to cover the staking amount and fees".toLowerCase():
-      return "Insufficient BTC";
-    case "Staking amount (stakingAmountSat) is required for staking input.".toLowerCase():
-      return "Enter BTC Amount to Stake";
-    case "Please select a finality provider".toLowerCase():
-      return "Add Finality Provider";
-    default:
-      return error;
-  }
+const ERROR_MESSAGE_MAP: Record<string, string> = {
+  "insufficient funds: unable to gather enough utxos to cover the staking amount and fees":
+    "Insufficient BTC",
+  "staking amount (stakingamountsat) is required for staking input.":
+    "Enter BTC Amount to Stake",
+  "please select a finality provider": "Add Finality Provider",
+};
+
+function beautifyErrorMessages(error: string): string {
+  const lowerError = error.toLowerCase();
+  return ERROR_MESSAGE_MAP[lowerError] || error;
 }
 
 export function PreviewButton() {
