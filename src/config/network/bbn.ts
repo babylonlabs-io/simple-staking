@@ -4,6 +4,7 @@ import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
 import { bbnMainnet } from "./bbn/mainnet";
 import { bbnTestnet } from "./bbn/testnet";
+import { bbnV4Devnet } from "./bbn/v4-devnet";
 
 const defaultNetwork = "devnet";
 export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
@@ -29,6 +30,14 @@ const config: Record<string, BBNConfig> = {
     chainId: bbnDevnet.chainId,
     rpc: bbnDevnet.rpc,
     chainData: bbnDevnet,
+    networkName: "Testnet BABY",
+    networkFullName: "Testnet Babylon Genesis",
+    coinSymbol: "tBABY",
+  },
+  v4devnet: {
+    chainId: bbnV4Devnet.chainId,
+    rpc: bbnV4Devnet.rpc,
+    chainData: bbnV4Devnet,
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",

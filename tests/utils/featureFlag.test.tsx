@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 
@@ -53,7 +54,19 @@ describe("Home page feature flag – MULTISTAKING", () => {
     const FeatureFlagService = require("@/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = true;
 
-    const { getByTestId, queryByTestId } = render(<Home />);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
+    const { getByTestId, queryByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <Home />
+      </QueryClientProvider>,
+    );
 
     expect(getByTestId("multistaking-form")).toBeInTheDocument();
     expect(queryByTestId("staking-form")).not.toBeInTheDocument();
@@ -63,7 +76,19 @@ describe("Home page feature flag – MULTISTAKING", () => {
     const FeatureFlagService = require("@/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = false;
 
-    const { getByTestId, queryByTestId } = render(<Home />);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
+    const { getByTestId, queryByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <Home />
+      </QueryClientProvider>,
+    );
 
     expect(getByTestId("staking-form")).toBeInTheDocument();
     expect(queryByTestId("multistaking-form")).not.toBeInTheDocument();

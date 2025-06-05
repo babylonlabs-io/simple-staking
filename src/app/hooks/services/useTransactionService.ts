@@ -2,6 +2,7 @@ import {
   BabylonBtcStakingManager,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
 
@@ -435,7 +436,7 @@ export const useTransactionService = () => {
    * @returns A cleanup function to remove the listener
    */
   const subscribeToSigningSteps = useCallback(
-    (callback: (step: SigningStep) => void) => {
+    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
       managerEventsOn(callback);
 
       // Return cleanup function

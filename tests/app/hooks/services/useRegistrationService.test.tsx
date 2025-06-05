@@ -185,21 +185,25 @@ describe("useRegistrationService", () => {
       callback(SigningStep.STAKING_SLASHING);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-staking-slashing",
+        undefined,
       );
 
       callback(SigningStep.UNBONDING_SLASHING);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-unbonding-slashing",
+        undefined,
       );
 
       callback(SigningStep.PROOF_OF_POSSESSION);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-proof-of-possession",
+        undefined,
       );
 
       callback(SigningStep.CREATE_BTC_DELEGATION_MSG);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-sign-bbn",
+        undefined,
       );
     });
   });

@@ -1,4 +1,6 @@
-import { useCallback, useMemo, useState } from "react";
+import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { useAppState } from "@/app/state";
@@ -66,6 +68,7 @@ export function useDelegationService() {
     isLoading: isDelegationLoading,
     isFetchingNextPage,
     updateDelegationStatus,
+    setCurrentStepOptions,
   } = useDelegationV2State();
 
   const {
@@ -74,6 +77,7 @@ export function useDelegationService() {
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
+    subscribeToSigningSteps,
   } = useTransactionService();
 
   const { isFetching: isFPLoading, finalityProviderMap } =
@@ -266,6 +270,17 @@ export function useDelegationService() {
     ],
   );
 
+  // Subscribe to the signing effects to capture options for v2 delegations
+  useEffect(() => {
+    const unsubscribe = subscribeToSigningSteps(
+      (_step: SigningStep, options?: SignPsbtOptions) => {
+        setCurrentStepOptions(options);
+      },
+    );
+
+    return unsubscribe;
+  }, [subscribeToSigningSteps, setCurrentStepOptions]);
+
   const openConfirmationModal = useCallback(
     (action: ActionType, delegation: DelegationWithFP) => {
       const param = getBbnParamByVersion(
@@ -282,10 +297,10 @@ export function useDelegationService() {
     [networkInfo],
   );
 
-  const closeConfirmationModal = useCallback(
-    () => void setConfirmationModal(null),
-    [],
-  );
+  const closeConfirmationModal = useCallback(() => {
+    setConfirmationModal(null);
+    setCurrentStepOptions(undefined);
+  }, [setCurrentStepOptions]);
 
   const toggleProcessingDelegation = useCallback(
     (id: string, processing: boolean) => {

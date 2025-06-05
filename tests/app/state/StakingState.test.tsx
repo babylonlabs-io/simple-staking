@@ -37,6 +37,10 @@ jest.mock("@/app/context/wallet/CosmosWalletProvider", () => ({
   useCosmosWallet: () => mockUseCosmosWallet(),
 }));
 
+jest.mock("@uidotdev/usehooks", () => ({
+  useDebounce: jest.fn((value) => value),
+}));
+
 // Mock useLocalStorage
 const mockSetSuccessModalShown = jest.fn();
 const mockSetCancelModalShown = jest.fn();
