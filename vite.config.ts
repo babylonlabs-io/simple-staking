@@ -33,14 +33,16 @@ export default defineConfig({
         404: resolve(__dirname, "404.html"),
       },
       output: {
-        manualChunks: (id) => {
-          if (id.includes("@babylonlabs-io/wallet-connector")) {
-            return;
-          }
-
-          if (id.includes("node_modules")) {
-            return "vendor";
-          }
+        manualChunks: {
+          react: ["react", "react-dom"],
+          bitcoin: ["@bitcoin-js/tiny-secp256k1-asmjs", "bitcoinjs-lib"],
+          cosmos: ["@cosmjs/proto-signing", "@cosmjs/stargate"],
+          babylon: [
+            "@babylonlabs-io/babylon-proto-ts",
+            "@babylonlabs-io/btc-staking-ts",
+            "@babylonlabs-io/core-ui",
+          ],
+          wallets: ["@babylonlabs-io/wallet-connector"],
         },
       },
     },
