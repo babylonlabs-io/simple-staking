@@ -59,21 +59,12 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
       // Extract stack trace if available
       const stackTrace = error instanceof Error ? error.stack || "" : "";
 
-      // Get error source from metadata if available
-      const paramErrorSource = metadata?.errorSource as string | undefined;
-      const errorSource: string | undefined = paramErrorSource;
-
-      const combinedMetadata = {
-        errorSource: errorSource,
-        ...metadata,
-      };
-
       const shouldShowModal = displayOptions?.showModal ?? true;
 
       const errorData = {
         message: error.message,
         trace: stackTrace,
-        ...combinedMetadata,
+        ...metadata,
       };
 
       if (shouldShowModal) {
@@ -81,8 +72,7 @@ export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
           isOpen: true,
           error: errorData,
           modalOptions: {
-            retryAction: displayOptions?.retryAction,
-            noCancel: displayOptions?.noCancel ?? false,
+            ...displayOptions,
           },
         });
       }

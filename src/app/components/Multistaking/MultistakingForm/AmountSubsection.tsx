@@ -32,6 +32,8 @@ export const AmountSubsection = () => {
         <input
           type="number"
           value={btcAmount ?? ""}
+          min="0"
+          step="any"
           onChange={handleInputChange}
           placeholder="0"
           autoFocus

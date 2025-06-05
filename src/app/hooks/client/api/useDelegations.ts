@@ -70,6 +70,9 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching delegations",
+        {
+          cause: query.error as Error,
+        },
       );
       logger.error(clientError, {
         tags: {

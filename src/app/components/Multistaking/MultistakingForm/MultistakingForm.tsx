@@ -1,4 +1,5 @@
 import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
+import { useCallback } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { twJoin } from "tailwind-merge";
 
@@ -9,11 +10,12 @@ import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
-import { useStakingState } from "@/app/state/StakingState";
 import {
   StakingModalPage,
-  useMultistakingState,
-} from "@/app/state/StakingV2State";
+  StakingStep,
+  useStakingState,
+  type FormFields,
+} from "@/app/state/StakingState";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -24,22 +26,44 @@ import { PreviewButton } from "./PreviewButton";
 const { networkName } = getNetworkConfigBTC();
 
 export function MultistakingForm() {
-  const { validationSchema, stakingInfo } = useStakingState();
-
   const {
+    validationSchema,
+    stakingInfo,
+    setFormData,
+    goToStep,
     isModalOpen,
     setIsModalOpen,
     stakingModalPage,
     setStakingModalPage,
     selectedProviders,
     selectedChain,
-    counter,
+    setSelectedChain,
     handleSelectProvider,
     removeProvider,
-    setSelectedChain,
-    handlePreview,
     MAX_FINALITY_PROVIDERS,
-  } = useMultistakingState();
+  } = useStakingState();
+
+  const counter = selectedProviders.length;
+
+  const handlePreview = useCallback(
+    (formValues: FormFields) => {
+      // Persist form values into global staking state
+      setFormData({
+        finalityProvider: formValues.finalityProvider,
+        term: Number(formValues.term),
+        amount: Number(formValues.amount),
+        feeRate: Number(formValues.feeRate),
+        feeAmount: Number(formValues.feeAmount),
+      });
+
+      goToStep(StakingStep.PREVIEW);
+    },
+    [setFormData, goToStep],
+  );
+
+  if (!stakingInfo) {
+    return null;
+  }
 
   return (
     <Section title={`${networkName} Staking`}>
@@ -49,10 +73,15 @@ export function MultistakingForm() {
         reValidateMode="onChange"
         onSubmit={handlePreview}
       >
-        <HiddenField
-          name="term"
-          defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
-        />
+        {stakingInfo && (
+          <HiddenField
+            name="term"
+            defaultValue={(
+              stakingInfo?.defaultStakingTimeBlocks ??
+              stakingInfo?.minStakingTimeBlocks
+            )?.toString()}
+          />
+        )}
         <HiddenField name="feeRate" defaultValue="0" />
         <HiddenField name="feeAmount" defaultValue="0" />
         <HiddenField name="finalityProvider" defaultValue="" />
