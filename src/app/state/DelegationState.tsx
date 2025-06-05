@@ -45,6 +45,8 @@ interface DelegationState {
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
+  setCurrentDelegationStepOptions: (options?: SignPsbtOptions) => void;
+  currentDelegationStepOptions?: SignPsbtOptions;
 }
 
 const { StateProvider, useState: useDelegationState } =
@@ -62,6 +64,8 @@ const { StateProvider, useState: useDelegationState } =
     setSelectedDelegation: () => null,
     resetRegistration: () => null,
     refetch: () => null,
+    setCurrentDelegationStepOptions: () => null,
+    currentDelegationStepOptions: undefined,
   });
 
 export function DelegationState({ children }: PropsWithChildren) {

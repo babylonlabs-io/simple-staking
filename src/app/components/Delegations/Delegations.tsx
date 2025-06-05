@@ -7,6 +7,7 @@ import { useLocalStorage } from "usehooks-ts";
 import { LoadingTableList } from "@/app/components/Loading/Loading";
 import { RegistrationEndModal } from "@/app/components/Modals/RegistrationModal/RegistrationEndModal";
 import { RegistrationStartModal } from "@/app/components/Modals/RegistrationModal/RegistrationStartModal";
+import { SignDetailsModal } from "@/app/components/Modals/SignDetailsModal";
 import { SignModal } from "@/app/components/Modals/SignModal/SignModal";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { ONE_MINUTE } from "@/app/constants";
@@ -18,6 +19,7 @@ import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
 import { useDelegationState } from "@/app/state/DelegationState";
+import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
   Delegation as DelegationInterface,
   DelegationState,
@@ -77,6 +79,7 @@ export const Delegations = ({}) => {
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
+  const { currentStepOptions, setCurrentStepOptions } = useDelegationV2State();
 
   const selectedDelegation = delegationsAPI?.delegations.find(
     (delegation) => delegation.stakingTxHashHex === txID,
@@ -198,10 +201,7 @@ export const Delegations = ({}) => {
         error,
       });
     } finally {
-      setModalOpen(false);
-      setTxID("");
-      setModalMode(undefined);
-      setAwaitingWalletResponse(false);
+      handleModalClose();
     }
   };
 
@@ -254,10 +254,7 @@ export const Delegations = ({}) => {
         },
       });
     } finally {
-      setModalOpen(false);
-      setTxID("");
-      setModalMode(undefined);
-      setAwaitingWalletResponse(false);
+      handleModalClose();
     }
   };
 
@@ -265,6 +262,16 @@ export const Delegations = ({}) => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setTxID("");
+    setModalMode(undefined);
+    setAwaitingWalletResponse(false);
+    setCurrentStepOptions(undefined);
+    setSelectedDelegation(undefined);
+    setStep(undefined);
   };
 
   useEffect(() => {
@@ -428,7 +435,7 @@ export const Delegations = ({}) => {
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleModalClose}
           onSubmit={() => {
             handleWithdraw(txID);
           }}
@@ -438,7 +445,7 @@ export const Delegations = ({}) => {
       {modalMode === MODE_UNBOND && (
         <UnbondModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleModalClose}
           onSubmit={() => {
             handleUnbond(txID);
           }}
@@ -474,6 +481,15 @@ export const Delegations = ({}) => {
         open={step === "registration-verified"}
         onClose={handleCloseRegistration}
       />
+
+      {currentStepOptions && (
+        <SignDetailsModal
+          open={Boolean(currentStepOptions)}
+          onClose={handleModalClose}
+          details={currentStepOptions}
+          title="Transaction Details"
+        />
+      )}
     </>
   );
 };

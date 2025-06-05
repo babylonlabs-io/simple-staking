@@ -8,6 +8,7 @@ import { StakeModal } from "@/app/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/app/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/app/components/Modals/VerificationModal";
 import { useStakingService } from "@/app/hooks/services/useStakingService";
+import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
 
@@ -32,6 +33,7 @@ export function StakingModal() {
     verifiedDelegation,
     reset: resetState,
   } = useStakingState();
+  const { setCurrentStepOptions } = useDelegationV2State();
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
   const {
@@ -102,16 +104,26 @@ export function StakingModal() {
           open={step === "verified"}
           processing={processing}
           onSubmit={() => stakeDelegation(verifiedDelegation)}
-          onClose={resetState}
+          onClose={() => {
+            resetState();
+            // TODO this is wrong because we mix staking state and delegation state
+            setCurrentStepOptions(undefined);
+          }}
         />
       )}
       <SuccessFeedbackModal
         open={step === "feedback-success"}
-        onClose={resetState}
+        onClose={() => {
+          resetState();
+          setCurrentStepOptions(undefined);
+        }}
       />
       <CancelFeedbackModal
         open={step === "feedback-cancel"}
-        onClose={resetState}
+        onClose={() => {
+          resetState();
+          setCurrentStepOptions(undefined);
+        }}
       />
     </>
   );

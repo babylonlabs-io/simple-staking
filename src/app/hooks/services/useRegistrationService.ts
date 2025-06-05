@@ -64,6 +64,8 @@ export function useRegistrationService() {
   useEffect(() => {
     const unsubscribe = subscribeToSigningSteps(
       (step: SigningStep, options?: SignPsbtOptions) => {
+        // TODO remove
+        console.log("useTransactionService", step, options);
         const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
         if (stepName) {
           setStep(stepName, options);
