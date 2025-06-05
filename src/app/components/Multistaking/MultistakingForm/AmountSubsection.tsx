@@ -31,16 +31,16 @@ export const AmountSubsection = () => {
         </div>
         <input
           type="number"
+          value={btcAmount ?? ""}
           min="0"
           step="any"
-          value={btcAmount}
           onChange={handleInputChange}
           placeholder="0"
           autoFocus
           className="text-lg bg-transparent text-right w-2/3 outline-none"
         />
       </div>
-      <HiddenField name="amount" />
+      <HiddenField name="amount" defaultValue="" />
 
       <AuthGuard>
         <AmountBalanceInfo />
