@@ -36,7 +36,6 @@ export function MultistakingForm() {
     stakingModalPage,
     setStakingModalPage,
     selectedProviders,
-    selectedChain,
     setSelectedChain,
     handleSelectProvider,
     removeProvider,
@@ -92,7 +91,7 @@ export function MultistakingForm() {
               <div className="flex flex-col w-full gap-4">
                 <div className="flex flex-row">
                   <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-                    View BSNs and Finality Provider
+                    View Finality Provider
                   </div>
                   <div className="flex">
                     {counter < MAX_FINALITY_PROVIDERS && (
@@ -130,7 +129,6 @@ export function MultistakingForm() {
                   <FinalityProviderItem
                     key={provider.id}
                     provider={provider}
-                    chainType={provider.chainType || selectedChain}
                     onRemove={() => removeProvider(provider.id)}
                   />
                 ))}
