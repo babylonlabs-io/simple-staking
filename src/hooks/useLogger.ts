@@ -1,4 +1,4 @@
-import { SeverityLevel, addBreadcrumb, captureException } from "@sentry/nextjs";
+import { SeverityLevel, addBreadcrumb, captureException } from "@sentry/react";
 import { useMemo } from "react";
 
 import { ClientError } from "@/errors";

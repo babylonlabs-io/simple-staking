@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useMemo } from "react";
 
 import { DOCUMENTATION_LINKS } from "@/app/constants";
@@ -48,13 +47,13 @@ export const SlashingContent = ({
     return (
       <>
         This Finality Provider has been slashed due to double voting.{" "}
-        <Link
+        <a
           className="text-secondary-main"
           target="_blank"
           href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
         >
           Learn more
-        </Link>
+        </a>
       </>
     );
   }
@@ -69,13 +68,13 @@ export const SlashingContent = ({
         </b>{" "}
         being deducted from your delegation. It will take {unbondingTime.blocks}{" "}
         blocks (~ {unbondingTime.time}) before it becomes withdrawable.{" "}
-        <Link
+        <a
           className="text-secondary-main"
           target="_blank"
           href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
         >
           Learn more
-        </Link>
+        </a>
       </>
     );
   }
@@ -89,13 +88,13 @@ export const SlashingContent = ({
       </b>{" "}
       being deducted from your delegation due to the finality provider double
       voting.{" "}
-      <Link
+      <a
         className="text-secondary-main"
         target="_blank"
         href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
       >
         Learn more
-      </Link>
+      </a>
     </>
   );
 };

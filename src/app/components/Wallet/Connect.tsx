@@ -9,7 +9,6 @@ import {
   useWalletConnect,
   useWidgetState,
 } from "@babylonlabs-io/wallet-connector";
-import Image from "next/image";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { FaLock, FaLockOpen } from "react-icons/fa6";
@@ -152,7 +151,7 @@ export const Connect: React.FC<ConnectProps> = ({
     <div className="flex flex-col gap-2 w-full min-w-[250px]">
       <div className="flex flex-row gap-2 mb-2">
         <div className="flex items-center justify-center">
-          <Image
+          <img
             src={bitcoin}
             alt="bitcoin"
             className="max-w-[40px] max-h-[40px]"
@@ -212,7 +211,7 @@ export const Connect: React.FC<ConnectProps> = ({
       <div className="divider my-0" />
       <div className="flex flex-row gap-2">
         <div className="flex items-center justify-center">
-          <Image
+          <img
             src={bbnIcon}
             alt="babylon"
             className="max-w-[40px] max-h-[40px]"

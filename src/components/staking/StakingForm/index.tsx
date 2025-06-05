@@ -1,5 +1,4 @@
 import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
-import Image from "next/image";
 
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
@@ -69,7 +68,7 @@ export function DelegationForm({
         title="Unavailable in Your Region"
         message={error ?? ""}
         icon={
-          <Image
+          <img
             src={walletIcon}
             alt="Unavailable in Your Region"
             width={120}
@@ -87,7 +86,7 @@ export function DelegationForm({
         title={disabled.title}
         message={disabled.message}
         icon={
-          <Image
+          <img
             src={stakingUnavailableIcon}
             alt="Staking Unavailable"
             width={120}
@@ -102,7 +101,7 @@ export function DelegationForm({
     return (
       <Message
         icon={
-          <Image
+          <img
             src={apiNotAvailable}
             alt="Staking is not available"
             width={120}

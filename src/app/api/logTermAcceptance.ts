@@ -26,5 +26,7 @@ export const logTermsAcceptance = async ({
       "Error submitting terms acceptance request",
       { body: payload },
     );
-  } catch {}
+  } catch {
+    return;
+  }
 };

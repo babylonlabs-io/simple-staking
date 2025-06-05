@@ -36,7 +36,7 @@ export const getSystemStats = async (): Promise<SystemStats> => {
       ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
       "Error getting system stats",
       {
-        cause: error as Error,
+        cause: error,
       },
     );
   }
