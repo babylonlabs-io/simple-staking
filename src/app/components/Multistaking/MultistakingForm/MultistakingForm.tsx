@@ -10,6 +10,7 @@ import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import {
   StakingModalPage,
   StakingStep,
@@ -21,6 +22,7 @@ import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
+import { FormAlert } from "./FormAlert";
 import { PreviewButton } from "./PreviewButton";
 
 const { networkName } = getNetworkConfigBTC();
@@ -41,7 +43,10 @@ export function MultistakingForm() {
     handleSelectProvider,
     removeProvider,
     MAX_FINALITY_PROVIDERS,
+    blocked: isGeoBlocked,
+    errorMessage: geoBlockMessage,
   } = useStakingState();
+  const { address } = useBTCWallet();
 
   const counter = selectedProviders.length;
 
@@ -138,6 +143,11 @@ export function MultistakingForm() {
             </SubSection>
             <FeesSection />
             <PreviewButton />
+            <FormAlert
+              address={address}
+              isGeoBlocked={isGeoBlocked}
+              geoBlockMessage={geoBlockMessage}
+            />
           </Card>
         </div>
 
