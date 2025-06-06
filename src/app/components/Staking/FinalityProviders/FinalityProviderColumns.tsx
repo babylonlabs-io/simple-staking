@@ -7,8 +7,8 @@ import {
   FinalityProviderState,
   FinalityProviderStateLabels,
 } from "@/app/types/finalityProviders";
-import { satoshiToBtc } from "@/utils/btc";
-import { maxDecimals } from "@/utils/maxDecimals";
+import { satoshiToBtc } from "@/app/utils/btc";
+import { maxDecimals } from "@/app/utils/maxDecimals";
 
 const { coinSymbol } = getNetworkConfigBTC();
 

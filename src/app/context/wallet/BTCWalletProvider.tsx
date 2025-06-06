@@ -28,12 +28,12 @@ import {
   getNetworkFees,
   getTipHeight,
   pushTx,
-} from "@/utils/mempool_api";
+} from "@/app/utils/mempool_api";
 import {
   getPublicKeyNoCoord,
   isSupportedAddressType,
   toNetwork,
-} from "@/utils/wallet";
+} from "@/app/utils/wallet";
 
 const btcConfig = getNetworkConfigBTC();
 

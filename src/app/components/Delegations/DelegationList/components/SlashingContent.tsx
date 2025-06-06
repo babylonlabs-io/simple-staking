@@ -7,11 +7,11 @@ import {
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
 import { NetworkInfo } from "@/app/types/networkInfo";
-import { satoshiToBtc } from "@/utils/btc";
-import { getSlashingAmount } from "@/utils/delegations/slashing";
-import { maxDecimals } from "@/utils/maxDecimals";
-import { getBbnParamByVersion } from "@/utils/params";
-import { blocksToDisplayTime } from "@/utils/time";
+import { satoshiToBtc } from "@/app/utils/btc";
+import { getSlashingAmount } from "@/app/utils/delegations/slashing";
+import { maxDecimals } from "@/app/utils/maxDecimals";
+import { getBbnParamByVersion } from "@/app/utils/params";
+import { blocksToDisplayTime } from "@/app/utils/time";
 
 interface SlashingContentProps {
   delegation: DelegationV2;

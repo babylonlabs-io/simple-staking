@@ -10,7 +10,7 @@ import {
 } from "@/app/types/delegationsV2";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { NetworkInfo } from "@/app/types/networkInfo";
-import { blocksToDisplayTime } from "@/utils/time";
+import { blocksToDisplayTime } from "@/app/utils/time";
 
 import { SlashingContent } from "./SlashingContent";
 

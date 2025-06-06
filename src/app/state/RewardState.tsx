@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
-import { createStateUtils } from "@/utils/createStateUtils";
+import { createStateUtils } from "@/app/utils/createStateUtils";
 
 interface RewardsStateProps {
   loading: boolean;

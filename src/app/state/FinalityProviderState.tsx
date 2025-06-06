@@ -10,7 +10,7 @@ import {
   FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
-import { createStateUtils } from "@/utils/createStateUtils";
+import { createStateUtils } from "@/app/utils/createStateUtils";
 
 interface SortState {
   field?: string;

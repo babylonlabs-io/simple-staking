@@ -20,8 +20,8 @@ import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useLogger } from "@/app/hooks/useLogger";
 import { useSentryUser } from "@/app/hooks/useSentryUser";
-import { createBbnAminoTypes } from "@/utils/wallet/amino";
-import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
+import { createBbnAminoTypes } from "@/app/utils/wallet/amino";
+import { createBbnRegistry } from "@/app/utils/wallet/bbnRegistry";
 
 const { chainId, rpc } = getNetworkConfigBBN();
 

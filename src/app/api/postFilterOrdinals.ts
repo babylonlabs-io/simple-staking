@@ -1,6 +1,6 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 
-import { chunkArray } from "@/utils/chunkArray";
+import { chunkArray } from "@/app/utils/chunkArray";
 
 import { apiWrapper } from "./apiWrapper";
 

@@ -4,7 +4,7 @@ import { MdErrorOutline } from "react-icons/md";
 
 import { InfoModal } from "@/app/components/Modals/InfoModal";
 import { useStakingState } from "@/app/state/StakingState";
-import { blocksToDisplayTime } from "@/utils/time";
+import { blocksToDisplayTime } from "@/app/utils/time";
 
 export function InfoAlert() {
   const [showMore, setShowMore] = useState(false);

@@ -2,7 +2,7 @@ import { Text } from "@babylonlabs-io/core-ui";
 
 import { Hash } from "@/app/components/Hash/Hash";
 import { BABYLON_EXPLORER } from "@/app/constants";
-import { trim } from "@/utils/trim";
+import { trim } from "@/app/utils/trim";
 
 export const SuccessContent = ({
   transactionHash,

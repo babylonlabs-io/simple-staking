@@ -1,6 +1,6 @@
 import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
-import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
+import { calculateTokenValueInCurrency } from "@/app/utils/formatCurrency";
 
 import { FeeItem } from "./FeeItem";
 interface FeeStatsProps {

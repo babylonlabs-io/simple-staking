@@ -8,8 +8,8 @@ import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
-import { ubbnToBaby } from "@/utils/bbn";
-import { satoshiToBtc } from "@/utils/btc";
+import { ubbnToBaby } from "@/app/utils/bbn";
+import { satoshiToBtc } from "@/app/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";

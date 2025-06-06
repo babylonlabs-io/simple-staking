@@ -12,7 +12,7 @@ jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
   initBTCCurve: jest.fn(),
 }));
 
-jest.mock("@/utils/FeatureFlagService", () => ({
+jest.mock("@/app/utils/FeatureFlagService", () => ({
   __esModule: true,
   default: {
     get IsMultiStakingEnabled() {
@@ -51,7 +51,8 @@ describe("Home page feature flag – MULTISTAKING", () => {
   });
 
   it("renders MultistakingForm when FF_MULTISTAKING is enabled", () => {
-    const FeatureFlagService = require("@/utils/FeatureFlagService").default;
+    const FeatureFlagService =
+      require("@/app/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = true;
 
     const queryClient = new QueryClient({
@@ -73,7 +74,8 @@ describe("Home page feature flag – MULTISTAKING", () => {
   });
 
   it("renders StakingForm when FF_MULTISTAKING is disabled", () => {
-    const FeatureFlagService = require("@/utils/FeatureFlagService").default;
+    const FeatureFlagService =
+      require("@/app/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = false;
 
     const queryClient = new QueryClient({

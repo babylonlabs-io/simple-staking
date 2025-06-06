@@ -10,11 +10,11 @@ import {
   type Delegation as DelegationInterface,
 } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
-import { satoshiToBtc } from "@/utils/btc";
-import { getState, getStateTooltip } from "@/utils/getState";
-import { maxDecimals } from "@/utils/maxDecimals";
-import { durationTillNow } from "@/utils/time";
-import { trim } from "@/utils/trim";
+import { satoshiToBtc } from "@/app/utils/btc";
+import { getState, getStateTooltip } from "@/app/utils/getState";
+import { maxDecimals } from "@/app/utils/maxDecimals";
+import { durationTillNow } from "@/app/utils/time";
+import { trim } from "@/app/utils/trim";
 
 import { DelegationCell } from "./components/DelegationCell";
 

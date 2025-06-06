@@ -15,10 +15,10 @@ import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { satoshiToBtc } from "@/utils/btc";
-import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
-import { maxDecimals } from "@/utils/maxDecimals";
-import { blocksToDisplayTime } from "@/utils/time";
+import { satoshiToBtc } from "@/app/utils/btc";
+import { calculateTokenValueInCurrency } from "@/app/utils/formatCurrency";
+import { maxDecimals } from "@/app/utils/maxDecimals";
+import { blocksToDisplayTime } from "@/app/utils/time";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 

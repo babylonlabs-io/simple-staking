@@ -8,7 +8,7 @@ import {
 
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { blocksToDisplayTime } from "@/utils/time";
+import { blocksToDisplayTime } from "@/app/utils/time";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 

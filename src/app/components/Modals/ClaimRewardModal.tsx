@@ -3,8 +3,8 @@ import { PropsWithChildren } from "react";
 
 import { shouldDisplayTestingMsg } from "@/app/config";
 import { getNetworkConfigBBN } from "@/app/config/network/bbn";
-import { ubbnToBaby } from "@/utils/bbn";
-import { trim } from "@/utils/trim";
+import { ubbnToBaby } from "@/app/utils/bbn";
+import { trim } from "@/app/utils/trim";
 
 import { LoadingSmall } from "../Loading/Loading";
 

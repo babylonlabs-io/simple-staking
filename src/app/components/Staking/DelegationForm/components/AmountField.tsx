@@ -1,7 +1,7 @@
 import { NumberField, Text } from "@babylonlabs-io/core-ui";
 
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
-import { satoshiToBtc } from "@/utils/btc";
+import { satoshiToBtc } from "@/app/utils/btc";
 
 interface AmountFieldProps {
   min?: number;

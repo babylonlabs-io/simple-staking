@@ -6,7 +6,10 @@ import {
   DelegationV2,
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
-import { validateDelegation, validateStakingInput } from "@/utils/delegations";
+import {
+  validateDelegation,
+  validateStakingInput,
+} from "@/app/utils/delegations";
 
 // Mock Transaction.fromHex
 jest.mock("bitcoinjs-lib", () => {

@@ -5,7 +5,7 @@ import ECPairFactory from "ecpair";
 
 import { ClientError } from "@/app/errors";
 import { ERROR_CODES } from "@/app/errors/codes";
-import { getPublicKeyNoCoord } from "@/utils/wallet";
+import { getPublicKeyNoCoord } from "@/app/utils/wallet";
 
 // Initialize the ECC library
 initBTCCurve();

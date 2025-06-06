@@ -1,5 +1,5 @@
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
-import { trim } from "@/utils/trim";
+import { trim } from "@/app/utils/trim";
 
 const { mempoolApiUrl } = getNetworkConfigBTC();
 

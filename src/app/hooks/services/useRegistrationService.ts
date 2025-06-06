@@ -13,7 +13,7 @@ import {
 } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
-import { retry } from "@/utils";
+import { retry } from "@/app/utils";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 

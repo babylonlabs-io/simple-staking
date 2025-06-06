@@ -11,9 +11,9 @@ import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
-import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
+import { btcToSatoshi, satoshiToBtc } from "@/app/utils/btc";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
 
 import { STAKING_DISABLED } from "../constants";
 import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";

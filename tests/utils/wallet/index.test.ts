@@ -6,7 +6,7 @@ import {
   isSupportedAddressType,
   isTaproot,
   toNetwork,
-} from "@/utils/wallet";
+} from "@/app/utils/wallet";
 
 import { testingNetworks } from "../../helper";
 

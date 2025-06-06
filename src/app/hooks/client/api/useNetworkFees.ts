@@ -1,5 +1,5 @@
 import { useClientQuery } from "@/app/hooks/client/useClient";
-import { getNetworkFees } from "@/utils/mempool_api";
+import { getNetworkFees } from "@/app/utils/mempool_api";
 
 export const NETWORK_FEES_KEY = "NETWORK_FEES";
 

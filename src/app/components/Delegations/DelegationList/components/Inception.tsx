@@ -1,4 +1,4 @@
-import { durationTillNow } from "@/utils/time";
+import { durationTillNow } from "@/app/utils/time";
 
 interface Inception {
   value: string;

@@ -12,7 +12,7 @@ import {
   useTransactionService,
 } from "@/app/hooks/services/useTransactionService";
 import { useAppState } from "@/app/state";
-import * as mempoolAPI from "@/utils/mempool_api";
+import * as mempoolAPI from "@/app/utils/mempool_api";
 
 import { testingNetworks } from "../../../helper";
 
@@ -55,7 +55,7 @@ jest.mock("@/app/state", () => ({
   useAppState: jest.fn(),
 }));
 
-jest.mock("@/utils/mempool_api", () => ({
+jest.mock("@/app/utils/mempool_api", () => ({
   getTxMerkleProof: jest.fn(),
   getTxInfo: jest.fn(),
 }));

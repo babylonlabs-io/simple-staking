@@ -1,5 +1,5 @@
 import { ClientError, ERROR_CODES } from "@/app/errors";
-import { getUTXOs } from "@/utils/mempool_api";
+import { getUTXOs } from "@/app/utils/mempool_api";
 
 // Mocking fetch globally
 global.fetch = jest.fn() as jest.Mock;

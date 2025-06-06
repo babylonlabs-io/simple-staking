@@ -20,8 +20,8 @@ import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
-import { retry } from "@/utils";
-import { btcToSatoshi } from "@/utils/btc";
+import { retry } from "@/app/utils";
+import { btcToSatoshi } from "@/app/utils/btc";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 

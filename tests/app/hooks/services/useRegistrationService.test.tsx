@@ -28,7 +28,7 @@ import {
   DelegationV2,
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
-import { retry } from "@/utils";
+import { retry } from "@/app/utils";
 
 // Mock all dependencies
 jest.mock("@/app/api/getDelegationsV2");
@@ -39,7 +39,7 @@ jest.mock("@/app/hooks/client/rpc/mutation/useBbnTransaction");
 jest.mock("@/app/hooks/services/useTransactionService");
 jest.mock("@/app/state/DelegationState");
 jest.mock("@/app/state/DelegationV2State");
-jest.mock("@/utils", () => ({
+jest.mock("@/app/utils", () => ({
   retry: jest.fn(),
 }));
 

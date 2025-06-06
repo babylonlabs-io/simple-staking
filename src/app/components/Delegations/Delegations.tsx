@@ -24,8 +24,8 @@ import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { getIntermediateDelegationsLocalStorageKey } from "@/app/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { toLocalStorageIntermediateDelegation } from "@/app/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";

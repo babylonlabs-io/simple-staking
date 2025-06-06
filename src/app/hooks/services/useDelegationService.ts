@@ -15,8 +15,8 @@ import {
 } from "@/app/types/delegationsV2";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
-import { validateDelegation } from "@/utils/delegations";
-import { getBbnParamByVersion } from "@/utils/params";
+import { validateDelegation } from "@/app/utils/delegations";
+import { getBbnParamByVersion } from "@/app/utils/params";
 
 import { useTransactionService } from "./useTransactionService";
 
