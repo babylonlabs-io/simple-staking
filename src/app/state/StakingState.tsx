@@ -17,10 +17,8 @@ import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
 
 import { STAKING_DISABLED } from "../constants";
 import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
-import type { FinalityProvider } from "../types/finalityProviders";
 
 import { useBalanceState } from "./BalanceState";
-import { useFinalityProviderState } from "./FinalityProviderState";
 
 export enum StakingModalPage {
   CHAIN_SELECTION = 0,
@@ -87,16 +85,6 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  isModalOpen: boolean;
-  setIsModalOpen: (value: boolean) => void;
-  stakingModalPage: StakingModalPage;
-  setStakingModalPage: (page: StakingModalPage) => void;
-  selectedProviders: (FinalityProvider & { chainType: string })[];
-  handleSelectProvider: (selectedProviderKey: string) => void;
-  removeProvider: (providerId: string) => void;
-  selectedChain: string;
-  setSelectedChain: (chain: string) => void;
-  MAX_FINALITY_PROVIDERS: number;
   currentStakingStepOptions: SignPsbtOptions | undefined;
   setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
 }
@@ -135,16 +123,6 @@ const { StateProvider, useState: useStakingState } =
     setFormData: () => {},
     setProcessing: () => {},
     reset: () => {},
-    isModalOpen: false,
-    setIsModalOpen: () => {},
-    stakingModalPage: StakingModalPage.FINALITY_PROVIDER,
-    setStakingModalPage: () => {},
-    selectedProviders: [],
-    handleSelectProvider: () => {},
-    removeProvider: () => {},
-    selectedChain: "babylon",
-    setSelectedChain: () => {},
-    MAX_FINALITY_PROVIDERS: 1,
     currentStakingStepOptions: undefined,
     setCurrentStakingStepOptions: () => {},
   });
@@ -157,9 +135,6 @@ export function StakingState({ children }: PropsWithChildren) {
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
   const [verifiedDelegation, setVerifiedDelegation] = useState<DelegationV2>();
-  const [selectedProvidersV2, setSelectedProvidersV2] = useState<
-    (FinalityProvider & { chainType: string })[]
-  >([]);
   const [successModalShown, setSuccessModalShown] = useLocalStorage<boolean>(
     "bbn-staking-successFeedbackModalOpened",
     false,
@@ -367,48 +342,13 @@ export function StakingState({ children }: PropsWithChildren) {
     setCurrentStep(undefined);
     setCurrentStakingStepOptions(undefined);
     setProcessing(false);
-    setSelectedProvidersV2([]);
   }, [
     setVerifiedDelegation,
     setFormData,
     setCurrentStep,
     setProcessing,
     setCurrentStakingStepOptions,
-    setSelectedProvidersV2,
   ]);
-
-  /* ---------------- StakingV2 UI state ---------------- */
-  const [isModalOpenV2, setIsModalOpenV2] = useState(false);
-  const [stakingModalPageV2, setStakingModalPageV2] =
-    useState<StakingModalPage>(StakingModalPage.FINALITY_PROVIDER);
-
-  const [selectedChainV2, setSelectedChainV2] = useState("babylon");
-
-  const MAX_FINALITY_PROVIDERS = 1;
-
-  const { finalityProviders } = useFinalityProviderState();
-
-  const handleSelectProvider = useCallback(
-    (selectedProviderKey: string) => {
-      if (selectedProviderKey) {
-        const providerData = finalityProviders?.find(
-          (p) => p.btcPk === selectedProviderKey,
-        );
-        if (providerData) {
-          setSelectedProvidersV2((prev) => [
-            ...prev,
-            { ...providerData, chainType: selectedChainV2 },
-          ]);
-        }
-      }
-      setIsModalOpenV2(false);
-    },
-    [finalityProviders, selectedChainV2],
-  );
-
-  const removeProvider = useCallback((providerId: string) => {
-    setSelectedProvidersV2((prev) => prev.filter((p) => p.id !== providerId));
-  }, []);
 
   const context = useMemo(
     () => ({
@@ -429,18 +369,6 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-
-      // StakingV2 UI state
-      isModalOpen: isModalOpenV2,
-      setIsModalOpen: setIsModalOpenV2,
-      stakingModalPage: stakingModalPageV2,
-      setStakingModalPage: setStakingModalPageV2,
-      selectedProviders: selectedProvidersV2,
-      handleSelectProvider,
-      removeProvider,
-      selectedChain: selectedChainV2,
-      setSelectedChain: setSelectedChainV2,
-      MAX_FINALITY_PROVIDERS,
       currentStakingStepOptions,
       setCurrentStakingStepOptions,
     }),
@@ -460,16 +388,6 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      isModalOpenV2,
-      setIsModalOpenV2,
-      stakingModalPageV2,
-      setStakingModalPageV2,
-      selectedProvidersV2,
-      handleSelectProvider,
-      removeProvider,
-      selectedChainV2,
-      setSelectedChainV2,
-      MAX_FINALITY_PROVIDERS,
       currentStakingStepOptions,
       setCurrentStakingStepOptions,
     ],
