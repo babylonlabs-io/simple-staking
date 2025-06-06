@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import {
   DelegationV2,
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
 import { NetworkInfo } from "@/app/types/networkInfo";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { getSlashingAmount } from "@/utils/delegations/slashing";
 import { maxDecimals } from "@/utils/maxDecimals";

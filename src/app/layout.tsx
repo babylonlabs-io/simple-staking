@@ -1,7 +1,7 @@
 import { twJoin } from "tailwind-merge";
 
+import { network } from "@/app/config/network/btc";
 import { Network } from "@/app/types/network";
-import { network } from "@/config/network/btc";
 
 import "./globals.css";
 import Providers from "./providers";

@@ -1,7 +1,7 @@
 import { useWatch } from "@babylonlabs-io/core-ui";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 

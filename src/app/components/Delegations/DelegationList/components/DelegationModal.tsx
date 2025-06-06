@@ -6,12 +6,12 @@ import { StakeModal } from "@/app/components/Modals/StakeModal";
 import { SubmitModal } from "@/app/components/Modals/SubmitModal";
 import { UnbondModal } from "@/app/components/Modals/UnbondModal";
 import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
+import { NetworkConfig } from "@/app/config/network";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
 import { DelegationWithFP } from "@/app/types/delegationsV2";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
-import { NetworkConfig } from "@/config/network";
 
 interface ConfirmationModalProps {
   processing: boolean;

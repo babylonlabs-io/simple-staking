@@ -1,9 +1,9 @@
 import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { Tooltip } from "react-tooltip";
 
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 const { coinSymbol } = getNetworkConfigBBN();
 

@@ -10,11 +10,11 @@ import {
 } from "@babylonlabs-io/core-ui";
 import { Fragment } from "react";
 
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 import { maxDecimals } from "@/utils/maxDecimals";

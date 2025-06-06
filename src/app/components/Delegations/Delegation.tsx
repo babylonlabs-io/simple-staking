@@ -2,6 +2,7 @@ import { FaBitcoin } from "react-icons/fa";
 
 import { Hint } from "@/app/components/Common/Hint";
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
@@ -9,7 +10,6 @@ import {
   type Delegation as DelegationInterface,
 } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { getState, getStateTooltip } from "@/utils/getState";
 import { maxDecimals } from "@/utils/maxDecimals";

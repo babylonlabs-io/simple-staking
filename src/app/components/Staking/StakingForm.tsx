@@ -3,9 +3,9 @@ import { Card, Form } from "@babylonlabs-io/core-ui";
 import { Section } from "@/app/components/Section/Section";
 import { DelegationForm } from "@/app/components/Staking/DelegationForm";
 import { StakingModal } from "@/app/components/Staking/StakingModal";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useStakingService } from "@/app/hooks/services/useStakingService";
 import { useStakingState } from "@/app/state/StakingState";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { FinalityProviders } from "./FinalityProviders/FinalityProviders";
 

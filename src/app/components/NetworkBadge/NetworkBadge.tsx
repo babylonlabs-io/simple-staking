@@ -1,7 +1,7 @@
 import { twJoin } from "tailwind-merge";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { Network } from "@/app/types/network";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import testnetIcon from "./testnet-icon.png";
 

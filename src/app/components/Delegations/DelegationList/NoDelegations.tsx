@@ -1,7 +1,7 @@
 import { Heading } from "@babylonlabs-io/core-ui";
 import { IoEye } from "react-icons/io5";
 
-import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 

@@ -17,9 +17,9 @@ import {
   type PropsWithChildren,
 } from "react";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { Fees } from "@/app/types/fee";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { useSentryUser } from "@/hooks/useSentryUser";

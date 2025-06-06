@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 
-import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { ClientError, ERROR_CODES } from "@/errors";
 
 interface BbnRpcContextType {

@@ -15,8 +15,8 @@ import {
   type PropsWithChildren,
 } from "react";
 
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { useSentryUser } from "@/hooks/useSentryUser";

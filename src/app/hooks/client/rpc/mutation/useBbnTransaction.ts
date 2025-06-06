@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 
-import { BBN_GAS_PRICE } from "@/config";
+import { BBN_GAS_PRICE } from "@/app/config";
 import { useLogger } from "@/hooks/useLogger";
 
 import { useSigningStargateClient } from "./useSigningStargateClient";

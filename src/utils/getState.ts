@@ -1,5 +1,5 @@
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { DelegationState } from "@/app/types/delegations";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
 

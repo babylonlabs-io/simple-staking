@@ -1,6 +1,6 @@
 import { NumberField, Text } from "@babylonlabs-io/core-ui";
 
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 
 interface AmountFieldProps {

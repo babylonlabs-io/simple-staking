@@ -1,7 +1,7 @@
 import { Text } from "@babylonlabs-io/core-ui";
 
+import { NetworkConfig } from "@/app/config/network";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
-import { NetworkConfig } from "@/config/network";
 
 import { ConfirmationModal } from "./ConfirmationModal";
 

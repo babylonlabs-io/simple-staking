@@ -8,8 +8,8 @@ import {
 import { useCallback } from "react";
 import { MdCancel } from "react-icons/md";
 
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 

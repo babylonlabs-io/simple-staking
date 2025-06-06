@@ -1,6 +1,6 @@
 import { FaBitcoin } from "react-icons/fa";
 
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 

@@ -1,6 +1,7 @@
 import { useMemo, type JSX } from "react";
 
 import { Hint } from "@/app/components/Common/Hint";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useAppState } from "@/app/state";
 import {
@@ -9,7 +10,6 @@ import {
 } from "@/app/types/delegationsV2";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
 import { NetworkInfo } from "@/app/types/networkInfo";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { blocksToDisplayTime } from "@/utils/time";
 
 import { SlashingContent } from "./SlashingContent";

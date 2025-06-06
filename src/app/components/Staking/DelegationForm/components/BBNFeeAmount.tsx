@@ -1,5 +1,5 @@
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
 import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
 
 import { FeeItem } from "./FeeItem";

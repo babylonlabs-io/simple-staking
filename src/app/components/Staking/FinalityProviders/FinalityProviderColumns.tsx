@@ -1,12 +1,12 @@
 import { Text } from "@babylonlabs-io/core-ui";
 
 import { Hash } from "@/app/components/Hash/Hash";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import {
   FinalityProvider,
   FinalityProviderState,
   FinalityProviderStateLabels,
 } from "@/app/types/finalityProviders";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 import { satoshiToBtc } from "@/utils/btc";
 import { maxDecimals } from "@/utils/maxDecimals";
 
