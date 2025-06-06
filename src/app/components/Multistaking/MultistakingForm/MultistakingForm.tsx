@@ -13,6 +13,7 @@ import { Section } from "@/app/components/Section/Section";
 import { StakingModal } from "@/app/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useMultistakingState } from "@/app/state/MultistakingState";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import {
   StakingModalPage,
   StakingStep,
@@ -22,14 +23,21 @@ import {
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
+import { FormAlert } from "./FormAlert";
 import { PreviewButton } from "./PreviewButton";
 
 const { networkName } = getNetworkConfigBTC();
 
 export function MultistakingForm() {
-  const { validationSchema, stakingInfo, setFormData, goToStep } =
-    useStakingState();
-
+  const { address } = useBTCWallet();
+  const {
+    validationSchema,
+    stakingInfo,
+    setFormData,
+    goToStep,
+    blocked: isGeoBlocked,
+    errorMessage: geoBlockMessage,
+  } = useStakingState();
   const {
     isModalOpen,
     setIsModalOpen,
@@ -136,6 +144,11 @@ export function MultistakingForm() {
             </SubSection>
             <FeesSection />
             <PreviewButton />
+            <FormAlert
+              address={address}
+              isGeoBlocked={isGeoBlocked}
+              geoBlockMessage={geoBlockMessage}
+            />
           </Card>
         </div>
 
