@@ -17,7 +17,7 @@ import {
   ONE_SECOND,
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useLogger } from "@/hooks/useLogger";
 
 export function useClientQuery<

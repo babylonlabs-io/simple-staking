@@ -1,8 +1,8 @@
 import type { BTCConfig } from "@babylonlabs-io/wallet-connector";
 
 import { MEMPOOL_API } from "@/app/constants";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { Network } from "@/app/types/network";
-import { ClientError, ERROR_CODES } from "@/errors";
 
 const defaultNetwork = "devnet";
 export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;

@@ -1,4 +1,4 @@
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { getUTXOs } from "@/utils/mempool_api";
 
 // Mocking fetch globally

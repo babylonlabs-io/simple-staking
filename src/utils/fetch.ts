@@ -1,4 +1,4 @@
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 type FetchOptions = {
   method?: Request["method"];

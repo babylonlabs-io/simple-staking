@@ -1,4 +1,4 @@
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 // Helper function to split the array into chunks of specified size
 export const chunkArray = (array: any[], size: number) => {

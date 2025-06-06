@@ -3,7 +3,7 @@ import { TxRaw } from "cosmjs-types/cosmos/tx/v1beta1/tx";
 import { useCallback } from "react";
 
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useLogger } from "@/hooks/useLogger";
 
 /**

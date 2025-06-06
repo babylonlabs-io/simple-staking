@@ -17,7 +17,7 @@ import {
 
 import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { useSentryUser } from "@/hooks/useSentryUser";
 import { createBbnAminoTypes } from "@/utils/wallet/amino";

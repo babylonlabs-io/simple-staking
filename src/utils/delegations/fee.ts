@@ -1,6 +1,6 @@
 import { Transaction } from "bitcoinjs-lib";
 
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 const FEE_TOLERANCE_COEFFICIENT = 2;
 

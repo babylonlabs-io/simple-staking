@@ -1,5 +1,5 @@
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { Delegation } from "@/app/types/delegations";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { filterDelegationsLocalStorage } from "@/utils/local_storage/filterDelegationsLocalStorage";
 import { getTxInfo } from "@/utils/mempool_api";
 

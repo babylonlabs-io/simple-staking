@@ -9,7 +9,7 @@ import {
 } from "react";
 
 import { getNetworkConfigBBN } from "@/app/config/network/bbn";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 interface BbnRpcContextType {
   queryClient: QueryClient | undefined;

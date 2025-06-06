@@ -17,6 +17,7 @@ import { act, renderHook } from "@testing-library/react";
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError } from "@/app/errors";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
@@ -27,7 +28,6 @@ import {
   DelegationV2,
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
-import { ClientError } from "@/errors";
 import { retry } from "@/utils";
 
 // Mock all dependencies

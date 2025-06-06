@@ -8,8 +8,8 @@ import { useCallback, useMemo } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useAppState } from "@/app/state";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { validateStakingInput } from "@/utils/delegations";
 import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";

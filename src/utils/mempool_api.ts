@@ -2,8 +2,8 @@ import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { Fees } from "@/app/types/fee";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { fetchApi } from "@/utils/fetch";
 
 const { mempoolApiUrl } = getNetworkConfigBTC();

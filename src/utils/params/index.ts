@@ -1,5 +1,5 @@
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
-import { ClientError, ERROR_CODES } from "@/errors";
 
 /*
   Get the BBN param by BTC height

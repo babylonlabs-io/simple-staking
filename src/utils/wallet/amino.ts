@@ -1,7 +1,7 @@
 import { btcstakingtx, incentivetx } from "@babylonlabs-io/babylon-proto-ts";
 import { AminoTypes } from "@cosmjs/stargate";
 
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 import { BBN_REGISTRY_TYPE_URLS } from "./bbnRegistry";
 

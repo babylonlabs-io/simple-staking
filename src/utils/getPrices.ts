@@ -1,6 +1,6 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
 interface PricesResponse {
   data: Record<string, number>;
 }

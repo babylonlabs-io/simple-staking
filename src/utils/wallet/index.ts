@@ -1,8 +1,8 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { networks } from "bitcoinjs-lib";
 
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { Network } from "@/app/types/network";
-import { ClientError, ERROR_CODES } from "@/errors";
 
 const nativeSegwitAddressLength = 42;
 const taprootAddressLength = 62;

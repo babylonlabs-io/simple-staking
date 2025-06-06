@@ -1,5 +1,5 @@
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
 
 import { apiWrapper } from "./apiWrapper";
 

@@ -1,12 +1,12 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { BtcStakingInputs } from "@/app/hooks/services/useTransactionService";
 import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
-import { ClientError, ERROR_CODES } from "@/errors";
 
 /**
  * Clears the signatures from a transaction.

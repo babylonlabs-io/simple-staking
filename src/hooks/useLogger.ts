@@ -1,7 +1,7 @@
 import { SeverityLevel, addBreadcrumb, captureException } from "@sentry/react";
 import { useMemo } from "react";
 
-import { ClientError } from "@/errors";
+import { ClientError } from "@/app/errors";
 
 type Context = Record<string, number | string | boolean> & {
   category?: string;

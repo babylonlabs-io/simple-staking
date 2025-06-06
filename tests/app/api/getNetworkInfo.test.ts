@@ -1,6 +1,6 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
 import { getNetworkInfo } from "@/app/api/getNetworkInfo";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 import { mockSuccessResponse } from "./getNetworkInfo.mocks";
 

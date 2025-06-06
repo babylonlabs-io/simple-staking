@@ -19,8 +19,8 @@ import {
 
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { Fees } from "@/app/types/fee";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { useSentryUser } from "@/hooks/useSentryUser";
 import {

@@ -12,6 +12,7 @@ import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
@@ -22,7 +23,6 @@ import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ClientError, ERROR_CODES } from "@/errors";
 import { useLogger } from "@/hooks/useLogger";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";

@@ -11,9 +11,9 @@ import {
 import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
 
 import { useClientQuery } from "../../useClient";
 import { useRpcErrorHandler } from "../useRpcErrorHandler";

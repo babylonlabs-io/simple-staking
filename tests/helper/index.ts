@@ -3,8 +3,8 @@ import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
 import { getPublicKeyNoCoord } from "@/utils/wallet";
 
 // Initialize the ECC library
