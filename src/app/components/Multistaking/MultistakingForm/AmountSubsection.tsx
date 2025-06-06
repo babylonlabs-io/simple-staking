@@ -35,7 +35,7 @@ export const AmountSubsection = () => {
           min="0"
           step="any"
           onChange={handleInputChange}
-          placeholder="0"
+          placeholder="Enter Amount"
           autoFocus
           className="text-lg bg-transparent text-right w-2/3 outline-none"
         />
