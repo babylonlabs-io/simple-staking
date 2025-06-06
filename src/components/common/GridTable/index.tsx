@@ -11,7 +11,7 @@ import { GridHead } from "./components/THead";
 import type { TableColumn, TableProps } from "./types";
 import { createColumnTemplate } from "./utils";
 
-export function GridTable<R extends object, P extends object = {}>({
+export function GridTable<R extends object, P extends object = object>({
   loading = false,
   isFetchingNextPage = false,
   infiniteScroll = false,

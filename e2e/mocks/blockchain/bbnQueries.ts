@@ -1,4 +1,6 @@
+import { incentivequery } from "@babylonlabs-io/babylon-proto-ts";
 import { Page } from "@playwright/test";
+import { QueryBalanceResponse } from "cosmjs-types/cosmos/bank/v1beta1/query.js";
 
 import mockData from "./constants";
 
@@ -6,11 +8,6 @@ export const injectBBNQueries = async (
   page: Page,
   rewardAmount: string = mockData.bbnQueries.rewardAmount,
 ) => {
-  const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
-  const {
-    QueryBalanceResponse,
-  } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-
   const rewardGaugeProto = incentivequery.QueryRewardGaugesResponse.fromPartial(
     {
       rewardGauges: {
@@ -124,14 +121,6 @@ export const injectBBNQueries = async (
         return false;
       },
       "cosmos.bank.v1beta1.Query/Balance": async () => {
-        try {
-          const {
-            QueryBalanceResponse,
-          } = require("cosmjs-types/cosmos/bank/v1beta1/query");
-        } catch (e) {
-          console.error("Error loading QueryBalanceResponse:", e);
-        }
-
         await route.fulfill({
           status: 200,
           contentType: "application/json",

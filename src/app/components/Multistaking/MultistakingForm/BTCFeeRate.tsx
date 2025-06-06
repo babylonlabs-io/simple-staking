@@ -93,7 +93,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
       <span>{feeRate} Sats/vB</span>
 
       <Button
-        //@ts-ignore - fix type issue in core-ui
+        //@ts-expect-error - fix type issue in core-ui
         type="button"
         size="small"
         variant="outlined"

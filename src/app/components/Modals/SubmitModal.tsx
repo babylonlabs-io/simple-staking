@@ -23,11 +23,6 @@ interface SubmitModalProps {
   onSubmit?: () => void;
 }
 
-const DEFAULT_BUTTONS = {
-  cancel: "Cancel",
-  submit: "Submit",
-};
-
 export const SubmitModal = ({
   className,
   processing = false,

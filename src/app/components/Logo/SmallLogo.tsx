@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { twMerge } from "tailwind-merge";
 
 interface LogoProps {
@@ -6,7 +5,7 @@ interface LogoProps {
 }
 
 export const SmallLogo: React.FC<LogoProps> = ({ className }) => (
-  <Link href="/">
+  <a href="/">
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 40 40"
@@ -21,5 +20,5 @@ export const SmallLogo: React.FC<LogoProps> = ({ className }) => (
         fill="#F5F7F2"
       />
     </svg>
-  </Link>
+  </a>
 );

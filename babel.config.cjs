@@ -1,12 +1,10 @@
-module.exports = function (api) {
-  const isTest = api.env("test") || process.env.JEST_ENV === "true";
-  if (!isTest) return {}; // Don't need to do anything for non-test environments
-  const presets = [
+module.exports = {
+  presets: [
     ["@babel/preset-env", { targets: { node: "current" } }],
     ["@babel/preset-react", { runtime: "automatic" }],
     "@babel/preset-typescript",
-  ];
-  const plugins = [
+  ],
+  plugins: [
     [
       "module-resolver",
       {
@@ -16,10 +14,5 @@ module.exports = function (api) {
         },
       },
     ],
-  ];
-
-  return {
-    presets,
-    plugins,
-  };
+  ],
 };

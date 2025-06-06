@@ -209,9 +209,7 @@ describe("useDelegationStorage", () => {
         return [{}, jest.fn()];
       });
 
-      const { result } = renderHook(() =>
-        useDelegationStorage(mockKey, mockDelegations),
-      );
+      renderHook(() => useDelegationStorage(mockKey, mockDelegations));
 
       await waitFor(() => {
         expect(mockSetPendingDelegations).toHaveBeenCalledWith({});
@@ -251,9 +249,7 @@ describe("useDelegationStorage", () => {
         return [{}, jest.fn()];
       });
 
-      const { result } = renderHook(() =>
-        useDelegationStorage(mockKey, mockDelegations),
-      );
+      renderHook(() => useDelegationStorage(mockKey, mockDelegations));
 
       await waitFor(() => {
         expect(mockSetDelegationStatuses).toHaveBeenCalledWith({});

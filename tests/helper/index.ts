@@ -56,7 +56,7 @@ export class DataGenerator {
         "Failed to generate random key pair",
       );
     }
-    let pk = publicKey.toString("hex");
+    const pk = publicKey.toString("hex");
     return {
       keyPair,
       publicKey: pk,

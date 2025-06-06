@@ -1,5 +1,3 @@
-"use client"; // Error components must be Client Components
-
 import FourOFourErrorCharacter from "@/app/assets/404-error-character.svg";
 
 import GenericError from "./components/Error/GenericError";
