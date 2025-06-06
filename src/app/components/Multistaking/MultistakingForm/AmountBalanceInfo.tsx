@@ -20,10 +20,18 @@ export const AmountBalanceInfo = () => {
   const btcAmountUsd = calculateTokenValueInCurrency(btcAmountValue, btcInUsd, {
     zeroDisplay: "$0.00",
   });
-  const formattedBalance = satoshiToBtc(totalBtcBalance);
+
+  const balanceBtc = satoshiToBtc(totalBtcBalance);
+
+  const feeAmountSat = parseFloat(
+    useWatch({ name: "feeAmount", defaultValue: "0" }) || "0",
+  );
+  const feeAmountBtc = satoshiToBtc(feeAmountSat);
+
+  const availableBalanceBtc = Math.max(balanceBtc - feeAmountBtc, 0);
 
   const handleSetMaxBalance = () => {
-    setValue("amount", formattedBalance.toString(), {
+    setValue("amount", availableBalanceBtc.toString(), {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true,
@@ -35,7 +43,7 @@ export const AmountBalanceInfo = () => {
       <div>
         Balance:{" "}
         <u className="cursor-pointer" onClick={handleSetMaxBalance}>
-          {maxDecimals(formattedBalance, 8)}
+          {maxDecimals(availableBalanceBtc, 8)}
         </u>{" "}
         {coinSymbol}
       </div>
