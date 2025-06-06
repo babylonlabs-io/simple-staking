@@ -16,6 +16,7 @@ import {
   useStakingState,
   type FormFields,
 } from "@/app/state/StakingState";
+import { useStakingStateV2 } from "@/app/state/StakingStateV2";
 import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
@@ -26,11 +27,10 @@ import { PreviewButton } from "./PreviewButton";
 const { networkName } = getNetworkConfigBTC();
 
 export function MultistakingForm() {
+  const { validationSchema, stakingInfo, setFormData, goToStep } =
+    useStakingState();
+
   const {
-    validationSchema,
-    stakingInfo,
-    setFormData,
-    goToStep,
     isModalOpen,
     setIsModalOpen,
     stakingModalPage,
@@ -41,7 +41,7 @@ export function MultistakingForm() {
     handleSelectProvider,
     removeProvider,
     MAX_FINALITY_PROVIDERS,
-  } = useStakingState();
+  } = useStakingStateV2();
 
   const counter = selectedProviders.length;
 
