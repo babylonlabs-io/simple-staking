@@ -12,13 +12,13 @@ import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSe
 import { Section } from "@/app/components/Section/Section";
 import { StakingModal } from "@/app/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
+import { useMultistakingState } from "@/app/state/MultistakingState";
 import {
   StakingModalPage,
   StakingStep,
   useStakingState,
   type FormFields,
 } from "@/app/state/StakingState";
-import { useStakingStateV2 } from "@/app/state/StakingStateV2";
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
@@ -40,7 +40,7 @@ export function MultistakingForm() {
     handleSelectProvider,
     removeProvider,
     MAX_FINALITY_PROVIDERS,
-  } = useStakingStateV2();
+  } = useMultistakingState();
 
   const counter = selectedProviders.length;
 

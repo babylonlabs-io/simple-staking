@@ -8,7 +8,7 @@ import type { FinalityProvider } from "../types/finalityProviders";
 import { useFinalityProviderState } from "./FinalityProviderState";
 import { StakingModalPage } from "./StakingState";
 
-export interface StakingStateV2 {
+export interface MultistakingState {
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   stakingModalPage: StakingModalPage;
@@ -23,8 +23,8 @@ export interface StakingStateV2 {
   setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
 }
 
-const { StateProvider, useState: useStakingStateV2 } =
-  createStateUtils<StakingStateV2>({
+const { StateProvider, useState: useMultistakingState } =
+  createStateUtils<MultistakingState>({
     isModalOpen: false,
     setIsModalOpen: () => {},
     stakingModalPage: StakingModalPage.FINALITY_PROVIDER,
@@ -39,7 +39,7 @@ const { StateProvider, useState: useStakingStateV2 } =
     setCurrentStakingStepOptions: () => {},
   });
 
-export function StakingStateV2({ children }: PropsWithChildren) {
+export function MultistakingState({ children }: PropsWithChildren) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.FINALITY_PROVIDER,
@@ -111,4 +111,4 @@ export function StakingStateV2({ children }: PropsWithChildren) {
   return <StateProvider value={context}>{children}</StateProvider>;
 }
 
-export { useStakingStateV2 };
+export { useMultistakingState };
