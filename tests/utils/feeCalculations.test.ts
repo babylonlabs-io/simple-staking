@@ -7,8 +7,8 @@
  */
 
 import { Fees } from "@/app/types/fee";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
+import { nextPowerOfTwo } from "@/app/utils/nextPowerOfTwo";
 
 // Constants from the actual codebase
 const DUST_LIMIT = 546; // satoshis

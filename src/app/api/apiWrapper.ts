@@ -1,8 +1,8 @@
 import qs from "qs";
 
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
-import { getApiBaseUrl } from "../../config";
+import { getApiBaseUrl } from "../config";
 
 type QueryParamValue =
   | string

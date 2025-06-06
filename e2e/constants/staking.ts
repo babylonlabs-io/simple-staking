@@ -1,4 +1,4 @@
-import { satoshiToBtc } from "@/utils/btc";
+import { satoshiToBtc } from "@/app/utils/btc";
 
 export const STAKING_AMOUNT_SAT = 50000;
 export const STAKING_AMOUNT_BTC = satoshiToBtc(STAKING_AMOUNT_SAT);

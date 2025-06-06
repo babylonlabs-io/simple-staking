@@ -1,8 +1,8 @@
 import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { twJoin } from "tailwind-merge";
 
+import { AuthGuard } from "@/app/components/Common/AuthGuard";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { AuthGuard } from "@/components/common/AuthGuard";
 
 function beautifyErrorMessages(error: string) {
   switch (error.toLowerCase()) {

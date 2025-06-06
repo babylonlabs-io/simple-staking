@@ -1,7 +1,7 @@
 import { useFormContext } from "@babylonlabs-io/core-ui";
 
 import { FinalityProvider } from "@/app/types/finalityProviders";
-import { trim } from "@/utils/trim";
+import { trim } from "@/app/utils/trim";
 
 export const FinalityProviderItem = ({
   provider,

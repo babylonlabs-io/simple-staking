@@ -3,10 +3,10 @@ import { useCallback } from "react";
 
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useRewardsState } from "@/app/state/RewardState";
-import { useLogger } from "@/hooks/useLogger";
-import { retry } from "@/utils";
-import { BBN_REGISTRY_TYPE_URLS } from "@/utils/wallet/bbnRegistry";
+import { retry } from "@/app/utils";
+import { BBN_REGISTRY_TYPE_URLS } from "@/app/utils/wallet/bbnRegistry";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";

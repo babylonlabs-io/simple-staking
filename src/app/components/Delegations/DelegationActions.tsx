@@ -4,13 +4,13 @@ import { IoMdMore } from "react-icons/io";
 import { Tooltip } from "react-tooltip";
 import { twJoin } from "tailwind-merge";
 
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
 import { useStakingManagerService } from "@/app/hooks/services/useStakingManagerService";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import { useStakingState } from "@/app/state/StakingState";
 import { DelegationState } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 interface DelegationActionsProps {
   state: string;

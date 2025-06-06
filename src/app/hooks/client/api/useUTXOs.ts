@@ -1,7 +1,7 @@
 import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useClientQuery } from "@/app/hooks/client/useClient";
-import { getUTXOs } from "@/utils/mempool_api";
+import { getUTXOs } from "@/app/utils/mempool_api";
 
 export const UTXO_KEY = "UTXO";
 

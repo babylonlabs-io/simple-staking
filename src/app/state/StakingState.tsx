@@ -4,16 +4,16 @@ import { useLocalStorage } from "usehooks-ts";
 import { number, object, ObjectSchema, string } from "yup";
 
 import { validateDecimalPoints } from "@/app/components/Staking/Form/validation/validation";
+import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/app/config";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
-import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/config";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
+import { btcToSatoshi, satoshiToBtc } from "@/app/utils/btc";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
 
 import { STAKING_DISABLED } from "../constants";
 import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";

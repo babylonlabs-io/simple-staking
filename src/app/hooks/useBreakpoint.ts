@@ -1,6 +1,6 @@
 import { useMediaQuery } from "usehooks-ts";
 
-import { screenBreakPoints } from "@/config/screen-breakpoints";
+import { screenBreakPoints } from "@/app/config/screen-breakpoints";
 
 type BreakpointKey = keyof typeof screenBreakPoints;
 

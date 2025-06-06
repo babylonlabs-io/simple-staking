@@ -1,5 +1,5 @@
 import { API_ENDPOINTS } from "@/app/constants/endpoints";
-import { isValidUrl } from "@/utils/url";
+import { isValidUrl } from "@/app/utils/url";
 
 import { Pagination } from "../types/api";
 import { FinalityProviderV1 } from "../types/finalityProviders";

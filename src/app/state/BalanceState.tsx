@@ -1,7 +1,7 @@
 import { useMemo, type PropsWithChildren } from "react";
 
 import { useBbnQuery } from "@/app/hooks/client/rpc/queries/useBbnQuery";
-import { createStateUtils } from "@/utils/createStateUtils";
+import { createStateUtils } from "@/app/utils/createStateUtils";
 
 import { useAppState } from ".";
 import { DelegationV2StakingState } from "../types/delegationsV2";

@@ -1,4 +1,4 @@
-import { getDelegationsLocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { getDelegationsLocalStorageKey } from "@/app/utils/local_storage/getDelegationsLocalStorageKey";
 
 describe("utils/local_storage/getDelegationsLocalStorageKey", () => {
   it("should return the correct key when pk is provided", () => {

@@ -1,6 +1,6 @@
 import { encode } from "url-safe-base64";
 
-import { getPublicKeyNoCoord } from "@/utils/wallet";
+import { getPublicKeyNoCoord } from "@/app/utils/wallet";
 
 import { apiWrapper } from "./apiWrapper";
 

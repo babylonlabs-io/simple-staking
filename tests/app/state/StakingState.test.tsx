@@ -7,7 +7,7 @@ jest.mock("@/app/state", () => ({
   useAppState: () => mockUseAppState(),
 }));
 
-jest.mock("@/config", () => ({
+jest.mock("@/app/config", () => ({
   IS_FIXED_TERM_FIELD: false,
   getDisabledWallets: () => [],
 }));
@@ -68,7 +68,7 @@ import {
 } from "@/app/types/delegationsV2";
 
 // Mock getFeeRateFromMempool
-jest.mock("@/utils/getFeeRateFromMempool", () => ({
+jest.mock("@/app/utils/getFeeRateFromMempool", () => ({
   getFeeRateFromMempool: jest.fn().mockReturnValue({
     minFeeRate: 1,
     defaultFeeRate: 5,

@@ -23,7 +23,7 @@ jest.mock("usehooks-ts", () => ({
 
 // Mock calculateDelegationsDiff
 const mockCalculateDelegationsDiff = jest.fn();
-jest.mock("@/utils/local_storage/calculateDelegationsDiff", () => ({
+jest.mock("@/app/utils/local_storage/calculateDelegationsDiff", () => ({
   calculateDelegationsDiff: (...args: any[]) =>
     mockCalculateDelegationsDiff(...args),
 }));

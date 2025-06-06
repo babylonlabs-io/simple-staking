@@ -1,7 +1,7 @@
 import { Loader } from "@babylonlabs-io/core-ui";
 import { BiSolidBadgeCheck } from "react-icons/bi";
 
-import { getNetworkConfigBBN } from "@/config/network/bbn";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 
 import { SubmitModal } from "../SubmitModal";
 

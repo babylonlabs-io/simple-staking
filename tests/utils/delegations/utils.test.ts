@@ -4,7 +4,7 @@ import {
   clearTxSignatures,
   extractSchnorrSignaturesFromTransaction,
   uint8ArrayToHex,
-} from "@/utils/delegations";
+} from "@/app/utils/delegations";
 
 // Mock bitcoinjs-lib
 jest.mock("bitcoinjs-lib", () => {

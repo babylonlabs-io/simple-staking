@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import { DelegationState } from "@/app/types/delegations";
-import { getState } from "@/utils/getState";
+import { getState } from "@/app/utils/getState";
 
 import { WalletConnectActions } from "./fixtures/wallet_connect";
 import { interceptRequest } from "./helper/interceptRequest";

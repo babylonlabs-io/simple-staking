@@ -1,4 +1,4 @@
-import { isValidUrl } from "@/utils/url";
+import { isValidUrl } from "@/app/utils/url";
 
 import { Pagination } from "../types/api";
 import {
