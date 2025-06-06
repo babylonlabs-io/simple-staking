@@ -1,7 +1,7 @@
 import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
-import { AuthGuard } from "@/components/common/AuthGuard";
+import { AuthGuard } from "@/app/components/Common/AuthGuard";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";

@@ -1,9 +1,9 @@
+import { Hint } from "@/app/components/Common/Hint";
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import {
   FinalityProvider,
   FinalityProviderState,
 } from "@/app/types/finalityProviders";
-import { Hint } from "@/components/common/Hint";
 
 interface FinalityProviderMonikerProps {
   value: FinalityProvider;

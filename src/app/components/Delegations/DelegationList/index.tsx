@@ -1,5 +1,8 @@
 import { Card, Heading } from "@babylonlabs-io/core-ui";
 
+import { GridTable, type TableColumn } from "@/app/components/Common/GridTable";
+import { Hint } from "@/app/components/Common/Hint";
+import { FinalityProviderMoniker } from "@/app/components/Delegations/DelegationList/components/FinalityProviderMoniker";
 import {
   ActionType,
   useDelegationService,
@@ -9,9 +12,6 @@ import {
   DelegationV2StakingState,
   DelegationWithFP,
 } from "@/app/types/delegationsV2";
-import { GridTable, type TableColumn } from "@/components/common/GridTable";
-import { Hint } from "@/components/common/Hint";
-import { FinalityProviderMoniker } from "@/components/delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/config/network";
 
 import { ActionButton } from "./components/ActionButton";

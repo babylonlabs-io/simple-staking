@@ -10,13 +10,13 @@ import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
+import { StakingModal } from "@/app/components/Staking/StakingModal";
 import {
   StakingModalPage,
   StakingStep,
   useStakingState,
   type FormFields,
 } from "@/app/state/StakingState";
-import { StakingModal } from "@/components/staking/StakingModal";
 import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";

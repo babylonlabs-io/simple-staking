@@ -1,5 +1,6 @@
 import { Button, Loader } from "@babylonlabs-io/core-ui";
 
+import { Hint } from "@/app/components/Common/Hint";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
 import { ActionType } from "@/app/hooks/services/useDelegationService";
 import {
@@ -7,7 +8,6 @@ import {
   DelegationWithFP,
 } from "@/app/types/delegationsV2";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
-import { Hint } from "@/components/common/Hint";
 
 interface ActionButtonProps {
   tooltip?: string | JSX.Element;

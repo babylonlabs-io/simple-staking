@@ -1,5 +1,6 @@
 import { Heading, HiddenField, Loader, Text } from "@babylonlabs-io/core-ui";
 
+import { AuthGuard } from "@/app/components/Common/AuthGuard";
 import { StatusView } from "@/app/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import apiNotAvailable from "@/app/components/Staking/Form/States/api-not-available.svg";
 import { Message } from "@/app/components/Staking/Form/States/Message";
@@ -8,7 +9,6 @@ import walletIcon from "@/app/components/Staking/Form/States/wallet-icon.svg";
 import { WalletNotConnected } from "@/app/components/Staking/Form/States/WalletNotConnected";
 import { BBN_FEE_AMOUNT } from "@/app/constants";
 import { useBalanceState } from "@/app/state/BalanceState";
-import { AuthGuard } from "@/components/common/AuthGuard";
 
 import { AmountField } from "./components/AmountField";
 import { BBNFeeAmount } from "./components/BBNFeeAmount";
