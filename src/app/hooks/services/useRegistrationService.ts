@@ -6,13 +6,13 @@ import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 import {
   RegistrationStep,
   useDelegationState,
 } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
-import { useLogger } from "@/hooks/useLogger";
 import { retry } from "@/utils";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";

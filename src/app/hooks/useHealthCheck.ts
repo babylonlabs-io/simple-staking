@@ -2,9 +2,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 import { getHealthCheck } from "@/app/services/healthCheckService";
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
-import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../context/Error/ErrorProvider";
 

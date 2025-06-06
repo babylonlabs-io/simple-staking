@@ -18,12 +18,12 @@ import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useDelegationState } from "@/app/state/DelegationState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { useLogger } from "@/hooks/useLogger";
 import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
 

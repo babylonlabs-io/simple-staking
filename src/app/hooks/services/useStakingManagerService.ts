@@ -9,8 +9,8 @@ import { useCallback, useRef } from "react";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useAppState } from "@/app/state";
-import { useLogger } from "@/hooks/useLogger";
 
 const stakingManagerEvents = {
   SIGNING: "signing",

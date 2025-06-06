@@ -6,7 +6,7 @@ import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useClientQuery } from "@/app/hooks/client/useClient";
-import { useLogger } from "@/hooks/useLogger";
+import { useLogger } from "@/app/hooks/useLogger";
 import { wait } from "@/utils";
 import { filterDust } from "@/utils/wallet";
 
