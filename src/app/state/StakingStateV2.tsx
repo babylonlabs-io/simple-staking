@@ -1,7 +1,7 @@
 import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
-import { createStateUtils } from "@/utils/createStateUtils";
+import { createStateUtils } from "@/app/utils/createStateUtils";
 
 import type { FinalityProvider } from "../types/finalityProviders";
 
