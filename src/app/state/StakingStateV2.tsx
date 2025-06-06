@@ -9,7 +9,6 @@ import { useFinalityProviderState } from "./FinalityProviderState";
 import { StakingModalPage } from "./StakingState";
 
 export interface StakingStateV2 {
-  /* UI state for multistaking flow */
   isModalOpen: boolean;
   setIsModalOpen: (value: boolean) => void;
   stakingModalPage: StakingModalPage;
@@ -41,7 +40,6 @@ const { StateProvider, useState: useStakingStateV2 } =
   });
 
 export function StakingStateV2({ children }: PropsWithChildren) {
-  // Multistaking specific state
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.FINALITY_PROVIDER,
