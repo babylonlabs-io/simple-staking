@@ -39,7 +39,7 @@ import {
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
 import { ErrorType } from "@/app/types/errors";
-import { retry } from "@/utils";
+import { retry } from "@/app/utils";
 
 // Mock all dependencies
 jest.mock("@/app/api/getDelegationsV2");
@@ -49,7 +49,7 @@ jest.mock("@/app/hooks/services/useTransactionService");
 jest.mock("@/app/hooks/client/rpc/mutation/useBbnTransaction");
 jest.mock("@/app/state/DelegationV2State");
 jest.mock("@/app/state/StakingState");
-jest.mock("@/utils", () => ({
+jest.mock("@/app/utils", () => ({
   retry: jest.fn(),
   btcToSatoshi: (value: number) => value * 100000000, // Mock satoshi conversion
 }));

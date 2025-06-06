@@ -5,7 +5,7 @@ import { IoIosCheckmarkCircle } from "react-icons/io";
 import { twMerge } from "tailwind-merge";
 import { useCopyToClipboard } from "usehooks-ts";
 
-import { trim } from "@/utils/trim";
+import { trim } from "@/app/utils/trim";
 
 interface HashProps {
   value: string;

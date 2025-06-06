@@ -7,7 +7,7 @@ import {
   API_DEFAULT_RETRY_DELAY,
   ONE_SECOND,
 } from "@/app/constants";
-import { useLogger } from "@/hooks/useLogger";
+import { useLogger } from "@/app/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
 export interface StakingStats {

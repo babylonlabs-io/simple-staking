@@ -2,7 +2,7 @@ import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
 import { StakingForm } from "@/app/components/Staking/StakingForm";
-import FeatureFlagService from "@/utils/FeatureFlagService";
+import FeatureFlagService from "@/app/utils/FeatureFlagService";
 
 import { Banner } from "./components/Banner/Banner";
 import { Container } from "./components/Container/Container";

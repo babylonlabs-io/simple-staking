@@ -6,9 +6,9 @@ import {
   Text,
 } from "@babylonlabs-io/core-ui";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { blocksToDisplayTime } from "@/utils/time";
+import { blocksToDisplayTime } from "@/app/utils/time";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 

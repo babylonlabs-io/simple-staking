@@ -1,5 +1,5 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;

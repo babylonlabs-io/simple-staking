@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
-import { useLogger } from "@/hooks/useLogger";
+import { useLogger } from "@/app/hooks/useLogger";
 
 /**
  * Hook that handles RPC connection errors by showing an error modal

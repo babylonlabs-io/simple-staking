@@ -10,6 +10,8 @@ import { AmountSubsection } from "@/app/components/Multistaking/MultistakingForm
 import { FeesSection } from "@/app/components/Multistaking/MultistakingForm/FeesSection";
 import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/app/components/Section/Section";
+import { StakingModal } from "@/app/components/Staking/StakingModal";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import {
   StakingModalPage,
   StakingStep,
@@ -17,8 +19,6 @@ import {
   type FormFields,
 } from "@/app/state/StakingState";
 import { useStakingStateV2 } from "@/app/state/StakingStateV2";
-import { StakingModal } from "@/components/staking/StakingModal";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
@@ -36,7 +36,6 @@ export function MultistakingForm() {
     stakingModalPage,
     setStakingModalPage,
     selectedProviders,
-    selectedChain,
     setSelectedChain,
     handleSelectProvider,
     removeProvider,
@@ -92,7 +91,7 @@ export function MultistakingForm() {
               <div className="flex flex-col w-full gap-4">
                 <div className="flex flex-row">
                   <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-                    View BSNs and Finality Provider
+                    View Finality Provider
                   </div>
                   <div className="flex">
                     {counter < MAX_FINALITY_PROVIDERS && (
@@ -130,7 +129,6 @@ export function MultistakingForm() {
                   <FinalityProviderItem
                     key={provider.id}
                     provider={provider}
-                    chainType={provider.chainType || selectedChain}
                     onRemove={() => removeProvider(provider.id)}
                   />
                 ))}

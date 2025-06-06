@@ -12,20 +12,20 @@ import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useDelegationState } from "@/app/state/DelegationState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { getIntermediateDelegationsLocalStorageKey } from "@/app/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { toLocalStorageIntermediateDelegation } from "@/app/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";

@@ -46,10 +46,10 @@ import { useStakingManagerService } from "@/app/hooks/services/useStakingManager
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
 import { useAppState } from "@/app/state";
 import { ErrorType } from "@/app/types/errors";
-import { validateStakingInput } from "@/utils/delegations";
-import { txFeeSafetyCheck } from "@/utils/delegations/fee";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { getBbnParamByBtcHeight } from "@/utils/params";
+import { validateStakingInput } from "@/app/utils/delegations";
+import { txFeeSafetyCheck } from "@/app/utils/delegations/fee";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
+import { getBbnParamByBtcHeight } from "@/app/utils/params";
 
 // Mock all dependencies
 jest.mock("@/app/api/getUnbondingEligibility");
@@ -58,10 +58,10 @@ jest.mock("@/app/context/wallet/BTCWalletProvider");
 jest.mock("@/app/hooks/client/api/useNetworkFees");
 jest.mock("@/app/hooks/services/useStakingManagerService");
 jest.mock("@/app/state");
-jest.mock("@/utils/delegations");
-jest.mock("@/utils/delegations/fee");
-jest.mock("@/utils/getFeeRateFromMempool");
-jest.mock("@/utils/params");
+jest.mock("@/app/utils/delegations");
+jest.mock("@/app/utils/delegations/fee");
+jest.mock("@/app/utils/getFeeRateFromMempool");
+jest.mock("@/app/utils/params");
 jest.mock("bitcoinjs-lib", () => ({
   Transaction: {
     fromHex: jest.fn(),

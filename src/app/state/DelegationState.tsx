@@ -11,9 +11,9 @@ import { useLocalStorage } from "usehooks-ts";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import type { Delegation } from "@/app/types/delegations";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
-import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { calculateDelegationsDiff } from "@/app/utils/local_storage/calculateDelegationsDiff";
+import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/app/utils/local_storage/getDelegationsLocalStorageKey";
 
 export type RegistrationStep =
   | undefined

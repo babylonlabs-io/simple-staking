@@ -15,13 +15,13 @@ import {
   type PropsWithChildren,
 } from "react";
 
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { useSentryUser } from "@/hooks/useSentryUser";
-import { createBbnAminoTypes } from "@/utils/wallet/amino";
-import { createBbnRegistry } from "@/utils/wallet/bbnRegistry";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
+import { useSentryUser } from "@/app/hooks/useSentryUser";
+import { createBbnAminoTypes } from "@/app/utils/wallet/amino";
+import { createBbnRegistry } from "@/app/utils/wallet/bbnRegistry";
 
 const { chainId, rpc } = getNetworkConfigBBN();
 

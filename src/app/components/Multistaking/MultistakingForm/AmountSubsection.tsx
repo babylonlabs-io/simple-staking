@@ -1,7 +1,7 @@
 import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
-import { AuthGuard } from "@/components/common/AuthGuard";
+import { AuthGuard } from "@/app/components/Common/AuthGuard";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
@@ -35,7 +35,7 @@ export const AmountSubsection = () => {
           min="0"
           step="any"
           onChange={handleInputChange}
-          placeholder="0"
+          placeholder="Enter Amount"
           autoFocus
           className="text-lg bg-transparent text-right w-2/3 outline-none"
         />

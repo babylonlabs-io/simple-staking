@@ -1,4 +1,4 @@
-import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
+import { nextPowerOfTwo } from "@/app/utils/nextPowerOfTwo";
 
 // Create a utility function to calculate the expected value
 // based on the actual implementation

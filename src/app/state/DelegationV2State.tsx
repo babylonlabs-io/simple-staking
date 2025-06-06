@@ -7,8 +7,8 @@ import {
   type DelegationLike,
   type DelegationV2,
 } from "@/app/types/delegationsV2";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { getDelegationsV2LocalStorageKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { getDelegationsV2LocalStorageKey } from "@/app/utils/local_storage/getDelegationsLocalStorageKey";
 
 import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
 import { useDelegationsV2 } from "../hooks/client/api/useDelegationsV2";

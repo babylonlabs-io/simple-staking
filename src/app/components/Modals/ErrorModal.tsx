@@ -11,7 +11,7 @@ import { FiCheck, FiCopy } from "react-icons/fi";
 import WarningTriangle from "@/app/assets/warning-triangle.svg";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { ErrorType, ShowErrorParams } from "@/app/types/errors";
-import { getCommitHash } from "@/utils/version";
+import { getCommitHash } from "@/app/utils/version";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 

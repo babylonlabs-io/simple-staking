@@ -12,9 +12,9 @@
 import * as Sentry from "@sentry/react";
 import { v4 as uuidv4 } from "uuid";
 
+import { isProductionEnv } from "@/app/config";
 import { REPLAYS_ON_ERROR_RATE } from "@/app/constants";
-import { isProductionEnv } from "@/config";
-import { getCommitHash } from "@/utils/version";
+import { getCommitHash } from "@/app/utils/version";
 
 const SENTRY_DEVICE_ID_KEY = "sentry_device_id";
 

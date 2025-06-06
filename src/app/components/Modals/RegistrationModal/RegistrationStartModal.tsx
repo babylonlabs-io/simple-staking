@@ -1,8 +1,8 @@
 import { Text } from "@babylonlabs-io/core-ui";
 import { BiSolidEditAlt } from "react-icons/bi";
 
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 
 import { SubmitModal } from "../SubmitModal";
 

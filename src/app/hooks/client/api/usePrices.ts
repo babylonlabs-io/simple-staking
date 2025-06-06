@@ -1,5 +1,5 @@
 import { ONE_MINUTE } from "@/app/constants";
-import { getPrices } from "@/utils/getPrices";
+import { getPrices } from "@/app/utils/getPrices";
 
 import { useClientQuery } from "../useClient";
 

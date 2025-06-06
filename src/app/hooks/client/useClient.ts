@@ -17,8 +17,8 @@ import {
   ONE_SECOND,
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 
 export function useClientQuery<
   TQueryFnData = unknown,

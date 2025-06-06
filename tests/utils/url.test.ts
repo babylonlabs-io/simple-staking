@@ -1,4 +1,4 @@
-import { isValidUrl } from "@/utils/url";
+import { isValidUrl } from "@/app/utils/url";
 
 describe("isValidUrl", () => {
   it("should mark url with https protocol as valid", () => {

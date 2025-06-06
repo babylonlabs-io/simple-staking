@@ -17,12 +17,12 @@ import { Tooltip } from "react-tooltip";
 
 import bbnIcon from "@/app/assets/bbn.svg";
 import bitcoin from "@/app/assets/bitcoin.png";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
 
 import { Hash } from "../Hash/Hash";
 import { MenuButton } from "../Menu/MenuButton";

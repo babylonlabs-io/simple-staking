@@ -3,6 +3,8 @@ import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/app/constants";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useAppState } from "@/app/state";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
@@ -13,10 +15,8 @@ import {
 } from "@/app/types/delegationsV2";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/app/types/networkInfo";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { validateDelegation } from "@/utils/delegations";
-import { getBbnParamByVersion } from "@/utils/params";
+import { validateDelegation } from "@/app/utils/delegations";
+import { getBbnParamByVersion } from "@/app/utils/params";
 
 import { useTransactionService } from "./useTransactionService";
 

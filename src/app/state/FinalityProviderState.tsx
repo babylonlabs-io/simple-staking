@@ -1,6 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
+import { DEFAULT_FILTER_VALUE } from "@/app/config";
 import { useSearchParams } from "@/app/context/SearchParamsProvider";
 import { useFinalityProviders } from "@/app/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/app/hooks/client/api/useFinalityProvidersV2";
@@ -9,8 +10,7 @@ import {
   FinalityProviderV1,
   type FinalityProvider,
 } from "@/app/types/finalityProviders";
-import { DEFAULT_FILTER_VALUE } from "@/config";
-import { createStateUtils } from "@/utils/createStateUtils";
+import { createStateUtils } from "@/app/utils/createStateUtils";
 
 interface SortState {
   field?: string;
