@@ -226,6 +226,12 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   }, [btcWalletProvider, connectBTC]);
 
   useEffect(() => {
+    if (!connected) {
+      btcDisconnect();
+    }
+  }, [connected, btcDisconnect]);
+
+  useEffect(() => {
     if (!btcConnector) return;
 
     const installedWallets = btcConnector.wallets
