@@ -1,25 +1,22 @@
 import {
   BabylonBtcStakingManager,
   SigningStep,
+  type SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
-import { EventEmitter } from "events";
-import { useCallback, useRef } from "react";
+import { useCallback } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
+import { useEventBus, type EventBusEvents } from "@/app/hooks/useEventBus";
 import { useLogger } from "@/app/hooks/useLogger";
 import { useAppState } from "@/app/state";
-
-const stakingManagerEvents = {
-  SIGNING: "signing",
-} as const;
 
 export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
   const logger = useLogger();
+  const eventBus = useEventBus();
 
   const { connected: cosmosConnected } = useCosmosWallet();
   const {
@@ -31,8 +28,6 @@ export const useStakingManagerService = () => {
 
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
-  const { current: eventEmitter } = useRef<EventEmitter>(new EventEmitter());
-
   const isLoading =
     !btcNetwork ||
     !cosmosConnected ||
@@ -43,89 +38,85 @@ export const useStakingManagerService = () => {
     !versionedParams ||
     versionedParams.length === 0;
 
-  const createBtcStakingManager = useCallback(() => {
-    if (isLoading) {
-      logger.info("createBtcStakingManager", {
-        cosmosConnected,
-        btcConnected,
-        btcNetwork: Boolean(btcNetwork),
-        signPsbt: Boolean(signPsbt),
-        signMessage: Boolean(signMessage),
-        signBbnTx: Boolean(signBbnTx),
-        versionedParams: Boolean(versionedParams),
-      });
-      return null;
-    }
+  const createBtcStakingManager = useCallback(
+    (eventChannel?: keyof EventBusEvents) => {
+      if (isLoading) {
+        logger.info("createBtcStakingManager", {
+          cosmosConnected,
+          btcConnected,
+          btcNetwork: Boolean(btcNetwork),
+          signPsbt: Boolean(signPsbt),
+          signMessage: Boolean(signMessage),
+          signBbnTx: Boolean(signBbnTx),
+          versionedParams: Boolean(versionedParams),
+        });
+        return null;
+      }
 
-    const btcProvider = {
-      signPsbt: async (
-        signingStep: SigningStep,
-        psbt: string,
-        options?: SignPsbtOptions,
-      ) => {
-        eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep, options);
-        return signPsbt(psbt, options);
-      },
-      signMessage: async (
-        signingStep: SigningStep,
-        message: string,
-        type: "ecdsa" | "bip322-simple",
-      ) => {
-        eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
-        return signMessage(message, type);
-      },
-    };
+      const btcProvider = {
+        signPsbt: async (
+          signingStep: SigningStep,
+          psbt: string,
+          options?: SignPsbtOptions,
+        ) => {
+          if (eventChannel) {
+            eventBus.emit(eventChannel, signingStep, options);
+          }
 
-    const bbnProvider = {
-      signTransaction: async <T extends object>(
-        signingStep: SigningStep,
-        msg: {
-          typeUrl: string;
-          value: T;
+          return signPsbt(psbt, options);
         },
-      ) => {
-        eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
-        return signBbnTx(msg);
-      },
-    };
+        signMessage: async (
+          signingStep: SigningStep,
+          message: string,
+          type: "ecdsa" | "bip322-simple",
+        ) => {
+          if (eventChannel) {
+            eventBus.emit(eventChannel, signingStep);
+          }
 
-    return new BabylonBtcStakingManager(
+          return signMessage(message, type);
+        },
+      };
+
+      const bbnProvider = {
+        signTransaction: async <T extends object>(
+          signingStep: SigningStep,
+          msg: {
+            typeUrl: string;
+            value: T;
+          },
+        ) => {
+          if (eventChannel) {
+            eventBus.emit(eventChannel, signingStep);
+          }
+
+          return signBbnTx(msg);
+        },
+      };
+
+      return new BabylonBtcStakingManager(
+        btcNetwork,
+        versionedParams,
+        btcProvider,
+        bbnProvider,
+      );
+    },
+    [
+      isLoading,
       btcNetwork,
       versionedParams,
-      btcProvider,
-      bbnProvider,
-    );
-  }, [
-    isLoading,
-    btcNetwork,
-    versionedParams,
-    cosmosConnected,
-    btcConnected,
-    signPsbt,
-    signMessage,
-    signBbnTx,
-    eventEmitter,
-    logger,
-  ]);
-
-  const on = useCallback(
-    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
-      eventEmitter.on(stakingManagerEvents.SIGNING, callback);
-    },
-    [eventEmitter],
-  );
-
-  const off = useCallback(
-    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
-      eventEmitter.off(stakingManagerEvents.SIGNING, callback);
-    },
-    [eventEmitter],
+      logger,
+      cosmosConnected,
+      btcConnected,
+      signPsbt,
+      signMessage,
+      signBbnTx,
+      eventBus,
+    ],
   );
 
   return {
     isLoading,
     createBtcStakingManager,
-    on,
-    off,
   };
 };

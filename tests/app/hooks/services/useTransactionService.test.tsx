@@ -1,4 +1,3 @@
-import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
 import { act, renderHook } from "@testing-library/react";
 import { Transaction } from "bitcoinjs-lib";
 
@@ -555,28 +554,6 @@ describe("useTransactionService", () => {
 
       // Verify transaction was pushed
       expect(mockPushTx).toHaveBeenCalledWith("mock-tx-hex");
-    });
-  });
-
-  describe("subscribeToSigningSteps", () => {
-    it("should subscribe to signing steps and return cleanup function", () => {
-      const { result } = renderHook(() => useTransactionService());
-      const mockCallback = jest.fn();
-
-      // Subscribe to signing steps
-      const unsubscribe = result.current.subscribeToSigningSteps(mockCallback);
-
-      // Trigger a signing event with the mocked enum value
-      mockEventCallback(SigningStep.STAKING_SLASHING);
-
-      // Check if the callback was called with the right step
-      expect(mockCallback).toHaveBeenCalledWith(SigningStep.STAKING_SLASHING);
-
-      // Call the cleanup function
-      unsubscribe();
-
-      // Verify the off function was called with the same callback
-      expect(useStakingManagerService().off).toHaveBeenCalledWith(mockCallback);
     });
   });
 

@@ -1,5 +1,14 @@
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import {
+  SigningStep,
+  type SignPsbtOptions,
+} from "@babylonlabs-io/btc-staking-ts";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { number, object, ObjectSchema, string } from "yup";
 
@@ -8,6 +17,7 @@ import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/app/config";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
+import { useEventBus } from "@/app/hooks/useEventBus";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
@@ -33,6 +43,14 @@ const formatNumber = (value: number) =>
   !Number.isNaN(value) ? value : undefined;
 
 const { coinName } = getNetworkConfigBTC();
+
+type StakingSigningStep = Extract<
+  SigningStep,
+  | "staking-slashing"
+  | "unbonding-slashing"
+  | "proof-of-possession"
+  | "create-btc-delegation-msg"
+>;
 
 export interface FormFields {
   finalityProvider: string;
@@ -98,8 +116,14 @@ export interface StakingState {
   setSelectedChain: (chain: string) => void;
   MAX_FINALITY_PROVIDERS: number;
   currentStakingStepOptions: SignPsbtOptions | undefined;
-  setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
 }
+
+const STAKING_SIGNING_STEP_MAP: Record<StakingSigningStep, StakingStep> = {
+  "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
+  "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
+  "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
+  "create-btc-delegation-msg": StakingStep.EOI_SIGN_BBN,
+};
 
 const { StateProvider, useState: useStakingState } =
   createStateUtils<StakingState>({
@@ -146,7 +170,6 @@ const { StateProvider, useState: useStakingState } =
     setSelectedChain: () => {},
     MAX_FINALITY_PROVIDERS: 1,
     currentStakingStepOptions: undefined,
-    setCurrentStakingStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
@@ -168,6 +191,7 @@ export function StakingState({ children }: PropsWithChildren) {
     "bbn-staking-cancelFeedbackModalOpened ",
     false,
   );
+  const eventBus = useEventBus();
 
   const {
     networkInfo,
@@ -333,7 +357,7 @@ export function StakingState({ children }: PropsWithChildren) {
   );
 
   const goToStep = useCallback(
-    (stepName: StakingStep, options?: SignPsbtOptions) => {
+    (stepName: StakingStep) => {
       if (stepName === StakingStep.FEEDBACK_SUCCESS) {
         if (successModalShown) {
           return;
@@ -349,8 +373,8 @@ export function StakingState({ children }: PropsWithChildren) {
           setCancelModalShown(true);
         }
       }
+
       setCurrentStep(stepName);
-      setCurrentStakingStepOptions(options);
     },
     [
       successModalShown,
@@ -410,6 +434,19 @@ export function StakingState({ children }: PropsWithChildren) {
     setSelectedProvidersV2((prev) => prev.filter((p) => p.id !== providerId));
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = eventBus.on("delegation:create", (step, options) => {
+      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
+
+      if (stepName) {
+        setCurrentStep(stepName);
+        setCurrentStakingStepOptions(options);
+      }
+    });
+
+    return unsubscribe;
+  }, [eventBus, setCurrentStep, setCurrentStakingStepOptions]);
+
   const context = useMemo(
     () => ({
       hasError,
@@ -442,7 +479,6 @@ export function StakingState({ children }: PropsWithChildren) {
       setSelectedChain: setSelectedChainV2,
       MAX_FINALITY_PROVIDERS,
       currentStakingStepOptions,
-      setCurrentStakingStepOptions,
     }),
     [
       hasError,
@@ -471,7 +507,6 @@ export function StakingState({ children }: PropsWithChildren) {
       setSelectedChainV2,
       MAX_FINALITY_PROVIDERS,
       currentStakingStepOptions,
-      setCurrentStakingStepOptions,
     ],
   );
 
