@@ -59,14 +59,14 @@ const formatDisplayValue = (key: string, value: any): ReactNode => {
     return (
       <div className="flex flex-col items-end max-w-xs">
         {value.map((item, index) => (
-          <Hash key={index} value={String(item)} small noFade />
+          <Hash key={index} value={String(item)} small noFade address />
         ))}
       </div>
     );
   }
   // Public keys
   if (typeof value === "string" && key.toLowerCase().includes("pk")) {
-    return <Hash value={value} small noFade />;
+    return <Hash value={value} small noFade address />;
   }
   // Addresses
   if (typeof value === "string" && key.toLowerCase().includes("address")) {
