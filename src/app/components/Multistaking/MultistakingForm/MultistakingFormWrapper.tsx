@@ -1,3 +1,4 @@
+import { MultistakingState } from "@/app/state/MultistakingState";
 import { StakingState } from "@/app/state/StakingState";
 
 import { MultistakingForm } from "./MultistakingForm";
@@ -5,7 +6,9 @@ import { MultistakingForm } from "./MultistakingForm";
 export function MultistakingFormWrapper() {
   return (
     <StakingState>
-      <MultistakingForm />
+      <MultistakingState>
+        <MultistakingForm />
+      </MultistakingState>
     </StakingState>
   );
 }
