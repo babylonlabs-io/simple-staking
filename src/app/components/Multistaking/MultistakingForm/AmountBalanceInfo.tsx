@@ -31,7 +31,10 @@ export const AmountBalanceInfo = () => {
   );
   const feeAmountBtc = satoshiToBtc(feeAmountSat);
 
-  const availableBalanceBtc = Math.max(balanceBtc - feeAmountBtc, 0);
+  const availableBalanceBtc = maxDecimals(
+    Math.max(balanceBtc - feeAmountBtc, 0),
+    8,
+  );
 
   useEffect(() => {
     if (isMaxBalanceMode) {
