@@ -1,19 +1,19 @@
 import { Text } from "@babylonlabs-io/core-ui";
-import React from "react";
+import { cloneElement, isValidElement, type ReactElement } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface AlertProps {
   children: React.ReactNode;
-  icon?: React.ReactNode;
+  title: React.ReactNode;
+  icon: React.ReactNode;
   className?: string;
   variant?: "info" | "warning" | "error";
-  title?: React.ReactNode;
 }
 
 const variantStyles = {
   info: {
-    bg: "bg-secondary-contrast dark:bg-white/5",
-    text: "text-primary-main",
+    bg: "bg-secondary-contrast",
+    text: "text-primary-light",
   },
   warning: {
     bg: "bg-orange-100 dark:bg-orange-900/50",
@@ -36,10 +36,10 @@ export const Alert = ({
   const styles = variantStyles[variant];
 
   let styledIcon = icon;
-  if (icon && React.isValidElement(icon)) {
-    styledIcon = React.cloneElement(icon as React.ReactElement<any>, {
+  if (icon && isValidElement(icon)) {
+    styledIcon = cloneElement(icon as ReactElement<any>, {
       className: twMerge(
-        (icon as React.ReactElement<any>).props.className,
+        (icon as ReactElement<any>).props.className,
         "w-5 h-5",
         styles.text,
       ),

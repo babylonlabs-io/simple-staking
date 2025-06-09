@@ -33,7 +33,7 @@ export const FormAlert = ({
         icon={<MdErrorOutline />}
         title={
           isGeoBlocked ? (
-            <strong>Unavailable In Your Region</strong>
+            <strong>Unavailable In Your Region.</strong>
           ) : (
             <strong>Staking Currently Unavailable.</strong>
           )
