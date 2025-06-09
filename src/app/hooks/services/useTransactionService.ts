@@ -2,17 +2,18 @@ import {
   BabylonBtcStakingManager,
   SigningStep,
 } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useAppState } from "@/app/state";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { validateStakingInput } from "@/utils/delegations";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { getTxInfo, getTxMerkleProof } from "@/utils/mempool_api";
+import { validateStakingInput } from "@/app/utils/delegations";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
+import { getTxInfo, getTxMerkleProof } from "@/app/utils/mempool_api";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
@@ -435,7 +436,7 @@ export const useTransactionService = () => {
    * @returns A cleanup function to remove the listener
    */
   const subscribeToSigningSteps = useCallback(
-    (callback: (step: SigningStep) => void) => {
+    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
       managerEventsOn(callback);
 
       // Return cleanup function

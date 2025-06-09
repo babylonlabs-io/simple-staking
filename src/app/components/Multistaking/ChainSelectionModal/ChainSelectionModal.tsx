@@ -5,7 +5,6 @@ import {
   DialogHeader,
   Text,
 } from "@babylonlabs-io/core-ui";
-import Image, { StaticImageData } from "next/image";
 import { PropsWithChildren, useState } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
@@ -35,7 +34,7 @@ const SubSection = ({
 interface ChainButtonProps extends PropsWithChildren {
   className?: string;
   disabled?: boolean;
-  logo?: string | StaticImageData;
+  logo?: string;
   title?: string | JSX.Element;
   alt?: string;
   selected?: boolean;
@@ -66,7 +65,7 @@ const ChainButton = ({
     <div className="flex w-full items-center justify-between">
       <div className="flex items-center text-base">
         {logo && (
-          <Image
+          <img
             src={logo}
             alt="bitcoin"
             className="max-w-[40px] max-h-[40px] mr-2 rounded-full"

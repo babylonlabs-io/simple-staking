@@ -1,5 +1,3 @@
-"use client";
-
 import {
   ChainConfigArr,
   ExternalWallets,
@@ -10,10 +8,10 @@ import { useCallback, type PropsWithChildren } from "react";
 
 import { logTermsAcceptance } from "@/app/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/app/api/verifyBTCAddress";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 
 import { useError } from "../Error/ErrorProvider";
 

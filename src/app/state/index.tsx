@@ -8,8 +8,8 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useOrdinals } from "@/app/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { filterDust } from "@/utils/wallet";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { filterDust } from "@/app/utils/wallet";
 
 import { useNetworkInfo } from "../hooks/client/api/useNetworkInfo";
 import { NetworkInfo } from "../types/networkInfo";

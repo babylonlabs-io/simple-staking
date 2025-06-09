@@ -13,9 +13,9 @@ import {
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
-import { useLogger } from "@/hooks/useLogger";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
+import { useLogger } from "@/app/hooks/useLogger";
 
 import { useHealthCheck } from "../../useHealthCheck";
 
@@ -70,6 +70,9 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching delegations",
+        {
+          cause: query.error as Error,
+        },
       );
       logger.error(clientError, {
         tags: {

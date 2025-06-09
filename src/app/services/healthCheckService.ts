@@ -1,9 +1,8 @@
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 import { isError451 } from "../api/error";
 import { fetchHealthCheck } from "../api/healthCheckClient";
 import {
-  API_ERROR_MESSAGE,
   GEO_BLOCK_MESSAGE,
   HealthCheckResult,
   HealthCheckStatus,
@@ -13,32 +12,16 @@ export const getHealthCheck = async (): Promise<HealthCheckResult> => {
   try {
     const healthCheckAPIResponse = await fetchHealthCheck();
 
-    if (healthCheckAPIResponse.data) {
-      return {
-        status: HealthCheckStatus.Normal,
-        message: healthCheckAPIResponse.data,
-      };
-    } else {
-      throw new ClientError(
-        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        API_ERROR_MESSAGE,
-      );
-    }
+    return {
+      status: HealthCheckStatus.Normal,
+      message: healthCheckAPIResponse.data,
+    };
   } catch (error: any) {
-    if (isError451(error)) {
-      return {
-        status: HealthCheckStatus.GeoBlocked,
-        message: GEO_BLOCK_MESSAGE,
-      };
-    } else {
-      return {
-        status: HealthCheckStatus.Error,
-        message: error.response?.message || error?.message || API_ERROR_MESSAGE,
-      };
+    if (isError451(error.cause)) {
+      throw new ClientError(ERROR_CODES.GEO_BLOCK, GEO_BLOCK_MESSAGE, {
+        cause: error.cause,
+      });
     }
+    throw error;
   }
-};
-
-export const isGeoBlockedResult = (result: HealthCheckResult): boolean => {
-  return result.status === HealthCheckStatus.GeoBlocked;
 };

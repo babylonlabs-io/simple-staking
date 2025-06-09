@@ -11,9 +11,9 @@ import {
 import { ONE_MINUTE } from "@/app/constants";
 import { useBbnRpc } from "@/app/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
 
 import { useClientQuery } from "../../useClient";
 import { useRpcErrorHandler } from "../useRpcErrorHandler";
@@ -38,7 +38,7 @@ export const useBbnQuery = () => {
    * @returns {Promise<number>} - The rewards from the user's account.
    */
   const rewardsQuery = useClientQuery({
-    queryKey: [BBN_REWARDS_KEY, bech32Address, connected, queryClient],
+    queryKey: [BBN_REWARDS_KEY, bech32Address, connected],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
         return undefined;
@@ -65,6 +65,7 @@ export const useBbnQuery = () => {
         throw new ClientError(
           ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
           "Error getting rewards",
+          { cause: error as Error },
         );
       }
       if (!rewards) {
@@ -102,7 +103,7 @@ export const useBbnQuery = () => {
    * @returns {Promise<Object>} - The balance of the user's account.
    */
   const balanceQuery = useClientQuery({
-    queryKey: [BBN_BALANCE_KEY, bech32Address, connected, queryClient],
+    queryKey: [BBN_BALANCE_KEY, bech32Address, connected],
     queryFn: async () => {
       if (!connected || !queryClient || !bech32Address) {
         return 0;
@@ -127,7 +128,7 @@ export const useBbnQuery = () => {
    * @returns {Promise<Object>} - The tip of the Bitcoin blockchain.
    */
   const btcTipQuery = useClientQuery({
-    queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY, queryClient],
+    queryKey: [BBN_BTCLIGHTCLIENT_TIP_KEY],
     queryFn: async () => {
       if (!queryClient) {
         return undefined;
@@ -148,6 +149,7 @@ export const useBbnQuery = () => {
     btcTipQuery,
     hasRpcError,
     reconnectRpc: reconnect,
+    queryClient,
   };
 };
 

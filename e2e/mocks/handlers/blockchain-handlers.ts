@@ -1,3 +1,5 @@
+import { incentivequery } from "@babylonlabs-io/babylon-proto-ts";
+import { QueryBalanceResponse } from "cosmjs-types/cosmos/bank/v1beta1/query.js";
 import { ResponseComposition, RestContext, RestRequest, rest } from "msw";
 
 import { MOCK_VALUES } from "./constants";
@@ -15,8 +17,6 @@ interface QueryStrategy {
 
 const handleRewardGauges: QueryHandler = (req, res, ctx) => {
   try {
-    const { incentivequery } = require("@babylonlabs-io/babylon-proto-ts");
-
     const mockResponse = incentivequery.QueryRewardGaugesResponse.fromPartial({
       rewardGauges: {
         BTC_STAKER: {
@@ -58,9 +58,6 @@ const handleRewardGauges: QueryHandler = (req, res, ctx) => {
 
 const handleBankBalance: QueryHandler = (req, res, ctx) => {
   try {
-    const {
-      QueryBalanceResponse,
-    } = require("cosmjs-types/cosmos/bank/v1beta1/query");
     const mockResp = QueryBalanceResponse.fromPartial({
       balance: { denom: "ubbn", amount: MOCK_VALUES.BBN_BALANCE },
     });

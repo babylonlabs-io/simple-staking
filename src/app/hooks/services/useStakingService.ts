@@ -1,4 +1,5 @@
 import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -6,6 +7,9 @@ import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
+import { ClientError } from "@/app/errors";
+import { ERROR_CODES } from "@/app/errors/codes";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import {
   StakingStep,
@@ -16,11 +20,8 @@ import {
   DelegationV2StakingState as DelegationState,
   DelegationV2,
 } from "@/app/types/delegationsV2";
-import { ClientError } from "@/errors";
-import { ERROR_CODES } from "@/errors/codes";
-import { useLogger } from "@/hooks/useLogger";
-import { retry } from "@/utils";
-import { btcToSatoshi } from "@/utils/btc";
+import { retry } from "@/app/utils";
+import { btcToSatoshi } from "@/app/utils/btc";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
@@ -59,12 +60,14 @@ export function useStakingService() {
   const logger = useLogger();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
-      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
-      if (stepName) {
-        goToStep(stepName);
-      }
-    });
+    const unsubscribe = subscribeToSigningSteps(
+      (step: SigningStep, options?: SignPsbtOptions) => {
+        const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
+        if (stepName) {
+          goToStep(stepName, options);
+        }
+      },
+    );
 
     return unsubscribe;
   }, [subscribeToSigningSteps, goToStep]);
@@ -153,7 +156,7 @@ export function useStakingService() {
         const clientError = new ClientError(
           ERROR_CODES.TRANSACTION_PREPARATION_ERROR,
           "Error creating EOI",
-          { cause: error },
+          { cause: error as Error },
         );
         logger.error(clientError, {
           data: metadata,
@@ -216,7 +219,7 @@ export function useStakingService() {
         const clientError = new ClientError(
           ERROR_CODES.TRANSACTION_SUBMISSION_ERROR,
           "Error submitting staking transaction",
-          { cause: error },
+          { cause: error as Error },
         );
         logger.error(clientError);
         reset();

@@ -1,8 +1,7 @@
-import Image from "next/image";
 import { twJoin } from "tailwind-merge";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { Network } from "@/app/types/network";
-import { getNetworkConfigBTC } from "@/config/network/btc";
 
 import testnetIcon from "./testnet-icon.png";
 
@@ -13,7 +12,7 @@ export const NetworkBadge = () => {
     <div className={twJoin(`absolute left-2 top-7`)}>
       {[Network.SIGNET, Network.TESTNET].includes(network) && (
         <>
-          <Image
+          <img
             src={testnetIcon}
             alt="Testnet"
             className="w-[4rem] md:w-[7rem]"

@@ -1,5 +1,5 @@
 import { apiWrapper } from "@/app/api/apiWrapper";
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;
@@ -193,7 +193,8 @@ describe("apiWrapper", () => {
       expect(error).toBeInstanceOf(ClientError);
       if (error instanceof ClientError) {
         expect(error.errorCode).toBe(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE);
-        expect(error.message).toBe("Failed to fetch data");
+        expect(error.message).toBe("Error fetching data from the API");
+        expect((error.cause as Error).message).toBe(errorText);
       }
     }
   });
@@ -222,7 +223,8 @@ describe("apiWrapper", () => {
       expect(error).toBeInstanceOf(ClientError);
       if (error instanceof ClientError) {
         expect(error.errorCode).toBe(ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE);
-        expect(error.message).toBe("General error message");
+        expect(error.message).toBe("Error fetching data from the API");
+        expect((error.cause as Error).message).toBe("General error message");
       }
     }
   });

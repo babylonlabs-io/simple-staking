@@ -1,6 +1,6 @@
 import { Text } from "@babylonlabs-io/core-ui";
 
-import { getNetworkConfigBTC } from "@/config/network/btc";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 
 import { ConfirmationModal } from "./ConfirmationModal";
 

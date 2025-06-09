@@ -12,30 +12,29 @@ import { WithdrawModal } from "@/app/components/Modals/WithdrawModal";
 import { ONE_MINUTE } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useNetworkInfo } from "@/app/hooks/client/api/useNetworkInfo";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useV1TransactionService } from "@/app/hooks/services/useV1TransactionService";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useDelegationState } from "@/app/state/DelegationState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/app/types/delegations";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { getIntermediateDelegationsLocalStorageKey } from "@/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
-import { toLocalStorageIntermediateDelegation } from "@/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { getIntermediateDelegationsLocalStorageKey } from "@/app/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { toLocalStorageIntermediateDelegation } from "@/app/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";
 
 import { Delegation } from "./Delegation";
 
-const MODE_TRANSITION = "transition";
 const MODE_WITHDRAW = "withdraw";
 const MODE_UNBOND = "unbond";
-type MODE = typeof MODE_TRANSITION | typeof MODE_WITHDRAW | typeof MODE_UNBOND;
+type MODE = "transition" | "withdraw" | "unbond";
 // step index
 const REGISTRATION_INDEXES: Record<string, number> = {
   "registration-staking-slashing": 1,
@@ -49,7 +48,7 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   "registration-verifying": 2,
 };
 
-export const Delegations = ({}) => {
+export const Delegations = () => {
   const { data: networkInfo } = useNetworkInfo();
   const { publicKeyNoCoord, connected, network } = useBTCWallet();
   const [modalOpen, setModalOpen] = useState(false);

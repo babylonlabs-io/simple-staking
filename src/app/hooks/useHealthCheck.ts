@@ -1,37 +1,43 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import {
-  getHealthCheck,
-  isGeoBlockedResult,
-} from "@/app/services/healthCheckService";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
+import { getHealthCheck } from "@/app/services/healthCheckService";
 import { HealthCheckStatus } from "@/app/types/services/healthCheck";
-import { useLogger } from "@/hooks/useLogger";
 
 import { useError } from "../context/Error/ErrorProvider";
+
+export const HEALTH_CHECK_KEY = "HEALTH_CHECK";
 
 export const useHealthCheck = () => {
   const { handleError } = useError();
   const logger = useLogger();
 
   const { data, error, isError, isLoading, refetch } = useQuery({
-    queryKey: ["api available"],
+    queryKey: [HEALTH_CHECK_KEY],
     queryFn: getHealthCheck,
     refetchOnMount: false,
     refetchOnWindowFocus: false,
+    retry: (_, error) => {
+      // Prevent retries for geoblocked errors
+      return (error as ClientError).errorCode !== ERROR_CODES.GEO_BLOCK;
+    },
   });
 
   const isApiNormal = data?.status === HealthCheckStatus.Normal;
-  const isGeoBlocked = data ? isGeoBlockedResult(data) : false;
+  const isGeoBlocked = error
+    ? (error as ClientError).errorCode === ERROR_CODES.GEO_BLOCK
+    : false;
   const apiMessage = data?.message;
 
   useEffect(() => {
     if (isError) {
-      logger.error(error, {
-        tags: {
-          isGeoblocked: isGeoBlocked ? "true" : "false",
-        },
-      });
+      if (isGeoBlocked) {
+        return;
+      }
+
+      logger.error(error);
 
       handleError({
         error,

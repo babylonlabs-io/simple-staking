@@ -10,13 +10,13 @@ import { useCallback, useMemo } from "react";
 import { getUnbondingEligibility } from "@/app/api/getUnbondingEligibility";
 import { postUnbonding } from "@/app/api/postUnbonding";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useAppState } from "@/app/state";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { validateStakingInput } from "@/utils/delegations";
-import { txFeeSafetyCheck } from "@/utils/delegations/fee";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { getBbnParamByBtcHeight } from "@/utils/params";
+import { validateStakingInput } from "@/app/utils/delegations";
+import { txFeeSafetyCheck } from "@/app/utils/delegations/fee";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
+import { getBbnParamByBtcHeight } from "@/app/utils/params";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
 

@@ -1,6 +1,6 @@
 import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 import { NetworkInfo } from "../types/networkInfo";
 

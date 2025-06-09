@@ -7,7 +7,7 @@ jest.mock("@/app/state", () => ({
   useAppState: () => mockUseAppState(),
 }));
 
-jest.mock("@/config", () => ({
+jest.mock("@/app/config", () => ({
   IS_FIXED_TERM_FIELD: false,
   getDisabledWallets: () => [],
 }));
@@ -37,6 +37,10 @@ jest.mock("@/app/context/wallet/CosmosWalletProvider", () => ({
   useCosmosWallet: () => mockUseCosmosWallet(),
 }));
 
+jest.mock("@uidotdev/usehooks", () => ({
+  useDebounce: jest.fn((value) => value),
+}));
+
 // Mock useLocalStorage
 const mockSetSuccessModalShown = jest.fn();
 const mockSetCancelModalShown = jest.fn();
@@ -64,7 +68,7 @@ import {
 } from "@/app/types/delegationsV2";
 
 // Mock getFeeRateFromMempool
-jest.mock("@/utils/getFeeRateFromMempool", () => ({
+jest.mock("@/app/utils/getFeeRateFromMempool", () => ({
   getFeeRateFromMempool: jest.fn().mockReturnValue({
     minFeeRate: 1,
     defaultFeeRate: 5,
@@ -290,7 +294,7 @@ describe("StakingState", () => {
     const testErrorMessage = "Test API error message";
     mockUseHealthCheck.mockReturnValue({
       ...mockUseHealthCheck(),
-      apiMessage: testErrorMessage,
+      error: { message: testErrorMessage },
     });
 
     const { result } = renderHook(() => useStakingState(), {

@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 
@@ -11,7 +12,7 @@ jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
   initBTCCurve: jest.fn(),
 }));
 
-jest.mock("@/utils/FeatureFlagService", () => ({
+jest.mock("@/app/utils/FeatureFlagService", () => ({
   __esModule: true,
   default: {
     get IsMultiStakingEnabled() {
@@ -50,20 +51,46 @@ describe("Home page feature flag – MULTISTAKING", () => {
   });
 
   it("renders MultistakingForm when FF_MULTISTAKING is enabled", () => {
-    const FeatureFlagService = require("@/utils/FeatureFlagService").default;
+    const FeatureFlagService =
+      require("@/app/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = true;
 
-    const { getByTestId, queryByTestId } = render(<Home />);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
+    const { getByTestId, queryByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <Home />
+      </QueryClientProvider>,
+    );
 
     expect(getByTestId("multistaking-form")).toBeInTheDocument();
     expect(queryByTestId("staking-form")).not.toBeInTheDocument();
   });
 
   it("renders StakingForm when FF_MULTISTAKING is disabled", () => {
-    const FeatureFlagService = require("@/utils/FeatureFlagService").default;
+    const FeatureFlagService =
+      require("@/app/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = false;
 
-    const { getByTestId, queryByTestId } = render(<Home />);
+    const queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          retry: false,
+        },
+      },
+    });
+
+    const { getByTestId, queryByTestId } = render(
+      <QueryClientProvider client={queryClient}>
+        <Home />
+      </QueryClientProvider>,
+    );
 
     expect(getByTestId("staking-form")).toBeInTheDocument();
     expect(queryByTestId("multistaking-form")).not.toBeInTheDocument();

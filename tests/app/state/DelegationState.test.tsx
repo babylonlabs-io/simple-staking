@@ -1,5 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { PropsWithChildren } from "react";
+import * as hooks from "usehooks-ts";
 
 // Mock the dependencies, but keep their APIs close to real ones
 const mockUseBTCWallet = jest.fn();
@@ -22,7 +23,7 @@ jest.mock("usehooks-ts", () => ({
 
 // Mock calculateDelegationsDiff
 const mockCalculateDelegationsDiff = jest.fn();
-jest.mock("@/utils/local_storage/calculateDelegationsDiff", () => ({
+jest.mock("@/app/utils/local_storage/calculateDelegationsDiff", () => ({
   calculateDelegationsDiff: (...args: any[]) =>
     mockCalculateDelegationsDiff(...args),
 }));
@@ -185,7 +186,7 @@ describe("DelegationState", () => {
     // Setup: mock that delegations already exist in local storage
     const existingDelegations = [mockDelegation1];
     jest
-      .spyOn(require("usehooks-ts"), "useLocalStorage")
+      .spyOn(hooks as any, "useLocalStorage")
       .mockImplementationOnce(() => [existingDelegations, mockSetDelegations]);
 
     const { result } = renderHook(() => useDelegationState(), {

@@ -1,4 +1,4 @@
-import { ClientError, ERROR_CODES } from "@/errors";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 
 import { FinalityProvider } from "./finalityProviders";
 

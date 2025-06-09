@@ -9,8 +9,8 @@ import { useCallback, useRef } from "react";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/app/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
+import { useLogger } from "@/app/hooks/useLogger";
 import { useAppState } from "@/app/state";
-import { useLogger } from "@/hooks/useLogger";
 
 const stakingManagerEvents = {
   SIGNING: "signing",
@@ -63,7 +63,7 @@ export const useStakingManagerService = () => {
         psbt: string,
         options?: SignPsbtOptions,
       ) => {
-        eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep);
+        eventEmitter.emit(stakingManagerEvents.SIGNING, signingStep, options);
         return signPsbt(psbt, options);
       },
       signMessage: async (
@@ -109,14 +109,14 @@ export const useStakingManagerService = () => {
   ]);
 
   const on = useCallback(
-    (callback: (step: SigningStep) => void) => {
+    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
       eventEmitter.on(stakingManagerEvents.SIGNING, callback);
     },
     [eventEmitter],
   );
 
   const off = useCallback(
-    (callback: (step: SigningStep) => void) => {
+    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
       eventEmitter.off(stakingManagerEvents.SIGNING, callback);
     },
     [eventEmitter],

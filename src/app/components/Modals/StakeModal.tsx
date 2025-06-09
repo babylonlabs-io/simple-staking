@@ -1,6 +1,6 @@
 import { BiSolidBadgeCheck } from "react-icons/bi";
 
-import { getNetworkConfig } from "@/config/network";
+import { getNetworkConfig } from "@/app/config/network";
 
 import { SubmitModal } from "./SubmitModal";
 

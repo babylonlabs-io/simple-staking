@@ -17,6 +17,7 @@ import { act, renderHook } from "@testing-library/react";
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError } from "@/app/errors";
 import { useBbnTransaction } from "@/app/hooks/client/rpc/mutation/useBbnTransaction";
 import { useRegistrationService } from "@/app/hooks/services/useRegistrationService";
 import { useTransactionService } from "@/app/hooks/services/useTransactionService";
@@ -27,8 +28,7 @@ import {
   DelegationV2,
   DelegationV2StakingState,
 } from "@/app/types/delegationsV2";
-import { ClientError } from "@/errors";
-import { retry } from "@/utils";
+import { retry } from "@/app/utils";
 
 // Mock all dependencies
 jest.mock("@/app/api/getDelegationsV2");
@@ -39,7 +39,7 @@ jest.mock("@/app/hooks/client/rpc/mutation/useBbnTransaction");
 jest.mock("@/app/hooks/services/useTransactionService");
 jest.mock("@/app/state/DelegationState");
 jest.mock("@/app/state/DelegationV2State");
-jest.mock("@/utils", () => ({
+jest.mock("@/app/utils", () => ({
   retry: jest.fn(),
 }));
 
@@ -153,7 +153,7 @@ describe("useRegistrationService", () => {
     (getDelegationV2 as jest.Mock).mockResolvedValue(mockDelegationV2);
 
     // Mock retry utility
-    (retry as jest.Mock).mockImplementation((fn, predicate, interval) => {
+    (retry as jest.Mock).mockImplementation((fn) => {
       return fn();
     });
 
@@ -185,21 +185,25 @@ describe("useRegistrationService", () => {
       callback(SigningStep.STAKING_SLASHING);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-staking-slashing",
+        undefined,
       );
 
       callback(SigningStep.UNBONDING_SLASHING);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-unbonding-slashing",
+        undefined,
       );
 
       callback(SigningStep.PROOF_OF_POSSESSION);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-proof-of-possession",
+        undefined,
       );
 
       callback(SigningStep.CREATE_BTC_DELEGATION_MSG);
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-sign-bbn",
+        undefined,
       );
     });
   });
@@ -308,7 +312,7 @@ describe("useRegistrationService", () => {
 
     it("should handle successful validation but wait for active state", async () => {
       // Mock retry to simulate waiting for active state
-      (retry as jest.Mock).mockImplementation((fn, predicate, interval) => {
+      (retry as jest.Mock).mockImplementation((_, predicate) => {
         // First call returns pending, second call returns active
         const pendingDelegation = {
           ...mockDelegationV2,

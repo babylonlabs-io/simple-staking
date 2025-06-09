@@ -1,20 +1,20 @@
 // This file configures the initialization of Sentry on the client.
 // The config you add here will be used whenever a users loads a page in their browser.
-// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+// https://docs.sentry.io/platforms/javascript/guides/react/
 
 /**
  * Extra notes:
- * This file is automatically included in the bundle by withSentryConfig() function
- * so it is not necessary to create an instrumentation.ts for this file specifically.
- * Reference: https://github.com/getsentry/sentry-javascript/blob/afa79b68640caf7ea3f3bc91c584e92225a49bc8/packages/nextjs/src/config/webpack.ts#L379
+ * This file is manually imported in the main entry point for Vite builds.
+ * Source maps are handled by the Sentry Vite plugin during build time.
+ * Reference: https://docs.sentry.io/platforms/javascript/sourcemaps/uploading/vite/
  */
 
-import * as Sentry from "@sentry/nextjs";
+import * as Sentry from "@sentry/react";
 import { v4 as uuidv4 } from "uuid";
 
+import { isProductionEnv } from "@/app/config";
 import { REPLAYS_ON_ERROR_RATE } from "@/app/constants";
-import { isProductionEnv } from "@/config";
-import { getCommitHash } from "@/utils/version";
+import { getCommitHash } from "@/app/utils/version";
 
 const SENTRY_DEVICE_ID_KEY = "sentry_device_id";
 
@@ -35,11 +35,11 @@ Sentry.init({
   // This environment variable is provided in the CI
   environment: process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT ?? "local",
 
-  // Ensure this release ID matches the one used during 'next build' for source map uploads
+  // Ensure this release ID matches the one used during 'vite build' for source map uploads
   // It's passed via NEXT_PUBLIC_RELEASE_ID in the build environment (e.g., GitHub Actions)
   release: process.env.NEXT_PUBLIC_RELEASE_ID ?? "local-dev",
 
-  // Ensure this dist ID matches the one used during 'next build' for source map uploads
+  // Ensure this dist ID matches the one used during 'vite build' for source map uploads
   // It's passed via NEXT_PUBLIC_DIST_ID in the build environment (e.g., GitHub Actions)
   dist: process.env.NEXT_PUBLIC_DIST_ID ?? "local",
 
@@ -72,6 +72,9 @@ Sentry.init({
       maskAllText: isProductionEnv(),
       blockAllMedia: true,
     }),
+    // Browser tracing for performance monitoring and React component annotation
+    // (matching reactComponentAnnotation: { enabled: true } from original Next.js config)
+    Sentry.browserTracingIntegration(),
   ],
 
   beforeSend(event, hint) {

@@ -1,23 +1,29 @@
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useLocalStorage } from "usehooks-ts";
 import { number, object, ObjectSchema, string } from "yup";
 
 import { validateDecimalPoints } from "@/app/components/Staking/Form/validation/validation";
+import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/app/config";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useNetworkFees } from "@/app/hooks/client/api/useNetworkFees";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
-import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/config";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { btcToSatoshi, satoshiToBtc } from "@/utils/btc";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
+import { btcToSatoshi, satoshiToBtc } from "@/app/utils/btc";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
 
 import { STAKING_DISABLED } from "../constants";
 import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
 
 import { useBalanceState } from "./BalanceState";
+
+export enum StakingModalPage {
+  CHAIN_SELECTION = 0,
+  FINALITY_PROVIDER = 1,
+}
 
 const formatStakingAmount = (value: number) =>
   !Number.isNaN(value) ? btcToSatoshi(value) : undefined;
@@ -70,7 +76,7 @@ export interface StakingState {
   formData?: FormFields;
   step?: StakingStep;
   verifiedDelegation?: DelegationV2;
-  goToStep: (name: StakingStep) => void;
+  goToStep: (name: StakingStep, options?: SignPsbtOptions) => void;
   setProcessing: (value: boolean) => void;
   setFormData: (formData?: FormFields) => void;
   setVerifiedDelegation: (value?: DelegationV2) => void;
@@ -79,6 +85,8 @@ export interface StakingState {
     title: string;
     message: string;
   };
+  currentStakingStepOptions: SignPsbtOptions | undefined;
+  setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useStakingState } =
@@ -115,10 +123,15 @@ const { StateProvider, useState: useStakingState } =
     setFormData: () => {},
     setProcessing: () => {},
     reset: () => {},
+    currentStakingStepOptions: undefined,
+    setCurrentStakingStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
+  const [currentStakingStepOptions, setCurrentStakingStepOptions] =
+    useState<SignPsbtOptions>();
+
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
   const [verifiedDelegation, setVerifiedDelegation] = useState<DelegationV2>();
@@ -139,8 +152,8 @@ export function StakingState({ children }: PropsWithChildren) {
   const {
     isApiNormal,
     isGeoBlocked,
-    apiMessage,
     isLoading: isCheckLoading,
+    error: healthCheckError,
   } = useHealthCheck();
   const {
     data: mempoolFeeRates,
@@ -157,7 +170,7 @@ export function StakingState({ children }: PropsWithChildren) {
   const hasError = isStateError || isNetworkFeeError || !isApiNormal;
   const blocked = isGeoBlocked;
   const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
-  const errorMessage = apiMessage;
+  const errorMessage = healthCheckError?.message;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
   const stakingInfo = useMemo(() => {
@@ -295,7 +308,7 @@ export function StakingState({ children }: PropsWithChildren) {
   );
 
   const goToStep = useCallback(
-    (stepName: StakingStep) => {
+    (stepName: StakingStep, options?: SignPsbtOptions) => {
       if (stepName === StakingStep.FEEDBACK_SUCCESS) {
         if (successModalShown) {
           return;
@@ -312,6 +325,7 @@ export function StakingState({ children }: PropsWithChildren) {
         }
       }
       setCurrentStep(stepName);
+      setCurrentStakingStepOptions(options);
     },
     [
       successModalShown,
@@ -326,8 +340,15 @@ export function StakingState({ children }: PropsWithChildren) {
     setVerifiedDelegation(undefined);
     setFormData(undefined);
     setCurrentStep(undefined);
+    setCurrentStakingStepOptions(undefined);
     setProcessing(false);
-  }, [setVerifiedDelegation, setFormData, setCurrentStep, setProcessing]);
+  }, [
+    setVerifiedDelegation,
+    setFormData,
+    setCurrentStep,
+    setProcessing,
+    setCurrentStakingStepOptions,
+  ]);
 
   const context = useMemo(
     () => ({
@@ -348,6 +369,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
+      currentStakingStepOptions,
+      setCurrentStakingStepOptions,
     }),
     [
       hasError,
@@ -365,6 +388,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
+      currentStakingStepOptions,
+      setCurrentStakingStepOptions,
     ],
   );
 

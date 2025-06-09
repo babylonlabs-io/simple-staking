@@ -1,3 +1,4 @@
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import {
   useCallback,
   useEffect,
@@ -10,9 +11,9 @@ import { useLocalStorage } from "usehooks-ts";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
 import type { Delegation } from "@/app/types/delegations";
-import { createStateUtils } from "@/utils/createStateUtils";
-import { calculateDelegationsDiff } from "@/utils/local_storage/calculateDelegationsDiff";
-import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/utils/local_storage/getDelegationsLocalStorageKey";
+import { createStateUtils } from "@/app/utils/createStateUtils";
+import { calculateDelegationsDiff } from "@/app/utils/local_storage/calculateDelegationsDiff";
+import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/app/utils/local_storage/getDelegationsLocalStorageKey";
 
 export type RegistrationStep =
   | undefined
@@ -36,7 +37,10 @@ interface DelegationState {
   // Methods
   addDelegation: (delegation: Delegation) => void;
   fetchMoreDelegations: () => void;
-  setRegistrationStep: (step: RegistrationStep) => void;
+  setRegistrationStep: (
+    step: RegistrationStep,
+    options?: SignPsbtOptions,
+  ) => void;
   setProcessing: (value: boolean) => void;
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
@@ -73,6 +77,8 @@ export function DelegationState({ children }: PropsWithChildren) {
   const [processing, setProcessing] = useState(false);
   const [registrationStep, setRegistrationStep] = useState<RegistrationStep>();
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
+  const [currentDelegationStepOptions, setCurrentDelegationStepOptions] =
+    useState<SignPsbtOptions>();
 
   // Methods
   const addDelegation = useCallback(
@@ -96,6 +102,7 @@ export function DelegationState({ children }: PropsWithChildren) {
   const resetRegistration = useCallback(() => {
     setSelectedDelegation(undefined);
     setRegistrationStep(undefined);
+    setCurrentDelegationStepOptions(undefined);
     setProcessing(false);
   }, []);
 
@@ -133,6 +140,8 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
+      setCurrentDelegationStepOptions,
+      currentDelegationStepOptions,
     }),
     [
       delegations,
@@ -148,6 +157,8 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
+      setCurrentDelegationStepOptions,
+      currentDelegationStepOptions,
     ],
   );
 

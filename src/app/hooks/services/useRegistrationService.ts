@@ -1,18 +1,19 @@
 import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
+import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useEffect } from "react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
 import { ONE_SECOND } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 import {
   RegistrationStep,
   useDelegationState,
 } from "@/app/state/DelegationState";
 import { useDelegationV2State } from "@/app/state/DelegationV2State";
 import { DelegationV2StakingState as DelegationState } from "@/app/types/delegationsV2";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { retry } from "@/utils";
+import { retry } from "@/app/utils";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
@@ -61,12 +62,14 @@ export function useRegistrationService() {
   const logger = useLogger();
 
   useEffect(() => {
-    const unsubscribe = subscribeToSigningSteps((step: SigningStep) => {
-      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
-      if (stepName) {
-        setStep(stepName);
-      }
-    });
+    const unsubscribe = subscribeToSigningSteps(
+      (step: SigningStep, options?: SignPsbtOptions) => {
+        const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
+        if (stepName) {
+          setStep(stepName, options);
+        }
+      },
+    );
 
     return unsubscribe;
   }, [subscribeToSigningSteps, setStep]);
@@ -80,9 +83,10 @@ export function useRegistrationService() {
         ERROR_CODES.VALIDATION_ERROR,
         "No delegation selected for registration",
       );
-      // log the error but don't throw it
       logger.warn(clientError.message);
-      handleError({ error: clientError });
+      handleError({
+        error: clientError,
+      });
       return;
     }
 
@@ -137,8 +141,9 @@ export function useRegistrationService() {
       }
       setProcessing(false);
     } catch (error: any) {
-      logger.error(error);
-      handleError({ error });
+      handleError({
+        error,
+      });
       reset();
     }
   }, [

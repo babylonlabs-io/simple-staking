@@ -17,8 +17,8 @@ import {
   ONE_SECOND,
 } from "@/app/constants";
 import { useError } from "@/app/context/Error/ErrorProvider";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
 
 export function useClientQuery<
   TQueryFnData = unknown,
@@ -49,7 +49,13 @@ export function useClientQuery<
 
   const data = useQuery({
     refetchInterval: ONE_MINUTE,
-    retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
+    retry: (failureCount, error) => {
+      // Prevent retries for geoblocked errors
+      if ((error as ClientError).errorCode === ERROR_CODES.GEO_BLOCK) {
+        return false;
+      }
+      return !isOpen && failureCount < API_DEFAULT_RETRY_COUNT;
+    },
     retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
     ...options,
   });
@@ -57,6 +63,13 @@ export function useClientQuery<
   useEffect(() => {
     if (data.isError) {
       const error = data.error as Error;
+      const isGeoBlocked =
+        (error as ClientError).errorCode === ERROR_CODES.GEO_BLOCK;
+
+      if (isGeoBlocked) {
+        return;
+      }
+
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching data from the API",

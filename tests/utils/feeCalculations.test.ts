@@ -7,20 +7,12 @@
  */
 
 import { Fees } from "@/app/types/fee";
-import { getFeeRateFromMempool } from "@/utils/getFeeRateFromMempool";
-import { nextPowerOfTwo } from "@/utils/nextPowerOfTwo";
+import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
+import { nextPowerOfTwo } from "@/app/utils/nextPowerOfTwo";
 
 // Constants from the actual codebase
 const DUST_LIMIT = 546; // satoshis
 const MIN_FEE_RATE = 128; // sats/vbyte
-
-// Simplified UTXO interface for testing
-interface UTXO {
-  txid: string;
-  vout: number;
-  value: number;
-  scriptPubKey?: string;
-}
 
 // Mock data that simulates what would come from mempool API in different network conditions
 const mockLowCongestion: Fees = {
@@ -298,7 +290,6 @@ describe("Fee Calculation Integration Tests", () => {
 
     it("should account for the cost to spend outputs in dust determination", () => {
       // As fee rates increase, the dust threshold increases
-      const values = [600, 1000, 3000, 6000, 10000];
       const feeRates = [10, 50, 100, 200, 300];
 
       for (let i = 0; i < feeRates.length; i++) {

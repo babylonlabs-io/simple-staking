@@ -12,7 +12,7 @@ jest.mock("@/app/context/Error/ErrorProvider", () => ({
   }),
 }));
 
-jest.mock("@/hooks/useLogger", () => ({
+jest.mock("@/app/hooks/useLogger", () => ({
   useLogger: () => ({
     error: jest.fn(),
   }),

@@ -4,11 +4,11 @@ import { InscriptionIdentifier } from "@babylonlabs-io/wallet-connector";
 import { postVerifyUtxoOrdinals } from "@/app/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useClientQuery } from "@/app/hooks/client/useClient";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { wait } from "@/utils";
-import { filterDust } from "@/utils/wallet";
+import { useLogger } from "@/app/hooks/useLogger";
+import { wait } from "@/app/utils";
+import { filterDust } from "@/app/utils/wallet";
 
 export const ORDINAL_KEY = "ORDINALS";
 export const WALLET_FETCH_INSRIPTIONS_TIMEOUT = 3_000;
@@ -44,7 +44,7 @@ export function useOrdinals(
       throw new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching ordinals data",
-        { cause: error },
+        { cause: error as Error },
       );
     }
   };

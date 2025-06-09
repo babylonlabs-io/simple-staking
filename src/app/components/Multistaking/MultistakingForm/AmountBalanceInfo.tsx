@@ -1,11 +1,11 @@
 import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { usePrice } from "@/app/hooks/client/api/usePrices";
 import { useBalanceState } from "@/app/state/BalanceState";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { satoshiToBtc } from "@/utils/btc";
-import { calculateTokenValueInCurrency } from "@/utils/formatCurrency";
-import { maxDecimals } from "@/utils/maxDecimals";
+import { satoshiToBtc } from "@/app/utils/btc";
+import { calculateTokenValueInCurrency } from "@/app/utils/formatCurrency";
+import { maxDecimals } from "@/app/utils/maxDecimals";
 
 export const AmountBalanceInfo = () => {
   const { totalBtcBalance } = useBalanceState();

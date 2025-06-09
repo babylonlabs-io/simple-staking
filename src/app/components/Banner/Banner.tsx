@@ -1,11 +1,9 @@
 import { Text } from "@babylonlabs-io/core-ui";
 import { PiWarningOctagonFill } from "react-icons/pi";
 
-import { shouldDisplayTestingMsg } from "@/config";
+import { shouldDisplayTestingMsg } from "@/app/config";
 
-interface Props {}
-
-export const Banner = ({}: Props) => {
+export const Banner = () => {
   if (!shouldDisplayTestingMsg()) {
     return null;
   }

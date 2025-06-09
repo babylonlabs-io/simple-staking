@@ -1,6 +1,6 @@
 import { encode } from "url-safe-base64";
 
-import { getPublicKeyNoCoord } from "@/utils/wallet";
+import { getPublicKeyNoCoord } from "@/app/utils/wallet";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -26,5 +26,7 @@ export const logTermsAcceptance = async ({
       "Error submitting terms acceptance request",
       { body: payload },
     );
-  } catch {}
+  } catch {
+    return;
+  }
 };

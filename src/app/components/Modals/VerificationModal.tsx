@@ -1,6 +1,6 @@
 import { Loader } from "@babylonlabs-io/core-ui";
 
-import { getNetworkConfig } from "@/config/network";
+import { getNetworkConfig } from "@/app/config/network";
 
 import { SubmitModal } from "./SubmitModal";
 

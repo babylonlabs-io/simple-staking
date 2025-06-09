@@ -1,15 +1,15 @@
 import { List } from "@babylonlabs-io/core-ui";
 
+import { AuthGuard } from "@/app/components/Common/AuthGuard";
+import { getNetworkConfigBBN } from "@/app/config/network/bbn";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useUTXOs } from "@/app/hooks/client/api/useUTXOs";
 import { useRewardsService } from "@/app/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/app/hooks/useBreakpoint";
 import { useBalanceState } from "@/app/state/BalanceState";
 import { useRewardsState } from "@/app/state/RewardState";
-import { AuthGuard } from "@/components/common/AuthGuard";
-import { getNetworkConfigBBN } from "@/config/network/bbn";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { ubbnToBaby } from "@/utils/bbn";
-import { satoshiToBtc } from "@/utils/btc";
+import { ubbnToBaby } from "@/app/utils/bbn";
+import { satoshiToBtc } from "@/app/utils/btc";
 
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";

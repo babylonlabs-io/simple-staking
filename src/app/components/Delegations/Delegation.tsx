@@ -1,7 +1,8 @@
-import Link from "next/link";
 import { FaBitcoin } from "react-icons/fa";
 
+import { Hint } from "@/app/components/Common/Hint";
 import { DelegationActions } from "@/app/components/Delegations/DelegationActions";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/app/constants";
 import { useFinalityProviderState } from "@/app/state/FinalityProviderState";
 import {
@@ -9,13 +10,11 @@ import {
   type Delegation as DelegationInterface,
 } from "@/app/types/delegations";
 import { FinalityProviderState } from "@/app/types/finalityProviders";
-import { Hint } from "@/components/common/Hint";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { satoshiToBtc } from "@/utils/btc";
-import { getState, getStateTooltip } from "@/utils/getState";
-import { maxDecimals } from "@/utils/maxDecimals";
-import { durationTillNow } from "@/utils/time";
-import { trim } from "@/utils/trim";
+import { satoshiToBtc } from "@/app/utils/btc";
+import { getState, getStateTooltip } from "@/app/utils/getState";
+import { maxDecimals } from "@/app/utils/maxDecimals";
+import { durationTillNow } from "@/app/utils/time";
+import { trim } from "@/app/utils/trim";
 
 import { DelegationCell } from "./components/DelegationCell";
 
@@ -50,13 +49,13 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
         tooltip={
           <span>
             This finality provider has been slashed.{" "}
-            <Link
+            <a
               className="text-error-main"
               target="_blank"
               href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
             >
               Learn more
-            </Link>
+            </a>
           </span>
         }
         status="error"
@@ -72,13 +71,13 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
         tooltip={
           <span>
             This finality provider has been jailed.{" "}
-            <Link
+            <a
               className="text-secondary-main"
               target="_blank"
               href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
             >
               Learn more
-            </Link>
+            </a>
           </span>
         }
         status="error"
@@ -105,13 +104,13 @@ const DelegationState: React.FC<{
       return (
         <span>
           This finality provider has been slashed.{" "}
-          <Link
+          <a
             className="text-secondary-main"
             target="_blank"
             href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
           >
             Learn more
-          </Link>
+          </a>
         </span>
       );
     }

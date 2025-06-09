@@ -1,4 +1,3 @@
-"use client";
 import {
   IBTCProvider,
   InscriptionIdentifier,
@@ -18,23 +17,23 @@ import {
   type PropsWithChildren,
 } from "react";
 
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useError } from "@/app/context/Error/ErrorProvider";
+import { ClientError, ERROR_CODES } from "@/app/errors";
+import { useLogger } from "@/app/hooks/useLogger";
+import { useSentryUser } from "@/app/hooks/useSentryUser";
 import { Fees } from "@/app/types/fee";
-import { getNetworkConfigBTC } from "@/config/network/btc";
-import { ClientError, ERROR_CODES } from "@/errors";
-import { useLogger } from "@/hooks/useLogger";
-import { useSentryUser } from "@/hooks/useSentryUser";
 import {
   getAddressBalance,
   getNetworkFees,
   getTipHeight,
   pushTx,
-} from "@/utils/mempool_api";
+} from "@/app/utils/mempool_api";
 import {
   getPublicKeyNoCoord,
   isSupportedAddressType,
   toNetwork,
-} from "@/utils/wallet";
+} from "@/app/utils/wallet";
 
 const btcConfig = getNetworkConfigBTC();
 
