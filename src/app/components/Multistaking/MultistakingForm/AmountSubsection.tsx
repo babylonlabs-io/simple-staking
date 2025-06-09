@@ -2,6 +2,7 @@ import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
 import { AuthGuard } from "@/app/components/Common/AuthGuard";
+import { useMultistakingState } from "@/app/state/MultistakingState";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
@@ -9,8 +10,11 @@ import { SubSection } from "./SubSection";
 export const AmountSubsection = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
+  const { setIsMaxBalanceMode } = useMultistakingState();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsMaxBalanceMode(false);
+
     setValue("amount", e.target.value, {
       shouldValidate: true,
       shouldDirty: true,
