@@ -6,6 +6,8 @@ import {
 import type { DBSchema, IDBPDatabase } from "idb";
 import type { Emitter } from "nanoevents";
 
+import type { Api } from "@/shared/utils/swagger/api";
+
 type Context = Record<string, number | string | boolean> & {
   category?: string;
 };
@@ -65,6 +67,8 @@ declare global {
       };
     }
 
+    type API = Api;
+
     type DB = IDBPDatabase<StakingSchema>;
   }
 
@@ -72,5 +76,6 @@ declare global {
     db: Infra.DB;
     eventBus: Infra.EventBus;
     logger: Infra.Logger;
+    api: Infra.API;
   }
 }
