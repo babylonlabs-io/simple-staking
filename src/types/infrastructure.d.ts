@@ -20,8 +20,6 @@ type ErrorContext = {
 
 declare global {
   namespace Infra {
-    type DB = {};
-
     interface EventBusEvents {
       // Create new Delegation V2
       "delegation:create": (
@@ -69,7 +67,7 @@ declare global {
 
     type API = Api;
 
-    type DB = IDBPDatabase<StakingSchema>;
+    type DB = IDBPDatabase<Schema>;
   }
 
   interface Infra {
