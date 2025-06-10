@@ -11,7 +11,7 @@ jest.mock("@uidotdev/usehooks", () => ({
   useDebounce: jest.fn((value) => value),
 }));
 
-import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
+import { RegistrationStep } from "@babylonlabs-io/btc-staking-ts";
 import { act, renderHook } from "@testing-library/react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -167,7 +167,7 @@ describe("useRegistrationService", () => {
   describe("subscribeToSigningSteps", () => {
     it("should subscribe to signing steps and update registration step", () => {
       // Initialize callback to avoid linter error
-      let callback = jest.fn() as unknown as (step: SigningStep) => void;
+      let callback = jest.fn() as unknown as (step: RegistrationStep) => void;
 
       // Mock the implementation of subscribeToSigningSteps
       mockSubscribeToSigningSteps.mockImplementation((cb) => {
@@ -182,25 +182,25 @@ describe("useRegistrationService", () => {
       expect(mockSubscribeToSigningSteps).toHaveBeenCalled();
 
       // Simulate different signing step events
-      callback(SigningStep.STAKING_SLASHING);
+      callback("staking-slashing");
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-staking-slashing",
         undefined,
       );
 
-      callback(SigningStep.UNBONDING_SLASHING);
+      callback("unbonding-slashing");
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-unbonding-slashing",
         undefined,
       );
 
-      callback(SigningStep.PROOF_OF_POSSESSION);
+      callback("proof-of-possession");
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-proof-of-possession",
         undefined,
       );
 
-      callback(SigningStep.CREATE_BTC_DELEGATION_MSG);
+      callback("create-btc-delegation-msg");
       expect(mockSetRegistrationStep).toHaveBeenCalledWith(
         "registration-sign-bbn",
         undefined,

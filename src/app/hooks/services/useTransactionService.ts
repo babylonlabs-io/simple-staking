@@ -56,7 +56,7 @@ export const useTransactionService = () => {
    */
   const createDelegationEoi = useCallback(
     async (stakingInput: BtcStakingInputs, feeRate: number) => {
-      const btcStakingManager = createBtcStakingManager("delegation:create");
+      const btcStakingManager = createBtcStakingManager();
 
       validateCommonInputs(
         btcStakingManager,
@@ -150,7 +150,7 @@ export const useTransactionService = () => {
       stakingHeight: number,
       stakingInput: BtcStakingInputs,
     ) => {
-      const btcStakingManager = createBtcStakingManager("delegation:register");
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -199,7 +199,7 @@ export const useTransactionService = () => {
       expectedTxHashHex: string,
       unsignedStakingTxHex: string,
     ) => {
-      const btcStakingManager = createBtcStakingManager("delegation:stake");
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -273,7 +273,7 @@ export const useTransactionService = () => {
         sigHex: string;
       }[],
     ) => {
-      const btcStakingManager = createBtcStakingManager("delegation:unbond");
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -315,7 +315,7 @@ export const useTransactionService = () => {
         paramVersion,
         earlyUnbondingTxHex,
       });
-      const btcStakingManager = createBtcStakingManager("delegation:withdraw");
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -360,7 +360,7 @@ export const useTransactionService = () => {
         paramVersion,
         stakingTxHash: Transaction.fromHex(stakingTxHex).getId(),
       });
-      const btcStakingManager = createBtcStakingManager("delegation:withdraw");
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,
@@ -401,7 +401,7 @@ export const useTransactionService = () => {
       paramVersion: number,
       slashingTxHex: string,
     ) => {
-      const btcStakingManager = createBtcStakingManager("delegation:withdraw");
+      const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
         btcStakingManager,
         stakingInput,

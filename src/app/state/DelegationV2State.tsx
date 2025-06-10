@@ -1,4 +1,4 @@
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import type { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import {
   useCallback,
   useEffect,

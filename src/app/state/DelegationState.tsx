@@ -1,6 +1,6 @@
-import {
-  SigningStep,
-  type SignPsbtOptions,
+import type {
+  RegistrationStep,
+  SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
@@ -19,15 +19,7 @@ import { createStateUtils } from "@/app/utils/createStateUtils";
 import { calculateDelegationsDiff } from "@/app/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/app/utils/local_storage/getDelegationsLocalStorageKey";
 
-type RegistrationSigningStep = Extract<
-  SigningStep,
-  | "staking-slashing"
-  | "unbonding-slashing"
-  | "proof-of-possession"
-  | "create-btc-delegation-msg"
->;
-
-export type RegistrationStep =
+export type SigningStep =
   | undefined
   | "registration-start"
   | "registration-staking-slashing"
@@ -44,28 +36,24 @@ interface DelegationState {
   delegations: Delegation[];
   // Registration state
   processing: boolean;
-  registrationStep: RegistrationStep;
+  registrationStep?: SigningStep;
   selectedDelegation?: Delegation;
   // Methods
   addDelegation: (delegation: Delegation) => void;
   fetchMoreDelegations: () => void;
-  setRegistrationStep: (
-    step: RegistrationStep,
-    options?: SignPsbtOptions,
-  ) => void;
+  setRegistrationStep: (step: SigningStep, options?: SignPsbtOptions) => void;
   setProcessing: (value: boolean) => void;
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
 }
 
-const REGISTRATION_STEP_MAP: Record<RegistrationSigningStep, RegistrationStep> =
-  {
-    [SigningStep.STAKING_SLASHING]: "registration-staking-slashing",
-    [SigningStep.UNBONDING_SLASHING]: "registration-unbonding-slashing",
-    [SigningStep.PROOF_OF_POSSESSION]: "registration-proof-of-possession",
-    [SigningStep.CREATE_BTC_DELEGATION_MSG]: "registration-sign-bbn",
-  };
+const REGISTRATION_STEP_MAP: Record<RegistrationStep, SigningStep> = {
+  "staking-slashing": "registration-staking-slashing",
+  "unbonding-slashing": "registration-unbonding-slashing",
+  "proof-of-possession": "registration-proof-of-possession",
+  "create-btc-delegation-msg": "registration-sign-bbn",
+};
 
 const { StateProvider, useState: useDelegationState } =
   createStateUtils<DelegationState>({
@@ -96,7 +84,9 @@ export function DelegationState({ children }: PropsWithChildren) {
     [],
   );
   const [processing, setProcessing] = useState(false);
-  const [registrationStep, setRegistrationStep] = useState<RegistrationStep>();
+  const [registrationStep, setRegistrationStep] = useState<
+    SigningStep | undefined
+  >();
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
   const [currentDelegationStepOptions, setCurrentDelegationStepOptions] =
     useState<SignPsbtOptions>();
@@ -147,7 +137,7 @@ export function DelegationState({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribe = eventBus.on("delegation:register", (step, options) => {
-      const stepName = REGISTRATION_STEP_MAP[step as RegistrationSigningStep];
+      const stepName = REGISTRATION_STEP_MAP[step];
 
       if (stepName) {
         setRegistrationStep(stepName);

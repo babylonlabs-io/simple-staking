@@ -1,6 +1,6 @@
-import {
-  SigningStep,
-  type SignPsbtOptions,
+import type {
+  RegistrationStep,
+  SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
@@ -41,14 +41,6 @@ const formatNumber = (value: number) =>
   !Number.isNaN(value) ? value : undefined;
 
 const { coinName } = getNetworkConfigBTC();
-
-type StakingSigningStep = Extract<
-  SigningStep,
-  | "staking-slashing"
-  | "unbonding-slashing"
-  | "proof-of-possession"
-  | "create-btc-delegation-msg"
->;
 
 export interface FormFields {
   finalityProvider: string;
@@ -106,7 +98,7 @@ export interface StakingState {
   currentStakingStepOptions: SignPsbtOptions | undefined;
 }
 
-const STAKING_SIGNING_STEP_MAP: Record<StakingSigningStep, StakingStep> = {
+const STAKING_SIGNING_STEP_MAP: Record<RegistrationStep, StakingStep> = {
   "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
   "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
   "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
@@ -376,7 +368,7 @@ export function StakingState({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribe = eventBus.on("delegation:create", (step, options) => {
-      const stepName = STAKING_SIGNING_STEP_MAP[step as StakingSigningStep];
+      const stepName = STAKING_SIGNING_STEP_MAP[step];
 
       if (stepName) {
         setCurrentStep(stepName);

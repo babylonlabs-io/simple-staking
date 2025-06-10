@@ -11,7 +11,6 @@ jest.mock("@uidotdev/usehooks", () => ({
   useDebounce: jest.fn((value) => value),
 }));
 
-import { SigningStep } from "@babylonlabs-io/btc-staking-ts";
 import { act, renderHook } from "@testing-library/react";
 
 import { getDelegationV2 } from "@/app/api/getDelegationsV2";
@@ -41,16 +40,6 @@ jest.mock("@/app/state/StakingState");
 jest.mock("@/app/utils", () => ({
   retry: jest.fn(),
   btcToSatoshi: (value: number) => value * 100000000, // Mock satoshi conversion
-}));
-
-// Mock the SigningStep enum from the library like in the other test
-jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
-  SigningStep: {
-    STAKING_SLASHING: "staking-slashing",
-    UNBONDING_SLASHING: "unbonding-slashing",
-    PROOF_OF_POSSESSION: "proof-of-possession",
-    CREATE_BTC_DELEGATION_MSG: "create-btc-delegation-msg",
-  },
 }));
 
 describe("useStakingService", () => {
@@ -360,7 +349,7 @@ describe("useStakingService", () => {
       expect(mockSubscribeToSigningSteps).toHaveBeenCalled();
 
       // Simulate a signing step event
-      mockCallback(SigningStep.STAKING_SLASHING);
+      mockCallback("staking-slashing");
 
       // Verify the step was updated
       expect(mockGoToStep).toHaveBeenCalledWith(
