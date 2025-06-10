@@ -1,5 +1,3 @@
-import { Text } from "@babylonlabs-io/core-ui";
-
 import { Hash } from "@/app/components/Hash/Hash";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import {
@@ -9,6 +7,8 @@ import {
 } from "@/app/types/finalityProviders";
 import { satoshiToBtc } from "@/app/utils/btc";
 import { maxDecimals } from "@/app/utils/maxDecimals";
+
+import { FinalityProviderLogo } from "./FinalityProviderLogo";
 
 const { coinSymbol } = getNetworkConfigBTC();
 
@@ -29,13 +29,11 @@ export const finalityProviderColumns = [
           className="inline-flex gap-1 items-center"
           title={row.description?.moniker}
         >
-          {/* Replace with KeybaseImage */}
-          <Text
-            as="span"
-            className="inline-flex justify-center items-center bg-secondary-main text-accent-contrast size-5 rounded-full text-[0.6rem]"
-          >
-            {row.rank}
-          </Text>
+          <FinalityProviderLogo
+            logoUrl={row.logo_url}
+            rank={row.rank}
+            moniker={row.description?.moniker}
+          />
           {row.description?.moniker || "No name provided"}
         </span>
       );

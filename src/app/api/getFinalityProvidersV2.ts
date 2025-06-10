@@ -27,6 +27,7 @@ interface FinalityProviderAPI {
   total_tvl: number;
   active_delegations: number;
   total_delegations: number;
+  logo_url?: string;
 }
 
 interface DescriptionAPI {
@@ -90,6 +91,7 @@ export const getFinalityProvidersV2 = async ({
       totalTVLSat: fp.total_tvl,
       activeDelegations: fp.active_delegations,
       totalDelegations: fp.total_delegations,
+      logo_url: fp.logo_url,
     }),
   );
 

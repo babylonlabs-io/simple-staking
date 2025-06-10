@@ -1,5 +1,6 @@
 import { useFormContext } from "@babylonlabs-io/core-ui";
 
+import { FinalityProviderLogo } from "@/app/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { FinalityProvider } from "@/app/types/finalityProviders";
 import { trim } from "@/app/utils/trim";
 
@@ -15,12 +16,12 @@ export const FinalityProviderItem = ({
   return (
     <div className="flex flex-row justify-between items-center">
       <div className="h-10 flex flex-row gap-2">
-        {/* Replace with KeybaseImage */}
-        <div
-          className={`w-10 h-10 text-sm flex items-center justify-center rounded-full bg-secondary-main text-accent-contrast`}
-        >
-          {provider.rank}
-        </div>
+        <FinalityProviderLogo
+          logoUrl={provider.logo_url}
+          rank={provider.rank}
+          moniker={provider.description?.moniker}
+          className="w-10 h-10"
+        />
         <div className="text-accent-primary flex items-center">
           {provider.description?.moniker ||
             trim(provider.btcPk, 8) ||
