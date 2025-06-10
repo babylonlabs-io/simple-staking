@@ -1,3 +1,5 @@
-namespace DI {
-  type Container = Infra & Repository & ViewModel & Application & Domain;
+declare global {
+  namespace DI {
+    type Container = Infra & Repository & ViewModel & Application & Domain;
+  }
 }
