@@ -3,6 +3,7 @@ import {
   SigningStep,
   type SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
+import type { DBSchema, IDBPDatabase } from "idb";
 import type { Emitter } from "nanoevents";
 
 type Context = Record<string, number | string | boolean> & {
@@ -52,6 +53,19 @@ declare global {
       warn(message: string, context?: Context): void;
       error(error: Error, context?: ErrorContext): string;
     }
+
+    interface Schema extends DBSchema {
+      delegations: {
+        key: "id";
+        value: {};
+      };
+      finalityProviders: {
+        key: "id";
+        value: {};
+      };
+    }
+
+    type DB = IDBPDatabase<StakingSchema>;
   }
 
   interface Infra {
