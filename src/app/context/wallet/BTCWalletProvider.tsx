@@ -211,6 +211,16 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     return unsubscribe;
   }, [btcConnector, connectBTC]);
 
+  useEffect(() => {
+    if (!btcConnector) return;
+
+    const unsubscribe = btcConnector.on("disconnect", () => {
+      btcDisconnect();
+    });
+
+    return unsubscribe;
+  }, [btcConnector, btcDisconnect]);
+
   // Listen for BTC account changes
   useEffect(() => {
     if (!btcWalletProvider) return;

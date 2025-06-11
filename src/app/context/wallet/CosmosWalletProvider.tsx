@@ -203,6 +203,16 @@ export const CosmosWalletProvider = ({ children }: PropsWithChildren) => {
   useEffect(() => {
     if (!bbnConnector) return;
 
+    const unsubscribe = bbnConnector.on("disconnect", () => {
+      cosmosDisconnect();
+    });
+
+    return unsubscribe;
+  }, [bbnConnector, cosmosDisconnect]);
+
+  useEffect(() => {
+    if (!bbnConnector) return;
+
     const installedWallets = bbnConnector.wallets
       .filter((wallet) => wallet.installed)
       .reduce(
