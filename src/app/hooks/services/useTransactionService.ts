@@ -1,8 +1,4 @@
-import {
-  BabylonBtcStakingManager,
-  SigningStep,
-} from "@babylonlabs-io/btc-staking-ts";
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import { BabylonBtcStakingManager } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
 
@@ -49,11 +45,7 @@ export const useTransactionService = () => {
 
   const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
 
-  const {
-    createBtcStakingManager,
-    on: managerEventsOn,
-    off: managerEventsOff,
-  } = useStakingManagerService();
+  const { createBtcStakingManager } = useStakingManagerService();
 
   /**
    * Create the delegation EOI
@@ -430,23 +422,6 @@ export const useTransactionService = () => {
     [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
-  /**
-   * Subscribe to signing step events
-   * @param callback - The callback to be called when a signing step event occurs
-   * @returns A cleanup function to remove the listener
-   */
-  const subscribeToSigningSteps = useCallback(
-    (callback: (step: SigningStep, options?: SignPsbtOptions) => void) => {
-      managerEventsOn(callback);
-
-      // Return cleanup function
-      return () => {
-        managerEventsOff(callback);
-      };
-    },
-    [managerEventsOff, managerEventsOn],
-  );
-
   return {
     createDelegationEoi,
     estimateStakingFee,
@@ -456,7 +431,6 @@ export const useTransactionService = () => {
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
-    subscribeToSigningSteps,
     tipHeight,
   };
 };

@@ -1,4 +1,7 @@
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import type {
+  RegistrationStep,
+  SignPsbtOptions,
+} from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -10,12 +13,13 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/app/hooks/client/api/useDelegations";
+import { useEventBus } from "@/app/hooks/useEventBus";
 import type { Delegation } from "@/app/types/delegations";
 import { createStateUtils } from "@/app/utils/createStateUtils";
 import { calculateDelegationsDiff } from "@/app/utils/local_storage/calculateDelegationsDiff";
 import { getDelegationsLocalStorageKey as getDelegationsKey } from "@/app/utils/local_storage/getDelegationsLocalStorageKey";
 
-export type RegistrationStep =
+export type SigningStep =
   | undefined
   | "registration-start"
   | "registration-staking-slashing"
@@ -32,20 +36,24 @@ interface DelegationState {
   delegations: Delegation[];
   // Registration state
   processing: boolean;
-  registrationStep: RegistrationStep;
+  registrationStep?: SigningStep;
   selectedDelegation?: Delegation;
   // Methods
   addDelegation: (delegation: Delegation) => void;
   fetchMoreDelegations: () => void;
-  setRegistrationStep: (
-    step: RegistrationStep,
-    options?: SignPsbtOptions,
-  ) => void;
+  setRegistrationStep: (step: SigningStep, options?: SignPsbtOptions) => void;
   setProcessing: (value: boolean) => void;
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
 }
+
+const REGISTRATION_STEP_MAP: Record<RegistrationStep, SigningStep> = {
+  "staking-slashing": "registration-staking-slashing",
+  "unbonding-slashing": "registration-unbonding-slashing",
+  "proof-of-possession": "registration-proof-of-possession",
+  "create-btc-delegation-msg": "registration-sign-bbn",
+};
 
 const { StateProvider, useState: useDelegationState } =
   createStateUtils<DelegationState>({
@@ -68,6 +76,7 @@ export function DelegationState({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
   const { data, fetchNextPage, isFetchingNextPage, hasNextPage, refetch } =
     useDelegations();
+  const eventBus = useEventBus();
 
   // States
   const [delegations, setDelegations] = useLocalStorage<Delegation[]>(
@@ -75,7 +84,9 @@ export function DelegationState({ children }: PropsWithChildren) {
     [],
   );
   const [processing, setProcessing] = useState(false);
-  const [registrationStep, setRegistrationStep] = useState<RegistrationStep>();
+  const [registrationStep, setRegistrationStep] = useState<
+    SigningStep | undefined
+  >();
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
   const [currentDelegationStepOptions, setCurrentDelegationStepOptions] =
     useState<SignPsbtOptions>();
@@ -124,6 +135,19 @@ export function DelegationState({ children }: PropsWithChildren) {
     [data?.delegations, setDelegations, delegations],
   );
 
+  useEffect(() => {
+    const unsubscribe = eventBus.on("delegation:register", (step, options) => {
+      const stepName = REGISTRATION_STEP_MAP[step];
+
+      if (stepName) {
+        setRegistrationStep(stepName);
+        setCurrentDelegationStepOptions(options);
+      }
+    });
+
+    return unsubscribe;
+  }, [setRegistrationStep, setCurrentDelegationStepOptions, eventBus]);
+
   // Context
   const state = useMemo(
     () => ({
@@ -140,7 +164,6 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
-      setCurrentDelegationStepOptions,
       currentDelegationStepOptions,
     }),
     [
@@ -157,7 +180,6 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
-      setCurrentDelegationStepOptions,
       currentDelegationStepOptions,
     ],
   );
