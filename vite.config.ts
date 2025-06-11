@@ -83,4 +83,9 @@ export default defineConfig({
     ),
     "process.env.NEXT_TELEMETRY_DISABLED": JSON.stringify("1"),
   },
+  resolve: {
+    alias: {
+      crypto: "crypto-browserify",
+    },
+  },
 });

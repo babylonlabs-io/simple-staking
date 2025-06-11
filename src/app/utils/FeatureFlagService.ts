@@ -12,11 +12,7 @@
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
 
-type FeatureFlag = "MULTISTAKING";
-
-const FEATURE_FLAGS = {
-  MULTISTAKING: process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true",
-} as const;
+type FeatureFlag = "MULTISTAKING" | "ENABLE_LEDGER";
 
 class FeatureFlagService {
   /**
@@ -25,7 +21,14 @@ class FeatureFlagService {
    * @returns True if the feature is enabled, false otherwise
    */
   private static getFlagValue(flagName: FeatureFlag): boolean {
-    const result = FEATURE_FLAGS[flagName];
+    // The set of feature flags are defined here so process.env will be
+    // looked up at runtime.
+    const featureFlags = {
+      MULTISTAKING: process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true",
+      ENABLE_LEDGER: process.env.NEXT_PUBLIC_FF_ENABLE_LEDGER === "true",
+    } as const;
+
+    const result = featureFlags[flagName];
     return result;
   }
 
@@ -38,6 +41,17 @@ class FeatureFlagService {
    */
   static get IsMultiStakingEnabled(): boolean {
     return this.getFlagValue("MULTISTAKING");
+  }
+
+  /**
+   * ENABLE_LEDGER feature flag
+   *
+   * Purpose: Enables ledger support
+   * Why needed: To gradually roll out ledger support
+   * ETA for removal: TBD - Will be removed once ledger support is fully released
+   */
+  static get IsLedgerEnabled(): boolean {
+    return this.getFlagValue("ENABLE_LEDGER");
   }
 }
 
