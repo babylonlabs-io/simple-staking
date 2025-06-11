@@ -3,6 +3,7 @@ import {
   SigningStep,
   type SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
+import mempoolJS from "@mempool/mempool.js";
 import type { DBSchema, IDBPDatabase } from "idb";
 import type { Emitter } from "nanoevents";
 
@@ -68,6 +69,8 @@ declare global {
     type API = Api;
 
     type DB = IDBPDatabase<Schema>;
+
+    type BTCClient = ReturnType<typeof mempoolJS>["bitcoin"];
   }
 
   interface Infra {
@@ -75,5 +78,6 @@ declare global {
     eventBus: Infra.EventBus;
     logger: Infra.Logger;
     api: Infra.API;
+    bitcoin: Infra.BTCClient;
   }
 }
