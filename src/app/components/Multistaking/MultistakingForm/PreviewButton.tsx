@@ -2,21 +2,29 @@ import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { twJoin } from "tailwind-merge";
 
 import { AuthGuard } from "@/app/components/Common/AuthGuard";
-import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { STAKING_DISABLED } from "@/app/constants";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useStakingState } from "@/app/state/StakingState";
 
-function beautifyErrorMessages(error: string) {
-  switch (error.toLowerCase()) {
-    case "Insufficient funds: unable to gather enough UTXOs to cover the staking amount and fees".toLowerCase():
-      return "Insufficient BTC";
-    case "Staking amount (stakingAmountSat) is required for staking input.".toLowerCase():
-      return "Enter BTC Amount to Stake";
-    case "Please select a finality provider".toLowerCase():
-      return "Add Finality Provider";
-    default:
-      return error;
-  }
+const ERROR_MESSAGE_MAP: Record<string, string> = {
+  "insufficient funds: unable to gather enough utxos to cover the staking amount and fees":
+    "Insufficient BTC",
+  "staking amount (stakingamountsat) is required for staking input.":
+    "Enter BTC Amount to Stake",
+  "staking amount is the required field.": "Enter BTC Amount to Stake",
+  "please select a finality provider": "Add Finality Provider",
+  "staking amount exceeds your balance": "Staking Amount Exceeds Balance",
+};
+
+const BUTTON_STATE_STYLES = {
+  error: "!text-error-main !bg-error-main/10",
+  disabled: "!text-accent-primary/50 !bg-accent-primary/10",
+  default: "",
+} as const;
+
+function beautifyErrorMessages(error: string): string {
+  const normalizedError = error.toLowerCase();
+  return ERROR_MESSAGE_MAP[normalizedError] || error;
 }
 
 export function PreviewButton() {
@@ -28,6 +36,12 @@ export function PreviewButton() {
   const errorKeys = Object.keys(errors);
   const errorMessages = errorKeys.map((key) => errors[key]?.message);
   const hasError = errorMessages.length > 0;
+
+  const getButtonState = () => {
+    if (hasError) return "error";
+    if (STAKING_DISABLED || isGeoBlocked) return "disabled";
+    return "default";
+  };
 
   const renderButtonContent = () => {
     if (STAKING_DISABLED) {
@@ -59,6 +73,8 @@ export function PreviewButton() {
     return "Preview";
   };
 
+  const buttonState = getButtonState();
+
   return (
     <AuthGuard
       fallback={
@@ -76,9 +92,7 @@ export function PreviewButton() {
         type="submit"
         className={twJoin(
           "w-full mt-2 capitalize",
-          hasError && "!text-accent-primary !bg-accent-primary/10",
-          (STAKING_DISABLED || isGeoBlocked) &&
-            "!text-gray-500/70 dark:!text-gray-400/70",
+          BUTTON_STATE_STYLES[buttonState],
         )}
         disabled={
           !isValid ||
