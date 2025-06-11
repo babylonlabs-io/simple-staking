@@ -1,8 +1,5 @@
 import { addBreadcrumb, captureException } from "@sentry/react";
 
-// TODO: move errors from app folder
-import { ClientError } from "@/app/errors";
-
 export default {
   info: (message, { category, ...data } = {}) =>
     addBreadcrumb({
@@ -22,7 +19,7 @@ export default {
     captureException(error, {
       level,
       tags: Reflect.has(error, "errorCode")
-        ? { ...tags, errorCode: (error as ClientError).errorCode }
+        ? { ...tags, errorCode: Reflect.get(error, "errorCode") }
         : tags,
       extra,
     }),
