@@ -86,12 +86,11 @@ export function MultistakingForm() {
         <HiddenField name="finalityProvider" defaultValue="" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <AmountSubsection />
             <SubSection>
               <div className="flex flex-col w-full gap-4">
                 <div className="flex flex-row">
                   <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-                    View Finality Provider
+                    Select Finality Provider
                   </div>
                   <div className="flex">
                     {counter < MAX_FINALITY_PROVIDERS && (
@@ -134,6 +133,7 @@ export function MultistakingForm() {
                 ))}
               </div>
             </SubSection>
+            <AmountSubsection />
             <FeesSection />
             <PreviewButton />
           </Card>
