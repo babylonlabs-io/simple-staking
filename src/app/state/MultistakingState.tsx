@@ -134,7 +134,16 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .test(
               "same-public-key",
               "Cannot select a finality provider with the same public key as the wallet",
-              (value) => value !== publicKeyNoCoord,
+              function (value) {
+                if (value === publicKeyNoCoord) {
+                  return this.createError({
+                    message:
+                      "Cannot select a finality provider with the same public key as the wallet",
+                    type: "critical",
+                  });
+                }
+                return true;
+              },
             ),
 
           term: number()
@@ -176,7 +185,16 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .test(
               "decimal-points",
               "Staking amount must have no more than 8 decimal points.",
-              (_, context) => validateDecimalPoints(context.originalValue),
+              function (_, context) {
+                if (!validateDecimalPoints(context.originalValue)) {
+                  return this.createError({
+                    message:
+                      "Staking amount must have no more than 8 decimal points.",
+                    type: "critical",
+                  });
+                }
+                return true;
+              },
             )
             .test("insufficient-funds", "Insufficient BTC", () => true),
 

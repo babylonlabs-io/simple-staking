@@ -20,11 +20,21 @@ export function PreviewButton() {
 
   const errorKeys = Object.keys(errors);
   const errorMessages = errorKeys.map((key) => errors[key]?.message);
+
+  const hasCriticalError = errorKeys.some(
+    (key) => errors[key]?.type === "critical",
+  );
+
   const hasError = errorMessages.length > 0;
 
   const getButtonState = () => {
-    if (hasError) return "error";
-    if (STAKING_DISABLED || isGeoBlocked) return "disabled";
+    if (hasCriticalError) return "error";
+
+    // Treat any other invalid form state as disabled to show gray styling
+    if (!isValid || STAKING_DISABLED || isGeoBlocked) {
+      return "disabled";
+    }
+
     return "default";
   };
 
