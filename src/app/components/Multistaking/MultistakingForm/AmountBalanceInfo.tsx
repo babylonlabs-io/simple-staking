@@ -47,7 +47,7 @@ export const AmountBalanceInfo = () => {
   return (
     <div className="flex text-sm flex-row justify-between w-full content-center">
       <div>
-        Balance:{" "}
+        Stakable:{" "}
         <u className="cursor-pointer" onClick={handleSetMaxBalance}>
           {maxDecimals(availableBalance, 8)}
         </u>{" "}

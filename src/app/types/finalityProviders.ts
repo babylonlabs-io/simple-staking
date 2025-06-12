@@ -9,6 +9,7 @@ export interface FinalityProvider {
   totalTVLSat: number;
   activeDelegations: number;
   totalDelegations: number;
+  logo_url?: string;
 }
 
 export interface FinalityProviderV1 {

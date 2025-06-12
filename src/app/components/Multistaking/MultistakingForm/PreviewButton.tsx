@@ -3,6 +3,8 @@ import { twJoin } from "tailwind-merge";
 
 import { AuthGuard } from "@/app/components/Common/AuthGuard";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { STAKING_DISABLED } from "@/app/constants";
+import { useStakingState } from "@/app/state/StakingState";
 
 function beautifyErrorMessages(error: string) {
   switch (error.toLowerCase()) {
@@ -21,12 +23,17 @@ export function PreviewButton() {
   const { open } = useBTCWallet();
   const form = useFormState();
   const { isValid, errors, isValidating, isLoading } = form;
+  const { blocked: isGeoBlocked } = useStakingState();
 
   const errorKeys = Object.keys(errors);
   const errorMessages = errorKeys.map((key) => errors[key]?.message);
   const hasError = errorMessages.length > 0;
 
   const renderButtonContent = () => {
+    if (STAKING_DISABLED) {
+      return "Preview";
+    }
+
     if (isValidating) {
       return "Calculating...";
     }
@@ -55,7 +62,11 @@ export function PreviewButton() {
   return (
     <AuthGuard
       fallback={
-        <Button onClick={open} className={"w-full mt-2"}>
+        <Button
+          onClick={open}
+          className={"w-full mt-2"}
+          disabled={isGeoBlocked}
+        >
           Connect Wallet
         </Button>
       }
@@ -66,8 +77,16 @@ export function PreviewButton() {
         className={twJoin(
           "w-full mt-2 capitalize",
           hasError && "!text-accent-primary !bg-accent-primary/10",
+          (STAKING_DISABLED || isGeoBlocked) &&
+            "!text-gray-500/70 dark:!text-gray-400/70",
         )}
-        disabled={!isValid || isValidating || isLoading}
+        disabled={
+          !isValid ||
+          isValidating ||
+          isLoading ||
+          STAKING_DISABLED ||
+          isGeoBlocked
+        }
       >
         {renderButtonContent()}
       </Button>

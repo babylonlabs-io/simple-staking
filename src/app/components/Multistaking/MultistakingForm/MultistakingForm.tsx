@@ -13,6 +13,7 @@ import { Section } from "@/app/components/Section/Section";
 import { StakingModal } from "@/app/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { useMultistakingState } from "@/app/state/MultistakingState";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import {
   StakingModalPage,
   StakingStep,
@@ -22,14 +23,21 @@ import {
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
+import { FormAlert } from "./FormAlert";
 import { PreviewButton } from "./PreviewButton";
 
 const { networkName } = getNetworkConfigBTC();
 
 export function MultistakingForm() {
-  const { validationSchema, stakingInfo, setFormData, goToStep } =
-    useStakingState();
-
+  const { address } = useBTCWallet();
+  const {
+    validationSchema,
+    stakingInfo,
+    setFormData,
+    goToStep,
+    blocked: isGeoBlocked,
+    errorMessage: geoBlockMessage,
+  } = useStakingState();
   const {
     isModalOpen,
     setIsModalOpen,
@@ -86,12 +94,11 @@ export function MultistakingForm() {
         <HiddenField name="finalityProvider" defaultValue="" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <AmountSubsection />
             <SubSection>
               <div className="flex flex-col w-full gap-4">
                 <div className="flex flex-row">
                   <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-                    View Finality Provider
+                    Select Finality Provider
                   </div>
                   <div className="flex">
                     {counter < MAX_FINALITY_PROVIDERS && (
@@ -134,8 +141,14 @@ export function MultistakingForm() {
                 ))}
               </div>
             </SubSection>
+            <AmountSubsection />
             <FeesSection />
             <PreviewButton />
+            <FormAlert
+              address={address}
+              isGeoBlocked={isGeoBlocked}
+              geoBlockMessage={geoBlockMessage}
+            />
           </Card>
         </div>
 

@@ -1,8 +1,15 @@
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import type { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 import { useLocalStorage } from "usehooks-ts";
 
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useEventBus } from "@/app/hooks/useEventBus";
 import {
   type DelegationLike,
   type DelegationV2,
@@ -13,6 +20,12 @@ import { getDelegationsV2LocalStorageKey } from "@/app/utils/local_storage/getDe
 import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
 import { useDelegationsV2 } from "../hooks/client/api/useDelegationsV2";
 import { useDelegationStorage } from "../hooks/storage/useDelegationStorage";
+
+const DELEGATION_V2_CHANNELS = [
+  "delegation:stake",
+  "delegation:unbond",
+  "delegation:withdraw",
+] as const;
 
 interface DelegationV2State {
   isLoading: boolean;
@@ -54,6 +67,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   const { bech32Address } = useCosmosWallet();
   const [currentStepOptions, setCurrentStepOptions] =
     useState<SignPsbtOptions>();
+  const eventBus = useEventBus();
 
   const {
     data,
@@ -75,6 +89,17 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     (txHash: string) => delegations.find((d) => d.stakingTxHashHex === txHash),
     [delegations],
   );
+
+  useEffect(() => {
+    const unsubscribeFns = DELEGATION_V2_CHANNELS.map((channel) =>
+      eventBus.on(channel, (_, options) => {
+        setCurrentStepOptions(options);
+      }),
+    );
+
+    return () =>
+      void unsubscribeFns.forEach((unsubscribe) => void unsubscribe());
+  }, [eventBus, setCurrentStepOptions]);
 
   // Context
   const state = useMemo(
