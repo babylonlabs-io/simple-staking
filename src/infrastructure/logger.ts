@@ -23,4 +23,4 @@ export default {
         : tags,
       extra,
     }),
-} as Infra.Logger;
+} satisfies Infra.Logger;
