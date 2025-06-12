@@ -17,19 +17,13 @@ export const AmountBalanceInfo = () => {
   const { coinSymbol } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
 
-  const { calculateAvailableBalance, calculateMaxStakingAmount } =
-    useAvailableBalance();
-
+  const { calculateAvailableBalance } = useAvailableBalance();
   const availableBalance = calculateAvailableBalance();
 
   const btcAmountValue = parseFloat(btcAmount || "0");
   const btcAmountUsd = calculateTokenValueInCurrency(btcAmountValue, btcInUsd, {
     zeroDisplay: "$0.00",
   });
-
-  const finalityProvider = useWatch({ name: "finalityProvider" });
-  const term = useWatch({ name: "term" });
-  const feeRate = useWatch({ name: "feeRate", defaultValue: "0" });
 
   useEffect(() => {
     if (isMaxBalanceMode) {
@@ -43,23 +37,7 @@ export const AmountBalanceInfo = () => {
 
   const handleSetMaxBalance = () => {
     setIsMaxBalanceMode(true);
-
-    if (!finalityProvider || !term || !feeRate) {
-      setValue("amount", availableBalance.toString(), {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-      return;
-    }
-
-    const maxAmount = calculateMaxStakingAmount({
-      finalityProvider,
-      term: Number(term),
-      feeRate: Number(feeRate),
-    });
-
-    setValue("amount", maxAmount.toString(), {
+    setValue("amount", availableBalance.toString(), {
       shouldValidate: true,
       shouldDirty: true,
       shouldTouch: true,
