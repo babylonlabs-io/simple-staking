@@ -1,12 +1,30 @@
 import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import { number, object, ObjectSchema, string } from "yup";
 
+import { validateDecimalPoints } from "@/app/components/Staking/Form/validation/validation";
+import { getNetworkConfigBTC } from "@/app/config/network/btc";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import { useAppState } from "@/app/state";
+import { satoshiToBtc } from "@/app/utils/btc";
 import { createStateUtils } from "@/app/utils/createStateUtils";
+import { formatNumber, formatStakingAmount } from "@/app/utils/formTransforms";
 
 import type { FinalityProvider } from "../types/finalityProviders";
 
+import { useBalanceState } from "./BalanceState";
 import { useFinalityProviderState } from "./FinalityProviderState";
 import { StakingModalPage } from "./StakingState";
+
+const { coinName } = getNetworkConfigBTC();
+
+export interface MultistakingFormFields {
+  finalityProvider: string;
+  amount: number;
+  term: number;
+  feeRate: number;
+  feeAmount: number;
+}
 
 export interface MultistakingState {
   isModalOpen: boolean;
@@ -21,6 +39,19 @@ export interface MultistakingState {
   MAX_FINALITY_PROVIDERS: number;
   currentStakingStepOptions: SignPsbtOptions | undefined;
   setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
+  validationSchema?: ObjectSchema<MultistakingFormFields>;
+  stakingInfo?: {
+    minFeeRate: number;
+    maxFeeRate: number;
+    defaultFeeRate: number;
+    minStakingTimeBlocks: number;
+    maxStakingTimeBlocks: number;
+    defaultStakingTimeBlocks?: number;
+    minStakingAmountSat: number;
+    maxStakingAmountSat: number;
+    unbondingFeeSat: number;
+    unbondingTime: number;
+  };
 }
 
 const { StateProvider, useState: useMultistakingState } =
@@ -37,6 +68,8 @@ const { StateProvider, useState: useMultistakingState } =
     MAX_FINALITY_PROVIDERS: 1,
     currentStakingStepOptions: undefined,
     setCurrentStakingStepOptions: () => {},
+    validationSchema: undefined,
+    stakingInfo: undefined,
   });
 
 export function MultistakingState({ children }: PropsWithChildren) {
@@ -54,6 +87,122 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const MAX_FINALITY_PROVIDERS = 1;
 
   const { finalityProviders } = useFinalityProviderState();
+  const { publicKeyNoCoord } = useBTCWallet();
+  const { stakableBtcBalance } = useBalanceState();
+  const { networkInfo } = useAppState();
+
+  const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
+
+  const stakingInfo = useMemo(() => {
+    if (!latestParam) {
+      return;
+    }
+
+    const {
+      minStakingAmountSat = 0,
+      maxStakingAmountSat = 0,
+      minStakingTimeBlocks = 0,
+      maxStakingTimeBlocks = 0,
+      unbondingFeeSat,
+      unbondingTime,
+    } = latestParam || {};
+
+    // Default fee rates for multistaking
+    const minFeeRate = 1;
+    const maxFeeRate = 1000;
+    const defaultFeeRate = 10;
+
+    return {
+      defaultFeeRate,
+      minFeeRate,
+      maxFeeRate,
+      minStakingAmountSat,
+      maxStakingAmountSat,
+      minStakingTimeBlocks,
+      maxStakingTimeBlocks,
+      unbondingFeeSat,
+      unbondingTime,
+    };
+  }, [latestParam]);
+
+  const validationSchema = useMemo(
+    () =>
+      object()
+        .shape({
+          finalityProvider: string()
+            .required("Add Finality Provider")
+            .test(
+              "same-public-key",
+              "Cannot select a finality provider with the same public key as the wallet",
+              (value) => value !== publicKeyNoCoord,
+            ),
+
+          term: number()
+            .transform(formatNumber)
+            .typeError("Staking term must be a valid number.")
+            .required("Staking term is the required field.")
+            .integer("Staking term must not have decimal points.")
+            .moreThan(0, "Staking term must be greater than 0.")
+            .min(
+              stakingInfo?.minStakingTimeBlocks ?? 0,
+              `Staking term must be at least ${stakingInfo?.minStakingTimeBlocks ?? 0} blocks.`,
+            )
+            .max(
+              stakingInfo?.maxStakingTimeBlocks ?? 0,
+              `Staking term must be no more than ${stakingInfo?.maxStakingTimeBlocks ?? 0} blocks.`,
+            ),
+
+          amount: number()
+            .transform(formatStakingAmount)
+            .typeError("Staking amount must be a valid number.")
+            .required("Enter BTC Amount to Stake")
+            .moreThan(0, "Staking amount must be greater than 0.")
+            .min(
+              stakingInfo?.minStakingAmountSat ?? 0,
+              `Staking amount must be at least ${satoshiToBtc(stakingInfo?.minStakingAmountSat ?? 0)} ${coinName}.`,
+            )
+            .max(
+              stakingInfo?.maxStakingAmountSat ?? 0,
+              `Staking amount must be no more than ${satoshiToBtc(stakingInfo?.maxStakingAmountSat ?? 0)} ${coinName}.`,
+            )
+            .test(
+              "balance-check",
+              "Staking Amount Exceeds Balance",
+              (value) => {
+                if (!value) return true;
+                return value <= stakableBtcBalance;
+              },
+            )
+            .test(
+              "decimal-points",
+              "Staking amount must have no more than 8 decimal points.",
+              (_, context) => validateDecimalPoints(context.originalValue),
+            )
+            .test("insufficient-funds", "Insufficient BTC", () => true),
+
+          feeRate: number()
+            .transform(formatNumber)
+            .typeError("Staking fee rate must be a valid number.")
+            .required("Staking fee rate is the required field.")
+            .moreThan(0, "Staking fee rate must be greater than 0.")
+            .min(
+              stakingInfo?.minFeeRate ?? 0,
+              "Selected fee rate is lower than the hour fee",
+            )
+            .max(
+              stakingInfo?.maxFeeRate ?? 0,
+              "Selected fee rate is higher than the hour fee",
+            ),
+
+          feeAmount: number()
+            .transform(formatNumber)
+            .typeError("Staking fee amount must be a valid number.")
+            .required("Staking fee amount is the required field.")
+            .moreThan(0, "Staking fee amount must be greater than 0."),
+        })
+        .required(),
+    [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
+  );
 
   const handleSelectProvider = useCallback(
     (selectedProviderKey: string) => {
@@ -91,6 +240,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
       MAX_FINALITY_PROVIDERS,
       currentStakingStepOptions,
       setCurrentStakingStepOptions,
+      validationSchema,
+      stakingInfo,
     }),
     [
       isModalOpen,
@@ -105,6 +256,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
       MAX_FINALITY_PROVIDERS,
       currentStakingStepOptions,
       setCurrentStakingStepOptions,
+      validationSchema,
+      stakingInfo,
     ],
   );
 

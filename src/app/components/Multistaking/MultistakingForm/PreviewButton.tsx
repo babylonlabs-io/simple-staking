@@ -6,26 +6,11 @@ import { STAKING_DISABLED } from "@/app/constants";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useStakingState } from "@/app/state/StakingState";
 
-const ERROR_MESSAGE_MAP: Record<string, string> = {
-  "insufficient funds: unable to gather enough utxos to cover the staking amount and fees":
-    "Insufficient BTC",
-  "staking amount (stakingamountsat) is required for staking input.":
-    "Enter BTC Amount to Stake",
-  "staking amount is the required field.": "Enter BTC Amount to Stake",
-  "please select a finality provider": "Add Finality Provider",
-  "staking amount exceeds your balance": "Staking Amount Exceeds Balance",
-};
-
 const BUTTON_STATE_STYLES = {
   error: "!text-error-main !bg-error-main/10",
   disabled: "!text-accent-primary/50 !bg-accent-primary/10",
   default: "",
 } as const;
-
-function beautifyErrorMessages(error: string): string {
-  const normalizedError = error.toLowerCase();
-  return ERROR_MESSAGE_MAP[normalizedError] || error;
-}
 
 export function PreviewButton() {
   const { open } = useBTCWallet();
@@ -58,16 +43,20 @@ export function PreviewButton() {
 
     if (hasError) {
       let selectedError = "";
+      // Filter for required field errors first, as they take priority
       const requiredErrors = errorKeys.filter(
         (key) => errors[key]?.type === "required",
       );
+
+      // If there are required field errors, show the first one
+      // Otherwise fall back to showing the first error message of any type
       if (requiredErrors.length > 0) {
         selectedError = errors[requiredErrors[0]]?.message?.toString() || "";
       } else {
         selectedError = errorMessages[0]?.toString() || "";
       }
 
-      return beautifyErrorMessages(selectedError);
+      return selectedError;
     }
 
     return "Preview";

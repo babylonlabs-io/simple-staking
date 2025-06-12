@@ -12,13 +12,15 @@ import { SubSection } from "@/app/components/Multistaking/MultistakingForm/SubSe
 import { Section } from "@/app/components/Section/Section";
 import { StakingModal } from "@/app/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
-import { useMultistakingState } from "@/app/state/MultistakingState";
 import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
+import {
+  useMultistakingState,
+  type MultistakingFormFields,
+} from "@/app/state/MultistakingState";
 import {
   StakingModalPage,
   StakingStep,
   useStakingState,
-  type FormFields,
 } from "@/app/state/StakingState";
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
@@ -31,14 +33,14 @@ const { networkName } = getNetworkConfigBTC();
 export function MultistakingForm() {
   const { address } = useBTCWallet();
   const {
-    validationSchema,
-    stakingInfo,
     setFormData,
     goToStep,
     blocked: isGeoBlocked,
     errorMessage: geoBlockMessage,
   } = useStakingState();
   const {
+    validationSchema,
+    stakingInfo,
     isModalOpen,
     setIsModalOpen,
     stakingModalPage,
@@ -53,7 +55,7 @@ export function MultistakingForm() {
   const counter = selectedProviders.length;
 
   const handlePreview = useCallback(
-    (formValues: FormFields) => {
+    (formValues: MultistakingFormFields) => {
       // Persist form values into global staking state
       setFormData({
         finalityProvider: formValues.finalityProvider,
