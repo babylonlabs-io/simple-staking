@@ -45,6 +45,7 @@ jobs:
       - name: Build project
         run: npm run build
         env:
+          NODE_OPTIONS: "--max-old-space-size=8192" # 8GB node memory limit
           NEXT_PUBLIC_MEMPOOL_API: ${{ vars.NEXT_PUBLIC_MEMPOOL_API }}
           NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL }}
           NEXT_PUBLIC_NETWORK: ${{ vars.NEXT_PUBLIC_NETWORK }}
