@@ -46,15 +46,6 @@ declare global {
         options?: SignPsbtOptions,
       ) => void;
     }
-
-    type EventBus = Emitter<EventBusEvents>;
-
-    interface Logger {
-      info(message: string, context?: Context): void;
-      warn(message: string, context?: Context): void;
-      error(error: Error, context?: ErrorContext): string;
-    }
-
     interface Schema extends DBSchema {
       delegations: {
         key: "id";
@@ -67,10 +58,23 @@ declare global {
     }
 
     type API = Api;
-
     type DB = IDBPDatabase<Schema>;
-
     type BTCClient = ReturnType<typeof mempoolJS>["bitcoin"];
+    type EventBus = Emitter<EventBusEvents>;
+    interface Logger {
+      info(message: string, context?: Context): void;
+      warn(message: string, context?: Context): void;
+      error(error: Error, context?: ErrorContext): string;
+    }
+    interface Config {
+      api: {
+        baseUrl: string;
+      };
+      bitcoin: {
+        url: string;
+        network: string;
+      };
+    }
   }
 
   interface Infra {
@@ -79,5 +83,6 @@ declare global {
     logger: Infra.Logger;
     api: Infra.API;
     bitcoin: Infra.BTCClient;
+    config: Infra.Config;
   }
 }
