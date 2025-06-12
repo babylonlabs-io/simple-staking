@@ -50,7 +50,7 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
-    nodePolyfills({ include: ["buffer"] }),
+    nodePolyfills({ include: ["buffer", "crypto"] }),
     EnvironmentPlugin("all", { prefix: "NEXT_PUBLIC_" }),
     ...(enableSentryPlugin
       ? [
@@ -82,10 +82,5 @@ export default defineConfig({
       process.env.NEXT_PUBLIC_COMMIT_HASH || "development",
     ),
     "process.env.NEXT_TELEMETRY_DISABLED": JSON.stringify("1"),
-  },
-  resolve: {
-    alias: {
-      crypto: "crypto-browserify",
-    },
   },
 });
