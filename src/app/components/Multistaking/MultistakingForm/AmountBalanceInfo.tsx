@@ -9,7 +9,8 @@ import { calculateTokenValueInCurrency } from "@/app/utils/formatCurrency";
 import { maxDecimals } from "@/app/utils/maxDecimals";
 
 export const AmountBalanceInfo = () => {
-  const { isMaxBalanceMode, setIsMaxBalanceMode } = useMultistakingState();
+  const { isMaxBalanceMode, setIsMaxBalanceMode, isProviderSelected } =
+    useMultistakingState();
 
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
@@ -36,6 +37,10 @@ export const AmountBalanceInfo = () => {
   }, [isMaxBalanceMode, availableBalance, setValue]);
 
   const handleSetMaxBalance = () => {
+    if (!isProviderSelected) {
+      return;
+    }
+
     setIsMaxBalanceMode(true);
     setValue("amount", availableBalance.toString(), {
       shouldValidate: true,
@@ -48,7 +53,15 @@ export const AmountBalanceInfo = () => {
     <div className="flex text-sm flex-row justify-between w-full content-center">
       <div>
         Stakable:{" "}
-        <u className="cursor-pointer" onClick={handleSetMaxBalance}>
+        <u
+          className={
+            isProviderSelected
+              ? "cursor-pointer"
+              : "cursor-not-allowed opacity-50"
+          }
+          onClick={handleSetMaxBalance}
+          aria-disabled={!isProviderSelected}
+        >
           {maxDecimals(availableBalance, 8)}
         </u>{" "}
         {coinSymbol}

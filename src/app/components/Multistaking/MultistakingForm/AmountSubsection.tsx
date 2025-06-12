@@ -10,9 +10,13 @@ import { SubSection } from "./SubSection";
 export const AmountSubsection = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
-  const { setIsMaxBalanceMode } = useMultistakingState();
+  const { setIsMaxBalanceMode, isProviderSelected } = useMultistakingState();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isProviderSelected) {
+      return;
+    }
+
     setIsMaxBalanceMode(false);
 
     setValue("amount", e.target.value, {
@@ -41,7 +45,8 @@ export const AmountSubsection = () => {
           onChange={handleInputChange}
           placeholder="Enter Amount"
           autoFocus
-          className="text-lg bg-transparent text-right w-2/3 outline-none"
+          disabled={!isProviderSelected}
+          className="text-lg bg-transparent text-right w-2/3 outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
       <HiddenField name="amount" defaultValue="" />

@@ -23,6 +23,7 @@ export interface MultistakingState {
   setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
   isMaxBalanceMode: boolean;
   setIsMaxBalanceMode: (value: boolean) => void;
+  isProviderSelected: boolean;
 }
 
 const { StateProvider, useState: useMultistakingState } =
@@ -41,6 +42,7 @@ const { StateProvider, useState: useMultistakingState } =
     setCurrentStakingStepOptions: () => {},
     isMaxBalanceMode: false,
     setIsMaxBalanceMode: () => {},
+    isProviderSelected: false,
   });
 
 export function MultistakingState({ children }: PropsWithChildren) {
@@ -59,6 +61,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const MAX_FINALITY_PROVIDERS = 1;
 
   const { finalityProviders } = useFinalityProviderState();
+
+  const isProviderSelected = selectedProviders.length > 0;
 
   const handleSelectProvider = useCallback(
     (selectedProviderKey: string) => {
@@ -98,6 +102,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
       setCurrentStakingStepOptions,
       isMaxBalanceMode,
       setIsMaxBalanceMode,
+      isProviderSelected,
     }),
     [
       isModalOpen,
@@ -114,6 +119,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
       setCurrentStakingStepOptions,
       isMaxBalanceMode,
       setIsMaxBalanceMode,
+      isProviderSelected,
     ],
   );
 
