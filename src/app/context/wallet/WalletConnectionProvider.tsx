@@ -12,6 +12,7 @@ import { getNetworkConfigBBN } from "@/app/config/network/bbn";
 import { getNetworkConfigBTC } from "@/app/config/network/btc";
 import { ClientError, ERROR_CODES } from "@/app/errors";
 import { useLogger } from "@/app/hooks/useLogger";
+import FeatureFlagService from "@/app/utils/FeatureFlagService";
 
 import { useError } from "../Error/ErrorProvider";
 
@@ -81,6 +82,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
       config={config}
       context={context}
       onError={onError}
+      disabledWallets={FeatureFlagService.IsLedgerEnabled ? [] : ["ledget_btc"]}
     >
       {children}
     </WalletProvider>

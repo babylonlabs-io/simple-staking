@@ -50,7 +50,7 @@ export default defineConfig({
   plugins: [
     react(),
     tsconfigPaths(),
-    nodePolyfills({ include: ["buffer"] }),
+    nodePolyfills({ include: ["buffer", "crypto"] }),
     EnvironmentPlugin("all", { prefix: "NEXT_PUBLIC_" }),
     ...(enableSentryPlugin
       ? [
