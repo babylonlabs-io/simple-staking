@@ -2,6 +2,7 @@ import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/app/assets/bitcoin.png";
 import { AuthGuard } from "@/app/components/Common/AuthGuard";
+import { useMultistakingState } from "@/app/state/MultistakingState";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
@@ -9,8 +10,15 @@ import { SubSection } from "./SubSection";
 export const AmountSubsection = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
+  const { setIsMaxBalanceMode, isProviderSelected } = useMultistakingState();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!isProviderSelected) {
+      return;
+    }
+
+    setIsMaxBalanceMode(false);
+
     setValue("amount", e.target.value, {
       shouldValidate: true,
       shouldDirty: true,
@@ -37,7 +45,8 @@ export const AmountSubsection = () => {
           onChange={handleInputChange}
           placeholder="Enter Amount"
           autoFocus
-          className="text-lg bg-transparent text-right w-2/3 outline-none"
+          disabled={!isProviderSelected}
+          className="text-lg bg-transparent text-right w-2/3 outline-none disabled:cursor-not-allowed disabled:opacity-50"
         />
       </div>
       <HiddenField name="amount" defaultValue="" />
