@@ -2,7 +2,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "@testing-library/jest-dom";
 import { render } from "@testing-library/react";
 
-import Home from "@/app/page";
+import Home from "@/ui/page";
 
 jest.mock("@uidotdev/usehooks", () => ({
   useDebounce: jest.fn((value) => value),
@@ -12,7 +12,7 @@ jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
   initBTCCurve: jest.fn(),
 }));
 
-jest.mock("@/app/utils/FeatureFlagService", () => ({
+jest.mock("@/ui/utils/FeatureFlagService", () => ({
   __esModule: true,
   default: {
     get IsMultiStakingEnabled() {
@@ -23,7 +23,7 @@ jest.mock("@/app/utils/FeatureFlagService", () => ({
 }));
 
 jest.mock(
-  "@/app/components/Multistaking/MultistakingForm/MultistakingForm",
+  "@/ui/components/Multistaking/MultistakingForm/MultistakingForm",
   () => ({
     MultistakingForm: () => (
       <div data-testid="multistaking-form">MultistakingForm</div>
@@ -31,19 +31,19 @@ jest.mock(
   }),
 );
 
-jest.mock("@/app/components/Staking/StakingForm", () => ({
+jest.mock("@/ui/components/Staking/StakingForm", () => ({
   StakingForm: () => <div data-testid="staking-form">StakingForm</div>,
 }));
 
-jest.mock("@/app/components/Delegations/Activity", () => ({
+jest.mock("@/ui/components/Delegations/Activity", () => ({
   Activity: () => null,
 })); // Uses @uidotdev/usehooks
-jest.mock("@/app/components/Header/Header", () => ({ Header: () => null })); // Uses @uidotdev/usehooks
-jest.mock("@/app/components/PersonalBalance/PersonalBalance", () => ({
+jest.mock("@/ui/components/Header/Header", () => ({ Header: () => null })); // Uses @uidotdev/usehooks
+jest.mock("@/ui/components/PersonalBalance/PersonalBalance", () => ({
   PersonalBalance: () => null,
 })); // Has API dependencies
-jest.mock("@/app/components/Stats/Stats", () => ({ Stats: () => null })); // Has API dependencies
-jest.mock("@/app/components/FAQ/FAQ", () => ({ FAQ: () => null })); // Uses ResizeObserver
+jest.mock("@/ui/components/Stats/Stats", () => ({ Stats: () => null })); // Has API dependencies
+jest.mock("@/ui/components/FAQ/FAQ", () => ({ FAQ: () => null })); // Uses ResizeObserver
 
 describe("Home page feature flag – MULTISTAKING", () => {
   beforeEach(() => {
@@ -51,8 +51,7 @@ describe("Home page feature flag – MULTISTAKING", () => {
   });
 
   it("renders MultistakingForm when FF_MULTISTAKING is enabled", () => {
-    const FeatureFlagService =
-      require("@/app/utils/FeatureFlagService").default;
+    const FeatureFlagService = require("@/ui/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = true;
 
     const queryClient = new QueryClient({
@@ -74,8 +73,7 @@ describe("Home page feature flag – MULTISTAKING", () => {
   });
 
   it("renders StakingForm when FF_MULTISTAKING is disabled", () => {
-    const FeatureFlagService =
-      require("@/app/utils/FeatureFlagService").default;
+    const FeatureFlagService = require("@/ui/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = false;
 
     const queryClient = new QueryClient({

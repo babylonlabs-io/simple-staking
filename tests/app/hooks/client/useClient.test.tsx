@@ -1,18 +1,18 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode } from "react";
 
-import { useClientQuery } from "@/app/hooks/client/useClient";
+import { useClientQuery } from "@/ui/hooks/client/useClient";
 
 import { testHookStability } from "../../../helper/validationHelper";
 
-jest.mock("@/app/context/Error/ErrorProvider", () => ({
+jest.mock("@/ui/context/Error/ErrorProvider", () => ({
   useError: () => ({
     isOpen: false,
     handleError: jest.fn(),
   }),
 }));
 
-jest.mock("@/app/hooks/useLogger", () => ({
+jest.mock("@/ui/hooks/useLogger", () => ({
   useLogger: () => ({
     error: jest.fn(),
   }),

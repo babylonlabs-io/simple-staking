@@ -1,15 +1,15 @@
 import { UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 
-import { BtcStakingInputs } from "@/app/hooks/services/useTransactionService";
+import { BtcStakingInputs } from "@/ui/hooks/services/useTransactionService";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/app/types/delegationsV2";
+} from "@/ui/types/delegationsV2";
 import {
   validateDelegation,
   validateStakingInput,
-} from "@/app/utils/delegations";
+} from "@/ui/utils/delegations";
 
 // Mock Transaction.fromHex
 jest.mock("bitcoinjs-lib", () => {

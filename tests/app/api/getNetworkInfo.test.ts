@@ -1,11 +1,11 @@
-import { apiWrapper } from "@/app/api/apiWrapper";
-import { getNetworkInfo } from "@/app/api/getNetworkInfo";
-import { ClientError, ERROR_CODES } from "@/app/errors";
+import { apiWrapper } from "@/ui/api/apiWrapper";
+import { getNetworkInfo } from "@/ui/api/getNetworkInfo";
+import { ClientError, ERROR_CODES } from "@/ui/errors";
 
 import { mockSuccessResponse } from "./getNetworkInfo.mocks";
 
 // Mock the apiWrapper module
-jest.mock("@/app/api/apiWrapper");
+jest.mock("@/ui/api/apiWrapper");
 // Mock the getPublicKeyNoCoord function
 jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
   getPublicKeyNoCoord: jest.fn((pk) => `no-coord-${pk}`),

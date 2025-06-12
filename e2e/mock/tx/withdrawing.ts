@@ -1,4 +1,4 @@
-import { DelegationState } from "@/app/types/delegations";
+import { DelegationState } from "@/ui/types/delegations";
 
 export const unbondedTX = {
   data: [
