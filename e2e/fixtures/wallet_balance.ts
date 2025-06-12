@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 import {
   BABY_BALANCE_VALUE_SELECTOR,
@@ -10,7 +10,11 @@ import {
 } from "./wallet_balance.selectors";
 
 export class WalletBalanceActions {
-  constructor(private page: Page) {}
+  private page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
 
   async waitForBalanceLoadingComplete() {
     await this.page.waitForFunction(

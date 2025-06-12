@@ -1,7 +1,7 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
-import mockData, { MockData } from "./constants";
-import { BBNWalletType } from "./types";
+import mockData, { type MockData } from "./constants";
+import type { BBNWalletType } from "./types";
 import { verifyBBNWalletInjected } from "./verification";
 
 type DataType = {

@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { setupServer } from "msw/node";
 
 import { handlers } from "./handlers/index";
