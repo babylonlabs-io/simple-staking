@@ -4,6 +4,7 @@ import { twJoin } from "tailwind-merge";
 import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { STAKING_DISABLED } from "@/ui/constants";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { usePreviewButtonContent } from "@/ui/hooks/usePreviewButtonContent";
 import { useStakingState } from "@/ui/state/StakingState";
 
 const BUTTON_STATE_STYLES = {
@@ -23,18 +24,13 @@ export function PreviewButton({ fieldPriority = [] }: PreviewButtonProps) {
   const { blocked: isGeoBlocked } = useStakingState();
 
   const errorKeys = Object.keys(errors);
-  const errorMessages = errorKeys.map((key) => errors[key]?.message);
-
   const hasCriticalError = errorKeys.some(
     (key) => errors[key]?.type === "critical",
   );
 
-  const hasError = errorMessages.length > 0;
-
   const getButtonState = () => {
     if (hasCriticalError) return "error";
 
-    // Treat any other invalid form state as disabled to show gray styling
     if (!isValid || STAKING_DISABLED || isGeoBlocked) {
       return "disabled";
     }
@@ -42,46 +38,12 @@ export function PreviewButton({ fieldPriority = [] }: PreviewButtonProps) {
     return "default";
   };
 
-  const renderButtonContent = () => {
-    if (STAKING_DISABLED) {
-      return "Preview";
-    }
-
-    if (isValidating) {
-      return "Calculating...";
-    }
-
-    if (isLoading) {
-      return "Loading...";
-    }
-
-    if (hasError) {
-      const prioritizedKeys =
-        fieldPriority.length > 0 ? fieldPriority : errorKeys;
-
-      const findKey = (predicate: (key: string) => boolean) =>
-        prioritizedKeys.find((key) => predicate(key) && errors[key]);
-
-      const criticalKey = findKey((k) => errors[k]?.type === "critical");
-      if (criticalKey) {
-        return errors[criticalKey]?.message?.toString() || "";
-      }
-
-      const requiredKey = findKey((k) => errors[k]?.type === "required");
-      if (requiredKey) {
-        return errors[requiredKey]?.message?.toString() || "";
-      }
-
-      const firstKey = prioritizedKeys.find((k) => errors[k]);
-      if (firstKey) {
-        return errors[firstKey]?.message?.toString() || "";
-      }
-
-      return errorMessages[0]?.toString() || "";
-    }
-
-    return "Preview";
-  };
+  const buttonContent = usePreviewButtonContent({
+    errors,
+    isValidating,
+    isLoading,
+    fieldPriority,
+  });
 
   const buttonState = getButtonState();
 
@@ -112,7 +74,7 @@ export function PreviewButton({ fieldPriority = [] }: PreviewButtonProps) {
           isGeoBlocked
         }
       >
-        {renderButtonContent()}
+        {buttonContent}
       </Button>
     </AuthGuard>
   );
