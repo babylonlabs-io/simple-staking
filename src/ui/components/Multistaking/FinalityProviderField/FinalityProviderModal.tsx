@@ -3,30 +3,39 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
-  useWatch,
 } from "@babylonlabs-io/core-ui";
+import { useState } from "react";
 
-import { FinalityProviders } from "@/ui/components/Multistaking/FinalityProviderModal/FinalityProviders";
+import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
+import { FinalityProviders } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviders";
 
-export const FinalityProviderModal = ({
-  onClose,
-  onAdd,
-  onBack,
-}: {
+interface Props {
+  open: boolean;
+  defaultFinalityProvider: string;
   onClose: () => void;
   onAdd: (selectedProviderKey: string) => void;
   onBack?: () => void;
-}) => {
-  const selectedFinalityProvider = useWatch({
-    name: "finalityProvider",
-    defaultValue: "",
-  });
+}
+
+export const FinalityProviderModal = ({
+  defaultFinalityProvider,
+  open,
+  onClose,
+  onAdd,
+  onBack,
+}: Props) => {
+  const [selectedFP, setSelectedFp] = useState(defaultFinalityProvider);
+
+  const handleClose = () => {
+    onClose();
+    setSelectedFp("");
+  };
 
   return (
-    <>
+    <ResponsiveDialog open={open} onClose={handleClose} className="w-[52rem]">
       <DialogHeader
         title="Select Babylon Genesis Finality Provider"
-        onClose={onClose}
+        onClose={handleClose}
         className="text-accent-primary"
       />
 
@@ -37,7 +46,7 @@ export const FinalityProviderModal = ({
           stake and earn rewards.
         </div>
         <div className="overflow-x-auto flex flex-col gap-2 mt-10">
-          <FinalityProviders />
+          <FinalityProviders selectedFP={selectedFP} onChange={setSelectedFp} />
         </div>
       </DialogBody>
 
@@ -51,12 +60,15 @@ export const FinalityProviderModal = ({
         )}
         <Button
           variant="contained"
-          onClick={() => onAdd(selectedFinalityProvider)}
-          disabled={!selectedFinalityProvider}
+          onClick={() => {
+            onAdd(selectedFP);
+            handleClose();
+          }}
+          disabled={!selectedFP}
         >
           Add
         </Button>
       </DialogFooter>
-    </>
+    </ResponsiveDialog>
   );
 };

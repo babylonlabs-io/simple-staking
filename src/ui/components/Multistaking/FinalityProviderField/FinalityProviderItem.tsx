@@ -8,7 +8,7 @@ export const FinalityProviderItem = ({
   provider,
   onRemove,
 }: {
-  provider: FinalityProvider & { chainType: string };
+  provider: FinalityProvider;
   onRemove: () => void;
 }) => {
   const { setValue } = useFormContext();
