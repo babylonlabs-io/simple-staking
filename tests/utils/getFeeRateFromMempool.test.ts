@@ -1,9 +1,9 @@
-import { Fees } from "@/app/types/fee";
-import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
-import { nextPowerOfTwo } from "@/app/utils/nextPowerOfTwo";
+import { Fees } from "@/ui/types/fee";
+import { getFeeRateFromMempool } from "@/ui/utils/getFeeRateFromMempool";
+import { nextPowerOfTwo } from "@/ui/utils/nextPowerOfTwo";
 
 // Mock nextPowerOfTwo
-jest.mock("@/app/utils/nextPowerOfTwo", () => ({
+jest.mock("@/ui/utils/nextPowerOfTwo", () => ({
   nextPowerOfTwo: jest.fn(),
 }));
 

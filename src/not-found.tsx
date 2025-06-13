@@ -1,9 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import "./app/globals.css";
+import "./ui/globals.css";
 
-import Layout from "@/app/layout";
-import NotFound from "@/app/not-found";
+import Layout from "@/ui/layout";
+import NotFound from "@/ui/not-found";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

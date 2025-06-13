@@ -1,13 +1,13 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { ErrorBoundary } from "react-error-boundary";
-import "./app/globals.css";
 
+import GlobalError from "@/ui/global-error";
+import Layout from "@/ui/layout";
+import HomePage from "@/ui/page";
+
+import "@/ui/globals.css";
 import "../sentry.client.config";
-
-import GlobalError from "@/app/global-error";
-import Layout from "@/app/layout";
-import HomePage from "@/app/page";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

@@ -1,4 +1,4 @@
-import { ClientError, ERROR_CODES } from "@/app/errors";
+import { ClientError, ERROR_CODES } from "@/ui/errors";
 
 describe("ClientError", () => {
   it("should correctly instantiate with errorCode and message", () => {

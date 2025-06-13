@@ -1,6 +1,6 @@
-import { Fees } from "@/app/types/fee";
-import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
-import { nextPowerOfTwo } from "@/app/utils/nextPowerOfTwo";
+import { Fees } from "@/ui/types/fee";
+import { getFeeRateFromMempool } from "@/ui/utils/getFeeRateFromMempool";
+import { nextPowerOfTwo } from "@/ui/utils/nextPowerOfTwo";
 
 /**
  * This test file tests the actual fee calculation utility functions from the codebase.

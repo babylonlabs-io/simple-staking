@@ -1,11 +1,11 @@
-import { ClientError, ERROR_CODES } from "@/app/errors";
-import { getUTXOs } from "@/app/utils/mempool_api";
+import { ClientError, ERROR_CODES } from "@/ui/errors";
+import { getUTXOs } from "@/ui/utils/mempool_api";
 
 // Mocking fetch globally
 global.fetch = jest.fn() as jest.Mock;
 
 // Mocking getNetworkConfig to return a specific mempoolApiUrl
-jest.mock("@/app/config/network/btc", () => ({
+jest.mock("@/ui/config/network/btc", () => ({
   getNetworkConfigBTC: jest.fn(() => ({
     mempoolApiUrl: "https://mempool.space",
   })),

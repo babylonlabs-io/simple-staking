@@ -1,5 +1,5 @@
-import { ClientError } from "@/app/errors";
-import { txFeeSafetyCheck } from "@/app/utils/delegations/fee";
+import { ClientError } from "@/ui/errors";
+import { txFeeSafetyCheck } from "@/ui/utils/delegations/fee";
 
 describe("txFeeSafetyCheck", () => {
   // Create a mock transaction with virtual size

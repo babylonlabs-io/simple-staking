@@ -3,17 +3,17 @@ import { PropsWithChildren } from "react";
 
 // Mock the dependencies, but keep their APIs close to real ones
 const mockUseCosmosWallet = jest.fn();
-jest.mock("@/app/context/wallet/CosmosWalletProvider", () => ({
+jest.mock("@/ui/context/wallet/CosmosWalletProvider", () => ({
   useCosmosWallet: () => mockUseCosmosWallet(),
 }));
 
 const mockUseBbnQuery = jest.fn();
-jest.mock("@/app/hooks/client/rpc/queries/useBbnQuery", () => ({
+jest.mock("@/ui/hooks/client/rpc/queries/useBbnQuery", () => ({
   useBbnQuery: () => mockUseBbnQuery(),
 }));
 
 // Import the actual component we're testing (after mocks are defined)
-import { RewardsState, useRewardsState } from "@/app/state/RewardState";
+import { RewardsState, useRewardsState } from "@/ui/state/RewardState";
 
 // Create a test wrapper
 const TestWrapper = ({ children }: PropsWithChildren) => (

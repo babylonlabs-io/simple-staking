@@ -1,13 +1,13 @@
-import { ClientError, ERROR_CODES } from "@/app/errors";
-import { Delegation } from "@/app/types/delegations";
-import { filterDelegationsLocalStorage } from "@/app/utils/local_storage/filterDelegationsLocalStorage";
-import { getTxInfo } from "@/app/utils/mempool_api";
+import { ClientError, ERROR_CODES } from "@/ui/errors";
+import { Delegation } from "@/ui/types/delegations";
+import { filterDelegationsLocalStorage } from "@/ui/utils/local_storage/filterDelegationsLocalStorage";
+import { getTxInfo } from "@/ui/utils/mempool_api";
 
 import { generateMockDelegation } from "../../helper/generateMockDelegation";
 
 // Mock the getTxInfo function
-jest.mock("@/app/utils/mempool_api");
-jest.mock("@/app/constants", () => ({
+jest.mock("@/ui/utils/mempool_api");
+jest.mock("@/ui/constants", () => ({
   MEMPOOL_API: "https://mempool.space",
 }));
 
