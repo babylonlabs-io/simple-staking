@@ -2,22 +2,15 @@ import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { twJoin } from "tailwind-merge";
 
 import { AuthGuard } from "@/app/components/Common/AuthGuard";
-import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { STAKING_DISABLED } from "@/app/constants";
+import { useBTCWallet } from "@/app/context/wallet/BTCWalletProvider";
 import { useStakingState } from "@/app/state/StakingState";
 
-function beautifyErrorMessages(error: string) {
-  switch (error.toLowerCase()) {
-    case "Insufficient funds: unable to gather enough UTXOs to cover the staking amount and fees".toLowerCase():
-      return "Insufficient BTC";
-    case "Staking amount (stakingAmountSat) is required for staking input.".toLowerCase():
-      return "Enter BTC Amount to Stake";
-    case "Please select a finality provider".toLowerCase():
-      return "Add Finality Provider";
-    default:
-      return error;
-  }
-}
+const BUTTON_STATE_STYLES = {
+  error: "!text-error-main !bg-error-main/10",
+  disabled: "!text-accent-primary/50 !bg-accent-primary/10",
+  default: "",
+} as const;
 
 export function PreviewButton() {
   const { open } = useBTCWallet();
@@ -27,7 +20,23 @@ export function PreviewButton() {
 
   const errorKeys = Object.keys(errors);
   const errorMessages = errorKeys.map((key) => errors[key]?.message);
+
+  const hasCriticalError = errorKeys.some(
+    (key) => errors[key]?.type === "critical",
+  );
+
   const hasError = errorMessages.length > 0;
+
+  const getButtonState = () => {
+    if (hasCriticalError) return "error";
+
+    // Treat any other invalid form state as disabled to show gray styling
+    if (!isValid || STAKING_DISABLED || isGeoBlocked) {
+      return "disabled";
+    }
+
+    return "default";
+  };
 
   const renderButtonContent = () => {
     if (STAKING_DISABLED) {
@@ -44,20 +53,26 @@ export function PreviewButton() {
 
     if (hasError) {
       let selectedError = "";
+      // Filter for required field errors first, as they take priority
       const requiredErrors = errorKeys.filter(
         (key) => errors[key]?.type === "required",
       );
+
+      // If there are required field errors, show the first one
+      // Otherwise fall back to showing the first error message of any type
       if (requiredErrors.length > 0) {
         selectedError = errors[requiredErrors[0]]?.message?.toString() || "";
       } else {
         selectedError = errorMessages[0]?.toString() || "";
       }
 
-      return beautifyErrorMessages(selectedError);
+      return selectedError;
     }
 
     return "Preview";
   };
+
+  const buttonState = getButtonState();
 
   return (
     <AuthGuard
@@ -76,9 +91,7 @@ export function PreviewButton() {
         type="submit"
         className={twJoin(
           "w-full mt-2 capitalize",
-          hasError && "!text-accent-primary !bg-accent-primary/10",
-          (STAKING_DISABLED || isGeoBlocked) &&
-            "!text-gray-500/70 dark:!text-gray-400/70",
+          BUTTON_STATE_STYLES[buttonState],
         )}
         disabled={
           !isValid ||

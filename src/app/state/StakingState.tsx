@@ -21,8 +21,9 @@ import { useEventBus } from "@/app/hooks/useEventBus";
 import { useHealthCheck } from "@/app/hooks/useHealthCheck";
 import { useAppState } from "@/app/state";
 import type { DelegationV2 } from "@/app/types/delegationsV2";
-import { btcToSatoshi, satoshiToBtc } from "@/app/utils/btc";
+import { satoshiToBtc } from "@/app/utils/btc";
 import { createStateUtils } from "@/app/utils/createStateUtils";
+import { formatNumber, formatStakingAmount } from "@/app/utils/formTransforms";
 import { getFeeRateFromMempool } from "@/app/utils/getFeeRateFromMempool";
 
 import { STAKING_DISABLED } from "../constants";
@@ -34,11 +35,6 @@ export enum StakingModalPage {
   CHAIN_SELECTION = 0,
   FINALITY_PROVIDER = 1,
 }
-
-const formatStakingAmount = (value: number) =>
-  !Number.isNaN(value) ? btcToSatoshi(value) : undefined;
-const formatNumber = (value: number) =>
-  !Number.isNaN(value) ? value : undefined;
 
 const { coinName } = getNetworkConfigBTC();
 
