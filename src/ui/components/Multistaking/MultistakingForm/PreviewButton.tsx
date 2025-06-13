@@ -4,6 +4,7 @@ import { twJoin } from "tailwind-merge";
 import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { STAKING_DISABLED } from "@/ui/constants";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { usePreviewButtonContent } from "@/ui/hooks/usePreviewButtonContent";
 import { useStakingState } from "@/ui/state/StakingState";
 
 const BUTTON_STATE_STYLES = {
@@ -12,25 +13,24 @@ const BUTTON_STATE_STYLES = {
   default: "",
 } as const;
 
-export function PreviewButton() {
+interface PreviewButtonProps {
+  fieldPriority?: readonly string[];
+}
+
+export function PreviewButton({ fieldPriority = [] }: PreviewButtonProps) {
   const { open } = useBTCWallet();
   const form = useFormState();
   const { isValid, errors, isValidating, isLoading } = form;
   const { blocked: isGeoBlocked } = useStakingState();
 
   const errorKeys = Object.keys(errors);
-  const errorMessages = errorKeys.map((key) => errors[key]?.message);
-
   const hasCriticalError = errorKeys.some(
     (key) => errors[key]?.type === "critical",
   );
 
-  const hasError = errorMessages.length > 0;
-
   const getButtonState = () => {
     if (hasCriticalError) return "error";
 
-    // Treat any other invalid form state as disabled to show gray styling
     if (!isValid || STAKING_DISABLED || isGeoBlocked) {
       return "disabled";
     }
@@ -38,39 +38,12 @@ export function PreviewButton() {
     return "default";
   };
 
-  const renderButtonContent = () => {
-    if (STAKING_DISABLED) {
-      return "Preview";
-    }
-
-    if (isValidating) {
-      return "Calculating...";
-    }
-
-    if (isLoading) {
-      return "Loading...";
-    }
-
-    if (hasError) {
-      let selectedError = "";
-      // Filter for required field errors first, as they take priority
-      const requiredErrors = errorKeys.filter(
-        (key) => errors[key]?.type === "required",
-      );
-
-      // If there are required field errors, show the first one
-      // Otherwise fall back to showing the first error message of any type
-      if (requiredErrors.length > 0) {
-        selectedError = errors[requiredErrors[0]]?.message?.toString() || "";
-      } else {
-        selectedError = errorMessages[0]?.toString() || "";
-      }
-
-      return selectedError;
-    }
-
-    return "Preview";
-  };
+  const buttonContent = usePreviewButtonContent({
+    errors,
+    isValidating,
+    isLoading,
+    fieldPriority,
+  });
 
   const buttonState = getButtonState();
 
@@ -101,7 +74,7 @@ export function PreviewButton() {
           isGeoBlocked
         }
       >
-        {renderButtonContent()}
+        {buttonContent}
       </Button>
     </AuthGuard>
   );

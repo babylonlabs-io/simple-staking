@@ -50,6 +50,7 @@ export function MultistakingForm() {
     handleSelectProvider,
     removeProvider,
     MAX_FINALITY_PROVIDERS,
+    fieldPriority,
   } = useMultistakingState();
 
   const counter = selectedProviders.length;
@@ -145,7 +146,7 @@ export function MultistakingForm() {
             </SubSection>
             <AmountSubsection />
             <FeesSection />
-            <PreviewButton />
+            <PreviewButton fieldPriority={fieldPriority} />
             <FormAlert
               address={address}
               isGeoBlocked={isGeoBlocked}
