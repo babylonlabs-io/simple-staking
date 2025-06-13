@@ -1,12 +1,19 @@
 import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
 import { createStateUtils } from "@/app/utils/createStateUtils";
 
 import type { FinalityProvider } from "../types/finalityProviders";
 
 import { useFinalityProviderState } from "./FinalityProviderState";
-import { StakingModalPage } from "./StakingState";
+import { StakingModalPage, useStakingState } from "./StakingState";
 
 export interface MultistakingState {
   isModalOpen: boolean;
@@ -54,6 +61,18 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const MAX_FINALITY_PROVIDERS = 1;
 
   const { finalityProviders } = useFinalityProviderState();
+  const { step } = useStakingState();
+  const prevStepRef = useRef<typeof step>();
+
+  useEffect(() => {
+    // Clear the providers only when the staking flow just transitioned
+    // from an active step back to undefined (i.e., a reset after error/cancel).
+    if (prevStepRef.current && step === undefined) {
+      setSelectedProviders([]);
+    }
+
+    prevStepRef.current = step;
+  }, [step]);
 
   const handleSelectProvider = useCallback(
     (selectedProviderKey: string) => {
