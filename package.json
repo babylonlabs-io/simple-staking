@@ -26,7 +26,7 @@
     "gen:api": "npx swagger-typescript-api generate -p https://staking-api.babylonlabs.io/swagger/doc.json -o ./src/shared/utils/swagger -t ./src/shared/utils/swagger/templates -n api.ts --unwrap-response-data --disable-format --silent"
   },
   "engines": {
-    "node": "22.3.0"
+    "node": "24.2.0"
   },
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "1.0.1",
@@ -36,6 +36,7 @@
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmjs/stargate": "^0.32.4",
+    "@mempool/mempool.js": "^3.0.0",
     "@sentry/react": "^8.30.0",
     "@tanstack/react-query": "^5.28.14",
     "@uidotdev/usehooks": "^2.4.1",

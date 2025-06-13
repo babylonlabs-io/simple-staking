@@ -1,5 +1,5 @@
 import { incentivequery } from "@babylonlabs-io/babylon-proto-ts";
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { QueryBalanceResponse } from "cosmjs-types/cosmos/bank/v1beta1/query.js";
 
 import mockData from "./constants";

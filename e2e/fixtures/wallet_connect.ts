@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 import { injectBBNWallet, injectBTCWallet } from "../mocks/blockchain";
 import { mockVerifyBTCAddress } from "../mocks/handlers";
@@ -13,7 +13,11 @@ import {
 } from "./wallet_connect.selectors";
 
 export class WalletConnectActions {
-  constructor(private page: Page) {}
+  private page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
 
   async clickConnectButton() {
     await this.page.waitForSelector(CONNECT_BUTTON_SELECTOR, {
