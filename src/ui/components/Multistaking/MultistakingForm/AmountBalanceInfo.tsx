@@ -33,13 +33,11 @@ export const AmountBalanceInfo = () => {
   return (
     <div className="flex text-sm flex-row justify-between w-full content-center">
       <div>
-        <div>
-          Stakable:{" "}
-          <span className="cursor-pointer">
-            {maxDecimals(formattedBalance, 8)}
-          </span>{" "}
-          {coinSymbol}
-        </div>
+        Stakable:{" "}
+        <span className="cursor-pointer">
+          {maxDecimals(formattedBalance, 8)}
+        </span>{" "}
+        {coinSymbol}
       </div>
       <div>{btcAmountUsd} USD</div>
     </div>
