@@ -12,7 +12,11 @@ const BUTTON_STATE_STYLES = {
   default: "",
 } as const;
 
-export function PreviewButton() {
+interface PreviewButtonProps {
+  fieldPriority?: readonly string[];
+}
+
+export function PreviewButton({ fieldPriority = [] }: PreviewButtonProps) {
   const { open } = useBTCWallet();
   const form = useFormState();
   const { isValid, errors, isValidating, isLoading } = form;
@@ -52,21 +56,28 @@ export function PreviewButton() {
     }
 
     if (hasError) {
-      let selectedError = "";
-      // Filter for required field errors first, as they take priority
-      const requiredErrors = errorKeys.filter(
-        (key) => errors[key]?.type === "required",
-      );
+      const prioritizedKeys =
+        fieldPriority.length > 0 ? fieldPriority : errorKeys;
 
-      // If there are required field errors, show the first one
-      // Otherwise fall back to showing the first error message of any type
-      if (requiredErrors.length > 0) {
-        selectedError = errors[requiredErrors[0]]?.message?.toString() || "";
-      } else {
-        selectedError = errorMessages[0]?.toString() || "";
+      const findKey = (predicate: (key: string) => boolean) =>
+        prioritizedKeys.find((key) => predicate(key) && errors[key]);
+
+      const criticalKey = findKey((k) => errors[k]?.type === "critical");
+      if (criticalKey) {
+        return errors[criticalKey]?.message?.toString() || "";
       }
 
-      return selectedError;
+      const requiredKey = findKey((k) => errors[k]?.type === "required");
+      if (requiredKey) {
+        return errors[requiredKey]?.message?.toString() || "";
+      }
+
+      const firstKey = prioritizedKeys.find((k) => errors[k]);
+      if (firstKey) {
+        return errors[firstKey]?.message?.toString() || "";
+      }
+
+      return errorMessages[0]?.toString() || "";
     }
 
     return "Preview";

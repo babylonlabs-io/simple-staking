@@ -3,7 +3,6 @@ import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { usePrice } from "@/ui/hooks/client/api/usePrices";
 import { useBalanceState } from "@/ui/state/BalanceState";
-import { useStakingState } from "@/ui/state/StakingState";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/utils/formatCurrency";
 import { maxDecimals } from "@/ui/utils/maxDecimals";
@@ -13,8 +12,6 @@ export const AmountBalanceInfo = () => {
 
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
-  const { stakableBtcBalance } = useBalanceState();
-  const { stakingInfo } = useStakingState();
 
   const { coinSymbol } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
@@ -33,12 +30,6 @@ export const AmountBalanceInfo = () => {
     });
   };
 
-  const maxAmount = Math.min(
-    stakableBtcBalance,
-    stakingInfo?.maxStakingAmountSat || 0,
-  );
-  const minAmount = stakingInfo?.minStakingAmountSat;
-
   return (
     <div className="flex text-sm flex-row justify-between w-full content-center">
       <div>
@@ -47,10 +38,6 @@ export const AmountBalanceInfo = () => {
           <u className="cursor-pointer" onClick={handleSetMaxBalance}>
             {maxDecimals(formattedBalance, 8)}
           </u>{" "}
-          {coinSymbol}
-        </div>
-        <div>
-          Min/Max: {satoshiToBtc(minAmount || 0)}/{satoshiToBtc(maxAmount)}{" "}
           {coinSymbol}
         </div>
       </div>

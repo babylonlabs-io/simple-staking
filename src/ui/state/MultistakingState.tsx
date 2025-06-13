@@ -168,11 +168,13 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking amount must be greater than 0.")
             .min(
               stakingInfo?.minStakingAmountSat ?? 0,
-              `Staking amount must be at least ${satoshiToBtc(stakingInfo?.minStakingAmountSat ?? 0)} ${coinName}.`,
+              `Minimum Staking ${satoshiToBtc(
+                stakingInfo?.minStakingAmountSat ?? 0,
+              )} ${coinName}`,
             )
             .max(
               stakingInfo?.maxStakingAmountSat ?? 0,
-              `Staking amount must be no more than ${satoshiToBtc(stakingInfo?.maxStakingAmountSat ?? 0)} ${coinName}.`,
+              `Maximum Staking ${satoshiToBtc(stakingInfo?.maxStakingAmountSat ?? 0)} ${coinName}`,
             )
             .test(
               "balance-check",

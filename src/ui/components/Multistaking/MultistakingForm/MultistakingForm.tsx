@@ -1,5 +1,5 @@
 import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { twJoin } from "tailwind-merge";
 
@@ -53,6 +53,17 @@ export function MultistakingForm() {
   } = useMultistakingState();
 
   const counter = selectedProviders.length;
+
+  const fieldPriority = useMemo(() => {
+    const schemaFields = Object.keys((validationSchema as any)?.fields ?? {});
+
+    const HIGH_PRIORITY = ["finalityProvider", "amount"];
+
+    return [
+      ...HIGH_PRIORITY,
+      ...schemaFields.filter((f) => !HIGH_PRIORITY.includes(f)),
+    ];
+  }, [validationSchema]);
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -145,7 +156,7 @@ export function MultistakingForm() {
             </SubSection>
             <AmountSubsection />
             <FeesSection />
-            <PreviewButton />
+            <PreviewButton fieldPriority={fieldPriority} />
             <FormAlert
               address={address}
               isGeoBlocked={isGeoBlocked}
