@@ -1,5 +1,5 @@
 import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { twJoin } from "tailwind-merge";
 
@@ -50,20 +50,10 @@ export function MultistakingForm() {
     handleSelectProvider,
     removeProvider,
     MAX_FINALITY_PROVIDERS,
+    fieldPriority,
   } = useMultistakingState();
 
   const counter = selectedProviders.length;
-
-  const fieldPriority = useMemo(() => {
-    const schemaFields = Object.keys((validationSchema as any)?.fields ?? {});
-
-    const HIGH_PRIORITY = ["finalityProvider", "amount"];
-
-    return [
-      ...HIGH_PRIORITY,
-      ...schemaFields.filter((f) => !HIGH_PRIORITY.includes(f)),
-    ];
-  }, [validationSchema]);
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {

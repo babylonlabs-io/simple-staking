@@ -1,6 +1,6 @@
 import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
-import { number, object, ObjectSchema, string } from "yup";
+import { number, object, ObjectSchema, string, type TestContext } from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
@@ -52,6 +52,7 @@ export interface MultistakingState {
     unbondingFeeSat: number;
     unbondingTime: number;
   };
+  fieldPriority: string[];
 }
 
 const { StateProvider, useState: useMultistakingState } =
@@ -70,6 +71,7 @@ const { StateProvider, useState: useMultistakingState } =
     setCurrentStakingStepOptions: () => {},
     validationSchema: undefined,
     stakingInfo: undefined,
+    fieldPriority: [],
   });
 
 export function MultistakingState({ children }: PropsWithChildren) {
@@ -130,13 +132,14 @@ export function MultistakingState({ children }: PropsWithChildren) {
       object()
         .shape({
           finalityProvider: string()
+            .meta({ priority: 1 })
             .required("Add Finality Provider")
             .test(
               "same-public-key",
               "Cannot select a finality provider with the same public key as the wallet",
-              function (value) {
+              function (value: string | undefined, context: TestContext) {
                 if (value === publicKeyNoCoord) {
-                  return this.createError({
+                  return context.createError({
                     message:
                       "Cannot select a finality provider with the same public key as the wallet",
                     type: "critical",
@@ -162,6 +165,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
             ),
 
           amount: number()
+            .meta({ priority: 1 })
             .transform(formatStakingAmount)
             .typeError("Staking amount must be a valid number.")
             .required("Enter BTC Amount to Stake")
@@ -224,6 +228,25 @@ export function MultistakingState({ children }: PropsWithChildren) {
     [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
   );
 
+  const fieldPriority = useMemo(() => {
+    if (!validationSchema) return [];
+    const schemaFields = Object.keys((validationSchema as any)?.fields ?? {});
+
+    return schemaFields.sort((a, b) => {
+      const priorityA = (validationSchema.describe().fields[a] as any).meta
+        ?.priority;
+      const priorityB = (validationSchema.describe().fields[b] as any).meta
+        ?.priority;
+
+      // Handle cases where priority is not defined
+      if (priorityA === undefined && priorityB === undefined) return 0;
+      if (priorityA === undefined) return 1;
+      if (priorityB === undefined) return -1;
+
+      return priorityA - priorityB;
+    });
+  }, [validationSchema]);
+
   const handleSelectProvider = useCallback(
     (selectedProviderKey: string) => {
       if (selectedProviderKey) {
@@ -262,6 +285,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
       setCurrentStakingStepOptions,
       validationSchema,
       stakingInfo,
+      fieldPriority,
     }),
     [
       isModalOpen,
@@ -278,6 +302,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
       setCurrentStakingStepOptions,
       validationSchema,
       stakingInfo,
+      fieldPriority,
     ],
   );
 
