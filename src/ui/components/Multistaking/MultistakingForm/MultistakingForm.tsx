@@ -1,5 +1,5 @@
 import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
@@ -40,6 +40,17 @@ export function MultistakingForm() {
     setStakingModalPage,
     MAX_FINALITY_PROVIDERS,
   } = useMultistakingState();
+
+  const fieldPriority = useMemo(() => {
+    const schemaFields = Object.keys((validationSchema as any)?.fields ?? {});
+
+    const HIGH_PRIORITY = ["finalityProvider", "amount"];
+
+    return [
+      ...HIGH_PRIORITY,
+      ...schemaFields.filter((f) => !HIGH_PRIORITY.includes(f)),
+    ];
+  }, [validationSchema]);
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -89,7 +100,7 @@ export function MultistakingForm() {
             />
             <AmountSubsection />
             <FeesSection />
-            <PreviewButton />
+            <PreviewButton fieldPriority={fieldPriority} />
             <FormAlert
               address={address}
               isGeoBlocked={isGeoBlocked}
