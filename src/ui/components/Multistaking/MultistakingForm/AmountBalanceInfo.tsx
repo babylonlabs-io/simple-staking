@@ -1,4 +1,4 @@
-import { useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import { useWatch } from "@babylonlabs-io/core-ui";
 
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { usePrice } from "@/ui/hooks/client/api/usePrices";
@@ -11,7 +11,7 @@ export const AmountBalanceInfo = () => {
   const { totalBtcBalance } = useBalanceState();
 
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
-  const { setValue } = useFormContext();
+  // const { setValue } = useFormContext();
 
   const { coinSymbol } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
@@ -22,21 +22,21 @@ export const AmountBalanceInfo = () => {
   });
   const formattedBalance = satoshiToBtc(totalBtcBalance);
 
-  const handleSetMaxBalance = () => {
-    setValue("amount", formattedBalance.toString(), {
-      shouldValidate: true,
-      shouldDirty: true,
-      shouldTouch: true,
-    });
-  };
+  // const handleSetMaxBalance = () => {
+  //   setValue("amount", formattedBalance.toString(), {
+  //     shouldValidate: true,
+  //     shouldDirty: true,
+  //     shouldTouch: true,
+  //   });
+  // };
 
   return (
     <div className="flex text-sm flex-row justify-between w-full content-center">
       <div>
         Stakable:{" "}
-        <u className="cursor-pointer" onClick={handleSetMaxBalance}>
+        <span className="cursor-default">
           {maxDecimals(formattedBalance, 8)}
-        </u>{" "}
+        </span>{" "}
         {coinSymbol}
       </div>
       <div>{btcAmountUsd} USD</div>
