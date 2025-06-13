@@ -50,13 +50,14 @@ export function MultistakingState({ children }: PropsWithChildren) {
       object()
         .shape({
           finalityProvider: string()
+            .meta({ priority: 1 })
             .required("Add Finality Provider")
             .test(
               "same-public-key",
               "Cannot select a finality provider with the same public key as the wallet",
-              function (value) {
+              function (value: string | undefined, context: TestContext) {
                 if (value === publicKeyNoCoord) {
-                  return this.createError({
+                  return context.createError({
                     message:
                       "Cannot select a finality provider with the same public key as the wallet",
                     type: "critical",
@@ -82,6 +83,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
             ),
 
           amount: number()
+            .meta({ priority: 1 })
             .transform(formatStakingAmount)
             .typeError("Staking amount must be a valid number.")
             .required("Enter BTC Amount to Stake")
