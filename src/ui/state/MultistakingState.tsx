@@ -1,4 +1,3 @@
-import { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { number, object, ObjectSchema, string } from "yup";
 
@@ -37,8 +36,6 @@ export interface MultistakingState {
   selectedChain: string;
   setSelectedChain: (chain: string) => void;
   MAX_FINALITY_PROVIDERS: number;
-  currentStakingStepOptions: SignPsbtOptions | undefined;
-  setCurrentStakingStepOptions: (options?: SignPsbtOptions) => void;
   validationSchema?: ObjectSchema<MultistakingFormFields>;
   stakingInfo?: {
     minFeeRate: number;
@@ -58,7 +55,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     isModalOpen: false,
     setIsModalOpen: () => {},
-    stakingModalPage: StakingModalPage.FINALITY_PROVIDER,
+    stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
     selectedProviders: [],
     handleSelectProvider: () => {},
@@ -66,8 +63,6 @@ const { StateProvider, useState: useMultistakingState } =
     selectedChain: "babylon",
     setSelectedChain: () => {},
     MAX_FINALITY_PROVIDERS: 1,
-    currentStakingStepOptions: undefined,
-    setCurrentStakingStepOptions: () => {},
     validationSchema: undefined,
     stakingInfo: undefined,
   });
@@ -75,14 +70,12 @@ const { StateProvider, useState: useMultistakingState } =
 export function MultistakingState({ children }: PropsWithChildren) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
-    StakingModalPage.FINALITY_PROVIDER,
+    StakingModalPage.DEFAULT,
   );
   const [selectedChain, setSelectedChain] = useState("babylon");
   const [selectedProviders, setSelectedProviders] = useState<
     (FinalityProvider & { chainType: string })[]
   >([]);
-  const [currentStakingStepOptions, setCurrentStakingStepOptions] =
-    useState<SignPsbtOptions>();
 
   const MAX_FINALITY_PROVIDERS = 1;
 
@@ -256,8 +249,6 @@ export function MultistakingState({ children }: PropsWithChildren) {
       selectedChain,
       setSelectedChain,
       MAX_FINALITY_PROVIDERS,
-      currentStakingStepOptions,
-      setCurrentStakingStepOptions,
       validationSchema,
       stakingInfo,
     }),
@@ -272,8 +263,6 @@ export function MultistakingState({ children }: PropsWithChildren) {
       selectedChain,
       setSelectedChain,
       MAX_FINALITY_PROVIDERS,
-      currentStakingStepOptions,
-      setCurrentStakingStepOptions,
       validationSchema,
       stakingInfo,
     ],

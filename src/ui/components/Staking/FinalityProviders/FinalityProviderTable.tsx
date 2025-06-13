@@ -3,7 +3,7 @@
  */
 import "core-js/features/array/to-sorted";
 
-import { Loader, Table, useWatch } from "@babylonlabs-io/core-ui";
+import { Loader, Table } from "@babylonlabs-io/core-ui";
 
 import warningOctagon from "@/ui/assets/warning-octagon.svg";
 import warningTriangle from "@/ui/assets/warning-triangle.svg";
@@ -13,10 +13,12 @@ import { finalityProviderColumns } from "./FinalityProviderColumns";
 import { StatusView } from "./FinalityProviderTableStatusView";
 
 interface FinalityProviderTable {
+  selectedFP: string;
   onSelectRow?: (fpPK: string) => void;
 }
 
 export const FinalityProviderTable = ({
+  selectedFP,
   onSelectRow,
 }: FinalityProviderTable) => {
   const {
@@ -27,8 +29,6 @@ export const FinalityProviderTable = ({
     fetchNextPage,
     isRowSelectable,
   } = useFinalityProviderState();
-
-  const selectedFP = useWatch({ name: "finalityProvider", defaultValue: "" });
 
   const errorView = (
     <StatusView
