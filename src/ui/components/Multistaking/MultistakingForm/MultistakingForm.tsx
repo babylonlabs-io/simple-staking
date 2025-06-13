@@ -28,6 +28,7 @@ const { networkName } = getNetworkConfigBTC();
 export function MultistakingForm() {
   const { address } = useBTCWallet();
   const {
+    stakingInfo,
     setFormData,
     goToStep,
     blocked: isGeoBlocked,
@@ -35,7 +36,6 @@ export function MultistakingForm() {
   } = useStakingState();
   const {
     validationSchema,
-    stakingInfo,
     stakingModalPage,
     setStakingModalPage,
     setSelectedChain,
@@ -74,10 +74,7 @@ export function MultistakingForm() {
         {stakingInfo && (
           <HiddenField
             name="term"
-            defaultValue={(
-              stakingInfo?.defaultStakingTimeBlocks ??
-              stakingInfo?.minStakingTimeBlocks
-            )?.toString()}
+            defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
           />
         )}
         <HiddenField name="feeRate" defaultValue="0" />
