@@ -1,19 +1,15 @@
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import { useMemo, useState, type PropsWithChildren } from "react";
 import { number, object, ObjectSchema, string } from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
-import { useAppState } from "@/ui/state";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
 
-import type { FinalityProvider } from "../types/finalityProviders";
-
 import { useBalanceState } from "./BalanceState";
-import { useFinalityProviderState } from "./FinalityProviderState";
-import { StakingModalPage } from "./StakingState";
+import { StakingModalPage, useStakingState } from "./StakingState";
 
 const { coinName } = getNetworkConfigBTC();
 
@@ -26,97 +22,28 @@ export interface MultistakingFormFields {
 }
 
 export interface MultistakingState {
-  isModalOpen: boolean;
-  setIsModalOpen: (value: boolean) => void;
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
-  selectedProviders: (FinalityProvider & { chainType: string })[];
-  handleSelectProvider: (selectedProviderKey: string) => void;
-  removeProvider: (providerId: string) => void;
-  selectedChain: string;
-  setSelectedChain: (chain: string) => void;
   MAX_FINALITY_PROVIDERS: number;
   validationSchema?: ObjectSchema<MultistakingFormFields>;
-  stakingInfo?: {
-    minFeeRate: number;
-    maxFeeRate: number;
-    defaultFeeRate: number;
-    minStakingTimeBlocks: number;
-    maxStakingTimeBlocks: number;
-    defaultStakingTimeBlocks?: number;
-    minStakingAmountSat: number;
-    maxStakingAmountSat: number;
-    unbondingFeeSat: number;
-    unbondingTime: number;
-  };
 }
 
 const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
-    isModalOpen: false,
-    setIsModalOpen: () => {},
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    selectedProviders: [],
-    handleSelectProvider: () => {},
-    removeProvider: () => {},
-    selectedChain: "babylon",
-    setSelectedChain: () => {},
     MAX_FINALITY_PROVIDERS: 1,
     validationSchema: undefined,
-    stakingInfo: undefined,
   });
 
 export function MultistakingState({ children }: PropsWithChildren) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const [selectedChain, setSelectedChain] = useState("babylon");
-  const [selectedProviders, setSelectedProviders] = useState<
-    (FinalityProvider & { chainType: string })[]
-  >([]);
-
   const MAX_FINALITY_PROVIDERS = 1;
-
-  const { finalityProviders } = useFinalityProviderState();
   const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
-  const { networkInfo } = useAppState();
-
-  const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
-
-  const stakingInfo = useMemo(() => {
-    if (!latestParam) {
-      return;
-    }
-
-    const {
-      minStakingAmountSat = 0,
-      maxStakingAmountSat = 0,
-      minStakingTimeBlocks = 0,
-      maxStakingTimeBlocks = 0,
-      unbondingFeeSat,
-      unbondingTime,
-    } = latestParam || {};
-
-    // Default fee rates for multistaking
-    const minFeeRate = 1;
-    const maxFeeRate = 1000;
-    const defaultFeeRate = 10;
-
-    return {
-      defaultFeeRate,
-      minFeeRate,
-      maxFeeRate,
-      minStakingAmountSat,
-      maxStakingAmountSat,
-      minStakingTimeBlocks,
-      maxStakingTimeBlocks,
-      unbondingFeeSat,
-      unbondingTime,
-    };
-  }, [latestParam]);
+  const { stakingInfo } = useStakingState();
 
   const validationSchema = useMemo(
     () =>
@@ -215,56 +142,18 @@ export function MultistakingState({ children }: PropsWithChildren) {
     [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
   );
 
-  const handleSelectProvider = useCallback(
-    (selectedProviderKey: string) => {
-      if (selectedProviderKey) {
-        const providerData = finalityProviders?.find(
-          (p) => p.btcPk === selectedProviderKey,
-        );
-        if (providerData) {
-          setSelectedProviders((prev) => [
-            ...prev,
-            { ...providerData, chainType: selectedChain },
-          ]);
-        }
-      }
-      setIsModalOpen(false);
-    },
-    [finalityProviders, selectedChain],
-  );
-
-  const removeProvider = useCallback((providerId: string) => {
-    setSelectedProviders((prev) => prev.filter((p) => p.id !== providerId));
-  }, []);
-
   const context = useMemo(
     () => ({
-      isModalOpen,
-      setIsModalOpen,
       stakingModalPage,
       setStakingModalPage,
-      selectedProviders,
-      handleSelectProvider,
-      removeProvider,
-      selectedChain,
-      setSelectedChain,
       MAX_FINALITY_PROVIDERS,
       validationSchema,
-      stakingInfo,
     }),
     [
-      isModalOpen,
-      setIsModalOpen,
       stakingModalPage,
       setStakingModalPage,
-      selectedProviders,
-      handleSelectProvider,
-      removeProvider,
-      selectedChain,
-      setSelectedChain,
       MAX_FINALITY_PROVIDERS,
       validationSchema,
-      stakingInfo,
     ],
   );
 

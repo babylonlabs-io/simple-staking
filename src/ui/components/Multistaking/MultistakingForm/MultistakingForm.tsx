@@ -38,7 +38,6 @@ export function MultistakingForm() {
     validationSchema,
     stakingModalPage,
     setStakingModalPage,
-    setSelectedChain,
     MAX_FINALITY_PROVIDERS,
   } = useMultistakingState();
 
@@ -105,8 +104,8 @@ export function MultistakingForm() {
           className="w-[52rem]"
         >
           <ChainSelectionModal
-            onNext={(chain) => {
-              setSelectedChain(chain);
+            onNext={() => {
+              // setSelectedChain(chain);
               setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
             }}
             onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
