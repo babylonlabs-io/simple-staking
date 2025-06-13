@@ -69,7 +69,6 @@ export function MultistakingForm() {
         mode="onChange"
         reValidateMode="onChange"
         onSubmit={handlePreview}
-        onChange={(values) => console.log(values)}
       >
         {stakingInfo && (
           <HiddenField
