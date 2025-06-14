@@ -1,6 +1,11 @@
 import { incentivequery } from "@babylonlabs-io/babylon-proto-ts";
 import { QueryBalanceResponse } from "cosmjs-types/cosmos/bank/v1beta1/query.js";
-import { ResponseComposition, RestContext, RestRequest, rest } from "msw";
+import {
+  type ResponseComposition,
+  type RestContext,
+  type RestRequest,
+  rest,
+} from "msw";
 
 import { MOCK_VALUES } from "./constants";
 

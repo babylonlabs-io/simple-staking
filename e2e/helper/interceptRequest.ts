@@ -1,4 +1,4 @@
-import { Page } from "@playwright/test";
+import type { Page } from "@playwright/test";
 
 // Utility function to intercept requests and fulfill them with mock data
 export const interceptRequest = async (
