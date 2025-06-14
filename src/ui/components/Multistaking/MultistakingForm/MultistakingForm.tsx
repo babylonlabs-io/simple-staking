@@ -75,7 +75,7 @@ export function MultistakingForm() {
   }
 
   return (
-    <Section title={`${networkName} Staking`}>
+    <Section title={`${networkName} staking for Babylon Genesis`}>
       <Form
         schema={validationSchema}
         mode="onChange"
