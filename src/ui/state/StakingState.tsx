@@ -32,8 +32,9 @@ import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
 import { useBalanceState } from "./BalanceState";
 
 export enum StakingModalPage {
-  CHAIN_SELECTION = 0,
-  FINALITY_PROVIDER = 1,
+  DEFAULT = 0,
+  CHAIN_SELECTION = 1,
+  FINALITY_PROVIDER = 2,
 }
 
 const { coinName } = getNetworkConfigBTC();

@@ -1,14 +1,11 @@
 import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
-import { AiOutlinePlus } from "react-icons/ai";
-import { twJoin } from "tailwind-merge";
 
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
-import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
+import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/ui/components/Multistaking/MultistakingForm/FeesSection";
-import { SubSection } from "@/ui/components/Multistaking/MultistakingForm/SubSection";
 import { Section } from "@/ui/components/Section/Section";
 import { StakingModal } from "@/ui/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
@@ -23,8 +20,6 @@ import {
   useStakingState,
 } from "@/ui/state/StakingState";
 
-import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
-
 import { FormAlert } from "./FormAlert";
 import { PreviewButton } from "./PreviewButton";
 
@@ -33,6 +28,7 @@ const { networkName } = getNetworkConfigBTC();
 export function MultistakingForm() {
   const { address } = useBTCWallet();
   const {
+    stakingInfo,
     setFormData,
     goToStep,
     blocked: isGeoBlocked,
@@ -40,19 +36,10 @@ export function MultistakingForm() {
   } = useStakingState();
   const {
     validationSchema,
-    stakingInfo,
-    isModalOpen,
-    setIsModalOpen,
     stakingModalPage,
     setStakingModalPage,
-    selectedProviders,
-    setSelectedChain,
-    handleSelectProvider,
-    removeProvider,
     MAX_FINALITY_PROVIDERS,
   } = useMultistakingState();
-
-  const counter = selectedProviders.length;
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -85,64 +72,21 @@ export function MultistakingForm() {
         {stakingInfo && (
           <HiddenField
             name="term"
-            defaultValue={(
-              stakingInfo?.defaultStakingTimeBlocks ??
-              stakingInfo?.minStakingTimeBlocks
-            )?.toString()}
+            defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
           />
         )}
         <HiddenField name="feeRate" defaultValue="0" />
         <HiddenField name="feeAmount" defaultValue="0" />
-        <HiddenField name="finalityProvider" defaultValue="" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <SubSection>
-              <div className="flex flex-col w-full gap-4">
-                <div className="flex flex-row">
-                  <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-                    Select Finality Provider
-                  </div>
-                  <div className="flex">
-                    {counter < MAX_FINALITY_PROVIDERS && (
-                      <div
-                        className={twJoin(
-                          "w-10 h-10 flex items-center justify-center rounded-md bg-primary-highlight border border-accent-primary cursor-pointer",
-                          counter > 0 ? "rounded-r-none" : "rounded",
-                        )}
-                        onClick={() => {
-                          setStakingModalPage(
-                            StakingModalPage.FINALITY_PROVIDER,
-                          );
-                          setIsModalOpen(true);
-                        }}
-                      >
-                        <AiOutlinePlus size={20} />
-                      </div>
-                    )}
-                    {0 < counter && 1 < MAX_FINALITY_PROVIDERS && (
-                      <div
-                        className={twJoin(
-                          "px-4 h-10 flex items-center border border-accent-primary",
-                          counter === MAX_FINALITY_PROVIDERS
-                            ? "rounded-md"
-                            : "border-l-0 rounded-r-md",
-                          "cursor-pointer",
-                        )}
-                      >
-                        {counter}/{MAX_FINALITY_PROVIDERS}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                {selectedProviders.map((provider) => (
-                  <FinalityProviderItem
-                    key={provider.id}
-                    provider={provider}
-                    onRemove={() => removeProvider(provider.id)}
-                  />
-                ))}
-              </div>
-            </SubSection>
+            <FinalityProviderField
+              open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
+              max={MAX_FINALITY_PROVIDERS}
+              onOpen={() =>
+                void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER)
+              }
+              onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+            />
             <AmountSubsection />
             <FeesSection />
             <PreviewButton />
@@ -155,27 +99,17 @@ export function MultistakingForm() {
         </div>
 
         <ResponsiveDialog
-          open={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          open={stakingModalPage === StakingModalPage.CHAIN_SELECTION}
+          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
           className="w-[52rem]"
         >
-          {stakingModalPage === StakingModalPage.CHAIN_SELECTION && (
-            <ChainSelectionModal
-              onNext={(chain) => {
-                setSelectedChain(chain);
-                setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
-              }}
-              onClose={() => setIsModalOpen(false)}
-            />
-          )}
-          {stakingModalPage === StakingModalPage.FINALITY_PROVIDER && (
-            <FinalityProviderModal
-              onAdd={(selectedProviderKey) =>
-                handleSelectProvider(selectedProviderKey)
-              }
-              onClose={() => setIsModalOpen(false)}
-            />
-          )}
+          <ChainSelectionModal
+            onNext={() => {
+              // setSelectedChain(chain);
+              setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
+            }}
+            onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+          />
         </ResponsiveDialog>
 
         <StakingModal />

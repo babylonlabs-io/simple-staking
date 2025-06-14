@@ -3,6 +3,7 @@ import {
   HiddenField,
   Text,
   useFormContext,
+  useWatch,
 } from "@babylonlabs-io/core-ui";
 
 import { FinalityProviderFilter } from "./FinalityProviderFilter";
@@ -11,6 +12,7 @@ import { FinalityProviderTable } from "./FinalityProviderTable";
 
 export const FinalityProviders = () => {
   const { setValue } = useFormContext();
+  const selectedFP = useWatch({ name: "finalityProvider", defaultValue: "" });
 
   return (
     <div className="flex flex-col gap-4">
@@ -31,6 +33,7 @@ export const FinalityProviders = () => {
       </div>
 
       <FinalityProviderTable
+        selectedFP={selectedFP}
         onSelectRow={(pk) =>
           setValue("finalityProvider", pk, {
             shouldValidate: true,
