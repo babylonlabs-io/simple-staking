@@ -7,6 +7,7 @@ import { satoshiToBtc } from "@/ui/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/utils/formatCurrency";
 import { maxDecimals } from "@/ui/utils/maxDecimals";
 
+//TODO: Temporary disable max button until we implement https://github.com/babylonlabs-io/simple-staking/issues/1119
 export const AmountBalanceInfo = () => {
   const { stakableBtcBalance } = useBalanceState();
 
