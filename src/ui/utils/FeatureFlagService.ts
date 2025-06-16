@@ -12,7 +12,7 @@
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
 
-type FeatureFlag = "MULTISTAKING" | "ENABLE_LEDGER";
+type FeatureFlag = "MULTISTAKING" | "ENABLE_LEDGER" | "PHASE_3";
 
 class FeatureFlagService {
   /**
@@ -26,6 +26,7 @@ class FeatureFlagService {
     const featureFlags = {
       MULTISTAKING: process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true",
       ENABLE_LEDGER: process.env.NEXT_PUBLIC_FF_ENABLE_LEDGER === "true",
+      PHASE_3: process.env.NEXT_PUBLIC_FF_PHASE_3 === "true",
     } as const;
 
     const result = featureFlags[flagName];
@@ -52,6 +53,17 @@ class FeatureFlagService {
    */
   static get IsLedgerEnabled(): boolean {
     return this.getFlagValue("ENABLE_LEDGER");
+  }
+
+  /**
+   * PHASE_3 feature flag
+   *
+   * Purpose: Enables phase 3 functionality
+   * Why needed: To gradually roll out phase 3
+   * ETA for removal: TBD - Will be removed once phase 3 is fully released
+   */
+  static get IsPhase3Enabled(): boolean {
+    return this.getFlagValue("PHASE_3");
   }
 }
 
