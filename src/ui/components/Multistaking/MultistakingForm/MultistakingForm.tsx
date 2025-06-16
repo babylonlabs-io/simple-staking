@@ -3,6 +3,7 @@ import { useCallback } from "react";
 
 import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
+import { BsnFinalityProviderField } from "@/ui/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
@@ -20,6 +21,7 @@ import {
   StakingStep,
   useStakingState,
 } from "@/ui/state/StakingState";
+import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
@@ -81,15 +83,29 @@ export function MultistakingForm() {
         <HiddenField name="feeAmount" defaultValue="0" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <FinalityProviderField
-              open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-              max={MAX_FINALITY_PROVIDERS}
-              onOpen={() =>
-                void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER)
-              }
-              onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-            />
+            {!FeatureFlagService.IsPhase3Enabled && (
+              <FinalityProviderField
+                open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
+                max={MAX_FINALITY_PROVIDERS}
+                onOpen={() =>
+                  void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER)
+                }
+                onClose={() =>
+                  void setStakingModalPage(StakingModalPage.DEFAULT)
+                }
+              />
+            )}
             <AmountSubsection />
+            {FeatureFlagService.IsPhase3Enabled && (
+              <BsnFinalityProviderField
+                open={stakingModalPage === StakingModalPage.BSN}
+                max={MAX_FINALITY_PROVIDERS}
+                onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
+                onClose={() =>
+                  void setStakingModalPage(StakingModalPage.DEFAULT)
+                }
+              />
+            )}
             <FeesSection />
 
             <AuthGuard fallback={<ConnectButton />}>
