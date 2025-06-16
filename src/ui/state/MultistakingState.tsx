@@ -2,6 +2,7 @@ import { useMemo, useState, type PropsWithChildren } from "react";
 import { number, object, ObjectSchema, ObjectShape, Schema, string } from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
+import { MAX_BSN_FP_PROVIDERS } from "@/ui/config";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
 import { satoshiToBtc } from "@/ui/utils/btc";
@@ -39,7 +40,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    MAX_FINALITY_PROVIDERS: 1,
+    MAX_FINALITY_PROVIDERS: MAX_BSN_FP_PROVIDERS,
     validationSchema: undefined,
     formFields: [],
   });
@@ -48,7 +49,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const MAX_FINALITY_PROVIDERS = 1;
+  const MAX_FINALITY_PROVIDERS = MAX_BSN_FP_PROVIDERS;
   const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
