@@ -22,10 +22,11 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:report": "playwright show-report",
-    "visualizer": "npx vite-bundle-visualizer"
+    "visualizer": "npx vite-bundle-visualizer",
+    "gen:api": "npx swagger-typescript-api generate -p https://staking-api.babylonlabs.io/swagger/doc.json -o ./src/shared/utils/swagger -t ./src/shared/utils/swagger/templates -n api.ts --unwrap-response-data --disable-format --silent"
   },
   "engines": {
-    "node": "22.3.0"
+    "node": "24.2.0"
   },
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "1.0.1",
@@ -35,6 +36,7 @@
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmjs/stargate": "^0.32.4",
+    "@mempool/mempool.js": "^3.0.0",
     "@sentry/react": "^8.30.0",
     "@tanstack/react-query": "^5.28.14",
     "@uidotdev/usehooks": "^2.4.1",
@@ -44,6 +46,7 @@
     "date-fns": "^3.6.0",
     "decimal.js-light": "^2.5.1",
     "nanoevents": "^9.1.0",
+    "idb": "^8.0.3",
     "next-themes": "^0.3.0",
     "qs": "^6.13.1",
     "react": "^18",
@@ -103,6 +106,7 @@
     "prettier-plugin-organize-imports": "^3.2.4",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "source-map-loader": "^5.0.0",
+    "swagger-typescript-api": "^13.1.1",
     "tailwindcss": "3.4.3",
     "text-encoding": "^0.7.0",
     "ts-node": "^10.9.2",
