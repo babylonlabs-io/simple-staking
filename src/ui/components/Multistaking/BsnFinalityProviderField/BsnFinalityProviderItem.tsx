@@ -4,7 +4,7 @@ import { FinalityProviderLogo } from "@/ui/components/Staking/FinalityProviders/
 import { FinalityProvider } from "@/ui/types/finalityProviders";
 import { trim } from "@/ui/utils/trim";
 
-export const FinalityProviderItem = ({
+export const BsnFinalityProviderItem = ({
   provider,
   onRemove,
 }: {
@@ -22,12 +22,16 @@ export const FinalityProviderItem = ({
           moniker={provider.description?.moniker}
           className="w-10 h-10"
         />
-        <div className="text-accent-primary flex items-center text-sm sm:text-base">
-          {provider.description?.moniker ||
-            trim(provider.btcPk, 8) ||
-            "Selected FP"}
+        <div className="text-accent-primary flex flex-col justify-center">
+          <div className="text-xs text-accent-secondary">
+            {provider.description?.moniker || "BSN Provider"}
+          </div>
+          <div className="text-base text-accent-primary font-medium">
+            {trim(provider.btcPk, 8) || "Selected FP"}
+          </div>
         </div>
       </div>
+
       <div
         onClick={() => {
           setValue("finalityProvider", "", {
@@ -37,7 +41,7 @@ export const FinalityProviderItem = ({
           });
           onRemove();
         }}
-        className="text-accent-primary text-xs sm:text-sm tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
+        className="text-accent-primary text-xs tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
       >
         Remove
       </div>
