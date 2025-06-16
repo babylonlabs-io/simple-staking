@@ -1,7 +1,6 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
-import { DEFAULT_FILTER_VALUE } from "@/ui/config";
 import { useSearchParams } from "@/ui/context/SearchParamsProvider";
 import { useFinalityProviders } from "@/ui/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/hooks/client/api/useFinalityProvidersV2";
@@ -72,7 +71,7 @@ const FILTERS = {
 const defaultState: FinalityProviderState = {
   filter: {
     search: "",
-    status: DEFAULT_FILTER_VALUE,
+    status: "active",
   },
   finalityProviders: [],
   hasNextPage: false,
@@ -96,7 +95,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
-    status: DEFAULT_FILTER_VALUE,
+    status: "active",
   });
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
