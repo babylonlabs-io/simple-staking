@@ -1,3 +1,4 @@
 import { Api } from "@/shared/utils/swagger/api";
 
-export default new Api({ baseUrl: process.env.NEXT_PUBLIC_API_URL });
+export default ({ config }: DI.Container) =>
+  new Api({ baseUrl: config.api.baseUrl });
