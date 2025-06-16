@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { AiOutlinePlus } from "react-icons/ai";
 import { twJoin } from "tailwind-merge";
 
+import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderModal/FinalityProviderModal";
@@ -25,8 +26,9 @@ import {
 
 import { FinalityProviderItem } from "../FinalityProviderModal/FinalityProviderItem";
 
+import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
-import { PreviewButton } from "./PreviewButton";
+import { SubmitButton } from "./SubmitButton";
 
 const { networkName } = getNetworkConfigBTC();
 
@@ -50,7 +52,6 @@ export function MultistakingForm() {
     handleSelectProvider,
     removeProvider,
     MAX_FINALITY_PROVIDERS,
-    fieldPriority,
   } = useMultistakingState();
 
   const counter = selectedProviders.length;
@@ -146,7 +147,11 @@ export function MultistakingForm() {
             </SubSection>
             <AmountSubsection />
             <FeesSection />
-            <PreviewButton fieldPriority={fieldPriority} />
+
+            <AuthGuard fallback={<ConnectButton />}>
+              <SubmitButton />
+            </AuthGuard>
+
             <FormAlert
               address={address}
               isGeoBlocked={isGeoBlocked}
