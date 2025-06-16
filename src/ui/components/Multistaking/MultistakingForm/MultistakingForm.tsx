@@ -1,6 +1,7 @@
 import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
 
+import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
@@ -20,8 +21,9 @@ import {
   useStakingState,
 } from "@/ui/state/StakingState";
 
+import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
-import { PreviewButton } from "./PreviewButton";
+import { SubmitButton } from "./SubmitButton";
 
 const { networkName } = getNetworkConfigBTC();
 
@@ -89,7 +91,11 @@ export function MultistakingForm() {
             />
             <AmountSubsection />
             <FeesSection />
-            <PreviewButton />
+
+            <AuthGuard fallback={<ConnectButton />}>
+              <SubmitButton />
+            </AuthGuard>
+
             <FormAlert
               address={address}
               isGeoBlocked={isGeoBlocked}
