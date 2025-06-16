@@ -66,6 +66,7 @@ jobs:
           # Feature Flags
           NEXT_PUBLIC_FF_MULTISTAKING: ${{ vars.NEXT_PUBLIC_FF_MULTISTAKING }}
           NEXT_PUBLIC_FF_ENABLE_LEDGER: ${{ vars.NEXT_PUBLIC_FF_ENABLE_LEDGER }}
+          NEXT_PUBLIC_FF_PHASE_3: ${{ vars.NEXT_PUBLIC_FF_PHASE_3 }}
 
       - name: Archive output
         run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
