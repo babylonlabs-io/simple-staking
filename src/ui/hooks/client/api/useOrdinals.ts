@@ -3,6 +3,7 @@ import { InscriptionIdentifier } from "@babylonlabs-io/wallet-connector";
 
 import { postVerifyUtxoOrdinals } from "@/ui/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/ui/constants";
+import { useError } from "@/ui/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/ui/errors";
 import { useClientQuery } from "@/ui/hooks/client/useClient";
@@ -17,7 +18,8 @@ export function useOrdinals(
   utxos: UTXO[],
   { enabled = true }: { enabled?: boolean } = {},
 ) {
-  const { getInscriptions, address } = useBTCWallet();
+  const { getInscriptions, address, publicKeyNoCoord } = useBTCWallet();
+  const { handleError } = useError();
   const logger = useLogger();
 
   const fetchOrdinals = async (): Promise<InscriptionIdentifier[]> => {
@@ -41,11 +43,26 @@ export function useOrdinals(
 
       return verifiedUTXOs.filter((utxo) => utxo.inscription);
     } catch (error) {
-      throw new ClientError(
+      const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        "Error fetching ordinals data",
-        { cause: error as Error },
+        "Error fetching ordinals information",
+        {
+          cause: error as Error,
+        },
       );
+      handleError({
+        error: clientError,
+        displayOptions: {
+          retryAction: () => fetchOrdinals(),
+        },
+        metadata: {
+          userPublicKey: publicKeyNoCoord,
+          btcAddress: address,
+        },
+      });
+      // App should work without ordinals
+      // -> return an empty array instead of throwing an error
+      return [];
     }
   };
 
