@@ -2,14 +2,19 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useSearchParams } from "@/ui/context/SearchParamsProvider";
+import { useBsn } from "@/ui/hooks/client/api/useBsn";
 import { useFinalityProviders } from "@/ui/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/hooks/client/api/useFinalityProvidersV2";
+import { Bsn } from "@/ui/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
   FinalityProviderV1,
   type FinalityProvider,
 } from "@/ui/types/finalityProviders";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
+
+import { useMultistakingState } from "./MultistakingState";
+import { StakingModalPage } from "./StakingState";
 
 interface SortState {
   field?: string;
@@ -28,6 +33,10 @@ interface FinalityProviderState {
   hasNextPage: boolean;
   isFetching: boolean;
   hasError: boolean;
+  // BSN
+  bsnList: Bsn[];
+  bsnLoading: boolean;
+  bsnError: boolean;
   handleSort: (sortField: string) => void;
   handleFilter: (key: keyof FilterState, value: string) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
@@ -77,6 +86,9 @@ const defaultState: FinalityProviderState = {
   hasNextPage: false,
   isFetching: false,
   hasError: false,
+  bsnList: [],
+  bsnLoading: false,
+  bsnError: false,
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
@@ -92,6 +104,7 @@ const { StateProvider, useState: useFpState } =
 export function FinalityProviderState({ children }: PropsWithChildren) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
+  const { stakingModalPage } = useMultistakingState();
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
@@ -108,6 +121,13 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     });
 
   const { data: dataV1 } = useFinalityProviders();
+  const {
+    data: bsnList = [],
+    isLoading: bsnLoading,
+    isError: bsnError,
+  } = useBsn({
+    enabled: stakingModalPage === StakingModalPage.CHAIN_SELECTION,
+  });
 
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) return [];
@@ -201,6 +221,9 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     () => ({
       filter,
       finalityProviders: filteredFinalityProviders,
+      bsnList,
+      bsnLoading,
+      bsnError,
       isFetching,
       hasError: isError,
       hasNextPage,
@@ -215,6 +238,9 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
     [
       filter,
       filteredFinalityProviders,
+      bsnList,
+      bsnLoading,
+      bsnError,
       isFetching,
       hasNextPage,
       isError,
