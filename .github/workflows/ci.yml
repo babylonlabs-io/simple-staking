@@ -1,9 +1,9 @@
 name: ci
 
 on:
-  pull_request:
+  push:
     branches:
-      - "**"
+      - hiep/test-options
 
 permissions:
   contents: read
