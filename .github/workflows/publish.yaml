@@ -3,7 +3,8 @@ name: docker_publish
 on:
   push:
     branches:
-      - "*"
+      - "main"
+      - "release/v1.x"
     tags:
       - "*"
 
@@ -19,7 +20,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        environment: [phase-2-devnet]
+        environment: [phase-2-devnet, testnet, mainnet, staging, rollup-devnet]
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
