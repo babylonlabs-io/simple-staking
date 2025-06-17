@@ -61,6 +61,30 @@ export function MultistakingForm() {
     [setFormData, goToStep],
   );
 
+  const renderFinalityProviderField = () => {
+    if (FeatureFlagService.IsPhase3Enabled) {
+      return (
+        <BsnFinalityProviderField
+          open={stakingModalPage === StakingModalPage.BSN}
+          max={MAX_FINALITY_PROVIDERS}
+          onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
+          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+        />
+      );
+    } else {
+      return (
+        <FinalityProviderField
+          open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
+          max={MAX_FINALITY_PROVIDERS}
+          onOpen={() =>
+            void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
+          }
+          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+        />
+      );
+    }
+  };
+
   if (!stakingInfo) {
     return null;
   }
@@ -83,29 +107,8 @@ export function MultistakingForm() {
         <HiddenField name="feeAmount" defaultValue="0" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            {!FeatureFlagService.IsPhase3Enabled && (
-              <FinalityProviderField
-                open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-                max={MAX_FINALITY_PROVIDERS}
-                onOpen={() =>
-                  void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
-                }
-                onClose={() =>
-                  void setStakingModalPage(StakingModalPage.DEFAULT)
-                }
-              />
-            )}
+            {renderFinalityProviderField()}
             <AmountSubsection />
-            {FeatureFlagService.IsPhase3Enabled && (
-              <BsnFinalityProviderField
-                open={stakingModalPage === StakingModalPage.BSN}
-                max={MAX_FINALITY_PROVIDERS}
-                onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
-                onClose={() =>
-                  void setStakingModalPage(StakingModalPage.DEFAULT)
-                }
-              />
-            )}
             <FeesSection />
 
             <AuthGuard fallback={<ConnectButton />}>

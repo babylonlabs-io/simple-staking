@@ -1,5 +1,4 @@
 import { useField } from "@babylonlabs-io/core-ui";
-import { useEffect, useState } from "react";
 
 import { CounterButton } from "@/ui/components/Multistaking/CounterButton";
 import type { FinalityProvider } from "@/ui/types/finalityProviders";
@@ -13,7 +12,7 @@ interface Props {
   open: boolean;
   max: number;
   disabled?: boolean;
-  defaultValue?: string;
+  defaultValue?: FinalityProvider[];
   onOpen: () => void;
   onClose: () => void;
 }
@@ -21,28 +20,16 @@ interface Props {
 export function BsnFinalityProviderField({
   disabled = false,
   max,
-  defaultValue,
+  defaultValue = [],
   open,
   onOpen,
   onClose,
 }: Props) {
-  const { onChange } = useField({
-    name: "finalityProvider",
+  const { value: selectedProviders, onChange } = useField<FinalityProvider[]>({
+    name: "selectedProviders",
     defaultValue,
     disabled,
   });
-
-  const [selectedProviders, setSelectedProviders] = useState<
-    FinalityProvider[]
-  >([]);
-
-  useEffect(() => {
-    if (selectedProviders.length > 0) {
-      onChange(selectedProviders[0].btcPk);
-    } else {
-      onChange("");
-    }
-  }, [selectedProviders, onChange]);
 
   const handleAdd = () => {
     // TODO: Implement provider selection logic
@@ -50,7 +37,7 @@ export function BsnFinalityProviderField({
   };
 
   const handleRemove = (btcPk: string) => {
-    setSelectedProviders((prev) => prev.filter((fp) => fp.btcPk !== btcPk));
+    onChange(selectedProviders.filter((fp) => fp.btcPk !== btcPk));
   };
 
   return (
