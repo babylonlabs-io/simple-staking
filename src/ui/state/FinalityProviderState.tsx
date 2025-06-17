@@ -5,6 +5,7 @@ import { useSearchParams } from "@/ui/context/SearchParamsProvider";
 import { useBsn } from "@/ui/hooks/client/api/useBsn";
 import { useFinalityProviders } from "@/ui/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/hooks/client/api/useFinalityProvidersV2";
+import { StakingModalPage } from "@/ui/state/StakingState";
 import { Bsn } from "@/ui/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
@@ -12,9 +13,6 @@ import {
   type FinalityProvider,
 } from "@/ui/types/finalityProviders";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
-
-import { useMultistakingState } from "./MultistakingState";
-import { StakingModalPage } from "./StakingState";
 
 interface SortState {
   field?: string;
@@ -37,6 +35,9 @@ interface FinalityProviderState {
   bsnList: Bsn[];
   bsnLoading: boolean;
   bsnError: boolean;
+  // Modal
+  stakingModalPage: StakingModalPage;
+  setStakingModalPage: (page: StakingModalPage) => void;
   handleSort: (sortField: string) => void;
   handleFilter: (key: keyof FilterState, value: string) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
@@ -96,6 +97,8 @@ const defaultState: FinalityProviderState = {
   fetchNextPage: () => {},
   getFinalityProviderName: () => undefined,
   finalityProviderMap: new Map(),
+  stakingModalPage: StakingModalPage.DEFAULT,
+  setStakingModalPage: () => {},
 };
 
 const { StateProvider, useState: useFpState } =
@@ -104,7 +107,9 @@ const { StateProvider, useState: useFpState } =
 export function FinalityProviderState({ children }: PropsWithChildren) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
-  const { stakingModalPage } = useMultistakingState();
+  const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
+    StakingModalPage.DEFAULT,
+  );
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
@@ -234,6 +239,8 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       getRegisteredFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
+      stakingModalPage,
+      setStakingModalPage,
     }),
     [
       filter,
@@ -251,6 +258,8 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       getRegisteredFinalityProvider,
       fetchNextPage,
       getFinalityProviderName,
+      stakingModalPage,
+      setStakingModalPage,
     ],
   );
 
