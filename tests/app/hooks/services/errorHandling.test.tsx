@@ -333,8 +333,8 @@ describe("Core Services Error Handling", () => {
       // Verify that stakeDelegation was called again
       expect(mockSubmitStakingTx).toHaveBeenCalledWith(
         {
-          finalityProviderPkNoCoordHex:
-            mockDelegation.finalityProviderBtcPksHex[0],
+          finalityProviderPksNoCoordHex:
+            mockDelegation.finalityProviderBtcPksHex,
           stakingAmountSat: mockDelegation.stakingAmount,
           stakingTimelock: mockDelegation.stakingTimelock,
         },

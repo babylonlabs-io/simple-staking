@@ -31,7 +31,7 @@ interface TxProps {
   }[];
   state: State;
   stakingInput: {
-    finalityProviderPkNoCoordHex: string;
+    finalityProviderPksNoCoordHex: string[];
     stakingAmountSat: number;
     stakingTimelock: number;
   };
@@ -308,9 +308,8 @@ export function useDelegationService() {
         slashing,
       } = delegation;
 
-      const finalityProviderPk = finalityProviderBtcPksHex[0];
       const stakingInput = {
-        finalityProviderPkNoCoordHex: finalityProviderPk,
+        finalityProviderPksNoCoordHex: finalityProviderBtcPksHex,
         stakingAmountSat: stakingAmount,
         stakingTimelock,
       };

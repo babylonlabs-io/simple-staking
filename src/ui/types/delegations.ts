@@ -1,3 +1,4 @@
+// The phase-1 delegation
 export interface Delegation {
   stakingTxHashHex: string;
   stakerPkHex: string;

@@ -94,7 +94,7 @@ describe("useTransactionService", () => {
 
   // Mock staking inputs
   const mockStakingInputs: BtcStakingInputs = {
-    finalityProviderPkNoCoordHex: mockCovenantPair.noCoordPublicKey,
+    finalityProviderPksNoCoordHex: [mockCovenantPair.noCoordPublicKey],
     stakingAmountSat: 1000000,
     stakingTimelock: mockStakingTerm,
   };

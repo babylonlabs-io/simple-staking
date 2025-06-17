@@ -170,7 +170,7 @@ describe("useStakingService", () => {
       // Verify estimateStakingFee was called correctly
       expect(mockEstimateStakingFee).toHaveBeenCalledWith(
         {
-          finalityProviderPkNoCoordHex: mockFormData.finalityProvider,
+          finalityProviderPksNoCoordHex: [mockFormData.finalityProvider],
           stakingAmountSat: mockAmountSat,
           stakingTimelock: mockFormData.term,
           feeRate: mockFormData.feeRate,
@@ -223,7 +223,7 @@ describe("useStakingService", () => {
 
       expect(mockCreateDelegationEoi).toHaveBeenCalledWith(
         {
-          finalityProviderPkNoCoordHex: mockFormData.finalityProvider,
+          finalityProviderPksNoCoordHex: [mockFormData.finalityProvider],
           stakingAmountSat: mockFormData.amount,
           stakingTimelock: mockFormData.term,
           feeRate: mockFormData.feeRate,
@@ -286,8 +286,8 @@ describe("useStakingService", () => {
 
       expect(mockSubmitStakingTx).toHaveBeenCalledWith(
         {
-          finalityProviderPkNoCoordHex:
-            mockDelegation.finalityProviderBtcPksHex[0],
+          finalityProviderPksNoCoordHex:
+            mockDelegation.finalityProviderBtcPksHex,
           stakingAmountSat: mockDelegation.stakingAmount,
           stakingTimelock: mockDelegation.stakingTimelock,
         },
