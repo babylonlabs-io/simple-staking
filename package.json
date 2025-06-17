@@ -8,7 +8,7 @@
     "build": "npx --node-options=--max-old-space-size=8192 tsc -b && npx --node-options=--max-old-space-size=8192 vite build",
     "lint": "eslint",
     "preview": "vite preview",
-    "build:e2e": "vite build --mode test",
+    "build:e2e": "npx --node-options=--max-old-space-size=8192 vite build --mode test",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
     "clean": "rm -r node_modules",
