@@ -180,7 +180,7 @@ export const Delegations = () => {
       await submitUnbondingTx(
         {
           stakingTimelock: stakingTx.timelock,
-          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          finalityProviderPksNoCoordHex: [finalityProviderPkHex],
           stakingAmountSat: stakingValueSat,
         },
         stakingTx.startHeight,
@@ -226,13 +226,13 @@ export const Delegations = () => {
         );
         throw clientError;
       }
-      // Sign the withdrawal transaction
+      // Sign the withdrawal transaction for phase-1 delegation
       const { stakingTx, finalityProviderPkHex, stakingValueSat, unbondingTx } =
         selectedDelegation;
       await submitWithdrawalTx(
         {
           stakingTimelock: stakingTx.timelock,
-          finalityProviderPkNoCoordHex: finalityProviderPkHex,
+          finalityProviderPksNoCoordHex: [finalityProviderPkHex],
           stakingAmountSat: stakingValueSat,
         },
         stakingTx.startHeight,

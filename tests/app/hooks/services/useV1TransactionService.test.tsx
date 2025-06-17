@@ -84,7 +84,7 @@ describe("useV1TransactionService", () => {
   const mockStakerSignatureHex = "mock-staker-signature-hex";
 
   const mockStakingInput = {
-    finalityProviderPkNoCoordHex: mockFinalityProviderPkHex,
+    finalityProviderPksNoCoordHex: [mockFinalityProviderPkHex],
     stakingAmountSat: mockStakingAmountSat,
     stakingTimelock: mockTimelock,
   };

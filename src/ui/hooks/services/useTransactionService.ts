@@ -17,7 +17,7 @@ import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
 import { useStakingManagerService } from "./useStakingManagerService";
 
 export interface BtcStakingInputs {
-  finalityProviderPkNoCoordHex: string;
+  finalityProviderPksNoCoordHex: string[];
   stakingAmountSat: number;
   stakingTimelock: number;
 }

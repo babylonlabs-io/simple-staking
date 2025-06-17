@@ -254,7 +254,7 @@ describe("useRegistrationService", () => {
         mockStakingTxHex,
         mockStartHeight,
         {
-          finalityProviderPkNoCoordHex: mockFinalityProviderPkHex,
+          finalityProviderPksNoCoordHex: [mockFinalityProviderPkHex],
           stakingAmountSat: mockStakingValueSat,
           stakingTimelock: mockTimelock,
         },

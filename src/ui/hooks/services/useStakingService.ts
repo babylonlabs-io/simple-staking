@@ -51,7 +51,8 @@ export function useStakingService() {
       feeRate,
     });
     const eoiInput = {
-      finalityProviderPkNoCoordHex: finalityProvider,
+      // TODO: To be replaced by multiple FPs
+      finalityProviderPksNoCoordHex: [finalityProvider],
       stakingAmountSat: btcToSatoshi(amount),
       stakingTimelock: term,
       feeRate: feeRate,
@@ -79,7 +80,8 @@ export function useStakingService() {
       });
       try {
         const eoiInput = {
-          finalityProviderPkNoCoordHex: finalityProvider,
+          // TODO: To be replaced by multiple FPs
+          finalityProviderPksNoCoordHex: [finalityProvider],
           stakingAmountSat: amount,
           stakingTimelock: term,
           feeRate: feeRate,
@@ -167,7 +169,7 @@ export function useStakingService() {
 
         await submitStakingTx(
           {
-            finalityProviderPkNoCoordHex: finalityProviderBtcPksHex[0],
+            finalityProviderPksNoCoordHex: finalityProviderBtcPksHex,
             stakingAmountSat: stakingAmount,
             stakingTimelock,
           },
