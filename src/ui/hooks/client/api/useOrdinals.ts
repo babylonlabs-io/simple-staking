@@ -50,14 +50,6 @@ export function useOrdinals(
           cause: error as Error,
         },
       );
-      logger.error(clientError, {
-        tags: {
-          btcAddress: address,
-        },
-        data: {
-          userPublicKey: publicKeyNoCoord,
-        },
-      });
       handleError({
         error: clientError,
         displayOptions: {
