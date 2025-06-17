@@ -3,8 +3,7 @@ name: docker_publish
 on:
   push:
     branches:
-      - "main"
-      - "release/v1.x"
+      - "*"
     tags:
       - "*"
 
@@ -20,7 +19,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        environment: [phase-2-devnet, testnet, mainnet, staging, rollup-devnet]
+        environment: [phase-2-devnet]
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
@@ -68,6 +67,14 @@ jobs:
           NEXT_PUBLIC_FF_ENABLE_LEDGER: ${{ vars.NEXT_PUBLIC_FF_ENABLE_LEDGER }}
           NEXT_PUBLIC_FF_PHASE_3: ${{ vars.NEXT_PUBLIC_FF_PHASE_3 }}
 
+      - name: Generate sha256sum checksum
+        run: |
+          cd out
+          FILES_CHECKSUM_PATH="/tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-files-checksum.txt"
+          GLOBAL_CHECKSUM_PATH="/tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-global-checksum.txt"
+          find . -type f -exec sha256sum {} \; | sort > $FILES_CHECKSUM_PATH
+          sha256sum $FILES_CHECKSUM_PATH > $GLOBAL_CHECKSUM_PATH
+
       - name: Archive output
         run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
 
@@ -76,7 +83,10 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_S3_REGION }}
-        run: aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz s3://${{ vars.S3_PUBLIC_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.sha }}.tar.gz
+        run: |
+          aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz s3://${{ vars.S3_PUBLIC_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.sha }}.tar.gz
+          aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-files-checksum.txt s3://${{ vars.S3_PUBLIC_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.sha }}-files-checksum.txt
+          aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-global-checksum.txt s3://${{ vars.S3_CHECKSUM_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.sha }}-global-checksum.txt
 
       - name: Upload to S3 with Git Tag
         if: startsWith(github.ref, 'refs/tags/')
@@ -84,4 +94,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ vars.AWS_S3_REGION }}
-        run: aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz s3://${{ vars.S3_PUBLIC_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.ref_name }}.tar.gz
+        run: |
+          aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz s3://${{ vars.S3_PUBLIC_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.ref_name }}.tar.gz
+          aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-files-checksum.txt s3://${{ vars.S3_PUBLIC_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.ref_name }}-files-checksum.txt
+          aws s3 cp /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-global-checksum.txt s3://${{ vars.S3_CHECKSUM_BUCKET }}/simple-staking/${{ matrix.environment }}/${{ github.ref_name }}-global-checksum.txt
