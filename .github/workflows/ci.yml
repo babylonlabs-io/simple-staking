@@ -10,10 +10,11 @@ permissions:
 
 jobs:
   lint_test:
-    uses: babylonlabs-io/.github/.github/workflows/reusable_node_lint_test.yml@v0.3.0
+    uses: babylonlabs-io/.github/.github/workflows/reusable_node_lint_test.yml@hiep/node-env-8G
     with:
       run-build: true
       run-unit-tests: true
+      build-node-options: "--max_old_space_size=8192"
 
   unit_tests:
     runs-on: ubuntu-latest
