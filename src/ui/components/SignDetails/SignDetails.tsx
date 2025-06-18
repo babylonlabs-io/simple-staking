@@ -18,6 +18,12 @@ const keyDisplayMappings: Record<string, string> = {
   stakingDuration: "Staking Duration",
   unbondingTimeBlocks: "Unbonding Time",
   address: "Address",
+  type: "Type",
+  timelockBlocks: "Timelock",
+  bech32Address: "BABY Address",
+  unbondingFeeSat: "Unbonding Fee",
+  slashingFeeSat: "Slashing Fee",
+  slashingPkScriptHex: "Slashing Script Hex",
 };
 
 const formatDisplayKey = (key: string): string => {
