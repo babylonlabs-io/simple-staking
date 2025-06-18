@@ -3,7 +3,6 @@ export interface ETHL2Metadata {
 }
 
 export interface Bsn {
-  id: string;
   name: string;
   description: string;
   maxMultiStakedFps: number;

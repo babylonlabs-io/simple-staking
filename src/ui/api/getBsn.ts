@@ -7,7 +7,6 @@ interface ETHL2MetadataAPI {
 }
 
 interface BsnAPI {
-  _id: string;
   name: string;
   description: string;
   max_multi_staked_fps: number;
@@ -20,7 +19,6 @@ interface BsnDataResponse {
 }
 
 const createBSN = (bsn: BsnAPI): Bsn => ({
-  id: bsn._id,
   name: bsn.name,
   description: bsn.description,
   maxMultiStakedFps: bsn.max_multi_staked_fps,
