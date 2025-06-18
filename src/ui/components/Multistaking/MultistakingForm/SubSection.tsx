@@ -1,4 +1,4 @@
-import React from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { twJoin } from "tailwind-merge";
 
 export const SubSection = ({
@@ -6,8 +6,8 @@ export const SubSection = ({
   style,
   className,
 }: {
-  children: React.ReactNode;
-  style?: React.CSSProperties;
+  children: ReactNode;
+  style?: CSSProperties;
   className?: string;
 }) => (
   <div

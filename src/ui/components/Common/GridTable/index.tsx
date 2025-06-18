@@ -1,5 +1,5 @@
 import { Loader } from "@babylonlabs-io/core-ui";
-import React, { useId } from "react";
+import { type ReactElement, useId } from "react";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { twJoin, twMerge } from "tailwind-merge";
 
@@ -26,7 +26,7 @@ export function GridTable<R extends object, P extends object = object>({
   onCellClick,
   onInfiniteScroll = () => null,
   onSortColumn = () => null,
-}: TableProps<R, P>): React.ReactElement | null {
+}: TableProps<R, P>): ReactElement | null {
   const id = useId();
 
   function handleCellClick(row: R, col: TableColumn<R, P>) {
@@ -47,7 +47,7 @@ export function GridTable<R extends object, P extends object = object>({
   }
 
   if (!data?.length) {
-    return fallback as React.ReactElement | null;
+    return fallback as ReactElement | null;
   }
 
   return (
