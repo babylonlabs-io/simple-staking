@@ -73,7 +73,7 @@ export function MultistakingForm() {
       return (
         <FinalityProviderField
           open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-          max={MAX_FINALITY_PROVIDERS}
+          max={1}
           onOpen={() =>
             void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
           }
