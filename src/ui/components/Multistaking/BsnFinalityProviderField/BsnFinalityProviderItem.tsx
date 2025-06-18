@@ -1,17 +1,23 @@
 import { useFormContext } from "@babylonlabs-io/core-ui";
 
 import { FinalityProviderLogo } from "@/ui/components/Staking/FinalityProviders/FinalityProviderLogo";
-import { FinalityProvider } from "@/ui/types/finalityProviders";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { trim } from "@/ui/utils/trim";
 
 export const BsnFinalityProviderItem = ({
-  provider,
+  providerId,
   onRemove,
 }: {
-  provider: FinalityProvider;
+  providerId: string;
   onRemove: () => void;
 }) => {
   const { setValue } = useFormContext();
+  const { finalityProviderMap } = useFinalityProviderBsnState();
+  const provider = finalityProviderMap.get(providerId);
+
+  if (!provider) {
+    return null;
+  }
 
   return (
     <div className="flex flex-row justify-between items-center">
