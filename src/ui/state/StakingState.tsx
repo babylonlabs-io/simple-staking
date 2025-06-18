@@ -92,7 +92,8 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  stakingStepOptions: SignPsbtOptions | undefined;
+  stakingStepOptions?: SignPsbtOptions;
+  setStakingStepOptions?: (options?: SignPsbtOptions) => void;
 }
 
 const STAKING_SIGNING_STEP_MAP: Record<RegistrationStep, StakingStep> = {
@@ -137,6 +138,7 @@ const { StateProvider, useState: useStakingState } =
     setProcessing: () => {},
     reset: () => {},
     stakingStepOptions: undefined,
+    setStakingStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
@@ -398,6 +400,7 @@ export function StakingState({ children }: PropsWithChildren) {
       setProcessing,
       reset,
       stakingStepOptions,
+      setStakingStepOptions,
     }),
     [
       hasError,
@@ -416,6 +419,7 @@ export function StakingState({ children }: PropsWithChildren) {
       setProcessing,
       reset,
       stakingStepOptions,
+      setStakingStepOptions,
     ],
   );
 
