@@ -1,11 +1,11 @@
-import { FinalityProviderState } from "@/ui/state/FinalityProviderBsnState";
+import { FinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 import { FinalityProviders } from "./FinalityProviders";
 
 export function FinalityProviderBsnWrapper() {
   return (
-    <FinalityProviderState>
+    <FinalityProviderBsnState>
       <FinalityProviders />
-    </FinalityProviderState>
+    </FinalityProviderBsnState>
   );
 }
