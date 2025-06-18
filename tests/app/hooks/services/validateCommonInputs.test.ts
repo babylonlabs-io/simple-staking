@@ -41,7 +41,7 @@ const validateCommonInputs = (
 describe("validateCommonInputs", () => {
   // Test data
   const mockStakingInput = {
-    finalityProviderPkNoCoordHex: "mock-provider-pk",
+    finalityProviderPksNoCoordHex: ["mock-provider-pk"],
     stakingAmountSat: 100000,
     stakingTimelock: 1000,
   };

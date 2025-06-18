@@ -27,8 +27,9 @@ describe("Transaction Validation", () => {
   describe("validateStakingInput", () => {
     it("should not throw an error for valid staking input", () => {
       const validInput: BtcStakingInputs = {
-        finalityProviderPkNoCoordHex:
+        finalityProviderPksNoCoordHex: [
           "0394f4c5563b66e6885d80c6b4735a73dad76e837b4e944ace49dd0ed9727ecc5a",
+        ],
         stakingAmountSat: 100000,
         stakingTimelock: 1000,
       };
@@ -36,22 +37,23 @@ describe("Transaction Validation", () => {
       expect(() => validateStakingInput(validInput)).not.toThrow();
     });
 
-    it("should throw an error when finalityProviderPkNoCoordHex is missing", () => {
+    it("should throw an error when finalityProviderPksNoCoordHex is missing", () => {
       const invalidInput: BtcStakingInputs = {
-        finalityProviderPkNoCoordHex: "",
+        finalityProviderPksNoCoordHex: [],
         stakingAmountSat: 100000,
         stakingTimelock: 1000,
       };
 
       expect(() => validateStakingInput(invalidInput)).toThrow(
-        "Finality provider public key (finalityProviderPkNoCoordHex) is required for staking input.",
+        "Finality provider public keys (finalityProviderPksNoCoordHex) are required for staking input.",
       );
     });
 
     it("should throw an error when stakingAmountSat is missing", () => {
       const invalidInput: BtcStakingInputs = {
-        finalityProviderPkNoCoordHex:
+        finalityProviderPksNoCoordHex: [
           "0394f4c5563b66e6885d80c6b4735a73dad76e837b4e944ace49dd0ed9727ecc5a",
+        ],
         stakingAmountSat: 0,
         stakingTimelock: 1000,
       };
@@ -63,8 +65,9 @@ describe("Transaction Validation", () => {
 
     it("should throw an error when stakingTimelock is missing", () => {
       const invalidInput: BtcStakingInputs = {
-        finalityProviderPkNoCoordHex:
+        finalityProviderPksNoCoordHex: [
           "0394f4c5563b66e6885d80c6b4735a73dad76e837b4e944ace49dd0ed9727ecc5a",
+        ],
         stakingAmountSat: 100000,
         stakingTimelock: 0,
       };

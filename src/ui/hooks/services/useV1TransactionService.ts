@@ -170,7 +170,6 @@ export function useV1TransactionService() {
         versionedParams!,
       );
 
-      validateStakingInput(stakingInput);
       let result: TransactionResult;
 
       if (earlyUnbondingTxHex) {
