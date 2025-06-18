@@ -48,7 +48,7 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-explicit-any": "off",
-      "import/namespace": "warn",
+      "import/namespace": "off",
       "import/order": [
         "error",
         {
