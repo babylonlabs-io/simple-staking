@@ -5,10 +5,12 @@ import {
   DialogHeader,
   Text,
 } from "@babylonlabs-io/core-ui";
+import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren, useState } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
+import { getBSNs } from "@/ui/api/getBsn";
 import { chainLogos } from "@/ui/constants";
 
 const SubSection = ({
@@ -86,6 +88,11 @@ export const ChainSelectionModal = ({
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
 
+  const { data: bsns, isLoading } = useQuery({
+    queryKey: ["API_BSN_LIST"],
+    queryFn: getBSNs,
+  });
+
   return (
     <>
       <DialogHeader
@@ -101,30 +108,24 @@ export const ChainSelectionModal = ({
           rewards.
         </div>
         <div className="overflow-x-auto flex flex-col gap-2 mt-10">
-          <ChainButton
-            logo={chainLogos.babylon}
-            title="Babylon"
-            selected={selected === "babylon"}
-            onClick={() => setSelected("babylon")}
-          />
-          <ChainButton
-            logo={chainLogos.cosmos}
-            title="Cosmos"
-            disabled
-            onClick={() => setSelected("cosmos")}
-          />
-          <ChainButton
-            logo={chainLogos.ethereum}
-            title="Ethereum"
-            disabled
-            onClick={() => setSelected("ethereum")}
-          />
-          <ChainButton
-            logo={chainLogos.sui}
-            title="Sui"
-            disabled
-            onClick={() => setSelected("sui")}
-          />
+          {isLoading && <div>Loading...</div>}
+          {bsns?.map((bsn) => {
+            const logo =
+              bsn.id === ""
+                ? chainLogos.babylon
+                : (chainLogos as Record<string, string>)[bsn.id] ||
+                  chainLogos.placeholder;
+
+            return (
+              <ChainButton
+                key={bsn.id}
+                logo={logo}
+                title={bsn.name}
+                selected={selected === bsn.id}
+                onClick={() => setSelected(bsn.id)}
+              />
+            );
+          })}
         </div>
         <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
           <div>
@@ -140,8 +141,8 @@ export const ChainSelectionModal = ({
       <DialogFooter className="flex justify-end">
         <Button
           variant="contained"
-          onClick={() => selected && onNext(selected)}
-          disabled={!selected}
+          onClick={() => selected !== null && onNext(selected)}
+          disabled={selected === null}
         >
           Next
         </Button>

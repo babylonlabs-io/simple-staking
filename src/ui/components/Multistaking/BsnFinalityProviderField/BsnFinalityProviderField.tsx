@@ -30,8 +30,9 @@ export function BsnFinalityProviderField({
     disabled,
   });
 
-  const handleAdd = () => {
-    // TODO: Implement provider selection logic
+  const handleAdd = (providerPk: string) => {
+    // Add selected provider ID to list
+    onChange([...selectedProviderIds, providerPk]);
     onClose();
   };
 

@@ -1,30 +1,45 @@
-import { DialogBody, DialogHeader } from "@babylonlabs-io/core-ui";
+import { useState } from "react";
 
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
+import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
+import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderModal";
+import { FinalityProviderState } from "@/ui/state/FinalityProviderState";
 
 interface Props {
   open: boolean;
-  defaultFinalityProvider?: string;
-  onAdd: () => void;
+  onAdd: (selectedProviderPk: string) => void;
   onClose: () => void;
 }
 
-export function BsnModal({
-  open,
-  // defaultFinalityProvider,
-  // onAdd,
-  onClose,
-}: Props) {
+export function BsnModal({ open, onAdd, onClose }: Props) {
+  const [selectedChainId, setSelectedChainId] = useState<string | null>(null);
+  const [page, setPage] = useState<"CHAIN" | "FP">("CHAIN");
+
+  const handleChainNext = (chainId: string) => {
+    setSelectedChainId(chainId);
+    setPage("FP");
+  };
+
+  const handleProviderAdd = (providerPk: string) => {
+    onAdd(providerPk);
+  };
+
   return (
     <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
-      <DialogHeader
-        title="Select BSN and Finality Provider"
-        onClose={onClose}
-        className="text-accent-primary"
-      />
-      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
-        {/* TODO: Implement BSN selection functionality */}
-      </DialogBody>
+      {page === "CHAIN" && (
+        <ChainSelectionModal onNext={handleChainNext} onClose={onClose} />
+      )}
+      {page === "FP" && selectedChainId !== null && (
+        <FinalityProviderState bsnId={selectedChainId}>
+          <FinalityProviderModal
+            open={true}
+            defaultFinalityProvider=""
+            onClose={onClose}
+            onAdd={handleProviderAdd}
+            onBack={() => setPage("CHAIN")}
+          />
+        </FinalityProviderState>
+      )}
     </ResponsiveDialog>
   );
 }
