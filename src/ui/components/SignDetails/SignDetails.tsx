@@ -64,6 +64,21 @@ const formatDisplayValue = (key: string, value: any): ReactNode => {
   ) {
     return <Hash value={value} small noFade address />;
   }
+  // Title
+  if (key.toLowerCase() === "type") {
+    const capitalizedTitle = (value as string)
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+    return (
+      <Text
+        variant="body2"
+        className="text-accent-primary break-all text-right"
+      >
+        {capitalizedTitle}
+      </Text>
+    );
+  }
   // Default case for other values
   return (
     <Text variant="body2" className="text-accent-primary break-all text-right">

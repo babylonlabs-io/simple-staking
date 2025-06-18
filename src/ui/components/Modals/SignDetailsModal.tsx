@@ -23,10 +23,15 @@ export const SignDetailsModal: React.FC<SignDetailsModalProps> = ({
   details,
   title = "Sign Details",
 }) => {
+  const capitalizedTitle = title
+    .split("-")
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+
   return (
     <ResponsiveDialog open={open} onClose={onClose} hasBackdrop>
       <DialogHeader
-        title={title}
+        title={capitalizedTitle}
         onClose={onClose}
         className="text-accent-primary"
       />

@@ -366,7 +366,7 @@ export const Delegations = () => {
       delegations;
 
   const detailsModalTitle =
-    (delegationV2StepOptions?.title as string) || "Transaction Details";
+    (delegationV2StepOptions?.type as string) || "Transaction Details";
 
   return (
     <>
