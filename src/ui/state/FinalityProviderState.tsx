@@ -89,7 +89,10 @@ const defaultState: FinalityProviderState = {
 const { StateProvider, useState: useFpState } =
   createStateUtils<FinalityProviderState>(defaultState);
 
-export function FinalityProviderState({ children }: PropsWithChildren) {
+export function FinalityProviderState({
+  children,
+  bsnId,
+}: PropsWithChildren & { bsnId?: string }) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
 
@@ -105,6 +108,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
+      bsnId,
     });
 
   const { data: dataV1 } = useFinalityProviders();
