@@ -1,7 +1,6 @@
 import { useField } from "@babylonlabs-io/core-ui";
 
 import { CounterButton } from "@/ui/components/Multistaking/CounterButton";
-import type { FinalityProvider } from "@/ui/types/finalityProviders";
 
 import { SubSection } from "../MultistakingForm/SubSection";
 
@@ -12,7 +11,7 @@ interface Props {
   open: boolean;
   max: number;
   disabled?: boolean;
-  defaultValue?: FinalityProvider[];
+  defaultValue?: string[]; // Store FP IDs
   onOpen: () => void;
   onClose: () => void;
 }
@@ -25,7 +24,7 @@ export function BsnFinalityProviderField({
   onOpen,
   onClose,
 }: Props) {
-  const { value: selectedProviders, onChange } = useField<FinalityProvider[]>({
+  const { value: selectedProviderIds, onChange } = useField<string[]>({
     name: "selectedProviders",
     defaultValue,
     disabled,
@@ -37,7 +36,7 @@ export function BsnFinalityProviderField({
   };
 
   const handleRemove = (btcPk: string) => {
-    onChange(selectedProviders.filter((fp) => fp.btcPk !== btcPk));
+    onChange(selectedProviderIds.filter((fpId) => fpId !== btcPk));
   };
 
   return (
@@ -49,16 +48,16 @@ export function BsnFinalityProviderField({
               Add BSN and Finality Provider
             </span>
             <CounterButton
-              counter={selectedProviders.length}
+              counter={selectedProviderIds.length}
               max={max}
               onAdd={onOpen}
               alwaysShowCounter={true}
             />
           </div>
         </div>
-        {selectedProviders.length > 0 && (
+        {selectedProviderIds.length > 0 && (
           <SelectedProvidersList
-            providers={selectedProviders}
+            providerIds={selectedProviderIds}
             onRemove={handleRemove}
           />
         )}
