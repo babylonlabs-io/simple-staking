@@ -12,6 +12,7 @@ import { Section } from "@/ui/components/Section/Section";
 import { StakingModal } from "@/ui/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import {
   useMultistakingState,
   type MultistakingFormFields,
@@ -38,12 +39,9 @@ export function MultistakingForm() {
     blocked: isGeoBlocked,
     errorMessage: geoBlockMessage,
   } = useStakingState();
-  const {
-    validationSchema,
-    stakingModalPage,
-    setStakingModalPage,
-    MAX_FINALITY_PROVIDERS,
-  } = useMultistakingState();
+  const { validationSchema, MAX_FINALITY_PROVIDERS } = useMultistakingState();
+  const { stakingModalPage, setStakingModalPage } =
+    useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
