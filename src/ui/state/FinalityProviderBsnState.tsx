@@ -24,7 +24,7 @@ interface FilterState {
   status: "active" | "inactive" | "";
 }
 
-interface FinalityProviderState {
+interface FinalityProviderBsnState {
   filter: FilterState;
   finalityProviders: FinalityProvider[];
   finalityProviderMap: Map<string, FinalityProvider>;
@@ -77,7 +77,7 @@ const FILTERS = {
     filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
 };
 
-const defaultState: FinalityProviderState = {
+const defaultState: FinalityProviderBsnState = {
   filter: {
     search: "",
     status: "active",
@@ -99,10 +99,10 @@ const defaultState: FinalityProviderState = {
   setStakingModalPage: () => {},
 };
 
-const { StateProvider, useState: useFpState } =
-  createStateUtils<FinalityProviderState>(defaultState);
+const { StateProvider, useState: useFpBsnState } =
+  createStateUtils<FinalityProviderBsnState>(defaultState);
 
-export function FinalityProviderState({ children }: PropsWithChildren) {
+export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
@@ -260,4 +260,4 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   return <StateProvider value={state}>{children}</StateProvider>;
 }
 
-export { useFpState as useFinalityProviderState };
+export { useFpBsnState as useFinalityProviderBsnState };

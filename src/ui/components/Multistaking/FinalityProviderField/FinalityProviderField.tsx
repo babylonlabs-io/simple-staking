@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { CounterButton } from "@/ui/components/Multistaking/CounterButton";
 import { FinalityProviderItem } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderItem";
 import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderModal";
-import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 import { SubSection } from "../MultistakingForm/SubSection";
 
@@ -25,7 +25,7 @@ export function FinalityProviderField({
   onOpen,
   onClose,
 }: Props) {
-  const { finalityProviderMap } = useFinalityProviderState();
+  const { finalityProviderMap } = useFinalityProviderBsnState();
   const { value: selectedFP, onChange } = useField({
     name: "finalityProvider",
     defaultValue,
