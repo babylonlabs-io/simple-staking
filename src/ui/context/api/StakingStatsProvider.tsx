@@ -1,5 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import React, { ReactNode, createContext, useContext, useEffect } from "react";
+import {
+  type FC,
+  ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+} from "react";
 
 import { getStats } from "@/ui/api/getStats";
 import {
@@ -36,7 +42,7 @@ const defaultContextValue: StakingStatsContextType = {
 const StakingStatsContext =
   createContext<StakingStatsContextType>(defaultContextValue);
 
-export const StakingStatsProvider: React.FC<StakingStatsProviderProps> = ({
+export const StakingStatsProvider: FC<StakingStatsProviderProps> = ({
   children,
 }) => {
   const { isOpen, handleError } = useError();

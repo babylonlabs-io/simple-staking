@@ -1,4 +1,4 @@
-import qs from "qs";
+import { stringify } from "qs";
 
 import { ClientError, ERROR_CODES } from "@/ui/errors";
 
@@ -30,7 +30,7 @@ export const apiWrapper = async <TResponseData = unknown>(
   status: number;
 }> => {
   const queryString = params?.query
-    ? `?${qs.stringify(params.query, { arrayFormat: "repeat" })}`
+    ? `?${stringify(params.query, { arrayFormat: "repeat" })}`
     : "";
 
   const baseUrl = getApiBaseUrl();

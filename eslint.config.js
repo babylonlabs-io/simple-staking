@@ -1,6 +1,7 @@
 import js from "@eslint/js";
 import pluginQuery from "@tanstack/eslint-plugin-query";
-import importPlugin from "eslint-plugin-import";
+import tsParser from "@typescript-eslint/parser";
+import importPlugin from "eslint-plugin-import-x";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
@@ -29,8 +30,9 @@ export default tseslint.config(
   ...pluginQuery.configs["flat/recommended"],
   {
     extends: [js.configs.recommended, ...tseslint.configs.recommended],
-    files: ["**/*.{ts,tsx}"],
+    files: ["**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}"],
     languageOptions: {
+      parser: tsParser,
       ecmaVersion: 2020,
       globals: globals.browser,
     },
@@ -48,7 +50,7 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-explicit-any": "off",
-      "import/order": [
+      "import-x/order": [
         "error",
         {
           groups: [

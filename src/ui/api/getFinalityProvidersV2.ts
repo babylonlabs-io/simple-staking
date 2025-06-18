@@ -28,6 +28,7 @@ interface FinalityProviderAPI {
   active_delegations: number;
   total_delegations: number;
   logo_url?: string;
+  bsn_id?: string;
 }
 
 interface DescriptionAPI {
@@ -44,12 +45,14 @@ export const getFinalityProvidersV2 = async ({
   sortBy,
   order,
   name,
+  bsnId,
 }: {
   key: string;
   name?: string;
   sortBy?: string;
   order?: "asc" | "desc";
   pk?: string;
+  bsnId?: string;
 }): Promise<PaginatedFinalityProviders> => {
   const params = {
     pagination_key: key,
@@ -57,6 +60,7 @@ export const getFinalityProvidersV2 = async ({
     sort_by: sortBy,
     order,
     name,
+    bsn_id: bsnId,
   };
 
   const response = await apiWrapper<FinalityProvidersAPIResponse>(
@@ -92,6 +96,7 @@ export const getFinalityProvidersV2 = async ({
       activeDelegations: fp.active_delegations,
       totalDelegations: fp.total_delegations,
       logo_url: fp.logo_url,
+      bsnId: fp.bsn_id,
     }),
   );
 

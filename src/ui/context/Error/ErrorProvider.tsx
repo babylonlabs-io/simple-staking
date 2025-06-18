@@ -1,4 +1,5 @@
-import React, {
+import {
+  type FC,
   ReactNode,
   createContext,
   useCallback,
@@ -38,7 +39,7 @@ export type ErrorContextType = ErrorState & {
   handleError: (param: ErrorHandlerParam) => void;
 };
 
-export const ErrorProvider: React.FC<ErrorProviderProps> = ({ children }) => {
+export const ErrorProvider: FC<ErrorProviderProps> = ({ children }) => {
   const [state, setState] = useState<ErrorState>({
     isOpen: false,
     error: { message: "" },
