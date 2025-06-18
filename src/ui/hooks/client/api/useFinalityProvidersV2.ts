@@ -21,6 +21,7 @@ interface Params {
   name?: string;
   sortBy?: string;
   order?: "asc" | "desc";
+  bsnId?: string;
 }
 
 export function useFinalityProvidersV2({
@@ -28,14 +29,22 @@ export function useFinalityProvidersV2({
   sortBy,
   order,
   name,
+  bsnId,
 }: Params = {}) {
   const { isOpen, handleError } = useError();
   const logger = useLogger();
 
   const query = useInfiniteQuery({
-    queryKey: [FINALITY_PROVIDERS_KEY, pk, sortBy, order, name],
+    queryKey: [FINALITY_PROVIDERS_KEY, pk, sortBy, order, name, bsnId],
     queryFn: ({ pageParam = "" }) =>
-      getFinalityProvidersV2({ key: pageParam, pk, sortBy, order, name }),
+      getFinalityProvidersV2({
+        key: pageParam,
+        pk,
+        sortBy,
+        order,
+        name,
+        bsnId,
+      }),
     getNextPageParam: (lastPage) =>
       lastPage?.pagination?.next_key !== ""
         ? lastPage?.pagination?.next_key

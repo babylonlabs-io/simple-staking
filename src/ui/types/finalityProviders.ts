@@ -10,6 +10,7 @@ export interface FinalityProvider {
   activeDelegations: number;
   totalDelegations: number;
   logo_url?: string;
+  bsnId?: string;
 }
 
 export interface FinalityProviderV1 {

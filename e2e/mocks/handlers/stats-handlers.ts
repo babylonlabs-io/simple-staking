@@ -43,6 +43,7 @@ const mockFinalityProviders = [
     total_tvl: 2500000,
     active_delegations: 4,
     total_delegations: 4,
+    bsn_id: "test-bsn-1",
   },
   {
     btc_pk: "e8197e71fdcc9987f95440415fcd852455da871d7c38a436465a3a9a78c682fc",
@@ -60,6 +61,7 @@ const mockFinalityProviders = [
     total_tvl: 233440000,
     active_delegations: 6,
     total_delegations: 6,
+    bsn_id: "test-bsn-2",
   },
   {
     btc_pk: "e02859d59bad2c011453a295e1f26410a74f4eacda513b2a88f53da7ad230c8f",
@@ -94,6 +96,7 @@ const mockFinalityProviders = [
     total_tvl: 4472000000,
     active_delegations: 4,
     total_delegations: 4,
+    bsn_id: "test-bsn-1",
   },
   {
     btc_pk: "289719ef19e455816e474588007f1824df7f6b1bace7decf8bb1c435e4cb849e",
