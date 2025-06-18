@@ -57,12 +57,11 @@ const formatDisplayValue = (key: string, value: any): ReactNode => {
       </div>
     );
   }
-  // Public keys
-  if (typeof value === "string" && key.toLowerCase().includes("pk")) {
-    return <Hash value={value} small noFade address />;
-  }
-  // Addresses
-  if (typeof value === "string" && key.toLowerCase().includes("address")) {
+  // Public keys and addresses
+  if (
+    key.toLowerCase().includes("pk") ||
+    key.toLowerCase().includes("address")
+  ) {
     return <Hash value={value} small noFade address />;
   }
   // Default case for other values
@@ -73,20 +72,26 @@ const formatDisplayValue = (key: string, value: any): ReactNode => {
   );
 };
 
+const getOrderedKeys = (details: EventData): string[] => {
+  // Provide an order for specific keys
+  const orderedKeys = ["type", "stakerPk"];
+  // We still want to show other keys
+  const allKeys = [...orderedKeys];
+  Object.keys(details).forEach((key) => {
+    if (!allKeys.includes(key)) {
+      allKeys.push(key);
+    }
+  });
+  return allKeys;
+};
+
 export const SignDetails: React.FC<SignDetailsProps> = ({ details }) => {
-  return (
-    <>
-      {Object.entries(details).map(([key, value]) => (
-        <div key={key} className="flex justify-between items-start gap-2">
-          <Text
-            variant="body2"
-            className="text-accent-secondary whitespace-nowrap"
-          >
-            {formatDisplayKey(key)}:
-          </Text>
-          {formatDisplayValue(key, value)}
-        </div>
-      ))}
-    </>
-  );
+  return getOrderedKeys(details).map((key) => (
+    <div key={key} className="flex justify-between items-start gap-2">
+      <Text variant="body2" className="text-accent-secondary whitespace-nowrap">
+        {formatDisplayKey(key)}:
+      </Text>
+      {formatDisplayValue(key, details[key])}
+    </div>
+  ));
 };
