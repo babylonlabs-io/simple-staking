@@ -136,10 +136,13 @@ export function DelegationState({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    const unsubscribe = eventBus.on("delegation:register", (step, options) => {
-      const stepName = REGISTRATION_STEP_MAP[step];
+    const unsubscribe = eventBus.on("delegation:register", (options) => {
+      console.log("delegation state, register", options); // TODO remove
 
-      if (stepName) {
+      const type = options?.type as RegistrationStep | undefined;
+
+      if (type) {
+        const stepName = REGISTRATION_STEP_MAP[type];
         setRegistrationStep(stepName);
         setCurrentDelegationStepOptions(options);
       }

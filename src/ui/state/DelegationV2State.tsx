@@ -92,7 +92,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribeFns = DELEGATION_V2_CHANNELS.map((channel) =>
-      eventBus.on(channel, (_, options) => {
+      eventBus.on(channel, (options) => {
+        console.log("delegation v2 state", options); // TODO remove
         setCurrentStepOptions(options);
       }),
     );

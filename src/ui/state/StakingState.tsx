@@ -364,10 +364,12 @@ export function StakingState({ children }: PropsWithChildren) {
   ]);
 
   useEffect(() => {
-    const unsubscribe = eventBus.on("delegation:create", (step, options) => {
-      const stepName = STAKING_SIGNING_STEP_MAP[step];
+    const unsubscribe = eventBus.on("delegation:create", (options) => {
+      console.log("staking state", options); // TODO remove
+      const type = options?.type as RegistrationStep | undefined;
 
-      if (stepName) {
+      if (type) {
+        const stepName = STAKING_SIGNING_STEP_MAP[type];
         setCurrentStep(stepName);
         setCurrentStakingStepOptions(options);
       }
