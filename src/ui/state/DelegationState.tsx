@@ -46,6 +46,8 @@ interface DelegationState {
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
+  delegationStepOptions?: SignPsbtOptions;
+  setDelegationStepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const REGISTRATION_STEP_MAP: Record<RegistrationStep, SigningStep> = {
@@ -70,6 +72,8 @@ const { StateProvider, useState: useDelegationState } =
     setSelectedDelegation: () => null,
     resetRegistration: () => null,
     refetch: () => null,
+    delegationStepOptions: undefined,
+    setDelegationStepOptions: () => null,
   });
 
 export function DelegationState({ children }: PropsWithChildren) {
@@ -168,6 +172,7 @@ export function DelegationState({ children }: PropsWithChildren) {
       resetRegistration,
       refetch,
       delegationStepOptions,
+      setDelegationStepOptions,
     }),
     [
       delegations,
@@ -184,6 +189,7 @@ export function DelegationState({ children }: PropsWithChildren) {
       resetRegistration,
       refetch,
       delegationStepOptions,
+      setDelegationStepOptions,
     ],
   );
 
