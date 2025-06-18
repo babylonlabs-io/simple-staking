@@ -2,6 +2,7 @@ import type { BBNConfig } from "@babylonlabs-io/wallet-connector";
 
 import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
+import { bbnEdgeDevnet } from "./bbn/edge-devnet";
 import { bbnMainnet } from "./bbn/mainnet";
 import { bbnRollupDevnet } from "./bbn/rollup-devnet";
 import { bbnTestnet } from "./bbn/testnet";
@@ -38,6 +39,14 @@ const config: Record<string, BBNConfig> = {
     chainId: bbnRollupDevnet.chainId,
     rpc: bbnRollupDevnet.rpc,
     chainData: bbnRollupDevnet,
+    networkName: "Testnet BABY",
+    networkFullName: "Testnet Babylon Genesis",
+    coinSymbol: "tBABY",
+  },
+  edgeDevnet: {
+    chainId: bbnEdgeDevnet.chainId,
+    rpc: bbnEdgeDevnet.rpc,
+    chainData: bbnEdgeDevnet,
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
