@@ -1,4 +1,4 @@
-import type { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -39,8 +39,8 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
-  delegationV2StepOptions: SignPsbtOptions | undefined;
-  setDelegationV2StepOptions: (options?: SignPsbtOptions) => void;
+  delegationV2StepOptions: EventData | undefined;
+  setDelegationV2StepOptions: (options?: EventData) => void;
 }
 
 const { StateProvider, useState: useDelegationV2State } =
@@ -68,7 +68,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
   const [delegationV2StepOptions, setDelegationV2StepOptions] =
-    useState<SignPsbtOptions>();
+    useState<EventData>();
   const eventBus = useEventBus();
 
   const {

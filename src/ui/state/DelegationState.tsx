@@ -2,6 +2,7 @@ import type {
   RegistrationStep,
   SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -46,8 +47,8 @@ interface DelegationState {
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
-  delegationStepOptions: SignPsbtOptions | undefined;
-  setDelegationStepOptions: (options?: SignPsbtOptions) => void;
+  delegationStepOptions: EventData | undefined;
+  setDelegationStepOptions: (options?: EventData) => void;
 }
 
 const REGISTRATION_STEP_MAP: Record<RegistrationStep, SigningStep> = {
@@ -93,7 +94,7 @@ export function DelegationState({ children }: PropsWithChildren) {
   >();
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
   const [delegationStepOptions, setDelegationStepOptions] =
-    useState<SignPsbtOptions>();
+    useState<EventData>();
 
   // Methods
   const addDelegation = useCallback(

@@ -2,6 +2,7 @@ import type {
   RegistrationStep,
   SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -92,8 +93,8 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  stakingStepOptions: SignPsbtOptions | undefined;
-  setStakingStepOptions?: (options?: SignPsbtOptions) => void;
+  stakingStepOptions: EventData | undefined;
+  setStakingStepOptions?: (options?: EventData) => void;
 }
 
 const STAKING_SIGNING_STEP_MAP: Record<RegistrationStep, StakingStep> = {
@@ -143,8 +144,7 @@ const { StateProvider, useState: useStakingState } =
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
-  const [stakingStepOptions, setStakingStepOptions] =
-    useState<SignPsbtOptions>();
+  const [stakingStepOptions, setStakingStepOptions] = useState<EventData>();
 
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
