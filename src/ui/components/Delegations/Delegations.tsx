@@ -27,6 +27,7 @@ import {
 import { getIntermediateDelegationsLocalStorageKey } from "@/ui/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/ui/utils/local_storage/toLocalStorageIntermediateDelegation";
 
+import { SignDetailsModal } from "../Modals/SignDetailsModal";
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";
 
@@ -73,6 +74,9 @@ export const Delegations = () => {
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
+
+  const { delegationStepOptions, setDelegationStepOptions } =
+    useDelegationState();
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
@@ -197,10 +201,7 @@ export const Delegations = () => {
         error,
       });
     } finally {
-      setModalOpen(false);
-      setTxID("");
-      setModalMode(undefined);
-      setAwaitingWalletResponse(false);
+      handleModalClose();
     }
   };
 
@@ -253,10 +254,7 @@ export const Delegations = () => {
         },
       });
     } finally {
-      setModalOpen(false);
-      setTxID("");
-      setModalMode(undefined);
-      setAwaitingWalletResponse(false);
+      handleModalClose();
     }
   };
 
@@ -264,6 +262,16 @@ export const Delegations = () => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setTxID("");
+    setModalMode(undefined);
+    setAwaitingWalletResponse(false);
+    setDelegationStepOptions(undefined);
+    setSelectedDelegation(undefined);
+    setStep(undefined);
   };
 
   useEffect(() => {
@@ -355,6 +363,10 @@ export const Delegations = () => {
     ? [...delegations, ...delegationsAPI.delegations]
     : // if no API data, fallback to using only local storage delegations
       delegations;
+
+  const detailsModalTitle =
+    (delegationStepOptions?.type as string) || "Transaction Details";
+
   return (
     <>
       {combinedDelegationsData.length !== 0 && (
@@ -427,7 +439,7 @@ export const Delegations = () => {
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleModalClose}
           onSubmit={() => {
             handleWithdraw(txID);
           }}
@@ -437,7 +449,7 @@ export const Delegations = () => {
       {modalMode === MODE_UNBOND && (
         <UnbondModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleModalClose}
           onSubmit={() => {
             handleUnbond(txID);
           }}
@@ -473,6 +485,15 @@ export const Delegations = () => {
         open={step === "registration-verified"}
         onClose={handleCloseRegistration}
       />
+
+      {delegationStepOptions && (processing || awaitingWalletResponse) && (
+        <SignDetailsModal
+          open={Boolean(delegationStepOptions)}
+          onClose={() => setDelegationStepOptions(undefined)}
+          details={delegationStepOptions}
+          title={detailsModalTitle}
+        />
+      )}
     </>
   );
 };
