@@ -46,7 +46,7 @@ interface DelegationState {
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
-  delegationStepOptions?: SignPsbtOptions;
+  delegationStepOptions: SignPsbtOptions | undefined;
   setDelegationStepOptions: (options?: SignPsbtOptions) => void;
 }
 

@@ -39,7 +39,7 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
-  delegationV2StepOptions?: SignPsbtOptions;
+  delegationV2StepOptions: SignPsbtOptions | undefined;
   setDelegationV2StepOptions: (options?: SignPsbtOptions) => void;
 }
 

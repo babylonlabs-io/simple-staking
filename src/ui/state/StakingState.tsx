@@ -92,7 +92,7 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  stakingStepOptions?: SignPsbtOptions;
+  stakingStepOptions: SignPsbtOptions | undefined;
   setStakingStepOptions?: (options?: SignPsbtOptions) => void;
 }
 
