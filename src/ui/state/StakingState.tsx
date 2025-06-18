@@ -92,7 +92,7 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  currentStakingStepOptions: SignPsbtOptions | undefined;
+  stakingStepOptions: SignPsbtOptions | undefined;
 }
 
 const STAKING_SIGNING_STEP_MAP: Record<RegistrationStep, StakingStep> = {
@@ -136,12 +136,12 @@ const { StateProvider, useState: useStakingState } =
     setFormData: () => {},
     setProcessing: () => {},
     reset: () => {},
-    currentStakingStepOptions: undefined,
+    stakingStepOptions: undefined,
   });
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
-  const [currentStakingStepOptions, setCurrentStakingStepOptions] =
+  const [stakingStepOptions, setStakingStepOptions] =
     useState<SignPsbtOptions>();
 
   const [formData, setFormData] = useState<FormFields>();
@@ -353,14 +353,14 @@ export function StakingState({ children }: PropsWithChildren) {
     setVerifiedDelegation(undefined);
     setFormData(undefined);
     setCurrentStep(undefined);
-    setCurrentStakingStepOptions(undefined);
+    setStakingStepOptions(undefined);
     setProcessing(false);
   }, [
     setVerifiedDelegation,
     setFormData,
     setCurrentStep,
     setProcessing,
-    setCurrentStakingStepOptions,
+    setStakingStepOptions,
   ]);
 
   useEffect(() => {
@@ -371,12 +371,12 @@ export function StakingState({ children }: PropsWithChildren) {
       if (type) {
         const stepName = STAKING_SIGNING_STEP_MAP[type];
         setCurrentStep(stepName);
-        setCurrentStakingStepOptions(options);
+        setStakingStepOptions(options);
       }
     });
 
     return unsubscribe;
-  }, [eventBus, setCurrentStep, setCurrentStakingStepOptions]);
+  }, [eventBus, setCurrentStep, setStakingStepOptions]);
 
   const context = useMemo(
     () => ({
@@ -397,7 +397,7 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      currentStakingStepOptions,
+      stakingStepOptions,
     }),
     [
       hasError,
@@ -415,7 +415,7 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      currentStakingStepOptions,
+      stakingStepOptions,
     ],
   );
 

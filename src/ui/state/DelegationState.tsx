@@ -88,7 +88,7 @@ export function DelegationState({ children }: PropsWithChildren) {
     SigningStep | undefined
   >();
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
-  const [currentDelegationStepOptions, setCurrentDelegationStepOptions] =
+  const [delegationStepOptions, setDelegationStepOptions] =
     useState<SignPsbtOptions>();
 
   // Methods
@@ -113,7 +113,7 @@ export function DelegationState({ children }: PropsWithChildren) {
   const resetRegistration = useCallback(() => {
     setSelectedDelegation(undefined);
     setRegistrationStep(undefined);
-    setCurrentDelegationStepOptions(undefined);
+    setDelegationStepOptions(undefined);
     setProcessing(false);
   }, []);
 
@@ -144,12 +144,12 @@ export function DelegationState({ children }: PropsWithChildren) {
       if (type) {
         const stepName = REGISTRATION_STEP_MAP[type];
         setRegistrationStep(stepName);
-        setCurrentDelegationStepOptions(options);
+        setDelegationStepOptions(options);
       }
     });
 
     return unsubscribe;
-  }, [setRegistrationStep, setCurrentDelegationStepOptions, eventBus]);
+  }, [setRegistrationStep, setDelegationStepOptions, eventBus]);
 
   // Context
   const state = useMemo(
@@ -167,7 +167,7 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
-      currentDelegationStepOptions,
+      delegationStepOptions,
     }),
     [
       delegations,
@@ -183,7 +183,7 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
-      currentDelegationStepOptions,
+      delegationStepOptions,
     ],
   );
 

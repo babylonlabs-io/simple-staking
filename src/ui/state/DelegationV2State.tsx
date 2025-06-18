@@ -39,7 +39,7 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
-  setCurrentStepOptions: (options?: SignPsbtOptions) => void;
+  setDelegationV2StepOptions: (options?: SignPsbtOptions) => void;
 }
 
 const { StateProvider, useState: useDelegationV2State } =
@@ -55,7 +55,7 @@ const { StateProvider, useState: useDelegationV2State } =
     findDelegationByTxHash: () => undefined,
     refetch: () => Promise.resolve(),
     displayLinkedDelegations: () => {},
-    setCurrentStepOptions: () => {},
+    setDelegationV2StepOptions: () => {},
   });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
@@ -65,7 +65,7 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   );
   const { publicKeyNoCoord } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
-  const [currentStepOptions, setCurrentStepOptions] =
+  const [delegationV2StepOptions, setDelegationV2StepOptions] =
     useState<SignPsbtOptions>();
   const eventBus = useEventBus();
 
@@ -94,13 +94,13 @@ export function DelegationV2State({ children }: PropsWithChildren) {
     const unsubscribeFns = DELEGATION_V2_CHANNELS.map((channel) =>
       eventBus.on(channel, (options) => {
         console.log("delegation v2 state", options); // TODO remove
-        setCurrentStepOptions(options);
+        setDelegationV2StepOptions(options);
       }),
     );
 
     return () =>
       void unsubscribeFns.forEach((unsubscribe) => void unsubscribe());
-  }, [eventBus, setCurrentStepOptions]);
+  }, [eventBus, setDelegationV2StepOptions]);
 
   // Context
   const state = useMemo(
@@ -118,8 +118,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       refetch: async () => {
         await refetch();
       },
-      currentStepOptions,
-      setCurrentStepOptions,
+      delegationV2StepOptions,
+      setDelegationV2StepOptions,
     }),
     [
       delegations,
@@ -133,8 +133,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchNextPage,
       setLinkedDelegations,
       refetch,
-      currentStepOptions,
-      setCurrentStepOptions,
+      delegationV2StepOptions,
+      setDelegationV2StepOptions,
     ],
   );
 
