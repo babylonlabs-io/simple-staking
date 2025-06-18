@@ -39,6 +39,7 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
+  delegationV2StepOptions?: SignPsbtOptions;
   setDelegationV2StepOptions: (options?: SignPsbtOptions) => void;
 }
 
@@ -55,6 +56,7 @@ const { StateProvider, useState: useDelegationV2State } =
     findDelegationByTxHash: () => undefined,
     refetch: () => Promise.resolve(),
     displayLinkedDelegations: () => {},
+    delegationV2StepOptions: undefined,
     setDelegationV2StepOptions: () => {},
   });
 
