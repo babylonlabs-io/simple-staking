@@ -28,13 +28,13 @@ interface FinalityProviderState {
   filter: FilterState;
   finalityProviders: FinalityProvider[];
   finalityProviderMap: Map<string, FinalityProvider>;
-  hasNextPage: boolean;
   isFetching: boolean;
   hasError: boolean;
   // BSN
   bsnList: Bsn[];
   bsnLoading: boolean;
   bsnError: boolean;
+  // selectedBsnId: string | null; // TODO: Uncomment when implementing BSN selection
   // Modal
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
@@ -42,7 +42,6 @@ interface FinalityProviderState {
   handleFilter: (key: keyof FilterState, value: string) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
   getRegisteredFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
-  fetchNextPage: () => void;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
 }
 
@@ -84,17 +83,16 @@ const defaultState: FinalityProviderState = {
     status: "active",
   },
   finalityProviders: [],
-  hasNextPage: false,
   isFetching: false,
   hasError: false,
   bsnList: [],
   bsnLoading: false,
   bsnError: false,
+  // selectedBsnId: null, // TODO: Uncomment when implementing BSN selection
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
   getRegisteredFinalityProvider: () => null,
-  fetchNextPage: () => {},
   getFinalityProviderName: () => undefined,
   finalityProviderMap: new Map(),
   stakingModalPage: StakingModalPage.DEFAULT,
@@ -118,12 +116,11 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  const { data, hasNextPage, fetchNextPage, isFetching, isError } =
-    useFinalityProvidersV2({
-      sortBy: sortState.field,
-      order: sortState.direction,
-      name: debouncedSearch,
-    });
+  const { data, isFetching, isError } = useFinalityProvidersV2({
+    sortBy: sortState.field,
+    order: sortState.direction,
+    name: debouncedSearch,
+  });
 
   const { data: dataV1 } = useFinalityProviders();
   const {
@@ -229,15 +226,14 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       bsnList,
       bsnLoading,
       bsnError,
+      // selectedBsnId: null, // TODO: Uncomment when implementing BSN selection
       isFetching,
       hasError: isError,
-      hasNextPage,
       finalityProviderMap,
       handleSort,
       handleFilter,
       isRowSelectable,
       getRegisteredFinalityProvider,
-      fetchNextPage,
       getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
@@ -249,14 +245,12 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       bsnLoading,
       bsnError,
       isFetching,
-      hasNextPage,
       isError,
       finalityProviderMap,
       handleSort,
       handleFilter,
       isRowSelectable,
       getRegisteredFinalityProvider,
-      fetchNextPage,
       getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,

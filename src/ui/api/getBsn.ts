@@ -2,16 +2,11 @@ import { Bsn } from "../types/bsn";
 
 import { apiWrapper } from "./apiWrapper";
 
-interface ETHL2MetadataAPI {
-  finality_contract_address: string;
-}
-
 interface BsnAPI {
+  id: string;
   name: string;
   description: string;
-  max_multi_staked_fps: number;
-  type: string;
-  rollup_metadata?: ETHL2MetadataAPI;
+  active_tvl: number;
 }
 
 interface BsnDataResponse {
@@ -19,15 +14,10 @@ interface BsnDataResponse {
 }
 
 const createBSN = (bsn: BsnAPI): Bsn => ({
+  id: bsn.id,
   name: bsn.name,
   description: bsn.description,
-  maxMultiStakedFps: bsn.max_multi_staked_fps,
-  type: bsn.type,
-  rollupMetadata: bsn.rollup_metadata
-    ? {
-        finalityContractAddress: bsn.rollup_metadata.finality_contract_address,
-      }
-    : undefined,
+  activeTvl: bsn.active_tvl,
 });
 
 export const getBSNs = async (): Promise<Bsn[]> => {
@@ -37,5 +27,6 @@ export const getBSNs = async (): Promise<Bsn[]> => {
     "Error getting BSN list",
   );
 
-  return response.data.data.map(createBSN);
+  const { data } = response.data;
+  return data.map(createBSN);
 };
