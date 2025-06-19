@@ -2,9 +2,9 @@ import { useMemo, useState, type PropsWithChildren } from "react";
 import { number, object, ObjectSchema, ObjectShape, Schema, string } from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
-import { MAX_BSN_FP_PROVIDERS } from "@/ui/config";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { useNetworkInfo } from "@/ui/hooks/client/api/useNetworkInfo";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
@@ -40,7 +40,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    MAX_FINALITY_PROVIDERS: MAX_BSN_FP_PROVIDERS,
+    MAX_FINALITY_PROVIDERS: 3,
     validationSchema: undefined,
     formFields: [],
   });
@@ -49,7 +49,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const MAX_FINALITY_PROVIDERS = MAX_BSN_FP_PROVIDERS;
+  const { data: networkInfo } = useNetworkInfo();
+  const MAX_FINALITY_PROVIDERS = networkInfo?.params.maxBsnFpProviders ?? 3;
   const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();

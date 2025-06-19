@@ -52,17 +52,6 @@ export const isProductionEnv = (): boolean => {
   return PROD_ENVS.includes(env);
 };
 
-// MAX_BSN_FP_PROVIDERS is used to configure the maximum number of BSN/FP providers
-export const MAX_BSN_FP_PROVIDERS = (() => {
-  const maxProviders = parseInt(
-    process.env.NEXT_PUBLIC_MAX_BSN_FP_PROVIDERS || "3",
-  );
-  if (isNaN(maxProviders) || maxProviders <= 0) {
-    return 3; // fallback to default if invalid
-  }
-  return maxProviders;
-})();
-
 // Disable the wallet by their name in the event of incident. split by comma.
 // You can find the wallet name from the wallet provider.
 export const getDisabledWallets = (): string[] => {
