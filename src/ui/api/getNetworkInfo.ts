@@ -24,6 +24,7 @@ interface NetworkInfoAPI {
   params: {
     bbn: BbnParams[];
     btc: BtcCheckpointParams[];
+    max_bsn_fp_providers?: number;
   };
 }
 
@@ -158,6 +159,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
         versions: epochCheckVersions,
         genesisParam: genesisEpochCheckParam,
       },
+      maxBsnFpProviders: params.max_bsn_fp_providers,
     },
   };
 };
