@@ -105,7 +105,6 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      bsnId,
     });
 
   const { data: dataV1 } = useFinalityProviders();
