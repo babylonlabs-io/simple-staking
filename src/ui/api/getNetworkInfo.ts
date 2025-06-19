@@ -24,7 +24,7 @@ interface NetworkInfoAPI {
   params: {
     bbn: BbnParams[];
     btc: BtcCheckpointParams[];
-    max_bsn_fp_providers: number;
+    max_bsn_fp_providers?: number;
   };
 }
 

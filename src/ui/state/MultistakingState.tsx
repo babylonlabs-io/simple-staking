@@ -40,7 +40,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    MAX_FINALITY_PROVIDERS: 3,
+    MAX_FINALITY_PROVIDERS: 1,
     validationSchema: undefined,
     formFields: [],
   });
