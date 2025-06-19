@@ -1,10 +1,19 @@
 import { useMemo, useState, type PropsWithChildren } from "react";
-import { number, object, ObjectSchema, ObjectShape, Schema, string } from "yup";
+import {
+  array,
+  number,
+  object,
+  ObjectSchema,
+  ObjectShape,
+  Schema,
+  string,
+} from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { MAX_BSN_FP_PROVIDERS } from "@/ui/config";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
@@ -53,6 +62,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
 
   const formFields: FieldOptions[] = useMemo(
     () =>
@@ -144,8 +154,34 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .required("Staking fee amount is the required field.")
             .moreThan(0, "Staking fee amount must be greater than 0."),
         },
+        {
+          field: "selectedProviders",
+          schema: array()
+            .of(string())
+            .min(1, "Add at least one finality provider.")
+            .test(
+              "hasBabylonProvider",
+              "Add a Babylon finality provider first",
+              (list) =>
+                (list as string[] | undefined)?.some(
+                  (pk) =>
+                    typeof pk === "string" &&
+                    getRegisteredFinalityProvider(pk)?.bsnId === "",
+                ) ?? false,
+            )
+            .max(
+              MAX_FINALITY_PROVIDERS,
+              `Maximum ${MAX_FINALITY_PROVIDERS} finality providers allowed.`,
+            ),
+        },
       ] as const,
-    [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
+    [
+      publicKeyNoCoord,
+      stakingInfo,
+      stakableBtcBalance,
+      getRegisteredFinalityProvider,
+      MAX_FINALITY_PROVIDERS,
+    ],
   );
 
   const validationSchema = useMemo(() => {
