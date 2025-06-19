@@ -73,7 +73,6 @@ const ChainButton = ({
         )}
         {title}
       </div>
-      <div className="text-xs">TVL: X BTC ($Y)</div>
     </div>
   </Text>
 );
@@ -90,7 +89,7 @@ export const ChainSelectionModal = ({
   return (
     <>
       <DialogHeader
-        title="Select Available BSN"
+        title="Select Babylon Secured Network"
         onClose={onClose}
         className="text-accent-primary"
       />
@@ -104,7 +103,7 @@ export const ChainSelectionModal = ({
         <div className="overflow-x-auto flex flex-col gap-2 mt-10">
           <ChainButton
             logo={chainLogos.babylon}
-            title="Babylon Genesis"
+            title="Babylon"
             selected={selected === "babylon"}
             onClick={() => setSelected("babylon")}
           />
