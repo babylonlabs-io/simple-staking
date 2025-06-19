@@ -13,7 +13,7 @@ import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/v
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
 import { useNetworkInfo } from "@/ui/hooks/client/api/useNetworkInfo";
-import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
@@ -63,7 +63,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
-  const { getRegisteredFinalityProvider } = useFinalityProviderState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
 
   const formFields: FieldOptions[] = useMemo(
     () =>

@@ -4,9 +4,9 @@ import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderModal";
 import {
-  FinalityProviderState,
-  useFinalityProviderState,
-} from "@/ui/state/FinalityProviderState";
+  FinalityProviderBsnState,
+  useFinalityProviderBsnState,
+} from "@/ui/state/FinalityProviderBsnState";
 
 interface Props {
   open: boolean;
@@ -24,7 +24,7 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
   const [selectedChainId, setSelectedChainId] = useState<string | null>(null);
   const [page, setPage] = useState<BsnModalPage>(BsnModalPage.CHAIN);
 
-  const { getRegisteredFinalityProvider } = useFinalityProviderState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
 
   const hasBabylonProvider = useMemo(
     () =>
@@ -72,7 +72,7 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
         />
       )}
       {page === BsnModalPage.FP && selectedChainId !== null && (
-        <FinalityProviderState bsnId={selectedChainId}>
+        <FinalityProviderBsnState bsnId={selectedChainId}>
           <FinalityProviderModal
             open={true}
             defaultFinalityProvider=""
@@ -80,7 +80,7 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
             onAdd={handleProviderAdd}
             onBack={() => setPage(BsnModalPage.CHAIN)}
           />
-        </FinalityProviderState>
+        </FinalityProviderBsnState>
       )}
     </ResponsiveDialog>
   );
