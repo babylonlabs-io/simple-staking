@@ -75,7 +75,7 @@ export function MultistakingForm() {
           open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
           max={1}
           onOpen={() =>
-            void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER)
+            void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
           }
           onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
         />
