@@ -2,6 +2,7 @@ import type {
   RegistrationStep,
   SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -46,9 +47,11 @@ interface DelegationState {
   setSelectedDelegation: (delegation?: Delegation) => void;
   resetRegistration: () => void;
   refetch: () => void;
+  delegationStepOptions: EventData | undefined;
+  setDelegationStepOptions: (options?: EventData) => void;
 }
 
-const REGISTRATION_STEP_MAP: Record<RegistrationStep, SigningStep> = {
+export const REGISTRATION_STEP_MAP: Record<RegistrationStep, SigningStep> = {
   "staking-slashing": "registration-staking-slashing",
   "unbonding-slashing": "registration-unbonding-slashing",
   "proof-of-possession": "registration-proof-of-possession",
@@ -70,6 +73,8 @@ const { StateProvider, useState: useDelegationState } =
     setSelectedDelegation: () => null,
     resetRegistration: () => null,
     refetch: () => null,
+    delegationStepOptions: undefined,
+    setDelegationStepOptions: () => null,
   });
 
 export function DelegationState({ children }: PropsWithChildren) {
@@ -88,8 +93,8 @@ export function DelegationState({ children }: PropsWithChildren) {
     SigningStep | undefined
   >();
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
-  const [currentDelegationStepOptions, setCurrentDelegationStepOptions] =
-    useState<SignPsbtOptions>();
+  const [delegationStepOptions, setDelegationStepOptions] =
+    useState<EventData>();
 
   // Methods
   const addDelegation = useCallback(
@@ -113,7 +118,7 @@ export function DelegationState({ children }: PropsWithChildren) {
   const resetRegistration = useCallback(() => {
     setSelectedDelegation(undefined);
     setRegistrationStep(undefined);
-    setCurrentDelegationStepOptions(undefined);
+    setDelegationStepOptions(undefined);
     setProcessing(false);
   }, []);
 
@@ -136,17 +141,18 @@ export function DelegationState({ children }: PropsWithChildren) {
   );
 
   useEffect(() => {
-    const unsubscribe = eventBus.on("delegation:register", (step, options) => {
-      const stepName = REGISTRATION_STEP_MAP[step];
+    const unsubscribe = eventBus.on("delegation:register", (options) => {
+      const type = options?.type as RegistrationStep | undefined;
 
-      if (stepName) {
+      if (type) {
+        const stepName = REGISTRATION_STEP_MAP[type];
         setRegistrationStep(stepName);
-        setCurrentDelegationStepOptions(options);
+        setDelegationStepOptions(options);
       }
     });
 
     return unsubscribe;
-  }, [setRegistrationStep, setCurrentDelegationStepOptions, eventBus]);
+  }, [setRegistrationStep, setDelegationStepOptions, eventBus]);
 
   // Context
   const state = useMemo(
@@ -164,7 +170,8 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
-      currentDelegationStepOptions,
+      delegationStepOptions,
+      setDelegationStepOptions,
     }),
     [
       delegations,
@@ -180,7 +187,8 @@ export function DelegationState({ children }: PropsWithChildren) {
       setSelectedDelegation,
       resetRegistration,
       refetch,
-      currentDelegationStepOptions,
+      delegationStepOptions,
+      setDelegationStepOptions,
     ],
   );
 
