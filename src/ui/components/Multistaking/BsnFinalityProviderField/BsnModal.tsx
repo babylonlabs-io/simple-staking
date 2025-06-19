@@ -30,7 +30,7 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
     () =>
       selectedProviderIds.some((pk) => {
         const fp = getRegisteredFinalityProvider(pk);
-        return fp?.bsnId === "";
+        return !fp?.bsnId;
       }),
     [selectedProviderIds, getRegisteredFinalityProvider],
   );
@@ -39,9 +39,7 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
     const set = new Set<string>();
     selectedProviderIds.forEach((pk) => {
       const fp = getRegisteredFinalityProvider(pk);
-      if (fp?.bsnId !== undefined) {
-        set.add(fp.bsnId);
-      }
+      set.add(fp?.bsnId || "");
     });
     return Array.from(set);
   }, [selectedProviderIds, getRegisteredFinalityProvider]);
