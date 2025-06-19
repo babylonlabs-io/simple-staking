@@ -82,9 +82,13 @@ const ChainButton = ({
 export const ChainSelectionModal = ({
   onNext,
   onClose,
+  disableNonBabylon = false,
+  disabledChainIds = [],
 }: {
   onNext: (selectedChain: string) => void;
   onClose: () => void;
+  disableNonBabylon?: boolean;
+  disabledChainIds?: string[];
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -116,26 +120,33 @@ export const ChainSelectionModal = ({
                 : (chainLogos as Record<string, string>)[bsn.id] ||
                   chainLogos.placeholder;
 
+            const isDisabled =
+              (disableNonBabylon && bsn.id !== "") ||
+              disabledChainIds.includes(bsn.id);
+
             return (
               <ChainButton
                 key={bsn.id}
                 logo={logo}
                 title={bsn.name}
                 selected={selected === bsn.id}
-                onClick={() => setSelected(bsn.id)}
+                disabled={isDisabled}
+                onClick={() => !isDisabled && setSelected(bsn.id)}
               />
             );
           })}
         </div>
-        <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
-          <div>
-            <MdOutlineInfo size={22} />
-          </div>
-          <div>
-            Babylon must be the first BSN you add before selecting others. Once
-            added, you can choose additional BSNs to multistake.
-          </div>
-        </SubSection>
+        {disableNonBabylon && (
+          <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
+            <div>
+              <MdOutlineInfo size={22} />
+            </div>
+            <div>
+              Babylon must be the first BSN you add before selecting others.
+              Once added, you can choose additional BSNs to multistake.
+            </div>
+          </SubSection>
+        )}
       </DialogBody>
 
       <DialogFooter className="flex justify-end">
