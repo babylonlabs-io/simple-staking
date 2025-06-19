@@ -89,10 +89,7 @@ const defaultState: FinalityProviderState = {
 const { StateProvider, useState: useFpState } =
   createStateUtils<FinalityProviderState>(defaultState);
 
-export function FinalityProviderState({
-  children,
-  bsnId,
-}: PropsWithChildren & { bsnId?: string }) {
+export function FinalityProviderState({ children }: PropsWithChildren) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
 
@@ -117,15 +114,6 @@ export function FinalityProviderState({
     if (!data?.finalityProviders) return [];
 
     return data.finalityProviders
-      .filter((fp) => {
-        if (bsnId === undefined) return true;
-
-        if (bsnId === "") {
-          return (fp.bsnId ?? "") === "";
-        }
-
-        return fp.bsnId === bsnId;
-      })
       .sort((a, b) => {
         const condition = FP_STATUSES[b.state] - FP_STATUSES[a.state];
 
@@ -140,7 +128,7 @@ export function FinalityProviderState({
         rank: i + 1,
         id: fp.btcPk,
       }));
-  }, [data?.finalityProviders, bsnId]);
+  }, [data?.finalityProviders]);
 
   const finalityProviderMap = useMemo(
     () =>
