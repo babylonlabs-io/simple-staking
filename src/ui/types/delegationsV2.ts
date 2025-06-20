@@ -34,6 +34,12 @@ export interface DelegationV2 extends DelegationLike {
 
 export interface DelegationWithFP extends DelegationV2 {
   fp: FinalityProvider;
+  /**
+   * All finality providers for this delegation.
+   * Only populated when Phase 3 feature flag is enabled.
+   * For backward compatibility, use `fp` property for the primary finality provider.
+   */
+  fps?: FinalityProvider[];
 }
 
 export enum DelegationV2StakingState {
