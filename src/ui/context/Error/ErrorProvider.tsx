@@ -57,6 +57,14 @@ export const ErrorProvider: FC<ErrorProviderProps> = ({ children }) => {
     ({ error, displayOptions, metadata }: ErrorHandlerParam) => {
       if (!error) return;
 
+      // Check for removeChild DOM error and suppress modal display
+      if (
+        error.message.includes("removeChild") &&
+        error.message.includes("not a child of this node")
+      ) {
+        return;
+      }
+
       // Extract stack trace if available
       const stackTrace = error instanceof Error ? error.stack || "" : "";
 
