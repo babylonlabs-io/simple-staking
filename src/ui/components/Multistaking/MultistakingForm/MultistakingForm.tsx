@@ -3,6 +3,7 @@ import { useCallback } from "react";
 
 import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
+import { BsnFinalityProviderField } from "@/ui/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
@@ -11,6 +12,7 @@ import { Section } from "@/ui/components/Section/Section";
 import { StakingModal } from "@/ui/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import {
   useMultistakingState,
   type MultistakingFormFields,
@@ -20,6 +22,7 @@ import {
   StakingStep,
   useStakingState,
 } from "@/ui/state/StakingState";
+import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
@@ -36,12 +39,9 @@ export function MultistakingForm() {
     blocked: isGeoBlocked,
     errorMessage: geoBlockMessage,
   } = useStakingState();
-  const {
-    validationSchema,
-    stakingModalPage,
-    setStakingModalPage,
-    MAX_FINALITY_PROVIDERS,
-  } = useMultistakingState();
+  const { validationSchema, MAX_FINALITY_PROVIDERS } = useMultistakingState();
+  const { stakingModalPage, setStakingModalPage } =
+    useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -58,6 +58,30 @@ export function MultistakingForm() {
     },
     [setFormData, goToStep],
   );
+
+  const renderFinalityProviderField = () => {
+    if (FeatureFlagService.IsPhase3Enabled) {
+      return (
+        <BsnFinalityProviderField
+          open={stakingModalPage === StakingModalPage.BSN}
+          max={MAX_FINALITY_PROVIDERS}
+          onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
+          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+        />
+      );
+    } else {
+      return (
+        <FinalityProviderField
+          open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
+          max={1}
+          onOpen={() =>
+            void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
+          }
+          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+        />
+      );
+    }
+  };
 
   if (!stakingInfo) {
     return null;
@@ -81,14 +105,7 @@ export function MultistakingForm() {
         <HiddenField name="feeAmount" defaultValue="0" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <FinalityProviderField
-              open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-              max={MAX_FINALITY_PROVIDERS}
-              onOpen={() =>
-                void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
-              }
-              onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-            />
+            {renderFinalityProviderField()}
             <AmountSubsection />
             <FeesSection />
 

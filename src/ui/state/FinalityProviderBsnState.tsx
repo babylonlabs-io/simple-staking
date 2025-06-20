@@ -24,12 +24,14 @@ interface FilterState {
   status: "active" | "inactive" | "";
 }
 
-interface FinalityProviderState {
+interface FinalityProviderBsnState {
   filter: FilterState;
   finalityProviders: FinalityProvider[];
   finalityProviderMap: Map<string, FinalityProvider>;
   isFetching: boolean;
   hasError: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
   // BSN
   bsnList: Bsn[];
   bsnLoading: boolean;
@@ -77,7 +79,7 @@ const FILTERS = {
     filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
 };
 
-const defaultState: FinalityProviderState = {
+const defaultState: FinalityProviderBsnState = {
   filter: {
     search: "",
     status: "active",
@@ -85,6 +87,8 @@ const defaultState: FinalityProviderState = {
   finalityProviders: [],
   isFetching: false,
   hasError: false,
+  hasNextPage: false,
+  fetchNextPage: () => {},
   bsnList: [],
   bsnLoading: false,
   bsnError: false,
@@ -99,10 +103,13 @@ const defaultState: FinalityProviderState = {
   setStakingModalPage: () => {},
 };
 
-const { StateProvider, useState: useFpState } =
-  createStateUtils<FinalityProviderState>(defaultState);
+const { StateProvider, useState: useFpBsnState } =
+  createStateUtils<FinalityProviderBsnState>(defaultState);
 
-export function FinalityProviderState({ children }: PropsWithChildren) {
+export function FinalityProviderBsnState({
+  children,
+  bsnId,
+}: PropsWithChildren & { bsnId?: string }) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
@@ -116,11 +123,13 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  const { data, isFetching, isError } = useFinalityProvidersV2({
-    sortBy: sortState.field,
-    order: sortState.direction,
-    name: debouncedSearch,
-  });
+  const { data, isFetching, isError, hasNextPage, fetchNextPage } =
+    useFinalityProvidersV2({
+      sortBy: sortState.field,
+      order: sortState.direction,
+      name: debouncedSearch,
+      bsnId,
+    });
 
   const { data: dataV1 } = useFinalityProviders();
   const {
@@ -134,7 +143,17 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) return [];
 
-    return data.finalityProviders
+    const filteredByBsn = (data.finalityProviders ?? []).filter((fp) => {
+      if (bsnId === undefined) return true;
+
+      if (bsnId === "") {
+        return (fp.bsnId ?? "") === "";
+      }
+
+      return fp.bsnId === bsnId;
+    });
+
+    return filteredByBsn
       .sort((a, b) => {
         const condition = FP_STATUSES[b.state] - FP_STATUSES[a.state];
 
@@ -149,7 +168,7 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
         rank: i + 1,
         id: fp.btcPk,
       }));
-  }, [data?.finalityProviders]);
+  }, [data?.finalityProviders, bsnId]);
 
   const finalityProviderMap = useMemo(
     () =>
@@ -226,6 +245,8 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       bsnList,
       bsnLoading,
       bsnError,
+      hasNextPage,
+      fetchNextPage,
       // selectedBsnId: null, // TODO: Uncomment when implementing BSN selection
       isFetching,
       hasError: isError,
@@ -244,6 +265,8 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       bsnList,
       bsnLoading,
       bsnError,
+      hasNextPage,
+      fetchNextPage,
       isFetching,
       isError,
       finalityProviderMap,
@@ -260,4 +283,4 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   return <StateProvider value={state}>{children}</StateProvider>;
 }
 
-export { useFpState as useFinalityProviderState };
+export { useFpBsnState as useFinalityProviderBsnState };
