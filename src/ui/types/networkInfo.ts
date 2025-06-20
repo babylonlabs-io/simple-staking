@@ -36,7 +36,6 @@ export interface StakingStatus {
 export interface Params {
   bbnStakingParams: BbnStakingParams;
   btcEpochCheckParams: BtcEpochCheckParams;
-  maxBsnFpProviders?: number;
 }
 
 export interface NetworkInfo {

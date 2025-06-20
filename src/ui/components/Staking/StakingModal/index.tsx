@@ -8,7 +8,7 @@ import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
+import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { useStakingState } from "@/ui/state/StakingState";
 
 const EOI_INDEXES: Record<string, number> = {
@@ -32,7 +32,7 @@ export function StakingModal() {
     verifiedDelegation,
     reset: resetState,
   } = useStakingState();
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
   const {
     reset: resetForm,
