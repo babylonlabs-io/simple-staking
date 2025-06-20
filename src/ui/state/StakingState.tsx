@@ -35,7 +35,6 @@ export enum StakingModalPage {
   DEFAULT = 0,
   CHAIN_SELECTION = 1,
   FINALITY_PROVIDER = 2,
-  BSN = 3,
 }
 
 const { coinName } = getNetworkConfigBTC();

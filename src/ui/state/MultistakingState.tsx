@@ -4,7 +4,6 @@ import { number, object, ObjectSchema, ObjectShape, Schema, string } from "yup";
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
-import { useNetworkInfo } from "@/ui/hooks/client/api/useNetworkInfo";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
@@ -49,8 +48,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const { data: networkInfo } = useNetworkInfo();
-  const MAX_FINALITY_PROVIDERS = networkInfo?.params.maxBsnFpProviders ?? 3;
+  const MAX_FINALITY_PROVIDERS = 1;
   const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();

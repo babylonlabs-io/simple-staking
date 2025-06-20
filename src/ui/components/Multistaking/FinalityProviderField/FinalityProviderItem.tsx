@@ -22,7 +22,7 @@ export const FinalityProviderItem = ({
           moniker={provider.description?.moniker}
           className="w-10 h-10"
         />
-        <div className="text-accent-primary flex items-center text-sm sm:text-base">
+        <div className="text-accent-primary flex items-center">
           {provider.description?.moniker ||
             trim(provider.btcPk, 8) ||
             "Selected FP"}
@@ -37,7 +37,7 @@ export const FinalityProviderItem = ({
           });
           onRemove();
         }}
-        className="text-accent-primary text-xs sm:text-sm tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
+        className="text-accent-primary text-xs tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
       >
         Remove
       </div>

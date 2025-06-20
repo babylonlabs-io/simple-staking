@@ -1,4 +1,3 @@
-import { FinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { MultistakingState } from "@/ui/state/MultistakingState";
 import { StakingState } from "@/ui/state/StakingState";
 
@@ -8,9 +7,7 @@ export function MultistakingFormWrapper() {
   return (
     <StakingState>
       <MultistakingState>
-        <FinalityProviderBsnState>
-          <MultistakingForm />
-        </FinalityProviderBsnState>
+        <MultistakingForm />
       </MultistakingState>
     </StakingState>
   );
