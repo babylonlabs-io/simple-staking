@@ -30,6 +30,8 @@ interface FinalityProviderBsnState {
   finalityProviderMap: Map<string, FinalityProvider>;
   isFetching: boolean;
   hasError: boolean;
+  hasNextPage: boolean;
+  fetchNextPage: () => void;
   // BSN
   bsnList: Bsn[];
   bsnLoading: boolean;
@@ -85,6 +87,8 @@ const defaultState: FinalityProviderBsnState = {
   finalityProviders: [],
   isFetching: false,
   hasError: false,
+  hasNextPage: false,
+  fetchNextPage: () => {},
   bsnList: [],
   bsnLoading: false,
   bsnError: false,
@@ -102,7 +106,10 @@ const defaultState: FinalityProviderBsnState = {
 const { StateProvider, useState: useFpBsnState } =
   createStateUtils<FinalityProviderBsnState>(defaultState);
 
-export function FinalityProviderBsnState({ children }: PropsWithChildren) {
+export function FinalityProviderBsnState({
+  children,
+  bsnId,
+}: PropsWithChildren & { bsnId?: string }) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
@@ -116,11 +123,13 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  const { data, isFetching, isError } = useFinalityProvidersV2({
-    sortBy: sortState.field,
-    order: sortState.direction,
-    name: debouncedSearch,
-  });
+  const { data, isFetching, isError, hasNextPage, fetchNextPage } =
+    useFinalityProvidersV2({
+      sortBy: sortState.field,
+      order: sortState.direction,
+      name: debouncedSearch,
+      bsnId,
+    });
 
   const { data: dataV1 } = useFinalityProviders();
   const {
@@ -134,7 +143,17 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) return [];
 
-    return data.finalityProviders
+    const filteredByBsn = (data.finalityProviders ?? []).filter((fp) => {
+      if (bsnId === undefined) return true;
+
+      if (bsnId === "") {
+        return (fp.bsnId ?? "") === "";
+      }
+
+      return fp.bsnId === bsnId;
+    });
+
+    return filteredByBsn
       .sort((a, b) => {
         const condition = FP_STATUSES[b.state] - FP_STATUSES[a.state];
 
@@ -149,7 +168,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
         rank: i + 1,
         id: fp.btcPk,
       }));
-  }, [data?.finalityProviders]);
+  }, [data?.finalityProviders, bsnId]);
 
   const finalityProviderMap = useMemo(
     () =>
@@ -226,6 +245,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       bsnList,
       bsnLoading,
       bsnError,
+      hasNextPage,
+      fetchNextPage,
       // selectedBsnId: null, // TODO: Uncomment when implementing BSN selection
       isFetching,
       hasError: isError,
@@ -244,6 +265,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       bsnList,
       bsnLoading,
       bsnError,
+      hasNextPage,
+      fetchNextPage,
       isFetching,
       isError,
       finalityProviderMap,
