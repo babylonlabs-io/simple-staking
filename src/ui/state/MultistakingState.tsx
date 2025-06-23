@@ -70,7 +70,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
           field: "finalityProviders",
           schema: array()
             .of(string())
-            .min(1, "Add at least one finality provider.")
+            .min(1, "Add Finality Provider")
             .test(
               "hasBabylonProvider",
               "Add a Babylon finality provider first",
@@ -78,7 +78,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
                 (list as string[] | undefined)?.some(
                   (pk) =>
                     typeof pk === "string" &&
-                    getRegisteredFinalityProvider(pk)?.bsnId === "",
+                    (getRegisteredFinalityProvider(pk)?.bsnId === "" ||
+                      getRegisteredFinalityProvider(pk)?.bsnId === undefined),
                 ) ?? false,
             )
             .max(

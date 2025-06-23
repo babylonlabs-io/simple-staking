@@ -1,12 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderModal";
-import {
-  FinalityProviderBsnState,
-  useFinalityProviderBsnState,
-} from "@/ui/state/FinalityProviderBsnState";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 interface Props {
   open: boolean;
@@ -21,39 +18,30 @@ enum BsnModalPage {
 }
 
 export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
-  const [selectedChainId, setSelectedChainId] = useState<string | null>(null);
   const [page, setPage] = useState<BsnModalPage>(BsnModalPage.CHAIN);
 
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
+  const {
+    setSelectedBsnId,
+    selectedBsnId,
+    hasBabylonProviderFlag,
+    disabledChainIds,
+    setSelectedProviderIds,
+  } = useFinalityProviderBsnState();
 
-  const hasBabylonProvider = useMemo(
-    () =>
-      selectedProviderIds.some((pk) => {
-        const fp = getRegisteredFinalityProvider(pk);
-        return !fp?.bsnId;
-      }),
-    [selectedProviderIds, getRegisteredFinalityProvider],
-  );
-
-  const disabledChainIds = useMemo(() => {
-    const set = new Set<string>();
-    selectedProviderIds.forEach((pk) => {
-      const fp = getRegisteredFinalityProvider(pk);
-      set.add(fp?.bsnId || "");
-    });
-    return Array.from(set);
-  }, [selectedProviderIds, getRegisteredFinalityProvider]);
+  useEffect(() => {
+    setSelectedProviderIds(selectedProviderIds);
+  }, [selectedProviderIds, setSelectedProviderIds]);
 
   useEffect(() => {
     if (!open) {
       return;
     }
     setPage(BsnModalPage.CHAIN);
-    setSelectedChainId(null);
-  }, [open]);
+    setSelectedBsnId(null);
+  }, [open, setSelectedBsnId]);
 
   const handleChainNext = (chainId: string) => {
-    setSelectedChainId(chainId);
+    setSelectedBsnId(chainId);
     setPage(BsnModalPage.FP);
   };
 
@@ -67,20 +55,18 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
         <ChainSelectionModal
           onNext={handleChainNext}
           onClose={onClose}
-          disableNonBabylon={!hasBabylonProvider}
+          disableNonBabylon={!hasBabylonProviderFlag}
           disabledChainIds={disabledChainIds}
         />
       )}
-      {page === BsnModalPage.FP && selectedChainId !== null && (
-        <FinalityProviderBsnState bsnId={selectedChainId}>
-          <FinalityProviderModal
-            open={true}
-            defaultFinalityProvider=""
-            onClose={onClose}
-            onAdd={handleProviderAdd}
-            onBack={() => setPage(BsnModalPage.CHAIN)}
-          />
-        </FinalityProviderBsnState>
+      {page === BsnModalPage.FP && selectedBsnId !== null && (
+        <FinalityProviderModal
+          open={true}
+          defaultFinalityProvider=""
+          onClose={onClose}
+          onAdd={handleProviderAdd}
+          onBack={() => setPage(BsnModalPage.CHAIN)}
+        />
       )}
     </ResponsiveDialog>
   );
