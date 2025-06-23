@@ -34,7 +34,89 @@ export const injectBBNQueries = async (
   QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64"));
 
   await page.addInitScript(() => {
+    // @ts-ignore – injected only in test context
     window.__e2eTestMode = true;
+  });
+
+  await page.addInitScript(() => {
+    // Stub the WebSocket implementation to prevent real network connections
+    // that are attempted by Tendermint clients during e2e tests. The stub
+    // immediately opens the connection and provides no-op implementations for
+    // the remaining methods/events that are used by the client library.
+    class MockWebSocket {
+      static CONNECTING = 0;
+      static OPEN = 1;
+      static CLOSING = 2;
+      static CLOSED = 3;
+
+      readonly url: string;
+      readyState: number = MockWebSocket.CONNECTING;
+      onopen: ((ev: Event) => any) | null = null;
+      onclose: ((ev: CloseEvent) => any) | null = null;
+      onerror: ((ev: Event) => any) | null = null;
+      onmessage: ((ev: MessageEvent) => any) | null = null;
+
+      private listeners: Record<string, Function[]> = {};
+
+      constructor(url: string) {
+        // Preserve the URL for potential debugging purposes.
+        this.url = url;
+        // Simulate an asynchronous connection opening.
+        setTimeout(() => {
+          this.readyState = MockWebSocket.OPEN;
+          const event = new Event("open");
+          this.onopen?.(event);
+          this.dispatchEvent(event);
+        }, 0);
+      }
+
+      send(_data: string | ArrayBufferLike | Blob | ArrayBufferView): void {
+        /* no-op */
+      }
+
+      close(): void {
+        this.readyState = MockWebSocket.CLOSED;
+        const event = new CloseEvent("close");
+        this.onclose?.(event);
+        this.dispatchEvent(event);
+      }
+
+      addEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+      ): void {
+        if (!this.listeners[type]) this.listeners[type] = [];
+        // @ts-ignore
+        this.listeners[type].push(listener);
+      }
+
+      removeEventListener(
+        type: string,
+        listener: EventListenerOrEventListenerObject,
+      ): void {
+        if (!this.listeners[type]) return;
+        // @ts-ignore
+        this.listeners[type] = this.listeners[type].filter(
+          (l) => l !== listener,
+        );
+      }
+
+      dispatchEvent(event: Event): boolean {
+        const listeners = this.listeners[event.type] || [];
+        for (const listener of listeners) {
+          const l: any = listener as any;
+          if (typeof l === "function") {
+            l.call(this, event);
+          } else if (l && typeof l.handleEvent === "function") {
+            l.handleEvent.call(this, event);
+          }
+        }
+        return true;
+      }
+    }
+
+    // @ts-ignore – override readonly property in test context
+    window.WebSocket = MockWebSocket as any;
   });
 
   await page.route("**/v2/staked*", async (route) => {
@@ -196,6 +278,9 @@ export const injectBBNQueries = async (
       return route.fulfill({
         status: 200,
         contentType: "application/json",
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
         body: JSON.stringify({
           jsonrpc: "2.0",
           id: parsed.id ?? -1,
@@ -400,6 +485,9 @@ export const injectBBNQueries = async (
     await route.fulfill({
       status: 200,
       contentType: "application/json",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
       body: JSON.stringify({
         jsonrpc: "2.0",
         id: -1,
@@ -541,7 +629,7 @@ export const injectBBNQueries = async (
           {
             btc_pk:
               "e8a3ef3ca40ade56bd986663f24d5ab3bcc3cd18a88a10a8cd25d8af42314f62",
-            state: "FINALITY_PROVIDER_STATUS_INACTIVE",
+            state: "FINALITY_PROVIDER_STATUS_ACTIVE",
             description: {
               moniker: "PRO Delegators",
               identity: "44771D06A00DD695",
@@ -570,7 +658,7 @@ export const injectBBNQueries = async (
           {
             btc_pk:
               "e8a3ef3ca40ade56bd986663f24d5ab3bcc3cd18a88a10a8cd25d8af42314f62",
-            state: "FINALITY_PROVIDER_STATUS_INACTIVE",
+            state: "FINALITY_PROVIDER_STATUS_ACTIVE",
             description: {
               moniker: "PRO Delegators",
               identity: "44771D06A00DD695",
@@ -715,6 +803,115 @@ export const injectBBNQueries = async (
           funded_txo_sum: Number(mockData.bbnQueries.stakableBtc),
           spent_txo_sum: 0,
         },
+      }),
+    });
+  });
+
+  await page.addInitScript(() => {
+    /*
+     * Patch CosmJS Tendermint client & QueryClient so that the Babylon RPC
+     * provider does not make any real RPC calls during E2E tests. This avoids
+     * the "Failed to connect RPC Provider" error that surfaces when the app
+     * cannot reach an actual Tendermint node.
+     */
+    function cosmjsPatch() {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore – CosmJS is bundled, we access via global scope in the browser build
+      const tm: any = (window as any).Tendermint34Client;
+      if (tm && typeof tm.connect === "function" && !tm.__e2ePatched) {
+        tm.__e2ePatched = true;
+        tm.connect = async () => {
+          // Minimal stub implementing the subset of TendermintClient interface
+          return {
+            status: async () => ({
+              nodeInfo: {},
+              syncInfo: {},
+              validatorInfo: {},
+            }),
+            abciQuery: async () => ({
+              code: 0,
+              value: new Uint8Array(),
+            }),
+            broadcastTxSync: async () => ({ code: 0 }),
+            // no-op
+            disconnect: () => {},
+          } as any;
+        };
+      }
+
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const qc: any = (window as any).QueryClient;
+      if (qc && typeof qc.withExtensions === "function" && !qc.__e2ePatched) {
+        qc.__e2ePatched = true;
+        qc.withExtensions = () => ({
+          // Provide the minimal shape expected in our components
+          disconnect: () => {},
+        });
+      }
+    }
+
+    // Attempt patch immediately and also retry for a short period in case the
+    // libraries load after this script runs.
+    cosmjsPatch();
+    const retry = setInterval(() => {
+      cosmjsPatch();
+      // Stop after first successful patch
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      if (
+        (window as any).Tendermint34Client?.__e2ePatched &&
+        (window as any).QueryClient?.__e2ePatched
+      ) {
+        clearInterval(retry);
+      }
+    }, 50);
+
+    // Clean up after 5 seconds just in case
+    setTimeout(() => clearInterval(retry), 5000);
+  });
+
+  // Mock network fees endpoint used in staking info
+  await page.route("**/api/v1/fees/recommended", async (route) => {
+    await route.fulfill({
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      contentType: "application/json",
+      body: JSON.stringify({
+        fastestFee: 15,
+        halfHourFee: 10,
+        hourFee: 5,
+        economyFee: 3,
+        minimumFee: 1,
+      }),
+    });
+  });
+
+  // Mock BSN list endpoint for chains modal
+  await page.route("**/v2/bsn", async (route) => {
+    await route.fulfill({
+      status: 200,
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+      },
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: [
+          {
+            id: "", // Babylon chain
+            name: "Babylon Genesis",
+            description: "Babylon testnet",
+            active_tvl: 0,
+          },
+          {
+            id: "cosmos",
+            name: "Cosmos",
+            description: "Cosmos Hub",
+            active_tvl: 0,
+          },
+        ],
       }),
     });
   });

@@ -28,7 +28,7 @@ export default defineConfig({
 
   use: {
     baseURL,
-    headless: true,
+    headless: false,
     trace: "on-first-retry",
   },
 

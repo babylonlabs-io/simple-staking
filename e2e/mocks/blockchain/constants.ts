@@ -102,7 +102,7 @@ const mockData: MockData = {
     rewardAmount: "500000",
     bbnBalance: "1000000",
     stakedBtc: "9876543",
-    stakableBtc: "74175",
+    stakableBtc: "200000",
     mockDelegation: {
       finality_provider_btc_pks_hex: [
         "0279be667ef9dcbbac55a06295ce870b07029bfcdb2dce28d959f2815b16f81798",

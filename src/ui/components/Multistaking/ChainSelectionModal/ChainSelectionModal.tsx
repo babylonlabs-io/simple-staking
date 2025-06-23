@@ -97,6 +97,8 @@ export const ChainSelectionModal = ({
     queryFn: getBSNs,
   });
 
+  console.log(JSON.stringify(bsns));
+
   return (
     <>
       <DialogHeader

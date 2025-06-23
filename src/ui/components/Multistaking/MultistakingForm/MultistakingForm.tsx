@@ -83,6 +83,8 @@ export function MultistakingForm() {
     }
   };
 
+  console.log(JSON.stringify(stakingInfo));
+
   if (!stakingInfo) {
     return null;
   }

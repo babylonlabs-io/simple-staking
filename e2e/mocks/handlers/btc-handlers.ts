@@ -37,4 +37,17 @@ export const btcHandlers = [
       }),
     );
   }),
+
+  rest.get("*/api/v1/fees/recommended", (req, res, ctx) => {
+    // Mock recommended fee rates required by the UI
+    return res(
+      ctx.json({
+        fastestFee: 15,
+        halfHourFee: 10,
+        hourFee: 5,
+        economyFee: 3,
+        minimumFee: 1,
+      }),
+    );
+  }),
 ];
