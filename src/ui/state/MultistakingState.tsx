@@ -11,7 +11,6 @@ import {
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
-import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
 import { useNetworkInfo } from "@/ui/hooks/client/api/useNetworkInfo";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { satoshiToBtc } from "@/ui/utils/btc";
@@ -60,7 +59,6 @@ export function MultistakingState({ children }: PropsWithChildren) {
   );
   const { data: networkInfo } = useNetworkInfo();
   const MAX_FINALITY_PROVIDERS = networkInfo?.params.maxBsnFpProviders ?? 3;
-  const { publicKeyNoCoord } = useBTCWallet();
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
   const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
@@ -69,17 +67,24 @@ export function MultistakingState({ children }: PropsWithChildren) {
     () =>
       [
         {
-          field: "finalityProvider",
-          schema: string()
-            .required("Add Finality Provider")
+          field: "finalityProviders",
+          schema: array()
+            .of(string())
+            .min(1, "Add at least one finality provider.")
             .test(
-              "invalidPublicKey",
-              "Cannot select a finality provider with the same public key as the wallet",
-              (value) => value !== publicKeyNoCoord,
+              "hasBabylonProvider",
+              "Add a Babylon finality provider first",
+              (list) =>
+                (list as string[] | undefined)?.some(
+                  (pk) =>
+                    typeof pk === "string" &&
+                    getRegisteredFinalityProvider(pk)?.bsnId === "",
+                ) ?? false,
+            )
+            .max(
+              MAX_FINALITY_PROVIDERS,
+              `Maximum ${MAX_FINALITY_PROVIDERS} finality providers allowed.`,
             ),
-          errors: {
-            invalidPublicKey: { level: "error" },
-          },
         },
         {
           field: "term",
@@ -155,29 +160,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .required("Staking fee amount is the required field.")
             .moreThan(0, "Staking fee amount must be greater than 0."),
         },
-        {
-          field: "selectedProviders",
-          schema: array()
-            .of(string())
-            .min(1, "Add at least one finality provider.")
-            .test(
-              "hasBabylonProvider",
-              "Add a Babylon finality provider first",
-              (list) =>
-                (list as string[] | undefined)?.some(
-                  (pk) =>
-                    typeof pk === "string" &&
-                    getRegisteredFinalityProvider(pk)?.bsnId === "",
-                ) ?? false,
-            )
-            .max(
-              MAX_FINALITY_PROVIDERS,
-              `Maximum ${MAX_FINALITY_PROVIDERS} finality providers allowed.`,
-            ),
-        },
       ] as const,
     [
-      publicKeyNoCoord,
       stakingInfo,
       stakableBtcBalance,
       getRegisteredFinalityProvider,

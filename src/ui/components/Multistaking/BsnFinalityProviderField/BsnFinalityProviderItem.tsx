@@ -1,5 +1,3 @@
-import { useFormContext } from "@babylonlabs-io/core-ui";
-
 import { FinalityProviderLogo } from "@/ui/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { trim } from "@/ui/utils/trim";
@@ -11,7 +9,6 @@ export const BsnFinalityProviderItem = ({
   providerId: string;
   onRemove: () => void;
 }) => {
-  const { setValue } = useFormContext();
   const { finalityProviderMap } = useFinalityProviderBsnState();
   const provider = finalityProviderMap.get(providerId);
 
@@ -39,14 +36,7 @@ export const BsnFinalityProviderItem = ({
       </div>
 
       <div
-        onClick={() => {
-          setValue("finalityProvider", "", {
-            shouldValidate: true,
-            shouldDirty: true,
-            shouldTouch: true,
-          });
-          onRemove();
-        }}
+        onClick={onRemove}
         className="text-accent-primary text-xs tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
       >
         Remove

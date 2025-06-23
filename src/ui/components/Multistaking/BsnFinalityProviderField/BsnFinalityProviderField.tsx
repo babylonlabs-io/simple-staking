@@ -25,7 +25,7 @@ export function BsnFinalityProviderField({
   onClose,
 }: Props) {
   const { value: selectedProviderIds, onChange } = useField<string[]>({
-    name: "selectedProviders",
+    name: "finalityProviders",
     defaultValue,
     disabled,
   });
