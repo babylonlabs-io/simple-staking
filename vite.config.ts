@@ -27,7 +27,7 @@ export default defineConfig({
   build: {
     outDir: "out",
     sourcemap: true,
-    bsnOptions: {
+    rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
         404: resolve(__dirname, "404.html"),
