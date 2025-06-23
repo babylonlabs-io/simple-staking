@@ -253,7 +253,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     [data?.finalityProviders],
   );
 
-  // Derived values based on currently selected provider ids
   const hasBabylonProviderFlag = useMemo(
     () =>
       selectedProviderIds.some((pk) => {
