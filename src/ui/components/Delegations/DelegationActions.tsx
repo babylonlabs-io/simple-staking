@@ -126,10 +126,12 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
 
   // Active, eligible for registration
   if (state === DelegationState.ACTIVE || isEligibleForRegistration) {
+    const tooltipId = `tooltip-registration-${stakingTxHashHex}`;
+
     return (
       <div
         className="flex justify-start"
-        data-tooltip-id="tooltip-registration"
+        data-tooltip-id={tooltipId}
         data-tooltip-html={getDelegationTooltip()}
       >
         <div className="flex items-center gap-1">
@@ -150,7 +152,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
             Register
           </Button>
           <Tooltip
-            id="tooltip-registration"
+            id={tooltipId}
             className="tooltip-wrap"
             clickable={true}
             delayHide={500}
