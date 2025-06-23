@@ -134,8 +134,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const [selectedBsnId, setSelectedBsnId] = useState<string | null>(null);
   const [selectedProviderIds, setSelectedProviderIds] = useState<string[]>([]);
 
-  console.log({ selectedBsnId });
-
   const { data, isFetching, isError, hasNextPage, fetchNextPage } =
     useFinalityProvidersV2({
       sortBy: sortState.field,
@@ -143,8 +141,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       name: debouncedSearch,
       bsnId: selectedBsnId === "" ? undefined : selectedBsnId?.toString(),
     });
-
-  console.log({ data });
 
   const { data: dataV1 } = useFinalityProviders();
   const {
