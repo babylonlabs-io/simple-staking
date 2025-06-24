@@ -1,24 +1,24 @@
 import { getUrlFromEnv } from "./urlUtils";
 
-export const BBN_BSN_DEVNET_RPC_URL = getUrlFromEnv(
+export const BSN_DEVNET_RPC_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
   "https://rpc.bsn-devnet.babylonlabs.io/",
 );
 
-export const BBN_BSN_DEVNET_LCD_URL = getUrlFromEnv(
+export const BSN_DEVNET_LCD_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_LCD_URL,
   "http://localhost:1317",
   "https://lcd.bsn-devnet.babylonlabs.io/",
 );
 
-export const bbnbsnDevnet = {
+export const bbnBsnDevnet = {
   chainId: "v4-devnet-1",
   chainName: "Babylon BSN Devnet 1",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
-  rpc: BBN_BSN_DEVNET_RPC_URL,
-  rest: BBN_BSN_DEVNET_LCD_URL,
+  rpc: BSN_DEVNET_RPC_URL,
+  rest: BSN_DEVNET_LCD_URL,
   nodeProvider: {
     name: "Babylonlabs",
     email: "contact@babylonlabs.io",
