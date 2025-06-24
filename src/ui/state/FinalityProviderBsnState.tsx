@@ -1,3 +1,4 @@
+import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
@@ -43,6 +44,9 @@ interface FinalityProviderBsnState {
   setSelectedProviderIds: (ids: string[]) => void;
   disabledChainIds: string[];
   hasBabylonProviderFlag: boolean;
+  bsnMap: Map<string, Bsn>;
+  getFinalityProvidersBsns: (fps: FinalityProvider[]) => Bsn[];
+  // selectedBsnId: string | null; // TODO: Uncomment when implementing BSN selection
   // Modal
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
@@ -104,6 +108,8 @@ const defaultState: FinalityProviderBsnState = {
   setSelectedProviderIds: () => {},
   disabledChainIds: [],
   hasBabylonProviderFlag: false,
+  bsnMap: new Map(),
+  getFinalityProvidersBsns: () => [],
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
@@ -119,6 +125,7 @@ const { StateProvider, useState: useFpBsnState } =
 
 export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const params = useSearchParams();
+  const { connected: isConnected } = useWalletConnect();
   const fpParam = params.get("fp");
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
@@ -148,8 +155,18 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     isLoading: bsnLoading,
     isError: bsnError,
   } = useBsn({
-    enabled: stakingModalPage === StakingModalPage.CHAIN_SELECTION,
+    enabled: isConnected,
   });
+
+  const bsnMap = useMemo(
+    () =>
+      bsnList.reduce((acc, bsn) => {
+        // Note: empty BSN ID corresponds to babylon network
+        acc.set(bsn.id, bsn);
+        return acc;
+      }, new Map<string, Bsn>()),
+    [bsnList],
+  );
 
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) return [];
@@ -267,6 +284,21 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     return Array.from(set);
   }, [selectedProviderIds, getRegisteredFinalityProvider]);
 
+  const getFinalityProvidersBsns = useCallback(
+    (fps: FinalityProvider[]) => {
+      const bsnIds = new Set<string>();
+      fps.forEach((fp) => {
+        if (fp.bsnId) {
+          bsnIds.add(fp.bsnId);
+        }
+      });
+      return Array.from(bsnIds)
+        .map((id) => bsnMap.get(id))
+        .filter(Boolean) as Bsn[];
+    },
+    [bsnMap],
+  );
+
   const state = useMemo(
     () => ({
       filter,
@@ -280,6 +312,9 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       setSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
+      // selectedBsnId: null, // TODO: Uncomment when implementing BSN selection
+      bsnMap,
+      getFinalityProvidersBsns: getFinalityProvidersBsns,
       isFetching,
       hasError: isError,
       finalityProviderMap,
@@ -305,6 +340,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       setSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
+      bsnMap,
+      getFinalityProvidersBsns,
       isFetching,
       isError,
       finalityProviderMap,

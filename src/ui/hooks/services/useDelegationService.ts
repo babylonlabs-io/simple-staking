@@ -14,6 +14,7 @@ import {
 import { FinalityProvider } from "@/ui/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/ui/types/networkInfo";
 import { validateDelegation } from "@/ui/utils/delegations";
+import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 import { getBbnParamByVersion } from "@/ui/utils/params";
 
 import { useTransactionService } from "./useTransactionService";
@@ -83,12 +84,27 @@ export function useDelegationService() {
 
   const delegationsWithFP = useMemo(
     () =>
-      delegations.map((d) => ({
-        ...d,
-        fp: finalityProviderMap.get(
-          d.finalityProviderBtcPksHex[0],
-        ) as FinalityProvider,
-      })),
+      delegations.map((delegation) => {
+        // Map all finality provider public keys to their full objects
+        const allFinalityProviders = delegation.finalityProviderBtcPksHex
+          .map((publicKey) => finalityProviderMap.get(publicKey))
+          .filter(Boolean) as FinalityProvider[];
+
+        // Base delegation with legacy fp property (first finality provider for backward compatibility)
+        const delegationWithFP = {
+          ...delegation,
+          fp: allFinalityProviders[0] || ({} as FinalityProvider),
+        };
+
+        if (FeatureFlagService.IsPhase3Enabled) {
+          return {
+            ...delegationWithFP,
+            fps: allFinalityProviders,
+          };
+        }
+
+        return delegationWithFP;
+      }),
     [delegations, finalityProviderMap],
   );
 
