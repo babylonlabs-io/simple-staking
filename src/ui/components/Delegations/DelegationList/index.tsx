@@ -117,6 +117,12 @@ export function DelegationList() {
   const { delegationV2StepOptions, setDelegationV2StepOptions } =
     useDelegationV2State();
 
+  const withdrawalList = ["early-unbonded", "slashed", "staking-expired"];
+
+  const isWithdrawal = withdrawalList.includes(
+    delegationV2StepOptions?.type as string,
+  );
+
   const detailsModalTitle =
     (delegationV2StepOptions?.type as string) || "Transaction Details";
 
@@ -161,15 +167,18 @@ export function DelegationList() {
         networkConfig={networkConfig}
       />
 
-      {delegationV2StepOptions && processing && (
-        <SignDetailsModal
-          open={Boolean(delegationV2StepOptions)}
-          // we don't need to close the underlying modal if we close the details modal
-          onClose={() => setDelegationV2StepOptions(undefined)}
-          details={delegationV2StepOptions}
-          title={detailsModalTitle}
-        />
-      )}
+      {delegationV2StepOptions &&
+        processing &&
+        // do not show for withdrawal
+        !isWithdrawal && (
+          <SignDetailsModal
+            open={Boolean(delegationV2StepOptions)}
+            // we don't need to close the underlying modal if we close the details modal
+            onClose={() => setDelegationV2StepOptions(undefined)}
+            details={delegationV2StepOptions}
+            title={detailsModalTitle}
+          />
+        )}
     </Card>
   );
 }

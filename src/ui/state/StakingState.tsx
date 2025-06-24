@@ -367,6 +367,7 @@ export function StakingState({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribe = eventBus.on("delegation:create", (options) => {
+      console.log("StakingState: delegation:create", options);
       const type = options?.type as RegistrationStep | undefined;
 
       if (type) {
