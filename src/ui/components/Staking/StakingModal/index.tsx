@@ -57,6 +57,11 @@ export function StakingModal() {
     return null;
   }
 
+  const handleClose = () => {
+    resetState();
+    setDelegationV2StepOptions(undefined);
+  };
+
   return (
     <>
       {formData && fp && stakingInfo && (
@@ -70,7 +75,7 @@ export function StakingModal() {
           stakingFeeSat={formData.feeAmount}
           feeRate={formData.feeRate}
           unbondingFeeSat={stakingInfo.unbondingFeeSat}
-          onClose={resetState}
+          onClose={handleClose}
           onSign={async () => {
             await createEOI(formData);
             resetForm({
@@ -110,16 +115,16 @@ export function StakingModal() {
           open={step === "verified"}
           processing={processing}
           onSubmit={() => stakeDelegation(verifiedDelegation)}
-          onClose={resetState}
+          onClose={handleClose}
         />
       )}
       <SuccessFeedbackModal
         open={step === "feedback-success"}
-        onClose={resetState}
+        onClose={handleClose}
       />
       <CancelFeedbackModal
         open={step === "feedback-cancel"}
-        onClose={resetState}
+        onClose={handleClose}
       />
       <SignDetailsModal
         open={Boolean(delegationV2StepOptions) && processing}
