@@ -3,14 +3,12 @@ import { Card, Heading } from "@babylonlabs-io/core-ui";
 import { GridTable, type TableColumn } from "@/ui/components/Common/GridTable";
 import { Hint } from "@/ui/components/Common/Hint";
 import { FinalityProviderMoniker } from "@/ui/components/Delegations/DelegationList/components/FinalityProviderMoniker";
-import { SignDetailsModal } from "@/ui/components/Modals/SignDetailsModal";
 import { getNetworkConfig } from "@/ui/config/network";
 import {
   ActionType,
   useDelegationService,
 } from "@/ui/hooks/services/useDelegationService";
 import { useStakingManagerService } from "@/ui/hooks/services/useStakingManagerService";
-import { useDelegationV2State } from "@/ui/state/DelegationV2State";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
@@ -114,11 +112,6 @@ export function DelegationList() {
 
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
-  const { delegationV2StepOptions, setDelegationV2StepOptions } =
-    useDelegationV2State();
-
-  const detailsModalTitle =
-    (delegationV2StepOptions?.type as string) || "Transaction Details";
 
   return (
     <Card>
@@ -159,13 +152,6 @@ export function DelegationList() {
         onSubmit={executeDelegationAction}
         onClose={closeConfirmationModal}
         networkConfig={networkConfig}
-      />
-
-      <SignDetailsModal
-        open={Boolean(delegationV2StepOptions) && processing}
-        onClose={() => setDelegationV2StepOptions(undefined)}
-        details={delegationV2StepOptions}
-        title={detailsModalTitle}
       />
     </Card>
   );
