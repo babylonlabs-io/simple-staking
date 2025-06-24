@@ -50,6 +50,8 @@ interface FinalityProviderBsnState {
   // Modal
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
+  selectedBsnPreviewModalOpen: boolean;
+  setSelectedBsnPreviewModalOpen: (open: boolean) => void;
   handleSort: (sortField: string) => void;
   handleFilter: (key: keyof FilterState, value: string) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
@@ -118,6 +120,8 @@ const defaultState: FinalityProviderBsnState = {
   finalityProviderMap: new Map(),
   stakingModalPage: StakingModalPage.DEFAULT,
   setStakingModalPage: () => {},
+  selectedBsnPreviewModalOpen: false,
+  setSelectedBsnPreviewModalOpen: () => {},
 };
 
 const { StateProvider, useState: useFpBsnState } =
@@ -140,6 +144,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
 
   const [selectedBsnId, setSelectedBsnId] = useState<string | null>(null);
   const [selectedProviderIds, setSelectedProviderIds] = useState<string[]>([]);
+  const [selectedBsnPreviewModalOpen, setSelectedBsnPreviewModalOpen] =
+    useState(false);
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage } =
     useFinalityProvidersV2({
@@ -325,6 +331,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
+      selectedBsnPreviewModalOpen,
+      setSelectedBsnPreviewModalOpen,
       hasBabylonProviderFlag,
       disabledChainIds,
     }),
@@ -352,6 +360,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
+      selectedBsnPreviewModalOpen,
+      setSelectedBsnPreviewModalOpen,
       hasBabylonProviderFlag,
       disabledChainIds,
     ],

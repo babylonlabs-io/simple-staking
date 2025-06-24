@@ -8,6 +8,7 @@ import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelection
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/ui/components/Multistaking/MultistakingForm/FeesSection";
+import { SelectedBsnPreviewModal } from "@/ui/components/Multistaking/SelectedBsnPreviewModal";
 import { Section } from "@/ui/components/Section/Section";
 import { StakingModal } from "@/ui/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
@@ -22,6 +23,7 @@ import {
   StakingStep,
   useStakingState,
 } from "@/ui/state/StakingState";
+import { FinalityProvider } from "@/ui/types/finalityProviders";
 import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
@@ -40,8 +42,15 @@ export function MultistakingForm() {
     errorMessage: geoBlockMessage,
   } = useStakingState();
   const { validationSchema, MAX_FINALITY_PROVIDERS } = useMultistakingState();
-  const { stakingModalPage, setStakingModalPage } =
-    useFinalityProviderBsnState();
+  const {
+    stakingModalPage,
+    setStakingModalPage,
+    selectedBsnPreviewModalOpen,
+    setSelectedBsnPreviewModalOpen,
+    selectedProviderIds,
+    finalityProviderMap,
+    getFinalityProvidersBsns,
+  } = useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -132,6 +141,24 @@ export function MultistakingForm() {
               setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
             }}
             onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+          />
+        </ResponsiveDialog>
+
+        <ResponsiveDialog
+          open={selectedBsnPreviewModalOpen}
+          onClose={() => void setSelectedBsnPreviewModalOpen(false)}
+          className="w-[52rem]"
+        >
+          <SelectedBsnPreviewModal
+            onClose={() => void setSelectedBsnPreviewModalOpen(false)}
+            bsnList={getFinalityProvidersBsns(
+              selectedProviderIds
+                .map((id) => finalityProviderMap.get(id))
+                .filter((fp): fp is FinalityProvider => fp !== undefined),
+            )}
+            finalityProviders={selectedProviderIds
+              .map((id) => finalityProviderMap.get(id))
+              .filter((fp): fp is FinalityProvider => fp !== undefined)}
           />
         </ResponsiveDialog>
 

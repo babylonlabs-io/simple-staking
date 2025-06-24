@@ -1,14 +1,17 @@
 import { Card, Heading } from "@babylonlabs-io/core-ui";
+import { useState } from "react";
 
 import { GridTable, type TableColumn } from "@/ui/components/Common/GridTable";
 import { Hint } from "@/ui/components/Common/Hint";
 import { FinalityProviderMoniker } from "@/ui/components/Delegations/DelegationList/components/FinalityProviderMoniker";
+import { SelectedBsnPreviewModal } from "@/ui/components/Multistaking/SelectedBsnPreviewModal";
 import { getNetworkConfig } from "@/ui/config/network";
 import {
   ActionType,
   useDelegationService,
 } from "@/ui/hooks/services/useDelegationService";
 import { useStakingManagerService } from "@/ui/hooks/services/useStakingManagerService";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
@@ -27,6 +30,7 @@ import { NoDelegations } from "./NoDelegations";
 type TableParams = {
   validations: Record<string, { valid: boolean; error?: string }>;
   handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void;
+  handleBsnClick: (delegation: DelegationWithFP) => void;
   isStakingManagerReady: boolean;
 };
 
@@ -60,7 +64,9 @@ const columnDefinitions = new Map<
       field: "bsn",
       headerName: "BSNs",
       width: "minmax(max-content, 1fr)",
-      renderCell: (row) => <DelegationBsn fps={row.fps} onClick={() => {}} />,
+      renderCell: (row, _, { handleBsnClick }) => (
+        <DelegationBsn fps={row.fps} onClick={() => handleBsnClick(row)} />
+      ),
     },
   ],
   [
@@ -147,6 +153,10 @@ const phase3ColumnOrder = [
 ];
 
 export function DelegationList() {
+  const [bsnPreviewModal, setBsnPreviewModal] = useState<{
+    delegation: DelegationWithFP;
+  } | null>(null);
+
   const {
     processing,
     confirmationModal,
@@ -163,6 +173,16 @@ export function DelegationList() {
 
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
+
+  const { getFinalityProvidersBsns } = useFinalityProviderBsnState();
+
+  const handleBsnClick = (delegation: DelegationWithFP) => {
+    setBsnPreviewModal({ delegation });
+  };
+
+  const closeBsnPreviewModal = () => {
+    setBsnPreviewModal(null);
+  };
 
   const columnOrder = FeatureFlagService.IsPhase3Enabled
     ? phase3ColumnOrder
@@ -197,6 +217,7 @@ export function DelegationList() {
         }}
         params={{
           handleActionClick: openConfirmationModal,
+          handleBsnClick,
           validations,
           isStakingManagerReady,
         }}
@@ -212,6 +233,16 @@ export function DelegationList() {
         onClose={closeConfirmationModal}
         networkConfig={networkConfig}
       />
+
+      {bsnPreviewModal && (
+        <SelectedBsnPreviewModal
+          onClose={closeBsnPreviewModal}
+          bsnList={getFinalityProvidersBsns(
+            bsnPreviewModal.delegation.fps || [],
+          )}
+          finalityProviders={bsnPreviewModal.delegation.fps || []}
+        />
+      )}
     </Card>
   );
 }
