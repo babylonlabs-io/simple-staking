@@ -24,7 +24,8 @@ import { useDelegationStorage } from "../hooks/storage/useDelegationStorage";
 const DELEGATION_V2_CHANNELS = [
   "delegation:stake",
   "delegation:unbond",
-  "delegation:withdraw",
+  // can be used later on if needed
+  // "delegation:withdraw",
 ] as const;
 
 interface DelegationV2State {
@@ -95,8 +96,6 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   useEffect(() => {
     const unsubscribeFns = DELEGATION_V2_CHANNELS.map((channel) =>
       eventBus.on(channel, (options) => {
-        // TODO remove
-        console.log("DelegationV2State: Event received", channel, options);
         setDelegationV2StepOptions(options);
       }),
     );

@@ -8,8 +8,11 @@ import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
+import { useDelegationV2State } from "@/ui/state/DelegationV2State";
 import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { useStakingState } from "@/ui/state/StakingState";
+
+import { SignDetailsModal } from "../../Modals/SignDetailsModal";
 
 const EOI_INDEXES: Record<string, number> = {
   "eoi-staking-slashing": 1,
@@ -39,6 +42,11 @@ export function StakingModal() {
     trigger: revalidateForm,
     setValue: setFieldValue,
   } = useFormContext();
+
+  const { delegationV2StepOptions, setDelegationV2StepOptions } =
+    useDelegationV2State();
+  const detailsModalTitle =
+    (delegationV2StepOptions?.type as string) || "Transaction Details";
 
   const fp = useMemo(
     () => getRegisteredFinalityProvider(formData?.finalityProvider ?? ""),
@@ -112,6 +120,12 @@ export function StakingModal() {
       <CancelFeedbackModal
         open={step === "feedback-cancel"}
         onClose={resetState}
+      />
+      <SignDetailsModal
+        open={Boolean(delegationV2StepOptions) && processing}
+        onClose={() => setDelegationV2StepOptions(undefined)}
+        details={delegationV2StepOptions}
+        title={detailsModalTitle}
       />
     </>
   );

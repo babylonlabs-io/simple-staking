@@ -13,7 +13,7 @@ import { ResponsiveDialog } from "./ResponsiveDialog";
 interface SignDetailsModalProps {
   open: boolean;
   onClose: () => void;
-  details: EventData;
+  details?: EventData;
   title?: string;
 }
 
@@ -23,6 +23,10 @@ export const SignDetailsModal: React.FC<SignDetailsModalProps> = ({
   details,
   title = "Sign Details",
 }) => {
+  if (!details) {
+    return null;
+  }
+
   const capitalizedTitle = title
     .split("-")
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
