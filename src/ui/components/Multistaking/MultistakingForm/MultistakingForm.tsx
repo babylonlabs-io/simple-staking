@@ -44,31 +44,16 @@ export function MultistakingForm() {
     useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
-    (
-      formValues: MultistakingFormFields & {
-        // Field available when Phase-3 multistaking is enabled
-        finalityProviders?: string[];
-      },
-    ) => {
-      // Determine the selected finality provider(s).
-      // 1. Phase-2 (single FP): `finalityProvider` is present.
-      // 2. Phase-3 (multi-FP): use the whole `finalityProviders` array instead of only the first element.
-      const selectedFinalityProvider =
-        formValues.finalityProvider || formValues.finalityProviders || "";
-
-      // Persist form values into global staking state so that the StakingModal
-      // can correctly render the PreviewModal.
+    (formValues: MultistakingFormFields) => {
+      // Persist form values into global staking state
       setFormData({
-        // In Phase-3 we persist the whole array so downstream services can
-        // operate on the complete list of providers.
-        finalityProvider: selectedFinalityProvider,
+        finalityProvider: formValues.finalityProvider,
         term: Number(formValues.term),
         amount: Number(formValues.amount),
         feeRate: Number(formValues.feeRate),
         feeAmount: Number(formValues.feeAmount),
       });
 
-      // Trigger the preview step which in turn opens the StakingModal.
       goToStep(StakingStep.PREVIEW);
     },
     [setFormData, goToStep],
