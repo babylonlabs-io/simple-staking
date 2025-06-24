@@ -95,6 +95,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   useEffect(() => {
     const unsubscribeFns = DELEGATION_V2_CHANNELS.map((channel) =>
       eventBus.on(channel, (options) => {
+        // TODO remove
+        console.log("DelegationV2State: Event received", channel, options);
         setDelegationV2StepOptions(options);
       }),
     );
