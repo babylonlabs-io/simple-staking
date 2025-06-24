@@ -27,7 +27,6 @@ import {
 import { getIntermediateDelegationsLocalStorageKey } from "@/ui/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/ui/utils/local_storage/toLocalStorageIntermediateDelegation";
 
-import { SignDetailsModal } from "../Modals/SignDetailsModal";
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";
 
@@ -75,8 +74,7 @@ export const Delegations = () => {
     isLoading,
   } = useDelegationState();
 
-  const { delegationStepOptions, setDelegationStepOptions } =
-    useDelegationState();
+  const { setDelegationStepOptions } = useDelegationState();
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
@@ -364,9 +362,6 @@ export const Delegations = () => {
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
-  const detailsModalTitle =
-    (delegationStepOptions?.type as string) || "Transaction Details";
-
   return (
     <>
       {combinedDelegationsData.length !== 0 && (
@@ -485,15 +480,6 @@ export const Delegations = () => {
         open={step === "registration-verified"}
         onClose={handleCloseRegistration}
       />
-
-      {delegationStepOptions && (processing || awaitingWalletResponse) && (
-        <SignDetailsModal
-          open={Boolean(delegationStepOptions)}
-          onClose={() => setDelegationStepOptions(undefined)}
-          details={delegationStepOptions}
-          title={detailsModalTitle}
-        />
-      )}
     </>
   );
 };
