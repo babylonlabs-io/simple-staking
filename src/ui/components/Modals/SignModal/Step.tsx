@@ -1,4 +1,10 @@
-import { Loader, Text } from "@babylonlabs-io/core-ui";
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Loader,
+  Text,
+} from "@babylonlabs-io/core-ui";
 import { useState, type PropsWithChildren, type ReactNode } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { IoCheckmarkSharp } from "react-icons/io5";
@@ -48,51 +54,57 @@ export const Step = ({
   children,
   shouldShowDetails,
 }: PropsWithChildren<StepProps>) => {
-  const [showDetails, setShowDetails] = useState(false);
   const { stakingStepOptions } = useStakingState();
   const { delegationStepOptions } = useDelegationState();
+  const [expanded, setExpanded] = useState(false);
 
   // use either stakingStepOptions or delegationStepOptions
   // base on phase-1 or phase-2
   const stepOptions = stakingStepOptions || delegationStepOptions;
+  const showAccordion =
+    shouldShowDetails && step === currentStep && stepOptions;
 
   return (
     <div className="flex flex-col w-full border border-secondary-strokeLight rounded bg-surface">
-      <div
-        className={twMerge(
-          "p-4 flex flex-row items-center justify-between gap-3 self-stretch",
-          step !== currentStep && "opacity-25",
-        )}
-      >
-        <div className="flex flex-row items-center gap-3">
-          {renderIcon(step, currentStep)}
-          <Text variant="body1" className="text-accent-primary">
-            Step {step}: {children}
-          </Text>
-        </div>
-
-        {shouldShowDetails && step === currentStep && stepOptions && (
-          <button
-            className={twMerge(
-              "border border-secondary-strokeLight flex justify-center items-center rounded bg-surface px-4 py-2 gap-1 hover:text-secondary-main cursor-pointer",
-            )}
-            onClick={() => step === currentStep && setShowDetails(!showDetails)}
+      {showAccordion ? (
+        <Accordion
+          expanded={expanded}
+          onChange={() => step === currentStep && setExpanded(!expanded)}
+        >
+          <AccordionSummary
+            className="p-4 mr-4"
+            renderIcon={() =>
+              expanded ? (
+                <AiOutlineMinus size={16} />
+              ) : (
+                <AiOutlinePlus size={16} />
+              )
+            }
           >
-            <div className="hidden md:flex">
-              <Text variant="body2">Details</Text>
+            <div className="flex flex-row items-center gap-3">
+              {renderIcon(step, currentStep)}
+              <Text variant="body1" className="text-accent-primary">
+                Step {step}: {children}
+              </Text>
             </div>
-            {showDetails && step === currentStep ? (
-              <AiOutlineMinus size={16} />
-            ) : (
-              <AiOutlinePlus size={16} />
-            )}
-          </button>
-        )}
-      </div>
-
-      {showDetails && stepOptions && step === currentStep && (
-        <div className="border border-secondary-strokeLight p-4 mx-4 mb-4 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4">
-          <SignDetails details={stepOptions} />
+          </AccordionSummary>
+          <AccordionDetails className="border border-secondary-strokeLight p-4 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4">
+            <SignDetails details={stepOptions} />
+          </AccordionDetails>
+        </Accordion>
+      ) : (
+        <div
+          className={twMerge(
+            "p-4 flex flex-row items-center justify-between gap-3 self-stretch",
+            step !== currentStep && "opacity-25",
+          )}
+        >
+          <div className="flex flex-row items-center gap-3">
+            {renderIcon(step, currentStep)}
+            <Text variant="body1" className="text-accent-primary">
+              Step {step}: {children}
+            </Text>
+          </div>
         </div>
       )}
     </div>
