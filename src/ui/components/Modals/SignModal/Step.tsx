@@ -4,6 +4,7 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";
 
+import { useDelegationState } from "@/ui/state/DelegationState";
 import { useStakingState } from "@/ui/state/StakingState";
 
 import { SignDetails } from "../../SignDetails/SignDetails";
@@ -49,6 +50,11 @@ export const Step = ({
 }: PropsWithChildren<StepProps>) => {
   const [showDetails, setShowDetails] = useState(false);
   const { stakingStepOptions } = useStakingState();
+  const { delegationStepOptions } = useDelegationState();
+
+  // use either stakingStepOptions or delegationStepOptions
+  // base on phase-1 or phase-2
+  const stepOptions = stakingStepOptions || delegationStepOptions;
 
   return (
     <div className="flex flex-col w-full border border-secondary-strokeLight rounded bg-surface">
@@ -65,7 +71,7 @@ export const Step = ({
           </Text>
         </div>
 
-        {shouldShowDetails && step === currentStep && stakingStepOptions && (
+        {shouldShowDetails && step === currentStep && stepOptions && (
           <button
             className={twMerge(
               "border border-secondary-strokeLight flex justify-center items-center rounded bg-surface px-4 py-2 gap-1 hover:text-secondary-main cursor-pointer",
@@ -84,9 +90,9 @@ export const Step = ({
         )}
       </div>
 
-      {showDetails && stakingStepOptions && step === currentStep && (
+      {showDetails && stepOptions && step === currentStep && (
         <div className="border border-secondary-strokeLight p-4 mx-4 mb-4 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4">
-          <SignDetails details={stakingStepOptions} />
+          <SignDetails details={stepOptions} />
         </div>
       )}
     </div>
