@@ -142,6 +142,7 @@ export function DelegationState({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribe = eventBus.on("delegation:register", (options) => {
+      // TODO remove
       console.log("DelegationState: delegation:register", options);
       const type = options?.type as RegistrationStep | undefined;
 
