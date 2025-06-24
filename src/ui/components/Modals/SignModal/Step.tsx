@@ -88,10 +88,7 @@ export const Step = ({
               </Text>
             </div>
           </AccordionSummary>
-          <AccordionDetails
-            wrapperClassName={twMerge(expanded ? "p-4" : "p-0")}
-            className="border border-secondary-strokeLight p-4 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4"
-          >
+          <AccordionDetails className="max-h-60">
             <SignDetails details={stepOptions} />
           </AccordionDetails>
         </Accordion>

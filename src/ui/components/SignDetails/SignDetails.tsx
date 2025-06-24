@@ -117,12 +117,19 @@ const getOrderedKeys = (details: EventData): string[] => {
 };
 
 export const SignDetails: React.FC<SignDetailsProps> = ({ details }) => {
-  return getOrderedKeys(details).map((key) => (
-    <div key={key} className="flex justify-between items-start gap-2">
-      <Text variant="body2" className="text-accent-secondary whitespace-nowrap">
-        {formatDisplayKey(key)}:
-      </Text>
-      {formatDisplayValue(key, details[key])}
+  return (
+    <div className="border flex flex-1 flex-col border-secondary-strokeLight p-4 bg-primary-contrast/50 rounded overflow-y-auto gap-4 m-4">
+      {getOrderedKeys(details).map((key) => (
+        <div key={key} className="flex justify-between items-start gap-2">
+          <Text
+            variant="body2"
+            className="text-accent-secondary whitespace-nowrap"
+          >
+            {formatDisplayKey(key)}:
+          </Text>
+          {formatDisplayValue(key, details[key])}
+        </div>
+      ))}
     </div>
-  ));
+  );
 };
