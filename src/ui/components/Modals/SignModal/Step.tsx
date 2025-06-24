@@ -89,7 +89,9 @@ export const Step = ({
             </div>
           </AccordionSummary>
           <AccordionDetails className="max-h-60">
-            <SignDetails details={stepOptions} />
+            <div className="border flex flex-1 flex-col border-secondary-strokeLight p-4 bg-primary-contrast/50 rounded overflow-y-auto gap-4 m-4">
+              <SignDetails details={stepOptions} />
+            </div>
           </AccordionDetails>
         </Accordion>
       ) : (
