@@ -2,7 +2,7 @@ import { useFormContext } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/ui/components/Modals/CancelFeedbackModal";
-import { PreviewModal } from "@/ui/components/Modals/PreviewModal";
+import { PreviewMultistakingModal } from "@/ui/components/Modals/PreviewMultistakingModal";
 import { SignModal } from "@/ui/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModal";
@@ -10,6 +10,7 @@ import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { useStakingState } from "@/ui/state/StakingState";
+import { trim } from "@/ui/utils/trim";
 
 const EOI_INDEXES: Record<string, number> = {
   "eoi-staking-slashing": 1,
@@ -23,7 +24,7 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   verifying: 2,
 };
 
-export function StakingModal() {
+export function MultistakingModal() {
   const {
     processing,
     step,
@@ -32,40 +33,49 @@ export function StakingModal() {
     verifiedDelegation,
     reset: resetState,
   } = useStakingState();
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
+
+  const { getRegisteredFinalityProvider, selectedProviderIds } =
+    useFinalityProviderBsnState();
+
   const { createEOI, stakeDelegation } = useStakingService();
+
   const {
     reset: resetForm,
     trigger: revalidateForm,
     setValue: setFieldValue,
   } = useFormContext();
 
-  const fp = useMemo(() => {
-    if (!formData) return null;
-    return typeof formData.finalityProvider === "string"
-      ? getRegisteredFinalityProvider(formData.finalityProvider)
-      : null;
-  }, [formData, getRegisteredFinalityProvider]);
+  // Build provider info list for preview
+  const providerInfos = useMemo(() => {
+    return selectedProviderIds
+      .map((pk) => {
+        const provider = getRegisteredFinalityProvider(pk);
+        if (!provider) return null;
+        return {
+          name: provider.description?.moniker || trim(pk, 8),
+          avatar: provider.description?.identity,
+        };
+      })
+      .filter(Boolean) as { name: string; avatar?: string }[];
+  }, [selectedProviderIds, getRegisteredFinalityProvider]);
 
-  if (!step) {
-    return null;
-  }
+  if (!step) return null;
 
   return (
     <>
-      {step === "preview" && formData && fp && stakingInfo && (
-        <PreviewModal
+      {step === "preview" && stakingInfo && (
+        <PreviewMultistakingModal
           open
           processing={processing}
-          finalityProvider={fp.description.moniker}
-          finalityProviderAvatar={fp.description.identity}
-          stakingAmountSat={formData.amount}
-          stakingTimelock={formData.term}
-          stakingFeeSat={formData.feeAmount}
-          feeRate={formData.feeRate}
+          providers={providerInfos}
+          stakingAmountSat={formData?.amount ?? 0}
+          stakingTimelock={formData?.term ?? 0}
+          stakingFeeSat={formData?.feeAmount ?? 0}
+          feeRate={formData?.feeRate ?? 0}
           unbondingFeeSat={stakingInfo.unbondingFeeSat}
           onClose={resetState}
           onSign={async () => {
+            if (!formData) return;
             await createEOI(formData);
             resetForm({
               finalityProvider: "",
@@ -84,6 +94,7 @@ export function StakingModal() {
           }}
         />
       )}
+
       {Boolean(EOI_INDEXES[step]) && (
         <SignModal
           open
@@ -92,6 +103,7 @@ export function StakingModal() {
           title="Staking"
         />
       )}
+
       {Boolean(VERIFICATION_STEPS[step]) && (
         <VerificationModal
           open
@@ -99,6 +111,7 @@ export function StakingModal() {
           step={VERIFICATION_STEPS[step]}
         />
       )}
+
       {verifiedDelegation && (
         <StakeModal
           open={step === "verified"}
@@ -107,6 +120,7 @@ export function StakingModal() {
           onClose={resetState}
         />
       )}
+
       <SuccessFeedbackModal
         open={step === "feedback-success"}
         onClose={resetState}

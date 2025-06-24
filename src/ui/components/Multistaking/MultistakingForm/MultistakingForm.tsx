@@ -8,8 +8,8 @@ import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelection
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/ui/components/Multistaking/MultistakingForm/FeesSection";
+import { MultistakingModal } from "@/ui/components/Multistaking/MultistakingModal/MultistakingModal";
 import { Section } from "@/ui/components/Section/Section";
-import { StakingModal } from "@/ui/components/Staking/StakingModal";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
@@ -44,16 +44,31 @@ export function MultistakingForm() {
     useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
-    (formValues: MultistakingFormFields) => {
-      // Persist form values into global staking state
+    (
+      formValues: MultistakingFormFields & {
+        // Field available when Phase-3 multistaking is enabled
+        finalityProviders?: string[];
+      },
+    ) => {
+      // Determine the selected finality provider(s).
+      // 1. Phase-2 (single FP): `finalityProvider` is present.
+      // 2. Phase-3 (multi-FP): use the whole `finalityProviders` array instead of only the first element.
+      const selectedFinalityProvider =
+        formValues.finalityProvider || formValues.finalityProviders || "";
+
+      // Persist form values into global staking state so that the StakingModal
+      // can correctly render the PreviewModal.
       setFormData({
-        finalityProvider: formValues.finalityProvider,
+        // In Phase-3 we persist the whole array so downstream services can
+        // operate on the complete list of providers.
+        finalityProvider: selectedFinalityProvider,
         term: Number(formValues.term),
         amount: Number(formValues.amount),
         feeRate: Number(formValues.feeRate),
         feeAmount: Number(formValues.feeAmount),
       });
 
+      // Trigger the preview step which in turn opens the StakingModal.
       goToStep(StakingStep.PREVIEW);
     },
     [setFormData, goToStep],
@@ -135,7 +150,7 @@ export function MultistakingForm() {
           />
         </ResponsiveDialog>
 
-        <StakingModal />
+        <MultistakingModal />
       </Form>
     </Section>
   );

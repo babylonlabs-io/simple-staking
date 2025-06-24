@@ -41,7 +41,7 @@ export enum StakingModalPage {
 const { coinName } = getNetworkConfigBTC();
 
 export interface FormFields {
-  finalityProvider: string;
+  finalityProvider: string | string[];
   amount: number;
   term: number;
   feeRate: number;

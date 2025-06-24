@@ -9,6 +9,7 @@ import { ClientError } from "@/ui/errors";
 import { ERROR_CODES } from "@/ui/errors/codes";
 import { useLogger } from "@/ui/hooks/useLogger";
 import { useDelegationV2State } from "@/ui/state/DelegationV2State";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import {
   StakingStep,
   useStakingState,
@@ -37,6 +38,7 @@ export function useStakingService() {
   const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
   const logger = useLogger();
+  const { selectedProviderIds } = useFinalityProviderBsnState();
 
   const calculateFeeAmount = ({
     finalityProvider,
@@ -45,14 +47,26 @@ export function useStakingService() {
     feeRate,
   }: Omit<FormFields, "feeAmount">) => {
     logger.info("Calculating fee amount for EOI", {
-      finalityProvider,
+      finalityProvider: Array.isArray(finalityProvider)
+        ? finalityProvider.join(",")
+        : finalityProvider,
       amount,
       term,
       feeRate,
     });
+    // Determine list of finality-provider public keys to be used when
+    // calculating the staking-fee. Priority order:
+    // 1. Providers selected in the multistaking flow (selectedProviderIds)
+    // 2. Providers coming from the form (can be a single pk or an array)
+    const fpList =
+      selectedProviderIds.length > 0
+        ? selectedProviderIds
+        : Array.isArray(finalityProvider)
+          ? finalityProvider
+          : [finalityProvider];
+
     const eoiInput = {
-      // TODO: To be replaced by multiple FPs
-      finalityProviderPksNoCoordHex: [finalityProvider],
+      finalityProviderPksNoCoordHex: fpList,
       stakingAmountSat: btcToSatoshi(amount),
       stakingTimelock: term,
       feeRate: feeRate,
@@ -73,15 +87,24 @@ export function useStakingService() {
   const createEOI = useCallback(
     async ({ finalityProvider, amount, term, feeRate }: FormFields) => {
       logger.info("Starting EOI creation process", {
-        finalityProvider,
+        finalityProvider: Array.isArray(finalityProvider)
+          ? finalityProvider.join(",")
+          : finalityProvider,
         amount,
         term,
         feeRate,
       });
       try {
+        // Build the list of finality-provider public keys that will be part of the EOI.
+        const fpList =
+          selectedProviderIds.length > 0
+            ? selectedProviderIds
+            : Array.isArray(finalityProvider)
+              ? finalityProvider
+              : [finalityProvider];
+
         const eoiInput = {
-          // TODO: To be replaced by multiple FPs
-          finalityProviderPksNoCoordHex: [finalityProvider],
+          finalityProviderPksNoCoordHex: fpList,
           stakingAmountSat: amount,
           stakingTimelock: term,
           feeRate: feeRate,
@@ -150,6 +173,7 @@ export function useStakingService() {
       btcAddress,
       bech32Address,
       logger,
+      selectedProviderIds,
     ],
   );
 
