@@ -54,11 +54,9 @@ export const Step = ({
   shouldShowDetails,
   options,
 }: PropsWithChildren<StepProps>) => {
-  const showAccordion = shouldShowDetails && step === currentStep && options;
-
   return (
     <div className="flex flex-col w-full border border-secondary-strokeLight rounded bg-surface">
-      {showAccordion ? (
+      {shouldShowDetails ? (
         <Accordion disabled={step !== currentStep}>
           <AccordionSummary
             className="p-4 mr-4"

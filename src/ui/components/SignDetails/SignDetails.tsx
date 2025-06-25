@@ -10,7 +10,7 @@ import { maxDecimals } from "@/ui/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/ui/utils/time";
 
 interface SignDetailsProps {
-  details: EventData;
+  details?: EventData;
   shouldHaveMargin?: boolean;
 }
 
@@ -122,6 +122,10 @@ export const SignDetails: React.FC<SignDetailsProps> = ({
   details,
   shouldHaveMargin,
 }) => {
+  if (!details || Object.keys(details).length === 0) {
+    return null;
+  }
+
   return (
     <div
       className={twMerge(
