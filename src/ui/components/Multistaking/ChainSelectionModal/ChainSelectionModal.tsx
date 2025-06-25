@@ -12,6 +12,7 @@ import { twMerge } from "tailwind-merge";
 
 import { getBSNs } from "@/ui/api/getBsn";
 import { chainLogos } from "@/ui/constants";
+import { useLogger } from "@/ui/hooks/useLogger";
 
 const SubSection = ({
   children,
@@ -91,11 +92,23 @@ export const ChainSelectionModal = ({
   disabledChainIds?: string[];
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
+  const logger = useLogger();
 
   const { data: bsns, isLoading } = useQuery({
     queryKey: ["API_BSN_LIST"],
     queryFn: getBSNs,
   });
+
+  const handleChainSelection = (bsnId: string) => {
+    logger.info("Chain selected", { bsnId, isBabylonGenesis: bsnId === "" });
+    setSelected(bsnId);
+  };
+
+  const handleNext = () => {
+    if (selected !== null) {
+      onNext(selected);
+    }
+  };
 
   return (
     <>
@@ -131,7 +144,7 @@ export const ChainSelectionModal = ({
                 title={bsn.name}
                 selected={selected === bsn.id}
                 disabled={isDisabled}
-                onClick={() => !isDisabled && setSelected(bsn.id)}
+                onClick={() => !isDisabled && handleChainSelection(bsn.id)}
               />
             );
           })}
@@ -152,7 +165,7 @@ export const ChainSelectionModal = ({
       <DialogFooter className="flex justify-end">
         <Button
           variant="contained"
-          onClick={() => selected !== null && onNext(selected)}
+          onClick={handleNext}
           disabled={selected === null}
         >
           Next

@@ -22,6 +22,7 @@ interface Params {
   sortBy?: string;
   order?: "asc" | "desc";
   bsnId?: string;
+  enabled?: boolean;
 }
 
 export function useFinalityProvidersV2({
@@ -30,6 +31,7 @@ export function useFinalityProvidersV2({
   order,
   name,
   bsnId,
+  enabled = false,
 }: Params = {}) {
   const { isOpen, handleError } = useError();
   const logger = useLogger();
@@ -50,6 +52,7 @@ export function useFinalityProvidersV2({
         ? lastPage?.pagination?.next_key
         : null,
     initialPageParam: "",
+    enabled,
     refetchInterval: ONE_MINUTE,
     placeholderData: (prev) => prev,
     select: (data) => {

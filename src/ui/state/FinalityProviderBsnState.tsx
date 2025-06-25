@@ -5,6 +5,7 @@ import { useSearchParams } from "@/ui/context/SearchParamsProvider";
 import { useBsn } from "@/ui/hooks/client/api/useBsn";
 import { useFinalityProviders } from "@/ui/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/hooks/client/api/useFinalityProvidersV2";
+import { useLogger } from "@/ui/hooks/useLogger";
 import { StakingModalPage } from "@/ui/state/StakingState";
 import { Bsn } from "@/ui/types/bsn";
 import {
@@ -120,6 +121,8 @@ const { StateProvider, useState: useFpBsnState } =
 export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
+  const logger = useLogger();
+
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
@@ -134,12 +137,40 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const [selectedBsnId, setSelectedBsnId] = useState<string | null>(null);
   const [selectedProviderIds, setSelectedProviderIds] = useState<string[]>([]);
 
+  // Log BSN selection changes
+  const handleSetSelectedBsnId = useCallback(
+    (id: string | null) => {
+      logger.info("BSN selected", {
+        bsnId: id ?? "null",
+        isBabylonGenesis: id === "",
+      });
+      setSelectedBsnId(id);
+    },
+    [logger],
+  );
+
+  // Fix: Properly handle empty string BSN ID for Babylon Genesis
+  // When selectedBsnId is "", we should pass it to the API, not undefined
+  const selectedBsnIdForApi = useMemo(() => {
+    if (selectedBsnId === null || selectedBsnId === undefined) {
+      return undefined;
+    }
+    // For Babylon Genesis (empty string), we want to explicitly filter by empty string
+    return selectedBsnId;
+  }, [selectedBsnId]);
+
+  // Determine when to enable the finality providers query
+  const shouldEnableQuery =
+    stakingModalPage === StakingModalPage.CHAIN_SELECTION ||
+    selectedBsnId !== null;
+
   const { data, isFetching, isError, hasNextPage, fetchNextPage } =
     useFinalityProvidersV2({
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      bsnId: selectedBsnId === "" ? undefined : selectedBsnId?.toString(),
+      bsnId: selectedBsnIdForApi,
+      enabled: shouldEnableQuery,
     });
 
   const { data: dataV1 } = useFinalityProviders();
@@ -152,11 +183,17 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   });
 
   const finalityProviders = useMemo(() => {
-    if (!data?.finalityProviders) return [];
+    if (!data?.finalityProviders) {
+      return [];
+    }
 
     const filteredByBsn = (data.finalityProviders ?? []).filter((fp) => {
-      if (selectedBsnId === null || selectedBsnId === undefined) return true;
+      // No BSN selected - show all providers
+      if (selectedBsnId === null || selectedBsnId === undefined) {
+        return true;
+      }
 
+      // Special case for Babylon Genesis (empty string BSN ID)
       if (selectedBsnId === "") {
         return (fp.bsnId ?? "") === "";
       }
@@ -295,7 +332,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       hasNextPage,
       fetchNextPage,
       selectedBsnId,
-      setSelectedBsnId,
+      setSelectedBsnId: handleSetSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
       isFetching,
@@ -320,7 +357,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       hasNextPage,
       fetchNextPage,
       selectedBsnId,
-      setSelectedBsnId,
+      handleSetSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
       isFetching,

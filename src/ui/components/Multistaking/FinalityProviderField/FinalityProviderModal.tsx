@@ -26,7 +26,6 @@ export const FinalityProviderModal = ({
   onBack,
 }: Props) => {
   const [selectedFP, setSelectedFp] = useState(defaultFinalityProvider);
-
   const { selectedBsnId, bsnList } = useFinalityProviderBsnState();
 
   const chainName = useMemo(() => {
@@ -40,6 +39,11 @@ export const FinalityProviderModal = ({
   const handleClose = () => {
     onClose();
     setSelectedFp("");
+  };
+
+  const handleAdd = () => {
+    onAdd(selectedFP);
+    handleClose();
   };
 
   return (
@@ -73,14 +77,7 @@ export const FinalityProviderModal = ({
         ) : (
           <div />
         )}
-        <Button
-          variant="contained"
-          onClick={() => {
-            onAdd(selectedFP);
-            handleClose();
-          }}
-          disabled={!selectedFP}
-        >
+        <Button variant="contained" onClick={handleAdd} disabled={!selectedFP}>
           Add
         </Button>
       </DialogFooter>

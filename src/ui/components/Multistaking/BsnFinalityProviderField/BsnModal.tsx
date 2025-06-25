@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderModal";
+import { useLogger } from "@/ui/hooks/useLogger";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 interface Props {
@@ -19,6 +20,7 @@ enum BsnModalPage {
 
 export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
   const [page, setPage] = useState<BsnModalPage>(BsnModalPage.CHAIN);
+  const logger = useLogger();
 
   const {
     setSelectedBsnId,
@@ -38,11 +40,15 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
   };
 
   const handleChainNext = (chainId: string) => {
+    logger.info("Proceeding to FP selection", { chainId });
     setSelectedBsnId(chainId);
     setPage(BsnModalPage.FP);
   };
 
   const handleProviderAdd = (providerPk: string) => {
+    logger.info("FP selected", {
+      providerPk: providerPk.substring(0, 8) + "...",
+    });
     onAdd(providerPk);
   };
 
