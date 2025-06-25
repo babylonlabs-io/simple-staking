@@ -2,6 +2,7 @@ import type {
   RegistrationStep,
   SignPsbtOptions,
 } from "@babylonlabs-io/btc-staking-ts";
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -93,10 +94,11 @@ export interface StakingState {
     title: string;
     message: string;
   };
-  currentStakingStepOptions: SignPsbtOptions | undefined;
+  stakingStepOptions: EventData | undefined;
+  setStakingStepOptions?: (options?: EventData) => void;
 }
 
-const STAKING_SIGNING_STEP_MAP: Record<RegistrationStep, StakingStep> = {
+export const STAKING_SIGNING_STEP_MAP: Record<RegistrationStep, StakingStep> = {
   "staking-slashing": StakingStep.EOI_STAKING_SLASHING,
   "unbonding-slashing": StakingStep.EOI_UNBONDING_SLASHING,
   "proof-of-possession": StakingStep.EOI_PROOF_OF_POSSESSION,
@@ -137,13 +139,13 @@ const { StateProvider, useState: useStakingState } =
     setFormData: () => {},
     setProcessing: () => {},
     reset: () => {},
-    currentStakingStepOptions: undefined,
+    stakingStepOptions: undefined,
+    setStakingStepOptions: () => {},
   });
 
 export function StakingState({ children }: PropsWithChildren) {
   const [currentStep, setCurrentStep] = useState<StakingStep>();
-  const [currentStakingStepOptions, setCurrentStakingStepOptions] =
-    useState<SignPsbtOptions>();
+  const [stakingStepOptions, setStakingStepOptions] = useState<EventData>();
 
   const [formData, setFormData] = useState<FormFields>();
   const [processing, setProcessing] = useState(false);
@@ -354,28 +356,29 @@ export function StakingState({ children }: PropsWithChildren) {
     setVerifiedDelegation(undefined);
     setFormData(undefined);
     setCurrentStep(undefined);
-    setCurrentStakingStepOptions(undefined);
+    setStakingStepOptions(undefined);
     setProcessing(false);
   }, [
     setVerifiedDelegation,
     setFormData,
     setCurrentStep,
     setProcessing,
-    setCurrentStakingStepOptions,
+    setStakingStepOptions,
   ]);
 
   useEffect(() => {
-    const unsubscribe = eventBus.on("delegation:create", (step, options) => {
-      const stepName = STAKING_SIGNING_STEP_MAP[step];
+    const unsubscribe = eventBus.on("delegation:create", (options) => {
+      const type = options?.type as RegistrationStep | undefined;
 
-      if (stepName) {
+      if (type) {
+        const stepName = STAKING_SIGNING_STEP_MAP[type];
         setCurrentStep(stepName);
-        setCurrentStakingStepOptions(options);
+        setStakingStepOptions(options);
       }
     });
 
     return unsubscribe;
-  }, [eventBus, setCurrentStep, setCurrentStakingStepOptions]);
+  }, [eventBus, setCurrentStep, setStakingStepOptions]);
 
   const context = useMemo(
     () => ({
@@ -396,7 +399,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      currentStakingStepOptions,
+      stakingStepOptions,
+      setStakingStepOptions,
     }),
     [
       hasError,
@@ -414,7 +418,8 @@ export function StakingState({ children }: PropsWithChildren) {
       goToStep,
       setProcessing,
       reset,
-      currentStakingStepOptions,
+      stakingStepOptions,
+      setStakingStepOptions,
     ],
   );
 
