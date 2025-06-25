@@ -34,6 +34,7 @@ export function StakingModal() {
     stakingInfo,
     verifiedDelegation,
     reset: resetState,
+    stakingStepOptions,
   } = useStakingState();
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
@@ -101,6 +102,7 @@ export function StakingModal() {
           processing={processing}
           step={EOI_INDEXES[step]}
           title="Staking"
+          options={stakingStepOptions}
         />
       )}
       {Boolean(VERIFICATION_STEPS[step]) && (

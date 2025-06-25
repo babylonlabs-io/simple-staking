@@ -1,3 +1,4 @@
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   Accordion,
   AccordionDetails,
@@ -10,9 +11,6 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";
 
-import { useDelegationState } from "@/ui/state/DelegationState";
-import { useStakingState } from "@/ui/state/StakingState";
-
 import { SignDetails } from "../../SignDetails/SignDetails";
 
 interface StepProps {
@@ -20,6 +18,7 @@ interface StepProps {
   currentStep: number;
   children: ReactNode;
   shouldShowDetails?: boolean;
+  options?: EventData;
 }
 
 const renderIcon = (step: number, currentStep: number) => {
@@ -53,16 +52,9 @@ export const Step = ({
   currentStep,
   children,
   shouldShowDetails,
+  options,
 }: PropsWithChildren<StepProps>) => {
-  const { stakingStepOptions } = useStakingState();
-  const { delegationStepOptions } = useDelegationState();
-
-  // use either stakingStepOptions or delegationStepOptions
-  // base on phase-1 or phase-2
-  // TODO as a prop
-  const stepOptions = stakingStepOptions || delegationStepOptions;
-  const showAccordion =
-    shouldShowDetails && step === currentStep && stepOptions;
+  const showAccordion = shouldShowDetails && step === currentStep && options;
 
   return (
     <div className="flex flex-col w-full border border-secondary-strokeLight rounded bg-surface">
@@ -86,7 +78,7 @@ export const Step = ({
             </div>
           </AccordionSummary>
           <AccordionDetails className="max-h-60">
-            <SignDetails details={stepOptions} shouldHaveMargin />
+            <SignDetails details={options} shouldHaveMargin />
           </AccordionDetails>
         </Accordion>
       ) : (

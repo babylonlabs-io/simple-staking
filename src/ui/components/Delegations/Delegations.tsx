@@ -65,6 +65,7 @@ export const Delegations = () => {
     setRegistrationStep: setStep,
     setSelectedDelegation,
     resetRegistration: handleCloseRegistration,
+    delegationStepOptions,
   } = useDelegationState();
   const { registerPhase1Delegation } = useRegistrationService();
   const {
@@ -465,6 +466,7 @@ export const Delegations = () => {
           title="Transition to Phase 2"
           step={REGISTRATION_INDEXES[step]}
           processing={processing}
+          options={delegationStepOptions}
         />
       )}
 
