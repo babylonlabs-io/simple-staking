@@ -23,7 +23,7 @@ import { StakingModalPage, useStakingState } from "./StakingState";
 const { coinName } = getNetworkConfigBTC();
 
 export interface MultistakingFormFields {
-  finalityProvider: string;
+  finalityProviders: string[];
   amount: number;
   term: number;
   feeRate: number;
@@ -39,7 +39,7 @@ interface FieldOptions {
 export interface MultistakingState {
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
-  MAX_FINALITY_PROVIDERS: number;
+  maxFinalityProviders: number;
   validationSchema?: ObjectSchema<MultistakingFormFields>;
   formFields: FieldOptions[];
 }
@@ -48,7 +48,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    MAX_FINALITY_PROVIDERS: 3,
+    maxFinalityProviders: 3,
     validationSchema: undefined,
     formFields: [],
   });
@@ -58,7 +58,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
     StakingModalPage.DEFAULT,
   );
   const { data: networkInfo } = useNetworkInfo();
-  const MAX_FINALITY_PROVIDERS = networkInfo?.params.maxBsnFpProviders ?? 3;
+  const maxFinalityProviders = networkInfo?.params.maxBsnFpProviders ?? 3;
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
   const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
@@ -83,8 +83,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
                 ) ?? false,
             )
             .max(
-              MAX_FINALITY_PROVIDERS,
-              `Maximum ${MAX_FINALITY_PROVIDERS} finality providers allowed.`,
+              maxFinalityProviders,
+              `Maximum ${maxFinalityProviders} finality providers allowed.`,
             ),
         },
         {
@@ -166,7 +166,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
       stakingInfo,
       stakableBtcBalance,
       getRegisteredFinalityProvider,
-      MAX_FINALITY_PROVIDERS,
+      maxFinalityProviders,
     ],
   );
 
@@ -185,14 +185,14 @@ export function MultistakingState({ children }: PropsWithChildren) {
     () => ({
       stakingModalPage,
       setStakingModalPage,
-      MAX_FINALITY_PROVIDERS,
+      maxFinalityProviders,
       validationSchema,
       formFields,
     }),
     [
       stakingModalPage,
       setStakingModalPage,
-      MAX_FINALITY_PROVIDERS,
+      maxFinalityProviders,
       validationSchema,
       formFields,
     ],

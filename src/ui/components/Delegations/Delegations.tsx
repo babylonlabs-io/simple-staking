@@ -65,6 +65,7 @@ export const Delegations = () => {
     setRegistrationStep: setStep,
     setSelectedDelegation,
     resetRegistration: handleCloseRegistration,
+    delegationStepOptions,
   } = useDelegationState();
   const { registerPhase1Delegation } = useRegistrationService();
   const {
@@ -73,6 +74,8 @@ export const Delegations = () => {
     hasMoreDelegations,
     isLoading,
   } = useDelegationState();
+
+  const { setDelegationStepOptions } = useDelegationState();
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
@@ -197,10 +200,7 @@ export const Delegations = () => {
         error,
       });
     } finally {
-      setModalOpen(false);
-      setTxID("");
-      setModalMode(undefined);
-      setAwaitingWalletResponse(false);
+      handleModalClose();
     }
   };
 
@@ -253,10 +253,7 @@ export const Delegations = () => {
         },
       });
     } finally {
-      setModalOpen(false);
-      setTxID("");
-      setModalMode(undefined);
-      setAwaitingWalletResponse(false);
+      handleModalClose();
     }
   };
 
@@ -264,6 +261,16 @@ export const Delegations = () => {
     setModalOpen(true);
     setTxID(txID);
     setModalMode(mode);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setTxID("");
+    setModalMode(undefined);
+    setAwaitingWalletResponse(false);
+    setDelegationStepOptions(undefined);
+    setSelectedDelegation(undefined);
+    setStep(undefined);
   };
 
   useEffect(() => {
@@ -355,6 +362,7 @@ export const Delegations = () => {
     ? [...delegations, ...delegationsAPI.delegations]
     : // if no API data, fallback to using only local storage delegations
       delegations;
+
   return (
     <>
       {combinedDelegationsData.length !== 0 && (
@@ -427,7 +435,7 @@ export const Delegations = () => {
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
         <WithdrawModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleModalClose}
           onSubmit={() => {
             handleWithdraw(txID);
           }}
@@ -437,7 +445,7 @@ export const Delegations = () => {
       {modalMode === MODE_UNBOND && (
         <UnbondModal
           open={modalOpen}
-          onClose={() => setModalOpen(false)}
+          onClose={handleModalClose}
           onSubmit={() => {
             handleUnbond(txID);
           }}
@@ -458,6 +466,7 @@ export const Delegations = () => {
           title="Transition to Phase 2"
           step={REGISTRATION_INDEXES[step]}
           processing={processing}
+          options={delegationStepOptions}
         />
       )}
 

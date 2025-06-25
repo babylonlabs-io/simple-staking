@@ -1,3 +1,4 @@
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   Button,
   DialogBody,
@@ -20,6 +21,7 @@ interface SignModalProps {
   step: number;
   onClose?: () => void;
   onSubmit?: () => void;
+  options?: EventData;
 }
 
 const { coinSymbol } = getNetworkConfigBTC();
@@ -32,6 +34,7 @@ export const SignModal = ({
   step,
   onClose,
   onSubmit,
+  options,
 }: SignModalProps) => (
   <ResponsiveDialog open={open} onClose={onClose} hasBackdrop>
     <DialogHeader
@@ -46,16 +49,17 @@ export const SignModal = ({
       </Text>
 
       <div className="py-4 flex flex-col items-start gap-6">
-        <Step step={1} currentStep={step}>
+        <Step step={1} currentStep={step} shouldShowDetails options={options}>
           Consent to slashing
         </Step>
-        <Step step={2} currentStep={step}>
+        <Step step={2} currentStep={step} shouldShowDetails options={options}>
           Consent to slashing during unbonding
         </Step>
-        <Step step={3} currentStep={step}>
+        <Step step={3} currentStep={step} shouldShowDetails options={options}>
           {coinSymbol}-{bbnCoinSymbol} address binding for receiving staking
           rewards
         </Step>
+        {/* There are no details to show on staking transaction registration */}
         <Step step={4} currentStep={step}>
           Staking transaction registration
         </Step>

@@ -8,8 +8,11 @@ import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
+import { useDelegationV2State } from "@/ui/state/DelegationV2State";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { useStakingState } from "@/ui/state/StakingState";
+
+import { SignDetailsModal } from "../../Modals/SignDetailsModal";
 
 const EOI_INDEXES: Record<string, number> = {
   "eoi-staking-slashing": 1,
@@ -31,6 +34,7 @@ export function StakingModal() {
     stakingInfo,
     verifiedDelegation,
     reset: resetState,
+    stakingStepOptions,
   } = useStakingState();
   const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
   const { createEOI, stakeDelegation } = useStakingService();
@@ -39,6 +43,11 @@ export function StakingModal() {
     trigger: revalidateForm,
     setValue: setFieldValue,
   } = useFormContext();
+
+  const { delegationV2StepOptions, setDelegationV2StepOptions } =
+    useDelegationV2State();
+  const detailsModalTitle =
+    (delegationV2StepOptions?.type as string) || "Transaction Details";
 
   const fp = useMemo(() => {
     if (!formData) return null;
@@ -50,6 +59,11 @@ export function StakingModal() {
   if (!step) {
     return null;
   }
+
+  const handleClose = () => {
+    resetState();
+    setDelegationV2StepOptions(undefined);
+  };
 
   return (
     <>
@@ -64,7 +78,7 @@ export function StakingModal() {
           stakingFeeSat={formData.feeAmount}
           feeRate={formData.feeRate}
           unbondingFeeSat={stakingInfo.unbondingFeeSat}
-          onClose={resetState}
+          onClose={handleClose}
           onSign={async () => {
             await createEOI(formData);
             resetForm({
@@ -90,6 +104,7 @@ export function StakingModal() {
           processing={processing}
           step={EOI_INDEXES[step]}
           title="Staking"
+          options={stakingStepOptions}
         />
       )}
       {Boolean(VERIFICATION_STEPS[step]) && (
@@ -104,16 +119,22 @@ export function StakingModal() {
           open={step === "verified"}
           processing={processing}
           onSubmit={() => stakeDelegation(verifiedDelegation)}
-          onClose={resetState}
+          onClose={handleClose}
         />
       )}
       <SuccessFeedbackModal
         open={step === "feedback-success"}
-        onClose={resetState}
+        onClose={handleClose}
       />
       <CancelFeedbackModal
         open={step === "feedback-cancel"}
-        onClose={resetState}
+        onClose={handleClose}
+      />
+      <SignDetailsModal
+        open={Boolean(delegationV2StepOptions) && processing}
+        onClose={() => setDelegationV2StepOptions(undefined)}
+        details={delegationV2StepOptions}
+        title={detailsModalTitle}
       />
     </>
   );

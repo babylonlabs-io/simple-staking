@@ -78,7 +78,7 @@ export function MultistakingModal() {
             if (!formData) return;
             await createEOI(formData);
             resetForm({
-              finalityProvider: "",
+              finalityProviders: [],
               term: "",
               amount: "",
               feeRate: stakingInfo?.defaultFeeRate?.toString() ?? "0",

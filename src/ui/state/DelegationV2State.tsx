@@ -1,4 +1,4 @@
-import type { SignPsbtOptions } from "@babylonlabs-io/wallet-connector";
+import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
@@ -24,7 +24,8 @@ import { useDelegationStorage } from "../hooks/storage/useDelegationStorage";
 const DELEGATION_V2_CHANNELS = [
   "delegation:stake",
   "delegation:unbond",
-  "delegation:withdraw",
+  // can be used later on if needed
+  // "delegation:withdraw",
 ] as const;
 
 interface DelegationV2State {
@@ -39,7 +40,8 @@ interface DelegationV2State {
   findDelegationByTxHash: (txHash: string) => DelegationV2 | undefined;
   refetch: () => void;
   displayLinkedDelegations: (value: boolean) => void;
-  setCurrentStepOptions: (options?: SignPsbtOptions) => void;
+  delegationV2StepOptions: EventData | undefined;
+  setDelegationV2StepOptions: (options?: EventData) => void;
 }
 
 const { StateProvider, useState: useDelegationV2State } =
@@ -55,7 +57,8 @@ const { StateProvider, useState: useDelegationV2State } =
     findDelegationByTxHash: () => undefined,
     refetch: () => Promise.resolve(),
     displayLinkedDelegations: () => {},
-    setCurrentStepOptions: () => {},
+    delegationV2StepOptions: undefined,
+    setDelegationV2StepOptions: () => {},
   });
 
 export function DelegationV2State({ children }: PropsWithChildren) {
@@ -65,8 +68,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
   );
   const { publicKeyNoCoord } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
-  const [currentStepOptions, setCurrentStepOptions] =
-    useState<SignPsbtOptions>();
+  const [delegationV2StepOptions, setDelegationV2StepOptions] =
+    useState<EventData>();
   const eventBus = useEventBus();
 
   const {
@@ -92,14 +95,14 @@ export function DelegationV2State({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const unsubscribeFns = DELEGATION_V2_CHANNELS.map((channel) =>
-      eventBus.on(channel, (_, options) => {
-        setCurrentStepOptions(options);
+      eventBus.on(channel, (options) => {
+        setDelegationV2StepOptions(options);
       }),
     );
 
     return () =>
       void unsubscribeFns.forEach((unsubscribe) => void unsubscribe());
-  }, [eventBus, setCurrentStepOptions]);
+  }, [eventBus, setDelegationV2StepOptions]);
 
   // Context
   const state = useMemo(
@@ -117,8 +120,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       refetch: async () => {
         await refetch();
       },
-      currentStepOptions,
-      setCurrentStepOptions,
+      delegationV2StepOptions,
+      setDelegationV2StepOptions,
     }),
     [
       delegations,
@@ -132,8 +135,8 @@ export function DelegationV2State({ children }: PropsWithChildren) {
       fetchNextPage,
       setLinkedDelegations,
       refetch,
-      currentStepOptions,
-      setCurrentStepOptions,
+      delegationV2StepOptions,
+      setDelegationV2StepOptions,
     ],
   );
 

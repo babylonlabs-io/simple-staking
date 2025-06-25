@@ -206,10 +206,28 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   );
 
   const getFinalityProviderName = useCallback(
-    (btcPkHex: string) =>
-      finalityProviderMap.get(btcPkHex)?.description?.moniker ??
-      providersV1Map.get(btcPkHex)?.description?.moniker,
-    [finalityProviderMap, providersV1Map],
+    (btcPkHex: string) => {
+      const fp =
+        finalityProviderMap.get(btcPkHex) ?? providersV1Map.get(btcPkHex);
+
+      if (!fp) return undefined;
+
+      const moniker = fp.description?.moniker?.trim();
+      if (moniker) return moniker;
+
+      const bsnId = (fp as FinalityProvider).bsnId;
+
+      if (bsnId === "") {
+        return "Babylon";
+      }
+
+      if (bsnId) {
+        return bsnList.find((bsn) => bsn.id === bsnId)?.name;
+      }
+
+      return undefined;
+    },
+    [finalityProviderMap, providersV1Map, bsnList],
   );
 
   const handleFilter = useCallback((key: keyof FilterState, value: string) => {

@@ -32,13 +32,10 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
     setSelectedProviderIds(selectedProviderIds);
   }, [selectedProviderIds, setSelectedProviderIds]);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    setPage(BsnModalPage.CHAIN);
+  const handleClose = () => {
     setSelectedBsnId(null);
-  }, [open, setSelectedBsnId]);
+    onClose();
+  };
 
   const handleChainNext = (chainId: string) => {
     setSelectedBsnId(chainId);
@@ -50,11 +47,11 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
   };
 
   return (
-    <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
+    <ResponsiveDialog open={open} onClose={handleClose} className="w-[52rem]">
       {page === BsnModalPage.CHAIN && (
         <ChainSelectionModal
           onNext={handleChainNext}
-          onClose={onClose}
+          onClose={handleClose}
           disableNonBabylon={!hasBabylonProviderFlag}
           disabledChainIds={disabledChainIds}
         />
@@ -63,7 +60,7 @@ export function BsnModal({ open, onAdd, onClose, selectedProviderIds }: Props) {
         <FinalityProviderModal
           open={true}
           defaultFinalityProvider=""
-          onClose={onClose}
+          onClose={handleClose}
           onAdd={handleProviderAdd}
           onBack={() => setPage(BsnModalPage.CHAIN)}
         />

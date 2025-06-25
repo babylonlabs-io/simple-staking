@@ -35,15 +35,16 @@ export function MultistakingForm() {
     blocked: isGeoBlocked,
     errorMessage: geoBlockMessage,
   } = useStakingState();
-  const { validationSchema, MAX_FINALITY_PROVIDERS } = useMultistakingState();
+  const { validationSchema, maxFinalityProviders } = useMultistakingState();
   const { stakingModalPage, setStakingModalPage } =
     useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
       // Persist form values into global staking state
+      // For multistaking, pass all selected finality providers
       setFormData({
-        finalityProvider: formValues.finalityProvider,
+        finalityProvider: formValues.finalityProviders,
         term: Number(formValues.term),
         amount: Number(formValues.amount),
         feeRate: Number(formValues.feeRate),
@@ -60,7 +61,7 @@ export function MultistakingForm() {
       return (
         <BsnFinalityProviderField
           open={stakingModalPage === StakingModalPage.BSN}
-          max={MAX_FINALITY_PROVIDERS}
+          max={maxFinalityProviders}
           onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
           onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
         />

@@ -66,6 +66,7 @@ export function useDelegationService() {
     isLoading: isDelegationLoading,
     isFetchingNextPage,
     updateDelegationStatus,
+    setDelegationV2StepOptions,
   } = useDelegationV2State();
 
   const {
@@ -284,7 +285,8 @@ export function useDelegationService() {
 
   const closeConfirmationModal = useCallback(() => {
     setConfirmationModal(null);
-  }, []);
+    setDelegationV2StepOptions(undefined);
+  }, [setDelegationV2StepOptions]);
 
   const toggleProcessingDelegation = useCallback(
     (id: string, processing: boolean) => {
