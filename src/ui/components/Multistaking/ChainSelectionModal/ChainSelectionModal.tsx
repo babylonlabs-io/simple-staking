@@ -111,7 +111,7 @@ export const ChainSelectionModal = ({
           by Bitcoin staking. Select a network to delegate your stake and earn
           rewards.
         </div>
-        <div className="overflow-x-auto flex flex-col gap-2 mt-10">
+        <div className="overflow-y-auto max-h-[350px] flex flex-col gap-2 mt-10">
           {isLoading && <div>Loading...</div>}
           {bsns?.map((bsn) => {
             const logo =

@@ -63,12 +63,14 @@ export function BsnFinalityProviderField({
           />
         )}
       </div>
-      <BsnModal
-        open={open}
-        onAdd={handleAdd}
-        onClose={onClose}
-        selectedProviderIds={selectedProviderIds}
-      />
+      {open && (
+        <BsnModal
+          open={open}
+          onAdd={handleAdd}
+          onClose={onClose}
+          selectedProviderIds={selectedProviderIds}
+        />
+      )}
     </SubSection>
   );
 }
