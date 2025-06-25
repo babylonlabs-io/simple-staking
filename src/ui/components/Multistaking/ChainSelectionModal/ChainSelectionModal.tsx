@@ -55,7 +55,7 @@ const ChainButton = ({
     disabled={disabled}
     as={disabled ? "div" : "button"}
     className={twMerge(
-      "bg-[#F9F9F9] w-full py-[14px] px-6 pl-[14px] rounded border",
+      "bg-secondary-highlight w-full py-[14px] px-6 pl-[14px] rounded border",
       selected ? "border-[#CE6533]" : "border-transparent",
       disabled
         ? "opacity-50 pointer-events-none cursor-default"
