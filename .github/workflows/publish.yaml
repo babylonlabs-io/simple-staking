@@ -21,14 +21,7 @@ jobs:
     strategy:
       matrix:
         environment:
-          [
-            phase-2-devnet,
-            testnet,
-            mainnet,
-            staging,
-            rollup-devnet,
-            edge-devnet,
-          ]
+          [phase-2-devnet, testnet, mainnet, staging, bsn-devnet, edge-devnet]
     environment: ${{ matrix.environment }}
     steps:
       - name: Checkout repository
