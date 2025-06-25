@@ -187,21 +187,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       return [];
     }
 
-    const filteredByBsn = (data.finalityProviders ?? []).filter((fp) => {
-      // No BSN selected - show all providers
-      if (selectedBsnId === null || selectedBsnId === undefined) {
-        return true;
-      }
-
-      // Special case for Babylon Genesis (empty string BSN ID)
-      if (selectedBsnId === "") {
-        return (fp.bsnId ?? "") === "";
-      }
-
-      return fp.bsnId === selectedBsnId;
-    });
-
-    return filteredByBsn
+    return data.finalityProviders
       .sort((a, b) => {
         const condition = FP_STATUSES[b.state] - FP_STATUSES[a.state];
 
@@ -216,7 +202,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
         rank: i + 1,
         id: fp.btcPk,
       }));
-  }, [data?.finalityProviders, selectedBsnId]);
+  }, [data?.finalityProviders]);
 
   const finalityProviderMap = useMemo(
     () =>
