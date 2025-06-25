@@ -46,8 +46,9 @@ export function MultistakingForm() {
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
       // Persist form values into global staking state
+      // For multistaking, pass all selected finality providers
       setFormData({
-        finalityProvider: formValues.finalityProvider,
+        finalityProvider: formValues.finalityProviders,
         term: Number(formValues.term),
         amount: Number(formValues.amount),
         feeRate: Number(formValues.feeRate),

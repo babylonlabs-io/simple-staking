@@ -23,7 +23,7 @@ import { StakingModalPage, useStakingState } from "./StakingState";
 const { coinName } = getNetworkConfigBTC();
 
 export interface MultistakingFormFields {
-  finalityProvider: string;
+  finalityProviders: string[];
   amount: number;
   term: number;
   feeRate: number;
