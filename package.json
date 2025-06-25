@@ -31,7 +31,7 @@
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "1.0.1",
     "@babylonlabs-io/btc-staking-ts": "2.3.0",
-    "@babylonlabs-io/core-ui": "1.1.1",
+    "@babylonlabs-io/core-ui": "file:../core-ui",
     "@babylonlabs-io/wallet-connector": "1.7.7",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@cosmjs/proto-signing": "^0.32.4",
