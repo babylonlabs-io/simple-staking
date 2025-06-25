@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { IoMdWarning } from "react-icons/io";
 
+import { SignDetailsModal } from "@/ui/components/Modals/SignDetailsModal";
 import { SlashingModal } from "@/ui/components/Modals/SlashingModal";
 import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SubmitModal } from "@/ui/components/Modals/SubmitModal";
@@ -9,6 +10,7 @@ import { WithdrawModal } from "@/ui/components/Modals/WithdrawModal";
 import { NetworkConfig } from "@/ui/config/network";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/ui/constants";
 import { ActionType } from "@/ui/hooks/services/useDelegationService";
+import { useDelegationV2State } from "@/ui/state/DelegationV2State";
 import { DelegationWithFP } from "@/ui/types/delegationsV2";
 import { FinalityProviderState } from "@/ui/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/ui/types/networkInfo";
@@ -34,6 +36,12 @@ export function DelegationModal({
 
     onSubmit(action, delegation);
   }, [action, delegation, onSubmit]);
+
+  const { delegationV2StepOptions, setDelegationV2StepOptions } =
+    useDelegationV2State();
+
+  const detailsModalTitle =
+    (delegationV2StepOptions?.type as string) || "Transaction Details";
 
   return (
     <>
@@ -103,6 +111,12 @@ export function DelegationModal({
         open={action === ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING}
         onSubmit={handleSubmit}
         {...restProps}
+      />
+      <SignDetailsModal
+        open={Boolean(delegationV2StepOptions) && restProps.processing}
+        onClose={() => setDelegationV2StepOptions(undefined)}
+        details={delegationV2StepOptions}
+        title={detailsModalTitle}
       />
     </>
   );
