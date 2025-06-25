@@ -70,7 +70,7 @@ export const Step = ({
               )
             }
           >
-            <div className="flex flex-row items-center gap-3">
+            <div className="flex flex-row items-center gap-3 mr-8">
               {renderIcon(step, currentStep)}
               <Text variant="body1" className="text-accent-primary">
                 Step {step}: {children}
