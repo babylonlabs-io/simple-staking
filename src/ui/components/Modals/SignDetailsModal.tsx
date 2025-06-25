@@ -39,10 +39,8 @@ export const SignDetailsModal: React.FC<SignDetailsModalProps> = ({
         onClose={onClose}
         className="text-accent-primary"
       />
-      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4">
-        <div className="border border-secondary-strokeLight p-4 mt-4 bg-primary-contrast/50 rounded max-h-60 overflow-y-auto flex flex-col gap-4">
-          <SignDetails details={details} />
-        </div>
+      <DialogBody className="flex flex-col pb-8 pt-4 text-accent-primary gap-4 max-h-72">
+        <SignDetails details={details} />
       </DialogBody>
       <DialogFooter>
         <Button

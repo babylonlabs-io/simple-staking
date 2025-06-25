@@ -5,7 +5,7 @@ import {
   Loader,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { useState, type PropsWithChildren, type ReactNode } from "react";
+import { type PropsWithChildren, type ReactNode } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { IoCheckmarkSharp } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";
@@ -56,10 +56,10 @@ export const Step = ({
 }: PropsWithChildren<StepProps>) => {
   const { stakingStepOptions } = useStakingState();
   const { delegationStepOptions } = useDelegationState();
-  const [expanded, setExpanded] = useState(false);
 
   // use either stakingStepOptions or delegationStepOptions
   // base on phase-1 or phase-2
+  // TODO as a prop
   const stepOptions = stakingStepOptions || delegationStepOptions;
   const showAccordion =
     shouldShowDetails && step === currentStep && stepOptions;
@@ -67,13 +67,10 @@ export const Step = ({
   return (
     <div className="flex flex-col w-full border border-secondary-strokeLight rounded bg-surface">
       {showAccordion ? (
-        <Accordion
-          expanded={expanded}
-          onChange={() => step === currentStep && setExpanded(!expanded)}
-        >
+        <Accordion disabled={step !== currentStep}>
           <AccordionSummary
             className="p-4 mr-4"
-            renderIcon={() =>
+            renderIcon={(expanded) =>
               expanded ? (
                 <AiOutlineMinus size={16} />
               ) : (
@@ -89,9 +86,7 @@ export const Step = ({
             </div>
           </AccordionSummary>
           <AccordionDetails className="max-h-60">
-            <div className="border flex flex-1 flex-col border-secondary-strokeLight p-4 bg-primary-contrast/50 rounded overflow-y-auto gap-4 m-4">
-              <SignDetails details={stepOptions} />
-            </div>
+            <SignDetails details={stepOptions} shouldHaveMargin />
           </AccordionDetails>
         </Accordion>
       ) : (

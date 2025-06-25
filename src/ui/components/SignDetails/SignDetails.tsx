@@ -1,6 +1,7 @@
 import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import { Text } from "@babylonlabs-io/core-ui";
 import { ReactNode } from "react";
+import { twMerge } from "tailwind-merge";
 
 import { Hash } from "@/ui/components/Hash/Hash";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
@@ -10,6 +11,7 @@ import { blocksToDisplayTime } from "@/ui/utils/time";
 
 interface SignDetailsProps {
   details: EventData;
+  shouldHaveMargin?: boolean;
 }
 
 const keyDisplayMappings: Record<string, string> = {
@@ -116,13 +118,28 @@ const getOrderedKeys = (details: EventData): string[] => {
   return allKeys;
 };
 
-export const SignDetails: React.FC<SignDetailsProps> = ({ details }) => {
-  return getOrderedKeys(details).map((key) => (
-    <div key={key} className="flex justify-between items-start gap-2">
-      <Text variant="body2" className="text-accent-secondary whitespace-nowrap">
-        {formatDisplayKey(key)}:
-      </Text>
-      {formatDisplayValue(key, details[key])}
+export const SignDetails: React.FC<SignDetailsProps> = ({
+  details,
+  shouldHaveMargin,
+}) => {
+  return (
+    <div
+      className={twMerge(
+        "border flex flex-1 flex-col border-secondary-strokeLight p-4 bg-primary-contrast/50 rounded overflow-y-auto gap-4",
+        shouldHaveMargin && "m-4",
+      )}
+    >
+      {getOrderedKeys(details).map((key) => (
+        <div key={key} className="flex justify-between items-start gap-2">
+          <Text
+            variant="body2"
+            className="text-accent-secondary whitespace-nowrap"
+          >
+            {formatDisplayKey(key)}:
+          </Text>
+          {formatDisplayValue(key, details[key])}
+        </div>
+      ))}
     </div>
-  ));
+  );
 };
