@@ -30,7 +30,7 @@ export function useFinalityProvidersV2({
   sortBy,
   order,
   name,
-  bsnId,
+  bsnId = "",
   enabled = false,
 }: Params = {}) {
   const { isOpen, handleError } = useError();
