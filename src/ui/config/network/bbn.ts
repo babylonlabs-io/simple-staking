@@ -1,10 +1,10 @@
 import type { BBNConfig } from "@babylonlabs-io/wallet-connector";
 
+import { bbnBsnDevnet } from "./bbn/bsn-devnet";
 import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
 import { bbnEdgeDevnet } from "./bbn/edge-devnet";
 import { bbnMainnet } from "./bbn/mainnet";
-import { bbnRollupDevnet } from "./bbn/rollup-devnet";
 import { bbnTestnet } from "./bbn/testnet";
 
 const defaultNetwork = "devnet";
@@ -35,10 +35,10 @@ const config: Record<string, BBNConfig> = {
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
   },
-  rollupDevnet: {
-    chainId: bbnRollupDevnet.chainId,
-    rpc: bbnRollupDevnet.rpc,
-    chainData: bbnRollupDevnet,
+  bsnDevnet: {
+    chainId: bbnBsnDevnet.chainId,
+    rpc: bbnBsnDevnet.rpc,
+    chainData: bbnBsnDevnet,
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
