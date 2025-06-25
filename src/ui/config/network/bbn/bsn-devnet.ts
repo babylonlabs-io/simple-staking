@@ -13,7 +13,7 @@ export const BSN_DEVNET_LCD_URL = getUrlFromEnv(
 );
 
 export const bbnBsnDevnet = {
-  chainId: "v4-devnet-1",
+  chainId: "bsn-devnet-1",
   chainName: "Babylon BSN Devnet 1",
   chainSymbolImageUrl:
     "https://raw.githubusercontent.com/babylonlabs-io/simple-staking/main/public/chain.png",
