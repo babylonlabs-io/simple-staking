@@ -20,11 +20,10 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const term = useWatch({ name: "term" });
   const finalityProviders = useWatch({ name: "finalityProviders" });
 
-  const validFinalityProviders = useMemo(() => {
-    if (!Array.isArray(finalityProviders)) return [];
-
-    return finalityProviders.filter((pk) => pk && pk.trim() !== "");
-  }, [finalityProviders]);
+  const validFinalityProviders = useMemo(
+    () => Object.values(finalityProviders ?? {}) as string[],
+    [finalityProviders],
+  );
 
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {
@@ -34,6 +33,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
     });
   }, [defaultRate, setValue]);
 
+  // TODO: useFieldState instead of multiple useWatch
   useEffect(() => {
     let cancelled = false;
 

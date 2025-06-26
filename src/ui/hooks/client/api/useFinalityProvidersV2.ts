@@ -30,8 +30,8 @@ export function useFinalityProvidersV2({
   sortBy,
   order,
   name,
-  bsnId = "",
-  enabled = false,
+  bsnId,
+  enabled,
 }: Params = {}) {
   const { isOpen, handleError } = useError();
   const logger = useLogger();
@@ -52,7 +52,6 @@ export function useFinalityProvidersV2({
         ? lastPage?.pagination?.next_key
         : null,
     initialPageParam: "",
-    enabled,
     refetchInterval: ONE_MINUTE,
     placeholderData: (prev) => prev,
     select: (data) => {
@@ -68,6 +67,7 @@ export function useFinalityProvidersV2({
     },
     retry: (failureCount) => !isOpen && failureCount < API_DEFAULT_RETRY_COUNT,
     retryDelay: (count) => API_DEFAULT_RETRY_DELAY ** (count + 1) * ONE_SECOND,
+    enabled,
   });
 
   useEffect(() => {

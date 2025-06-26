@@ -4,13 +4,13 @@ import ethereum from "@/ui/assets/chains/ethereum.png";
 import placeholder from "@/ui/assets/chains/placeholder.svg";
 import sui from "@/ui/assets/chains/sui.png";
 
-export const chainLogos = {
+export const chainLogos: Record<string, string> = {
   babylon,
   cosmos,
   ethereum,
   sui,
   placeholder,
-} as const;
+};
 
 export const chainNames = {
   babylon: "Babylon Genesis",

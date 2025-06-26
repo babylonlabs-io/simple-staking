@@ -1,23 +1,28 @@
+import { useMemo } from "react";
+
 import { BsnFinalityProviderItem } from "@/ui/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderItem";
 
 interface SelectedProvidersListProps {
-  providerIds: string[];
-  onRemove: (btcPk: string) => void;
+  selectedFPs: Record<string, string>;
+  onRemove: (bsnId?: string) => void;
 }
 
 export function SelectedProvidersList({
-  providerIds,
+  selectedFPs,
   onRemove,
 }: SelectedProvidersListProps) {
-  if (providerIds.length === 0) return null;
+  const values = useMemo(() => Object.entries(selectedFPs), [selectedFPs]);
+
+  if (values.length === 0) return null;
 
   return (
     <div className="flex flex-col gap-8">
-      {providerIds.map((providerId) => (
+      {values.map(([bsnId, providerId]) => (
         <BsnFinalityProviderItem
           key={providerId}
+          bsnId={bsnId}
           providerId={providerId}
-          onRemove={() => onRemove(providerId)}
+          onRemove={onRemove}
         />
       ))}
     </div>

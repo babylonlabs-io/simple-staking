@@ -1,12 +1,17 @@
 import { useDebounce } from "@uidotdev/usehooks";
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
 import { useSearchParams } from "@/ui/context/SearchParamsProvider";
 import { useBsn } from "@/ui/hooks/client/api/useBsn";
 import { useFinalityProviders } from "@/ui/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/hooks/client/api/useFinalityProvidersV2";
-import { useLogger } from "@/ui/hooks/useLogger";
-import { StakingModalPage } from "@/ui/state/StakingState";
 import { Bsn } from "@/ui/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
@@ -37,13 +42,8 @@ interface FinalityProviderBsnState {
   bsnList: Bsn[];
   bsnLoading: boolean;
   bsnError: boolean;
-  selectedBsnId: string | null;
-  setSelectedBsnId: (id: string | null) => void;
-  // Selected providers (from Multistaking form)
-  selectedProviderIds: string[];
-  setSelectedProviderIds: (ids: string[]) => void;
-  disabledChainIds: string[];
-  hasBabylonProviderFlag: boolean;
+  selectedBsnId: string | undefined;
+  setSelectedBsnId: (id: string | undefined) => void;
   // Modal
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
@@ -52,6 +52,12 @@ interface FinalityProviderBsnState {
   isRowSelectable: (row: FinalityProvider) => boolean;
   getRegisteredFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
+}
+
+export enum StakingModalPage {
+  DEFAULT,
+  BSN,
+  FINALITY_PROVIDER,
 }
 
 const FP_STATUSES = {
@@ -99,12 +105,8 @@ const defaultState: FinalityProviderBsnState = {
   bsnList: [],
   bsnLoading: false,
   bsnError: false,
-  selectedBsnId: null,
+  selectedBsnId: undefined,
   setSelectedBsnId: () => {},
-  selectedProviderIds: [],
-  setSelectedProviderIds: () => {},
-  disabledChainIds: [],
-  hasBabylonProviderFlag: false,
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
@@ -121,11 +123,11 @@ const { StateProvider, useState: useFpBsnState } =
 export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const params = useSearchParams();
   const fpParam = params.get("fp");
-  const logger = useLogger();
 
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
+  const finalityProviderMap = useRef(new Map<string, FinalityProvider>());
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
@@ -134,52 +136,26 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  const [selectedBsnId, setSelectedBsnId] = useState<string | null>(null);
+  const [selectedBsnId, setSelectedBsnId] = useState<string>();
   const [selectedProviderIds, setSelectedProviderIds] = useState<string[]>([]);
-
-  // Log BSN selection changes
-  const handleSetSelectedBsnId = useCallback(
-    (id: string | null) => {
-      logger.info("BSN selected", {
-        bsnId: id ?? "null",
-        isBabylonGenesis: id === "",
-      });
-      setSelectedBsnId(id);
-    },
-    [logger],
-  );
-
-  // Fix: Properly handle empty string BSN ID for Babylon Genesis
-  // When selectedBsnId is "", we should pass it to the API, not undefined
-  const selectedBsnIdForApi = useMemo(() => {
-    if (selectedBsnId === null || selectedBsnId === undefined) {
-      return undefined;
-    }
-    // For Babylon Genesis (empty string), we want to explicitly filter by empty string
-    return selectedBsnId;
-  }, [selectedBsnId]);
-
-  // Determine when to enable the finality providers query
-  const shouldEnableQuery =
-    stakingModalPage === StakingModalPage.CHAIN_SELECTION ||
-    selectedBsnId !== null;
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage } =
     useFinalityProvidersV2({
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      bsnId: selectedBsnIdForApi,
-      enabled: shouldEnableQuery,
+      bsnId: selectedBsnId,
+      enabled: stakingModalPage === StakingModalPage.FINALITY_PROVIDER,
     });
 
   const { data: dataV1 } = useFinalityProviders();
+
   const {
     data: bsnList = [],
     isLoading: bsnLoading,
     isError: bsnError,
   } = useBsn({
-    enabled: stakingModalPage === StakingModalPage.CHAIN_SELECTION,
+    enabled: stakingModalPage === StakingModalPage.BSN,
   });
 
   const finalityProviders = useMemo(() => {
@@ -204,17 +180,11 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       }));
   }, [data?.finalityProviders]);
 
-  const finalityProviderMap = useMemo(
-    () =>
-      finalityProviders.reduce((acc, fp) => {
-        if (fp.btcPk) {
-          acc.set(fp.btcPk, fp);
-        }
-
-        return acc;
-      }, new Map<string, FinalityProvider>()),
-    [finalityProviders],
-  );
+  useEffect(() => {
+    finalityProviders.forEach((fp) => {
+      finalityProviderMap.current.set(fp.btcPk, fp);
+    });
+  }, [finalityProviders]);
 
   const providersV1Map = useMemo(
     () =>
@@ -228,10 +198,12 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     [dataV1?.finalityProviders],
   );
 
+  // TODO: this method is broken (we don't receive all FPs from BE anymore)
   const getFinalityProviderName = useCallback(
     (btcPkHex: string) => {
       const fp =
-        finalityProviderMap.get(btcPkHex) ?? providersV1Map.get(btcPkHex);
+        finalityProviderMap.current.get(btcPkHex) ??
+        providersV1Map.get(btcPkHex);
 
       if (!fp) return undefined;
 
@@ -290,24 +262,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     [data?.finalityProviders],
   );
 
-  const hasBabylonProviderFlag = useMemo(
-    () =>
-      selectedProviderIds.some((pk) => {
-        const fp = getRegisteredFinalityProvider(pk);
-        return !fp?.bsnId;
-      }),
-    [selectedProviderIds, getRegisteredFinalityProvider],
-  );
-
-  const disabledChainIds = useMemo(() => {
-    const set = new Set<string>();
-    selectedProviderIds.forEach((pk) => {
-      const fp = getRegisteredFinalityProvider(pk);
-      set.add(fp?.bsnId || "");
-    });
-    return Array.from(set);
-  }, [selectedProviderIds, getRegisteredFinalityProvider]);
-
   const state = useMemo(
     () => ({
       filter,
@@ -318,12 +272,12 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       hasNextPage,
       fetchNextPage,
       selectedBsnId,
-      setSelectedBsnId: handleSetSelectedBsnId,
+      setSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
       isFetching,
       hasError: isError,
-      finalityProviderMap,
+      finalityProviderMap: finalityProviderMap.current,
       handleSort,
       handleFilter,
       isRowSelectable,
@@ -331,8 +285,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
-      hasBabylonProviderFlag,
-      disabledChainIds,
     }),
     [
       filter,
@@ -343,7 +295,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       hasNextPage,
       fetchNextPage,
       selectedBsnId,
-      handleSetSelectedBsnId,
+      setSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
       isFetching,
@@ -356,8 +308,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
-      hasBabylonProviderFlag,
-      disabledChainIds,
     ],
   );
 
