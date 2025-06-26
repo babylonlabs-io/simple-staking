@@ -40,7 +40,7 @@ export function MultistakingForm() {
     errorMessage: geoBlockMessage,
   } = useStakingState();
   const { validationSchema, maxFinalityProviders } = useMultistakingState();
-  const { stakingModalPage, setStakingModalPage } =
+  const { stakingModalPage, setStakingModalPage, setSelectedBsnId } =
     useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
@@ -75,9 +75,10 @@ export function MultistakingForm() {
         <FinalityProviderField
           open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
           max={1}
-          onOpen={() =>
-            void setStakingModalPage(StakingModalPage.CHAIN_SELECTION)
-          }
+          onOpen={() => {
+            setSelectedBsnId("");
+            void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
+          }}
           onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
         />
       );
