@@ -60,7 +60,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
         }
 
         const feeAmount = calculateFeeAmount({
-          finalityProvider,
+          finalityProviders: [finalityProvider],
           amount: Number(amount),
           term: Number(term),
           feeRate: Number(feeRate),
