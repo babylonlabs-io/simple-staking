@@ -12,7 +12,6 @@ import {
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useNetworkInfo } from "@/ui/hooks/client/api/useNetworkInfo";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
@@ -23,7 +22,7 @@ import { StakingModalPage, useStakingState } from "./StakingState";
 const { coinName } = getNetworkConfigBTC();
 
 export interface MultistakingFormFields {
-  finalityProviders: string[];
+  finalityProviders: Record<string, string>;
   amount: number;
   term: number;
   feeRate: number;
@@ -61,7 +60,6 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const maxFinalityProviders = networkInfo?.params.maxBsnFpProviders ?? 3;
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
 
   const formFields: FieldOptions[] = useMemo(
     () =>
@@ -70,18 +68,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
           field: "finalityProviders",
           schema: array()
             .of(string())
+            .transform((value) => Object.values(value))
             .min(1, "Add Finality Provider")
-            .test(
-              "hasBabylonProvider",
-              "Add a Babylon finality provider first",
-              (list) =>
-                (list as string[] | undefined)?.some(
-                  (pk) =>
-                    typeof pk === "string" &&
-                    (getRegisteredFinalityProvider(pk)?.bsnId === "" ||
-                      getRegisteredFinalityProvider(pk)?.bsnId === undefined),
-                ) ?? false,
-            )
             .max(
               maxFinalityProviders,
               `Maximum ${maxFinalityProviders} finality providers allowed.`,
@@ -162,12 +150,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking fee amount must be greater than 0."),
         },
       ] as const,
-    [
-      stakingInfo,
-      stakableBtcBalance,
-      getRegisteredFinalityProvider,
-      maxFinalityProviders,
-    ],
+    [stakingInfo, stakableBtcBalance, maxFinalityProviders],
   );
 
   const validationSchema = useMemo(() => {

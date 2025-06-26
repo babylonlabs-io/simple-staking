@@ -34,8 +34,7 @@ export function MultistakingModal() {
     reset: resetState,
   } = useStakingState();
 
-  const { getRegisteredFinalityProvider, selectedProviderIds } =
-    useFinalityProviderBsnState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
 
   const { createEOI, stakeDelegation } = useStakingService();
 
@@ -47,7 +46,7 @@ export function MultistakingModal() {
 
   // Build provider info list for preview
   const providerInfos = useMemo(() => {
-    return selectedProviderIds
+    return (formData?.finalityProviders ?? [])
       .map((pk) => {
         const provider = getRegisteredFinalityProvider(pk);
         if (!provider) return null;
@@ -57,7 +56,7 @@ export function MultistakingModal() {
         };
       })
       .filter(Boolean) as { name: string; avatar?: string }[];
-  }, [selectedProviderIds, getRegisteredFinalityProvider]);
+  }, [formData?.finalityProviders, getRegisteredFinalityProvider]);
 
   if (!step) return null;
 

@@ -3,11 +3,13 @@ import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState
 import { trim } from "@/ui/utils/trim";
 
 export const BsnFinalityProviderItem = ({
+  bsnId,
   providerId,
   onRemove,
 }: {
+  bsnId: string;
   providerId: string;
-  onRemove: () => void;
+  onRemove: (bsnId?: string) => void;
 }) => {
   const { finalityProviderMap } = useFinalityProviderBsnState();
   const provider = finalityProviderMap.get(providerId);
@@ -35,12 +37,14 @@ export const BsnFinalityProviderItem = ({
         </div>
       </div>
 
-      <div
-        onClick={onRemove}
+      <button
+        onClick={() => {
+          onRemove(bsnId);
+        }}
         className="text-accent-primary text-xs tracking-[0.4px] bg-accent-secondary/20 px-2 py-0.5 rounded cursor-pointer"
       >
         Remove
-      </div>
+      </button>
     </div>
   );
 };

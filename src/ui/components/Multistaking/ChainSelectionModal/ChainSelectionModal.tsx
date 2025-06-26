@@ -5,14 +5,16 @@ import {
   DialogHeader,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { useQuery } from "@tanstack/react-query";
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useMemo } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
-import { getBSNs } from "@/ui/api/getBsn";
+import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { chainLogos } from "@/ui/constants";
-import { useLogger } from "@/ui/hooks/useLogger";
+import { Bsn } from "@/ui/types/bsn";
+
+// const { chainId: BSN_ID } = getNetworkConfigBBN();
+const BSN_ID = "";
 
 const SubSection = ({
   children,
@@ -54,7 +56,7 @@ const ChainButton = ({
 }: ChainButtonProps) => (
   <Text
     disabled={disabled}
-    as={disabled ? "div" : "button"}
+    as="button"
     className={twMerge(
       "bg-secondary-highlight w-full py-[14px] px-6 pl-[14px] rounded border",
       selected ? "border-[#CE6533]" : "border-transparent",
@@ -80,38 +82,41 @@ const ChainButton = ({
   </Text>
 );
 
+interface ChainSelectionModalProps {
+  open: boolean;
+  loading?: boolean;
+  activeBsnId?: string;
+  selectedBsns?: Record<string, string>;
+  bsns?: Bsn[];
+  onNext: () => void;
+  onClose: () => void;
+  onSelect: (bsnId: string) => void;
+}
+
 export const ChainSelectionModal = ({
+  bsns = [],
+  open,
+  loading,
+  activeBsnId,
+  selectedBsns = {},
+  onSelect,
   onNext,
   onClose,
-  disableNonBabylon = false,
-  disabledChainIds = [],
-}: {
-  onNext: (selectedChain: string) => void;
-  onClose: () => void;
-  disableNonBabylon?: boolean;
-  disabledChainIds?: string[];
-}) => {
-  const [selected, setSelected] = useState<string | null>(null);
-  const logger = useLogger();
-
-  const { data: bsns, isLoading } = useQuery({
-    queryKey: ["API_BSN_LIST"],
-    queryFn: getBSNs,
-  });
-
-  const handleChainSelection = (bsnId: string) => {
-    logger.info("Chain selected", { bsnId, isBabylonGenesis: bsnId === "" });
-    setSelected(bsnId);
-  };
-
-  const handleNext = () => {
-    if (selected !== null) {
-      onNext(selected);
-    }
-  };
+}: ChainSelectionModalProps) => {
+  const babylonBsn = useMemo(
+    () => bsns.find((bsn) => bsn.id === BSN_ID),
+    [bsns],
+  );
+  const externalBsns = useMemo(
+    () => bsns.filter((bsn) => bsn.id !== BSN_ID),
+    [bsns],
+  );
+  const isBabylonSelected = babylonBsn
+    ? Boolean(selectedBsns[babylonBsn.id])
+    : false;
 
   return (
-    <>
+    <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
       <DialogHeader
         title="Select Babylon Secured Network"
         onClose={onClose}
@@ -125,31 +130,28 @@ export const ChainSelectionModal = ({
           rewards.
         </div>
         <div className="overflow-y-auto max-h-[350px] flex flex-col gap-2 mt-10">
-          {isLoading && <div>Loading...</div>}
-          {bsns?.map((bsn) => {
-            const logo =
-              bsn.id === ""
-                ? chainLogos.babylon
-                : (chainLogos as Record<string, string>)[bsn.id] ||
-                  chainLogos.placeholder;
-
-            const isDisabled =
-              (disableNonBabylon && bsn.id !== "") ||
-              disabledChainIds.includes(bsn.id);
-
-            return (
-              <ChainButton
-                key={bsn.id}
-                logo={logo}
-                title={bsn.name}
-                selected={selected === bsn.id}
-                disabled={isDisabled}
-                onClick={() => !isDisabled && handleChainSelection(bsn.id)}
-              />
-            );
-          })}
+          {loading && <div>Loading...</div>}
+          {babylonBsn && (
+            <ChainButton
+              logo={chainLogos.babylon}
+              title={babylonBsn.name}
+              selected={activeBsnId === babylonBsn.id}
+              disabled={isBabylonSelected}
+              onClick={() => onSelect(babylonBsn.id)}
+            />
+          )}
+          {externalBsns.map((bsn) => (
+            <ChainButton
+              key={bsn.id}
+              logo={chainLogos[bsn.id] || chainLogos.placeholder}
+              title={bsn.name}
+              selected={activeBsnId === bsn.id}
+              disabled={Boolean(selectedBsns[bsn.id]) || !isBabylonSelected}
+              onClick={() => onSelect(bsn.id)}
+            />
+          ))}
         </div>
-        {disableNonBabylon && (
+        {!isBabylonSelected && (
           <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
             <div>
               <MdOutlineInfo size={22} />
@@ -165,12 +167,12 @@ export const ChainSelectionModal = ({
       <DialogFooter className="flex justify-end">
         <Button
           variant="contained"
-          onClick={handleNext}
-          disabled={selected === null}
+          onClick={onNext}
+          disabled={activeBsnId === undefined}
         >
           Next
         </Button>
       </DialogFooter>
-    </>
+    </ResponsiveDialog>
   );
 };

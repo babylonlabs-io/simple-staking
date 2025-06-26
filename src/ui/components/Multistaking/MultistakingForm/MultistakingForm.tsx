@@ -2,9 +2,7 @@ import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
 
 import { AuthGuard } from "@/ui/components/Common/AuthGuard";
-import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { BsnFinalityProviderField } from "@/ui/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
-import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/ui/components/Multistaking/MultistakingForm/FeesSection";
@@ -12,16 +10,11 @@ import { MultistakingModal } from "@/ui/components/Multistaking/MultistakingModa
 import { Section } from "@/ui/components/Section/Section";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
 import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import {
   useMultistakingState,
   type MultistakingFormFields,
 } from "@/ui/state/MultistakingState";
-import {
-  StakingModalPage,
-  StakingStep,
-  useStakingState,
-} from "@/ui/state/StakingState";
+import { StakingStep, useStakingState } from "@/ui/state/StakingState";
 import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
@@ -40,15 +33,13 @@ export function MultistakingForm() {
     errorMessage: geoBlockMessage,
   } = useStakingState();
   const { validationSchema, maxFinalityProviders } = useMultistakingState();
-  const { stakingModalPage, setStakingModalPage, setSelectedBsnId } =
-    useFinalityProviderBsnState();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
       // Persist form values into global staking state
       // For multistaking, pass all selected finality providers
       setFormData({
-        finalityProviders: formValues.finalityProviders,
+        finalityProviders: Object.values(formValues.finalityProviders),
         term: Number(formValues.term),
         amount: Number(formValues.amount),
         feeRate: Number(formValues.feeRate),
@@ -59,31 +50,6 @@ export function MultistakingForm() {
     },
     [setFormData, goToStep],
   );
-
-  const renderFinalityProviderField = () => {
-    if (FeatureFlagService.IsPhase3Enabled) {
-      return (
-        <BsnFinalityProviderField
-          open={stakingModalPage === StakingModalPage.BSN}
-          max={maxFinalityProviders}
-          onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
-          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-        />
-      );
-    } else {
-      return (
-        <FinalityProviderField
-          open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-          max={1}
-          onOpen={() => {
-            setSelectedBsnId("");
-            void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
-          }}
-          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-        />
-      );
-    }
-  };
 
   if (!stakingInfo) {
     return null;
@@ -107,7 +73,11 @@ export function MultistakingForm() {
         <HiddenField name="feeAmount" defaultValue="0" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            {renderFinalityProviderField()}
+            {FeatureFlagService.IsPhase3Enabled ? (
+              <BsnFinalityProviderField max={maxFinalityProviders} />
+            ) : (
+              <FinalityProviderField max={1} />
+            )}
             <AmountSubsection />
             <FeesSection />
 
@@ -122,20 +92,6 @@ export function MultistakingForm() {
             />
           </Card>
         </div>
-
-        <ResponsiveDialog
-          open={stakingModalPage === StakingModalPage.CHAIN_SELECTION}
-          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-          className="w-[52rem]"
-        >
-          <ChainSelectionModal
-            onNext={() => {
-              // setSelectedChain(chain);
-              setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
-            }}
-            onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-          />
-        </ResponsiveDialog>
 
         <MultistakingModal />
       </Form>
