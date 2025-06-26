@@ -61,7 +61,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const maxFinalityProviders = networkInfo?.params.maxBsnFpProviders ?? 3;
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
+  const { getFinalityProviderInfo } = useFinalityProviderBsnState();
 
   const formFields: FieldOptions[] = useMemo(
     () =>
@@ -78,8 +78,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
                 (list as string[] | undefined)?.some(
                   (pk) =>
                     typeof pk === "string" &&
-                    (getRegisteredFinalityProvider(pk)?.bsnId === "" ||
-                      getRegisteredFinalityProvider(pk)?.bsnId === undefined),
+                    (getFinalityProviderInfo(pk)?.bsnId === "" ||
+                      getFinalityProviderInfo(pk)?.bsnId === undefined),
                 ) ?? false,
             )
             .max(
@@ -165,7 +165,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
     [
       stakingInfo,
       stakableBtcBalance,
-      getRegisteredFinalityProvider,
+      getFinalityProviderInfo,
       maxFinalityProviders,
     ],
   );

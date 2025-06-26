@@ -26,15 +26,15 @@ export const FinalityProviderModal = ({
   onBack,
 }: Props) => {
   const [selectedFP, setSelectedFp] = useState(defaultFinalityProvider);
-  const { selectedBsnId, bsnList } = useFinalityProviderBsnState();
+  const { selectedBsnId, bsn } = useFinalityProviderBsnState();
 
   const chainName = useMemo(() => {
     if (selectedBsnId === undefined || selectedBsnId === null) return "";
 
     if (selectedBsnId === "") return "Babylon";
 
-    return bsnList.find((b) => b.id === selectedBsnId)?.name ?? "";
-  }, [selectedBsnId, bsnList]);
+    return bsn.find((b) => b.id === selectedBsnId)?.name ?? "";
+  }, [selectedBsnId, bsn]);
 
   const handleClose = () => {
     onClose();

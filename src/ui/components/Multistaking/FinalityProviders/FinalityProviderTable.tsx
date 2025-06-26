@@ -21,11 +21,11 @@ export const FinalityProviderTable = ({
   onSelectRow,
 }: FinalityProviderTableProps) => {
   const {
-    isFetching,
+    isFetchingFinalityProvider,
     finalityProviders,
-    hasNextPage,
-    hasError,
-    fetchNextPage,
+    finalityProviderHasNextPage,
+    finalityProviderHasError,
+    finalityProviderFetchNextPage,
     isRowSelectable,
   } = useFinalityProviderBsnState();
 
@@ -56,15 +56,21 @@ export const FinalityProviderTable = ({
     />
   );
 
-  if (hasError) {
+  if (finalityProviderHasError) {
     return errorView;
   }
 
-  if (isFetching && (!finalityProviders || finalityProviders.length === 0)) {
+  if (
+    isFetchingFinalityProvider &&
+    (!finalityProviders || finalityProviders.length === 0)
+  ) {
     return loadingView;
   }
 
-  if (!isFetching && (!finalityProviders || finalityProviders.length === 0)) {
+  if (
+    !isFetchingFinalityProvider &&
+    (!finalityProviders || finalityProviders.length === 0)
+  ) {
     return noMatchesView;
   }
 
@@ -74,9 +80,9 @@ export const FinalityProviderTable = ({
       className="min-w-full"
       data={finalityProviders}
       columns={finalityProviderColumns}
-      loading={isFetching}
-      hasMore={hasNextPage}
-      onLoadMore={fetchNextPage}
+      loading={isFetchingFinalityProvider}
+      hasMore={finalityProviderHasNextPage}
+      onLoadMore={finalityProviderFetchNextPage}
       selectedRow={selectedFP}
       onRowSelect={(row) => {
         onSelectRow?.(row?.btcPk ?? "");

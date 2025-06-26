@@ -9,14 +9,16 @@ export function SelectedProvidersList({
   providerIds,
   onRemove,
 }: SelectedProvidersListProps) {
-  if (providerIds.length === 0) return null;
+  if (providerIds.length === 0) {
+    return null;
+  }
 
   return (
     <div className="flex flex-col gap-8">
       {providerIds.map((providerId) => (
         <BsnFinalityProviderItem
           key={providerId}
-          providerId={providerId}
+          finalityProviderId={providerId}
           onRemove={() => onRemove(providerId)}
         />
       ))}

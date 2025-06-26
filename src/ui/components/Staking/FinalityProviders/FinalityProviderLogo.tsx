@@ -1,5 +1,5 @@
 import { Text } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface FinalityProviderLogoProps {
   logoUrl?: string;
@@ -16,6 +16,17 @@ export const FinalityProviderLogo = ({
 }: FinalityProviderLogoProps) => {
   const [imageError, setImageError] = useState(false);
 
+  // Reset error state when logoUrl changes
+  useEffect(() => {
+    if (logoUrl) {
+      setImageError(false);
+    }
+  }, [logoUrl]);
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
   // Show logo if available and not errored
   if (logoUrl && !imageError) {
     return (
@@ -23,7 +34,7 @@ export const FinalityProviderLogo = ({
         src={logoUrl}
         alt={moniker || `Finality Provider ${rank}`}
         className={`${className} rounded-full object-cover`}
-        onError={() => setImageError(true)}
+        onError={handleImageError}
       />
     );
   }

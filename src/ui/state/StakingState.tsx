@@ -367,15 +367,18 @@ export function StakingState({ children }: PropsWithChildren) {
   ]);
 
   useEffect(() => {
-    const unsubscribe = eventBus.on("delegation:create", (options) => {
-      const type = options?.type as RegistrationStep | undefined;
+    const unsubscribe = eventBus.on(
+      "delegation:create",
+      (options: EventData) => {
+        const type = options?.type as RegistrationStep | undefined;
 
-      if (type) {
-        const stepName = STAKING_SIGNING_STEP_MAP[type];
-        setCurrentStep(stepName);
-        setStakingStepOptions(options);
-      }
-    });
+        if (type) {
+          const stepName = STAKING_SIGNING_STEP_MAP[type];
+          setCurrentStep(stepName);
+          setStakingStepOptions(options);
+        }
+      },
+    );
 
     return unsubscribe;
   }, [eventBus, setCurrentStep, setStakingStepOptions]);

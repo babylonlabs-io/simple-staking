@@ -21,20 +21,20 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const term = useWatch({ name: "term" });
   const finalityProviders = useWatch({ name: "finalityProviders" });
 
-  const { finalityProviderMap } = useFinalityProviderBsnState();
+  const { getFinalityProviderInfo } = useFinalityProviderBsnState();
 
   const finalityProvider = useMemo(() => {
     if (!Array.isArray(finalityProviders)) return;
 
     for (const pk of finalityProviders) {
-      const fp = finalityProviderMap.get(pk);
+      const fp = getFinalityProviderInfo(pk);
       if (fp && (fp.bsnId === "" || fp.bsnId === undefined)) {
         return pk;
       }
     }
 
     return "";
-  }, [finalityProviders, finalityProviderMap]);
+  }, [finalityProviders, getFinalityProviderInfo]);
 
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {

@@ -25,7 +25,7 @@ export function FinalityProviderField({
   onOpen,
   onClose,
 }: Props) {
-  const { finalityProviderMap } = useFinalityProviderBsnState();
+  const { getFinalityProviderInfo } = useFinalityProviderBsnState();
   const { value: selectedFP, onChange } = useField({
     name: "finalityProvider",
     defaultValue,
@@ -34,8 +34,8 @@ export function FinalityProviderField({
 
   const counter = selectedFP ? 1 : 0;
   const selectedProvider = useMemo(
-    () => finalityProviderMap.get(selectedFP),
-    [selectedFP, finalityProviderMap],
+    () => getFinalityProviderInfo(selectedFP),
+    [selectedFP, getFinalityProviderInfo],
   );
 
   function handleRemove() {
@@ -53,7 +53,7 @@ export function FinalityProviderField({
         </div>
         {selectedProvider ? (
           <FinalityProviderItem
-            provider={selectedProvider}
+            finalityProviderId={selectedFP}
             onRemove={handleRemove}
           />
         ) : null}
