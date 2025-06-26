@@ -11,7 +11,7 @@ import { FinalityProviders } from "@/ui/components/Multistaking/FinalityProvider
 
 interface Props {
   open: boolean;
-  defaultFinalityProvider: string;
+  defaultFinalityProvider?: string;
   selectedBsnId?: string;
   onClose: () => void;
   onAdd: (selectedBsnId: string, selectedProviderKey: string) => void;
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export const FinalityProviderModal = ({
-  defaultFinalityProvider,
+  defaultFinalityProvider = "",
   open,
   selectedBsnId,
   onClose,

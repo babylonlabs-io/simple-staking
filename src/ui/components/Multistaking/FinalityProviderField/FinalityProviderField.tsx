@@ -41,7 +41,8 @@ export function FinalityProviderField({ max }: Props) {
     onChange([]);
   }
 
-  const handleOpen = () => void setStakingModalPage(StakingModalPage.BSN);
+  const handleOpen = () =>
+    void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
   const handleClose = () => void setStakingModalPage(StakingModalPage.DEFAULT);
 
   return (
@@ -62,9 +63,10 @@ export function FinalityProviderField({ max }: Props) {
       </div>
 
       <FinalityProviderModal
+        selectedBsnId=""
         defaultFinalityProvider={selectedFP}
         open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-        onAdd={(selectedProviderKey) => void onChange([selectedProviderKey])}
+        onAdd={(_, selectedProviderKey) => void onChange([selectedProviderKey])}
         onClose={handleClose}
       />
 

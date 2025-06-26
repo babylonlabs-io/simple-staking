@@ -111,7 +111,6 @@ export function BsnFinalityProviderField({ max }: Props) {
       <FinalityProviderModal
         selectedBsnId={selectedBsnId}
         open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-        defaultFinalityProvider=""
         onClose={handleClose}
         onAdd={handleAdd}
         onBack={handleBack}
