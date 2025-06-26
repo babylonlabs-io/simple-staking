@@ -1,10 +1,11 @@
 import { Button, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaPen } from "react-icons/fa6";
 
 import { FeeItem } from "@/ui/components/Staking/DelegationForm/components/FeeItem";
 import { FeeModal } from "@/ui/components/Staking/FeeModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 interface FeeFiledProps {
   defaultRate?: number;
@@ -18,7 +19,22 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
 
   const amount = useWatch({ name: "amount" });
   const term = useWatch({ name: "term" });
-  const finalityProvider = useWatch({ name: "finalityProvider" });
+  const finalityProviders = useWatch({ name: "finalityProviders" });
+
+  const { finalityProviderMap } = useFinalityProviderBsnState();
+
+  const finalityProvider = useMemo(() => {
+    if (!Array.isArray(finalityProviders)) return;
+
+    for (const pk of finalityProviders) {
+      const fp = finalityProviderMap.get(pk);
+      if (fp && (fp.bsnId === "" || fp.bsnId === undefined)) {
+        return pk;
+      }
+    }
+
+    return "";
+  }, [finalityProviders, finalityProviderMap]);
 
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {

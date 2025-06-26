@@ -1,9 +1,18 @@
 import { useMemo, useState, type PropsWithChildren } from "react";
-import { number, object, ObjectSchema, ObjectShape, Schema, string } from "yup";
+import {
+  array,
+  number,
+  object,
+  ObjectSchema,
+  ObjectShape,
+  Schema,
+  string,
+} from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/config/network/btc";
-import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
+import { useNetworkInfo } from "@/ui/hooks/client/api/useNetworkInfo";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { satoshiToBtc } from "@/ui/utils/btc";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
 import { formatNumber, formatStakingAmount } from "@/ui/utils/formTransforms";
@@ -14,7 +23,7 @@ import { StakingModalPage, useStakingState } from "./StakingState";
 const { coinName } = getNetworkConfigBTC();
 
 export interface MultistakingFormFields {
-  finalityProvider: string;
+  finalityProviders: string[];
   amount: number;
   term: number;
   feeRate: number;
@@ -30,7 +39,7 @@ interface FieldOptions {
 export interface MultistakingState {
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
-  MAX_FINALITY_PROVIDERS: number;
+  maxFinalityProviders: number;
   validationSchema?: ObjectSchema<MultistakingFormFields>;
   formFields: FieldOptions[];
 }
@@ -39,7 +48,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    MAX_FINALITY_PROVIDERS: 1,
+    maxFinalityProviders: 3,
     validationSchema: undefined,
     formFields: [],
   });
@@ -48,26 +57,35 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const MAX_FINALITY_PROVIDERS = 1;
-  const { publicKeyNoCoord } = useBTCWallet();
+  const { data: networkInfo } = useNetworkInfo();
+  const maxFinalityProviders = networkInfo?.params.maxBsnFpProviders ?? 3;
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
 
   const formFields: FieldOptions[] = useMemo(
     () =>
       [
         {
-          field: "finalityProvider",
-          schema: string()
-            .required("Add Finality Provider")
+          field: "finalityProviders",
+          schema: array()
+            .of(string())
+            .min(1, "Add Finality Provider")
             .test(
-              "invalidPublicKey",
-              "Cannot select a finality provider with the same public key as the wallet",
-              (value) => value !== publicKeyNoCoord,
+              "hasBabylonProvider",
+              "Add a Babylon finality provider first",
+              (list) =>
+                (list as string[] | undefined)?.some(
+                  (pk) =>
+                    typeof pk === "string" &&
+                    (getRegisteredFinalityProvider(pk)?.bsnId === "" ||
+                      getRegisteredFinalityProvider(pk)?.bsnId === undefined),
+                ) ?? false,
+            )
+            .max(
+              maxFinalityProviders,
+              `Maximum ${maxFinalityProviders} finality providers allowed.`,
             ),
-          errors: {
-            invalidPublicKey: { level: "error" },
-          },
         },
         {
           field: "term",
@@ -144,7 +162,12 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking fee amount must be greater than 0."),
         },
       ] as const,
-    [publicKeyNoCoord, stakingInfo, stakableBtcBalance],
+    [
+      stakingInfo,
+      stakableBtcBalance,
+      getRegisteredFinalityProvider,
+      maxFinalityProviders,
+    ],
   );
 
   const validationSchema = useMemo(() => {
@@ -162,14 +185,14 @@ export function MultistakingState({ children }: PropsWithChildren) {
     () => ({
       stakingModalPage,
       setStakingModalPage,
-      MAX_FINALITY_PROVIDERS,
+      maxFinalityProviders,
       validationSchema,
       formFields,
     }),
     [
       stakingModalPage,
       setStakingModalPage,
-      MAX_FINALITY_PROVIDERS,
+      maxFinalityProviders,
       validationSchema,
       formFields,
     ],

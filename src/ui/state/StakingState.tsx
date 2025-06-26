@@ -36,12 +36,13 @@ export enum StakingModalPage {
   DEFAULT = 0,
   CHAIN_SELECTION = 1,
   FINALITY_PROVIDER = 2,
+  BSN = 3,
 }
 
 const { coinName } = getNetworkConfigBTC();
 
 export interface FormFields {
-  finalityProvider: string;
+  finalityProvider: string | string[];
   amount: number;
   term: number;
   feeRate: number;

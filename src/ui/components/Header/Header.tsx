@@ -11,7 +11,7 @@ export const Header = () => {
   const { isLoading: loading } = useAppState();
 
   return (
-    <header className="bg-primary-main h-[18.75rem]">
+    <header className="h-[18.75rem]">
       <Container className="h-20 flex items-center justify-between">
         <SmallLogo />
 
