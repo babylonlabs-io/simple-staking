@@ -69,6 +69,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
           schema: array()
             .of(string())
             .transform((value) => Object.values(value))
+            .required("Add Finality Provider")
             .min(1, "Add Finality Provider")
             .max(
               maxFinalityProviders,
