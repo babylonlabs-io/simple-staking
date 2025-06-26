@@ -56,7 +56,7 @@ export function FinalityProviderField({ max }: Props) {
         </div>
         {selectedProvider ? (
           <FinalityProviderItem
-            provider={selectedProvider}
+            finalityProvider={selectedProvider}
             onRemove={handleRemove}
           />
         ) : null}
