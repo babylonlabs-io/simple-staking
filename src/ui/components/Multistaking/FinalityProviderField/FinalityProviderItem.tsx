@@ -28,9 +28,16 @@ export const FinalityProviderItem = ({
 
     const logoUrl =
       chainLogos[bsn.id === "" ? "babylon" : bsn.id] || chainLogos.placeholder;
-    const alt = bsn.name;
 
-    return <Avatar url={logoUrl} alt={alt} className="w-4 h-4 mr-1" />;
+    return (
+      <Avatar
+        url={logoUrl}
+        alt={bsn.name}
+        variant="rounded"
+        size="tiny"
+        className="mr-1"
+      />
+    );
   };
 
   const renderProviderInfo = () => {
