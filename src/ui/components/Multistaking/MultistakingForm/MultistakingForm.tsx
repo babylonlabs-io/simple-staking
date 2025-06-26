@@ -3,7 +3,6 @@ import { useCallback } from "react";
 
 import { AuthGuard } from "@/ui/components/Common/AuthGuard";
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
-import { BsnFinalityProviderField } from "@/ui/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
 import { ChainSelectionModal } from "@/ui/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderField } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/components/Multistaking/MultistakingForm/AmountSubsection";
@@ -60,29 +59,37 @@ export function MultistakingForm() {
     [setFormData, goToStep],
   );
 
-  const renderFinalityProviderField = () => {
+  const handleFinalityProviderOpen = useCallback(() => {
     if (FeatureFlagService.IsPhase3Enabled) {
-      return (
-        <BsnFinalityProviderField
-          open={stakingModalPage === StakingModalPage.BSN}
-          max={maxFinalityProviders}
-          onOpen={() => void setStakingModalPage(StakingModalPage.BSN)}
-          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-        />
-      );
+      // Phase 3 mode: Open BSN modal
+      setStakingModalPage(StakingModalPage.BSN);
     } else {
-      return (
-        <FinalityProviderField
-          open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
-          max={1}
-          onOpen={() => {
-            setSelectedBsnId("");
-            void setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
-          }}
-          onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
-        />
-      );
+      // Phase 2 mode: Reset BSN selection and open finality provider modal
+      setSelectedBsnId("");
+      setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
     }
+  }, [setStakingModalPage, setSelectedBsnId]);
+
+  const renderFinalityProviderField = () => {
+    let modalPage: StakingModalPage;
+    let max: number;
+
+    if (FeatureFlagService.IsPhase3Enabled) {
+      modalPage = StakingModalPage.BSN;
+      max = maxFinalityProviders;
+    } else {
+      modalPage = StakingModalPage.FINALITY_PROVIDER;
+      max = 1;
+    }
+
+    return (
+      <FinalityProviderField
+        open={stakingModalPage === modalPage}
+        max={max}
+        onOpen={handleFinalityProviderOpen}
+        onClose={() => void setStakingModalPage(StakingModalPage.DEFAULT)}
+      />
+    );
   };
 
   if (!stakingInfo) {
