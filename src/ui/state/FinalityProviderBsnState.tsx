@@ -144,7 +144,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      bsnId: selectedBsnId ? selectedBsnId : undefined,
+      bsnId: selectedBsnId,
       enabled: stakingModalPage === StakingModalPage.FINALITY_PROVIDER,
     });
 
