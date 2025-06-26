@@ -5,11 +5,14 @@ import {
   DialogHeader,
   Text,
 } from "@babylonlabs-io/core-ui";
+import { useQuery } from "@tanstack/react-query";
 import { PropsWithChildren, useState } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
+import { getBSNs } from "@/ui/api/getBsn";
 import { chainLogos } from "@/ui/constants";
+import { useLogger } from "@/ui/hooks/useLogger";
 
 const SubSection = ({
   children,
@@ -53,7 +56,7 @@ const ChainButton = ({
     disabled={disabled}
     as={disabled ? "div" : "button"}
     className={twMerge(
-      "bg-[#F9F9F9] w-full py-[14px] px-6 pl-[14px] rounded border",
+      "bg-secondary-highlight w-full py-[14px] px-6 pl-[14px] rounded border",
       selected ? "border-[#CE6533]" : "border-transparent",
       disabled
         ? "opacity-50 pointer-events-none cursor-default"
@@ -80,11 +83,32 @@ const ChainButton = ({
 export const ChainSelectionModal = ({
   onNext,
   onClose,
+  disableNonBabylon = false,
+  disabledChainIds = [],
 }: {
   onNext: (selectedChain: string) => void;
   onClose: () => void;
+  disableNonBabylon?: boolean;
+  disabledChainIds?: string[];
 }) => {
   const [selected, setSelected] = useState<string | null>(null);
+  const logger = useLogger();
+
+  const { data: bsns, isLoading } = useQuery({
+    queryKey: ["API_BSN_LIST"],
+    queryFn: getBSNs,
+  });
+
+  const handleChainSelection = (bsnId: string) => {
+    logger.info("Chain selected", { bsnId, isBabylonGenesis: bsnId === "" });
+    setSelected(bsnId);
+  };
+
+  const handleNext = () => {
+    if (selected !== null) {
+      onNext(selected);
+    }
+  };
 
   return (
     <>
@@ -100,48 +124,49 @@ export const ChainSelectionModal = ({
           by Bitcoin staking. Select a network to delegate your stake and earn
           rewards.
         </div>
-        <div className="overflow-x-auto flex flex-col gap-2 mt-10">
-          <ChainButton
-            logo={chainLogos.babylon}
-            title="Babylon"
-            selected={selected === "babylon"}
-            onClick={() => setSelected("babylon")}
-          />
-          <ChainButton
-            logo={chainLogos.cosmos}
-            title="Cosmos"
-            disabled
-            onClick={() => setSelected("cosmos")}
-          />
-          <ChainButton
-            logo={chainLogos.ethereum}
-            title="Ethereum"
-            disabled
-            onClick={() => setSelected("ethereum")}
-          />
-          <ChainButton
-            logo={chainLogos.sui}
-            title="Sui"
-            disabled
-            onClick={() => setSelected("sui")}
-          />
+        <div className="overflow-y-auto max-h-[350px] flex flex-col gap-2 mt-10">
+          {isLoading && <div>Loading...</div>}
+          {bsns?.map((bsn) => {
+            const logo =
+              bsn.id === ""
+                ? chainLogos.babylon
+                : (chainLogos as Record<string, string>)[bsn.id] ||
+                  chainLogos.placeholder;
+
+            const isDisabled =
+              (disableNonBabylon && bsn.id !== "") ||
+              disabledChainIds.includes(bsn.id);
+
+            return (
+              <ChainButton
+                key={bsn.id}
+                logo={logo}
+                title={bsn.name}
+                selected={selected === bsn.id}
+                disabled={isDisabled}
+                onClick={() => !isDisabled && handleChainSelection(bsn.id)}
+              />
+            );
+          })}
         </div>
-        <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
-          <div>
-            <MdOutlineInfo size={22} />
-          </div>
-          <div>
-            Babylon must be the first BSN you add before selecting others. Once
-            added, you can choose additional BSNs to multistake.
-          </div>
-        </SubSection>
+        {disableNonBabylon && (
+          <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
+            <div>
+              <MdOutlineInfo size={22} />
+            </div>
+            <div>
+              Babylon must be the first BSN you add before selecting others.
+              Once added, you can choose additional BSNs to multistake.
+            </div>
+          </SubSection>
+        )}
       </DialogBody>
 
       <DialogFooter className="flex justify-end">
         <Button
           variant="contained"
-          onClick={() => selected && onNext(selected)}
-          disabled={!selected}
+          onClick={handleNext}
+          disabled={selected === null}
         >
           Next
         </Button>

@@ -1,5 +1,5 @@
 import { Button, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FaPen } from "react-icons/fa6";
 
 import { FeeItem } from "@/ui/components/Staking/DelegationForm/components/FeeItem";
@@ -18,7 +18,13 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
 
   const amount = useWatch({ name: "amount" });
   const term = useWatch({ name: "term" });
-  const finalityProvider = useWatch({ name: "finalityProvider" });
+  const finalityProviders = useWatch({ name: "finalityProviders" });
+
+  const validFinalityProviders = useMemo(() => {
+    if (!Array.isArray(finalityProviders)) return [];
+
+    return finalityProviders.filter((pk) => pk && pk.trim() !== "");
+  }, [finalityProviders]);
 
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {
@@ -33,7 +39,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
 
     const run = () => {
       try {
-        if (!finalityProvider || !amount || !term || !feeRate) {
+        if (!validFinalityProviders.length || !amount || !term || !feeRate) {
           if (cancelled) return;
           setValue("feeAmount", "0", {
             shouldValidate: false,
@@ -44,7 +50,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
         }
 
         const feeAmount = calculateFeeAmount({
-          finalityProvider,
+          finalityProviders: validFinalityProviders,
           amount: Number(amount),
           term: Number(term),
           feeRate: Number(feeRate),
@@ -81,7 +87,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
     feeRate,
     amount,
     term,
-    finalityProvider,
+    validFinalityProviders,
     setValue,
     setError,
     clearErrors,

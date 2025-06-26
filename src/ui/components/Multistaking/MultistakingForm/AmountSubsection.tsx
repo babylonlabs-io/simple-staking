@@ -18,6 +18,12 @@ export const AmountSubsection = () => {
     });
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      e.preventDefault();
+    }
+  };
+
   return (
     <SubSection className="flex flex-col justify-between w-full content-center gap-4">
       <div className="font-normal items-center flex flex-row justify-between w-full content-center">
@@ -35,6 +41,7 @@ export const AmountSubsection = () => {
           min="0"
           step="any"
           onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
           placeholder="Enter Amount"
           autoFocus
           className="text-lg bg-transparent text-right w-2/3 outline-none"

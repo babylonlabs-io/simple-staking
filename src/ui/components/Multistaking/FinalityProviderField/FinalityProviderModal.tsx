@@ -4,10 +4,11 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { FinalityProviders } from "@/ui/components/Multistaking/FinalityProviderField/FinalityProviders";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 interface Props {
   open: boolean;
@@ -25,16 +26,34 @@ export const FinalityProviderModal = ({
   onBack,
 }: Props) => {
   const [selectedFP, setSelectedFp] = useState(defaultFinalityProvider);
+  const { selectedBsnId, bsnList } = useFinalityProviderBsnState();
+
+  const chainName = useMemo(() => {
+    if (selectedBsnId === undefined || selectedBsnId === null) return "";
+
+    if (selectedBsnId === "") return "Babylon";
+
+    return bsnList.find((b) => b.id === selectedBsnId)?.name ?? "";
+  }, [selectedBsnId, bsnList]);
 
   const handleClose = () => {
     onClose();
     setSelectedFp("");
   };
 
+  const handleAdd = () => {
+    onAdd(selectedFP);
+    handleClose();
+  };
+
   return (
     <ResponsiveDialog open={open} onClose={handleClose} className="w-[52rem]">
       <DialogHeader
-        title="Select Babylon Genesis Finality Provider"
+        title={
+          chainName
+            ? `Select ${chainName} Finality Provider`
+            : "Select Finality Provider"
+        }
         onClose={handleClose}
         className="text-accent-primary"
       />
@@ -58,14 +77,7 @@ export const FinalityProviderModal = ({
         ) : (
           <div />
         )}
-        <Button
-          variant="contained"
-          onClick={() => {
-            onAdd(selectedFP);
-            handleClose();
-          }}
-          disabled={!selectedFP}
-        >
+        <Button variant="contained" onClick={handleAdd} disabled={!selectedFP}>
           Add
         </Button>
       </DialogFooter>

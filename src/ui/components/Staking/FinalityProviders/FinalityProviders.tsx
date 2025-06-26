@@ -1,6 +1,5 @@
 import {
   Heading,
-  HiddenField,
   Text,
   useFormContext,
   useWatch,
@@ -12,7 +11,7 @@ import { FinalityProviderTable } from "./FinalityProviderTable";
 
 export const FinalityProviders = () => {
   const { setValue } = useFormContext();
-  const selectedFP = useWatch({ name: "finalityProvider", defaultValue: "" });
+  const selectedFP = useWatch({ name: "finalityProviders", defaultValue: [] });
 
   return (
     <div className="flex flex-col gap-4">
@@ -33,17 +32,15 @@ export const FinalityProviders = () => {
       </div>
 
       <FinalityProviderTable
-        selectedFP={selectedFP}
+        selectedFP={selectedFP.length > 0 ? selectedFP[0] : ""}
         onSelectRow={(pk) =>
-          setValue("finalityProvider", pk, {
+          setValue("finalityProviders", [pk], {
             shouldValidate: true,
             shouldTouch: true,
             shouldDirty: true,
           })
         }
       />
-
-      <HiddenField name="finalityProvider" defaultValue="" />
     </div>
   );
 };

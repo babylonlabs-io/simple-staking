@@ -378,7 +378,7 @@ describe("StakingState", () => {
     });
 
     const testFormData = {
-      finalityProvider: "test-provider",
+      finalityProviders: ["test-provider"],
       term: 5000,
       amount: 100000,
       feeRate: 5,
@@ -456,7 +456,7 @@ describe("StakingState", () => {
     act(() => {
       result.current.goToStep(StakingStep.PREVIEW);
       result.current.setFormData({
-        finalityProvider: "test-provider",
+        finalityProviders: ["test-provider"],
         term: 5000,
         amount: 100000,
         feeRate: 5,
@@ -555,7 +555,7 @@ describe("StakingState", () => {
 
       const initialFormData = result.current.formData;
       const newFormData = {
-        finalityProvider: "test-provider",
+        finalityProviders: ["test-provider"],
         amount: 100000,
         term: 5000,
         feeRate: 5,
@@ -634,7 +634,7 @@ describe("StakingState", () => {
 
       // Set up a non-default state
       const newFormData = {
-        finalityProvider: "test-provider",
+        finalityProviders: ["test-provider"],
         amount: 100000,
         term: 5000,
         feeRate: 5,
@@ -697,7 +697,7 @@ describe("StakingState", () => {
 
       // Step 1: Fill the form
       const stakingFormData = {
-        finalityProvider: "test-provider",
+        finalityProviders: ["test-provider"],
         amount: 100000,
         term: 5000,
         feeRate: 5,
@@ -756,7 +756,7 @@ describe("StakingState", () => {
         stakingTxHashHex: "mock-hash",
         stakingTxHex: "mock-tx-hex",
         paramsVersion: 1,
-        finalityProviderBtcPksHex: [stakingFormData.finalityProvider],
+        finalityProviderBtcPksHex: stakingFormData.finalityProviders,
         stakerBtcPkHex: "mock-staker-pk",
         stakingTimelock: stakingFormData.term,
         bbnInceptionHeight: 100,
@@ -807,7 +807,7 @@ describe("StakingState", () => {
 
       // Step 1: Fill the form
       const stakingFormData = {
-        finalityProvider: "test-provider",
+        finalityProviders: ["test-provider"],
         amount: 100000,
         term: 5000,
         feeRate: 5,

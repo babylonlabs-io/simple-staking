@@ -11,7 +11,7 @@ import {
   type PropsWithChildren,
 } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import { number, object, ObjectSchema, string } from "yup";
+import { array, number, object, ObjectSchema, string } from "yup";
 
 import { validateDecimalPoints } from "@/ui/components/Staking/Form/validation/validation";
 import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/ui/config";
@@ -36,12 +36,13 @@ export enum StakingModalPage {
   DEFAULT = 0,
   CHAIN_SELECTION = 1,
   FINALITY_PROVIDER = 2,
+  BSN = 3,
 }
 
 const { coinName } = getNetworkConfigBTC();
 
 export interface FormFields {
-  finalityProvider: string;
+  finalityProviders: string[];
   amount: number;
   term: number;
   feeRate: number;
@@ -125,7 +126,7 @@ const { StateProvider, useState: useStakingState } =
       unbondingTime: 0,
     },
     formData: {
-      finalityProvider: "",
+      finalityProviders: [],
       term: 0,
       amount: 0,
       feeRate: 0,
@@ -252,12 +253,14 @@ export function StakingState({ children }: PropsWithChildren) {
     () =>
       object()
         .shape({
-          finalityProvider: string()
+          finalityProviders: array()
+            .of(string().required())
             .required("Please select a finality provider")
+            .min(1, "Please select at least one finality provider")
             .test(
-              "same-public-key",
+              "no-duplicate-public-keys",
               "Cannot select a finality provider with the same public key as the wallet",
-              (value) => value !== publicKeyNoCoord,
+              (value) => !value?.includes(publicKeyNoCoord),
             ),
 
           term: number()

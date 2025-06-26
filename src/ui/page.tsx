@@ -1,7 +1,6 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
-import { StakingForm } from "@/ui/components/Staking/StakingForm";
 import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 import { Banner } from "./components/Banner/Banner";
@@ -12,6 +11,7 @@ import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { MultistakingFormWrapper } from "./components/Multistaking/MultistakingForm/MultistakingFormWrapper";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
+import { StakingForm } from "./components/Staking/StakingForm";
 import { Stats } from "./components/Stats/Stats";
 
 const Home = () => {

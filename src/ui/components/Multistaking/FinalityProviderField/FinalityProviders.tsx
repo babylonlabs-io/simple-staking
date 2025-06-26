@@ -1,6 +1,6 @@
-import { FinalityProviderFilter } from "@/ui/components/Staking/FinalityProviders/FinalityProviderFilter";
-import { FinalityProviderSearch } from "@/ui/components/Staking/FinalityProviders/FinalityProviderSearch";
-import { FinalityProviderTable } from "@/ui/components/Staking/FinalityProviders/FinalityProviderTable";
+import { FinalityProviderFilter } from "@/ui/components/Multistaking/FinalityProviders/FinalityProviderFilter";
+import { FinalityProviderSearch } from "@/ui/components/Multistaking/FinalityProviders/FinalityProviderSearch";
+import { FinalityProviderTable } from "@/ui/components/Multistaking/FinalityProviders/FinalityProviderTable";
 
 interface Props {
   selectedFP: string;

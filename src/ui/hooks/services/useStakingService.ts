@@ -38,29 +38,23 @@ export function useStakingService() {
   const { bech32Address } = useCosmosWallet();
   const logger = useLogger();
 
-  const calculateFeeAmount = ({
-    finalityProvider,
-    amount,
-    term,
-    feeRate,
-  }: Omit<FormFields, "feeAmount">) => {
-    logger.info("Calculating fee amount for EOI", {
-      finalityProvider,
+  const calculateFeeAmount = useCallback(
+    ({
+      finalityProviders,
       amount,
       term,
       feeRate,
-    });
-    const eoiInput = {
-      // TODO: To be replaced by multiple FPs
-      finalityProviderPksNoCoordHex: [finalityProvider],
-      stakingAmountSat: btcToSatoshi(amount),
-      stakingTimelock: term,
-      feeRate: feeRate,
-    };
-    // Calculate the staking fee
-    const feeAmount = estimateStakingFee(eoiInput, feeRate);
-    return feeAmount;
-  };
+    }: Omit<FormFields, "feeAmount">) => {
+      const eoiInput = {
+        finalityProviderPksNoCoordHex: finalityProviders || [],
+        stakingAmountSat: btcToSatoshi(amount),
+        stakingTimelock: term,
+        feeRate: feeRate,
+      };
+      return estimateStakingFee(eoiInput, feeRate);
+    },
+    [estimateStakingFee],
+  );
 
   const displayPreview = useCallback(
     (formFields: FormFields) => {
@@ -71,17 +65,10 @@ export function useStakingService() {
   );
 
   const createEOI = useCallback(
-    async ({ finalityProvider, amount, term, feeRate }: FormFields) => {
-      logger.info("Starting EOI creation process", {
-        finalityProvider,
-        amount,
-        term,
-        feeRate,
-      });
+    async ({ finalityProviders, amount, term, feeRate }: FormFields) => {
       try {
         const eoiInput = {
-          // TODO: To be replaced by multiple FPs
-          finalityProviderPksNoCoordHex: [finalityProvider],
+          finalityProviderPksNoCoordHex: finalityProviders || [],
           stakingAmountSat: amount,
           stakingTimelock: term,
           feeRate: feeRate,

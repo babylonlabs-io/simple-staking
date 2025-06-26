@@ -1,7 +1,7 @@
 import { useFieldState } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren } from "react";
 
-const FIELDS = ["finalityProvider", "term", "amount"];
+const FIELDS = ["finalityProviders", "term", "amount"];
 
 export const FeeSection = ({ children }: PropsWithChildren) => {
   const fieldStates = useFieldState(FIELDS);

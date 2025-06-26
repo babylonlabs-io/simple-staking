@@ -69,7 +69,7 @@ const TestWrapper = ({ children }: PropsWithChildren) => <>{children}</>;
 
 // Mock data for tests
 const mockFormData = {
-  finalityProvider: "mock-finality-provider",
+  finalityProviders: ["mock-finality-provider"],
   amount: 1.2, // BTC
   term: 10000, // blocks
   feeRate: 5,
