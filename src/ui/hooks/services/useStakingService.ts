@@ -40,29 +40,34 @@ export function useStakingService() {
   const logger = useLogger();
   const { selectedProviderIds } = useFinalityProviderBsnState();
 
-  const calculateFeeAmount = ({
-    finalityProviders,
-    amount,
-    term,
-    feeRate,
-  }: Omit<FormFields, "feeAmount">) => {
-    // Determine list of finality-provider public keys to be used when
-    // calculating the staking-fee. Priority order:
-    // 1. Providers selected in the multistaking flow (selectedProviderIds)
-    // 2. Providers coming from the form (array)
-    const fpList =
-      selectedProviderIds.length > 0 ? selectedProviderIds : finalityProviders;
+  const calculateFeeAmount = useCallback(
+    ({
+      finalityProviders,
+      amount,
+      term,
+      feeRate,
+    }: Omit<FormFields, "feeAmount">) => {
+      // Determine list of finality-provider public keys to be used when
+      // calculating the staking-fee. Priority order:
+      // 1. Providers selected in the multistaking flow (selectedProviderIds)
+      // 2. Providers coming from the form (array)
+      const fpList =
+        selectedProviderIds.length > 0
+          ? selectedProviderIds
+          : finalityProviders;
 
-    const eoiInput = {
-      finalityProviderPksNoCoordHex: fpList,
-      stakingAmountSat: btcToSatoshi(amount),
-      stakingTimelock: term,
-      feeRate: feeRate,
-    };
-    // Calculate the staking fee
-    const feeAmount = estimateStakingFee(eoiInput, feeRate);
-    return feeAmount;
-  };
+      const eoiInput = {
+        finalityProviderPksNoCoordHex: fpList,
+        stakingAmountSat: btcToSatoshi(amount),
+        stakingTimelock: term,
+        feeRate: feeRate,
+      };
+      // Calculate the staking fee
+      const feeAmount = estimateStakingFee(eoiInput, feeRate);
+      return feeAmount;
+    },
+    [selectedProviderIds, estimateStakingFee],
+  );
 
   const displayPreview = useCallback(
     (formFields: FormFields) => {

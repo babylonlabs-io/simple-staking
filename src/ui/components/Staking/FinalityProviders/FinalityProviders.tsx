@@ -1,6 +1,5 @@
 import {
   Heading,
-  HiddenField,
   Text,
   useFormContext,
   useWatch,
@@ -42,8 +41,6 @@ export const FinalityProviders = () => {
           })
         }
       />
-
-      <HiddenField name="finalityProviders" defaultValue="" />
     </div>
   );
 };
