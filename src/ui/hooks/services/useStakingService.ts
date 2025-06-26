@@ -41,15 +41,13 @@ export function useStakingService() {
   const { selectedProviderIds } = useFinalityProviderBsnState();
 
   const calculateFeeAmount = ({
-    finalityProvider,
+    finalityProviders,
     amount,
     term,
     feeRate,
   }: Omit<FormFields, "feeAmount">) => {
     logger.info("Calculating fee amount for EOI", {
-      finalityProvider: Array.isArray(finalityProvider)
-        ? finalityProvider.join(",")
-        : finalityProvider,
+      finalityProviders: finalityProviders.join(","),
       amount,
       term,
       feeRate,
@@ -57,13 +55,9 @@ export function useStakingService() {
     // Determine list of finality-provider public keys to be used when
     // calculating the staking-fee. Priority order:
     // 1. Providers selected in the multistaking flow (selectedProviderIds)
-    // 2. Providers coming from the form (can be a single pk or an array)
+    // 2. Providers coming from the form (array)
     const fpList =
-      selectedProviderIds.length > 0
-        ? selectedProviderIds
-        : Array.isArray(finalityProvider)
-          ? finalityProvider
-          : [finalityProvider];
+      selectedProviderIds.length > 0 ? selectedProviderIds : finalityProviders;
 
     const eoiInput = {
       finalityProviderPksNoCoordHex: fpList,
@@ -85,11 +79,9 @@ export function useStakingService() {
   );
 
   const createEOI = useCallback(
-    async ({ finalityProvider, amount, term, feeRate }: FormFields) => {
+    async ({ finalityProviders, amount, term, feeRate }: FormFields) => {
       logger.info("Starting EOI creation process", {
-        finalityProvider: Array.isArray(finalityProvider)
-          ? finalityProvider.join(",")
-          : finalityProvider,
+        finalityProviders: finalityProviders.join(","),
         amount,
         term,
         feeRate,
@@ -99,9 +91,7 @@ export function useStakingService() {
         const fpList =
           selectedProviderIds.length > 0
             ? selectedProviderIds
-            : Array.isArray(finalityProvider)
-              ? finalityProvider
-              : [finalityProvider];
+            : finalityProviders;
 
         const eoiInput = {
           finalityProviderPksNoCoordHex: fpList,
