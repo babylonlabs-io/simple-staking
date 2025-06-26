@@ -26,7 +26,7 @@ export function FinalityProviderField({ max }: Props) {
     setSelectedBsnId,
   } = useFinalityProviderBsnState();
   const { value: selectedFPs = [], onChange } = useField({
-    name: "finalityProvider",
+    name: "finalityProviders",
   });
 
   const selectedFP =

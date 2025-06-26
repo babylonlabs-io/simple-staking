@@ -198,6 +198,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     [dataV1?.finalityProviders],
   );
 
+  // TODO: this method is broken (we don't receive all FPs from BE anymore)
   const getFinalityProviderName = useCallback(
     (btcPkHex: string) => {
       const fp =
