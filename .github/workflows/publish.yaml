@@ -74,8 +74,8 @@ jobs:
           cd out
           FILES_CHECKSUM_PATH="/tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-files-checksum.txt"
           GLOBAL_CHECKSUM_PATH="/tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}-global-checksum.txt"
-          find . -type f -exec sha256sum {} \; | sort > $FILES_CHECKSUM_PATH
-          sha256sum $FILES_CHECKSUM_PATH > $GLOBAL_CHECKSUM_PATH
+          find . -type f -exec sha256sum {} \; | sort > $FILES_CHECKSUM_PATH # sort is for make sure the order on different OS is the same
+          sha256sum $FILES_CHECKSUM_PATH | cut -d' ' -f1 > $GLOBAL_CHECKSUM_PATH # cut is for remove the filename from the output
 
       - name: Archive output
         run: tar -czvf /tmp/simple-staking-${{ matrix.environment }}-${{ github.sha }}.tar.gz -C out .
