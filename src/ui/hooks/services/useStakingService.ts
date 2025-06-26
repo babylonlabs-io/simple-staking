@@ -9,7 +9,6 @@ import { ClientError } from "@/ui/errors";
 import { ERROR_CODES } from "@/ui/errors/codes";
 import { useLogger } from "@/ui/hooks/useLogger";
 import { useDelegationV2State } from "@/ui/state/DelegationV2State";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import {
   StakingStep,
   useStakingState,
@@ -38,7 +37,6 @@ export function useStakingService() {
   const { publicKeyNoCoord, address: btcAddress } = useBTCWallet();
   const { bech32Address } = useCosmosWallet();
   const logger = useLogger();
-  const { selectedProviderIds } = useFinalityProviderBsnState();
 
   const calculateFeeAmount = useCallback(
     ({
@@ -47,26 +45,15 @@ export function useStakingService() {
       term,
       feeRate,
     }: Omit<FormFields, "feeAmount">) => {
-      // Determine list of finality-provider public keys to be used when
-      // calculating the staking-fee. Priority order:
-      // 1. Providers selected in the multistaking flow (selectedProviderIds)
-      // 2. Providers coming from the form (array)
-      const fpList =
-        selectedProviderIds.length > 0
-          ? selectedProviderIds
-          : finalityProviders;
-
       const eoiInput = {
-        finalityProviderPksNoCoordHex: fpList,
+        finalityProviderPksNoCoordHex: finalityProviders || [],
         stakingAmountSat: btcToSatoshi(amount),
         stakingTimelock: term,
         feeRate: feeRate,
       };
-      // Calculate the staking fee
-      const feeAmount = estimateStakingFee(eoiInput, feeRate);
-      return feeAmount;
+      return estimateStakingFee(eoiInput, feeRate);
     },
-    [selectedProviderIds, estimateStakingFee],
+    [estimateStakingFee],
   );
 
   const displayPreview = useCallback(
@@ -80,14 +67,8 @@ export function useStakingService() {
   const createEOI = useCallback(
     async ({ finalityProviders, amount, term, feeRate }: FormFields) => {
       try {
-        // Build the list of finality-provider public keys that will be part of the EOI.
-        const fpList =
-          selectedProviderIds.length > 0
-            ? selectedProviderIds
-            : finalityProviders || [];
-
         const eoiInput = {
-          finalityProviderPksNoCoordHex: fpList,
+          finalityProviderPksNoCoordHex: finalityProviders || [],
           stakingAmountSat: amount,
           stakingTimelock: term,
           feeRate: feeRate,
@@ -156,7 +137,6 @@ export function useStakingService() {
       btcAddress,
       bech32Address,
       logger,
-      selectedProviderIds,
     ],
   );
 
