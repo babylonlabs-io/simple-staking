@@ -45,7 +45,7 @@ jest.mock("@/ui/utils", () => ({
 describe("useStakingService", () => {
   // Mock data
   const mockFormData = {
-    finalityProvider: "mock-finality-provider",
+    finalityProviders: ["mock-finality-provider"],
     amount: 1.2, // BTC
     term: 10000, // blocks
     feeRate: 5,
@@ -161,7 +161,7 @@ describe("useStakingService", () => {
       const { result } = renderHook(() => useStakingService());
 
       const fee = result.current.calculateFeeAmount({
-        finalityProvider: mockFormData.finalityProvider,
+        finalityProviders: mockFormData.finalityProviders,
         amount: mockFormData.amount,
         term: mockFormData.term,
         feeRate: mockFormData.feeRate,
@@ -170,7 +170,7 @@ describe("useStakingService", () => {
       // Verify estimateStakingFee was called correctly
       expect(mockEstimateStakingFee).toHaveBeenCalledWith(
         {
-          finalityProviderPksNoCoordHex: [mockFormData.finalityProvider],
+          finalityProviderPksNoCoordHex: mockFormData.finalityProviders,
           stakingAmountSat: mockAmountSat,
           stakingTimelock: mockFormData.term,
           feeRate: mockFormData.feeRate,
@@ -190,7 +190,7 @@ describe("useStakingService", () => {
 
       expect(() => {
         result.current.calculateFeeAmount({
-          finalityProvider: mockFormData.finalityProvider,
+          finalityProviders: mockFormData.finalityProviders,
           amount: mockFormData.amount,
           term: mockFormData.term,
           feeRate: mockFormData.feeRate,
@@ -223,7 +223,7 @@ describe("useStakingService", () => {
 
       expect(mockCreateDelegationEoi).toHaveBeenCalledWith(
         {
-          finalityProviderPksNoCoordHex: [mockFormData.finalityProvider],
+          finalityProviderPksNoCoordHex: mockFormData.finalityProviders,
           stakingAmountSat: mockFormData.amount,
           stakingTimelock: mockFormData.term,
           feeRate: mockFormData.feeRate,

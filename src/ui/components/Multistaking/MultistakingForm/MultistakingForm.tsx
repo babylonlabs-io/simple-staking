@@ -48,7 +48,7 @@ export function MultistakingForm() {
       // Persist form values into global staking state
       // For multistaking, pass all selected finality providers
       setFormData({
-        finalityProvider: formValues.finalityProviders,
+        finalityProviders: formValues.finalityProviders,
         term: Number(formValues.term),
         amount: Number(formValues.amount),
         feeRate: Number(formValues.feeRate),

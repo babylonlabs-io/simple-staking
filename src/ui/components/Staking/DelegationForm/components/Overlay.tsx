@@ -10,7 +10,7 @@ export function FormOverlay({
   className,
   children,
 }: PropsWithChildren<OverlayProps>) {
-  const fpState = useFieldState("finalityProvider");
+  const fpState = useFieldState("finalityProviders");
   const available = !fpState.invalid && fpState.isTouched;
 
   return (

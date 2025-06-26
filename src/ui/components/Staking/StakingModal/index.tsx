@@ -9,7 +9,7 @@ import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModa
 import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
 import { useDelegationV2State } from "@/ui/state/DelegationV2State";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
+import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { useStakingState } from "@/ui/state/StakingState";
 
 import { SignDetailsModal } from "../../Modals/SignDetailsModal";
@@ -36,7 +36,7 @@ export function StakingModal() {
     reset: resetState,
     stakingStepOptions,
   } = useStakingState();
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
   const {
     reset: resetForm,
@@ -50,10 +50,8 @@ export function StakingModal() {
     (delegationV2StepOptions?.type as string) || "Transaction Details";
 
   const fp = useMemo(() => {
-    if (!formData) return null;
-    return typeof formData.finalityProvider === "string"
-      ? getRegisteredFinalityProvider(formData.finalityProvider)
-      : null;
+    if (!formData || !formData.finalityProviders?.length) return null;
+    return getRegisteredFinalityProvider(formData.finalityProviders[0]);
   }, [formData, getRegisteredFinalityProvider]);
 
   if (!step) {
@@ -82,7 +80,7 @@ export function StakingModal() {
           onSign={async () => {
             await createEOI(formData);
             resetForm({
-              finalityProvider: "",
+              finalityProviders: [],
               term: "",
               amount: "",
               feeRate: stakingInfo?.defaultFeeRate?.toString() ?? "0",

@@ -5,7 +5,6 @@ import { FaPen } from "react-icons/fa6";
 import { FeeItem } from "@/ui/components/Staking/DelegationForm/components/FeeItem";
 import { FeeModal } from "@/ui/components/Staking/FeeModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 
 interface FeeFiledProps {
   defaultRate?: number;
@@ -21,20 +20,11 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const term = useWatch({ name: "term" });
   const finalityProviders = useWatch({ name: "finalityProviders" });
 
-  const { finalityProviderMap } = useFinalityProviderBsnState();
+  const validFinalityProviders = useMemo(() => {
+    if (!Array.isArray(finalityProviders)) return [];
 
-  const finalityProvider = useMemo(() => {
-    if (!Array.isArray(finalityProviders)) return;
-
-    for (const pk of finalityProviders) {
-      const fp = finalityProviderMap.get(pk);
-      if (fp && (fp.bsnId === "" || fp.bsnId === undefined)) {
-        return pk;
-      }
-    }
-
-    return "";
-  }, [finalityProviders, finalityProviderMap]);
+    return finalityProviders.filter((pk) => pk && pk.trim() !== "");
+  }, [finalityProviders]);
 
   useEffect(() => {
     setValue("feeRate", defaultRate.toString(), {
@@ -49,7 +39,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
 
     const run = () => {
       try {
-        if (!finalityProvider || !amount || !term || !feeRate) {
+        if (!validFinalityProviders.length || !amount || !term || !feeRate) {
           if (cancelled) return;
           setValue("feeAmount", "0", {
             shouldValidate: false,
@@ -60,7 +50,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
         }
 
         const feeAmount = calculateFeeAmount({
-          finalityProvider,
+          finalityProviders: validFinalityProviders,
           amount: Number(amount),
           term: Number(term),
           feeRate: Number(feeRate),
@@ -97,7 +87,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
     feeRate,
     amount,
     term,
-    finalityProvider,
+    validFinalityProviders,
     setValue,
     setError,
     clearErrors,

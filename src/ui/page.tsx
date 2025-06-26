@@ -1,7 +1,7 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
-import { StakingForm } from "@/ui/components/Staking/StakingForm";
+import { StakingFormWrapper } from "@/ui/components/Staking/StakingFormWrapper";
 import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 import { Banner } from "./components/Banner/Banner";
@@ -33,7 +33,7 @@ const Home = () => {
         {FeatureFlagService.IsMultiStakingEnabled ? (
           <MultistakingFormWrapper />
         ) : (
-          <StakingForm />
+          <StakingFormWrapper />
         )}
         <Activity />
         <FAQ />

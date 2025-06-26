@@ -30,7 +30,7 @@ export const FinalityProviderItem = ({
       </div>
       <div
         onClick={() => {
-          setValue("finalityProvider", "", {
+          setValue("finalityProviders", [], {
             shouldValidate: true,
             shouldDirty: true,
             shouldTouch: true,
