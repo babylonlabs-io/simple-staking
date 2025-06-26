@@ -46,12 +46,6 @@ export function useStakingService() {
     term,
     feeRate,
   }: Omit<FormFields, "feeAmount">) => {
-    logger.info("Calculating fee amount for EOI", {
-      finalityProviders: finalityProviders.join(","),
-      amount,
-      term,
-      feeRate,
-    });
     // Determine list of finality-provider public keys to be used when
     // calculating the staking-fee. Priority order:
     // 1. Providers selected in the multistaking flow (selectedProviderIds)
@@ -80,18 +74,12 @@ export function useStakingService() {
 
   const createEOI = useCallback(
     async ({ finalityProviders, amount, term, feeRate }: FormFields) => {
-      logger.info("Starting EOI creation process", {
-        finalityProviders: finalityProviders.join(","),
-        amount,
-        term,
-        feeRate,
-      });
       try {
         // Build the list of finality-provider public keys that will be part of the EOI.
         const fpList =
           selectedProviderIds.length > 0
             ? selectedProviderIds
-            : finalityProviders;
+            : finalityProviders || [];
 
         const eoiInput = {
           finalityProviderPksNoCoordHex: fpList,
