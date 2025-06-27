@@ -19,7 +19,7 @@ export function SelectedProvidersList({
     <div className="flex flex-col gap-8">
       {values.map(([bsnId, providerId]) => (
         <BsnFinalityProviderItem
-          key={providerId}
+          key={`${bsnId}-${providerId}`}
           bsnId={bsnId}
           providerId={providerId}
           onRemove={onRemove}
