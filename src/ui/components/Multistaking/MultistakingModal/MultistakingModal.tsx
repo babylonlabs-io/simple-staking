@@ -8,7 +8,7 @@ import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
+import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { useStakingState } from "@/ui/state/StakingState";
 import { trim } from "@/ui/utils/trim";
 
@@ -33,9 +33,7 @@ export function MultistakingModal() {
     verifiedDelegation,
     reset: resetState,
   } = useStakingState();
-
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
-
+  const { getRegisteredFinalityProvider } = useFinalityProviderState();
   const { createEOI, stakeDelegation } = useStakingService();
 
   const {

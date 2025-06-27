@@ -1,5 +1,5 @@
 import { FinalityProviderLogo } from "@/ui/components/Staking/FinalityProviders/FinalityProviderLogo";
-import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
+import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { trim } from "@/ui/utils/trim";
 
 export const BsnFinalityProviderItem = ({
@@ -11,7 +11,7 @@ export const BsnFinalityProviderItem = ({
   providerId: string;
   onRemove: (bsnId?: string) => void;
 }) => {
-  const { finalityProviderMap } = useFinalityProviderBsnState();
+  const { finalityProviderMap } = useFinalityProviderState();
   const provider = finalityProviderMap.get(providerId);
 
   if (!provider) {

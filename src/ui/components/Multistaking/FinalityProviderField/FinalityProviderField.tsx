@@ -8,6 +8,7 @@ import {
   StakingModalPage,
   useFinalityProviderBsnState,
 } from "@/ui/state/FinalityProviderBsnState";
+import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 
 import { ChainSelectionModal } from "../ChainSelectionModal/ChainSelectionModal";
 import { SubSection } from "../MultistakingForm/SubSection";
@@ -21,10 +22,11 @@ export function FinalityProviderField({ max }: Props) {
     bsnList,
     bsnLoading,
     stakingModalPage,
-    finalityProviderMap,
     setStakingModalPage,
     setSelectedBsnId,
   } = useFinalityProviderBsnState();
+  const { finalityProviderMap } = useFinalityProviderState();
+
   const { value: selectedFPs = [], onChange } = useField({
     name: "finalityProviders",
   });

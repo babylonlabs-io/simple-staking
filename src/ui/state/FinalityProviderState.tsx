@@ -101,15 +101,12 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  // Disable this state when Phase 3 is enabled (BSN functionality)
-  const shouldEnableQuery = !FeatureFlagService.IsPhase3Enabled;
-
   const { data, hasNextPage, fetchNextPage, isFetching, isError } =
     useFinalityProvidersV2({
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      enabled: shouldEnableQuery,
+      bsnId: FeatureFlagService.IsPhase3Enabled ? "all" : "",
     });
 
   const { data: dataV1 } = useFinalityProviders();
