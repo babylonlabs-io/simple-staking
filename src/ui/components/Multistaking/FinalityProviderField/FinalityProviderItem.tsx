@@ -9,7 +9,7 @@ import { trim } from "@/ui/utils/trim";
 
 interface FinalityProviderItemProps {
   finalityProvider: FinalityProvider;
-  bsn?: Bsn; // Only present when phase-3 flag is enabled
+  bsn?: Bsn;
   onRemove: (bsnId?: string) => void;
 }
 

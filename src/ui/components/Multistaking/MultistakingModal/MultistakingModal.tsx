@@ -14,6 +14,7 @@ import { useStakingService } from "@/ui/hooks/services/useStakingService";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { useStakingState } from "@/ui/state/StakingState";
 import { satoshiToBtc } from "@/ui/utils/btc";
+import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 import { maxDecimals } from "@/ui/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/ui/utils/time";
 import { trim } from "@/ui/utils/trim";
@@ -55,13 +56,15 @@ export function MultistakingModal() {
       .map((pk) => {
         const provider = finalityProviderMap.get(pk);
         if (!provider) return null;
+
+        const name: string = provider.description?.moniker;
         return {
-          name: provider.description?.moniker || trim(pk, 8),
+          name,
           icon: (
             <FinalityProviderLogo
               logoUrl={provider.logo_url}
               rank={provider.rank}
-              moniker={provider.description?.moniker}
+              moniker={name}
               className="w-8 h-8"
             />
           ),
@@ -71,6 +74,12 @@ export function MultistakingModal() {
   }, [formData?.finalityProviders, finalityProviderMap]);
 
   const bsnInfos = useMemo(() => {
+    const isPhase3 = FeatureFlagService.IsPhase3Enabled;
+
+    if (!isPhase3) {
+      return [];
+    }
+
     const bsnMap = new Map<string, { name: string; id: string }>();
 
     (formData?.finalityProviders ?? []).forEach((pk) => {
@@ -91,23 +100,20 @@ export function MultistakingModal() {
       }
     });
 
-    return Array.from(bsnMap.values()).map(({ name, id }) => ({
-      name,
-      icon: (
-        <img
-          src={chainLogos[id] || chainLogos.placeholder}
-          alt={name}
-          className="w-8 h-8 rounded-full"
-        />
-      ),
-    })) as { name: string; icon: React.ReactNode | undefined }[];
+    return Array.from(bsnMap.values()).map(({ name, id }) => {
+      const logoUrl =
+        chainLogos[id === "" ? "babylon" : id] || chainLogos.placeholder;
+
+      return {
+        name,
+        icon: <img src={logoUrl} alt={name} className="w-8 h-8 rounded-full" />,
+      };
+    }) as { name: string; icon: React.ReactNode | undefined }[];
   }, [formData?.finalityProviders, finalityProviderMap, bsnList]);
 
   const { coinSymbol } = getNetworkConfigBTC();
 
   if (!step) return null;
-
-  console.log({ finalityProviderInfos });
 
   return (
     <>
