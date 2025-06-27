@@ -6,7 +6,6 @@ import { chainLogos } from "@/ui/constants";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { Bsn } from "@/ui/types/bsn";
-import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 export const BsnFinalityProviderItem = ({
   bsnId,
@@ -19,7 +18,6 @@ export const BsnFinalityProviderItem = ({
 }) => {
   const { bsnList } = useFinalityProviderBsnState();
   const { finalityProviderMap } = useFinalityProviderState();
-  const isPhase3 = FeatureFlagService.IsPhase3Enabled;
   const provider = finalityProviderMap.get(providerId);
 
   const bsn = useMemo(
@@ -28,7 +26,7 @@ export const BsnFinalityProviderItem = ({
   );
 
   const renderBsnLogo = (bsn?: Bsn) => {
-    if (!isPhase3 || !bsn) {
+    if (!bsn) {
       return null;
     }
 
