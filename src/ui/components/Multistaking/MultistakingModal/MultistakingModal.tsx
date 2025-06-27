@@ -32,6 +32,7 @@ export function MultistakingModal() {
     stakingInfo,
     verifiedDelegation,
     reset: resetState,
+    stakingStepOptions,
   } = useStakingState();
 
   const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
@@ -100,6 +101,7 @@ export function MultistakingModal() {
           processing={processing}
           step={EOI_INDEXES[step]}
           title="Staking"
+          options={stakingStepOptions}
         />
       )}
 
