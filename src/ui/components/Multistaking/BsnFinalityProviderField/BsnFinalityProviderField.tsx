@@ -33,6 +33,7 @@ export function BsnFinalityProviderField({ max }: Props) {
   const {
     bsnList,
     bsnLoading,
+    finalityProviderMap,
     stakingModalPage,
     selectedBsnId,
     setStakingModalPage,
@@ -92,6 +93,8 @@ export function BsnFinalityProviderField({ max }: Props) {
         {count > 0 && (
           <SelectedProvidersList
             selectedFPs={selectedProviderMap}
+            bsnList={bsnList}
+            finalityProviderMap={finalityProviderMap}
             onRemove={handleRemove}
           />
         )}
