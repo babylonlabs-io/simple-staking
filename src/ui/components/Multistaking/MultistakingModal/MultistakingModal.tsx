@@ -2,14 +2,20 @@ import { useFormContext } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/ui/components/Modals/CancelFeedbackModal";
-import { PreviewMultistakingModal } from "@/ui/components/Modals/PreviewMultistakingModal";
+import { MultistakingPreviewModal } from "@/ui/components/Modals/MultistakingModal/MultistakingStartModal";
 import { SignModal } from "@/ui/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/ui/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/components/Modals/VerificationModal";
+import { FinalityProviderLogo } from "@/ui/components/Staking/FinalityProviders/FinalityProviderLogo";
+import { getNetworkConfigBTC } from "@/ui/config/network/btc";
+import { chainLogos } from "@/ui/constants";
 import { useStakingService } from "@/ui/hooks/services/useStakingService";
 import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { useStakingState } from "@/ui/state/StakingState";
+import { satoshiToBtc } from "@/ui/utils/btc";
+import { maxDecimals } from "@/ui/utils/maxDecimals";
+import { blocksToDisplayTime } from "@/ui/utils/time";
 import { trim } from "@/ui/utils/trim";
 
 const EOI_INDEXES: Record<string, number> = {
@@ -34,7 +40,7 @@ export function MultistakingModal() {
     reset: resetState,
   } = useStakingState();
 
-  const { getRegisteredFinalityProvider } = useFinalityProviderBsnState();
+  const { bsnList, finalityProviderMap } = useFinalityProviderBsnState();
 
   const { createEOI, stakeDelegation } = useStakingService();
 
@@ -44,36 +50,86 @@ export function MultistakingModal() {
     setValue: setFieldValue,
   } = useFormContext();
 
-  // Build provider info list for preview
-  const providerInfos = useMemo(() => {
+  const finalityProviderInfos = useMemo(() => {
     return (formData?.finalityProviders ?? [])
       .map((pk) => {
-        const provider = getRegisteredFinalityProvider(pk);
+        const provider = finalityProviderMap.get(pk);
         if (!provider) return null;
         return {
           name: provider.description?.moniker || trim(pk, 8),
-          avatar: provider.description?.identity,
+          icon: (
+            <FinalityProviderLogo
+              logoUrl={provider.logo_url}
+              rank={provider.rank}
+              moniker={provider.description?.moniker}
+              className="w-8 h-8"
+            />
+          ),
         };
       })
-      .filter(Boolean) as { name: string; avatar?: string }[];
-  }, [formData?.finalityProviders, getRegisteredFinalityProvider]);
+      .filter(Boolean) as { name: string; icon: React.ReactNode | undefined }[];
+  }, [formData?.finalityProviders, finalityProviderMap]);
+
+  const bsnInfos = useMemo(() => {
+    const bsnMap = new Map<string, { name: string; id: string }>();
+
+    (formData?.finalityProviders ?? []).forEach((pk) => {
+      const provider = finalityProviderMap.get(pk);
+      if (!provider) return;
+
+      const bsnId = (provider as any).bsnId || "";
+
+      const defaultBsnName = "Babylon Genesis";
+      const defaultBsnId = "babylon";
+
+      if (bsnId && !bsnMap.has(bsnId)) {
+        const bsnName =
+          bsnList.find((b) => b.id === bsnId)?.name || trim(bsnId, 8);
+        bsnMap.set(bsnId, { name: bsnName, id: bsnId });
+      } else if (!bsnId && !bsnMap.has("babylon")) {
+        bsnMap.set("babylon", { name: defaultBsnName, id: defaultBsnId });
+      }
+    });
+
+    return Array.from(bsnMap.values()).map(({ name, id }) => ({
+      name,
+      icon: (
+        <img
+          src={chainLogos[id] || chainLogos.placeholder}
+          alt={name}
+          className="w-8 h-8 rounded-full"
+        />
+      ),
+    })) as { name: string; icon: React.ReactNode | undefined }[];
+  }, [formData?.finalityProviders, finalityProviderMap, bsnList]);
+
+  const { coinSymbol } = getNetworkConfigBTC();
 
   if (!step) return null;
+
+  console.log({ finalityProviderInfos });
 
   return (
     <>
       {step === "preview" && stakingInfo && (
-        <PreviewMultistakingModal
+        <MultistakingPreviewModal
           open
           processing={processing}
-          providers={providerInfos}
-          stakingAmountSat={formData?.amount ?? 0}
-          stakingTimelock={formData?.term ?? 0}
-          stakingFeeSat={formData?.feeAmount ?? 0}
-          feeRate={formData?.feeRate ?? 0}
-          unbondingFeeSat={stakingInfo.unbondingFeeSat}
+          bsns={bsnInfos}
+          finalityProviders={finalityProviderInfos}
+          details={{
+            stakeAmount: `${maxDecimals(satoshiToBtc(formData?.amount ?? 0), 8)} ${coinSymbol}`,
+            feeRate: `${formData?.feeRate ?? 0} sat/vB`,
+            transactionFees: `${maxDecimals(satoshiToBtc(formData?.feeAmount ?? 0), 8)} ${coinSymbol}`,
+            term: {
+              blocks: `${formData?.term ?? 0} blocks`,
+              duration: `~ ${blocksToDisplayTime(formData?.term ?? 0)}`,
+            },
+            onDemandBonding: `Enabled (~ ${blocksToDisplayTime(stakingInfo.unbondingTime)} unbonding time)`,
+            unbondingFee: `${maxDecimals(satoshiToBtc(stakingInfo.unbondingFeeSat), 8)} ${coinSymbol}`,
+          }}
           onClose={resetState}
-          onSign={async () => {
+          onProceed={async () => {
             if (!formData) return;
             await createEOI(formData);
             resetForm({
