@@ -13,7 +13,6 @@ import { ResponsiveDialog } from "@/ui/components/Modals/ResponsiveDialog";
 import { chainLogos } from "@/ui/constants";
 import { Bsn } from "@/ui/types/bsn";
 
-// const { chainId: BSN_ID } = getNetworkConfigBBN();
 const BSN_ID = "";
 
 const SubSection = ({
