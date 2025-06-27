@@ -1,21 +1,12 @@
 import { useDebounce } from "@uidotdev/usehooks";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type PropsWithChildren,
-} from "react";
+import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 
 import { useSearchParams } from "@/ui/context/SearchParamsProvider";
 import { useBsn } from "@/ui/hooks/client/api/useBsn";
-import { useFinalityProviders } from "@/ui/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/hooks/client/api/useFinalityProvidersV2";
 import { Bsn } from "@/ui/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
-  FinalityProviderV1,
   type FinalityProvider,
 } from "@/ui/types/finalityProviders";
 import { createStateUtils } from "@/ui/utils/createStateUtils";
@@ -33,7 +24,6 @@ interface FilterState {
 interface FinalityProviderBsnState {
   filter: FilterState;
   finalityProviders: FinalityProvider[];
-  finalityProviderMap: Map<string, FinalityProvider>;
   isFetching: boolean;
   hasError: boolean;
   hasNextPage: boolean;
@@ -50,8 +40,6 @@ interface FinalityProviderBsnState {
   handleSort: (sortField: string) => void;
   handleFilter: (key: keyof FilterState, value: string) => void;
   isRowSelectable: (row: FinalityProvider) => boolean;
-  getRegisteredFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
-  getFinalityProviderName: (btcPkHex: string) => string | undefined;
 }
 
 export enum StakingModalPage {
@@ -110,9 +98,6 @@ const defaultState: FinalityProviderBsnState = {
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
-  getRegisteredFinalityProvider: () => null,
-  getFinalityProviderName: () => undefined,
-  finalityProviderMap: new Map(),
   stakingModalPage: StakingModalPage.DEFAULT,
   setStakingModalPage: () => {},
 };
@@ -127,7 +112,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const finalityProviderMap = useRef(new Map<string, FinalityProvider>());
 
   const [filter, setFilter] = useState<FilterState>({
     search: fpParam || "",
@@ -147,8 +131,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       bsnId: selectedBsnId,
       enabled: stakingModalPage === StakingModalPage.FINALITY_PROVIDER,
     });
-
-  const { data: dataV1 } = useFinalityProviders();
 
   const {
     data: bsnList = [],
@@ -179,51 +161,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
         id: fp.btcPk,
       }));
   }, [data?.finalityProviders]);
-
-  useEffect(() => {
-    finalityProviders.forEach((fp) => {
-      finalityProviderMap.current.set(fp.btcPk, fp);
-    });
-  }, [finalityProviders]);
-
-  const providersV1Map = useMemo(
-    () =>
-      (dataV1?.finalityProviders ?? []).reduce((acc, fp) => {
-        if (fp.btcPk) {
-          acc.set(fp.btcPk, fp);
-        }
-
-        return acc;
-      }, new Map<string, FinalityProviderV1>()),
-    [dataV1?.finalityProviders],
-  );
-
-  // TODO: this method is broken (we don't receive all FPs from BE anymore)
-  const getFinalityProviderName = useCallback(
-    (btcPkHex: string) => {
-      const fp =
-        finalityProviderMap.current.get(btcPkHex) ??
-        providersV1Map.get(btcPkHex);
-
-      if (!fp) return undefined;
-
-      const moniker = fp.description?.moniker?.trim();
-      if (moniker) return moniker;
-
-      const bsnId = (fp as FinalityProvider).bsnId;
-
-      if (bsnId === "") {
-        return "Babylon";
-      }
-
-      if (bsnId) {
-        return bsnList.find((bsn) => bsn.id === bsnId)?.name;
-      }
-
-      return undefined;
-    },
-    [finalityProviderMap, providersV1Map, bsnList],
-  );
 
   const handleFilter = useCallback((key: keyof FilterState, value: string) => {
     setFilter((state) => ({ ...state, [key]: value }));
@@ -256,12 +193,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     );
   }, [finalityProviders, filter]);
 
-  const getRegisteredFinalityProvider = useCallback(
-    (btcPkHex: string) =>
-      data?.finalityProviders.find((fp) => fp.btcPk === btcPkHex) || null,
-    [data?.finalityProviders],
-  );
-
   const state = useMemo(
     () => ({
       filter,
@@ -277,12 +208,9 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       setSelectedProviderIds,
       isFetching,
       hasError: isError,
-      finalityProviderMap: finalityProviderMap.current,
       handleSort,
       handleFilter,
       isRowSelectable,
-      getRegisteredFinalityProvider,
-      getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
     }),
@@ -300,12 +228,9 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       setSelectedProviderIds,
       isFetching,
       isError,
-      finalityProviderMap,
       handleSort,
       handleFilter,
       isRowSelectable,
-      getRegisteredFinalityProvider,
-      getFinalityProviderName,
       stakingModalPage,
       setStakingModalPage,
     ],
