@@ -17,7 +17,6 @@ import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState
 import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
 import { useStakingState } from "@/ui/state/StakingState";
 import { satoshiToBtc } from "@/ui/utils/btc";
-import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 import { calculateTokenValueInCurrency } from "@/ui/utils/formatCurrency";
 import { maxDecimals } from "@/ui/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/ui/utils/time";
@@ -59,16 +58,13 @@ export function MultistakingModal() {
   const { data: networkInfo } = useNetworkInfo();
   const btcInUsd = usePrice(coinSymbol);
 
-  // Get the current form field value directly to preserve BSN-FP mapping
   const currentFinalityProviders = useWatch({ name: "finalityProviders" });
 
-  // Build BSN and FP info for preview
   const { bsnInfos, finalityProviderInfos } = useMemo(() => {
     const bsns: Array<{ icon: React.ReactNode; name: string }> = [];
     const fps: Array<{ icon: React.ReactNode; name: string }> = [];
 
     if (currentFinalityProviders) {
-      // If currentFinalityProviders is a Record (multistaking), process BSN-FP pairs
       if (
         typeof currentFinalityProviders === "object" &&
         !Array.isArray(currentFinalityProviders)
@@ -76,12 +72,8 @@ export function MultistakingModal() {
         const providerMap = currentFinalityProviders as Record<string, string>;
 
         Object.entries(providerMap).forEach(([bsnId, fpPublicKey]) => {
-          // Get BSN info - in Phase 3 use actual BSN, in non-Phase 3 use babylon
-          const actualBsnId = FeatureFlagService.IsPhase3Enabled
-            ? bsnId
-            : "babylon";
-          const bsn = bsnList.find((bsn) => bsn.id === actualBsnId);
-
+          const bsn = bsnList.find((bsn) => bsn.id === bsnId);
+          console.log({ bsn });
           if (bsn) {
             const logoUrl =
               chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
@@ -98,7 +90,6 @@ export function MultistakingModal() {
             });
           }
 
-          // Get FP info
           const provider = getRegisteredFinalityProvider(fpPublicKey);
           if (provider) {
             fps.push({
@@ -115,29 +106,23 @@ export function MultistakingModal() {
           }
         });
       } else {
-        // If currentFinalityProviders is an array (single staking), process FPs and show Babylon BSN
         const fpArray = Array.isArray(currentFinalityProviders)
           ? currentFinalityProviders
           : [];
 
         fpArray.forEach((fpPublicKey) => {
-          // For single staking, always use babylon as BSN
-          const bsn = bsnList.find((bsn) => bsn.id === "babylon");
-          if (bsn) {
-            const logoUrl =
-              chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
-            bsns.push({
-              icon: (
-                <Avatar
-                  url={logoUrl}
-                  alt={bsn.name}
-                  variant="rounded"
-                  size="tiny"
-                />
-              ),
-              name: bsn.name,
-            });
-          }
+          const logoUrl = chainLogos["babylon"];
+          bsns.push({
+            icon: (
+              <Avatar
+                url={logoUrl}
+                alt={"Babylon"}
+                variant="rounded"
+                size="tiny"
+              />
+            ),
+            name: "Babylon",
+          });
 
           const provider = getRegisteredFinalityProvider(fpPublicKey);
           if (provider) {
@@ -160,7 +145,6 @@ export function MultistakingModal() {
     return { bsnInfos: bsns, finalityProviderInfos: fps };
   }, [currentFinalityProviders, bsnList, getRegisteredFinalityProvider]);
 
-  // Build details object for the new modal
   const details = useMemo(() => {
     if (!formData || !stakingInfo) return null;
 
