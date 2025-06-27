@@ -33,12 +33,17 @@ export function BsnFinalityProviderField({ max }: Props) {
   const {
     bsnList,
     bsnLoading,
-    finalityProviderMap,
     stakingModalPage,
     selectedBsnId,
     setStakingModalPage,
     setSelectedBsnId,
+    getSelectedProviders,
   } = useFinalityProviderBsnState();
+
+  const selectedProviders = useMemo(
+    () => getSelectedProviders(selectedProviderMap),
+    [getSelectedProviders, selectedProviderMap],
+  );
 
   const handleAdd = (selectedBsnId: string, providerPk: string) => {
     onChange({ ...selectedProviderMap, [selectedBsnId]: providerPk });
@@ -92,9 +97,7 @@ export function BsnFinalityProviderField({ max }: Props) {
         </div>
         {count > 0 && (
           <SelectedProvidersList
-            selectedFPs={selectedProviderMap}
-            bsnList={bsnList}
-            finalityProviderMap={finalityProviderMap}
+            selectedProviders={selectedProviders}
             onRemove={handleRemove}
           />
         )}

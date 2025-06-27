@@ -46,7 +46,9 @@ export const FinalityProviderItem = ({
         <div className="text-accent-primary flex flex-col justify-center">
           <div className="text-xs text-accent-secondary flex items-center">
             {renderBsnLogo()}
-            {finalityProvider.description?.moniker || "BSN Provider"}
+            {finalityProvider.description?.moniker ||
+              trim(finalityProvider.btcPk, 8) ||
+              "BSN Provider"}
           </div>
           <div className="text-base text-accent-primary font-medium">
             {trim(finalityProvider.btcPk, 8) || "Selected FP"}

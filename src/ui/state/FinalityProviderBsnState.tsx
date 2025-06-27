@@ -30,6 +30,11 @@ interface FilterState {
   status: "active" | "inactive" | "";
 }
 
+interface SelectedProvider {
+  bsn: Bsn;
+  finalityProvider: FinalityProvider;
+}
+
 interface FinalityProviderBsnState {
   filter: FilterState;
   finalityProviders: FinalityProvider[];
@@ -52,6 +57,9 @@ interface FinalityProviderBsnState {
   isRowSelectable: (row: FinalityProvider) => boolean;
   getRegisteredFinalityProvider: (btcPkHex: string) => FinalityProvider | null;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
+  getSelectedProviders: (
+    selectedProviderMap: Record<string, string>,
+  ) => SelectedProvider[];
 }
 
 export enum StakingModalPage {
@@ -112,6 +120,7 @@ const defaultState: FinalityProviderBsnState = {
   handleFilter: () => {},
   getRegisteredFinalityProvider: () => null,
   getFinalityProviderName: () => undefined,
+  getSelectedProviders: () => [],
   finalityProviderMap: new Map(),
   stakingModalPage: StakingModalPage.DEFAULT,
   setStakingModalPage: () => {},
@@ -262,6 +271,22 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     [data?.finalityProviders],
   );
 
+  const getSelectedProviders = useCallback(
+    (selectedProviderMap: Record<string, string>): SelectedProvider[] => {
+      return Object.entries(selectedProviderMap)
+        .map(([bsnId, providerId]) => {
+          const bsn = bsnList.find((b) => b.id === bsnId);
+          const finalityProvider = finalityProviderMap.current.get(providerId);
+
+          if (!bsn || !finalityProvider) return null;
+
+          return { bsn, finalityProvider };
+        })
+        .filter((item): item is NonNullable<typeof item> => item !== null);
+    },
+    [bsnList],
+  );
+
   const state = useMemo(
     () => ({
       filter,
@@ -283,6 +308,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       isRowSelectable,
       getRegisteredFinalityProvider,
       getFinalityProviderName,
+      getSelectedProviders,
       stakingModalPage,
       setStakingModalPage,
     }),
@@ -306,6 +332,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       isRowSelectable,
       getRegisteredFinalityProvider,
       getFinalityProviderName,
+      getSelectedProviders,
       stakingModalPage,
       setStakingModalPage,
     ],
@@ -315,3 +342,4 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
 }
 
 export { useFpBsnState as useFinalityProviderBsnState };
+export type { SelectedProvider };
