@@ -1,6 +1,12 @@
+import { Avatar } from "@babylonlabs-io/core-ui";
+import { useMemo } from "react";
+
 import { FinalityProviderLogo } from "@/ui/components/Staking/FinalityProviders/FinalityProviderLogo";
+import { chainLogos } from "@/ui/constants";
+import { useFinalityProviderBsnState } from "@/ui/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/state/FinalityProviderState";
-import { trim } from "@/ui/utils/trim";
+import { Bsn } from "@/ui/types/bsn";
+import FeatureFlagService from "@/ui/utils/FeatureFlagService";
 
 export const BsnFinalityProviderItem = ({
   bsnId,
@@ -11,8 +17,33 @@ export const BsnFinalityProviderItem = ({
   providerId: string;
   onRemove: (bsnId?: string) => void;
 }) => {
+  const { bsnList } = useFinalityProviderBsnState();
   const { finalityProviderMap } = useFinalityProviderState();
+  const isPhase3 = FeatureFlagService.IsPhase3Enabled;
   const provider = finalityProviderMap.get(providerId);
+
+  const bsn = useMemo(
+    () => bsnList.find((bsn) => bsn.id === bsnId),
+    [bsnList, bsnId],
+  );
+
+  const renderBsnLogo = (bsn?: Bsn) => {
+    if (!isPhase3 || !bsn) {
+      return null;
+    }
+
+    const logoUrl = chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
+
+    return (
+      <Avatar
+        url={logoUrl}
+        alt={bsn.name}
+        variant="rounded"
+        size="tiny"
+        className="mr-1"
+      />
+    );
+  };
 
   if (!provider) {
     return null;
@@ -28,11 +59,12 @@ export const BsnFinalityProviderItem = ({
           className="w-10 h-10"
         />
         <div className="text-accent-primary flex flex-col justify-center">
-          <div className="text-xs text-accent-secondary">
-            {provider.description?.moniker || "BSN Provider"}
+          <div className="text-xs text-accent-secondary flex items-center">
+            {renderBsnLogo(bsn)}
+            {bsn?.name}
           </div>
           <div className="text-base text-accent-primary font-medium">
-            {trim(provider.btcPk, 8) || "Selected FP"}
+            {provider.description?.moniker}
           </div>
         </div>
       </div>
