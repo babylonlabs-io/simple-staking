@@ -1,17 +1,17 @@
 import { act, renderHook } from "@testing-library/react";
 import { Transaction } from "bitcoinjs-lib";
 
-import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
-import { useCosmosWallet } from "@/ui/context/wallet/CosmosWalletProvider";
-import { useNetworkFees } from "@/ui/hooks/client/api/useNetworkFees";
-import { useBbnQuery } from "@/ui/hooks/client/rpc/queries/useBbnQuery";
-import { useStakingManagerService } from "@/ui/hooks/services/useStakingManagerService";
+import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
+import { useNetworkFees } from "@/ui/common/hooks/client/api/useNetworkFees";
+import { useBbnQuery } from "@/ui/common/hooks/client/rpc/queries/useBbnQuery";
+import { useStakingManagerService } from "@/ui/common/hooks/services/useStakingManagerService";
 import {
   BtcStakingInputs,
   useTransactionService,
-} from "@/ui/hooks/services/useTransactionService";
-import { useAppState } from "@/ui/state";
-import * as mempoolAPI from "@/ui/utils/mempool_api";
+} from "@/ui/common/hooks/services/useTransactionService";
+import { useAppState } from "@/ui/common/state";
+import * as mempoolAPI from "@/ui/common/utils/mempool_api";
 
 import { testingNetworks } from "../../../helper";
 
@@ -30,31 +30,31 @@ jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
 }));
 
 // Mock all dependencies at the module level, so we avoid importing the actual files
-jest.mock("@/ui/hooks/services/useStakingManagerService", () => ({
+jest.mock("@/ui/common/hooks/services/useStakingManagerService", () => ({
   useStakingManagerService: jest.fn(),
 }));
 
-jest.mock("@/ui/hooks/client/api/useNetworkFees", () => ({
+jest.mock("@/ui/common/hooks/client/api/useNetworkFees", () => ({
   useNetworkFees: jest.fn(),
 }));
 
-jest.mock("@/ui/hooks/client/rpc/queries/useBbnQuery", () => ({
+jest.mock("@/ui/common/hooks/client/rpc/queries/useBbnQuery", () => ({
   useBbnQuery: jest.fn(),
 }));
 
-jest.mock("@/ui/context/wallet/BTCWalletProvider", () => ({
+jest.mock("@/ui/common/context/wallet/BTCWalletProvider", () => ({
   useBTCWallet: jest.fn(),
 }));
 
-jest.mock("@/ui/context/wallet/CosmosWalletProvider", () => ({
+jest.mock("@/ui/common/context/wallet/CosmosWalletProvider", () => ({
   useCosmosWallet: jest.fn(),
 }));
 
-jest.mock("@/ui/state", () => ({
+jest.mock("@/ui/common/state", () => ({
   useAppState: jest.fn(),
 }));
 
-jest.mock("@/ui/utils/mempool_api", () => ({
+jest.mock("@/ui/common/utils/mempool_api", () => ({
   getTxMerkleProof: jest.fn(),
   getTxInfo: jest.fn(),
 }));

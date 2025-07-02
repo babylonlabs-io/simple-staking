@@ -1,6 +1,9 @@
-import { apiWrapper } from "@/ui/api/apiWrapper";
-import { getDelegationV2, getDelegationsV2 } from "@/ui/api/getDelegationsV2";
-import { DelegationV2StakingState } from "@/ui/types/delegationsV2";
+import { apiWrapper } from "@/ui/common/api/apiWrapper";
+import {
+  getDelegationV2,
+  getDelegationsV2,
+} from "@/ui/common/api/getDelegationsV2";
+import { DelegationV2StakingState } from "@/ui/common/types/delegationsV2";
 
 import {
   mockPaginatedResponse,
@@ -8,7 +11,7 @@ import {
 } from "./getDelegationsV2.mocks";
 
 // Mock the apiWrapper module
-jest.mock("@/ui/api/apiWrapper");
+jest.mock("@/ui/common/api/apiWrapper");
 
 describe("getDelegationsV2 API functions", () => {
   beforeEach(() => {

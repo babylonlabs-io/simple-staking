@@ -3,37 +3,37 @@ import { PropsWithChildren } from "react";
 
 // Mock the dependencies, but keep their APIs close to real ones
 const mockUseAppState = jest.fn();
-jest.mock("@/ui/state", () => ({
+jest.mock("@/ui/common/state", () => ({
   useAppState: () => mockUseAppState(),
 }));
 
-jest.mock("@/ui/config", () => ({
+jest.mock("@/ui/common/config", () => ({
   IS_FIXED_TERM_FIELD: false,
   getDisabledWallets: () => [],
 }));
 
 const mockUseHealthCheck = jest.fn();
-jest.mock("@/ui/hooks/useHealthCheck", () => ({
+jest.mock("@/ui/common/hooks/useHealthCheck", () => ({
   useHealthCheck: () => mockUseHealthCheck(),
 }));
 
 const mockUseNetworkFees = jest.fn();
-jest.mock("@/ui/hooks/client/api/useNetworkFees", () => ({
+jest.mock("@/ui/common/hooks/client/api/useNetworkFees", () => ({
   useNetworkFees: () => mockUseNetworkFees(),
 }));
 
 const mockUseBalanceState = jest.fn();
-jest.mock("@/ui/state/BalanceState", () => ({
+jest.mock("@/ui/common/state/BalanceState", () => ({
   useBalanceState: () => mockUseBalanceState(),
 }));
 
 const mockUseBTCWallet = jest.fn();
-jest.mock("@/ui/context/wallet/BTCWalletProvider", () => ({
+jest.mock("@/ui/common/context/wallet/BTCWalletProvider", () => ({
   useBTCWallet: () => mockUseBTCWallet(),
 }));
 
 const mockUseCosmosWallet = jest.fn();
-jest.mock("@/ui/context/wallet/CosmosWalletProvider", () => ({
+jest.mock("@/ui/common/context/wallet/CosmosWalletProvider", () => ({
   useCosmosWallet: () => mockUseCosmosWallet(),
 }));
 
@@ -61,14 +61,14 @@ import {
   StakingState,
   StakingStep,
   useStakingState,
-} from "@/ui/state/StakingState";
+} from "@/ui/common/state/StakingState";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/ui/types/delegationsV2";
+} from "@/ui/common/types/delegationsV2";
 
 // Mock getFeeRateFromMempool
-jest.mock("@/ui/utils/getFeeRateFromMempool", () => ({
+jest.mock("@/ui/common/utils/getFeeRateFromMempool", () => ({
   getFeeRateFromMempool: jest.fn().mockReturnValue({
     minFeeRate: 1,
     defaultFeeRate: 5,

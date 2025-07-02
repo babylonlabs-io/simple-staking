@@ -6,9 +6,9 @@
  * application in realistic transaction scenarios.
  */
 
-import { Fees } from "@/ui/types/fee";
-import { getFeeRateFromMempool } from "@/ui/utils/getFeeRateFromMempool";
-import { nextPowerOfTwo } from "@/ui/utils/nextPowerOfTwo";
+import { Fees } from "@/ui/common/types/fee";
+import { getFeeRateFromMempool } from "@/ui/common/utils/getFeeRateFromMempool";
+import { nextPowerOfTwo } from "@/ui/common/utils/nextPowerOfTwo";
 
 // Constants from the actual codebase
 const DUST_LIMIT = 546; // satoshis

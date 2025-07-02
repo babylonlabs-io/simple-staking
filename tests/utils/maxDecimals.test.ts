@@ -1,4 +1,4 @@
-import { maxDecimals } from "@/ui/utils/maxDecimals";
+import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 describe("maxDecimals", () => {
   it("should limit the number of decimal places to 2", () => {
