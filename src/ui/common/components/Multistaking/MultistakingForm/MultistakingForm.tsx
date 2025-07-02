@@ -3,7 +3,6 @@ import { useCallback } from "react";
 
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { BsnFinalityProviderField } from "@/ui/common/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
-import { FinalityProviderField } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderField";
 import { AmountSubsection } from "@/ui/common/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/ui/common/components/Multistaking/MultistakingForm/FeesSection";
 import { MultistakingModal } from "@/ui/common/components/Multistaking/MultistakingModal/MultistakingModal";
@@ -73,11 +72,11 @@ export function MultistakingForm() {
         <HiddenField name="feeAmount" defaultValue="0" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            {FeatureFlagService.IsPhase3Enabled ? (
-              <BsnFinalityProviderField max={maxFinalityProviders} />
-            ) : (
-              <FinalityProviderField max={1} />
-            )}
+            <BsnFinalityProviderField
+              max={
+                FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1
+              }
+            />
             <AmountSubsection />
             <FeesSection />
 

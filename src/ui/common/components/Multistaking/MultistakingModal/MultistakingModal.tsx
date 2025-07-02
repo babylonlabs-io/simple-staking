@@ -73,20 +73,19 @@ export function MultistakingModal() {
 
         Object.entries(providerMap).forEach(([bsnId, fpPublicKey]) => {
           const bsn = bsnList.find((bsn) => bsn.id === bsnId);
-          console.log({ bsn });
-          if (bsn) {
+          if (bsn || bsnId === "") {
             const logoUrl =
-              chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
+              chainLogos[bsn?.id || "babylon"] || chainLogos.placeholder;
             bsns.push({
               icon: (
                 <Avatar
                   url={logoUrl}
-                  alt={bsn.name}
+                  alt={bsn?.name || "Babylon"}
                   variant="rounded"
                   size="tiny"
                 />
               ),
-              name: bsn.name,
+              name: bsn?.name || "Babylon",
             });
           }
 
