@@ -55,6 +55,7 @@ jobs:
           NEXT_PUBLIC_DISABLED_WALLETS: ${{ vars.NEXT_PUBLIC_DISABLED_WALLETS }}
           S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
+          GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
           SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           SENTRY_URL: ${{ vars.SENTRY_URL }}
