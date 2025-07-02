@@ -94,12 +94,7 @@ export function BsnFinalityProviderField({ max }: Props) {
             <span className="text-sm sm:text-base">
               Add BSN and Finality Provider
             </span>
-            <CounterButton
-              counter={count}
-              max={max}
-              onAdd={handleOpen}
-              alwaysShowCounter={true}
-            />
+            <CounterButton counter={count} max={max} onAdd={handleOpen} />
           </div>
         </div>
         {count > 0 && (
