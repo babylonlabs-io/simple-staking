@@ -3,9 +3,9 @@ import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
-import { ClientError } from "@/ui/errors";
-import { ERROR_CODES } from "@/ui/errors/codes";
-import { getPublicKeyNoCoord } from "@/ui/utils/wallet";
+import { ClientError } from "@/ui/common/errors";
+import { ERROR_CODES } from "@/ui/common/errors/codes";
+import { getPublicKeyNoCoord } from "@/ui/common/utils/wallet";
 
 // Initialize the ECC library
 initBTCCurve();

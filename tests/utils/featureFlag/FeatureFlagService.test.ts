@@ -1,4 +1,4 @@
-import FeatureFlagService from "../../../src/ui/utils/FeatureFlagService";
+import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 describe("FeatureFlagService", () => {
   const originalEnv = process.env;
