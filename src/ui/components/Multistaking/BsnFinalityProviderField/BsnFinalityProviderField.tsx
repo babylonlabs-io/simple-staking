@@ -39,6 +39,8 @@ export function BsnFinalityProviderField({ max }: Props) {
     setSelectedBsnId,
   } = useFinalityProviderBsnState();
 
+  const allowsMultipleBsns = max > 1;
+
   const handleAdd = (selectedBsnId: string, providerPk: string) => {
     onChange({ ...selectedProviderMap, [selectedBsnId]: providerPk });
     setStakingModalPage(StakingModalPage.DEFAULT);
@@ -53,7 +55,12 @@ export function BsnFinalityProviderField({ max }: Props) {
   };
 
   const handleOpen = () => {
-    setStakingModalPage(StakingModalPage.BSN);
+    if (allowsMultipleBsns) {
+      setStakingModalPage(StakingModalPage.BSN);
+    } else {
+      setSelectedBsnId("");
+      setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
+    }
   };
 
   const handleClose = () => {
@@ -70,8 +77,14 @@ export function BsnFinalityProviderField({ max }: Props) {
   };
 
   const handleBack = () => {
-    setStakingModalPage(StakingModalPage.BSN);
+    if (allowsMultipleBsns) {
+      setStakingModalPage(StakingModalPage.BSN);
+    } else {
+      setStakingModalPage(StakingModalPage.DEFAULT);
+    }
   };
+
+  const effectiveSelectedBsnId = allowsMultipleBsns ? selectedBsnId : "";
 
   return (
     <SubSection>
@@ -109,7 +122,7 @@ export function BsnFinalityProviderField({ max }: Props) {
       />
 
       <FinalityProviderModal
-        selectedBsnId={selectedBsnId}
+        selectedBsnId={effectiveSelectedBsnId}
         open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
         onClose={handleClose}
         onAdd={handleAdd}
