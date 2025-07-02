@@ -3,23 +3,23 @@ import { PropsWithChildren } from "react";
 
 // Mock the dependencies, but keep their APIs close to real ones
 const mockUseBbnQuery = jest.fn();
-jest.mock("@/ui/hooks/client/rpc/queries/useBbnQuery", () => ({
+jest.mock("@/ui/common/hooks/client/rpc/queries/useBbnQuery", () => ({
   useBbnQuery: () => mockUseBbnQuery(),
 }));
 
 const mockUseAppState = jest.fn();
-jest.mock("@/ui/state", () => ({
+jest.mock("@/ui/common/state", () => ({
   useAppState: () => mockUseAppState(),
 }));
 
 const mockUseDelegationV2State = jest.fn();
-jest.mock("@/ui/state/DelegationV2State", () => ({
+jest.mock("@/ui/common/state/DelegationV2State", () => ({
   useDelegationV2State: () => mockUseDelegationV2State(),
 }));
 
 // Import the actual component we're testing (after mocks are defined)
-import { BalanceState, useBalanceState } from "@/ui/state/BalanceState";
-import { DelegationV2StakingState } from "@/ui/types/delegationsV2";
+import { BalanceState, useBalanceState } from "@/ui/common/state/BalanceState";
+import { DelegationV2StakingState } from "@/ui/common/types/delegationsV2";
 
 // Create a test wrapper that provides the Balance state
 const TestWrapper = ({ children }: PropsWithChildren) => (

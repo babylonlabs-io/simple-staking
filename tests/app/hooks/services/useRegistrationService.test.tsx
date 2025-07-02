@@ -1,8 +1,8 @@
 // Mock SVG imports
-jest.mock("@/ui/assets/warning-triangle.svg", () => "SVG-mock");
+jest.mock("@/ui/common/assets/warning-triangle.svg", () => "SVG-mock");
 
 // Mock the Error Provider to avoid the SVG import issue
-jest.mock("@/ui/context/Error/ErrorProvider", () => ({
+jest.mock("@/ui/common/context/Error/ErrorProvider", () => ({
   useError: jest.fn(),
 }));
 
@@ -14,32 +14,32 @@ jest.mock("@uidotdev/usehooks", () => ({
 import { RegistrationStep } from "@babylonlabs-io/btc-staking-ts";
 import { act, renderHook } from "@testing-library/react";
 
-import { getDelegationV2 } from "@/ui/api/getDelegationsV2";
-import { ONE_SECOND } from "@/ui/constants";
-import { useError } from "@/ui/context/Error/ErrorProvider";
-import { ClientError } from "@/ui/errors";
-import { useBbnTransaction } from "@/ui/hooks/client/rpc/mutation/useBbnTransaction";
-import { useRegistrationService } from "@/ui/hooks/services/useRegistrationService";
-import { useTransactionService } from "@/ui/hooks/services/useTransactionService";
-import { useDelegationState } from "@/ui/state/DelegationState";
-import { useDelegationV2State } from "@/ui/state/DelegationV2State";
-import { Delegation } from "@/ui/types/delegations";
+import { getDelegationV2 } from "@/ui/common/api/getDelegationsV2";
+import { ONE_SECOND } from "@/ui/common/constants";
+import { useError } from "@/ui/common/context/Error/ErrorProvider";
+import { ClientError } from "@/ui/common/errors";
+import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
+import { useRegistrationService } from "@/ui/common/hooks/services/useRegistrationService";
+import { useTransactionService } from "@/ui/common/hooks/services/useTransactionService";
+import { useDelegationState } from "@/ui/common/state/DelegationState";
+import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
+import { Delegation } from "@/ui/common/types/delegations";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/ui/types/delegationsV2";
-import { retry } from "@/ui/utils";
+} from "@/ui/common/types/delegationsV2";
+import { retry } from "@/ui/common/utils";
 
 // Mock all dependencies
-jest.mock("@/ui/api/getDelegationsV2");
-jest.mock("@/ui/constants", () => ({
+jest.mock("@/ui/common/api/getDelegationsV2");
+jest.mock("@/ui/common/constants", () => ({
   ONE_SECOND: 1000,
 }));
-jest.mock("@/ui/hooks/client/rpc/mutation/useBbnTransaction");
-jest.mock("@/ui/hooks/services/useTransactionService");
-jest.mock("@/ui/state/DelegationState");
-jest.mock("@/ui/state/DelegationV2State");
-jest.mock("@/ui/utils", () => ({
+jest.mock("@/ui/common/hooks/client/rpc/mutation/useBbnTransaction");
+jest.mock("@/ui/common/hooks/services/useTransactionService");
+jest.mock("@/ui/common/state/DelegationState");
+jest.mock("@/ui/common/state/DelegationV2State");
+jest.mock("@/ui/common/utils", () => ({
   retry: jest.fn(),
 }));
 

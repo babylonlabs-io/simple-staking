@@ -1,8 +1,8 @@
 // Mock SVG imports
-jest.mock("@/ui/assets/warning-triangle.svg", () => "SVG-mock");
+jest.mock("@/ui/common/assets/warning-triangle.svg", () => "SVG-mock");
 
 // Mock the Error Provider to avoid the SVG import issue
-jest.mock("@/ui/context/Error/ErrorProvider", () => ({
+jest.mock("@/ui/common/context/Error/ErrorProvider", () => ({
   useError: jest.fn(),
 }));
 
@@ -13,31 +13,31 @@ jest.mock("@uidotdev/usehooks", () => ({
 
 import { act, renderHook } from "@testing-library/react";
 
-import { getDelegationV2 } from "@/ui/api/getDelegationsV2";
-import { useError } from "@/ui/context/Error/ErrorProvider";
-import { useBTCWallet } from "@/ui/context/wallet/BTCWalletProvider";
-import { useCosmosWallet } from "@/ui/context/wallet/CosmosWalletProvider";
-import { useBbnTransaction } from "@/ui/hooks/client/rpc/mutation/useBbnTransaction";
-import { useStakingService } from "@/ui/hooks/services/useStakingService";
-import { useTransactionService } from "@/ui/hooks/services/useTransactionService";
-import { useDelegationV2State } from "@/ui/state/DelegationV2State";
-import { StakingStep, useStakingState } from "@/ui/state/StakingState";
+import { getDelegationV2 } from "@/ui/common/api/getDelegationsV2";
+import { useError } from "@/ui/common/context/Error/ErrorProvider";
+import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
+import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
+import { useStakingService } from "@/ui/common/hooks/services/useStakingService";
+import { useTransactionService } from "@/ui/common/hooks/services/useTransactionService";
+import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
+import { StakingStep, useStakingState } from "@/ui/common/state/StakingState";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/ui/types/delegationsV2";
-import { retry } from "@/ui/utils";
+} from "@/ui/common/types/delegationsV2";
+import { retry } from "@/ui/common/utils";
 
 // Mock all dependencies
-jest.mock("@/ui/api/getDelegationsV2");
-jest.mock("@/ui/context/Error/ErrorProvider");
-jest.mock("@/ui/context/wallet/BTCWalletProvider");
-jest.mock("@/ui/context/wallet/CosmosWalletProvider");
-jest.mock("@/ui/hooks/services/useTransactionService");
-jest.mock("@/ui/hooks/client/rpc/mutation/useBbnTransaction");
-jest.mock("@/ui/state/DelegationV2State");
-jest.mock("@/ui/state/StakingState");
-jest.mock("@/ui/utils", () => ({
+jest.mock("@/ui/common/api/getDelegationsV2");
+jest.mock("@/ui/common/context/Error/ErrorProvider");
+jest.mock("@/ui/common/context/wallet/BTCWalletProvider");
+jest.mock("@/ui/common/context/wallet/CosmosWalletProvider");
+jest.mock("@/ui/common/hooks/services/useTransactionService");
+jest.mock("@/ui/common/hooks/client/rpc/mutation/useBbnTransaction");
+jest.mock("@/ui/common/state/DelegationV2State");
+jest.mock("@/ui/common/state/StakingState");
+jest.mock("@/ui/common/utils", () => ({
   retry: jest.fn(),
   btcToSatoshi: (value: number) => value * 100000000, // Mock satoshi conversion
 }));

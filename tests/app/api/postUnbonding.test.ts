@@ -1,5 +1,5 @@
-import { apiWrapper } from "@/ui/api/apiWrapper";
-import { postUnbonding } from "@/ui/api/postUnbonding";
+import { apiWrapper } from "@/ui/common/api/apiWrapper";
+import { postUnbonding } from "@/ui/common/api/postUnbonding";
 
 import {
   mockAcceptedResponse,
@@ -8,7 +8,7 @@ import {
 } from "./postUnbonding.mocks";
 
 // Mock the apiWrapper module
-jest.mock("@/ui/api/apiWrapper");
+jest.mock("@/ui/common/api/apiWrapper");
 
 describe("postUnbonding", () => {
   beforeEach(() => {
