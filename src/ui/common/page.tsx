@@ -3,16 +3,14 @@ import { useEffect } from "react";
 
 import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
-import { Banner } from "./components/Banner/Banner";
 import { Container } from "./components/Container/Container";
 import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
-import { Footer } from "./components/Footer/Footer";
-import { Header } from "./components/Header/Header";
 import { MultistakingFormWrapper } from "./components/Multistaking/MultistakingForm/MultistakingFormWrapper";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { StakingForm } from "./components/Staking/StakingForm";
 import { Stats } from "./components/Stats/Stats";
+import Layout from "./layout";
 
 const Home = () => {
   useEffect(() => {
@@ -20,10 +18,7 @@ const Home = () => {
   }, []);
 
   return (
-    <>
-      <Banner />
-      <Header />
-
+    <Layout>
       <Container
         as="main"
         className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
@@ -38,9 +33,7 @@ const Home = () => {
         <Activity />
         <FAQ />
       </Container>
-
-      <Footer />
-    </>
+    </Layout>
   );
 };
 

@@ -1,7 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import { useSearchParams } from "react-router";
 
-import { useSearchParams } from "@/ui/common/context/SearchParamsProvider";
 import { useBsn } from "@/ui/common/hooks/client/api/useBsn";
 import { useFinalityProvidersV2 } from "@/ui/common/hooks/client/api/useFinalityProvidersV2";
 import { Bsn } from "@/ui/common/types/bsn";
@@ -106,7 +106,7 @@ const { StateProvider, useState: useFpBsnState } =
   createStateUtils<FinalityProviderBsnState>(defaultState);
 
 export function FinalityProviderBsnState({ children }: PropsWithChildren) {
-  const params = useSearchParams();
+  const [params] = useSearchParams();
   const fpParam = params.get("fp");
 
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(

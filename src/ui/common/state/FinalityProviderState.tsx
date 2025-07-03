@@ -1,7 +1,7 @@
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import { useSearchParams } from "react-router";
 
-import { useSearchParams } from "@/ui/common/context/SearchParamsProvider";
 import { useFinalityProviders } from "@/ui/common/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/common/hooks/client/api/useFinalityProvidersV2";
 import {
@@ -91,7 +91,7 @@ const { StateProvider, useState: useFpState } =
   createStateUtils<FinalityProviderState>(defaultState);
 
 export function FinalityProviderState({ children }: PropsWithChildren) {
-  const params = useSearchParams();
+  const [params] = useSearchParams();
   const fpParam = params.get("fp");
 
   const [filter, setFilter] = useState<FilterState>({
