@@ -1,8 +1,6 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useEffect } from "react";
 
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
-
 import { Banner } from "./components/Banner/Banner";
 import { Container } from "./components/Container/Container";
 import { Activity } from "./components/Delegations/Activity";
@@ -11,13 +9,36 @@ import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
 import { MultistakingFormWrapper } from "./components/Multistaking/MultistakingForm/MultistakingFormWrapper";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
-import { StakingForm } from "./components/Staking/StakingForm";
 import { Stats } from "./components/Stats/Stats";
+import { Tabs } from "./components/Tabs";
 
 const Home = () => {
   useEffect(() => {
     initBTCCurve();
   }, []);
+
+  const tabItems = [
+    {
+      id: "stake",
+      label: "Stake",
+      content: <MultistakingFormWrapper />,
+    },
+    {
+      id: "balances",
+      label: "Balances",
+      content: <PersonalBalance />,
+    },
+    {
+      id: "activity",
+      label: "Activity",
+      content: <Activity />,
+    },
+    {
+      id: "faqs",
+      label: "FAQs",
+      content: <FAQ />,
+    },
+  ];
 
   return (
     <>
@@ -26,17 +47,10 @@ const Home = () => {
 
       <Container
         as="main"
-        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
+        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto"
       >
         <Stats />
-        <PersonalBalance />
-        {FeatureFlagService.IsMultiStakingEnabled ? (
-          <MultistakingFormWrapper />
-        ) : (
-          <StakingForm />
-        )}
-        <Activity />
-        <FAQ />
+        <Tabs items={tabItems} defaultActiveTab="stake" />
       </Container>
 
       <Footer />
