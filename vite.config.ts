@@ -89,6 +89,9 @@ export default defineConfig({
     "import.meta.env.NEXT_PUBLIC_COMMIT_HASH": JSON.stringify(
       process.env.NEXT_PUBLIC_COMMIT_HASH || "development",
     ),
+    "import.meta.env.NEXT_PUBLIC_CANONICAL": JSON.stringify(
+      process.env.NEXT_PUBLIC_CANONICAL || "https://babylonlabs.io/",
+    ),
     "process.env.NEXT_TELEMETRY_DISABLED": JSON.stringify("1"),
   },
 });
