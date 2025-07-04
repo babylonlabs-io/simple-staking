@@ -8,6 +8,7 @@ import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/common/components/Modals/VerificationModal";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { chainLogos } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
@@ -60,6 +61,8 @@ export function MultistakingModal() {
 
   const currentFinalityProviders = useWatch({ name: "finalityProviders" });
 
+  const BBN_CHAIN_ID = getNetworkConfigBBN().chainId;
+
   const { bsnInfos, finalityProviderInfos } = useMemo(() => {
     const bsns: Array<{ icon: React.ReactNode; name: string }> = [];
     const fps: Array<{ icon: React.ReactNode; name: string }> = [];
@@ -73,7 +76,7 @@ export function MultistakingModal() {
 
         Object.entries(providerMap).forEach(([bsnId, fpPublicKey]) => {
           const bsn = bsnList.find((bsn) => bsn.id === bsnId);
-          if (bsn || bsnId === "") {
+          if (bsn || bsnId === BBN_CHAIN_ID) {
             const logoUrl =
               chainLogos[bsn?.id || "babylon"] || chainLogos.placeholder;
             bsns.push({
@@ -142,7 +145,12 @@ export function MultistakingModal() {
     }
 
     return { bsnInfos: bsns, finalityProviderInfos: fps };
-  }, [currentFinalityProviders, bsnList, getRegisteredFinalityProvider]);
+  }, [
+    currentFinalityProviders,
+    bsnList,
+    getRegisteredFinalityProvider,
+    BBN_CHAIN_ID,
+  ]);
 
   const details = useMemo(() => {
     if (!formData || !stakingInfo) return null;
