@@ -80,12 +80,12 @@ export function MultistakingModal() {
               icon: (
                 <Avatar
                   url={logoUrl}
-                  alt={bsn?.name || "Babylon"}
+                  alt={bsn?.name || "Babylon Genesis"}
                   variant="rounded"
                   size="tiny"
                 />
               ),
-              name: bsn?.name || "Babylon",
+              name: bsn?.name || "Babylon Genesis",
             });
           }
 
@@ -115,12 +115,12 @@ export function MultistakingModal() {
             icon: (
               <Avatar
                 url={logoUrl}
-                alt={"Babylon"}
+                alt={"Babylon Genesis"}
                 variant="rounded"
                 size="tiny"
               />
             ),
-            name: "Babylon",
+            name: "Babylon Genesis",
           });
 
           const provider = getRegisteredFinalityProvider(fpPublicKey);

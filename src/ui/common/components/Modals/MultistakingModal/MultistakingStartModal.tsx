@@ -150,7 +150,7 @@ export const MultistakingPreviewModal = ({
             2. Your stake will first be sent to Babylon Genesis for verification
             (~20 seconds), then you will be prompted to submit it to the Bitcoin
             ledger. It will be marked as &apos;Pending&apos; until it receives
-            10 Bitcoin confirmations
+            10 Bitcoin confirmations.
           </Text>
         </div>
       </DialogBody>
@@ -170,7 +170,7 @@ export const MultistakingPreviewModal = ({
           className="flex-1"
           disabled={processing}
         >
-          {processing ? "Processing..." : "Process to Signing"}
+          {processing ? "Processing..." : "Proceed to Signing"}
         </Button>
       </DialogFooter>
     </ResponsiveDialog>
