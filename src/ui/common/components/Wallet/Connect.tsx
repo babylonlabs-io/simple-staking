@@ -114,7 +114,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   if (!isConnected) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <Button
           size="large"
           color="secondary"
@@ -243,7 +243,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   return (
     <>
-      <div className="relative flex flex-row items-center gap-2">
+      <div className="relative flex flex-row items-center gap-4">
         <div className="flex flex-row">
           <AvatarGroup max={2} variant="circular">
             <Avatar
