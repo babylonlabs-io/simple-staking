@@ -29,7 +29,7 @@ export const Tabs = ({ items, defaultActiveTab, className }: TabsProps) => {
             className={twMerge(
               "px-4 py-2 rounded transition-colors duration-200 text-primary",
               activeTab === item.id
-                ? "bg-secondary-strokeDark"
+                ? "bg-secondary-highlight"
                 : "bg-transparent",
             )}
             onClick={() => setActiveTab(item.id)}

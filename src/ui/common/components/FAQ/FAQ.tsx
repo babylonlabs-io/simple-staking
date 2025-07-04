@@ -11,7 +11,7 @@ export const FAQ = () => {
 
   return (
     <SectionContainer title="FAQs" titleClassName="md:text-[1.25rem] mt-10">
-      <Card className="flex flex-col gap-4 divide-y">
+      <Card className="flex flex-col gap-4 divide-y bg-secondary-highlight">
         {questions(coinName).map((question) => (
           <Section
             key={question.title}

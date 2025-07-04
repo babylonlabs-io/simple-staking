@@ -17,7 +17,6 @@ export default function RootLayout({
         className={twJoin(
           `relative h-full min-h-svh w-full`,
           network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet",
-          "bg-primary-contrast",
         )}
       >
         {children}

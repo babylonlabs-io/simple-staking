@@ -29,7 +29,7 @@ export const Stats = memo(() => {
   const usdRate = usePrice(coinSymbol);
 
   return (
-    <Section title="Babylon Stats" titleClassName="text-accent-contrast">
+    <Section title="Babylon Stats">
       <List orientation="adaptive" className="bg-surface">
         <StatItem
           loading={isLoading}
