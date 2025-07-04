@@ -10,6 +10,8 @@ import { FiCheck, FiCopy } from "react-icons/fi";
 
 import WarningTriangle from "@/ui/common/assets/warning-triangle.svg";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
+import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { ErrorType, ShowErrorParams } from "@/ui/common/types/errors";
 import { getCommitHash } from "@/ui/common/utils/version";
 
@@ -20,6 +22,19 @@ export const ErrorModal: React.FC = () => {
   const { retryAction, noCancel } = modalOptions;
   const [copied, setCopied] = useState(false);
   const version = getCommitHash();
+
+  const {
+    connected: btcConnected,
+    address: btcAddress,
+    publicKeyNoCoord: btcPublicKey,
+    network: btcNetwork,
+  } = useBTCWallet();
+
+  const {
+    connected: cosmosConnected,
+    bech32Address: cosmosAddress,
+    walletName: cosmosWalletName,
+  } = useCosmosWallet();
 
   const handleRetry = () => {
     const retryErrorParam: ShowErrorParams = {
@@ -71,14 +86,33 @@ export const ErrorModal: React.FC = () => {
   };
 
   const copyErrorDetails = () => {
+    const walletInfo: any = {};
+
+    if (btcConnected) {
+      walletInfo.btcWallet = {
+        connected: true,
+        address: btcAddress,
+        publicKeyNoCoord: btcPublicKey,
+        network: btcNetwork?.bech32 || "unknown",
+      };
+    }
+
+    if (cosmosConnected) {
+      walletInfo.cosmosWallet = {
+        connected: true,
+        address: cosmosAddress,
+        walletName: cosmosWalletName,
+      };
+    }
+
     const errorDetails = JSON.stringify(
       {
         date: new Date().toISOString(),
         device: navigator.userAgent,
         version,
-        release: version,
         environment: process.env.NODE_ENV,
         ...error,
+        ...(Object.keys(walletInfo).length > 0 && { walletInfo }),
       },
       null,
       2,
