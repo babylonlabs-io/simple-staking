@@ -213,7 +213,7 @@ export const Connect: React.FC<ConnectProps> = ({
         <div className="flex items-center justify-center">
           <img
             src={bbnIcon}
-            alt="babylon genesis"
+            alt="Babylon Genesis"
             className="max-w-[40px] max-h-[40px]"
           />
         </div>
