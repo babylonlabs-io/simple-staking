@@ -1,4 +1,6 @@
+import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
+import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import { useEffect } from "react";
 
 import { Banner } from "./components/Banner/Banner";
@@ -17,22 +19,30 @@ const Home = () => {
     initBTCCurve();
   }, []);
 
+  const { connected } = useWalletConnect();
+  const { isGeoBlocked, isLoading } = useHealthCheck();
+  const isConnected = connected && !isGeoBlocked && !isLoading;
+
   const tabItems = [
     {
       id: "stake",
       label: "Stake",
       content: <MultistakingFormWrapper />,
     },
-    {
-      id: "balances",
-      label: "Balances",
-      content: <PersonalBalance />,
-    },
-    {
-      id: "activity",
-      label: "Activity",
-      content: <Activity />,
-    },
+    ...(isConnected
+      ? [
+          {
+            id: "balances",
+            label: "Balances",
+            content: <PersonalBalance />,
+          },
+          {
+            id: "activity",
+            label: "Activity",
+            content: <Activity />,
+          },
+        ]
+      : []),
     {
       id: "faqs",
       label: "FAQs",
@@ -47,7 +57,7 @@ const Home = () => {
 
       <Container
         as="main"
-        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto"
+        className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto"
       >
         <Stats />
         <Tabs items={tabItems} defaultActiveTab="stake" />

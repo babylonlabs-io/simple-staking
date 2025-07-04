@@ -39,28 +39,12 @@ export const Stats = memo(() => {
             coinSymbol,
             usdRate,
           )}
-          tooltip="Total number of Bitcoins staked in the protocol"
         />
 
         <StatItem
           loading={isLoading}
           title={`Registered ${coinSymbol} TVL`}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
-          tooltip={
-            <>
-              Total number of Bitcoins staked to secure Babylon Genesis. Follow
-              this{" "}
-              <a
-                href="https://babylonlabs.io/blog/phase-2-btc-staking-participation-guide"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-accent-primary underline"
-              >
-                guide
-              </a>{" "}
-              on how to transition a Phase-1 stake or register a new one
-            </>
-          }
         />
 
         <StatItem
@@ -68,7 +52,6 @@ export const Stats = memo(() => {
           loading={isLoading}
           title={`${coinSymbol} Staking APR`}
           value={`${formatter.format(stakingAPR ? stakingAPR * 100 : 0)}%`}
-          tooltip="Annual Percentage Reward (APR) is a dynamic estimate of the annualized staking reward rate based on current network conditions, and it refers to staking rewards rather than traditional lending interest. Rewards are distributed in BABY tokens but shown as a Bitcoin-equivalent rate relative to the Bitcoin initially staked. APR is calculated using U.S. dollar values for Bitcoin and BABY from independent, reputable sources. The APR shown is an approximate figure that can fluctuate, and the displayed value may not always be completely accurate. Actual rewards are not guaranteed and may vary over time. Staking carries exposure to slashing and other risks"
         />
       </List>
     </Section>

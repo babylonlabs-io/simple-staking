@@ -10,7 +10,7 @@ export const FAQ = () => {
   const { coinName } = getNetworkConfigBTC();
 
   return (
-    <SectionContainer title="FAQ’s">
+    <SectionContainer title="FAQs" titleClassName="md:text-[1.25rem] mt-10">
       <Card className="flex flex-col gap-4 divide-y">
         {questions(coinName).map((question) => (
           <Section
