@@ -10,10 +10,11 @@ import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
 import { Bsn } from "@/ui/common/types/bsn";
 
-const BSN_ID = "";
+const BSN_ID = getNetworkConfigBBN().chainId;
 
 const SubSection = ({
   children,
