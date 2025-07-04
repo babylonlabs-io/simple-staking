@@ -22,10 +22,15 @@ export const Tabs = ({ items, defaultActiveTab, className }: TabsProps) => {
 
   return (
     <div className={twMerge("w-full", className)}>
-      <div className="flex gap-2 w-full">
+      <div className="flex gap-2 w-full" role="tablist">
         {items.map((item) => (
           <button
             key={item.id}
+            id={`tab-${item.id}`}
+            role="tab"
+            aria-selected={activeTab === item.id}
+            aria-controls={`panel-${item.id}`}
+            tabIndex={activeTab === item.id ? 0 : -1}
             className={twMerge(
               "px-4 py-2 rounded transition-colors duration-200 text-primary",
               activeTab === item.id
@@ -39,7 +44,14 @@ export const Tabs = ({ items, defaultActiveTab, className }: TabsProps) => {
         ))}
       </div>
 
-      <div className="mt-6">{activeContent}</div>
+      <div
+        className="mt-6"
+        role="tabpanel"
+        id={`panel-${activeTab}`}
+        aria-labelledby={`tab-${activeTab}`}
+      >
+        {activeContent}
+      </div>
     </div>
   );
 };

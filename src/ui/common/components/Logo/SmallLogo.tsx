@@ -1,8 +1,4 @@
-interface LogoProps {
-  className?: string;
-}
-
-export const SmallLogo: React.FC<LogoProps> = () => (
+export const SmallLogo: React.FC = () => (
   <a href="/">
     <svg
       width="164"
