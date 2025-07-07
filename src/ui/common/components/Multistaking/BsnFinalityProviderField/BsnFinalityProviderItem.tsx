@@ -2,10 +2,13 @@ import { Avatar } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { Bsn } from "@/ui/common/types/bsn";
+
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 export const BsnFinalityProviderItem = ({
   bsnId,
@@ -30,7 +33,9 @@ export const BsnFinalityProviderItem = ({
       return null;
     }
 
-    const logoUrl = chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
+    const chainLogoId = bsn.id === BBN_CHAIN_ID ? "babylon" : bsn.id;
+
+    const logoUrl = chainLogos[chainLogoId] || chainLogos.placeholder;
 
     return (
       <Avatar
