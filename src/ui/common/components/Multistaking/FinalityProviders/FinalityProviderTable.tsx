@@ -70,7 +70,7 @@ export const FinalityProviderTable = ({
 
   return (
     <Table
-      wrapperClassName="h-[21rem]"
+      wrapperClassName="h-auto md:h-[21rem]"
       className="min-w-full"
       data={finalityProviders}
       columns={finalityProviderColumns}
