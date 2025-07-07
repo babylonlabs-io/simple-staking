@@ -2,6 +2,7 @@ import { useField } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CounterButton } from "@/ui/common/components/Multistaking/CounterButton";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import {
   StakingModalPage,
   useFinalityProviderBsnState,
@@ -16,6 +17,8 @@ import { SelectedProvidersList } from "./SelectedProvidersList";
 interface Props {
   max: number;
 }
+
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 export function BsnFinalityProviderField({ max }: Props) {
   const { value: selectedProviderMap = {}, onChange } = useField<
@@ -58,7 +61,7 @@ export function BsnFinalityProviderField({ max }: Props) {
     if (allowsMultipleBsns) {
       setStakingModalPage(StakingModalPage.BSN);
     } else {
-      setSelectedBsnId("");
+      setSelectedBsnId(BBN_CHAIN_ID);
       setStakingModalPage(StakingModalPage.FINALITY_PROVIDER);
     }
   };
@@ -83,8 +86,6 @@ export function BsnFinalityProviderField({ max }: Props) {
       setStakingModalPage(StakingModalPage.DEFAULT);
     }
   };
-
-  const effectiveSelectedBsnId = allowsMultipleBsns ? selectedBsnId : "";
 
   return (
     <SubSection>
@@ -117,7 +118,7 @@ export function BsnFinalityProviderField({ max }: Props) {
       />
 
       <FinalityProviderModal
-        selectedBsnId={effectiveSelectedBsnId}
+        selectedBsnId={selectedBsnId}
         open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
         onClose={handleClose}
         onAdd={handleAdd}
