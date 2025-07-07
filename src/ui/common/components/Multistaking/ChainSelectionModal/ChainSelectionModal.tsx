@@ -125,9 +125,9 @@ export const ChainSelectionModal = ({
 
       <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
         <div>
-          Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake chains secured
-          by Bitcoin staking. Select a network to delegate your stake and earn
-          rewards.
+          Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake systems
+          secured by Bitcoin staking. Select a network to delegate your stake
+          and earn rewards.
         </div>
         <div className="overflow-y-auto max-h-[350px] flex flex-col gap-2 mt-10">
           {loading && <div>Loading...</div>}
@@ -157,8 +157,8 @@ export const ChainSelectionModal = ({
               <MdOutlineInfo size={22} />
             </div>
             <div>
-              Babylon must be the first BSN you add before selecting others.
-              Once added, you can choose additional BSNs to multistake.
+              Babylon Genesis must be the first BSN you add before selecting
+              others. Once added, you can choose additional BSNs to multi-stake.
             </div>
           </SubSection>
         )}
