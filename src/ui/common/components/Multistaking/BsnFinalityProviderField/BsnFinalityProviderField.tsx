@@ -18,6 +18,8 @@ interface Props {
   max: number;
 }
 
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
+
 export function BsnFinalityProviderField({ max }: Props) {
   const { value: selectedProviderMap = {}, onChange } = useField<
     Record<string, string>
@@ -41,8 +43,6 @@ export function BsnFinalityProviderField({ max }: Props) {
   } = useFinalityProviderBsnState();
 
   const allowsMultipleBsns = max > 1;
-
-  const BBN_CHAIN_ID = getNetworkConfigBBN().chainId;
 
   const handleAdd = (selectedBsnId: string, providerPk: string) => {
     onChange({ ...selectedProviderMap, [selectedBsnId]: providerPk });
@@ -87,10 +87,6 @@ export function BsnFinalityProviderField({ max }: Props) {
     }
   };
 
-  const effectiveSelectedBsnId = allowsMultipleBsns
-    ? selectedBsnId
-    : BBN_CHAIN_ID;
-
   return (
     <SubSection>
       <div className="flex flex-col w-full gap-4">
@@ -122,7 +118,7 @@ export function BsnFinalityProviderField({ max }: Props) {
       />
 
       <FinalityProviderModal
-        selectedBsnId={effectiveSelectedBsnId}
+        selectedBsnId={selectedBsnId}
         open={stakingModalPage === StakingModalPage.FINALITY_PROVIDER}
         onClose={handleClose}
         onAdd={handleAdd}
