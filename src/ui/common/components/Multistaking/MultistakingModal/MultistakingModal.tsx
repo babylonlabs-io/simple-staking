@@ -35,6 +35,8 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   verifying: 2,
 };
 
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
+
 export function MultistakingModal() {
   const {
     processing,
@@ -60,8 +62,6 @@ export function MultistakingModal() {
   const btcInUsd = usePrice(coinSymbol);
 
   const currentFinalityProviders = useWatch({ name: "finalityProviders" });
-
-  const BBN_CHAIN_ID = getNetworkConfigBBN().chainId;
 
   const { bsnInfos, finalityProviderInfos } = useMemo(() => {
     const bsns: Array<{ icon: React.ReactNode; name: string }> = [];
@@ -145,12 +145,7 @@ export function MultistakingModal() {
     }
 
     return { bsnInfos: bsns, finalityProviderInfos: fps };
-  }, [
-    currentFinalityProviders,
-    bsnList,
-    getRegisteredFinalityProvider,
-    BBN_CHAIN_ID,
-  ]);
+  }, [currentFinalityProviders, bsnList, getRegisteredFinalityProvider]);
 
   const details = useMemo(() => {
     if (!formData || !stakingInfo) return null;
