@@ -2,6 +2,7 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useSearchParams } from "react-router";
 
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useBsn } from "@/ui/common/hooks/client/api/useBsn";
 import { useFinalityProvidersV2 } from "@/ui/common/hooks/client/api/useFinalityProvidersV2";
 import { Bsn } from "@/ui/common/types/bsn";
@@ -80,6 +81,8 @@ const FILTERS = {
     filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
 };
 
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
+
 const defaultState: FinalityProviderBsnState = {
   filter: {
     search: "",
@@ -120,7 +123,9 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   const [sortState, setSortState] = useState<SortState>({});
   const debouncedSearch = useDebounce(filter.search, 300);
 
-  const [selectedBsnId, setSelectedBsnId] = useState<string>();
+  const [selectedBsnId, setSelectedBsnId] = useState<string | undefined>(
+    BBN_CHAIN_ID,
+  );
   const [selectedProviderIds, setSelectedProviderIds] = useState<string[]>([]);
 
   const { data, isFetching, isError, hasNextPage, fetchNextPage } =

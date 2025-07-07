@@ -8,6 +8,7 @@ import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/common/components/Modals/VerificationModal";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { chainLogos } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
@@ -33,6 +34,8 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   "eoi-send-bbn": 1,
   verifying: 2,
 };
+
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 export function MultistakingModal() {
   const {
@@ -73,19 +76,19 @@ export function MultistakingModal() {
 
         Object.entries(providerMap).forEach(([bsnId, fpPublicKey]) => {
           const bsn = bsnList.find((bsn) => bsn.id === bsnId);
-          if (bsn || bsnId === "") {
+          if (bsn || bsnId === BBN_CHAIN_ID) {
             const logoUrl =
               chainLogos[bsn?.id || "babylon"] || chainLogos.placeholder;
             bsns.push({
               icon: (
                 <Avatar
                   url={logoUrl}
-                  alt={bsn?.name || "Babylon"}
+                  alt={bsn?.name || "Babylon Genesis"}
                   variant="rounded"
                   size="tiny"
                 />
               ),
-              name: bsn?.name || "Babylon",
+              name: bsn?.name || "Babylon Genesis",
             });
           }
 
@@ -115,12 +118,12 @@ export function MultistakingModal() {
             icon: (
               <Avatar
                 url={logoUrl}
-                alt={"Babylon"}
+                alt={"Babylon Genesis"}
                 variant="rounded"
                 size="tiny"
               />
             ),
-            name: "Babylon",
+            name: "Babylon Genesis",
           });
 
           const provider = getRegisteredFinalityProvider(fpPublicKey);
