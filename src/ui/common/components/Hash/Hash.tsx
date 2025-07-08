@@ -14,6 +14,7 @@ interface HashProps {
   small?: boolean;
   fullWidth?: boolean;
   symbols?: number;
+  size?: React.ComponentProps<typeof Text>["variant"];
   className?: string;
   noCopy?: boolean;
 }
@@ -27,6 +28,7 @@ export const Hash: React.FC<HashProps> = ({
   className,
   symbols = 8,
   noCopy = false,
+  size = "body2",
 }) => {
   const [, copy] = useCopyToClipboard();
   const [copiedText, setCopiedText] = useState("");
@@ -45,7 +47,7 @@ export const Hash: React.FC<HashProps> = ({
   }, [copiedText]);
 
   if (!value) {
-    return <Text variant="body2">-</Text>;
+    return <Text variant={size}>-</Text>;
   }
 
   return (
@@ -61,31 +63,22 @@ export const Hash: React.FC<HashProps> = ({
       onClick={!noCopy ? handleCopy : undefined}
     >
       <Text
-        variant="body2"
+        variant={size}
         style={{
           minWidth: small ? "3.5rem" : "5.5rem",
         }}
       >
-        {copiedText || (
+        {copiedText ? copiedText : (
           <>
-            {!address && (
-              <>
-                <span>0</span>
-                <span className="font-mono">x</span>
-              </>
-            )}
+            {!address && <span className="font-mono">0x</span>}
             <span>{trim(value, symbols) ?? value}</span>
           </>
         )}
       </Text>
       {!noCopy && (
-        <>
-          {copiedText ? (
-            <IoIosCheckmarkCircle className="ml-1" />
-          ) : (
-            <FiCopy className="ml-1" />
-          )}
-        </>
+        copiedText
+          ? <IoIosCheckmarkCircle className="ml-1" />
+          : <FiCopy className="ml-1" />
       )}
     </div>
   );
