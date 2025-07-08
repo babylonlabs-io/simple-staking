@@ -96,7 +96,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
 
   return (
     <FeeItem title="Network Fee Rate">
-      <span>{feeRate} Sats/vB</span>
+      <span>{feeRate} sats/vB</span>
 
       <Button
         //@ts-expect-error - fix type issue in core-ui

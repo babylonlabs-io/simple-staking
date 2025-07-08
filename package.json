@@ -32,7 +32,7 @@
     "@babylonlabs-io/babylon-proto-ts": "1.0.1",
     "@babylonlabs-io/btc-staking-ts": "2.3.4",
     "@babylonlabs-io/core-ui": "1.1.1",
-    "@babylonlabs-io/wallet-connector": "1.7.7",
+    "@babylonlabs-io/wallet-connector": "1.7.9",
     "@bitcoin-js/tiny-secp256k1-asmjs": "2.2.3",
     "@cosmjs/proto-signing": "^0.32.4",
     "@cosmjs/stargate": "^0.32.4",
@@ -54,6 +54,7 @@
     "react-error-boundary": "^6.0.0",
     "react-icons": "^5.1.0",
     "react-infinite-scroll-component": "^6.1.0",
+    "react-router": "^7.6.3",
     "react-toastify": "^10.0.6",
     "react-tooltip": "^5.26.4",
     "sharp": "^0.33.4",
@@ -116,6 +117,7 @@
     "vite": "^6.3.5",
     "vite-plugin-environment": "^1.1.3",
     "vite-plugin-node-polyfills": "^0.23.0",
+    "vite-plugin-radar": "^0.10.0",
     "vite-tsconfig-paths": "^5.1.4"
   },
   "overrides": {

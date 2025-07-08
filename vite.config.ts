@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import { defineConfig } from "vite";
 import EnvironmentPlugin from "vite-plugin-environment";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import { VitePluginRadar } from "vite-plugin-radar";
 import tsconfigPaths from "vite-tsconfig-paths";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -30,7 +31,6 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(__dirname, "index.html"),
-        404: resolve(__dirname, "404.html"),
       },
       output: {
         manualChunks: {
@@ -52,34 +52,44 @@ export default defineConfig({
     tsconfigPaths(),
     nodePolyfills({ include: ["buffer", "crypto"] }),
     EnvironmentPlugin("all", { prefix: "NEXT_PUBLIC_" }),
-    ...(enableSentryPlugin
-      ? [
-          sentryVitePlugin({
-            org: process.env.SENTRY_ORG,
-            project: process.env.SENTRY_PROJECT,
-            authToken: process.env.SENTRY_AUTH_TOKEN,
-            url: process.env.SENTRY_URL,
-            release: {
-              name: process.env.SENTRY_RELEASE,
-              dist: process.env.SENTRY_DIST,
-            },
-            sourcemaps: {
-              assets: "./dist/**",
-            },
-            silent: !process.env.CI,
-            telemetry: false,
-            errorHandler: (err) => {
-              // Don't fail the build if Sentry operations fail (matching original error handling)
-              console.warn("⚠️ Sentry encountered an error during build:");
-              console.warn("⚠️", err.message);
-            },
-          }),
-        ]
-      : []),
+    sentryVitePlugin({
+      disable: !enableSentryPlugin,
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      url: process.env.SENTRY_URL,
+      release: {
+        name: process.env.SENTRY_RELEASE,
+        dist: process.env.SENTRY_DIST,
+      },
+      sourcemaps: {
+        assets: "./dist/**",
+      },
+      silent: !process.env.CI,
+      telemetry: false,
+      errorHandler: (err) => {
+        // Don't fail the build if Sentry operations fail (matching original error handling)
+        console.warn("⚠️ Sentry encountered an error during build:");
+        console.warn("⚠️", err.message);
+      },
+    }),
+    VitePluginRadar({
+      analytics: {
+        id: process.env.GA4_MEASUREMENT_ID ?? "",
+        disable: !process.env.GA4_MEASUREMENT_ID,
+        config: {
+          cookie_flags: "SameSite=None;Secure",
+          cookie_domain: "babylonlabs.io",
+        },
+      },
+    }),
   ],
   define: {
     "import.meta.env.NEXT_PUBLIC_COMMIT_HASH": JSON.stringify(
       process.env.NEXT_PUBLIC_COMMIT_HASH || "development",
+    ),
+    "import.meta.env.NEXT_PUBLIC_CANONICAL": JSON.stringify(
+      process.env.NEXT_PUBLIC_CANONICAL || "https://babylonlabs.io/",
     ),
     "process.env.NEXT_TELEMETRY_DISABLED": JSON.stringify("1"),
   },

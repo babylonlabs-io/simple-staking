@@ -79,15 +79,17 @@ export const MultistakingPreviewModal = ({
       <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4 overflow-y-auto no-scrollbar max-h-[calc(100vh-12rem)]">
         <Card className="p-6 pt-4">
           <div className="flex flex-col">
-            <div className="grid grid-cols-2 gap-4 items-center pb-4">
-              <Text variant="caption" className="text-secondary text-center">
-                BSNs
-              </Text>
-              <Text variant="caption" className="text-secondary text-center">
-                Finality Provider
-              </Text>
-            </div>
-            <div className="grid grid-cols-2 gap-4 bg-primary-contrast rounded p-4">
+            {bsns.length > 1 ? (
+              <div className="grid grid-cols-2 gap-4 items-center pb-4">
+                <Text variant="caption" className="text-secondary text-center">
+                  BSNs
+                </Text>
+                <Text variant="caption" className="text-secondary text-center">
+                  Finality Provider
+                </Text>
+              </div>
+            ) : null}
+            <div className="grid grid-cols-2 gap-4 bg-primary-contrast rounded p-4 items-center">
               <div className="flex flex-col gap-3">
                 {bsns.map((bsnItem, index) => (
                   <div
@@ -150,7 +152,7 @@ export const MultistakingPreviewModal = ({
             2. Your stake will first be sent to Babylon Genesis for verification
             (~20 seconds), then you will be prompted to submit it to the Bitcoin
             ledger. It will be marked as &apos;Pending&apos; until it receives
-            10 Bitcoin confirmations
+            10 Bitcoin confirmations.
           </Text>
         </div>
       </DialogBody>
@@ -170,7 +172,7 @@ export const MultistakingPreviewModal = ({
           className="flex-1"
           disabled={processing}
         >
-          {processing ? "Processing..." : "Process to Signing"}
+          {processing ? "Processing..." : "Proceed to Signing"}
         </Button>
       </DialogFooter>
     </ResponsiveDialog>
