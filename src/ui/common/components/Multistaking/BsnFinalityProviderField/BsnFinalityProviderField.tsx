@@ -87,14 +87,16 @@ export function BsnFinalityProviderField({ max }: Props) {
     }
   };
 
+  const actionText = allowsMultipleBsns
+    ? "Add BSN and Finality Provider"
+    : "Add Finality Provider";
+
   return (
     <SubSection>
       <div className="flex flex-col w-full gap-4">
         <div className="flex flex-row">
           <div className="font-normal items-center flex flex-row justify-between w-full content-center">
-            <span className="text-sm sm:text-base">
-              Add BSN and Finality Provider
-            </span>
+            <span className="text-sm sm:text-base">{actionText}</span>
             <CounterButton counter={count} max={max} onAdd={handleOpen} />
           </div>
         </div>
