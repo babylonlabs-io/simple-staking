@@ -14,7 +14,7 @@ export const AmountBalanceInfo = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   // const { setValue } = useFormContext();
 
-  const { coinSymbol } = getNetworkConfigBTC();
+  const { coinSymbol, hasValue } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
 
   const btcAmountValue = parseFloat(btcAmount || "0");
@@ -40,7 +40,7 @@ export const AmountBalanceInfo = () => {
         </span>{" "}
         {coinSymbol}
       </div>
-      <div>{btcAmountUsd} USD</div>
+      {hasValue && <div>{btcAmountUsd} USD</div>}
     </div>
   );
 };

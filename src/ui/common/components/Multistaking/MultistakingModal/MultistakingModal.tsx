@@ -176,16 +176,18 @@ export function MultistakingModal() {
       btcInUsd,
     );
 
+    const { hasValue } = getNetworkConfigBTC();
+
     return {
-      stakeAmount: `${stakeAmountBtc} ${coinSymbol} (${stakeAmountUsd})`,
+      stakeAmount: `${stakeAmountBtc} ${coinSymbol}${hasValue ? ` (${stakeAmountUsd})` : ""}`,
       feeRate: `${formData.feeRate} sat/vB`,
-      transactionFees: `${feeAmountBtc} ${coinSymbol} (${feeAmountUsd})`,
+      transactionFees: `${feeAmountBtc} ${coinSymbol}${hasValue ? ` (${feeAmountUsd})` : ""}`,
       term: {
         blocks: `${formData.term} blocks`,
         duration: `~ ${blocksToDisplayTime(formData.term)}`,
       },
       onDemandBonding: `Enabled (~ ${unbondingTime} unbonding time)`,
-      unbondingFee: `${unbondingFeeBtc} ${coinSymbol} (${unbondingFeeUsd})`,
+      unbondingFee: `${unbondingFeeBtc} ${coinSymbol}${hasValue ? ` (${unbondingFeeUsd})` : ""}`,
     };
   }, [formData, stakingInfo, networkInfo, btcInUsd, coinSymbol]);
 
