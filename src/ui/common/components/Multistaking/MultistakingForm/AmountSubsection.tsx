@@ -1,10 +1,12 @@
 import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
-import bitcoin from "@/ui/common/assets/bitcoin.png";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
+
+const { icon, name } = getNetworkConfigBTC();
 
 export const AmountSubsection = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
@@ -29,11 +31,11 @@ export const AmountSubsection = () => {
       <div className="font-normal items-center flex flex-row justify-between w-full content-center">
         <div className="flex items-center gap-2">
           <img
-            src={bitcoin}
-            alt="bitcoin"
-            className="max-w-[2.5rem] max-h-[2.5rem]"
+            src={icon}
+            alt={name}
+            className="max-w-[2.5rem] max-h-[2.5rem] w-10 h-10"
           />
-          <div className="text-lg">Bitcoin</div>
+          <div className="text-lg">{name}</div>
         </div>
         <input
           type="number"
