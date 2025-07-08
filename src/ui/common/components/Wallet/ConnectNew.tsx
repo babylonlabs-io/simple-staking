@@ -114,7 +114,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   if (!isConnected) {
     return (
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         <Button
           size="large"
           color="secondary"
@@ -128,7 +128,6 @@ export const Connect: React.FC<ConnectProps> = ({
 
         <MenuButton
           ref={buttonRef}
-          isOpen={isMenuOpen}
           toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
         />
         <MenuContent
@@ -213,7 +212,7 @@ export const Connect: React.FC<ConnectProps> = ({
         <div className="flex items-center justify-center">
           <img
             src={bbnIcon}
-            alt="Babylon Genesis"
+            alt="babylon"
             className="max-w-[40px] max-h-[40px]"
           />
         </div>
@@ -244,7 +243,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   return (
     <>
-      <div className="relative flex flex-row items-center gap-2">
+      <div className="relative flex flex-row items-center gap-4">
         <div className="flex flex-row">
           <AvatarGroup max={2} variant="circular">
             <Avatar
@@ -261,17 +260,8 @@ export const Connect: React.FC<ConnectProps> = ({
             />
           </AvatarGroup>
         </div>
-        <div className="hidden md:flex flex-col text-secondary-contrast">
-          <Text variant="body1">Wallet Connected</Text>
-          <div className="flex flex-row text-sm gap-2">
-            <Text variant="body1">{btcAddress.slice(0, 6)}</Text>
-            <Text variant="body1">|</Text>
-            <Text variant="body1">{bech32Address.slice(0, 6)}</Text>
-          </div>
-        </div>
         <MenuButton
           ref={buttonRef}
-          isOpen={isMenuOpen}
           toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
         />
 

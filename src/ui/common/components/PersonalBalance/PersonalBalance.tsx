@@ -1,3 +1,5 @@
+import { List } from "@babylonlabs-io/core-ui";
+
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
@@ -17,7 +19,7 @@ import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
   getNetworkConfigBBN();
-const { coinSymbol, networkName } = getNetworkConfigBTC();
+const { coinSymbol } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
   // Load reward state
@@ -54,82 +56,76 @@ export function PersonalBalance() {
 
   return (
     <AuthGuard>
-      <Section
-        title={`${networkName} Balances`}
-        titleClassName="md:text-[1.25rem] mt-10"
-      >
-        <StatItem
-          loading={isBalanceLoading}
-          title="Staked Balance"
-          value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
+      <Section title="Wallet Balance">
+        <List orientation="adaptive" className="bg-surface">
+          <StatItem
+            loading={isBalanceLoading}
+            title="Staked Balance"
+            value={`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
+          />
+
+          <StatItem
+            loading={isBalanceLoading || hasUnconfirmedUTXOs}
+            title="Stakable Balance"
+            loadingStyle={
+              hasUnconfirmedUTXOs
+                ? LoadingStyle.ShowSpinnerAndValue
+                : LoadingStyle.ShowSpinner
+            }
+            value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
+            tooltip={
+              inscriptionsBtcBalance
+                ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+                : undefined
+            }
+          />
+
+          <StatItem
+            loading={isBalanceLoading || processing}
+            title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
+            value={
+              isBalanceLoading || processing
+                ? ""
+                : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
+            }
+            loadingStyle={LoadingStyle.ShowSpinner}
+          />
+
+          <StatItem
+            loading={rewardLoading}
+            title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
+            value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
+            suffix={
+              <ActionComponent
+                className="h-6"
+                title="Claim"
+                onAction={showPreview}
+                isDisabled={!rewardBalance || processing}
+              />
+            }
+          />
+        </List>
+
+        <ClaimRewardModal
+          processing={processing}
+          open={showRewardModal}
+          onClose={closeRewardModal}
+          onSubmit={claimRewards}
+          receivingValue={`${formattedRewardBalance}`}
+          address={bbnAddress}
+          transactionFee={transactionFee}
         />
 
-        <StatItem
-          loading={isBalanceLoading || hasUnconfirmedUTXOs}
-          title="Stakable Balance"
-          loadingStyle={
-            hasUnconfirmedUTXOs
-              ? LoadingStyle.ShowSpinnerAndValue
-              : LoadingStyle.ShowSpinner
-          }
-          value={`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
-          tooltip={
-            inscriptionsBtcBalance
-              ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
-              : undefined
-          }
+        <ClaimStatusModal
+          open={showProcessingModal}
+          onClose={() => {
+            closeProcessingModal();
+            setTransactionHash("");
+          }}
+          loading={processing}
+          transactionHash={transactionHash}
         />
       </Section>
-
-      <Section
-        title={`${bbnNetworkName} Balances`}
-        titleClassName="md:text-[1.25rem] mt-10"
-      >
-        <StatItem
-          loading={isBalanceLoading || processing}
-          title={`${isMobile ? "BABY" : bbnNetworkName} Balance`}
-          value={
-            isBalanceLoading || processing
-              ? ""
-              : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
-          }
-          loadingStyle={LoadingStyle.ShowSpinner}
-        />
-
-        <StatItem
-          loading={rewardLoading}
-          title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
-          value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
-          suffix={
-            <ActionComponent
-              className="h-6"
-              title="Claim"
-              onAction={showPreview}
-              isDisabled={!rewardBalance || processing}
-            />
-          }
-        />
-      </Section>
-
-      <ClaimRewardModal
-        processing={processing}
-        open={showRewardModal}
-        onClose={closeRewardModal}
-        onSubmit={claimRewards}
-        receivingValue={`${formattedRewardBalance}`}
-        address={bbnAddress}
-        transactionFee={transactionFee}
-      />
-
-      <ClaimStatusModal
-        open={showProcessingModal}
-        onClose={() => {
-          closeProcessingModal();
-          setTransactionHash("");
-        }}
-        loading={processing}
-        transactionHash={transactionHash}
-      />
     </AuthGuard>
   );
 }

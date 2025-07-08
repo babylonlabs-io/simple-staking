@@ -1,4 +1,4 @@
-import { Card, Form, HiddenField } from "@babylonlabs-io/core-ui";
+import { Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
 
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
@@ -6,8 +6,6 @@ import { BsnFinalityProviderField } from "@/ui/common/components/Multistaking/Bs
 import { AmountSubsection } from "@/ui/common/components/Multistaking/MultistakingForm/AmountSubsection";
 import { FeesSection } from "@/ui/common/components/Multistaking/MultistakingForm/FeesSection";
 import { MultistakingModal } from "@/ui/common/components/Multistaking/MultistakingModal/MultistakingModal";
-import { Section } from "@/ui/common/components/Section/Section";
-import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import {
   useMultistakingState,
@@ -19,8 +17,6 @@ import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
 import { SubmitButton } from "./SubmitButton";
-
-const { networkName } = getNetworkConfigBTC();
 
 export function MultistakingForm() {
   const { address } = useBTCWallet();
@@ -55,45 +51,39 @@ export function MultistakingForm() {
   }
 
   return (
-    <Section title={`${networkName} staking for Babylon Genesis`}>
-      <Form
-        schema={validationSchema}
-        mode="onChange"
-        reValidateMode="onChange"
-        onSubmit={handlePreview}
-      >
-        {stakingInfo && (
-          <HiddenField
-            name="term"
-            defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
-          />
-        )}
-        <HiddenField name="feeRate" defaultValue="0" />
-        <HiddenField name="feeAmount" defaultValue="0" />
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <BsnFinalityProviderField
-              max={
-                FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1
-              }
-            />
-            <AmountSubsection />
-            <FeesSection />
+    <Form
+      schema={validationSchema}
+      mode="onChange"
+      reValidateMode="onChange"
+      onSubmit={handlePreview}
+    >
+      {stakingInfo && (
+        <HiddenField
+          name="term"
+          defaultValue={stakingInfo?.defaultStakingTimeBlocks?.toString()}
+        />
+      )}
+      <HiddenField name="feeRate" defaultValue="0" />
+      <HiddenField name="feeAmount" defaultValue="0" />
+      <div className="flex flex-col gap-2">
+        <BsnFinalityProviderField
+          max={FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1}
+        />
+        <AmountSubsection />
+        <FeesSection />
 
-            <AuthGuard fallback={<ConnectButton />}>
-              <SubmitButton />
-            </AuthGuard>
+        <AuthGuard fallback={<ConnectButton />}>
+          <SubmitButton />
+        </AuthGuard>
 
-            <FormAlert
-              address={address}
-              isGeoBlocked={isGeoBlocked}
-              geoBlockMessage={geoBlockMessage}
-            />
-          </Card>
-        </div>
+        <FormAlert
+          address={address}
+          isGeoBlocked={isGeoBlocked}
+          geoBlockMessage={geoBlockMessage}
+        />
+      </div>
 
-        <MultistakingModal />
-      </Form>
-    </Section>
+      <MultistakingModal />
+    </Form>
   );
 }

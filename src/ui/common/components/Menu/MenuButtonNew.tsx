@@ -1,14 +1,15 @@
 import type { HTMLAttributes } from "react";
 import { forwardRef } from "react";
-import { MdKeyboardArrowDown } from "react-icons/md";
+import { twJoin } from "tailwind-merge";
+
+import cogIcon from "@/ui/common/assets/cog.svg";
 
 type MenuButtonProps = HTMLAttributes<HTMLButtonElement> & {
-  isOpen: boolean;
   toggleMenu: () => void;
 };
 
 export const MenuButton = forwardRef<HTMLButtonElement, MenuButtonProps>(
-  ({ className, isOpen, toggleMenu, ...props }, ref) => {
+  ({ className, toggleMenu, ...props }, ref) => {
     return (
       <button
         ref={ref}
@@ -17,14 +18,12 @@ export const MenuButton = forwardRef<HTMLButtonElement, MenuButtonProps>(
           toggleMenu();
           props.onClick?.(e);
         }}
-        className={`flex items-center justify-center p-2 border rounded border-secondary-contrast text-secondary-contrast ${className}`}
+        className={twJoin(
+          "flex items-center justify-center w-10 h-10 p-1 border-secondary-contrast text-secondary-contrast",
+          className,
+        )}
       >
-        <MdKeyboardArrowDown
-          size={24}
-          className={`transition-transform duration-200 ${
-            isOpen ? "rotate-180" : ""
-          }`}
-        />
+        <img src={cogIcon} alt="Settings" className="w-8 h-8" />
       </button>
     );
   },
