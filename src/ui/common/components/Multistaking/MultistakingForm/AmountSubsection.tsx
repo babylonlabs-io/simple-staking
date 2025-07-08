@@ -35,9 +35,7 @@ export const AmountSubsection = () => {
             alt="bitcoin"
             className="max-w-[2.5rem] max-h-[2.5rem]"
           />
-          <div className="text-lg">
-            {coinName === "BTC" ? "Bitcoin" : coinName}
-          </div>
+          <div className="text-lg">{coinName.replace(/BTC/g, "Bitcoin")}</div>
         </div>
         <input
           type="number"
