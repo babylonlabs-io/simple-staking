@@ -87,13 +87,9 @@ export function BsnFinalityProviderField({ max }: Props) {
     }
   };
 
-  const actionText = useMemo(
-    () =>
-      allowsMultipleBsns
-        ? "Add BSN and Finality Provider"
-        : "Add Finality Provider",
-    [allowsMultipleBsns],
-  );
+  const actionText = allowsMultipleBsns
+    ? "Add BSN and Finality Provider"
+    : "Add Finality Provider";
 
   return (
     <SubSection>
