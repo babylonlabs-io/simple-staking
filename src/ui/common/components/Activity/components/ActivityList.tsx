@@ -320,13 +320,15 @@ export function ActivityList() {
 
   return (
     <>
-      <div className="space-y-4">
-        {activityList.map((data, index) => (
-          <ActivityCard
-            key={delegations[index]?.stakingTxHashHex || index}
-            data={data}
-          />
-        ))}
+      <div className="max-h-[25rem] overflow-y-auto">
+        <div className="space-y-4">
+          {activityList.map((data, index) => (
+            <ActivityCard
+              key={delegations[index]?.stakingTxHashHex || index}
+              data={data}
+            />
+          ))}
+        </div>
       </div>
 
       <DelegationModal
