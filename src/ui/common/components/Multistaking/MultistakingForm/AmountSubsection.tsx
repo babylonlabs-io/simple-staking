@@ -1,8 +1,10 @@
 import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
-import bitcoin from "@/ui/common/assets/bitcoin.png";
+import bitcoinIcon from "@/ui/common/assets/bitcoin.png";
+import signetBitcoinIcon from "@/ui/common/assets/signet_bitcoin.svg";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { Network } from "@/ui/common/types/network";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
@@ -10,7 +12,7 @@ import { SubSection } from "./SubSection";
 export const AmountSubsection = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
-  const { coinName } = getNetworkConfigBTC();
+  const { coinName, network } = getNetworkConfigBTC();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue("amount", e.target.value, {
@@ -26,16 +28,19 @@ export const AmountSubsection = () => {
     }
   };
 
+  const fullCoinName = coinName.replace(/BTC/g, "Bitcoin");
+  const icon = network === Network.SIGNET ? signetBitcoinIcon : bitcoinIcon;
+
   return (
     <SubSection className="flex flex-col justify-between w-full content-center gap-4">
       <div className="font-normal items-center flex flex-row justify-between w-full content-center">
         <div className="flex items-center gap-2">
           <img
-            src={bitcoin}
-            alt="bitcoin"
-            className="max-w-[2.5rem] max-h-[2.5rem]"
+            src={icon}
+            alt={fullCoinName}
+            className="max-w-[2.5rem] max-h-[2.5rem] w-10 h-10"
           />
-          <div className="text-lg">{coinName.replace(/BTC/g, "Bitcoin")}</div>
+          <div className="text-lg">{fullCoinName}</div>
         </div>
         <input
           type="number"
