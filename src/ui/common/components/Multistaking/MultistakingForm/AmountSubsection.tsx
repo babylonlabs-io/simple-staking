@@ -2,6 +2,7 @@ import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 
 import bitcoin from "@/ui/common/assets/bitcoin.png";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 
 import { AmountBalanceInfo } from "./AmountBalanceInfo";
 import { SubSection } from "./SubSection";
@@ -9,6 +10,7 @@ import { SubSection } from "./SubSection";
 export const AmountSubsection = () => {
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   const { setValue } = useFormContext();
+  const { coinName } = getNetworkConfigBTC();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setValue("amount", e.target.value, {
@@ -33,7 +35,9 @@ export const AmountSubsection = () => {
             alt="bitcoin"
             className="max-w-[2.5rem] max-h-[2.5rem]"
           />
-          <div className="text-lg">Bitcoin</div>
+          <div className="text-lg">
+            {coinName === "BTC" ? "Bitcoin" : coinName}
+          </div>
         </div>
         <input
           type="number"
