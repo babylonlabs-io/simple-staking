@@ -12,27 +12,7 @@
  * 4. Feature flags are only configurable by DevOps in mainnet environments
  */
 
-type FeatureFlag = "MULTISTAKING" | "ENABLE_LEDGER" | "PHASE_3";
-
-class FeatureFlagService {
-  /**
-   * Gets the value of a feature flag from compile-time constants
-   * @param flagName The feature flag name to check
-   * @returns True if the feature is enabled, false otherwise
-   */
-  private static getFlagValue(flagName: FeatureFlag): boolean {
-    // The set of feature flags are defined here so process.env will be
-    // looked up at runtime.
-    const featureFlags = {
-      MULTISTAKING: process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true",
-      ENABLE_LEDGER: process.env.NEXT_PUBLIC_FF_ENABLE_LEDGER === "true",
-      PHASE_3: process.env.NEXT_PUBLIC_FF_PHASE_3 === "true",
-    } as const;
-
-    const result = featureFlags[flagName];
-    return result;
-  }
-
+export default {
   /**
    * MULTISTAKING feature flag
    *
@@ -40,9 +20,9 @@ class FeatureFlagService {
    * Why needed: To gradually roll out multi-staking capabilities
    * ETA for removal: TBD - Will be removed once multi-staking is fully released
    */
-  static get IsMultiStakingEnabled(): boolean {
-    return this.getFlagValue("MULTISTAKING");
-  }
+  get IsMultiStakingEnabled() {
+    return process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true";
+  },
 
   /**
    * ENABLE_LEDGER feature flag
@@ -51,9 +31,9 @@ class FeatureFlagService {
    * Why needed: To gradually roll out ledger support
    * ETA for removal: TBD - Will be removed once ledger support is fully released
    */
-  static get IsLedgerEnabled(): boolean {
-    return this.getFlagValue("ENABLE_LEDGER");
-  }
+  get IsLedgerEnabled() {
+    return process.env.NEXT_PUBLIC_FF_ENABLE_LEDGER === "true";
+  },
 
   /**
    * PHASE_3 feature flag
@@ -62,9 +42,18 @@ class FeatureFlagService {
    * Why needed: To gradually roll out phase 3
    * ETA for removal: TBD - Will be removed once phase 3 is fully released
    */
-  static get IsPhase3Enabled(): boolean {
-    return this.getFlagValue("PHASE_3");
-  }
-}
+  get IsPhase3Enabled() {
+    return process.env.NEXT_PUBLIC_FF_PHASE_3 === "true";
+  },
 
-export default FeatureFlagService;
+  /**
+   * Baby Staking feature flag
+   *
+   * Purpose: Enables Baby Staking Page
+   * Why needed: To gradually roll out Baby Staking
+   * ETA for removal: TBD - Will be removed once Baby Staking is fully released
+   */
+  get IsBabyStakingEnabled() {
+    return process.env.NEXT_PUBLIC_FF_BABYSTAKING === "true";
+  },
+};
