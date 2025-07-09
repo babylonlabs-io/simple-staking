@@ -16,27 +16,29 @@ export const FinalityProviderLogo = ({
 }: FinalityProviderLogoProps) => {
   const [imageError, setImageError] = useState(false);
 
-  // Show logo if available and not errored
-  if (logoUrl && !imageError) {
-    return (
-      <img
-        src={logoUrl}
-        alt={moniker || `Finality Provider ${rank}`}
-        className={`${className} rounded-full object-cover`}
-        onError={() => setImageError(true)}
-      />
-    );
-  }
-
-  // Fallback to first letter of the moniker (uppercased), or rank if moniker is unavailable
   const fallbackLabel = moniker?.charAt(0).toUpperCase() ?? String(rank);
 
   return (
-    <Text
-      as="span"
-      className={`inline-flex justify-center items-center bg-secondary-main text-accent-contrast ${className} rounded-full text-[0.6rem]`}
-    >
-      {fallbackLabel}
-    </Text>
+    <span className={`relative inline-block ${className}`}>
+      {logoUrl && !imageError ? (
+        <img
+          src={logoUrl}
+          alt={moniker || `Finality Provider ${rank}`}
+          className="w-full h-full rounded-full object-cover"
+          onError={() => setImageError(true)}
+        />
+      ) : (
+        <Text
+          as="span"
+          className="inline-flex justify-center items-center w-full h-full bg-secondary-main text-accent-contrast rounded-full text-[0.6rem]"
+        >
+          {fallbackLabel}
+        </Text>
+      )}
+
+      <span className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 flex items-center justify-center bg-secondary-main text-accent-contrast rounded-full text-[0.5rem] w-[50%] h-[50%] ring-2 ring-surface">
+        {rank}
+      </span>
+    </span>
   );
 };
