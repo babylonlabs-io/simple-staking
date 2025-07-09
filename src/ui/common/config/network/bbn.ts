@@ -7,10 +7,14 @@ import { bbnEdgeDevnet } from "./bbn/edge-devnet";
 import { bbnMainnet } from "./bbn/mainnet";
 import { bbnTestnet } from "./bbn/testnet";
 
+interface ExtendedBBNConfig extends BBNConfig {
+  displayUSD: boolean;
+}
+
 const defaultNetwork = "devnet";
 export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
 
-const config: Record<string, BBNConfig> = {
+const config: Record<string, ExtendedBBNConfig> = {
   mainnet: {
     chainId: bbnMainnet.chainId,
     rpc: bbnMainnet.rpc,
@@ -18,6 +22,7 @@ const config: Record<string, BBNConfig> = {
     networkName: "BABY",
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
+    displayUSD: true,
   },
   canary: {
     chainId: bbnCanary.chainId,
@@ -26,6 +31,7 @@ const config: Record<string, BBNConfig> = {
     networkName: "BABY",
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
+    displayUSD: true,
   },
   devnet: {
     chainId: bbnDevnet.chainId,
@@ -34,6 +40,7 @@ const config: Record<string, BBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
+    displayUSD: false,
   },
   bsnDevnet: {
     chainId: bbnBsnDevnet.chainId,
@@ -42,6 +49,7 @@ const config: Record<string, BBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
+    displayUSD: false,
   },
   edgeDevnet: {
     chainId: bbnEdgeDevnet.chainId,
@@ -50,6 +58,7 @@ const config: Record<string, BBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
+    displayUSD: false,
   },
   testnet: {
     chainId: bbnTestnet.chainId,
@@ -58,9 +67,10 @@ const config: Record<string, BBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
+    displayUSD: false,
   },
 };
 
-export function getNetworkConfigBBN(): BBNConfig {
+export function getNetworkConfigBBN(): ExtendedBBNConfig {
   return config[network] ?? config[defaultNetwork];
 }

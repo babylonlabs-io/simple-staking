@@ -9,7 +9,7 @@ import { Network } from "@/ui/common/types/network";
 const defaultNetwork = "devnet";
 export const network = process.env.NEXT_PUBLIC_NETWORK ?? defaultNetwork;
 
-type Config = BTCConfig & { icon: string; name: string };
+type Config = BTCConfig & { icon: string; name: string; displayUSD: boolean };
 
 const config: Record<string, Config> = {
   mainnet: {
@@ -20,6 +20,7 @@ const config: Record<string, Config> = {
     mempoolApiUrl: `${MEMPOOL_API}`,
     network: Network.MAINNET,
     icon: bitcoinIcon,
+    displayUSD: true,
   },
   canary: {
     name: "Bitcoin",
@@ -29,6 +30,7 @@ const config: Record<string, Config> = {
     mempoolApiUrl: `${MEMPOOL_API}`,
     network: Network.MAINNET,
     icon: bitcoinIcon,
+    displayUSD: true,
   },
   testnet: {
     // We do not use BTC Testnet
@@ -39,6 +41,7 @@ const config: Record<string, Config> = {
     mempoolApiUrl: `${MEMPOOL_API}/signet`,
     network: Network.SIGNET,
     icon: signetBitcoinIcon,
+    displayUSD: false,
   },
   devnet: {
     name: "Signet Bitcoin",
@@ -48,6 +51,7 @@ const config: Record<string, Config> = {
     mempoolApiUrl: `${MEMPOOL_API}/signet`,
     network: Network.SIGNET,
     icon: signetBitcoinIcon,
+    displayUSD: false,
   },
 };
 
