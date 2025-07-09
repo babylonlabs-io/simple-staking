@@ -7,14 +7,14 @@ import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
+const { coinSymbol, displayUSD } = getNetworkConfigBTC();
+
 //TODO: Temporary disable max button until we implement https://github.com/babylonlabs-io/simple-staking/issues/1119
 export const AmountBalanceInfo = () => {
   const { stakableBtcBalance } = useBalanceState();
 
   const btcAmount = useWatch({ name: "amount", defaultValue: "" });
   // const { setValue } = useFormContext();
-
-  const { coinSymbol, hasValue } = getNetworkConfigBTC();
   const btcInUsd = usePrice(coinSymbol);
 
   const btcAmountValue = parseFloat(btcAmount || "0");
@@ -40,7 +40,7 @@ export const AmountBalanceInfo = () => {
         </span>{" "}
         {coinSymbol}
       </div>
-      {hasValue && <div>{btcAmountUsd} USD</div>}
+      {displayUSD && <div>{btcAmountUsd} USD</div>}
     </div>
   );
 };

@@ -7,7 +7,7 @@ import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
-const { coinSymbol, hasValue } = getNetworkConfigBTC();
+const { coinSymbol, displayUSD } = getNetworkConfigBTC();
 
 export function Total() {
   const [amount, feeAmount] = useWatch({ name: ["amount", "feeAmount"] });
@@ -31,7 +31,7 @@ export function Total() {
         <Text variant="body1" className="font-bold">
           {total} {coinSymbol}
         </Text>
-        {hasValue && (
+        {displayUSD && (
           <Text variant="body1" className="text-accent-secondary text-sm">
             {totalInUsd}
           </Text>

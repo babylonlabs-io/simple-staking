@@ -7,7 +7,7 @@ import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency"
 
 import { FeeItem } from "./FeeItem";
 
-const { coinSymbol, hasValue } = getNetworkConfigBTC();
+const { coinSymbol, displayUSD } = getNetworkConfigBTC();
 
 export function BTCFeeAmount() {
   const feeAmount = useWatch({ name: "feeAmount" });
@@ -22,7 +22,7 @@ export function BTCFeeAmount() {
   return (
     <FeeItem
       title={`${coinSymbol} Network Fee`}
-      hint={hasValue ? feeInUsd : undefined}
+      hint={displayUSD ? feeInUsd : undefined}
     >
       {satoshiToBtc(formattedFeeAmount)} {coinSymbol}
     </FeeItem>

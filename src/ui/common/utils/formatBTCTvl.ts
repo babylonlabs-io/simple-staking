@@ -4,13 +4,13 @@ export function formatBTCTvl(
   tvlInBtc: number,
   coinSymbol: string,
   rate?: number,
-  hasValue: boolean = true,
+  displayUSD: boolean = true,
 ): string {
   const btcFormatted =
     tvlInBtc >= 1 ? maxDecimals(tvlInBtc, 2) : maxDecimals(tvlInBtc, 8);
 
   const usdPart =
-    rate && hasValue
+    rate && displayUSD
       ? `($${(tvlInBtc * rate).toLocaleString("en", {
           notation: "compact",
           maximumFractionDigits: 2,

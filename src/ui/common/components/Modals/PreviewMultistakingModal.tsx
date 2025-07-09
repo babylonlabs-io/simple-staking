@@ -41,6 +41,7 @@ interface PreviewMultistakingModalProps {
 }
 
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+const { coinSymbol, networkName, displayUSD } = getNetworkConfigBTC();
 
 export const PreviewMultistakingModal = ({
   open,
@@ -55,7 +56,6 @@ export const PreviewMultistakingModal = ({
   processing,
 }: PreviewMultistakingModalProps) => {
   const isMobileView = useIsMobileView();
-  const { coinSymbol, networkName, hasValue } = getNetworkConfigBTC();
 
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
@@ -102,7 +102,7 @@ export const PreviewMultistakingModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
           </Text>
-          {hasValue && (
+          {displayUSD && (
             <Text
               as="span"
               variant="body2"
@@ -128,7 +128,7 @@ export const PreviewMultistakingModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
           </Text>
-          {hasValue && (
+          {displayUSD && (
             <Text
               as="span"
               variant="body2"
@@ -167,7 +167,7 @@ export const PreviewMultistakingModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
           </Text>
-          {hasValue && (
+          {displayUSD && (
             <Text
               as="span"
               variant="body2"

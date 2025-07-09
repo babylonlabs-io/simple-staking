@@ -7,7 +7,7 @@ interface FeeStatsProps {
   amount?: string;
 }
 
-const { coinSymbol, hasValue } = getNetworkConfigBBN();
+const { coinSymbol, displayUSD } = getNetworkConfigBBN();
 
 export function BBNFeeAmount({ amount = "0" }: FeeStatsProps) {
   const bbnInUsd = usePrice(coinSymbol);
@@ -16,7 +16,7 @@ export function BBNFeeAmount({ amount = "0" }: FeeStatsProps) {
   return (
     <FeeItem
       title={`${coinSymbol} Network Fee`}
-      hint={hasValue ? feeInUsd : undefined}
+      hint={displayUSD ? feeInUsd : undefined}
     >
       {amount} {coinSymbol}
     </FeeItem>

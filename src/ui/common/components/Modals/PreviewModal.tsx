@@ -37,6 +37,7 @@ interface PreviewModalProps {
 }
 
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+const { coinSymbol, networkName, displayUSD } = getNetworkConfigBTC();
 
 export const PreviewModal = ({
   open,
@@ -52,7 +53,6 @@ export const PreviewModal = ({
   processing,
 }: PreviewModalProps) => {
   const isMobileView = useIsMobileView();
-  const { coinSymbol, networkName, hasValue } = getNetworkConfigBTC();
 
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
@@ -93,7 +93,7 @@ export const PreviewModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
           </Text>
-          {hasValue && (
+          {displayUSD && (
             <Text
               as="span"
               variant="body2"
@@ -119,7 +119,7 @@ export const PreviewModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
           </Text>
-          {hasValue && (
+          {displayUSD && (
             <Text
               as="span"
               variant="body2"
@@ -158,7 +158,7 @@ export const PreviewModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
           </Text>
-          {hasValue && (
+          {displayUSD && (
             <Text
               as="span"
               variant="body2"

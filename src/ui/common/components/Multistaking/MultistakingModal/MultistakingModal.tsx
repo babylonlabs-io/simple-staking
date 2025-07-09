@@ -36,6 +36,7 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
 };
 
 const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
+const { displayUSD } = getNetworkConfigBTC();
 
 export function MultistakingModal() {
   const {
@@ -176,18 +177,16 @@ export function MultistakingModal() {
       btcInUsd,
     );
 
-    const { hasValue } = getNetworkConfigBTC();
-
     return {
-      stakeAmount: `${stakeAmountBtc} ${coinSymbol}${hasValue ? ` (${stakeAmountUsd})` : ""}`,
+      stakeAmount: `${stakeAmountBtc} ${coinSymbol}${displayUSD ? ` (${stakeAmountUsd})` : ""}`,
       feeRate: `${formData.feeRate} sat/vB`,
-      transactionFees: `${feeAmountBtc} ${coinSymbol}${hasValue ? ` (${feeAmountUsd})` : ""}`,
+      transactionFees: `${feeAmountBtc} ${coinSymbol}${displayUSD ? ` (${feeAmountUsd})` : ""}`,
       term: {
         blocks: `${formData.term} blocks`,
         duration: `~ ${blocksToDisplayTime(formData.term)}`,
       },
       onDemandBonding: `Enabled (~ ${unbondingTime} unbonding time)`,
-      unbondingFee: `${unbondingFeeBtc} ${coinSymbol}${hasValue ? ` (${unbondingFeeUsd})` : ""}`,
+      unbondingFee: `${unbondingFeeBtc} ${coinSymbol}${displayUSD ? ` (${unbondingFeeUsd})` : ""}`,
     };
   }, [formData, stakingInfo, networkInfo, btcInUsd, coinSymbol]);
 

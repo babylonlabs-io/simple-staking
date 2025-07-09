@@ -8,7 +8,7 @@ import { bbnMainnet } from "./bbn/mainnet";
 import { bbnTestnet } from "./bbn/testnet";
 
 interface ExtendedBBNConfig extends BBNConfig {
-  hasValue: boolean;
+  displayUSD: boolean;
 }
 
 const defaultNetwork = "devnet";
@@ -22,7 +22,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkName: "BABY",
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
-    hasValue: true,
+    displayUSD: true,
   },
   canary: {
     chainId: bbnCanary.chainId,
@@ -31,7 +31,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkName: "BABY",
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
-    hasValue: true,
+    displayUSD: true,
   },
   devnet: {
     chainId: bbnDevnet.chainId,
@@ -40,7 +40,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
-    hasValue: false,
+    displayUSD: false,
   },
   bsnDevnet: {
     chainId: bbnBsnDevnet.chainId,
@@ -49,7 +49,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
-    hasValue: false,
+    displayUSD: false,
   },
   edgeDevnet: {
     chainId: bbnEdgeDevnet.chainId,
@@ -58,7 +58,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
-    hasValue: false,
+    displayUSD: false,
   },
   testnet: {
     chainId: bbnTestnet.chainId,
@@ -67,7 +67,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkName: "Testnet BABY",
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
-    hasValue: false,
+    displayUSD: false,
   },
 };
 
