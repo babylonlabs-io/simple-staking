@@ -28,13 +28,15 @@ export const FinalityProviderLogo = ({
     );
   }
 
-  // Fallback to rank display
+  // Fallback to first letter of the moniker (uppercased), or rank if moniker is unavailable
+  const fallbackLabel = moniker?.charAt(0).toUpperCase() ?? String(rank);
+
   return (
     <Text
       as="span"
       className={`inline-flex justify-center items-center bg-secondary-main text-accent-contrast ${className} rounded-full text-[0.6rem]`}
     >
-      {rank}
+      {fallbackLabel}
     </Text>
   );
 };
