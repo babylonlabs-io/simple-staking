@@ -8,4 +8,9 @@ export default {
     url: process.env.NEXT_PUBLIC_MEMPOOL_API ?? "https://mempool.space",
     network: process.env.NEXT_PUBLIC_NETWORK ?? "signet",
   },
+  babylon: {
+    rpcUrl:
+      process.env.NEXT_PUBLIC_BABY_RPC_URL ??
+      "https://rpc-dapp.devnet.babylonlabs.io/",
+  },
 } satisfies Infra.Config;

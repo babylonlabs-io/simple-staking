@@ -41,6 +41,7 @@ interface PreviewMultistakingModalProps {
 }
 
 const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
+const { coinSymbol, networkName, displayUSD } = getNetworkConfigBTC();
 
 export const PreviewMultistakingModal = ({
   open,
@@ -55,7 +56,6 @@ export const PreviewMultistakingModal = ({
   processing,
 }: PreviewMultistakingModalProps) => {
   const isMobileView = useIsMobileView();
-  const { coinSymbol, networkName } = getNetworkConfigBTC();
 
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
@@ -102,16 +102,18 @@ export const PreviewMultistakingModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
           </Text>
-          <Text
-            as="span"
-            variant="body2"
-            className="text-accent-secondary ml-2"
-          >
-            {calculateTokenValueInCurrency(
-              satoshiToBtc(stakingAmountSat),
-              btcInUsd,
-            )}
-          </Text>
+          {displayUSD && (
+            <Text
+              as="span"
+              variant="body2"
+              className="text-accent-secondary ml-2"
+            >
+              {calculateTokenValueInCurrency(
+                satoshiToBtc(stakingAmountSat),
+                btcInUsd,
+              )}
+            </Text>
+          )}
         </>
       ),
     },
@@ -126,16 +128,18 @@ export const PreviewMultistakingModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
           </Text>
-          <Text
-            as="span"
-            variant="body2"
-            className="text-accent-secondary ml-2"
-          >
-            {calculateTokenValueInCurrency(
-              satoshiToBtc(stakingFeeSat),
-              btcInUsd,
-            )}
-          </Text>
+          {displayUSD && (
+            <Text
+              as="span"
+              variant="body2"
+              className="text-accent-secondary ml-2"
+            >
+              {calculateTokenValueInCurrency(
+                satoshiToBtc(stakingFeeSat),
+                btcInUsd,
+              )}
+            </Text>
+          )}
         </>
       ),
     },
@@ -163,16 +167,18 @@ export const PreviewMultistakingModal = ({
           <Text variant="body1">
             {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
           </Text>
-          <Text
-            as="span"
-            variant="body2"
-            className="text-accent-secondary ml-2"
-          >
-            {calculateTokenValueInCurrency(
-              satoshiToBtc(unbondingFeeSat),
-              btcInUsd,
-            )}
-          </Text>
+          {displayUSD && (
+            <Text
+              as="span"
+              variant="body2"
+              className="text-accent-secondary ml-2"
+            >
+              {calculateTokenValueInCurrency(
+                satoshiToBtc(unbondingFeeSat),
+                btcInUsd,
+              )}
+            </Text>
+          )}
         </>
       ),
     },
