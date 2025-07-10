@@ -1,4 +1,5 @@
 import { MobileDialog, Popover } from "@babylonlabs-io/core-ui";
+import { twJoin } from "tailwind-merge";
 
 import { useIsMobileView } from "@/ui/common/hooks/useBreakpoint";
 
@@ -19,10 +20,18 @@ export const SettingMenuContainer = ({
 }: SettingMenuContainerProps) => {
   const isMobileView = useIsMobileView();
 
+  const menuContent = (
+    <div className="w-full text-primary-main">{children}</div>
+  );
+
   if (isMobileView) {
     return (
-      <MobileDialog open={isOpen} onClose={onClose} className={className}>
-        {children}
+      <MobileDialog
+        open={isOpen}
+        onClose={onClose}
+        className="bg-[#FFFFFF] dark:bg-[#252525] text-primary-main p-0"
+      >
+        {menuContent}
       </MobileDialog>
     );
   }
@@ -31,12 +40,16 @@ export const SettingMenuContainer = ({
     <Popover
       anchorEl={anchorEl}
       open={isOpen}
-      offset={[0, 11]}
+      offset={[0, 8]}
       placement="bottom-end"
       onClickOutside={onClose}
-      className={`flex flex-col gap-2 bg-surface rounded p-4 border border-secondary-strokeLight ${className}`}
+      className={twJoin(
+        "shadow-lg border border-[#38708533] bg-[#FFFFFF] dark:bg-[#252525] dark:border-[#404040] rounded-lg",
+        "min-w-[294px]",
+        className,
+      )}
     >
-      {children}
+      {menuContent}
     </Popover>
   );
 };

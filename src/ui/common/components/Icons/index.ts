@@ -17,4 +17,12 @@ export { LinkWalletIcon } from "./wallet/LinkWalletIcon";
 export { UsingInscriptionIcon } from "./wallet/UsingInscriptionIcon";
 
 // Common icons
+export { ChevronLeftIcon } from "./common/ChevronLeftIcon";
+export { ChevronRightIcon } from "./common/ChevronRightIcon";
 export { CopyIcon } from "./common/CopyIcon";
+export { CurrencyIcon } from "./common/CurrencyIcon";
+export { DocumentIcon } from "./common/DocumentIcon";
+export { NetworkIcon } from "./common/NetworkIcon";
+export { ShieldIcon } from "./common/ShieldIcon";
+export { ThemeIcon } from "./common/ThemeIcon";
+export { WarningIcon } from "./common/WarningIcon";
