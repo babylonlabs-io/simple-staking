@@ -30,7 +30,7 @@ export const Stats = memo(() => {
 
   return (
     <Section title="Babylon Stats">
-      <List orientation="adaptive" className="bg-surface">
+      <List orientation="adaptive" className="bg-surface" newDesign>
         <StatItem
           loading={isLoading}
           title={`Total ${coinSymbol} TVL`}
