@@ -16,6 +16,7 @@ import { SlashingContent } from "./SlashingContent";
 
 interface StatusProps {
   delegation: DelegationWithFP;
+  showTooltip?: boolean;
 }
 
 interface StatusParams {
@@ -162,7 +163,7 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
   [FinalityProviderState.JAILED]: {},
 };
 
-export function Status({ delegation }: StatusProps) {
+export function Status({ delegation, showTooltip = true }: StatusProps) {
   const { networkInfo } = useAppState();
 
   const delegationStatus = useMemo(
@@ -185,7 +186,7 @@ export function Status({ delegation }: StatusProps) {
   } = delegationStatus ?? {};
 
   return (
-    <Hint tooltip={tooltip} status={status}>
+    <Hint tooltip={showTooltip ? tooltip : undefined} status={status}>
       {label}
     </Hint>
   );

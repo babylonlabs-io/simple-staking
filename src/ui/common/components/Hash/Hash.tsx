@@ -14,7 +14,9 @@ interface HashProps {
   small?: boolean;
   fullWidth?: boolean;
   symbols?: number;
+  size?: React.ComponentProps<typeof Text>["variant"];
   className?: string;
+  noCopy?: boolean;
 }
 
 export const Hash: React.FC<HashProps> = ({
@@ -25,12 +27,14 @@ export const Hash: React.FC<HashProps> = ({
   fullWidth,
   className,
   symbols = 8,
+  noCopy = false,
+  size = "body2",
 }) => {
   const [, copy] = useCopyToClipboard();
   const [copiedText, setCopiedText] = useState("");
 
   const handleCopy = () => {
-    if (!value) return;
+    if (!value || noCopy) return;
     setCopiedText("Copied!");
     copy(value);
   };
@@ -43,43 +47,42 @@ export const Hash: React.FC<HashProps> = ({
   }, [copiedText]);
 
   if (!value) {
-    return <Text variant="body2">-</Text>;
+    return <Text variant={size}>-</Text>;
   }
 
   return (
     <div
       className={twMerge(
-        "inline-flex min-h-[25px] cursor-pointer items-center",
-        "hover:opacity-100 pointer-events-auto text-accent-primary",
+        "inline-flex min-h-[25px] items-center",
+        !noCopy && "cursor-pointer hover:opacity-100 pointer-events-auto",
+        "text-accent-primary",
         className,
         !noFade && "opacity-50",
         fullWidth && "w-full",
       )}
-      onClick={handleCopy}
+      onClick={!noCopy ? handleCopy : undefined}
     >
       <Text
-        variant="body2"
+        variant={size}
         style={{
           minWidth: small ? "3.5rem" : "5.5rem",
         }}
       >
-        {copiedText || (
+        {copiedText ? (
+          copiedText
+        ) : (
           <>
-            {!address && (
-              <>
-                <span>0</span>
-                <span className="font-mono">x</span>
-              </>
-            )}
+            {!address && <span className="font-mono">0x</span>}
             <span>{trim(value, symbols) ?? value}</span>
           </>
         )}
       </Text>
-      {copiedText ? (
-        <IoIosCheckmarkCircle className="ml-1" />
-      ) : (
-        <FiCopy className="ml-1" />
-      )}
+      {!noCopy &&
+        (copiedText ? (
+          <IoIosCheckmarkCircle className="ml-1" />
+        ) : (
+          <FiCopy className="ml-1" />
+        ))}
     </div>
   );
 };

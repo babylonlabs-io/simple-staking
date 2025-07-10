@@ -1,15 +1,15 @@
+import { ActivityList } from "@/ui/common/components/Activity/components/ActivityList";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
-import { DelegationList } from "@/ui/common/components/Delegations/DelegationList";
 import { Section } from "@/ui/common/components/Section/Section";
 
-import { Delegations } from "./Delegations";
+import { Delegations } from "../Delegations/Delegations";
 
 export function Activity() {
   return (
     <AuthGuard>
       <Section title="Activity">
         <Delegations />
-        <DelegationList />
+        <ActivityList />
       </Section>
     </AuthGuard>
   );

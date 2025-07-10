@@ -1,21 +1,62 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
-import { useEffect } from "react";
+import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
+import { useEffect, useState } from "react";
 
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
+import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 
+import { Activity } from "./components/Activity/Activity";
 import { Container } from "./components/Container/Container";
-import { Activity } from "./components/Delegations/Activity";
 import { FAQ } from "./components/FAQ/FAQ";
 import { MultistakingFormWrapper } from "./components/Multistaking/MultistakingForm/MultistakingFormWrapper";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
-import { StakingForm } from "./components/Staking/StakingForm";
 import { Stats } from "./components/Stats/Stats";
+import { Tabs } from "./components/Tabs";
 import Layout from "./layout";
 
 const Home = () => {
+  const [activeTab, setActiveTab] = useState("stake");
+
   useEffect(() => {
     initBTCCurve();
   }, []);
+
+  const { connected } = useWalletConnect();
+  const { isGeoBlocked, isLoading } = useHealthCheck();
+  const isConnected = connected && !isGeoBlocked && !isLoading;
+
+  // Reset tab to "stake" when wallet disconnects
+  useEffect(() => {
+    if (!connected) {
+      setActiveTab("stake");
+    }
+  }, [connected]);
+
+  const tabItems = [
+    {
+      id: "stake",
+      label: "Stake",
+      content: <MultistakingFormWrapper />,
+    },
+    ...(isConnected
+      ? [
+          {
+            id: "balances",
+            label: "Balances",
+            content: <PersonalBalance />,
+          },
+          {
+            id: "activity",
+            label: "Activity",
+            content: <Activity />,
+          },
+        ]
+      : []),
+    {
+      id: "faqs",
+      label: "FAQs",
+      content: <FAQ />,
+    },
+  ];
 
   return (
     <Layout>
@@ -24,14 +65,12 @@ const Home = () => {
         className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
       >
         <Stats />
-        <PersonalBalance />
-        {FeatureFlagService.IsMultiStakingEnabled ? (
-          <MultistakingFormWrapper />
-        ) : (
-          <StakingForm />
-        )}
-        <Activity />
-        <FAQ />
+        <Tabs
+          items={tabItems}
+          defaultActiveTab="stake"
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </Container>
     </Layout>
   );

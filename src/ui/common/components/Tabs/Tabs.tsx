@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 
 interface TabItem {
@@ -10,13 +10,38 @@ interface TabItem {
 interface TabsProps {
   items: TabItem[];
   defaultActiveTab?: string;
+  activeTab?: string;
+  onTabChange?: (tabId: string) => void;
   className?: string;
 }
 
-export const Tabs = ({ items, defaultActiveTab, className }: TabsProps) => {
-  const [activeTab, setActiveTab] = useState(
+export const Tabs = ({
+  items,
+  defaultActiveTab,
+  activeTab: controlledActiveTab,
+  onTabChange,
+  className,
+}: TabsProps) => {
+  const [internalActiveTab, setInternalActiveTab] = useState(
     defaultActiveTab || items[0]?.id || "",
   );
+
+  const activeTab = controlledActiveTab ?? internalActiveTab;
+
+  // Synchronizes the internal active tab state with the controlledActiveTab prop.
+  useEffect(() => {
+    if (controlledActiveTab !== undefined) {
+      setInternalActiveTab(controlledActiveTab);
+    }
+  }, [controlledActiveTab]);
+
+  const handleTabClick = (tabId: string) => {
+    if (onTabChange) {
+      onTabChange(tabId);
+    } else {
+      setInternalActiveTab(tabId);
+    }
+  };
 
   const activeContent = items.find((item) => item.id === activeTab)?.content;
 
@@ -37,7 +62,7 @@ export const Tabs = ({ items, defaultActiveTab, className }: TabsProps) => {
                 ? "bg-secondary-highlight"
                 : "bg-transparent",
             )}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => handleTabClick(item.id)}
           >
             {item.label}
           </button>
@@ -45,7 +70,7 @@ export const Tabs = ({ items, defaultActiveTab, className }: TabsProps) => {
       </div>
 
       <div
-        className="mt-6"
+        className="mt-6 min-h-[450px]"
         role="tabpanel"
         id={`panel-${activeTab}`}
         aria-labelledby={`tab-${activeTab}`}
