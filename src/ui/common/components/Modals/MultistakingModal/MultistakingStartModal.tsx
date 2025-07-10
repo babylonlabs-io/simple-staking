@@ -26,7 +26,7 @@ interface StakingDetails {
   feeRate: string;
   transactionFees: string;
   term: StakingTerm;
-  onDemandBonding: string;
+  unbonding: string;
   unbondingFee: string;
 }
 
@@ -65,7 +65,7 @@ export const MultistakingPreviewModal = ({
         </>
       ),
     },
-    { label: "On Demand Bonding", value: details.onDemandBonding },
+    { label: "Unbonding", value: details.unbonding },
     { label: "Unbonding Fee", value: details.unbondingFee },
   ];
 

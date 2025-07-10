@@ -30,7 +30,7 @@ export const BsnFinalityProviderItem = ({
       return null;
     }
 
-    const logoUrl = chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
+    const logoUrl = chainLogos[bsn.id] || chainLogos.placeholder;
 
     return (
       <Avatar
