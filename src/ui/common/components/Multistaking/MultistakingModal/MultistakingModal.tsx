@@ -101,7 +101,7 @@ export function MultistakingModal() {
                   logoUrl={provider.logo_url}
                   rank={provider.rank}
                   moniker={provider.description?.moniker}
-                  className="w-5 h-5"
+                  size="sm"
                 />
               ),
               name: provider.description?.moniker || trim(fpPublicKey, 8),
@@ -135,7 +135,7 @@ export function MultistakingModal() {
                   logoUrl={provider.logo_url}
                   rank={provider.rank}
                   moniker={provider.description?.moniker}
-                  className="w-5 h-5"
+                  size="sm"
                 />
               ),
               name: provider.description?.moniker || trim(fpPublicKey, 8),

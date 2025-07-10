@@ -54,7 +54,7 @@ export const BsnFinalityProviderItem = ({
           logoUrl={provider.logo_url}
           rank={provider.rank}
           moniker={provider.description?.moniker}
-          className="w-10 h-10"
+          size="lg"
         />
         <div className="text-accent-primary flex flex-col justify-center">
           <div className="text-xs text-accent-secondary flex items-center">
