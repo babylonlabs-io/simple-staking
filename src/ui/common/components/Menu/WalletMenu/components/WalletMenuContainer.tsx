@@ -3,7 +3,6 @@ import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import { useCallback, useEffect, useState } from "react";
 import { twJoin } from "tailwind-merge";
 
-import { WalletDisconnectModal } from "@/ui/common/components/Modals/WalletDisconnectModal";
 import { useIsMobileView } from "@/ui/common/hooks/useBreakpoint";
 
 import { WalletInfoSection } from "./WalletInfoSection";
@@ -42,7 +41,6 @@ export const WalletMenuContainer = ({
   const [isPopoverOpen, setIsPopoverOpen] = useState(forceOpen);
   const [mobileDialogOpen, setMobileDialogOpen] = useState(forceOpen);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
-  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
 
   const { disconnect } = useWalletConnect();
 
@@ -53,15 +51,6 @@ export const WalletMenuContainer = ({
   }, [isPopoverOpen, mobileDialogOpen, isMobile, onOpenChange]);
 
   const handleDisconnectClick = useCallback(() => {
-    setShowDisconnectModal(true);
-  }, []);
-
-  const handleDisconnectCancel = useCallback(() => {
-    setShowDisconnectModal(false);
-  }, []);
-
-  const handleDisconnectConfirm = useCallback(() => {
-    setShowDisconnectModal(false);
     setIsPopoverOpen(false);
     setMobileDialogOpen(false);
     disconnect();
@@ -121,12 +110,6 @@ export const WalletMenuContainer = ({
         >
           {menuContent}
         </MobileDialog>
-        <WalletDisconnectModal
-          isOpen={showDisconnectModal}
-          onClose={handleDisconnectCancel}
-          onDisconnect={handleDisconnectConfirm}
-          closeMenu={handleCloseMenu}
-        />
       </>
     );
   }
@@ -146,12 +129,6 @@ export const WalletMenuContainer = ({
       >
         {menuContent}
       </Popover>
-      <WalletDisconnectModal
-        isOpen={showDisconnectModal}
-        onClose={handleDisconnectCancel}
-        onDisconnect={handleDisconnectConfirm}
-        closeMenu={handleCloseMenu}
-      />
     </>
   );
 };
