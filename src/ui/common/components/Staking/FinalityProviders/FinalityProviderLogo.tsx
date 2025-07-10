@@ -1,5 +1,6 @@
 import { Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
+import { twJoin, twMerge } from "tailwind-merge";
 
 interface FinalityProviderLogoProps {
   logoUrl?: string;
@@ -19,7 +20,7 @@ export const FinalityProviderLogo = ({
   const fallbackLabel = moniker?.charAt(0).toUpperCase() ?? String(rank);
 
   return (
-    <span className={`relative inline-block ${className}`}>
+    <span className={twMerge("relative inline-block", className)}>
       {logoUrl && !imageError ? (
         <img
           src={logoUrl}
@@ -30,13 +31,22 @@ export const FinalityProviderLogo = ({
       ) : (
         <Text
           as="span"
-          className="inline-flex justify-center items-center w-full h-full bg-secondary-main text-accent-contrast rounded-full text-[0.6rem]"
+          className="inline-flex justify-center items-center w-full h-full bg-secondary-main text-accent-contrast rounded-full text-[1rem]"
         >
           {fallbackLabel}
         </Text>
       )}
 
-      <span className="absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 flex items-center justify-center bg-secondary-main text-accent-contrast rounded-full text-[0.5rem] w-[50%] h-[50%] ring-2 ring-surface">
+      <span
+        className={twJoin(
+          "absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 flex items-center justify-center bg-secondary-main text-accent-contrast rounded-full w-[50%] h-[50%] ring-2 ring-surface p-[5px]",
+          String(rank).length === 1
+            ? "text-[0.8rem]"
+            : String(rank).length === 2
+              ? "text-[0.6rem]"
+              : "text-[0.4rem]",
+        )}
+      >
         {rank}
       </span>
     </span>
