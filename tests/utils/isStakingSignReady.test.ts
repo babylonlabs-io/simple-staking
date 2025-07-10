@@ -1,4 +1,4 @@
-import { isStakingSignReady } from "@/ui/common/utils/isStakingSignReady";
+import { isStakingSignReady } from "@/ui/legacy/utils/isStakingSignReady";
 
 describe("utils/isStakingSignReady", () => {
   it("should return false with reason if fpSelected is false", () => {

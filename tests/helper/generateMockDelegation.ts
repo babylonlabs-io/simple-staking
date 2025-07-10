@@ -1,4 +1,4 @@
-import { Delegation, DelegationState } from "@/ui/common/types/delegations";
+import { Delegation, DelegationState } from "@/ui/legacy/types/delegations";
 
 export function generateMockDelegation(
   hash: string,

@@ -1,7 +1,7 @@
-import { useError } from "@/ui/common/context/Error/ErrorProvider";
-import { WalletConnectionProvider } from "@/ui/common/context/wallet/WalletConnectionProvider";
-import { useLogger } from "@/ui/common/hooks/useLogger";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
+import { useError } from "@/ui/legacy/context/Error/ErrorProvider";
+import { WalletConnectionProvider } from "@/ui/legacy/context/wallet/WalletConnectionProvider";
+import { useLogger } from "@/ui/legacy/hooks/useLogger";
+import FeatureFlagService from "@/ui/legacy/utils/FeatureFlagService";
 import { WalletProvider } from "@babylonlabs-io/wallet-connector";
 import { render } from "@testing-library/react";
 import { useTheme } from "next-themes";
@@ -18,15 +18,15 @@ jest.mock("next-themes", () => ({
   useTheme: jest.fn(),
 }));
 
-jest.mock("@/ui/common/context/Error/ErrorProvider", () => ({
+jest.mock("@/ui/legacy/context/Error/ErrorProvider", () => ({
   useError: jest.fn(),
 }));
 
-jest.mock("@/ui/common/hooks/useLogger", () => ({
+jest.mock("@/ui/legacy/hooks/useLogger", () => ({
   useLogger: jest.fn(),
 }));
 
-jest.mock("@/ui/common/utils/FeatureFlagService", () => ({
+jest.mock("@/ui/legacy/utils/FeatureFlagService", () => ({
   __esModule: true,
   default: {
     IsLedgerEnabled: false,

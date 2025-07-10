@@ -1,4 +1,4 @@
-import { getIntermediateDelegationsLocalStorageKey } from "@/ui/common/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
+import { getIntermediateDelegationsLocalStorageKey } from "@/ui/legacy/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 
 describe("utils/local_storage/getIntermediateDelegationsLocalStorageKey", () => {
   it("should return the correct key when pk is provided", () => {

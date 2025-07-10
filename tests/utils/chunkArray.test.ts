@@ -1,4 +1,4 @@
-import { chunkArray } from "@/ui/common/utils/chunkArray";
+import { chunkArray } from "@/ui/legacy/utils/chunkArray";
 
 describe("chunkArray", () => {
   it("should split an array into chunks of the specified size", () => {

@@ -1,9 +1,9 @@
 import { Route, Routes } from "react-router";
 
 import BabyStaking from "./baby";
-import NotFound from "./common/not-found";
-import BTCStaking from "./common/page";
-import FeatureFlagService from "./common/utils/FeatureFlagService";
+import NotFound from "./legacy/not-found";
+import BTCStaking from "./legacy/page";
+import FeatureFlagService from "./legacy/utils/FeatureFlagService";
 
 export const Router = () => (
   <Routes>
