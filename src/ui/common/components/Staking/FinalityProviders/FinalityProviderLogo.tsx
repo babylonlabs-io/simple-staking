@@ -7,20 +7,38 @@ interface FinalityProviderLogoProps {
   rank: number;
   moniker?: string;
   className?: string;
+  size?: "lg" | "md" | "sm";
 }
+
+const STYLES = {
+  lg: {
+    logo: "size-10",
+    subLogo: "text-[0.8rem]",
+  },
+  md: {
+    logo: "size-6",
+    subLogo: "text-[0.5rem]",
+  },
+  sm: {
+    logo: "size-5",
+    subLogo: "text-[0.4rem]",
+  },
+};
 
 export const FinalityProviderLogo = ({
   logoUrl,
   rank,
   moniker,
-  className = "size-6",
+  size = "md",
+  className,
 }: FinalityProviderLogoProps) => {
   const [imageError, setImageError] = useState(false);
+  const styles = STYLES[size];
 
   const fallbackLabel = moniker?.charAt(0).toUpperCase() ?? String(rank);
 
   return (
-    <span className={twMerge("relative inline-block", className)}>
+    <span className={twMerge("relative inline-block", styles.logo, className)}>
       {logoUrl && !imageError ? (
         <img
           src={logoUrl}
@@ -40,11 +58,7 @@ export const FinalityProviderLogo = ({
       <span
         className={twJoin(
           "absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 flex items-center justify-center bg-secondary-main text-accent-contrast rounded-full w-[50%] h-[50%] ring-2 ring-surface p-[5px]",
-          String(rank).length === 1
-            ? "text-[0.8rem]"
-            : String(rank).length === 2
-              ? "text-[0.6rem]"
-              : "text-[0.4rem]",
+          styles.subLogo,
         )}
       >
         {rank}
