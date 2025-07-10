@@ -7,6 +7,7 @@ import cogIcon from "@/ui/common/assets/cog.svg";
 interface SettingMenuButtonProps extends HTMLAttributes<HTMLButtonElement> {
   toggleMenu: () => void;
 }
+
 export const SettingMenuButton = forwardRef<
   HTMLButtonElement,
   SettingMenuButtonProps
@@ -20,7 +21,7 @@ export const SettingMenuButton = forwardRef<
         props.onClick?.(e);
       }}
       className={twJoin(
-        "flex items-center justify-center w-10 h-10 p-1 border-secondary-contrast text-secondary-contrast",
+        "flex items-center justify-center w-10 h-10 p-1 border-secondary-contrast text-secondary-contrast box-content",
         className,
       )}
     >
