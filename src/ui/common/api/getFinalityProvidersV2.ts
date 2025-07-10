@@ -29,6 +29,7 @@ interface FinalityProviderAPI {
   total_delegations: number;
   logo_url?: string;
   bsn_id?: string;
+  type: string;
 }
 
 interface DescriptionAPI {
@@ -97,6 +98,7 @@ export const getFinalityProvidersV2 = async ({
       totalDelegations: fp.total_delegations,
       logo_url: fp.logo_url,
       bsnId: fp.bsn_id,
+      chain: fp.type,
     }),
   );
 

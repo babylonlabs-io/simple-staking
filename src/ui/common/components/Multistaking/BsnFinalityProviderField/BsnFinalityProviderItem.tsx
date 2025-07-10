@@ -5,7 +5,6 @@ import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityPro
 import { chainLogos } from "@/ui/common/constants";
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
-import { Bsn } from "@/ui/common/types/bsn";
 
 export const BsnFinalityProviderItem = ({
   bsnId,
@@ -25,12 +24,12 @@ export const BsnFinalityProviderItem = ({
     [bsnList, bsnId],
   );
 
-  const renderBsnLogo = (bsn?: Bsn) => {
-    if (!bsn) {
+  const renderBsnLogo = () => {
+    if (!bsn || !provider) {
       return null;
     }
 
-    const logoUrl = chainLogos[bsn.id || "babylon"] || chainLogos.placeholder;
+    const logoUrl = chainLogos[provider.chain || "babylon"];
 
     return (
       <Avatar
@@ -54,11 +53,11 @@ export const BsnFinalityProviderItem = ({
           logoUrl={provider.logo_url}
           rank={provider.rank}
           moniker={provider.description?.moniker}
-          className="w-10 h-10"
+          size="lg"
         />
         <div className="text-accent-primary flex flex-col justify-center">
           <div className="text-xs text-accent-secondary flex items-center">
-            {renderBsnLogo(bsn)}
+            {renderBsnLogo()}
             {bsn?.name}
           </div>
           <div className="text-base text-accent-primary font-medium">
