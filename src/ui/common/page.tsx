@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 
 import { Activity } from "./components/Activity/Activity";
-import { Banner } from "./components/Banner/Banner";
 import { Container } from "./components/Container/Container";
 import { FAQ } from "./components/FAQ/FAQ";
 import { Footer } from "./components/Footer/Footer";

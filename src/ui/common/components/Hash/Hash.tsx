@@ -1,3 +1,7 @@
+// NOTE: This is the original Hash component with integrated copy functionality, to be deprecated
+// For display-only hash rendering (like in WalletMenu), use DisplayHash component instead
+// This component includes click-to-copy functionality with visual feedback
+
 import { Text } from "@babylonlabs-io/core-ui";
 import { useEffect, useState } from "react";
 import { FiCopy } from "react-icons/fi";

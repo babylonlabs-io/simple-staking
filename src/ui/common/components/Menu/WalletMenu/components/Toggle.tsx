@@ -1,18 +1,18 @@
 import { twJoin } from "tailwind-merge";
 
-interface NewToggleProps {
+interface ToggleProps {
   value: boolean;
   onChange: (value: boolean) => void;
   className?: string;
   disabled?: boolean;
 }
 
-export const NewToggle = ({
+export const Toggle = ({
   value,
   onChange,
   className = "",
   disabled = false,
-}: NewToggleProps) => {
+}: ToggleProps) => {
   const handleClick = () => {
     if (!disabled) {
       onChange(!value);
