@@ -1,51 +1,45 @@
-import {
-  Avatar,
-  AvatarGroup,
-  Button,
-  Text,
-  Toggle,
-} from "@babylonlabs-io/core-ui";
-import {
-  useWalletConnect,
-  useWidgetState,
-} from "@babylonlabs-io/wallet-connector";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { Avatar, AvatarGroup, Button } from "@babylonlabs-io/core-ui";
+import { useWidgetState } from "@babylonlabs-io/wallet-connector";
+import { useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
-import { FaLock, FaLockOpen } from "react-icons/fa6";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
+import { twMerge } from "tailwind-merge";
 
-import bbnIcon from "@/ui/common/assets/bbn.svg";
-import bitcoin from "@/ui/common/assets/bitcoin.png";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 import { useAppState } from "@/ui/common/state";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 
-import { Hash } from "../Hash/Hash";
-import { MenuButton } from "../Menu/MenuButton";
-import { MenuContent } from "../Menu/MenuContent";
-import { WalletDisconnectModal } from "../Modals/WalletDisconnectModal";
-import { ThemeToggle } from "../ThemeToggle/ThemeToggle";
+import {
+  SettingMenuButton,
+  SettingMenuContainer,
+  SettingMenuContent,
+} from "../Menu/SettingMenu";
+import { WalletMenuContainer } from "../Menu/WalletMenu";
 
 interface ConnectProps {
   loading?: boolean;
   onConnect: () => void;
 }
 
-const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
-
 export const Connect: React.FC<ConnectProps> = ({
   loading = false,
   onConnect,
 }) => {
-  const buttonRef = useRef<HTMLButtonElement>(null);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
+
+  const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
+  const handleOpenChange = (open: boolean) => {
+    setIsWalletMenuOpen(open);
+  };
+
+  // App state and wallet context
   const { includeOrdinals, excludeOrdinals, ordinalsExcluded } = useAppState();
   const { linkedDelegationsVisibility, displayLinkedDelegations } =
     useDelegationV2State();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   // Wallet states
   const {
@@ -59,7 +53,6 @@ export const Connect: React.FC<ConnectProps> = ({
     bech32Address,
     connected: bbnConnected,
   } = useCosmosWallet();
-  const { disconnect } = useWalletConnect();
 
   // Widget states
   const { selectedWallets } = useWidgetState();
@@ -70,8 +63,6 @@ export const Connect: React.FC<ConnectProps> = ({
     apiMessage,
     isLoading: isHealthcheckLoading,
   } = useHealthCheck();
-  const [showDisconnectModal, setShowDisconnectModal] = useState(false);
-
   const isConnected = useMemo(
     () =>
       btcConnected && bbnConnected && !isGeoBlocked && !isHealthcheckLoading,
@@ -81,18 +72,15 @@ export const Connect: React.FC<ConnectProps> = ({
   const isLoading =
     isConnected || !isApiNormal || loading || btcLoading || bbnLoading;
 
-  const handleDisconnectClick = useCallback(() => {
-    setShowDisconnectModal(true);
-  }, []);
-
-  const handleDisconnectCancel = useCallback(() => {
-    setShowDisconnectModal(false);
-  }, []);
-
-  const handleDisconnectConfirm = useCallback(() => {
-    setShowDisconnectModal(false);
-    disconnect();
-  }, [disconnect]);
+  const transformedWallets = useMemo(() => {
+    const result: Record<string, { name: string; icon: string }> = {};
+    Object.entries(selectedWallets).forEach(([key, wallet]) => {
+      if (wallet) {
+        result[key] = { name: wallet.name, icon: wallet.icon };
+      }
+    });
+    return result;
+  }, [selectedWallets]);
 
   const renderApiNotAvailableTooltip = useMemo(() => {
     if (!isGeoBlocked && isApiNormal) return null;
@@ -112,6 +100,7 @@ export const Connect: React.FC<ConnectProps> = ({
     );
   }, [isGeoBlocked, isApiNormal, apiMessage]);
 
+  // DISCONNECTED STATE: Show connect button + settings menu
   if (!isConnected) {
     return (
       <div className="flex items-center gap-4">
@@ -126,161 +115,76 @@ export const Connect: React.FC<ConnectProps> = ({
           <span className="hidden md:flex">Connect Wallets</span>
         </Button>
 
-        <MenuButton
-          ref={buttonRef}
-          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
+        <SettingMenuButton
+          ref={settingsButtonRef}
+          toggleMenu={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
         />
-        <MenuContent
-          anchorEl={buttonRef.current}
-          className="p-4"
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
+        <SettingMenuContainer
+          anchorEl={settingsButtonRef.current}
+          isOpen={isSettingsMenuOpen}
+          onClose={() => setIsSettingsMenuOpen(false)}
         >
-          <div className="min-w-[250px]">
-            <ThemeToggle />
-          </div>
-        </MenuContent>
+          <SettingMenuContent />
+        </SettingMenuContainer>
 
         {!isApiNormal && renderApiNotAvailableTooltip}
       </div>
     );
   }
 
-  const walletContent = (
-    <div className="flex flex-col gap-2 w-full min-w-[250px]">
-      <div className="flex flex-row gap-2 mb-2">
-        <div className="flex items-center justify-center">
-          <img
-            src={bitcoin}
-            alt="bitcoin"
-            className="max-w-[40px] max-h-[40px]"
-          />
-        </div>
-        <div className="flex flex-col w-full">
-          <Text variant="body1" className="text-accent-primary text-base">
-            Bitcoin
-          </Text>
-          <Hash
-            className="text-accent-secondary"
-            value={btcAddress}
-            address
-            noFade
-            symbols={12}
-          />
-        </div>
-      </div>
-      <div className="flex flex-row items-center justify-between">
-        <Text variant="body2" className="text-sm text-accent-primary">
-          {ordinalsExcluded ? "Not using Inscriptions" : "Using Inscriptions"}
-        </Text>
-        <div className="flex flex-col items-center justify-center">
-          <Toggle
-            defaultValue={!ordinalsExcluded}
-            onChange={(value) =>
-              value ? includeOrdinals() : excludeOrdinals()
-            }
-            inactiveIcon={<FaLock size={10} />}
-            activeIcon={<FaLockOpen size={10} />}
-          />
-        </div>
-      </div>
-      <div className="flex flex-row items-center justify-between">
-        <Text variant="body2" className="text-sm text-accent-primary">
-          Linked Wallet Stakes
-        </Text>
-        <div className="flex flex-col items-center justify-center">
-          <Toggle
-            value={linkedDelegationsVisibility}
-            onChange={displayLinkedDelegations}
-          />
-        </div>
-      </div>
-      <div className="flex flex-col justify-start items-start self-stretch mb-1 gap-2">
-        <Text variant="body2" className="text-sm text-accent-primary">
-          Public Key
-        </Text>
-        <Hash
-          className="text-accent-secondary"
-          value={publicKeyNoCoord}
-          address
-          noFade
-          symbols={12}
-        />
-      </div>
-      <div className="divider my-0" />
-      <div className="flex flex-row gap-2">
-        <div className="flex items-center justify-center">
-          <img
-            src={bbnIcon}
-            alt="Babylon Genesis"
-            className="max-w-[40px] max-h-[40px]"
-          />
-        </div>
-        <div className="flex flex-col w-full">
-          <Text variant="body1" className="text-accent-primary text-base">
-            {bbnNetworkFullName}
-          </Text>
-          <Hash
-            className="text-accent-secondary"
-            value={bech32Address}
-            address
-            noFade
-            symbols={12}
-          />
-        </div>
-      </div>
-      <div className="divider my-0" />
-      <div
-        className="flex items-center justify-start text-secondary-main cursor-pointer transition-colors w-full py-2"
-        onClick={handleDisconnectClick}
-      >
-        <button className="text-sm w-full text-left">Disconnect Wallets</button>
-      </div>
-      <div className="divider my-0" />
-      <ThemeToggle />
-    </div>
-  );
-
+  // CONNECTED STATE: Show wallet avatars + settings menu
   return (
-    <>
-      <div className="relative flex flex-row items-center gap-4">
-        <div className="flex flex-row">
-          <AvatarGroup max={2} variant="circular">
-            <Avatar
-              alt={selectedWallets["BTC"]?.name}
-              url={selectedWallets["BTC"]?.icon}
-              size="large"
-              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
-            />
-            <Avatar
-              alt={selectedWallets["BBN"]?.name}
-              url={selectedWallets["BBN"]?.icon}
-              size="large"
-              className="object-contain bg-accent-contrast box-content border-[3px] border-primary-main"
-            />
-          </AvatarGroup>
-        </div>
-        <MenuButton
-          ref={buttonRef}
-          toggleMenu={() => setIsMenuOpen(!isMenuOpen)}
-        />
-
-        <MenuContent
-          anchorEl={buttonRef.current}
-          className="p-4 min-w-[250px]"
-          isOpen={isMenuOpen}
-          onClose={() => setIsMenuOpen(false)}
-        >
-          {walletContent}
-        </MenuContent>
-      </div>
-
-      <WalletDisconnectModal
-        isOpen={showDisconnectModal}
-        onClose={handleDisconnectCancel}
-        onDisconnect={handleDisconnectConfirm}
-        closeMenu={() => setIsMenuOpen(false)}
+    <div className="relative flex flex-row items-center gap-4">
+      <WalletMenuContainer
+        trigger={
+          <div className="flex flex-row cursor-pointer">
+            <AvatarGroup max={2} variant="circular">
+              <Avatar
+                alt={selectedWallets["BTC"]?.name}
+                url={selectedWallets["BTC"]?.icon}
+                size="large"
+                className={twMerge(
+                  "object-contain bg-accent-contrast box-content",
+                  isWalletMenuOpen &&
+                    "outline outline-[2px] outline-accent-primary",
+                )}
+              />
+              <Avatar
+                alt={selectedWallets["BBN"]?.name}
+                url={selectedWallets["BBN"]?.icon}
+                size="large"
+                className={twMerge(
+                  "object-contain bg-accent-contrast box-content",
+                  isWalletMenuOpen &&
+                    "outline outline-[2px] outline-accent-primary",
+                )}
+              />
+            </AvatarGroup>
+          </div>
+        }
+        btcAddress={btcAddress}
+        bbnAddress={bech32Address}
+        selectedWallets={transformedWallets}
+        ordinalsExcluded={ordinalsExcluded}
+        linkedDelegationsVisibility={linkedDelegationsVisibility}
+        onIncludeOrdinals={includeOrdinals}
+        onExcludeOrdinals={excludeOrdinals}
+        onDisplayLinkedDelegations={displayLinkedDelegations}
+        publicKeyNoCoord={publicKeyNoCoord}
+        onOpenChange={handleOpenChange}
       />
-    </>
+
+      <SettingMenuButton
+        ref={settingsButtonRef}
+        toggleMenu={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
+      />
+      <SettingMenuContainer
+        anchorEl={settingsButtonRef.current}
+        isOpen={isSettingsMenuOpen}
+        onClose={() => setIsSettingsMenuOpen(false)}
+      >
+        <SettingMenuContent />
+      </SettingMenuContainer>
+    </div>
   );
 };

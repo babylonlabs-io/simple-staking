@@ -1,6 +1,6 @@
 import { initBTCCurve } from "@babylonlabs-io/btc-staking-ts";
 import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 
@@ -14,6 +14,8 @@ import { Tabs } from "./components/Tabs";
 import Layout from "./layout";
 
 const Home = () => {
+  const [activeTab, setActiveTab] = useState("stake");
+
   useEffect(() => {
     initBTCCurve();
   }, []);
@@ -21,6 +23,13 @@ const Home = () => {
   const { connected } = useWalletConnect();
   const { isGeoBlocked, isLoading } = useHealthCheck();
   const isConnected = connected && !isGeoBlocked && !isLoading;
+
+  // Reset tab to "stake" when wallet disconnects
+  useEffect(() => {
+    if (!connected) {
+      setActiveTab("stake");
+    }
+  }, [connected]);
 
   const tabItems = [
     {
@@ -56,7 +65,12 @@ const Home = () => {
         className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto"
       >
         <Stats />
-        <Tabs items={tabItems} defaultActiveTab="stake" />
+        <Tabs
+          items={tabItems}
+          defaultActiveTab="stake"
+          activeTab={activeTab}
+          onTabChange={setActiveTab}
+        />
       </Container>
     </Layout>
   );
