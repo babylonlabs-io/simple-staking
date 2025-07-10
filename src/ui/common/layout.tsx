@@ -3,27 +3,24 @@ import { twJoin } from "tailwind-merge";
 import { network } from "@/ui/common/config/network/btc";
 import { Network } from "@/ui/common/types/network";
 
-import { Banner } from "./components/Banner/Banner";
-import { Footer } from "./components/Footer/Footer";
-import { Header } from "./components/Header/Header";
+import "@/ui/globals.css";
+import Providers from "./providers";
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children?: React.ReactNode;
+  children: React.ReactNode;
 }>) {
   return (
-    <div
-      className={twJoin(
-        `relative h-full min-h-svh w-full`,
-        network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet",
-      )}
-    >
-      <Banner />
-      <Header />
-      {children}
-
-      <Footer />
-    </div>
+    <Providers>
+      <div
+        className={twJoin(
+          `relative h-full min-h-svh w-full`,
+          network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet",
+        )}
+      >
+        {children}
+      </div>
+    </Providers>
   );
 }
