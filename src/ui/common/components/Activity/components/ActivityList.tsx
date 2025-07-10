@@ -307,9 +307,6 @@ export function ActivityList() {
   if (activityList.length === 0) {
     return (
       <div className="flex flex-col pb-16 pt-6 text-accent-primary gap-4 text-center items-center justify-center">
-        <div className="bg-primary-contrast h-20 w-20 flex items-center justify-center">
-          <span className="text-5xl text-primary-light">👁️</span>
-        </div>
         <h4 className="text-xl font-semibold">
           No {networkConfig.bbn.networkFullName} Stakes
         </h4>
