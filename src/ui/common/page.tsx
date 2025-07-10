@@ -5,13 +5,15 @@ import { useEffect, useState } from "react";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 
 import { Activity } from "./components/Activity/Activity";
+import { Banner } from "./components/Banner/Banner";
 import { Container } from "./components/Container/Container";
 import { FAQ } from "./components/FAQ/FAQ";
+import { Footer } from "./components/Footer/Footer";
+import { Header } from "./components/Header/Header";
 import { MultistakingFormWrapper } from "./components/Multistaking/MultistakingForm/MultistakingFormWrapper";
 import { PersonalBalance } from "./components/PersonalBalance/PersonalBalance";
 import { Stats } from "./components/Stats/Stats";
 import { Tabs } from "./components/Tabs";
-import Layout from "./layout";
 
 const Home = () => {
   const [activeTab, setActiveTab] = useState("stake");
@@ -59,10 +61,13 @@ const Home = () => {
   ];
 
   return (
-    <Layout>
+    <>
+      <Banner />
+      <Header />
+
       <Container
         as="main"
-        className="-mt-[10rem] md:-mt-[6.5rem] flex flex-col gap-12 md:gap-16 pb-16"
+        className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto"
       >
         <Stats />
         <Tabs
@@ -72,7 +77,9 @@ const Home = () => {
           onTabChange={setActiveTab}
         />
       </Container>
-    </Layout>
+
+      <Footer />
+    </>
   );
 };
 
