@@ -1,6 +1,6 @@
 import { Text } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
-import { twJoin, twMerge } from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 
 interface FinalityProviderLogoProps {
   logoUrl?: string;
@@ -55,14 +55,14 @@ export const FinalityProviderLogo = ({
         </Text>
       )}
 
-      <span
+      {/*<span
         className={twJoin(
           "absolute bottom-0 right-0 translate-x-1/4 translate-y-1/4 flex items-center justify-center bg-secondary-main text-accent-contrast rounded-full w-[50%] h-[50%] ring-2 ring-surface p-[5px]",
           styles.subLogo,
         )}
       >
         {rank}
-      </span>
+      </span>*/}
     </span>
   );
 };

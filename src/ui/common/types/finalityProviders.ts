@@ -11,6 +11,7 @@ export interface FinalityProvider {
   totalDelegations: number;
   logo_url?: string;
   bsnId?: string;
+  chain: string;
 }
 
 export interface FinalityProviderV1 {
