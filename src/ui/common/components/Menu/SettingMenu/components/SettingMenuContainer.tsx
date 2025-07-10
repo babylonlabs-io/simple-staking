@@ -2,21 +2,21 @@ import { MobileDialog, Popover } from "@babylonlabs-io/core-ui";
 
 import { useIsMobileView } from "@/ui/common/hooks/useBreakpoint";
 
-type MenuContentProps = {
+interface SettingMenuContainerProps {
   anchorEl: HTMLElement | null;
   children: React.ReactNode;
   className?: string;
   isOpen: boolean;
   onClose: () => void;
-};
+}
 
-export const MenuContent = ({
+export const SettingMenuContainer = ({
   anchorEl,
   children,
   className,
   isOpen,
   onClose,
-}: MenuContentProps) => {
+}: SettingMenuContainerProps) => {
   const isMobileView = useIsMobileView();
 
   if (isMobileView) {
