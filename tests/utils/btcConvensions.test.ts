@@ -1,4 +1,4 @@
-import { btcToSatoshi, satoshiToBtc } from "@/ui/common/utils/btc";
+import { btcToSatoshi, satoshiToBtc } from "@/ui/legacy/utils/btc";
 
 describe("satoshiToBtc", () => {
   it("should convert 0 satoshis to 0 BTC", () => {

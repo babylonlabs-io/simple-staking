@@ -1,11 +1,11 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 import { useLocalStorage } from "usehooks-ts";
 
-import { useDelegationStorage } from "@/ui/common/hooks/storage/useDelegationStorage";
+import { useDelegationStorage } from "@/ui/legacy/hooks/storage/useDelegationStorage";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/ui/common/types/delegationsV2";
+} from "@/ui/legacy/types/delegationsV2";
 
 jest.mock("usehooks-ts", () => ({
   useLocalStorage: jest.fn(),

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
-import { DelegationState } from "@/ui/common/types/delegations";
-import { getState } from "@/ui/common/utils/getState";
+import { DelegationState } from "@/ui/legacy/types/delegations";
+import { getState } from "@/ui/legacy/utils/getState";
 
 import { WalletConnectActions } from "./fixtures/wallet_connect";
 import { interceptRequest } from "./helper/interceptRequest";

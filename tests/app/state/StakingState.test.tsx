@@ -3,37 +3,37 @@ import { PropsWithChildren } from "react";
 
 // Mock the dependencies, but keep their APIs close to real ones
 const mockUseAppState = jest.fn();
-jest.mock("@/ui/common/state", () => ({
+jest.mock("@/ui/legacy/state", () => ({
   useAppState: () => mockUseAppState(),
 }));
 
-jest.mock("@/ui/common/config", () => ({
+jest.mock("@/ui/legacy/config", () => ({
   IS_FIXED_TERM_FIELD: false,
   getDisabledWallets: () => [],
 }));
 
 const mockUseHealthCheck = jest.fn();
-jest.mock("@/ui/common/hooks/useHealthCheck", () => ({
+jest.mock("@/ui/legacy/hooks/useHealthCheck", () => ({
   useHealthCheck: () => mockUseHealthCheck(),
 }));
 
 const mockUseNetworkFees = jest.fn();
-jest.mock("@/ui/common/hooks/client/api/useNetworkFees", () => ({
+jest.mock("@/ui/legacy/hooks/client/api/useNetworkFees", () => ({
   useNetworkFees: () => mockUseNetworkFees(),
 }));
 
 const mockUseBalanceState = jest.fn();
-jest.mock("@/ui/common/state/BalanceState", () => ({
+jest.mock("@/ui/legacy/state/BalanceState", () => ({
   useBalanceState: () => mockUseBalanceState(),
 }));
 
 const mockUseBTCWallet = jest.fn();
-jest.mock("@/ui/common/context/wallet/BTCWalletProvider", () => ({
+jest.mock("@/ui/legacy/context/wallet/BTCWalletProvider", () => ({
   useBTCWallet: () => mockUseBTCWallet(),
 }));
 
 const mockUseCosmosWallet = jest.fn();
-jest.mock("@/ui/common/context/wallet/CosmosWalletProvider", () => ({
+jest.mock("@/ui/legacy/context/wallet/CosmosWalletProvider", () => ({
   useCosmosWallet: () => mockUseCosmosWallet(),
 }));
 
@@ -61,14 +61,14 @@ import {
   StakingState,
   StakingStep,
   useStakingState,
-} from "@/ui/common/state/StakingState";
+} from "@/ui/legacy/state/StakingState";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/ui/common/types/delegationsV2";
+} from "@/ui/legacy/types/delegationsV2";
 
 // Mock getFeeRateFromMempool
-jest.mock("@/ui/common/utils/getFeeRateFromMempool", () => ({
+jest.mock("@/ui/legacy/utils/getFeeRateFromMempool", () => ({
   getFeeRateFromMempool: jest.fn().mockReturnValue({
     minFeeRate: 1,
     defaultFeeRate: 5,

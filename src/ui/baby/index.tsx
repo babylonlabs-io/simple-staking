@@ -1,4 +1,4 @@
-import Layout from "@/ui/common/layout";
+import Layout from "@/ui/legacy/layout";
 
 export default function BabyStaking() {
   return (

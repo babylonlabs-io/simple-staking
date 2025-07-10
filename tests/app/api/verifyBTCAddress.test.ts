@@ -1,8 +1,8 @@
-import { apiWrapper } from "@/ui/common/api/apiWrapper";
-import { verifyBTCAddress } from "@/ui/common/api/verifyBTCAddress";
+import { apiWrapper } from "@/ui/legacy/api/apiWrapper";
+import { verifyBTCAddress } from "@/ui/legacy/api/verifyBTCAddress";
 
 // Mock the apiWrapper module
-jest.mock("@/ui/common/api/apiWrapper");
+jest.mock("@/ui/legacy/api/apiWrapper");
 
 describe("verifyBTCAddress", () => {
   beforeEach(() => {

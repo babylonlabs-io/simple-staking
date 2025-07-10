@@ -1,6 +1,6 @@
-import { shouldDisplayTestingMsg } from "@/ui/common/config";
+import { shouldDisplayTestingMsg } from "@/ui/legacy/config";
 
-jest.mock("@/ui/common/constants", () => ({
+jest.mock("@/ui/legacy/constants", () => ({
   MEMPOOL_API: "https://mempool.space",
 }));
 
