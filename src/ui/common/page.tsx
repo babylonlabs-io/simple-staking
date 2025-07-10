@@ -61,13 +61,13 @@ const Home = () => {
   ];
 
   return (
-    <>
+    <div className="flex min-h-svh flex-col">
       <Banner />
       <Header />
 
       <Container
         as="main"
-        className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto"
+        className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
       >
         <Stats />
         <Tabs
@@ -78,8 +78,10 @@ const Home = () => {
         />
       </Container>
 
-      <Footer />
-    </>
+      <div className="mt-auto">
+        <Footer />
+      </div>
+    </div>
   );
 };
 
