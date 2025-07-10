@@ -3,13 +3,9 @@ import cosmos from "@/ui/common/assets/chains/cosmos.png";
 import ethereum from "@/ui/common/assets/chains/ethereum.png";
 import placeholder from "@/ui/common/assets/chains/placeholder.svg";
 import sui from "@/ui/common/assets/chains/sui.png";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-
-const { chainId: BABYLON_BSN_ID } = getNetworkConfigBBN();
 
 export const chainLogos: Record<string, string> = {
   babylon,
-  [BABYLON_BSN_ID]: babylon,
   cosmos,
   ethereum,
   sui,
