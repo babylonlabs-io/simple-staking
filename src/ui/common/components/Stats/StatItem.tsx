@@ -110,7 +110,6 @@ export const StatItem = ({
       title={title}
       value={loading ? SPINNER_RENDERERS[loadingStyle](value) : value}
       suffix={suffixEl}
-      newDesign
     />
   );
 };
