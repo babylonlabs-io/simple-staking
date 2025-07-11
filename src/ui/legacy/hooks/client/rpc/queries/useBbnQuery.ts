@@ -6,7 +6,14 @@ import {
   QueryClient,
   createProtobufRpcClient,
   setupBankExtension,
+  setupDistributionExtension,
+  setupStakingExtension,
 } from "@cosmjs/stargate";
+import { QueryDelegationTotalRewardsResponse } from "cosmjs-types/cosmos/distribution/v1beta1/query";
+import {
+  QueryDelegatorDelegationsResponse,
+  QueryValidatorsResponse,
+} from "cosmjs-types/cosmos/staking/v1beta1/query";
 
 import { ONE_MINUTE } from "@/ui/legacy/constants";
 import { useBbnRpc } from "@/ui/legacy/context/rpc/BbnRpcProvider";
@@ -14,6 +21,7 @@ import { useCosmosWallet } from "@/ui/legacy/context/wallet/CosmosWalletProvider
 import { ClientError } from "@/ui/legacy/errors";
 import { ERROR_CODES } from "@/ui/legacy/errors/codes";
 import { useHealthCheck } from "@/ui/legacy/hooks/useHealthCheck";
+import { normalizeRewardResponse } from "@/ui/legacy/utils/bbn";
 
 import { useClientQuery } from "../../useClient";
 import { useRpcErrorHandler } from "../useRpcErrorHandler";
@@ -21,6 +29,9 @@ import { useRpcErrorHandler } from "../useRpcErrorHandler";
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
 const BBN_REWARDS_KEY = "BBN_REWARDS";
+const BBN_DELEGATIONS_KEY = "BBN_DELEGATIONS";
+const BBN_DELEGATION_REWARDS_KEY = "BBN_DELEGATION_REWARDS";
+const BBN_VALIDATORS_KEY = "BBN_VALIDATORS";
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
 
 /**
@@ -34,7 +45,7 @@ export const useBbnQuery = () => {
   const { hasRpcError, reconnect } = useRpcErrorHandler();
 
   /**
-   * Gets the rewards from the user's account.
+   * [BTC Staking] Gets the rewards of the user's account.
    * @returns {Promise<number>} - The rewards from the user's account.
    */
   const rewardsQuery = useClientQuery({
@@ -143,10 +154,119 @@ export const useBbnQuery = () => {
     refetchInterval: false, // Disable automatic periodic refetching
   });
 
+  /**
+   * [BABY Staking] Gets all delegations of the user's account.
+   */
+  const delegationsQuery = useClientQuery({
+    queryKey: [BBN_DELEGATIONS_KEY, bech32Address, connected],
+    queryFn: async () => {
+      if (!connected || !queryClient || !bech32Address) {
+        return undefined;
+      }
+
+      const { staking } = setupStakingExtension(queryClient);
+
+      try {
+        const response: QueryDelegatorDelegationsResponse =
+          await staking.delegatorDelegations(bech32Address);
+        return response.delegationResponses || [];
+      } catch (error) {
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          "Error getting delegations",
+          { cause: error as Error },
+        );
+      }
+    },
+    enabled: Boolean(
+      queryClient &&
+        connected &&
+        bech32Address &&
+        !isGeoBlocked &&
+        !isHealthcheckLoading,
+    ),
+    staleTime: ONE_MINUTE,
+    refetchInterval: ONE_MINUTE,
+  });
+
+  /**
+   * [BABY Staking] Gets all delegation rewards of the user's account.
+   */
+  const delegationRewardsQuery = useClientQuery({
+    queryKey: [BBN_DELEGATION_REWARDS_KEY, bech32Address, connected],
+    queryFn: async () => {
+      if (!connected || !queryClient || !bech32Address) {
+        return undefined;
+      }
+
+      const { distribution } = setupDistributionExtension(queryClient);
+
+      try {
+        const response: QueryDelegationTotalRewardsResponse =
+          await distribution.delegationTotalRewards(bech32Address);
+
+        // Need to normalize the response to 6 decimals
+        const rewards = normalizeRewardResponse(response);
+
+        return rewards || [];
+      } catch (error) {
+        // If no rewards found, return empty array
+        if (error instanceof Error && error.message.includes("no delegation")) {
+          return [];
+        }
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          "Error getting delegation rewards",
+          { cause: error as Error },
+        );
+      }
+    },
+    enabled: Boolean(
+      queryClient &&
+        connected &&
+        bech32Address &&
+        !isGeoBlocked &&
+        !isHealthcheckLoading,
+    ),
+    staleTime: ONE_MINUTE,
+    refetchInterval: ONE_MINUTE,
+  });
+
+  /**
+   * [BABY Staking] Gets all the validators.
+   */
+  const validatorsQuery = useClientQuery({
+    queryKey: [BBN_VALIDATORS_KEY],
+    queryFn: async () => {
+      if (!queryClient) {
+        return undefined;
+      }
+
+      const { staking } = setupStakingExtension(queryClient);
+
+      try {
+        const response: QueryValidatorsResponse = await staking.validators("");
+        return response.validators || [];
+      } catch (error) {
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          "Error getting validators",
+          { cause: error as Error },
+        );
+      }
+    },
+    enabled: Boolean(queryClient && !isGeoBlocked && !isHealthcheckLoading),
+    staleTime: ONE_MINUTE,
+    refetchInterval: ONE_MINUTE,
+  });
+
   return {
     rewardsQuery,
     balanceQuery,
     btcTipQuery,
+    delegationsQuery,
+    delegationRewardsQuery,
+    validatorsQuery,
     hasRpcError,
     reconnectRpc: reconnect,
     queryClient,
