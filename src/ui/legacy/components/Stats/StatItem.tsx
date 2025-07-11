@@ -1,6 +1,6 @@
 import {
   Button,
-  ListItem,
+  ListItemLegacy as ListItem,
   Loader,
   MobileDialog,
   type ListItemProps,

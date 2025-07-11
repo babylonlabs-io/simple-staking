@@ -1,4 +1,4 @@
-import { List } from "@babylonlabs-io/core-ui";
+import { ListLegacy as List } from "@babylonlabs-io/core-ui";
 import { memo } from "react";
 
 import { Section } from "@/ui/legacy/components/Section/Section";
