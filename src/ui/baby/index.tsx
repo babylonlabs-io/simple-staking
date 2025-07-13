@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { Container } from "@/ui/common/components/Container/Container";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/ui/legacy/hooks/client/rpc/queries/useBbnQuery";
 import { useEpochingService } from "@/ui/legacy/hooks/services/useEpochingService";
@@ -147,9 +148,10 @@ export default function BabyStaking() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl flex flex-col gap-2">
-      <h1 className="text-3xl font-bold mb-8 text-center">Baby Staking</h1>
-
+    <Container
+      as="main"
+      className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
+    >
       <WalletInfo
         bech32Address={bech32Address}
         delegationsCount={delegations.length}
@@ -196,6 +198,6 @@ export default function BabyStaking() {
           loading={loading}
         />
       </div>
-    </div>
+    </Container>
   );
 }
