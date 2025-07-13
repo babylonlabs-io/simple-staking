@@ -11,12 +11,10 @@ import { RewardsForm } from "./components/RewardsForm";
 import { StakeForm } from "./components/StakeForm";
 import { UnstakeForm } from "./components/UnstakeForm";
 import { WalletInfo } from "./components/WalletInfo";
-import { WalletNotConnected } from "./components/WalletNotConnected";
 
 export default function BabyStaking() {
   const cosmosWallet = useCosmosWallet();
-  const { bech32Address, connected } = cosmosWallet;
-  console.log({ cosmosWallet });
+  const { bech32Address } = cosmosWallet;
   const { stake, unstake, claimRewards } = useEpochingService();
   const { delegationsQuery, delegationRewardsQuery, validatorsQuery } =
     useBbnQuery();
@@ -142,10 +140,6 @@ export default function BabyStaking() {
     setValidatorAddress(validatorAddr);
     await handleClaimRewards();
   };
-
-  if (!connected) {
-    return <WalletNotConnected />;
-  }
 
   return (
     <Container
