@@ -1,12 +1,14 @@
 import { useState } from "react";
 
-import { useCosmosWallet } from "@/ui/legacy/context/wallet/CosmosWalletProvider";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/ui/legacy/hooks/client/rpc/queries/useBbnQuery";
 import { useEpochingService } from "@/ui/legacy/hooks/services/useEpochingService";
 import { babyToUbbn, ubbnToBaby } from "@/ui/legacy/utils/bbn";
 
 export default function BabyStaking() {
-  const { bech32Address, connected } = useCosmosWallet();
+  const cosmosWallet = useCosmosWallet();
+  const { bech32Address, connected } = cosmosWallet;
+  console.log({ cosmosWallet });
   const { stake, unstake, claimRewards } = useEpochingService();
   const { delegationsQuery, delegationRewardsQuery, validatorsQuery } =
     useBbnQuery();
