@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Container } from "@/ui/common/components/Container/Container";
+import { Stats, type StatItemData } from "@/ui/common/components/Stats/Stats";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/ui/legacy/hooks/client/rpc/queries/useBbnQuery";
 import { useEpochingService } from "@/ui/legacy/hooks/services/useEpochingService";
@@ -10,7 +11,6 @@ import { DelegationsList } from "./components/DelegationsList";
 import { RewardsForm } from "./components/RewardsForm";
 import { StakeForm } from "./components/StakeForm";
 import { UnstakeForm } from "./components/UnstakeForm";
-import { WalletInfo } from "./components/WalletInfo";
 
 export default function BabyStaking() {
   const cosmosWallet = useCosmosWallet();
@@ -141,18 +141,31 @@ export default function BabyStaking() {
     await handleClaimRewards();
   };
 
+  const statsItems: StatItemData[] = [
+    {
+      title: "Active Delegations",
+      value: delegations.length.toString(),
+    },
+    {
+      title: "Total Staked",
+      value: `${totalStaked.toLocaleString()} tBABY`,
+    },
+    {
+      title: "Total Rewards",
+      value: `${totalRewards.toLocaleString()} tBABY`,
+    },
+    {
+      title: "Available Validators",
+      value: validators.length.toString(),
+    },
+  ];
+
   return (
     <Container
       as="main"
       className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
     >
-      <WalletInfo
-        bech32Address={bech32Address}
-        delegationsCount={delegations.length}
-        totalStaked={totalStaked}
-        totalRewards={totalRewards}
-        validatorsCount={validators.length}
-      />
+      <Stats title="Babylon Stats" items={statsItems} />
 
       <DelegationsList
         delegations={delegations}
