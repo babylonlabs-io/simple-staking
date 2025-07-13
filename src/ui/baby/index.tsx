@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { Container } from "@/ui/common/components/Container/Container";
 import { Stats, type StatItemData } from "@/ui/common/components/Stats/Stats";
+import { Tabs } from "@/ui/common/components/Tabs";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnQuery } from "@/ui/legacy/hooks/client/rpc/queries/useBbnQuery";
 import { useEpochingService } from "@/ui/legacy/hooks/services/useEpochingService";
@@ -15,12 +16,11 @@ import { UnstakeForm } from "./components/UnstakeForm";
 export default function BabyStaking() {
   const cosmosWallet = useCosmosWallet();
   const { bech32Address } = cosmosWallet;
-  const { stake, unstake, claimRewards } = useEpochingService();
+  const { unstake, claimRewards } = useEpochingService();
   const { delegationsQuery, delegationRewardsQuery, validatorsQuery } =
     useBbnQuery();
 
   const [validatorAddress, setValidatorAddress] = useState("");
-  const [stakeAmount, setStakeAmount] = useState("");
   const [unstakeAmount, setUnstakeAmount] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -62,30 +62,13 @@ export default function BabyStaking() {
     );
   }, 0);
 
-  const handleStake = async () => {
-    if (!validatorAddress || !stakeAmount) return;
-
-    const tbabyAmount = parseFloat(stakeAmount);
-    if (isNaN(tbabyAmount) || tbabyAmount <= 0) {
-      alert("Please enter a valid amount");
-      return;
-    }
-
-    setLoading(true);
+  const handleStakeSuccess = async () => {
     try {
-      const ubbnAmount = babyToUbbn(tbabyAmount);
-      await stake(bech32Address, validatorAddress, {
-        denom: "ubbn",
-        amount: ubbnAmount.toString(),
-      });
-      alert(`Successfully staked ${tbabyAmount} tBABY!`);
       await delegationsQuery.refetch();
       await delegationRewardsQuery.refetch();
-      setStakeAmount("");
-    } catch (error: any) {
-      alert(`Staking failed: ${error.message || "Unknown error"}`);
-    } finally {
-      setLoading(false);
+      // Success notification can be added here
+    } catch (error) {
+      console.error("Error refetching data:", error);
     }
   };
 
@@ -160,6 +143,47 @@ export default function BabyStaking() {
     },
   ];
 
+  const tabItems = [
+    {
+      id: "stake",
+      label: "Stake",
+      content: (
+        <StakeForm
+          validators={validators}
+          onStakeSuccess={handleStakeSuccess}
+        />
+      ),
+    },
+    {
+      id: "unstake",
+      label: "Unstake",
+      content: (
+        <UnstakeForm
+          validators={validators}
+          validatorAddress={validatorAddress}
+          setValidatorAddress={setValidatorAddress}
+          unstakeAmount={unstakeAmount}
+          setUnstakeAmount={setUnstakeAmount}
+          onUnstake={handleUnstake}
+          loading={loading}
+        />
+      ),
+    },
+    {
+      id: "rewards",
+      label: "Claim Rewards",
+      content: (
+        <RewardsForm
+          validators={validators}
+          validatorAddress={validatorAddress}
+          setValidatorAddress={setValidatorAddress}
+          onClaimRewards={handleClaimRewards}
+          loading={loading}
+        />
+      ),
+    },
+  ];
+
   return (
     <Container
       as="main"
@@ -176,35 +200,7 @@ export default function BabyStaking() {
         loading={loading}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StakeForm
-          validators={validators}
-          validatorAddress={validatorAddress}
-          setValidatorAddress={setValidatorAddress}
-          stakeAmount={stakeAmount}
-          setStakeAmount={setStakeAmount}
-          onStake={handleStake}
-          loading={loading}
-        />
-
-        <UnstakeForm
-          validators={validators}
-          validatorAddress={validatorAddress}
-          setValidatorAddress={setValidatorAddress}
-          unstakeAmount={unstakeAmount}
-          setUnstakeAmount={setUnstakeAmount}
-          onUnstake={handleUnstake}
-          loading={loading}
-        />
-
-        <RewardsForm
-          validators={validators}
-          validatorAddress={validatorAddress}
-          setValidatorAddress={setValidatorAddress}
-          onClaimRewards={handleClaimRewards}
-          loading={loading}
-        />
-      </div>
+      <Tabs items={tabItems} defaultActiveTab="stake" className="w-full" />
     </Container>
   );
 }
