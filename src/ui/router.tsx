@@ -1,15 +1,24 @@
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 
 import BabyStaking from "./baby";
-import NotFound from "./legacy/not-found";
-import BTCStaking from "./legacy/page";
-import FeatureFlagService from "./legacy/utils/FeatureFlagService";
+import Layout from "./common/layout";
+import NotFound from "./common/not-found";
+import BTCStaking from "./common/page";
+import FF from "./common/utils/FeatureFlagService";
+import LegacyPage from "./legacy/page";
 
 export const Router = () => (
   <Routes>
-    <Route index path="/" element={<BTCStaking />} />
-    {FeatureFlagService.IsBabyStakingEnabled && (
-      <Route path="baby" element={<BabyStaking />} />
+    {FF.IsPhase3Enabled ? (
+      <Route path="/" element={<Layout />}>
+        <Route path="btc" element={<BTCStaking />} />
+        <Route index element={<Navigate to="btc" replace />} />
+        {FF.IsBabyStakingEnabled && (
+          <Route path="baby" element={<BabyStaking />} />
+        )}
+      </Route>
+    ) : (
+      <Route path="/" element={<LegacyPage />} />
     )}
     <Route path="*" element={<NotFound />} />
   </Routes>

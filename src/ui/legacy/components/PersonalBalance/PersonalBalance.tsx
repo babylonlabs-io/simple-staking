@@ -1,4 +1,4 @@
-import { List } from "@babylonlabs-io/core-ui";
+import { ListLegacy as List } from "@babylonlabs-io/core-ui";
 
 import { AuthGuard } from "@/ui/legacy/components/Common/AuthGuard";
 import { getNetworkConfigBBN } from "@/ui/legacy/config/network/bbn";
