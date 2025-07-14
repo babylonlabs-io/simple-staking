@@ -1,11 +1,14 @@
 import { Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
 
+import { AmountSubsection } from "@/ui/common/components/Common/AmountSubsection/AmountSubsection";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
+import { SubmitButton } from "@/ui/common/components/Common/SubmitButton/SubmitButton";
 import { BsnFinalityProviderField } from "@/ui/common/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
-import { AmountSubsection } from "@/ui/common/components/Multistaking/MultistakingForm/AmountSubsection";
+import { AmountBalanceInfo } from "@/ui/common/components/Multistaking/MultistakingForm/AmountBalanceInfo";
 import { FeesSection } from "@/ui/common/components/Multistaking/MultistakingForm/FeesSection";
 import { MultistakingModal } from "@/ui/common/components/Multistaking/MultistakingModal/MultistakingModal";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import {
   useMultistakingState,
@@ -16,7 +19,6 @@ import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
-import { SubmitButton } from "./SubmitButton";
 
 export function MultistakingForm() {
   const { address } = useBTCWallet();
@@ -28,6 +30,8 @@ export function MultistakingForm() {
     errorMessage: geoBlockMessage,
   } = useStakingState();
   const { validationSchema, maxFinalityProviders } = useMultistakingState();
+
+  const { icon: btcIcon, name: btcName } = getNetworkConfigBTC();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -69,7 +73,12 @@ export function MultistakingForm() {
         <BsnFinalityProviderField
           max={FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1}
         />
-        <AmountSubsection />
+        <AmountSubsection
+          fieldName="amount"
+          currencyIcon={btcIcon}
+          currencyName={btcName}
+          renderBalanceInfo={() => <AmountBalanceInfo />}
+        />
         <FeesSection />
 
         <AuthGuard fallback={<ConnectButton />}>
