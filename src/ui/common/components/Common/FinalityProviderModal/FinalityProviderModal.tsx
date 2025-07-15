@@ -30,7 +30,7 @@ interface Props {
   ) => React.ReactNode;
 }
 
-export const ProviderModal = ({
+export const FinalityProviderModal = ({
   open,
   onClose,
   title,

@@ -1,0 +1,1 @@
+export { FinalityProviderModal } from "./FinalityProviderModal";

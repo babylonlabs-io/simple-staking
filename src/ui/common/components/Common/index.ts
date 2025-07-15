@@ -1,4 +1,4 @@
 export { AmountSubsection } from "./AmountSubsection";
 export { AuthGuard } from "./AuthGuard";
-export { FinalityProviderField } from "./FinalityProviderField";
+export { FinalityProviderModal } from "./FinalityProviderModal";
 export { SubmitButton } from "./SubmitButton";
