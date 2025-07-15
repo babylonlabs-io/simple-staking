@@ -1,20 +1,25 @@
 import { Form, HiddenField } from "@babylonlabs-io/core-ui";
 import { useCallback } from "react";
 
-import { AmountSubsection } from "@/ui/common/components/Common/AmountSubsection/AmountSubsection";
-import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
-import { SubmitButton } from "@/ui/common/components/Common/SubmitButton/SubmitButton";
-import { BsnFinalityProviderField } from "@/ui/common/components/Multistaking/BsnFinalityProviderField/BsnFinalityProviderField";
-import { AmountBalanceInfo } from "@/ui/common/components/Multistaking/MultistakingForm/AmountBalanceInfo";
+import {
+  AmountSubsection,
+  AuthGuard,
+  FinalityProviderField,
+  SubmitButton,
+} from "@/ui/common/components/Common";
 import { FeesSection } from "@/ui/common/components/Multistaking/MultistakingForm/FeesSection";
 import { MultistakingModal } from "@/ui/common/components/Multistaking/MultistakingModal/MultistakingModal";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
+import { useBalanceState } from "@/ui/common/state/BalanceState";
+import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 import {
   useMultistakingState,
   type MultistakingFormFields,
 } from "@/ui/common/state/MultistakingState";
 import { StakingStep, useStakingState } from "@/ui/common/state/StakingState";
+import { satoshiToBtc } from "@/ui/common/utils/btc";
 import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
@@ -31,12 +36,20 @@ export function MultistakingForm() {
   } = useStakingState();
   const { validationSchema, maxFinalityProviders } = useMultistakingState();
 
-  const { icon: btcIcon, name: btcName } = getNetworkConfigBTC();
+  const {
+    icon: btcIcon,
+    name: btcName,
+    coinSymbol,
+    displayUSD,
+  } = getNetworkConfigBTC();
+
+  const { bsnList, bsnLoading } = useFinalityProviderBsnState();
+  const { stakableBtcBalance } = useBalanceState();
+  const btcInUsd = usePrice(coinSymbol);
+  const formattedBalance = satoshiToBtc(stakableBtcBalance);
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
-      // Persist form values into global staking state
-      // For multistaking, pass all selected finality providers
       setFormData({
         finalityProviders: Object.values(formValues.finalityProviders),
         term: Number(formValues.term),
@@ -70,14 +83,21 @@ export function MultistakingForm() {
       <HiddenField name="feeRate" defaultValue="0" />
       <HiddenField name="feeAmount" defaultValue="0" />
       <div className="flex flex-col gap-2">
-        <BsnFinalityProviderField
+        <FinalityProviderField
           max={FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1}
+          bsns={bsnList}
+          loading={bsnLoading}
         />
         <AmountSubsection
           fieldName="amount"
           currencyIcon={btcIcon}
           currencyName={btcName}
-          renderBalanceInfo={() => <AmountBalanceInfo />}
+          balanceDetails={{
+            balance: formattedBalance,
+            symbol: coinSymbol,
+            price: btcInUsd,
+            displayUSD: displayUSD,
+          }}
         />
         <FeesSection />
 
