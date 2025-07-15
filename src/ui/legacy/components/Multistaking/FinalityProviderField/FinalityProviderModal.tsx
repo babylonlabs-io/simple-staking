@@ -45,7 +45,7 @@ export const FinalityProviderModal = ({
         <div>
           Finality Providers play a key role in securing Proof-of-Stake networks
           by validating and finalising transactions. Select one to delegate your
-          stake and earn rewards.
+          stake.
         </div>
         <div className="overflow-x-auto flex flex-col gap-2 mt-10">
           <FinalityProviders selectedFP={selectedFP} onChange={setSelectedFp} />
