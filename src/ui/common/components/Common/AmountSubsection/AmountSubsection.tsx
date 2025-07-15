@@ -3,12 +3,22 @@ import { HiddenField, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { SubSection } from "@/ui/common/components/Multistaking/MultistakingForm/SubSection";
 
+import { AmountBalanceInfo } from "./AmountBalanceInfo";
+
+interface BalanceDetails {
+  balance: number | string;
+  symbol: string;
+  price?: number;
+  displayUSD?: boolean;
+  decimals?: number;
+}
+
 interface Props {
   fieldName: string;
   currencyIcon: string;
   currencyName: string;
   placeholder?: string;
-  renderBalanceInfo?: () => React.ReactNode;
+  balanceDetails?: BalanceDetails;
   min?: string;
   step?: string;
   autoFocus?: boolean;
@@ -19,7 +29,7 @@ export const AmountSubsection = ({
   currencyIcon,
   currencyName,
   placeholder = "Enter Amount",
-  renderBalanceInfo,
+  balanceDetails,
   min = "0",
   step = "any",
   autoFocus = true,
@@ -66,7 +76,18 @@ export const AmountSubsection = ({
       </div>
       <HiddenField name={fieldName} defaultValue="" />
 
-      {renderBalanceInfo && <AuthGuard>{renderBalanceInfo()}</AuthGuard>}
+      {balanceDetails && (
+        <AuthGuard>
+          <AmountBalanceInfo
+            balance={balanceDetails.balance}
+            symbol={balanceDetails.symbol}
+            price={balanceDetails.price}
+            displayUSD={balanceDetails.displayUSD}
+            decimals={balanceDetails.decimals ?? 8}
+            fieldName={fieldName}
+          />
+        </AuthGuard>
+      )}
     </SubSection>
   );
 };
