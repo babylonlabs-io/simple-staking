@@ -10,7 +10,6 @@ import {
 } from "@/ui/common/types/delegationsV2";
 import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import { NetworkInfo } from "@/ui/common/types/networkInfo";
-import { blocksToDisplayTime } from "@/ui/common/utils/time";
 
 import { SlashingContent } from "./SlashingContent";
 
@@ -50,9 +49,9 @@ const STATUSES: Record<string, StatusAdapter> = {
     tooltip:
       "Stake is about to be unbonded as it's reaching the timelock period",
   }),
-  [State.EARLY_UNBONDING]: ({ networkInfo }) => ({
+  [State.EARLY_UNBONDING]: () => ({
     label: "Unbonding",
-    tooltip: `Stake unbonding is in progress. The unbonding time is set to ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)}.`,
+    tooltip: "Stake unbonding is in progress.",
   }),
   [State.TIMELOCK_WITHDRAWABLE]: () => ({
     label: "Withdrawable",
@@ -113,9 +112,9 @@ const STATUSES: Record<string, StatusAdapter> = {
     label: `Pending ${coinName} Confirmation`,
     tooltip: `Stake is pending ${networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0} ${coinName} confirmations`,
   }),
-  [State.INTERMEDIATE_UNBONDING_SUBMITTED]: ({ networkInfo }) => ({
+  [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
     label: "Unbonding",
-    tooltip: `Stake unbonding is in progress. The unbonding time is set to ${blocksToDisplayTime(networkInfo?.params?.bbnStakingParams.latestParam.unbondingTime ?? 0)}.`,
+    tooltip: "Stake unbonding is in progress.",
   }),
   [State.INTERMEDIATE_EARLY_UNBONDING_WITHDRAWAL_SUBMITTED]: () => ({
     label: "Withdrawing",
