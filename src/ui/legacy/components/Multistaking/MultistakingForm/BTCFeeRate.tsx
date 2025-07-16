@@ -1,4 +1,4 @@
-import { Button, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import { Button, useField, useFormContext } from "@babylonlabs-io/core-ui";
 import { useEffect, useMemo, useState } from "react";
 import { FaPen } from "react-icons/fa6";
 
@@ -12,13 +12,14 @@ interface FeeFiledProps {
 
 export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const [visible, setVisibility] = useState(false);
-  const feeRate = useWatch({ name: "feeRate" });
   const { setValue, setError, clearErrors } = useFormContext();
   const { calculateFeeAmount } = useStakingService();
 
-  const amount = useWatch({ name: "amount" });
-  const term = useWatch({ name: "term" });
-  const finalityProviders = useWatch({ name: "finalityProviders" });
+  // Use useField instead of multiple useWatch calls to prevent infinite loops
+  const { value: feeRate } = useField({ name: "feeRate" });
+  const { value: amount } = useField({ name: "amount" });
+  const { value: term } = useField({ name: "term" });
+  const { value: finalityProviders } = useField({ name: "finalityProviders" });
 
   const validFinalityProviders = useMemo(
     () => Object.values(finalityProviders ?? {}) as string[],
@@ -33,70 +34,56 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
     });
   }, [defaultRate, setValue]);
 
-  // TODO: useFieldState instead of multiple useWatch
+  // Calculate fee amount when dependencies change
   useEffect(() => {
-    let cancelled = false;
-
-    const run = () => {
-      try {
-        if (!validFinalityProviders.length || !amount || !term || !feeRate) {
-          if (cancelled) return;
-          setValue("feeAmount", "0", {
-            shouldValidate: false,
-            shouldDirty: false,
-            shouldTouch: false,
-          });
-          return;
-        }
-
-        const feeAmount = calculateFeeAmount({
-          finalityProviders: validFinalityProviders,
-          amount: Number(amount),
-          term: Number(term),
-          feeRate: Number(feeRate),
-        });
-
-        if (cancelled) return;
-
-        clearErrors("feeAmount");
-        setValue("feeAmount", feeAmount.toString(), {
-          shouldValidate: true,
-          shouldDirty: true,
-          shouldTouch: true,
-        });
-      } catch (e: any) {
-        if (cancelled) return;
+    try {
+      if (!validFinalityProviders.length || !amount || !term || !feeRate) {
         setValue("feeAmount", "0", {
           shouldValidate: false,
           shouldDirty: false,
           shouldTouch: false,
         });
-        setError("feeAmount", {
-          type: "custom",
-          message: e.message,
-        });
+        return;
       }
-    };
 
-    Promise.resolve().then(run);
+      const feeAmount = calculateFeeAmount({
+        finalityProviders: validFinalityProviders,
+        amount: Number(amount),
+        term: Number(term),
+        feeRate: Number(feeRate),
+      });
 
-    return () => {
-      cancelled = true;
-    };
+      clearErrors("feeAmount");
+      setValue("feeAmount", feeAmount.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+        shouldTouch: true,
+      });
+    } catch (e: any) {
+      setValue("feeAmount", "0", {
+        shouldValidate: false,
+        shouldDirty: false,
+        shouldTouch: false,
+      });
+      setError("feeAmount", {
+        type: "custom",
+        message: e.message,
+      });
+    }
   }, [
-    feeRate,
+    validFinalityProviders,
     amount,
     term,
-    validFinalityProviders,
+    feeRate,
+    calculateFeeAmount,
     setValue,
     setError,
     clearErrors,
-    calculateFeeAmount,
   ]);
 
   return (
     <FeeItem title="Network Fee Rate">
-      <span>{feeRate} sats/vB</span>
+      <span>{feeRate || defaultRate} sats/vB</span>
 
       <Button
         //@ts-expect-error - fix type issue in core-ui
