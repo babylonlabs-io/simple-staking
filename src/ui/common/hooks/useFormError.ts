@@ -11,8 +11,12 @@ interface FieldError {
 }
 
 export function useFormError(): FieldError | undefined {
-  const { errors } = useFormState();
+  const { errors, isValid } = useFormState();
   const { formFields } = useMultistakingState();
+
+  if (isValid) {
+    return undefined;
+  }
 
   const fieldErrors = formFields
     .map(({ field, errors: errorOptions }) => {
