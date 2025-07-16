@@ -15,11 +15,12 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   const { setValue, setError, clearErrors } = useFormContext();
   const { calculateFeeAmount } = useStakingService();
 
-  // Use useField instead of multiple useWatch calls to prevent infinite loops
+  // Use useField to monitor changes to the fields
   const { value: feeRate } = useField({ name: "feeRate" });
   const { value: amount } = useField({ name: "amount" });
   const { value: term } = useField({ name: "term" });
   const { value: finalityProviders } = useField({ name: "finalityProviders" });
+  const { value: feeAmount } = useField({ name: "feeAmount" });
 
   const validFinalityProviders = useMemo(
     () => Object.values(finalityProviders ?? {}) as string[],
@@ -37,28 +38,37 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
   // Calculate fee amount when dependencies change
   useEffect(() => {
     try {
-      if (!validFinalityProviders.length || !amount || !term || !feeRate) {
-        setValue("feeAmount", "0", {
-          shouldValidate: false,
-          shouldDirty: false,
-          shouldTouch: false,
-        });
+      if (
+        !validFinalityProviders.length ||
+        !amount ||
+        !term ||
+        !feeRate ||
+        feeRate === "0"
+      ) {
+        if (feeAmount && feeAmount !== "0") {
+          setValue("feeAmount", "0", {
+            shouldValidate: false,
+            shouldDirty: false,
+            shouldTouch: false,
+          });
+        }
         return;
       }
 
-      const feeAmount = calculateFeeAmount({
+      const newFeeAmount = calculateFeeAmount({
         finalityProviders: validFinalityProviders,
         amount: Number(amount),
         term: Number(term),
         feeRate: Number(feeRate),
-      });
-
-      clearErrors("feeAmount");
-      setValue("feeAmount", feeAmount.toString(), {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
+      }).toString();
+      if (feeAmount !== newFeeAmount) {
+        clearErrors("feeAmount");
+        setValue("feeAmount", newFeeAmount, {
+          shouldValidate: true,
+          shouldDirty: true,
+          shouldTouch: true,
+        });
+      }
     } catch (e: any) {
       setValue("feeAmount", "0", {
         shouldValidate: false,
@@ -75,6 +85,7 @@ export function BTCFeeRate({ defaultRate = 0 }: FeeFiledProps) {
     amount,
     term,
     feeRate,
+    feeAmount,
     calculateFeeAmount,
     setValue,
     setError,
