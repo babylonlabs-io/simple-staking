@@ -15,15 +15,19 @@ export function CounterButton({
   alwaysShowCounter = false,
 }: CounterButtonProps) {
   const isClickable = counter < max;
-  const showsCounter =
-    (0 < counter && 1 < max) || (alwaysShowCounter && counter === 0);
+  const hasActiveCounter = counter > 0 && max > 1;
+  const showsInitialCounter = alwaysShowCounter && counter === 0;
+  const showsCounter = hasActiveCounter || showsInitialCounter;
+
+  if (!showsCounter && !isClickable) {
+    return null;
+  }
 
   return (
     <div
       className={twJoin(
         "flex border border-accent-primary rounded-md bg-primary-highlight overflow-hidden",
         isClickable && "cursor-pointer",
-        !showsCounter && !isClickable && "hidden",
       )}
       onClick={isClickable ? onAdd : undefined}
     >
