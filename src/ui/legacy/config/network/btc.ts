@@ -3,7 +3,6 @@ import type { BTCConfig } from "@babylonlabs-io/wallet-connector";
 import bitcoinIcon from "@/ui/legacy/assets/bitcoin.png";
 import signetBitcoinIcon from "@/ui/legacy/assets/signet_bitcoin.svg";
 import { MEMPOOL_API } from "@/ui/legacy/constants";
-import { ClientError, ERROR_CODES } from "@/ui/legacy/errors";
 import { Network } from "@/ui/legacy/types/network";
 
 const defaultNetwork = "devnet";
@@ -57,28 +56,4 @@ const config: Record<string, Config> = {
 
 export function getNetworkConfigBTC(): Config {
   return config[network] ?? config[defaultNetwork];
-}
-
-export function validateAddress(network: Network, address: string): void {
-  if (network === Network.MAINNET && !address.startsWith("bc1")) {
-    throw new ClientError(
-      ERROR_CODES.VALIDATION_ERROR,
-      `Incorrect address prefix for ${network}. Expected address to start with 'bc1'.`,
-    );
-  } else if (
-    [Network.SIGNET, Network.TESTNET].includes(network) &&
-    !address.startsWith("tb1")
-  ) {
-    throw new ClientError(
-      ERROR_CODES.VALIDATION_ERROR,
-      "Incorrect address prefix for Testnet / Signet. Expected address to start with 'tb1'.",
-    );
-  } else if (
-    ![Network.MAINNET, Network.SIGNET, Network.TESTNET].includes(network)
-  ) {
-    throw new ClientError(
-      ERROR_CODES.VALIDATION_ERROR,
-      `Unsupported network: ${network}. Please provide a valid network.`,
-    );
-  }
 }

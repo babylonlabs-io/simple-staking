@@ -20,18 +20,3 @@ export const useBreakpoint = (breakpoint: BreakpointKey): boolean => {
 export const useIsMobileView = () => {
   return useBreakpoint("md");
 };
-
-// Returns true if the viewport is desktop
-export const useIsDesktopView = () => {
-  return useBreakpoint("lg");
-};
-
-// Returns true if the viewport is large desktop
-export const useIsLargeDesktopView = () => {
-  return useBreakpoint("xl");
-};
-
-// Returns true if the viewport is extra large desktop
-export const useIsExtraLargeDesktopView = () => {
-  return useBreakpoint("2xl");
-};

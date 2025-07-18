@@ -12,14 +12,6 @@ export const chainLogos: Record<string, string> = {
   placeholder,
 };
 
-export const chainNames = {
-  babylon: "Babylon Genesis",
-  cosmos: "Cosmos",
-  ethereum: "Ethereum",
-  sui: "Sui",
-  unknown: "Unknown Chain",
-} as const;
-
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 

@@ -67,7 +67,6 @@ jobs:
           NEXT_PUBLIC_DIST_ID: ${{ github.run_id }}
           NEXT_PUBLIC_SENTRY_ENVIRONMENT: ${{ matrix.environment }}
           # Feature Flags
-          NEXT_PUBLIC_FF_MULTISTAKING: ${{ vars.NEXT_PUBLIC_FF_MULTISTAKING }}
           NEXT_PUBLIC_FF_ENABLE_LEDGER: ${{ vars.NEXT_PUBLIC_FF_ENABLE_LEDGER }}
           NEXT_PUBLIC_FF_PHASE_3: ${{ vars.NEXT_PUBLIC_FF_PHASE_3 }}
           NEXT_PUBLIC_FF_BABYSTAKING: ${{ vars.NEXT_PUBLIC_FF_BABYSTAKING }}
