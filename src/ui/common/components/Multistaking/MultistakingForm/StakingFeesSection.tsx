@@ -137,7 +137,12 @@ export function StakingFeesSection() {
     <>
       <CoreFeesSection
         feeRate={feeRate || 0}
-        onFeeRateEdit={() => setFeeModalVisible(true)}
+        onFeeRateEdit={(event?: React.MouseEvent) => {
+          event?.preventDefault?.();
+          event?.stopPropagation?.();
+
+          setFeeModalVisible(true);
+        }}
         feeAmount={feeAmountBTC}
         coinSymbol={coinSymbol}
         feeAmountHint={feeAmountHint}

@@ -1,5 +1,4 @@
-import { HiddenField, useFormContext } from "@babylonlabs-io/core-ui";
-import { useEffect } from "react";
+import { HiddenField } from "@babylonlabs-io/core-ui";
 
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { MultistakingModal } from "@/ui/common/components/Multistaking/MultistakingModal/MultistakingModal";
@@ -20,13 +19,6 @@ export function MultistakingFormContent() {
     blocked: isGeoBlocked,
     errorMessage: geoBlockMessage,
   } = useStakingState();
-
-  const { setValue } = useFormContext();
-
-  useEffect(() => {
-    setValue("feeRate", "0", { shouldValidate: false, shouldDirty: false });
-    setValue("feeAmount", "0", { shouldValidate: false, shouldDirty: false });
-  }, [setValue]);
 
   return (
     <>
