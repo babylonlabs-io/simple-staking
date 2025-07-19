@@ -52,7 +52,7 @@ describe("Home page feature flag – MULTISTAKING", () => {
     jest.clearAllMocks();
   });
 
-  it("renders MultistakingForm when FF_MULTISTAKING is enabled", () => {
+  it("Should render MultistakingForm", () => {
     const FeatureFlagService =
       require("@/ui/legacy/utils/FeatureFlagService").default;
     FeatureFlagService._isMultiStakingEnabled = true;
@@ -65,36 +65,12 @@ describe("Home page feature flag – MULTISTAKING", () => {
       },
     });
 
-    const { getByTestId, queryByTestId } = render(
+    const { getByTestId } = render(
       <QueryClientProvider client={queryClient}>
         <Home />
       </QueryClientProvider>,
     );
 
     expect(getByTestId("multistaking-form")).toBeInTheDocument();
-    expect(queryByTestId("staking-form")).not.toBeInTheDocument();
-  });
-
-  it("renders StakingForm when FF_MULTISTAKING is disabled", () => {
-    const FeatureFlagService =
-      require("@/ui/legacy/utils/FeatureFlagService").default;
-    FeatureFlagService._isMultiStakingEnabled = false;
-
-    const queryClient = new QueryClient({
-      defaultOptions: {
-        queries: {
-          retry: false,
-        },
-      },
-    });
-
-    const { getByTestId, queryByTestId } = render(
-      <QueryClientProvider client={queryClient}>
-        <Home />
-      </QueryClientProvider>,
-    );
-
-    expect(getByTestId("staking-form")).toBeInTheDocument();
-    expect(queryByTestId("multistaking-form")).not.toBeInTheDocument();
   });
 });

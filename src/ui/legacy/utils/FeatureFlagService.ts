@@ -14,17 +14,6 @@
 
 export default {
   /**
-   * MULTISTAKING feature flag
-   *
-   * Purpose: Enables multi-staking functionality
-   * Why needed: To gradually roll out multi-staking capabilities
-   * ETA for removal: TBD - Will be removed once multi-staking is fully released
-   */
-  get IsMultiStakingEnabled() {
-    return process.env.NEXT_PUBLIC_FF_MULTISTAKING === "true";
-  },
-
-  /**
    * ENABLE_LEDGER feature flag
    *
    * Purpose: Enables ledger support

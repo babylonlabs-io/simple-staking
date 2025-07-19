@@ -50,6 +50,9 @@ export default tseslint.config(
         { allowConstantExport: true },
       ],
       "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unused-vars": "error",
+      "@typescript-eslint/no-unused-expressions": "error",
+      "import-x/no-unused-modules": "error",
       "import-x/order": [
         "error",
         {
