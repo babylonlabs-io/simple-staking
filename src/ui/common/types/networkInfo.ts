@@ -3,7 +3,7 @@ import { StakingParams } from "@babylonlabs-io/btc-staking-ts";
 export interface BbnStakingParamsVersion extends StakingParams {
   version: number;
   minCommissionRate: string;
-  maxActiveFinalityProviders: number;
+  maxFinalityProviders: number;
   delegationCreationBaseGasFee: number;
   btcActivationHeight: number;
   allowListExpirationHeight: number;
@@ -36,7 +36,6 @@ export interface StakingStatus {
 export interface Params {
   bbnStakingParams: BbnStakingParams;
   btcEpochCheckParams: BtcEpochCheckParams;
-  maxBsnFpProviders?: number;
 }
 
 export interface NetworkInfo {

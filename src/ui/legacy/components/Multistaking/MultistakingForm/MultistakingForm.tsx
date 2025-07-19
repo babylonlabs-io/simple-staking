@@ -14,7 +14,6 @@ import {
   type MultistakingFormFields,
 } from "@/ui/legacy/state/MultistakingState";
 import { StakingStep, useStakingState } from "@/ui/legacy/state/StakingState";
-import FeatureFlagService from "@/ui/legacy/utils/FeatureFlagService";
 
 import { ConnectButton } from "./ConnectButton";
 import { FormAlert } from "./FormAlert";
@@ -31,7 +30,7 @@ export function MultistakingForm() {
     blocked: isGeoBlocked,
     errorMessage: geoBlockMessage,
   } = useStakingState();
-  const { validationSchema, maxFinalityProviders } = useMultistakingState();
+  const { validationSchema } = useMultistakingState();
 
   const handlePreview = useCallback(
     (formValues: MultistakingFormFields) => {
@@ -72,11 +71,8 @@ export function MultistakingForm() {
         <HiddenField name="feeAmount" defaultValue="0" />
         <div className="flex flex-col gap-6 lg:flex-row">
           <Card className="flex-1 min-w-0 flex flex-col gap-2">
-            <BsnFinalityProviderField
-              max={
-                FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1
-              }
-            />
+            {/* Legacy UI only support single FP staking */}
+            <BsnFinalityProviderField max={1} />
             <AmountSubsection />
             <FeesSection />
 

@@ -24,7 +24,6 @@ interface NetworkInfoAPI {
   params: {
     bbn: BbnParams[];
     btc: BtcCheckpointParams[];
-    max_bsn_fp_providers?: number;
   };
 }
 
@@ -42,7 +41,7 @@ export interface BbnParams {
   unbonding_time_blocks: number;
   unbonding_fee_sat: number;
   min_commission_rate: string;
-  max_active_finality_providers: number;
+  max_finality_providers: number;
   delegation_creation_base_gas_fee: number;
   btc_activation_height: number;
   allow_list_expiration_height: number;
@@ -73,7 +72,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
       unbondingTime: v.unbonding_time_blocks,
       unbondingFeeSat: v.unbonding_fee_sat,
       minCommissionRate: v.min_commission_rate,
-      maxActiveFinalityProviders: v.max_active_finality_providers,
+      maxFinalityProviders: v.max_finality_providers || 1, // default to 1 if not set
       delegationCreationBaseGasFee: v.delegation_creation_base_gas_fee,
       slashing: {
         slashingPkScriptHex: v.slashing_pk_script,
@@ -159,7 +158,6 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
         versions: epochCheckVersions,
         genesisParam: genesisEpochCheckParam,
       },
-      maxBsnFpProviders: params.max_bsn_fp_providers,
     },
   };
 };

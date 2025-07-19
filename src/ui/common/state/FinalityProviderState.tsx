@@ -2,7 +2,6 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useSearchParams } from "react-router";
 
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useFinalityProviders } from "@/ui/common/hooks/client/api/useFinalityProviders";
 import { useFinalityProvidersV2 } from "@/ui/common/hooks/client/api/useFinalityProvidersV2";
 import {
@@ -37,8 +36,6 @@ interface FinalityProviderState {
   fetchNextPage: () => void;
   getFinalityProviderName: (btcPkHex: string) => string | undefined;
 }
-
-const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 const FP_STATUSES = {
   [FinalityProviderStateEnum.ACTIVE]: 1,
@@ -109,7 +106,9 @@ export function FinalityProviderState({ children }: PropsWithChildren) {
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      bsnId: FeatureFlagService.IsPhase3Enabled ? "all" : BBN_CHAIN_ID,
+      // By default, if no bsn is passed, the FP endpoint will return babylon
+      // FP only
+      ...(FeatureFlagService.IsPhase3Enabled ? { bsnId: "all" } : {}),
     });
 
   const { data: dataV1 } = useFinalityProviders();
