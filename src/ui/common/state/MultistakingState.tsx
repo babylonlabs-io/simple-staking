@@ -38,6 +38,8 @@ interface FieldOptions {
   errors?: Record<string, { level: "warning" | "default" | "error" }>;
 }
 
+const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
+
 export interface MultistakingState {
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
@@ -50,7 +52,7 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    maxFinalityProviders: 3,
+    maxFinalityProviders: DEFAULT_MAX_FINALITY_PROVIDERS, // Default to 1 FP in staking
     validationSchema: undefined,
     formFields: [],
   });
@@ -60,7 +62,9 @@ export function MultistakingState({ children }: PropsWithChildren) {
     StakingModalPage.DEFAULT,
   );
   const { data: networkInfo } = useNetworkInfo();
-  const maxFinalityProviders = networkInfo?.params.maxBsnFpProviders ?? 3;
+  const maxFinalityProviders =
+    networkInfo?.params.bbnStakingParams.latestParam.maxFinalityProviders ??
+    DEFAULT_MAX_FINALITY_PROVIDERS;
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
 

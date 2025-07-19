@@ -9,7 +9,7 @@ import LegacyPage from "./legacy/page";
 
 export const Router = () => (
   <Routes>
-    {FF.IsPhase3Enabled ? (
+    {FF.IsNewUIEnabled ? (
       <Route path="/" element={<Layout />}>
         <Route path="btc" element={<BTCStaking />} />
         <Route index element={<Navigate to="btc" replace />} />

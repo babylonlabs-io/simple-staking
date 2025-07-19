@@ -61,7 +61,7 @@ export const getFinalityProvidersV2 = async ({
     sort_by: sortBy,
     order,
     name,
-    bsn_id: bsnId,
+    ...(bsnId ? { bsn_id: bsnId } : {}),
   };
 
   const response = await apiWrapper<FinalityProvidersAPIResponse>(

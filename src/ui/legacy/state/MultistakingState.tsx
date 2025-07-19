@@ -11,7 +11,6 @@ import {
 
 import { validateDecimalPoints } from "@/ui/legacy/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/legacy/config/network/btc";
-import { useNetworkInfo } from "@/ui/legacy/hooks/client/api/useNetworkInfo";
 import { satoshiToBtc } from "@/ui/legacy/utils/btc";
 import { createStateUtils } from "@/ui/legacy/utils/createStateUtils";
 import {
@@ -50,7 +49,8 @@ const { StateProvider, useState: useMultistakingState } =
   createStateUtils<MultistakingState>({
     stakingModalPage: StakingModalPage.DEFAULT,
     setStakingModalPage: () => {},
-    maxFinalityProviders: 3,
+    // Legacy UI only support single FP staking
+    maxFinalityProviders: 1,
     validationSchema: undefined,
     formFields: [],
   });
@@ -59,8 +59,6 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const { data: networkInfo } = useNetworkInfo();
-  const maxFinalityProviders = networkInfo?.params.maxBsnFpProviders ?? 3;
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
 
@@ -74,10 +72,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .transform((value) => Object.values(value))
             .required("Add Finality Provider")
             .min(1, "Add Finality Provider")
-            .max(
-              maxFinalityProviders,
-              `Maximum ${maxFinalityProviders} finality providers allowed.`,
-            ),
+            .max(1, `Maximum of 1 finality provider allowed.`),
         },
         {
           field: "term",
@@ -154,7 +149,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking fee amount must be greater than 0."),
         },
       ] as const,
-    [stakingInfo, stakableBtcBalance, maxFinalityProviders],
+    [stakingInfo, stakableBtcBalance],
   );
 
   const validationSchema = useMemo(() => {
@@ -172,17 +167,11 @@ export function MultistakingState({ children }: PropsWithChildren) {
     () => ({
       stakingModalPage,
       setStakingModalPage,
-      maxFinalityProviders,
+      maxFinalityProviders: 1, // Legacy UI only support single FP staking
       validationSchema,
       formFields,
     }),
-    [
-      stakingModalPage,
-      setStakingModalPage,
-      maxFinalityProviders,
-      validationSchema,
-      formFields,
-    ],
+    [stakingModalPage, setStakingModalPage, validationSchema, formFields],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;
