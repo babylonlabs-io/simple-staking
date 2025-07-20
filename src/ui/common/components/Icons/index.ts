@@ -1,20 +1,13 @@
-// Base icon props interface
 export interface BaseIconProps {
   className?: string;
   size?: number;
 }
 
-// Extended icon props with variant support
-export interface IconProps extends BaseIconProps {
-  variant?: "default" | "primary" | "secondary" | "error" | "success";
-}
-
-export { ThemedIcon } from "./ThemedIcon";
-
-// Wallet icons
-export { BitcoinPublicKeyIcon } from "./wallet/BitcoinPublicKeyIcon";
-export { LinkWalletIcon } from "./wallet/LinkWalletIcon";
-export { UsingInscriptionIcon } from "./wallet/UsingInscriptionIcon";
-
-// Common icons
-export { CopyIcon } from "./common/CopyIcon";
+export * from "./common/ChevronLeftIcon";
+export * from "./common/CopyIcon";
+export * from "./common/ReportBugIcon";
+export * from "./common/ThemeIcon";
+export * from "./ThemedIcon";
+export * from "./wallet/BitcoinPublicKeyIcon";
+export * from "./wallet/LinkWalletIcon";
+export * from "./wallet/UsingInscriptionIcon";
