@@ -22,7 +22,7 @@ type SelectedProviderItemLocal = {
 
 export function FinalityProvidersSection() {
   const { maxFinalityProviders } = useMultistakingState();
-  const allowsMultipleBsns = maxFinalityProviders > 1;
+  const allowsMultipleBsns = FeatureFlagService.IsPhase3Enabled;
 
   const { value: selectedProviderMap = {}, onChange } = useField<
     Record<string, string>
@@ -99,7 +99,7 @@ export function FinalityProvidersSection() {
   return (
     <Fragment>
       <FinalityProviderSubsection
-        max={FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1}
+        max={allowsMultipleBsns ? maxFinalityProviders : 1}
         items={selectedItems}
         onAdd={handleOpen}
         onRemove={handleRemove}
