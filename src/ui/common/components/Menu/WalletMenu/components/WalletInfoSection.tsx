@@ -2,8 +2,9 @@ import { Avatar, Text } from "@babylonlabs-io/core-ui";
 
 import bbnIcon from "@/ui/common/assets/bbn.svg";
 import bitcoin from "@/ui/common/assets/bitcoin.png";
-import { Hash } from "@/ui/common/components/Hash/Hash";
+import { DisplayHash } from "@/ui/common/components/Hash";
 import { CopyIcon } from "@/ui/common/components/Icons";
+import { useCopy } from "@/ui/common/hooks/useCopy";
 
 interface WalletInfoProps {
   btcAddress: string;
@@ -16,21 +17,19 @@ export const WalletInfoSection = ({
   bbnAddress,
   selectedWallets,
 }: WalletInfoProps) => {
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-  };
+  const { copyToClipboard, isCopied } = useCopy();
 
   return (
-    <div className="flex flex-col gap-4 w-full">
+    <div className="flex flex-row gap-2 w-full md:flex-col md:gap-4">
       {/* Bitcoin Wallet */}
-      <div className="bg-secondary-highlight dark:bg-secondary-strokeLight rounded-[4px] p-4">
+      <div className="bg-secondary-highlight dark:bg-secondary-strokeLight rounded-[4px] p-3 flex-1 md:p-4">
         <div className="flex flex-col w-full">
-          <div className="flex justify-start mb-3">
+          <div className="flex justify-start mb-2 md:mb-3">
             <Avatar
               alt={selectedWallets["BTC"]?.name || "Bitcoin"}
               url={selectedWallets["BTC"]?.icon || bitcoin}
               size="large"
-              className="w-10 h-10"
+              className="w-8 h-8 md:w-10 md:h-10"
             />
           </div>
 
@@ -44,33 +43,36 @@ export const WalletInfoSection = ({
           </div>
 
           <div className="flex items-center justify-between w-full">
-            <Hash
-              className="text-accent-primary text-sm flex-1 min-w-0"
-              value={btcAddress}
-              address
-              noFade
-              symbols={12}
-              noCopy
-            />
+            {isCopied("btc") ? (
+              <Text className="text-accent-primary text-sm flex-1 min-w-0">
+                Copied ✓
+              </Text>
+            ) : (
+              <DisplayHash
+                className="text-accent-primary text-sm flex-1 min-w-0"
+                value={btcAddress}
+                symbols={12}
+              />
+            )}
             <button
-              onClick={() => copyToClipboard(btcAddress)}
+              onClick={() => copyToClipboard("btc", btcAddress)}
               className="flex-shrink-0 ml-3 p-1 rounded hover:bg-surface-tertiary transition-colors h-6 w-6 flex items-center justify-center hover:opacity-80"
             >
-              <CopyIcon size={16} />
+              <CopyIcon size={14} className="md:w-4 md:h-4" />
             </button>
           </div>
         </div>
       </div>
 
       {/* Babylon Wallet */}
-      <div className="bg-secondary-highlight dark:bg-secondary-strokeLight rounded p-4">
+      <div className="bg-secondary-highlight dark:bg-secondary-strokeLight rounded p-3 flex-1 md:p-4">
         <div className="flex flex-col w-full">
-          <div className="flex justify-start mb-3">
+          <div className="flex justify-start mb-2 md:mb-3">
             <Avatar
               alt={selectedWallets["BBN"]?.name || "Babylon"}
               url={selectedWallets["BBN"]?.icon || bbnIcon}
               size="large"
-              className="w-10 h-10"
+              className="w-8 h-8 md:w-10 md:h-10"
             />
           </div>
 
@@ -84,19 +86,22 @@ export const WalletInfoSection = ({
           </div>
 
           <div className="flex items-center justify-between w-full">
-            <Hash
-              className="text-accent-primary text-sm flex-1 min-w-0"
-              value={bbnAddress}
-              address
-              noFade
-              symbols={12}
-              noCopy
-            />
+            {isCopied("bbn") ? (
+              <Text className="text-accent-primary text-sm flex-1 min-w-0">
+                Copied ✓
+              </Text>
+            ) : (
+              <DisplayHash
+                className="text-accent-primary text-sm flex-1 min-w-0"
+                value={bbnAddress}
+                symbols={12}
+              />
+            )}
             <button
-              onClick={() => copyToClipboard(bbnAddress)}
+              onClick={() => copyToClipboard("bbn", bbnAddress)}
               className="flex-shrink-0 ml-3 p-1 rounded hover:bg-surface-tertiary transition-colors h-6 w-6 flex items-center justify-center hover:opacity-80"
             >
-              <CopyIcon size={16} />
+              <CopyIcon size={14} className="md:w-4 md:h-4" />
             </button>
           </div>
         </div>
