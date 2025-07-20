@@ -11,7 +11,6 @@ import {
 } from "@/ui/common/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { useMultistakingState } from "@/ui/common/state/MultistakingState";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 type SelectedProviderItemLocal = {
   bsnId: string;
@@ -96,11 +95,16 @@ export function FinalityProvidersSection() {
     }
   };
 
+  const actionText = allowsMultipleBsns
+    ? "Add BSN and Finality Provider"
+    : "Add Finality Provider";
+
   return (
     <Fragment>
       <FinalityProviderSubsection
-        max={FeatureFlagService.IsPhase3Enabled ? maxFinalityProviders : 1}
+        max={maxFinalityProviders}
         items={selectedItems}
+        actionText={actionText}
         onAdd={handleOpen}
         onRemove={handleRemove}
       />
