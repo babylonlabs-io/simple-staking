@@ -19,6 +19,8 @@ import {
   formatStakingAmount,
 } from "@/ui/common/utils/formTransforms";
 
+import FeatureFlagService from "../utils/FeatureFlagService";
+
 import { useBalanceState } from "./BalanceState";
 import { StakingModalPage, useStakingState } from "./StakingState";
 
@@ -62,9 +64,15 @@ export function MultistakingState({ children }: PropsWithChildren) {
     StakingModalPage.DEFAULT,
   );
   const { data: networkInfo } = useNetworkInfo();
+  // The maxFinalityProviders is controlled by the FF. Only when IsPhase3Enabled
+  // is true, the maxFinalityProviders is the max number of FP that can be
+  // selected. Otherwise, it is 1.
   const maxFinalityProviders =
-    networkInfo?.params.bbnStakingParams.latestParam.maxFinalityProviders ??
-    DEFAULT_MAX_FINALITY_PROVIDERS;
+    FeatureFlagService.IsPhase3Enabled &&
+    networkInfo?.params.bbnStakingParams.latestParam.maxFinalityProviders
+      ? networkInfo.params.bbnStakingParams.latestParam.maxFinalityProviders
+      : DEFAULT_MAX_FINALITY_PROVIDERS;
+
   const { stakableBtcBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
 
