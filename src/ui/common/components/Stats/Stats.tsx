@@ -25,6 +25,7 @@ export const Stats = memo(() => {
       btc_staking_apr: stakingAPR,
     } = {},
     isLoading,
+    isError,
   } = useSystemStats();
   const usdRate = usePrice(coinSymbol);
 
@@ -32,7 +33,7 @@ export const Stats = memo(() => {
     <Section title="Babylon Stats">
       <List orientation="adaptive">
         <StatItem
-          loading={isLoading}
+          loading={isLoading || isError}
           title={`Total ${coinSymbol} TVL`}
           value={formatBTCTvl(
             satoshiToBtc(totalActiveTVL),
@@ -42,14 +43,14 @@ export const Stats = memo(() => {
         />
 
         <StatItem
-          loading={isLoading}
+          loading={isLoading || isError}
           title={`Registered ${coinSymbol} TVL`}
           value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
         />
 
         <StatItem
           hidden={!stakingAPR}
-          loading={isLoading}
+          loading={isLoading || isError}
           title={`${coinSymbol} Staking APR`}
           value={`${formatter.format(stakingAPR ? stakingAPR * 100 : 0)}%`}
         />
