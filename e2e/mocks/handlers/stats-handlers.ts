@@ -1,16 +1,5 @@
 import { rest } from "msw";
 
-import { MOCK_VALUES } from "./constants";
-
-const mockStatsV1 = {
-  active_tvl: parseInt(MOCK_VALUES.STAKED_BTC),
-  total_tvl: parseInt(MOCK_VALUES.STAKED_BTC),
-  active_delegations: 1,
-  total_delegations: 1,
-  total_stakers: 1,
-  unconfirmed_tvl: 0,
-};
-
 const mockStatsV2 = {
   active_tvl: 3238664649941,
   active_delegations: 21906,
@@ -118,10 +107,6 @@ const mockFinalityProviders = [
 ];
 
 export const statsHandlers = [
-  rest.get("/v1/stats*", (req, res, ctx) => {
-    return res(ctx.json({ data: mockStatsV1 }));
-  }),
-
   rest.get("/v2/stats*", (req, res, ctx) => {
     return res(ctx.json({ data: mockStatsV2 }));
   }),
