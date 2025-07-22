@@ -6,7 +6,6 @@ import { Suspense, useState } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
-import { StakingStatsProvider } from "./context/api/StakingStatsProvider";
 import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
@@ -26,9 +25,7 @@ function Providers({ children }: React.PropsWithChildren) {
                 <WalletConnectionProvider>
                   <BTCWalletProvider>
                     <CosmosWalletProvider>
-                      <AppState>
-                        <StakingStatsProvider>{children}</StakingStatsProvider>
-                      </AppState>
+                      <AppState>{children}</AppState>
                     </CosmosWalletProvider>
                   </BTCWalletProvider>
                 </WalletConnectionProvider>

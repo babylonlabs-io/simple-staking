@@ -34,7 +34,7 @@ export const injectBBNQueries = async (
   QueryBalanceResponse.decode(Buffer.from(balanceBase64, "base64"));
 
   await page.addInitScript(() => {
-    window.__e2eTestMode = true;
+    (window as any).__e2eTestMode = true;
   });
 
   await page.route("**/v2/staked*", async (route) => {
