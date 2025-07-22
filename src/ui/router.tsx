@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 
 import BabyStaking from "./baby";
 import Layout from "./common/layout";
@@ -11,8 +11,8 @@ export const Router = () => (
   <Routes>
     {FF.IsNewUIEnabled ? (
       <Route path="/" element={<Layout />}>
+        <Route index element={<BTCStaking />} />
         <Route path="btc" element={<BTCStaking />} />
-        <Route index element={<Navigate to="btc" replace />} />
         {FF.IsBabyStakingEnabled && (
           <Route path="baby" element={<BabyStaking />} />
         )}
