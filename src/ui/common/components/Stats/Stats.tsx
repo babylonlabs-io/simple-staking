@@ -22,6 +22,8 @@ export const Stats = memo(() => {
     data: {
       total_active_tvl: totalActiveTVL = 0,
       active_tvl: activeTVL = 0,
+      active_finality_providers: activeFPs = 0,
+      total_finality_providers: totalFPs = 0,
       btc_staking_apr: stakingAPR,
     } = {},
     isLoading,
@@ -52,6 +54,12 @@ export const Stats = memo(() => {
           loading={isLoading}
           title={`${coinSymbol} Staking APR`}
           value={`${formatter.format(stakingAPR ? stakingAPR * 100 : 0)}%`}
+        />
+
+        <StatItem
+          loading={isLoading}
+          title="Finality Providers"
+          value={`${formatter.format(activeFPs)} Active (${formatter.format(totalFPs)} Total)`}
         />
       </List>
     </Section>
