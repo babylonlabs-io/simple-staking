@@ -22,6 +22,7 @@ import {
 import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
+import { durationTillNow } from "@/ui/common/utils/time";
 
 import {
   ActivityCard,
@@ -177,11 +178,7 @@ const transformToActivityCard = (
     {
       label: "Inception",
       value: delegation.bbnInceptionTime
-        ? new Date(delegation.bbnInceptionTime).toLocaleDateString("en-GB", {
-            year: "2-digit",
-            month: "2-digit",
-            day: "2-digit",
-          })
+        ? durationTillNow(delegation.bbnInceptionTime, Date.now())
         : "N/A",
     },
     {
