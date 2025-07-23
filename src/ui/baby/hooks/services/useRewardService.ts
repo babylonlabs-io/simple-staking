@@ -27,7 +27,7 @@ export function useRewardService() {
         const signedTx = await signBbnTx(claimRewardMsg);
         const result = await sendBbnTx(signedTx);
 
-        await logger.info("Baby Staking: claim reward", {
+        logger.info("Baby Staking: claim reward", {
           txHash: result?.txHash,
         });
         await refetchRewards();
