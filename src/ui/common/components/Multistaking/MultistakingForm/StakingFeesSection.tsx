@@ -24,6 +24,11 @@ export function StakingFeesSection() {
   const term = useWatch({ name: "term" });
   const finalityProviders = useWatch({ name: "finalityProviders" });
 
+  const providerIdsJson = useMemo(
+    () => JSON.stringify(Object.values(finalityProviders ?? {}).sort()),
+    [finalityProviders],
+  );
+
   const { calculateFeeAmount } = useStakingService();
   const { stakingInfo } = useStakingState();
 
@@ -42,9 +47,9 @@ export function StakingFeesSection() {
 
     const run = () => {
       try {
-        const validProviders = Object.values(
-          finalityProviders ?? {},
-        ) as string[];
+        const validProviders = providerIdsJson
+          ? (JSON.parse(providerIdsJson) as string[])
+          : [];
 
         if (!validProviders.length || !amount || !term || !feeRate) {
           if (!cancelled) {
@@ -93,7 +98,7 @@ export function StakingFeesSection() {
     feeRate,
     amount,
     term,
-    finalityProviders,
+    providerIdsJson,
     setValue,
     setError,
     clearErrors,
