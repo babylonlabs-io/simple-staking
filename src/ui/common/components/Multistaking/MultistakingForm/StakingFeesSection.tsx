@@ -24,6 +24,16 @@ export function StakingFeesSection() {
   const term = useWatch({ name: "term" });
   const finalityProviders = useWatch({ name: "finalityProviders" });
 
+  // Stable representation of the selected provider map so that the effect
+  // only re-runs when the actual content changes, not every render.
+  const providerIds = useMemo(
+    () =>
+      Object.values(finalityProviders ?? {})
+        .sort()
+        .join(","),
+    [finalityProviders],
+  );
+
   const { calculateFeeAmount } = useStakingService();
   const { stakingInfo } = useStakingState();
 
@@ -42,9 +52,7 @@ export function StakingFeesSection() {
 
     const run = () => {
       try {
-        const validProviders = Object.values(
-          finalityProviders ?? {},
-        ) as string[];
+        const validProviders = providerIds ? providerIds.split(",") : [];
 
         if (!validProviders.length || !amount || !term || !feeRate) {
           if (!cancelled) {
@@ -93,7 +101,7 @@ export function StakingFeesSection() {
     feeRate,
     amount,
     term,
-    finalityProviders,
+    providerIds,
     setValue,
     setError,
     clearErrors,
