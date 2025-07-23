@@ -24,8 +24,6 @@ export function StakingFeesSection() {
   const term = useWatch({ name: "term" });
   const finalityProviders = useWatch({ name: "finalityProviders" });
 
-  // Stable representation of the selected provider map so that the effect
-  // only re-runs when the actual content changes, not every render.
   const providerIds = useMemo(
     () =>
       Object.values(finalityProviders ?? {})
