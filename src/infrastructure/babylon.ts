@@ -1,4 +1,9 @@
-import { createBabylonSDK } from "@babylonlabs-io/babylon-proto-ts";
+import { createClient, txs, utils } from "@babylonlabs-io/babylon-proto-ts";
 
-export default ({ config }: DI.Container): Infra.BabylonSDK =>
-  createBabylonSDK({ rpcUrl: config.babylon.rpcUrl });
+import config from "./config";
+
+export default {
+  client: await createClient({ rpcUrl: config.babylon.rpcUrl }),
+  txs,
+  utils,
+};
