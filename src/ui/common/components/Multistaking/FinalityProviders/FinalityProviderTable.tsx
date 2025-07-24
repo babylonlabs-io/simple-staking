@@ -98,9 +98,6 @@ export const FinalityProviderTable = ({ selectedFP, onSelectRow }: Props) => {
             }}
             attributes={{
               Status: status,
-              [`${coinSymbol} PK`]: fp.btcPk
-                ? `${fp.btcPk.slice(0, 5)}...${fp.btcPk.slice(-5)}`
-                : "",
               "Total Delegation": (
                 <>
                   {totalDelegation} {coinSymbol}
