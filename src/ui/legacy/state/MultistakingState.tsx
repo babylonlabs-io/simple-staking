@@ -59,7 +59,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const { stakableBtcBalance } = useBalanceState();
+  const { stakableBtcBalance, bbnBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
 
   const formFields: FieldOptions[] = useMemo(
@@ -118,10 +118,13 @@ export function MultistakingState({ children }: PropsWithChildren) {
               "Staking amount must have no more than 8 decimal points.",
               (_, context) => validateDecimalPoints(context.originalValue),
             )
-            // ???
-            .test("insufficientFunds", "Insufficient BTC", () => true),
+            .test(
+              "insufficientBabyBalance",
+              "Insufficient BABY Balance",
+              () => bbnBalance > 0,
+            ),
           errors: {
-            invalidFormat: { level: "error" },
+            invalidFormat:           { level: "error" },
           },
         },
         {
@@ -149,7 +152,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking fee amount must be greater than 0."),
         },
       ] as const,
-    [stakingInfo, stakableBtcBalance],
+    [stakingInfo, stakableBtcBalance, bbnBalance],
   );
 
   const validationSchema = useMemo(() => {
