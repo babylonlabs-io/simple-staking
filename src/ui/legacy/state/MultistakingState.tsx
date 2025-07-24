@@ -125,7 +125,6 @@ export function MultistakingState({ children }: PropsWithChildren) {
             ),
           errors: {
             invalidFormat: { level: "error" },
-            insufficientBabyBalance: { level: "error" },
           },
         },
         {
