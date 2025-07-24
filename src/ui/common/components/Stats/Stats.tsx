@@ -21,7 +21,6 @@ export const Stats = memo(() => {
   const {
     data: {
       total_active_tvl: totalActiveTVL = 0,
-      active_tvl: activeTVL = 0,
       active_finality_providers: activeFPs = 0,
       total_finality_providers: totalFPs = 0,
       btc_staking_apr: stakingAPR,
@@ -41,12 +40,6 @@ export const Stats = memo(() => {
             coinSymbol,
             usdRate,
           )}
-        />
-
-        <StatItem
-          loading={isLoading}
-          title={`Registered ${coinSymbol} TVL`}
-          value={formatBTCTvl(satoshiToBtc(activeTVL), coinSymbol, usdRate)}
         />
 
         <StatItem
