@@ -3,6 +3,7 @@ import { twMerge } from "tailwind-merge";
 
 import { STAKING_DISABLED } from "@/ui/common/constants";
 import { useFormError } from "@/ui/common/hooks/useFormError";
+import { useBalanceState } from "@/ui/common/state/BalanceState";
 import { useStakingState } from "@/ui/common/state/StakingState";
 
 const BUTTON_STYLES: Record<string, string> = {
@@ -13,6 +14,7 @@ const BUTTON_STYLES: Record<string, string> = {
 export function SubmitButton() {
   const { isValid, isValidating, isLoading } = useFormState();
   const { blocked: isGeoBlocked } = useStakingState();
+  const { bbnBalance } = useBalanceState();
   const error = useFormError();
 
   const renderText = () => {
@@ -26,6 +28,10 @@ export function SubmitButton() {
 
     if (error) {
       return error.message;
+    }
+
+    if (bbnBalance === 0) {
+      return "Insufficient BABY Balance";
     }
 
     return "Preview";
@@ -43,6 +49,7 @@ export function SubmitButton() {
         !isValid ||
         isValidating ||
         isLoading ||
+        bbnBalance === 0 || // Disable when user has no BABY balance
         STAKING_DISABLED ||
         isGeoBlocked
       }

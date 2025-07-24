@@ -1,6 +1,7 @@
 import { Button, useFormState } from "@babylonlabs-io/core-ui";
 import { twMerge } from "tailwind-merge";
 
+import { useBalanceState } from "@/ui/common/state/BalanceState";
 import { STAKING_DISABLED } from "@/ui/legacy/constants";
 import { useFormError } from "@/ui/legacy/hooks/useFormError";
 import { useStakingState } from "@/ui/legacy/state/StakingState";
@@ -13,6 +14,7 @@ const BUTTON_STYLES: Record<string, string> = {
 export function SubmitButton() {
   const { isValid, isValidating, isLoading } = useFormState();
   const { blocked: isGeoBlocked } = useStakingState();
+  const { bbnBalance } = useBalanceState();
   const error = useFormError();
 
   const renderText = () => {
@@ -26,6 +28,10 @@ export function SubmitButton() {
 
     if (error) {
       return error.message;
+    }
+
+    if (bbnBalance === 0) {
+      return "Insufficient BABY Balance";
     }
 
     return "Preview";
