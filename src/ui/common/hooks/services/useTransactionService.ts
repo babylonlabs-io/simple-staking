@@ -1,4 +1,4 @@
-import { BabylonBtcStakingManager } from "@babylonlabs-io/btc-staking-ts";
+import { BabylonBtcStakingManager, UTXO } from "@babylonlabs-io/btc-staking-ts";
 import { Transaction } from "bitcoinjs-lib";
 import { useCallback, useMemo } from "react";
 
@@ -9,7 +9,11 @@ import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useAppState } from "@/ui/common/state";
 import { validateStakingInput } from "@/ui/common/utils/delegations";
 import { getFeeRateFromMempool } from "@/ui/common/utils/getFeeRateFromMempool";
-import { getTxInfo, getTxMerkleProof } from "@/ui/common/utils/mempool_api";
+import {
+  getTxHex,
+  getTxInfo,
+  getTxMerkleProof,
+} from "@/ui/common/utils/mempool_api";
 
 import { useNetworkFees } from "../client/api/useNetworkFees";
 import { useBbnQuery } from "../client/rpc/queries/useBbnQuery";
@@ -20,6 +24,14 @@ export interface BtcStakingInputs {
   finalityProviderPksNoCoordHex: string[];
   stakingAmountSat: number;
   stakingTimelock: number;
+}
+
+export interface StakingExpansionInputs {
+  finalityProviderPksNoCoordHex: string[];
+  stakingAmountSat: number;
+  stakingTimelock: number;
+  previousStakingTxHash: string;
+  fundingTx: Uint8Array;
 }
 
 export const useTransactionService = () => {
@@ -216,7 +228,6 @@ export const useTransactionService = () => {
       }
 
       const unsignedStakingTx = Transaction.fromHex(unsignedStakingTxHex);
-
       const signedStakingTx =
         await btcStakingManager!.createSignedBtcStakingTransaction(
           stakerInfo,
@@ -422,15 +433,486 @@ export const useTransactionService = () => {
     [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
+  /**
+   * Create a UTXO object from a transaction hash
+   *
+   * @param txHash - The transaction hash
+   * @param outputIndex - The output index (vout)
+   * @returns The UTXO object
+   */
+  const createUtxoFromTxHash = async (
+    txHash: string,
+    outputIndex: number,
+  ): Promise<UTXO> => {
+    try {
+      const txHex = await getTxHex(txHash);
+      const tx = Transaction.fromHex(txHex);
+      const output = tx.outs[outputIndex];
+
+      if (!output) {
+        console.error("❌ [UTXO DEBUG] Output not found:", {
+          txHash,
+          outputIndex,
+          availableOutputs: tx.outs.length,
+        });
+        throw new Error(
+          `Output ${outputIndex} not found in transaction ${txHash}`,
+        );
+      }
+
+      const utxo = {
+        txid: txHash,
+        vout: outputIndex,
+        value: output.value,
+        scriptPubKey: output.script.toString("hex"),
+        rawTxHex: txHex,
+      };
+
+      return utxo;
+    } catch (error) {
+      console.error("❌ [UTXO DEBUG] Error in createUtxoFromTxHash:", {
+        txHash,
+        outputIndex,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+      });
+      throw new ClientError(
+        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+        `Failed to create UTXO from transaction hash: ${txHash}`,
+        { cause: error as Error },
+      );
+    }
+  };
+
+  /**
+   * Find the funding UTXO from available UTXOs that matches the funding transaction
+   *
+   * @param availableUTXOs - Array of available UTXOs
+   * @param fundingTx - The funding transaction bytes
+   * @returns The matching UTXO or null if not found
+   */
+  const findFundingUtxo = (
+    availableUTXOs: UTXO[],
+    fundingTx: Uint8Array,
+  ): UTXO | null => {
+    try {
+      // Convert Uint8Array to Buffer for bitcoinjs-lib
+      const buffer = Buffer.from(fundingTx);
+
+      // Parse the funding transaction
+      const tx = Transaction.fromBuffer(buffer);
+      const fundingTxId = tx.getId();
+
+      // Find UTXO that matches any output of the funding transaction
+      for (let vout = 0; vout < tx.outs.length; vout++) {
+        const matchingUtxo = availableUTXOs.find(
+          (utxo) => utxo.txid === fundingTxId && utxo.vout === vout,
+        );
+        if (matchingUtxo) {
+          return matchingUtxo;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
+  };
+
+  /**
+   * Create a BTC stake expansion transaction
+   *
+   * @param expansionInput - The expansion inputs
+   * @param feeRate - The fee rate
+   * @returns The expansion transaction result
+   */
+  const createStakeExpansionTransaction = useCallback(
+    async (expansionInput: StakingExpansionInputs, feeRate: number) => {
+      const btcStakingManager = createBtcStakingManager();
+
+      validateCommonInputs(
+        btcStakingManager,
+        expansionInput,
+        tipHeight,
+        stakerInfo,
+      );
+
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Create UTXO from previous staking transaction for the first input
+      const previousStakingUtxo = await createUtxoFromTxHash(
+        expansionInput.previousStakingTxHash,
+        0, // Assuming staking output is at index 0
+      );
+      // Find funding UTXO from available UTXOs based on the funding transaction
+      const fundingUtxo = findFundingUtxo(
+        availableUTXOs,
+        expansionInput.fundingTx,
+      );
+
+      if (!fundingUtxo) {
+        console.error("=== FAILED to find matching funding UTXO ===");
+        console.error("fundingTx length:", expansionInput.fundingTx.length);
+        console.error("availableUTXOs count:", availableUTXOs.length);
+        console.error(
+          "availableUTXO txids:",
+          availableUTXOs.map((u) => u.txid),
+        );
+        const clientError = new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Could not find matching funding UTXO in available UTXOs",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Create the 2-input UTXO array: previous staking + funding
+      const expansionInputUtxos = [previousStakingUtxo, fundingUtxo];
+
+      const result = await (
+        btcStakingManager as any
+      ).createBtcStakeExpansionTransaction(
+        stakerInfo,
+        expansionInput,
+        tipHeight,
+        expansionInputUtxos,
+        feeRate,
+        bech32Address,
+      );
+
+      return result;
+    },
+    [
+      availableUTXOs,
+      bech32Address,
+      createBtcStakingManager,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
+  );
+
+  /**
+   * Estimate the expansion fee
+   *
+   * @param expansionInput - The expansion inputs
+   * @param feeRate - The fee rate
+   * @returns The expansion fee
+   */
+  const estimateExpansionFee = useCallback(
+    (expansionInput: StakingExpansionInputs, feeRate: number): number => {
+      logger.info("Estimating expansion fee", {
+        feeRate,
+        previousStakingTxHash: expansionInput.previousStakingTxHash,
+      });
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        expansionInput,
+        tipHeight,
+        stakerInfo,
+      );
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Note: The btc-staking-ts library may need to add this method
+      // For now, we'll use the regular staking fee estimation as a fallback
+      const fee = btcStakingManager!.estimateBtcStakingFee(
+        stakerInfo,
+        tipHeight,
+        expansionInput,
+        availableUTXOs,
+        feeRate,
+      );
+      return fee;
+    },
+    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs, logger],
+  );
+
+  /**
+   * Submit the expansion staking transaction
+   *
+   * @param stakingInput - The staking inputs
+   * @param paramVersion - The param version
+   * @param expectedTxHashHex - The expected transaction hash hex
+   * @param unsignedStakingTxHex - The unsigned staking transaction hex
+   * @param previousStakingTxHash - The previous staking transaction hash
+   * @param fundingTx - The funding transaction bytes
+   */
+  const submitExpansionStakingTx = useCallback(
+    async (
+      stakingInput: BtcStakingInputs,
+      paramVersion: number,
+      expectedTxHashHex: string,
+      unsignedStakingTxHex: string,
+      previousStakingTxHash: string,
+      fundingTx: Uint8Array,
+    ) => {
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        stakingInput,
+        tipHeight,
+        stakerInfo,
+      );
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+      const unsignedStakingTx = Transaction.fromHex(unsignedStakingTxHex);
+      // Create UTXO from previous staking transaction
+      const previousStakingUtxo = await createUtxoFromTxHash(
+        previousStakingTxHash,
+        0, // Assuming staking output is at index 0
+      );
+      // Find funding UTXO from available UTXOs
+      const fundingUtxo = findFundingUtxo(availableUTXOs, fundingTx);
+      if (!fundingUtxo) {
+        console.error("❌ [EXPANSION DEBUG] Could not find funding UTXO");
+        const clientError = new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Could not find matching funding UTXO in available UTXOs",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+      // Create the combined UTXO array for signing
+      const expansionInputUtxos = [previousStakingUtxo, fundingUtxo];
+      // CRITICAL: Reorder UTXOs to match the unsigned transaction input order
+      // Get transaction input order
+      const transactionInputs = unsignedStakingTx.ins.map((input, index) => ({
+        index,
+        txid: Buffer.from(input.hash).reverse().toString("hex"),
+        vout: input.index,
+      }));
+
+      // Reorder UTXO array to match transaction input order
+      const reorderedUtxos: UTXO[] = [];
+      for (const txInput of transactionInputs) {
+        const matchingUtxo = expansionInputUtxos.find(
+          (utxo) => utxo.txid === txInput.txid && utxo.vout === txInput.vout,
+        );
+
+        if (!matchingUtxo) {
+          console.error(
+            "❌ [EXPANSION DEBUG] No UTXO found for transaction input:",
+            txInput,
+          );
+          throw new ClientError(
+            ERROR_CODES.VALIDATION_ERROR,
+            `No UTXO found for transaction input ${txInput.txid}:${txInput.vout}`,
+          );
+        }
+
+        reorderedUtxos.push(matchingUtxo);
+      }
+
+      try {
+        const signedStakingTx =
+          await btcStakingManager!.createSignedBtcStakingTransaction(
+            stakerInfo,
+            stakingInput,
+            unsignedStakingTx,
+            reorderedUtxos, // Use the reordered UTXO array to match transaction input order
+            paramVersion,
+          );
+
+        if (signedStakingTx.getId() !== expectedTxHashHex) {
+          console.error("❌ [EXPANSION DEBUG] Transaction hash mismatch!");
+          const clientError = new ClientError(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Expansion transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
+          );
+          logger.error(clientError);
+          throw clientError;
+        }
+
+        await pushTx(signedStakingTx.toHex());
+        refetchUTXOs();
+      } catch (error) {
+        console.error(
+          "❌ [EXPANSION DEBUG] Error during transaction signing:",
+          {
+            error: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+            stakerInfo,
+            stakingInput,
+            originalUtxos: expansionInputUtxos.map((u) => ({
+              txid: u.txid,
+              vout: u.vout,
+              value: u.value,
+              scriptPubKey: u.scriptPubKey?.toString(),
+            })),
+            reorderedUtxos: reorderedUtxos.map((u) => ({
+              txid: u.txid,
+              vout: u.vout,
+              value: u.value,
+              scriptPubKey: u.scriptPubKey?.toString(),
+            })),
+          },
+        );
+        throw error;
+      }
+    },
+    [
+      availableUTXOs,
+      createBtcStakingManager,
+      pushTx,
+      refetchUTXOs,
+      stakerInfo,
+      tipHeight,
+      logger,
+      createUtxoFromTxHash,
+      findFundingUtxo,
+    ],
+  );
+
+  /**
+   * Submit the expansion staking transaction with covenant signatures
+   *
+   * @param expansionInput - The expansion staking inputs
+   * @param paramVersion - The param version
+   * @param expectedTxHashHex - The expected transaction hash hex
+   * @param unsignedStakingTxHex - The unsigned staking transaction hex
+   * @param previousStakingTxHash - The previous staking transaction hash
+   * @param fundingTx - The funding transaction bytes
+   * @param covenantExpansionSignatures - The covenant signatures for the previous staking UTXO
+   */
+  const submitExpansionStakingTxWithCovenantSignatures = useCallback(
+    async (
+      expansionInput: BtcStakingInputs,
+      paramVersion: number,
+      expectedTxHashHex: string, // TODO not used right now
+      unsignedStakingTxHex: string,
+      previousStakingTxHash: string,
+      fundingTx: Uint8Array,
+      covenantExpansionSignatures: {
+        btcPkHex: string;
+        sigHex: string;
+      }[],
+    ) => {
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        expansionInput,
+        tipHeight,
+        stakerInfo,
+      );
+
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      const unsignedStakingTx = Transaction.fromHex(unsignedStakingTxHex);
+
+      // Create UTXO from previous staking transaction
+      const previousStakingUtxo = await createUtxoFromTxHash(
+        previousStakingTxHash,
+        0, // Assuming staking output is at index 0
+      );
+
+      // Find funding UTXO from available UTXOs
+      const fundingUtxo = findFundingUtxo(availableUTXOs, fundingTx);
+
+      if (!fundingUtxo) {
+        const clientError = new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Could not find matching funding UTXO in available UTXOs",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Create the combined UTXO array for signing
+      const expansionInputUtxos = [previousStakingUtxo, fundingUtxo];
+
+      // Reorder UTXOs to match the unsigned transaction input order
+      const transactionInputs = unsignedStakingTx.ins.map((input, index) => ({
+        index,
+        txid: Buffer.from(input.hash).reverse().toString("hex"),
+        vout: input.index,
+      }));
+
+      const reorderedUtxos: UTXO[] = [];
+      for (const txInput of transactionInputs) {
+        const matchingUtxo = expansionInputUtxos.find(
+          (utxo) => utxo.txid === txInput.txid && utxo.vout === txInput.vout,
+        );
+
+        if (!matchingUtxo) {
+          throw new ClientError(
+            ERROR_CODES.VALIDATION_ERROR,
+            `No UTXO found for transaction input ${txInput.txid}:${txInput.vout}`,
+          );
+        }
+
+        reorderedUtxos.push(matchingUtxo);
+      }
+
+      // Sign the expansion transaction with covenant signatures
+      const signedExpansionTx =
+        await btcStakingManager!.createSignedBtcStakingExpansionTransaction(
+          stakerInfo,
+          expansionInput,
+          unsignedStakingTx,
+          reorderedUtxos,
+          paramVersion,
+          covenantExpansionSignatures,
+        );
+
+      console.log("signedExpansionTx", signedExpansionTx);
+      console.log("signedExpansionTx.toHex()", signedExpansionTx.toHex());
+
+      await pushTx(signedExpansionTx.toHex());
+    },
+    [
+      availableUTXOs,
+      createBtcStakingManager,
+      createUtxoFromTxHash,
+      findFundingUtxo,
+      pushTx,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
+  );
+
   return {
     createDelegationEoi,
+    createExpansionEoi,
     estimateStakingFee,
     transitionPhase1Delegation,
     submitStakingTx,
+    submitExpansionStakingTx,
+    submitExpansionStakingTxWithCovenantSignatures,
     submitUnbondingTx,
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
+    createStakeExpansionTransaction,
+    estimateExpansionFee,
     tipHeight,
   };
 };
