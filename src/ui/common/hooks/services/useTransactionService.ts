@@ -901,7 +901,6 @@ export const useTransactionService = () => {
 
   return {
     createDelegationEoi,
-    createExpansionEoi,
     estimateStakingFee,
     transitionPhase1Delegation,
     submitStakingTx,
