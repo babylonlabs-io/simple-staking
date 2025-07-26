@@ -239,11 +239,6 @@ const StakingExpansion = () => {
           break;
         }
         case "timelock": {
-          if (timelock <= selectedDelegation.stakingTimelock) {
-            throw new Error(
-              "New timelock must be greater than current timelock",
-            );
-          }
           newTimelock = timelock;
           break;
         }
