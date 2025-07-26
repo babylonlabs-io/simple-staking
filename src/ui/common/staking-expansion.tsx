@@ -159,6 +159,7 @@ const StakingExpansion = () => {
         selectedDelegation.stakingTxHashHex,
         fundingTx,
         covenantSignatures,
+        selectedDelegation.finalityProviderBtcPksHex, // Original finality providers
       );
 
       // ✅ NOW reset the form after successful BTC broadcast
@@ -248,12 +249,26 @@ const StakingExpansion = () => {
               "Please select at least one finality provider to add",
             );
           }
-          // Combine existing and new providers (removing duplicates)
-          const allProviders = [
-            ...selectedDelegation.finalityProviderBtcPksHex,
-            ...selectedProviders,
+          if (!timelock || timelock <= 0) {
+            throw new Error("Please enter a valid timelock value");
+          }
+          // Maintain original provider order and append new ones
+          const existingProviders =
+            selectedDelegation.finalityProviderBtcPksHex;
+          const newProvidersToAdd = selectedProviders.filter(
+            (provider) => !existingProviders.includes(provider),
+          );
+
+          // Preserve original order and append new providers
+          const combinedProviders = [
+            ...existingProviders,
+            ...newProvidersToAdd,
           ];
-          newProviders = [...new Set(allProviders)];
+
+          newProviders = combinedProviders;
+
+          // ✅ RENEW TIMELOCK when adding finality providers
+          newTimelock = timelock;
           break;
         }
       }
@@ -595,6 +610,24 @@ const StakingExpansion = () => {
                     No finality providers available in the selected BSN network.
                   </p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Timelock (blocks)
+                </label>
+                <input
+                  type="number"
+                  min="1"
+                  value={timelock}
+                  onChange={(e) => setTimelock(parseInt(e.target.value))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  required
+                />
+                <p className="text-sm text-gray-500 mt-1">
+                  Adding finality providers requires renewing the timelock
+                  period
+                </p>
               </div>
             </div>
           )}

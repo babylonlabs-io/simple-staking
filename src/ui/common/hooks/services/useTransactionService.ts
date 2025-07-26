@@ -796,6 +796,7 @@ export const useTransactionService = () => {
    * @param previousStakingTxHash - The previous staking transaction hash
    * @param fundingTx - The funding transaction bytes
    * @param covenantExpansionSignatures - The covenant signatures for the previous staking UTXO
+   * @param originalFinalityProviderPksNoCoordHex - The original finality provider public keys from the delegation being expanded
    */
   const submitExpansionStakingTxWithCovenantSignatures = useCallback(
     async (
@@ -809,6 +810,7 @@ export const useTransactionService = () => {
         btcPkHex: string;
         sigHex: string;
       }[],
+      originalFinalityProviderPksNoCoordHex: string[],
     ) => {
       const btcStakingManager = createBtcStakingManager();
       validateCommonInputs(
@@ -914,6 +916,7 @@ export const useTransactionService = () => {
             reorderedUtxos,
             paramVersion,
             covenantExpansionSignatures,
+            originalFinalityProviderPksNoCoordHex,
           );
 
         console.log("✅ [EXPANSION DEBUG] Transaction signed successfully");
