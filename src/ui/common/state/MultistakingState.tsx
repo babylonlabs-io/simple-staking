@@ -141,7 +141,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
               () => bbnBalance > 0,
             ),
           errors: {
-            invalidFormat:           { level: "error" },
+            invalidFormat: { level: "error" },
           },
         },
         {
