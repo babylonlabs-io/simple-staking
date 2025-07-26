@@ -440,49 +440,49 @@ export const useTransactionService = () => {
    * @param outputIndex - The output index (vout)
    * @returns The UTXO object
    */
-  const createUtxoFromTxHash = async (
-    txHash: string,
-    outputIndex: number,
-  ): Promise<UTXO> => {
-    try {
-      const txHex = await getTxHex(txHash);
-      const tx = Transaction.fromHex(txHex);
-      const output = tx.outs[outputIndex];
+  const createUtxoFromTxHash = useCallback(
+    async (txHash: string, outputIndex: number): Promise<UTXO> => {
+      try {
+        const txHex = await getTxHex(txHash);
+        const tx = Transaction.fromHex(txHex);
+        const output = tx.outs[outputIndex];
 
-      if (!output) {
-        console.error("❌ [UTXO DEBUG] Output not found:", {
+        if (!output) {
+          console.error("❌ [UTXO DEBUG] Output not found:", {
+            txHash,
+            outputIndex,
+            availableOutputs: tx.outs.length,
+          });
+          throw new Error(
+            `Output ${outputIndex} not found in transaction ${txHash}`,
+          );
+        }
+
+        const utxo = {
+          txid: txHash,
+          vout: outputIndex,
+          value: output.value,
+          scriptPubKey: output.script.toString("hex"),
+          rawTxHex: txHex,
+        };
+
+        return utxo;
+      } catch (error) {
+        console.error("❌ [UTXO DEBUG] Error in createUtxoFromTxHash:", {
           txHash,
           outputIndex,
-          availableOutputs: tx.outs.length,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
         });
-        throw new Error(
-          `Output ${outputIndex} not found in transaction ${txHash}`,
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          `Failed to create UTXO from transaction hash: ${txHash}`,
+          { cause: error as Error },
         );
       }
-
-      const utxo = {
-        txid: txHash,
-        vout: outputIndex,
-        value: output.value,
-        scriptPubKey: output.script.toString("hex"),
-        rawTxHex: txHex,
-      };
-
-      return utxo;
-    } catch (error) {
-      console.error("❌ [UTXO DEBUG] Error in createUtxoFromTxHash:", {
-        txHash,
-        outputIndex,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
-      });
-      throw new ClientError(
-        ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-        `Failed to create UTXO from transaction hash: ${txHash}`,
-        { cause: error as Error },
-      );
-    }
-  };
+    },
+    [],
+  );
 
   /**
    * Find the funding UTXO from available UTXOs that matches the funding transaction
@@ -491,33 +491,33 @@ export const useTransactionService = () => {
    * @param fundingTx - The funding transaction bytes
    * @returns The matching UTXO or null if not found
    */
-  const findFundingUtxo = (
-    availableUTXOs: UTXO[],
-    fundingTx: Uint8Array,
-  ): UTXO | null => {
-    try {
-      // Convert Uint8Array to Buffer for bitcoinjs-lib
-      const buffer = Buffer.from(fundingTx);
+  const findFundingUtxo = useCallback(
+    (availableUTXOs: UTXO[], fundingTx: Uint8Array): UTXO | null => {
+      try {
+        // Convert Uint8Array to Buffer for bitcoinjs-lib
+        const buffer = Buffer.from(fundingTx);
 
-      // Parse the funding transaction
-      const tx = Transaction.fromBuffer(buffer);
-      const fundingTxId = tx.getId();
+        // Parse the funding transaction
+        const tx = Transaction.fromBuffer(buffer);
+        const fundingTxId = tx.getId();
 
-      // Find UTXO that matches any output of the funding transaction
-      for (let vout = 0; vout < tx.outs.length; vout++) {
-        const matchingUtxo = availableUTXOs.find(
-          (utxo) => utxo.txid === fundingTxId && utxo.vout === vout,
-        );
-        if (matchingUtxo) {
-          return matchingUtxo;
+        // Find UTXO that matches any output of the funding transaction
+        for (let vout = 0; vout < tx.outs.length; vout++) {
+          const matchingUtxo = availableUTXOs.find(
+            (utxo) => utxo.txid === fundingTxId && utxo.vout === vout,
+          );
+          if (matchingUtxo) {
+            return matchingUtxo;
+          }
         }
-      }
 
-      return null;
-    } catch (error) {
-      return null;
-    }
-  };
+        return null;
+      } catch {
+        return null;
+      }
+    },
+    [],
+  );
 
   /**
    * Create a BTC stake expansion transaction
@@ -593,6 +593,8 @@ export const useTransactionService = () => {
       availableUTXOs,
       bech32Address,
       createBtcStakingManager,
+      createUtxoFromTxHash,
+      findFundingUtxo,
       stakerInfo,
       tipHeight,
       logger,
@@ -799,7 +801,7 @@ export const useTransactionService = () => {
     async (
       expansionInput: BtcStakingInputs,
       paramVersion: number,
-      expectedTxHashHex: string, // TODO not used right now
+      _expectedTxHashHex: string, // TODO not used right now
       unsignedStakingTxHex: string,
       previousStakingTxHash: string,
       fundingTx: Uint8Array,
@@ -832,9 +834,11 @@ export const useTransactionService = () => {
         previousStakingTxHash,
         0, // Assuming staking output is at index 0
       );
+      console.log("previousStakingUtxo", previousStakingUtxo);
 
       // Find funding UTXO from available UTXOs
       const fundingUtxo = findFundingUtxo(availableUTXOs, fundingTx);
+      console.log("fundingUtxo", fundingUtxo);
 
       if (!fundingUtxo) {
         const clientError = new ClientError(
@@ -871,21 +875,91 @@ export const useTransactionService = () => {
         reorderedUtxos.push(matchingUtxo);
       }
 
+      console.log(
+        `🔄 [EXPANSION DEBUG] mode: reordered UTXOs`,
+        reorderedUtxos.map((u) => `${u.txid}:${u.vout}`),
+      );
+
+      // Validate UTXOs before signing to ensure they have required data
+      for (const utxo of reorderedUtxos) {
+        if (!utxo.scriptPubKey || utxo.scriptPubKey.length === 0) {
+          console.error("❌ [EXPANSION DEBUG] UTXO missing scriptPubKey:", {
+            txid: utxo.txid,
+            vout: utxo.vout,
+            value: utxo.value,
+            scriptPubKey: utxo.scriptPubKey,
+          });
+          throw new ClientError(
+            ERROR_CODES.VALIDATION_ERROR,
+            `UTXO ${utxo.txid}:${utxo.vout} is missing scriptPubKey data required for transaction signing. This causes "Unknown script type" errors in the btc-staking-ts library.`,
+          );
+        }
+      }
+
+      console.log(
+        "✅ [EXPANSION DEBUG] All UTXOs validated with proper scriptPubKey data",
+      );
+
       // Sign the expansion transaction with covenant signatures
-      const signedExpansionTx =
-        await btcStakingManager!.createSignedBtcStakingExpansionTransaction(
-          stakerInfo,
-          expansionInput,
-          unsignedStakingTx,
-          reorderedUtxos,
-          paramVersion,
-          covenantExpansionSignatures,
+      console.log(
+        `🔐 [EXPANSION DEBUG] Signing transaction with ${reorderedUtxos.length} UTXOs and ${covenantExpansionSignatures.length} covenant signatures`,
+      );
+
+      try {
+        const signedExpansionTx =
+          await btcStakingManager!.createSignedBtcStakingExpansionTransaction(
+            stakerInfo,
+            expansionInput,
+            unsignedStakingTx,
+            reorderedUtxos,
+            paramVersion,
+            covenantExpansionSignatures,
+          );
+
+        console.log("✅ [EXPANSION DEBUG] Transaction signed successfully");
+        console.log(
+          "📝 [EXPANSION DEBUG] Signed transaction hex:",
+          signedExpansionTx.toHex(),
         );
 
-      console.log("signedExpansionTx", signedExpansionTx);
-      console.log("signedExpansionTx.toHex()", signedExpansionTx.toHex());
+        console.log(
+          "📡 [EXPANSION DEBUG] Broadcasting transaction to Bitcoin network...",
+        );
+        await pushTx(signedExpansionTx.toHex());
 
-      await pushTx(signedExpansionTx.toHex());
+        console.log("🎉 [EXPANSION DEBUG] Transaction broadcast successful!");
+      } catch (error) {
+        console.error(`❌ [EXPANSION DEBUG] Error in  "normal" mode:`, {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+          utxoCount: reorderedUtxos.length,
+          covenantSigCount: covenantExpansionSignatures.length,
+          utxoDetails: reorderedUtxos.map((u) => ({
+            txid: u.txid,
+            vout: u.vout,
+            value: u.value,
+            hasScriptPubKey: !!u.scriptPubKey && u.scriptPubKey.length > 0,
+            scriptPubKeyLength: u.scriptPubKey?.length || 0,
+          })),
+        });
+
+        // Provide more specific error message if it's the "Unknown script type" issue
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        if (
+          errorMessage.toLowerCase().includes("unknown script type") ||
+          (errorMessage.toLowerCase().includes("script") &&
+            errorMessage.toLowerCase().includes("type"))
+        ) {
+          throw new ClientError(
+            ERROR_CODES.VALIDATION_ERROR,
+            `Transaction signing failed due to script type detection error. This usually occurs when UTXOs lack proper scriptPubKey data. Original error: ${errorMessage}`,
+            { cause: error as Error },
+          );
+        }
+
+        throw error;
+      }
     },
     [
       availableUTXOs,

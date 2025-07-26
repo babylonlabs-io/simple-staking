@@ -68,12 +68,11 @@ const StakingExpansion = () => {
   });
   const {
     createStakeExpansionTransaction,
-    submitExpansionStakingTx,
     submitExpansionStakingTxWithCovenantSignatures,
   } = useTransactionService();
   const { sendBbnTx } = useBbnTransaction();
   const { data: networkFees } = useNetworkFees();
-  const { defaultFeeRate, maxFeeRate } = getFeeRateFromMempool(networkFees);
+  const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const { availableUTXOs } = useAppState();
   const {
     fundingTx,
@@ -144,25 +143,13 @@ const StakingExpansion = () => {
         stakingTimelock: verifiedDelegation.stakingTimelock,
       };
 
-      // Sign and broadcast the BTC expansion transaction using the new function
-      // await submitExpansionStakingTx(
-      //   expansionInputs,
-      //   verifiedDelegation.paramsVersion,
-      //   verifiedDelegation.stakingTxHashHex,
-      //   verifiedDelegation.stakingTxHex,
-      //   selectedDelegation.stakingTxHashHex, // Previous staking tx hash - now safe
-      //   fundingTx, // The funding transaction bytes - now safe
-      // );
-
-      // console.log("verifiedDelegation", verifiedDelegation);
-
       const covenantSignatures =
         verifiedDelegation.covenantUnbondingSignatures?.map((signature) => ({
           btcPkHex: signature.covenantBtcPkHex,
-          sigHex: signature.signatureHex,
+          sigHex: signature.stakeExpansionSignatureHex as string,
         })) || [];
 
-      // console.log("covenantSignatures", covenantSignatures);
+      console.log("covenantSignatures", covenantSignatures);
 
       await submitExpansionStakingTxWithCovenantSignatures(
         expansionInputs,
