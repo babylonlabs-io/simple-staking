@@ -10,24 +10,26 @@ import BTCStaking from "./common/page";
 import FF from "./common/utils/FeatureFlagService";
 import LegacyPage from "./legacy/page";
 
-export const Router = () => (
-  <Routes>
-    {FF.IsNewUIEnabled ? (
-      <Route path="/" element={<Layout />}>
-        <Route index element={<Navigate to="btc" replace />} />
-        <Route path="btc" element={<BTCStaking />} />
-        {FF.IsBabyStakingEnabled && (
-          <Route path="baby" element={<BabyLayout />}>
-            <Route index element={<Navigate to="staking" replace />} />
-            <Route path="staking" element={<BabyStakingForm />} />
-            <Route path="rewards" element={<BabyRewards />} />
-            <Route path="activities" element={<BabyActivities />} />
-          </Route>
-        )}
-      </Route>
-    ) : (
-      <Route path="/" element={<LegacyPage />} />
-    )}
-    <Route path="*" element={<NotFound />} />
-  </Routes>
-);
+export const Router = () => {
+  return (
+    <Routes>
+      {FF.IsNewUIEnabled ? (
+        <Route path="/" element={<Layout />}>
+          <Route index element={<Navigate to="btc" replace />} />
+          <Route path="btc" element={<BTCStaking />} />
+          {FF.IsBabyStakingEnabled && (
+            <Route path="baby" element={<BabyLayout />}>
+              <Route index element={<Navigate to="staking" replace />} />
+              <Route path="staking" element={<BabyStakingForm />} />
+              <Route path="rewards" element={<BabyRewards />} />
+              <Route path="activities" element={<BabyActivities />} />
+            </Route>
+          )}
+        </Route>
+      ) : (
+        <Route path="/" element={<LegacyPage />} />
+      )}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
