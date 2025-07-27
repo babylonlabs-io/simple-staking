@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import { twJoin } from "tailwind-merge";
 
-interface NavItemProps {
+export interface NavItemProps {
   title: string;
   to: string;
 }

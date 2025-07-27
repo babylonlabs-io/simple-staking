@@ -1,3 +1,9 @@
+import { RouteGuard } from "@/ui/common/components/RouteGuard/RouteGuard";
+
 export default function Activities() {
-  return <div className="h-[500px]">Activities</div>;
+  return (
+    <RouteGuard redirectTo="/baby/staking">
+      <div className="h-[500px]">Activities</div>
+    </RouteGuard>
+  );
 }
