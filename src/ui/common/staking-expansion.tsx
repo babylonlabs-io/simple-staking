@@ -339,7 +339,7 @@ const StakingExpansion = () => {
         className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
       >
         <div className="text-center py-8">
-          <h1 className="text-2xl font-bold mb-4">sBTC Staking Expansion</h1>
+          <h1 className="text-2xl font-bold mb-4">Staking Expansion</h1>
           <p className="text-gray-600">
             Please connect your wallet to continue
           </p>
@@ -354,7 +354,7 @@ const StakingExpansion = () => {
       className="-mt-[10rem] flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
     >
       <div className="bg-white rounded-lg p-6 shadow-sm border">
-        <h1 className="text-2xl font-bold mb-6">sBTC Staking Expansion</h1>
+        <h1 className="text-2xl font-bold mb-6">Staking Expansion</h1>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
