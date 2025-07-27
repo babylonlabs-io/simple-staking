@@ -12,8 +12,8 @@ export const NavItem = ({ title, to }: NavItemProps) => {
       to={to}
       className={({ isActive }) =>
         twJoin(
-          "w-32 h-10 text-center whitespace-nowrap flex items-center justify-center",
-          isActive ? "text-accent-primary" : "text-accent-secondary",
+          "px-4 py-2 rounded transition-colors duration-200 text-primary",
+          isActive ? "bg-secondary-highlight" : "bg-transparent",
         )
       }
     >
