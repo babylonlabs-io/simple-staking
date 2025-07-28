@@ -24,6 +24,7 @@ export interface DelegationV2 extends DelegationLike {
   covenantUnbondingSignatures?: {
     covenantBtcPkHex: string;
     signatureHex: string;
+    stakeExpansionSignatureHex?: string;
   }[];
   slashing: {
     stakingSlashingTxHex: string;
