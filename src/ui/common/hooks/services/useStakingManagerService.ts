@@ -14,7 +14,7 @@ export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
   const {
-    heightQuery: { data: bbnHeight = 0 },
+    babyTipQuery: { data: bbnHeight = 0 },
   } = useBbnQuery();
   const logger = useLogger();
   const eventBus = useEventBus();

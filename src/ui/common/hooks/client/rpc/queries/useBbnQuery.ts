@@ -148,7 +148,7 @@ export const useBbnQuery = () => {
    * Gets the current height of the Babylon Genesis chain.
    * @returns {Promise<number>} - The current height of the Babylon Genesis chain.
    */
-  const heightQuery = useClientQuery({
+  const babyTipQuery = useClientQuery({
     queryKey: [BBN_HEIGHT_KEY],
     queryFn: async () => {
       if (!tmClient) {
@@ -165,18 +165,16 @@ export const useBbnQuery = () => {
         );
       }
     },
-    enabled: Boolean(
-      tmClient && connected && !isGeoBlocked && !isHealthcheckLoading,
-    ),
-    staleTime: ONE_MINUTE,
-    refetchInterval: ONE_SECOND * 10,
+    enabled: Boolean(tmClient && connected),
+    staleTime: ONE_SECOND * 10,
+    refetchInterval: false, // Disable automatic periodic refetching
   });
 
   return {
     rewardsQuery,
     balanceQuery,
     btcTipQuery,
-    heightQuery,
+    babyTipQuery,
     hasRpcError,
     reconnectRpc: reconnect,
     queryClient,
