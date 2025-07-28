@@ -1,9 +1,11 @@
 import { BabylonBtcStakingManager } from "@babylonlabs-io/btc-staking-ts";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
+import { useBbnQuery } from "@/ui/common/hooks/client/rpc/queries/useBbnQuery";
 import { useEventBus } from "@/ui/common/hooks/useEventBus";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useAppState } from "@/ui/common/state";
@@ -11,6 +13,9 @@ import { useAppState } from "@/ui/common/state";
 export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
   const { signBbnTx } = useBbnTransaction();
+  const {
+    babyTipQuery: { data: bbnHeight = 0 },
+  } = useBbnQuery();
   const logger = useLogger();
   const eventBus = useEventBus();
 
@@ -23,6 +28,18 @@ export const useStakingManagerService = () => {
   } = useBTCWallet();
 
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
+
+  const networkUpgrade = useMemo(
+    () => ({
+      pop: {
+        upgradeHeight: networkInfo?.networkUpgrade?.pop?.[0]?.height ?? 0,
+        version: networkInfo?.networkUpgrade?.pop?.[0]?.version ?? 0,
+      },
+    }),
+    [networkInfo?.networkUpgrade],
+  );
+
+  const { chainId } = getNetworkConfigBBN();
 
   const isLoading =
     !btcNetwork ||
@@ -56,6 +73,10 @@ export const useStakingManagerService = () => {
 
     const bbnProvider = {
       signTransaction: signBbnTx,
+      getCurrentHeight: async () => {
+        return bbnHeight;
+      },
+      getChainId: async () => chainId,
     };
 
     return new BabylonBtcStakingManager(
@@ -64,11 +85,14 @@ export const useStakingManagerService = () => {
       btcProvider,
       bbnProvider,
       eventBus,
+      networkUpgrade,
     );
   }, [
     isLoading,
     btcNetwork,
     versionedParams,
+    networkUpgrade,
+    bbnHeight,
     logger,
     cosmosConnected,
     btcConnected,
@@ -76,6 +100,7 @@ export const useStakingManagerService = () => {
     signPsbt,
     signMessage,
     signBbnTx,
+    chainId,
   ]);
 
   return {

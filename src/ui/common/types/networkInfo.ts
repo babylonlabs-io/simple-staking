@@ -1,5 +1,14 @@
 import { StakingParams } from "@babylonlabs-io/btc-staking-ts";
 
+export interface PopUpgradeConfig {
+  height: number;
+  version: number;
+}
+
+export interface NetworkUpgradeConfig {
+  pop?: PopUpgradeConfig[];
+}
+
 export interface BbnStakingParamsVersion extends StakingParams {
   version: number;
   minCommissionRate: string;
@@ -28,7 +37,6 @@ export interface BtcEpochCheckParams {
   latestParam: BtcEpochCheckParamsVersion;
   versions: BtcEpochCheckParamsVersion[];
 }
-
 export interface StakingStatus {
   isStakingOpen: boolean;
 }
@@ -41,4 +49,5 @@ export interface Params {
 export interface NetworkInfo {
   stakingStatus: StakingStatus;
   params: Params;
+  networkUpgrade?: NetworkUpgradeConfig;
 }

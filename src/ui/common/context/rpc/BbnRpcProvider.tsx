@@ -13,6 +13,7 @@ import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 
 interface BbnRpcContextType {
   queryClient: QueryClient | undefined;
+  tmClient: Tendermint34Client | undefined;
   isLoading: boolean;
   error: Error | null;
   reconnect: () => Promise<void>;
@@ -20,6 +21,7 @@ interface BbnRpcContextType {
 
 const BbnRpcContext = createContext<BbnRpcContextType>({
   queryClient: undefined,
+  tmClient: undefined,
   isLoading: true,
   error: null,
   reconnect: async () => {},
@@ -27,15 +29,17 @@ const BbnRpcContext = createContext<BbnRpcContextType>({
 
 export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
   const [queryClient, setQueryClient] = useState<QueryClient>();
+  const [tmClient, setTmClient] = useState<Tendermint34Client>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { rpc } = getNetworkConfigBBN();
 
   const connect = useCallback(async () => {
     try {
-      const tmClient = await Tendermint34Client.connect(rpc);
-      const client = QueryClient.withExtensions(tmClient);
+      const tmClientInstance = await Tendermint34Client.connect(rpc);
+      const client = QueryClient.withExtensions(tmClientInstance);
       setQueryClient(client);
+      setTmClient(tmClientInstance);
       setIsLoading(false);
       setError(null);
     } catch (err) {
@@ -73,7 +77,7 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <BbnRpcContext.Provider
-      value={{ queryClient, isLoading, error, reconnect }}
+      value={{ queryClient, tmClient, isLoading, error, reconnect }}
     >
       {children}
     </BbnRpcContext.Provider>
