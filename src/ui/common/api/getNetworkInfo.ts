@@ -2,7 +2,7 @@ import { getPublicKeyNoCoord } from "@babylonlabs-io/btc-staking-ts";
 
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 
-import { NetworkInfo } from "../types/networkInfo";
+import { NetworkInfo, NetworkUpgradeConfig } from "../types/networkInfo";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -25,6 +25,7 @@ interface NetworkInfoAPI {
     bbn: BbnParams[];
     btc: BtcCheckpointParams[];
   };
+  network_upgrade?: NetworkUpgradeConfig;
 }
 
 export interface BbnParams {
@@ -55,7 +56,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     "Error getting network info",
   );
   const { data } = response;
-  const { params, staking_status } = data.data;
+  const { params, staking_status, network_upgrade } = data.data;
 
   const stakingVersions = (params.bbn || [])
     .sort((a, b) => a.version - b.version)
@@ -159,5 +160,6 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
         genesisParam: genesisEpochCheckParam,
       },
     },
+    networkUpgrade: network_upgrade,
   };
 };

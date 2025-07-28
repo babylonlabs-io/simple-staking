@@ -8,7 +8,7 @@ import {
   setupBankExtension,
 } from "@cosmjs/stargate";
 
-import { ONE_MINUTE } from "@/ui/common/constants";
+import { ONE_MINUTE, ONE_SECOND } from "@/ui/common/constants";
 import { useBbnRpc } from "@/ui/common/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { ClientError } from "@/ui/common/errors";
@@ -21,6 +21,7 @@ import { useRpcErrorHandler } from "../useRpcErrorHandler";
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
 const BBN_REWARDS_KEY = "BBN_REWARDS";
+const BBN_HEIGHT_KEY = "BBN_HEIGHT";
 const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
 
 /**
@@ -30,7 +31,7 @@ const REWARD_GAUGE_KEY_BTC_DELEGATION = "BTC_STAKER";
 export const useBbnQuery = () => {
   const { isGeoBlocked, isLoading: isHealthcheckLoading } = useHealthCheck();
   const { bech32Address, connected } = useCosmosWallet();
-  const { queryClient } = useBbnRpc();
+  const { queryClient, tmClient } = useBbnRpc();
   const { hasRpcError, reconnect } = useRpcErrorHandler();
 
   /**
@@ -143,10 +144,39 @@ export const useBbnQuery = () => {
     refetchInterval: false, // Disable automatic periodic refetching
   });
 
+  /**
+   * Gets the current height of the Babylon Genesis chain.
+   * @returns {Promise<number>} - The current height of the Babylon Genesis chain.
+   */
+  const heightQuery = useClientQuery({
+    queryKey: [BBN_HEIGHT_KEY],
+    queryFn: async () => {
+      if (!tmClient) {
+        return 0;
+      }
+      try {
+        const status = await tmClient.status();
+        return status.syncInfo.latestBlockHeight;
+      } catch (error) {
+        throw new ClientError(
+          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
+          "Error getting Babylon chain height",
+          { cause: error as Error },
+        );
+      }
+    },
+    enabled: Boolean(
+      tmClient && connected && !isGeoBlocked && !isHealthcheckLoading,
+    ),
+    staleTime: ONE_MINUTE,
+    refetchInterval: ONE_SECOND * 10,
+  });
+
   return {
     rewardsQuery,
     balanceQuery,
     btcTipQuery,
+    heightQuery,
     hasRpcError,
     reconnectRpc: reconnect,
     queryClient,
