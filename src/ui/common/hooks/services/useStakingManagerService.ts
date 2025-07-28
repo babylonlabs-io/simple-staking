@@ -29,15 +29,17 @@ export const useStakingManagerService = () => {
 
   const versionedParams = networkInfo?.params.bbnStakingParams?.versions;
 
-  const networkUpgrade = useMemo(
-    () => ({
-      pop: {
-        upgradeHeight: networkInfo?.networkUpgrade?.pop?.[0]?.height ?? 0,
-        version: networkInfo?.networkUpgrade?.pop?.[0]?.version ?? 0,
-      },
-    }),
-    [networkInfo?.networkUpgrade],
-  );
+  const networkUpgrade = useMemo(() => {
+    const popUpgrade = networkInfo?.networkUpgrade?.pop?.[0];
+    return popUpgrade
+      ? {
+          pop: {
+            upgradeHeight: popUpgrade.height,
+            version: popUpgrade.version,
+          },
+        }
+      : undefined;
+  }, [networkInfo?.networkUpgrade]);
 
   const { chainId } = getNetworkConfigBBN();
 
