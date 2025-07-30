@@ -1,3 +1,4 @@
+import type { EncodeObject } from "@cosmjs/proto-signing";
 import { useCallback } from "react";
 
 import { BBN_GAS_PRICE } from "@/ui/common/config";
@@ -27,7 +28,7 @@ export const useBbnTransaction = () => {
    * @returns {Promise<Object>} - The gas fee.
    */
   const estimateBbnGasFee = useCallback(
-    async <T>(msg: { typeUrl: string; value: T }): Promise<BbnGasFee> => {
+    async (msg: EncodeObject | EncodeObject[]): Promise<BbnGasFee> => {
       const gasEstimate = await simulate(msg);
       const gasWanted = Math.ceil(gasEstimate * GAS_MULTIPLIER);
       return {
@@ -49,13 +50,9 @@ export const useBbnTransaction = () => {
    * @returns The signed transaction in bytes
    */
   const signBbnTx = useCallback(
-    async <T extends object>(msg: {
-      typeUrl: string;
-      value: T;
-    }): Promise<Uint8Array> => {
+    async (msg: EncodeObject | EncodeObject[]): Promise<Uint8Array> => {
       logger.info("Starting BBN transaction signing", {
-        msgType: msg.typeUrl,
-        category: "transaction",
+        txs: msg,
       });
 
       // estimate gas
