@@ -1,5 +1,6 @@
 import { type PropsWithChildren, useCallback, useMemo, useState } from "react";
 
+import { usePool } from "@/ui/baby/hooks/api/usePool";
 import { useValidators } from "@/ui/baby/hooks/api/useValidators";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 
@@ -11,11 +12,12 @@ interface Filter {
 
 interface Validator {
   address: string;
-  logoUrl: string;
   name: string;
-  apr: number;
   votingPower: number;
   commission: number;
+  tokens: number;
+  // apr: number;
+  // logoUrl: string;
 }
 
 interface ValidatorState {
@@ -41,20 +43,22 @@ function StakingState({ children }: PropsWithChildren) {
   const [listView, setListView] = useState<ListView>("table");
   const [filter, setFilter] = useState<Filter>({ search: "" });
 
-  const { data: validatorList = [], isLoading: loading } = useValidators();
+  const { data: validatorList = [], isLoading } = useValidators();
+  const { data: pool, isLoading: isPoolLoading } = usePool();
 
   // TODO: properly calculate missing apr and votingPower fields
   const validators = useMemo(
     () =>
       validatorList.map((validator) => ({
         address: validator.operatorAddress,
-        logoUrl: "",
         name: validator.description.moniker,
-        apr: 0,
-        votingPower: 0,
+        tokens: parseFloat(validator.tokens),
+        votingPower: parseFloat(validator.tokens) / (pool?.bondedTokens ?? 0),
         commission: parseFloat(validator.commission.commissionRates.rate),
+        // apr: 0,
+        // logoUrl: "",
       })),
-    [validatorList],
+    [validatorList, pool?.bondedTokens],
   );
   const filteredValidators = useMemo(() => {
     const searchTerm = filter.search.toLowerCase();
@@ -71,14 +75,14 @@ function StakingState({ children }: PropsWithChildren) {
 
   const context = useMemo(
     () => ({
-      loading,
+      loading: isLoading || isPoolLoading,
       filter,
       listView,
       validators: filteredValidators,
       search,
       changeListView: setListView,
     }),
-    [filter, filteredValidators, listView, loading, search],
+    [filter, filteredValidators, listView, isLoading, isPoolLoading, search],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;

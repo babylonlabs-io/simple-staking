@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import babylon from "@/infrastructure/babylon";
 import { useDelegations } from "@/ui/baby/hooks/api/useDelegations";
@@ -10,6 +10,14 @@ interface StakingParams {
   amount: string;
 }
 
+export interface Delegation {
+  validatorAddress: string;
+  delegatorAddress: string;
+  shares: number;
+  amount: bigint;
+  coin: "ubbn";
+}
+
 export function useDelegationService() {
   const { bech32Address } = useCosmosWallet();
   const {
@@ -18,6 +26,32 @@ export function useDelegationService() {
     isLoading,
   } = useDelegations(bech32Address);
   const { signBbnTx, sendBbnTx, estimateBbnGasFee } = useBbnTransaction();
+
+  const groupedDelegations = useMemo(
+    () =>
+      Object.values(
+        delegations.reduce(
+          (acc, item) => {
+            const delegation = acc[item.delegation.validatorAddress];
+            if (delegation) {
+              delegation.shares += parseFloat(item.delegation.shares);
+              delegation.amount += BigInt(item.balance.amount);
+            } else {
+              acc[item.delegation.validatorAddress] = {
+                validatorAddress: item.delegation.validatorAddress,
+                delegatorAddress: item.delegation.delegatorAddress,
+                shares: parseFloat(item.delegation.shares),
+                amount: BigInt(item.balance.amount),
+                coin: "ubbn",
+              };
+            }
+            return acc;
+          },
+          {} as Record<string, Delegation>,
+        ),
+      ),
+    [delegations],
+  );
 
   const stake = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
@@ -73,7 +107,7 @@ export function useDelegationService() {
 
   return {
     loading: isLoading,
-    delegations,
+    delegations: groupedDelegations,
     stake,
     unstake,
     estimateStakingFee,
