@@ -1,2 +1,2 @@
-export { Nav } from "./Nav";
-export { NavItem } from "./NavItem";
+export * from "./Nav";
+export * from "./NavItem";

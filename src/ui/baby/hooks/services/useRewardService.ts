@@ -1,46 +1,65 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import babylon from "@/infrastructure/babylon";
 import { useRewards } from "@/ui/baby/hooks/api/useRewards";
-import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
-import { useLogger } from "@/ui/common/hooks/useLogger";
+
+export interface Reward {
+  validatorAddress: string;
+  coin: string;
+  amount: bigint;
+}
 
 export function useRewardService() {
   const { bech32Address } = useCosmosWallet();
-  const { data: rewards = [], refetch: refetchRewards } =
-    useRewards(bech32Address);
+  const {
+    data: rewards = [],
+    isLoading,
+    refetch: refetchRewards,
+  } = useRewards(bech32Address);
   const { signBbnTx, sendBbnTx } = useBbnTransaction();
-  const { handleError } = useError();
-  const logger = useLogger();
 
-  const claimReward = useCallback(
-    async (validatorAddress: string) => {
-      try {
-        if (!bech32Address) throw Error("Babylon Wallet is not connected");
-
-        const claimRewardMsg = babylon.txs.baby.createClaimRewardMsg({
-          validatorAddress,
-          delegatorAddress: bech32Address,
-        });
-        const signedTx = await signBbnTx(claimRewardMsg);
-        const result = await sendBbnTx(signedTx);
-
-        logger.info("Baby Staking: claim reward", {
-          txHash: result?.txHash,
-        });
-        await refetchRewards();
-      } catch (error: any) {
-        handleError({ error });
-        logger.error(error);
-      }
-    },
-    [logger, bech32Address, signBbnTx, sendBbnTx, refetchRewards, handleError],
+  const rewardList = useMemo(
+    () =>
+      rewards
+        .map(({ validatorAddress, reward }) => {
+          const coin = reward.find((coin) => coin.denom === "ubbn");
+          return coin
+            ? {
+                validatorAddress,
+                amount: BigInt(coin.amount),
+                coin: coin.denom,
+              }
+            : null;
+        })
+        .filter(Boolean) as Reward[],
+    [rewards],
   );
 
+  const totalReward = useMemo(
+    () => rewardList.reduce((total, reward) => total + reward.amount, 0n),
+    [rewardList],
+  );
+
+  const claimAllRewards = useCallback(async () => {
+    if (!bech32Address) throw Error("Babylon Wallet is not connected");
+    const msgs = rewards.map((reward) =>
+      babylon.txs.baby.createClaimRewardMsg({
+        validatorAddress: reward.validatorAddress,
+        delegatorAddress: bech32Address,
+      }),
+    );
+    const signedTx = await signBbnTx(msgs);
+    const result = await sendBbnTx(signedTx);
+    await refetchRewards();
+    return result;
+  }, [bech32Address, rewards, signBbnTx, sendBbnTx, refetchRewards]);
+
   return {
-    rewards,
-    claimReward,
+    loading: isLoading,
+    rewards: rewardList,
+    totalReward,
+    claimAllRewards,
   };
 }

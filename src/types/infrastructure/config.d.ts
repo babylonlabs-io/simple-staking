@@ -8,6 +8,7 @@ namespace Infra {
       network: string;
     };
     babylon: {
+      lcdUrl: string;
       rpcUrl: string;
     };
   }

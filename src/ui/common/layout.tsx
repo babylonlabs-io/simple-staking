@@ -8,28 +8,25 @@ import "@/ui/globals.css";
 import { Banner } from "./components/Banner/Banner";
 import { Footer } from "./components/Footer/Footer";
 import { Header } from "./components/Header/Header";
-import Providers from "./providers";
 
 export default function RootLayout() {
   return (
-    <Providers>
-      <div
-        className={twJoin(
-          `relative h-full min-h-svh w-full`,
-          network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet",
-        )}
-      >
-        <div className="flex min-h-svh flex-col">
-          <Banner />
-          <Header />
+    <div
+      className={twJoin(
+        `relative h-full min-h-svh w-full`,
+        network === Network.MAINNET ? "main-app-mainnet" : "main-app-testnet",
+      )}
+    >
+      <div className="flex min-h-svh flex-col">
+        <Banner />
+        <Header />
 
-          <Outlet />
+        <Outlet />
 
-          <div className="mt-auto">
-            <Footer />
-          </div>
+        <div className="mt-auto">
+          <Footer />
         </div>
       </div>
-    </Providers>
+    </div>
   );
 }
