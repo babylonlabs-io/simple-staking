@@ -3,14 +3,16 @@ import { useMemo } from "react";
 
 import { ClientError } from "@/ui/common/errors";
 
-type Context = Record<string, number | string | boolean> & {
+type Value = string | number | boolean | object;
+
+type Context = Record<string, Value | Value[]> & {
   category?: string;
 };
 
 type ErrorContext = {
   level?: SeverityLevel;
   tags?: Record<string, string>;
-  data?: Record<string, string | number | boolean>;
+  data?: Record<string, Value | Value[]>;
 };
 
 interface Logger {
