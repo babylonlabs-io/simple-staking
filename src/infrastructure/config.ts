@@ -9,6 +9,9 @@ export default {
     network: process.env.NEXT_PUBLIC_NETWORK ?? "signet",
   },
   babylon: {
+    lcdUrl:
+      process.env.NEXT_PUBLIC_BABY_LCD_URL ??
+      "https://lcd.devnet.babylonlabs.io",
     rpcUrl:
       process.env.NEXT_PUBLIC_BABY_RPC_URL ??
       "https://rpc-dapp.devnet.babylonlabs.io/",
