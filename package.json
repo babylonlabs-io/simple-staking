@@ -29,7 +29,7 @@
     "node": "24.2.0"
   },
   "dependencies": {
-    "@babylonlabs-io/babylon-proto-ts": "1.8.0",
+    "@babylonlabs-io/babylon-proto-ts": "1.9.0",
     "@babylonlabs-io/btc-staking-ts": "2.4.1",
     "@babylonlabs-io/core-ui": "1.10.1",
     "@babylonlabs-io/wallet-connector": "1.10.0",
