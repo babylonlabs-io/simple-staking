@@ -149,6 +149,13 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     throw clientError;
   }
 
+  const allowList = staking_status.allow_list
+    ? {
+        activationBlock: staking_status.allow_list.activation_block,
+        expirationBlock: staking_status.allow_list.expiration_block,
+      }
+    : undefined;
+
   return {
     stakingStatus: {
       isStakingOpen: staking_status.is_staking_open,
