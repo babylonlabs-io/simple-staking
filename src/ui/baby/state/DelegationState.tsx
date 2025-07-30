@@ -38,34 +38,6 @@ function DelegationState({ children }: PropsWithChildren) {
   const { handleError } = useError();
   const logger = useLogger();
 
-  const groupedDelegations = useMemo(
-    () =>
-      Object.values(
-        delegations.reduce(
-          (acc, item) => {
-            const delegation = acc[item.delegation.validatorAddress];
-
-            if (delegation) {
-              delegation.shares += parseFloat(item.delegation.shares);
-              delegation.amount += BigInt(item.balance.amount);
-            } else {
-              acc[item.delegation.validatorAddress] = {
-                validatorAddress: item.delegation.validatorAddress,
-                delegatorAddress: item.delegation.delegatorAddress,
-                shares: parseFloat(item.delegation.shares),
-                amount: BigInt(item.balance.amount),
-                coin: "ubbn",
-              };
-            }
-
-            return acc;
-          },
-          {} as Record<string, Delegation>,
-        ),
-      ),
-    [delegations],
-  );
-
   const unbond = useCallback(
     async ({ validatorAddress, amount }: UnbondProps) => {
       try {
@@ -87,10 +59,10 @@ function DelegationState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       loading: processing || loading,
-      delegations: groupedDelegations,
+      delegations,
       unbond,
     }),
-    [processing, loading, groupedDelegations, unbond],
+    [processing, loading, delegations, unbond],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;
