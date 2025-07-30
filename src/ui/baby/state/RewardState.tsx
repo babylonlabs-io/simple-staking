@@ -1,15 +1,12 @@
 import { type PropsWithChildren, useCallback, useMemo, useState } from "react";
 
-import { useRewardService } from "@/ui/baby/hooks/services/useRewardService";
+import {
+  type Reward,
+  useRewardService,
+} from "@/ui/baby/hooks/services/useRewardService";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
-
-interface Reward {
-  validatorAddress: string;
-  coin: string;
-  amount: bigint;
-}
 
 interface RewardState {
   loading: boolean;
@@ -24,35 +21,12 @@ const { StateProvider, useState: useRewardState } =
     claimAll: async () => {},
   });
 
-// TODO: group rewards
 function RewardState({ children }: PropsWithChildren) {
   const [processing, setProcessing] = useState(false);
 
-  const { loading, rewards, claimAllRewards } = useRewardService();
+  const { loading, rewards, totalReward, claimAllRewards } = useRewardService();
   const { handleError } = useError();
   const logger = useLogger();
-
-  const rewardList = useMemo(
-    () =>
-      rewards
-        .map(({ validatorAddress, reward }) => {
-          const coin = reward.find((coin) => coin.denom === "ubbn");
-          return coin
-            ? {
-                validatorAddress,
-                amount: BigInt(coin.amount),
-                coin: coin.denom,
-              }
-            : null;
-        })
-        .filter(Boolean) as Reward[],
-    [rewards],
-  );
-
-  const totalReward = useMemo(
-    () => rewardList.reduce((total, reward) => total + reward.amount, 0n),
-    [rewardList],
-  );
 
   const claimAll = useCallback(async () => {
     try {
@@ -72,11 +46,11 @@ function RewardState({ children }: PropsWithChildren) {
   const context = useMemo(
     () => ({
       loading: loading || processing,
-      rewards: rewardList,
+      rewards,
       totalReward,
       claimAll,
     }),
-    [loading, processing, rewardList, totalReward, claimAll],
+    [loading, processing, rewards, totalReward, claimAll],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;

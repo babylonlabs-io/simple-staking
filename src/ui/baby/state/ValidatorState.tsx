@@ -46,7 +46,6 @@ function StakingState({ children }: PropsWithChildren) {
   const { data: validatorList = [], isLoading } = useValidators();
   const { data: pool, isLoading: isPoolLoading } = usePool();
 
-  // TODO: properly calculate missing apr and votingPower fields
   const validators = useMemo(
     () =>
       validatorList.map((validator) => ({
