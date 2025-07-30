@@ -256,6 +256,10 @@ export function useDelegationService() {
           State.INTERMEDIATE_TIMELOCK_SLASHING_WITHDRAWAL_SUBMITTED,
         );
       },
+
+      [ACTIONS.EXPAND]: async ({ stakingTxHashHex }: TxProps) => {
+        console.log("Expand action called for delegation:", stakingTxHashHex);
+      },
     }),
     [
       submitStakingTx,

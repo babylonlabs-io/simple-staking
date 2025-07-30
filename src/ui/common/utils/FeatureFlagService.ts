@@ -61,4 +61,15 @@ export default {
   get IsNewUIEnabled() {
     return process.env.NEXT_PUBLIC_FF_NEW_UI === "true";
   },
+
+  /**
+   * Staking Expansion feature flag
+   *
+   * Purpose: Enables staking expansion capabilities
+   * Why needed: To gradually roll out staking expansion functionality
+   * ETA for removal: 8th of August 2025 - will be removed after the MVP
+   */
+  get IsStakingExpansionEnabled() {
+    return process.env.NEXT_PUBLIC_FF_STAKING_EXPANSION === "true";
+  },
 };
