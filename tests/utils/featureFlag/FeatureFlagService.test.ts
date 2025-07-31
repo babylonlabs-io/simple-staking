@@ -45,6 +45,22 @@ describe("FeatureFlagService", () => {
     });
   });
 
+  describe("IsStakingExpansionEnabled", () => {
+    it("should return false when NEXT_PUBLIC_FF_STAKING_EXPANSION is not set", () => {
+      expect(FeatureFlagService.IsStakingExpansionEnabled).toBe(false);
+    });
+
+    it('should return false when NEXT_PUBLIC_FF_STAKING_EXPANSION is set to "false"', () => {
+      process.env.NEXT_PUBLIC_FF_STAKING_EXPANSION = "false";
+      expect(FeatureFlagService.IsStakingExpansionEnabled).toBe(false);
+    });
+
+    it('should return true when NEXT_PUBLIC_FF_STAKING_EXPANSION is set to "true"', () => {
+      process.env.NEXT_PUBLIC_FF_STAKING_EXPANSION = "true";
+      expect(FeatureFlagService.IsStakingExpansionEnabled).toBe(true);
+    });
+  });
+
   describe("Feature flag behavior", () => {
     it("should handle multiple feature flags independently", () => {
       process.env.NEXT_PUBLIC_FF_ENABLE_LEDGER = "false";

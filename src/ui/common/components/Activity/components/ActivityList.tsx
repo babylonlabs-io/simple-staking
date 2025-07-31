@@ -21,6 +21,7 @@ import {
 } from "@/ui/common/types/delegationsV2";
 import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
+import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 import { durationTillNow } from "@/ui/common/utils/time";
 
@@ -168,6 +169,7 @@ const getActionButton = (
 const transformToActivityCard = (
   delegation: DelegationWithFP,
   onAction: (action: ActionType, delegation: DelegationWithFP) => void,
+  executeAction: (action: ActionType, delegation: DelegationWithFP) => void,
   isStakingManagerReady: boolean,
 ): ActivityCardData => {
   const details: ActivityCardDetailItem[] = [
@@ -252,6 +254,21 @@ const transformToActivityCard = (
     isStakingManagerReady,
   );
 
+  // Check if expand button should be shown as secondary action
+  const secondaryActions: ActivityCardActionButton[] = [];
+  const showExpandButton =
+    FeatureFlagService.IsStakingExpansionEnabled &&
+    delegation.state === DelegationV2StakingState.ACTIVE;
+
+  if (showExpandButton) {
+    secondaryActions.push({
+      label: "Expand",
+      onClick: () => executeAction(ACTIONS.EXPAND, delegation),
+      variant: "outlined",
+      size: "medium",
+    });
+  }
+
   return {
     formattedAmount: `${maxDecimals(satoshiToBtc(delegation.stakingAmount), 8)} ${coinName}`,
     icon: bitcoin,
@@ -259,6 +276,8 @@ const transformToActivityCard = (
     details,
     listItems: listItems.length > 0 ? listItems : undefined,
     primaryAction,
+    secondaryActions:
+      secondaryActions.length > 0 ? secondaryActions : undefined,
   };
 };
 
@@ -287,10 +306,17 @@ export function ActivityList() {
         transformToActivityCard(
           delegation,
           openConfirmationModal,
+          executeDelegationAction,
           isStakingManagerReady,
         ),
       );
-  }, [delegations, validations, openConfirmationModal, isStakingManagerReady]);
+  }, [
+    delegations,
+    validations,
+    openConfirmationModal,
+    executeDelegationAction,
+    isStakingManagerReady,
+  ]);
 
   if (isLoading) {
     return (
