@@ -43,7 +43,7 @@ interface DelegationV2API {
     };
   };
   state: string;
-  can_expand?: boolean;
+  can_expand: boolean;
   previous_staking_tx_hash_hex?: string;
 }
 
