@@ -50,6 +50,7 @@ export function useDelegationStorage(
             unbondingSlashingTxHex: "",
             spendingHeight: 0,
           },
+          canExpand: false,
         }) as DelegationV2,
     );
 
