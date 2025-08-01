@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="30px" height="30px" viewBox="0 0 30 30" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <title>Frame</title>
+    <defs>
+        <path d="M0,0 L30,0 L30,30 L0,30 L0,0 Z" id="path-1"></path>
+    </defs>
+    <g id="Frame" stroke="none" fill="none" xlink:href="#path-1" fill-rule="evenodd" stroke-width="1">
+        <g id="bsn-fp" transform="translate(1, 1)" fill="#FFFFFF">
+            <g id="Group" transform="translate(3, 2)">
+                <polygon id="Path" fill-rule="nonzero" points="10.8947368 0 4.23684211 10.8 17.5526316 10.8"></polygon>
+                <path d="M17.5526316,24 C20.5611526,24 23,21.58236 23,18.6 C23,15.61764 20.5611526,13.2 17.5526316,13.2 C14.5441105,13.2 12.1052632,15.61764 12.1052632,18.6 C12.1052632,21.58236 14.5441105,24 17.5526316,24 Z" id="Path" fill-rule="nonzero"></path>
+                <polygon id="Path" fill-rule="nonzero" points="0 13.8 9.68421053 13.8 9.68421053 23.4 0 23.4"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

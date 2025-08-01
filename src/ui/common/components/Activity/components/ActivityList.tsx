@@ -169,7 +169,6 @@ const getActionButton = (
 const transformToActivityCard = (
   delegation: DelegationWithFP,
   onAction: (action: ActionType, delegation: DelegationWithFP) => void,
-  executeAction: (action: ActionType, delegation: DelegationWithFP) => void,
   isStakingManagerReady: boolean,
 ): ActivityCardData => {
   const details: ActivityCardDetailItem[] = [
@@ -254,20 +253,10 @@ const transformToActivityCard = (
     isStakingManagerReady,
   );
 
-  // Check if expand button should be shown as secondary action
-  const secondaryActions: ActivityCardActionButton[] = [];
-  const showExpandButton =
+  // Check if expansion section should be shown
+  const showExpansionSection =
     FeatureFlagService.IsStakingExpansionEnabled &&
     delegation.state === DelegationV2StakingState.ACTIVE;
-
-  if (showExpandButton) {
-    secondaryActions.push({
-      label: "Expand",
-      onClick: () => executeAction(ACTIONS.EXPAND, delegation),
-      variant: "outlined",
-      size: "medium",
-    });
-  }
 
   return {
     formattedAmount: `${maxDecimals(satoshiToBtc(delegation.stakingAmount), 8)} ${coinName}`,
@@ -276,8 +265,7 @@ const transformToActivityCard = (
     details,
     listItems: listItems.length > 0 ? listItems : undefined,
     primaryAction,
-    secondaryActions:
-      secondaryActions.length > 0 ? secondaryActions : undefined,
+    expansionSection: showExpansionSection ? delegation : undefined,
   };
 };
 
@@ -306,17 +294,10 @@ export function ActivityList() {
         transformToActivityCard(
           delegation,
           openConfirmationModal,
-          executeDelegationAction,
           isStakingManagerReady,
         ),
       );
-  }, [
-    delegations,
-    validations,
-    openConfirmationModal,
-    executeDelegationAction,
-    isStakingManagerReady,
-  ]);
+  }, [delegations, validations, openConfirmationModal, isStakingManagerReady]);
 
   if (isLoading) {
     return (
