@@ -14,6 +14,7 @@ import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { Bsn } from "@/ui/common/types/bsn";
+import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
 const BSN_ID = getNetworkConfigBBN().chainId;
 
@@ -39,7 +40,7 @@ const SubSection = ({
 
 interface ChainButtonProps {
   disabled?: boolean;
-  provider?: any;
+  provider?: FinalityProvider;
   bsnId?: string;
   bsnName?: string;
   logoUrl?: string;
