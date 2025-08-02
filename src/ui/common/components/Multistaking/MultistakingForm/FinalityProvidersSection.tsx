@@ -59,8 +59,13 @@ export function FinalityProvidersSection() {
   }, [selectedProviderMap, bsnList, finalityProviderMap]);
 
   const handleAdd = (bsnId: string, providerPk: string) => {
-    onChange({ ...selectedProviderMap, [bsnId]: providerPk });
-    setStakingModalPage(StakingModalPage.DEFAULT);
+    const updated = { ...selectedProviderMap, [bsnId]: providerPk };
+    onChange(updated);
+    if (allowsMultipleBsns) {
+      setStakingModalPage(StakingModalPage.BSN);
+    } else {
+      setStakingModalPage(StakingModalPage.DEFAULT);
+    }
   };
 
   const handleRemove = (bsnId?: string) => {
@@ -118,6 +123,7 @@ export function FinalityProvidersSection() {
         onNext={handleNext}
         onClose={handleClose}
         onSelect={handleSelectBsn}
+        onRemove={handleRemove}
       />
 
       <FinalityProviderModal

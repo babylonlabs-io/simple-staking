@@ -3,15 +3,16 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
-  Text,
+  FinalityProviderItem,
 } from "@babylonlabs-io/core-ui";
-import { PropsWithChildren, useMemo } from "react";
+import { useMemo } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
+import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { Bsn } from "@/ui/common/types/bsn";
 
 const BSN_ID = getNetworkConfigBBN().chainId;
@@ -36,50 +37,69 @@ const SubSection = ({
   </div>
 );
 
-interface ChainButtonProps extends PropsWithChildren {
-  className?: string;
+interface ChainButtonProps {
   disabled?: boolean;
-  logo?: string;
+  provider?: any;
+  bsnId?: string;
+  bsnName?: string;
+  logoUrl?: string;
   title?: string | JSX.Element;
-  alt?: string;
-  selected?: boolean;
-  onClick?: () => void;
+  onSelectFp?: () => void;
+  onRemove?: (bsnId: string) => void;
 }
 
 const ChainButton = ({
-  className,
   disabled,
   title,
-  logo,
-  selected,
-  onClick,
+  provider,
+  bsnId,
+  bsnName,
+  logoUrl,
+  onSelectFp,
+  onRemove,
 }: ChainButtonProps) => (
-  <Text
-    disabled={disabled}
-    as="button"
+  <div
     className={twMerge(
-      "bg-secondary-highlight w-full py-[14px] px-6 pl-[14px] rounded border",
-      selected ? "border-[#CE6533]" : "border-transparent",
-      disabled
-        ? "opacity-50 pointer-events-none cursor-default"
-        : "cursor-pointer",
-      className,
+      provider
+        ? "bg-secondary-highlight w-full py-[14px] px-[14px] rounded"
+        : "bg-secondary-highlight w-full py-[14px] px-[14px] rounded flex items-center justify-between",
+      disabled ? "opacity-50" : "",
     )}
-    onClick={onClick}
   >
-    <div className="flex w-full items-center justify-between">
-      <div className="flex items-center text-base">
-        {logo && (
-          <img
-            src={logo}
-            alt="bitcoin"
-            className="max-w-[40px] max-h-[40px] mr-2 rounded-full"
+    <div className="flex items-center text-base">
+      {provider ? (
+        <div className="w-full">
+          <FinalityProviderItem
+            bsnId={bsnId || ""}
+            bsnName={bsnName || ""}
+            provider={provider}
+            onRemove={() => onRemove?.(bsnId || "")}
           />
-        )}
-        {title}
-      </div>
+        </div>
+      ) : (
+        <>
+          {logoUrl && (
+            <img
+              src={logoUrl}
+              alt="chain-logo"
+              className="max-w-[40px] max-h-[40px] mr-2 rounded-full"
+            />
+          )}
+          {title}
+        </>
+      )}
     </div>
-  </Text>
+    {!provider && (
+      <Button
+        variant="outlined"
+        disabled={disabled}
+        onClick={onSelectFp}
+        className="box-border flex items-center justify-center p-1 w-[86px] h-[28px] border border-secondary-strokeDark rounded text-accent-primary text-sm"
+      >
+        Select FP
+      </Button>
+    )}
+  </div>
 );
 
 interface ChainSelectionModalProps {
@@ -91,22 +111,26 @@ interface ChainSelectionModalProps {
   onNext: () => void;
   onClose: () => void;
   onSelect: (bsnId: string) => void;
+  onRemove: (bsnId: string) => void;
 }
 
 export const ChainSelectionModal = ({
   bsns = [],
   open,
   loading,
-  activeBsnId,
   selectedBsns = {},
   onSelect,
   onNext,
   onClose,
+  onRemove,
 }: ChainSelectionModalProps) => {
   const babylonBsn = useMemo(
     () => bsns.find((bsn) => bsn.id === BSN_ID),
     [bsns],
   );
+
+  const { getFinalityProviderName, finalityProviderMap } =
+    useFinalityProviderState();
   const externalBsns = useMemo(
     () => bsns.filter((bsn) => bsn.id !== BSN_ID),
     [bsns],
@@ -114,6 +138,12 @@ export const ChainSelectionModal = ({
   const isBabylonSelected = babylonBsn
     ? Boolean(selectedBsns[babylonBsn.id])
     : false;
+
+  // Helper: when user clicks "Select FP" on a chain, choose it and advance.
+  const handleSelectFp = (bsnId: string) => {
+    onSelect(bsnId);
+    onNext();
+  };
 
   return (
     <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
@@ -128,25 +158,51 @@ export const ChainSelectionModal = ({
           Bitcoin Supercharged Networks (BSNs) are Proof-of-Stake systems
           secured by Bitcoin staking. Select a network to delegate your stake.
         </div>
-        <div className="overflow-y-auto max-h-[350px] flex flex-col gap-2 mt-10">
+        <div
+          className="overflow-y-auto flex flex-col gap-2 mt-10"
+          style={{ maxHeight: "min(60vh, 500px)" }}
+        >
           {loading && <div>Loading...</div>}
           {babylonBsn && (
             <ChainButton
-              logo={chainLogos.babylon}
-              title={babylonBsn.name}
-              selected={activeBsnId === babylonBsn.id}
-              disabled={isBabylonSelected}
-              onClick={() => onSelect(babylonBsn.id)}
+              provider={
+                selectedBsns[babylonBsn.id]
+                  ? finalityProviderMap.get(selectedBsns[babylonBsn.id])
+                  : undefined
+              }
+              bsnName={babylonBsn.name}
+              bsnId={babylonBsn.id}
+              logoUrl={chainLogos.babylon}
+              title={
+                selectedBsns[babylonBsn.id]
+                  ? (getFinalityProviderName(selectedBsns[babylonBsn.id]) ??
+                    babylonBsn.name)
+                  : babylonBsn.name
+              }
+              disabled={false}
+              onSelectFp={() => handleSelectFp(babylonBsn.id)}
+              onRemove={() => onRemove(babylonBsn.id)}
             />
           )}
           {externalBsns.map((bsn) => (
             <ChainButton
               key={bsn.id}
-              logo={chainLogos[bsn.id] || chainLogos.placeholder}
-              title={bsn.name}
-              selected={activeBsnId === bsn.id}
-              disabled={Boolean(selectedBsns[bsn.id]) || !isBabylonSelected}
-              onClick={() => onSelect(bsn.id)}
+              provider={
+                selectedBsns[bsn.id]
+                  ? finalityProviderMap.get(selectedBsns[bsn.id])
+                  : undefined
+              }
+              bsnName={bsn.name}
+              bsnId={bsn.id}
+              logoUrl={chainLogos[bsn.id] || chainLogos.placeholder}
+              title={
+                selectedBsns[bsn.id]
+                  ? (getFinalityProviderName(selectedBsns[bsn.id]) ?? bsn.name)
+                  : bsn.name
+              }
+              disabled={!selectedBsns[bsn.id] && !isBabylonSelected}
+              onSelectFp={() => handleSelectFp(bsn.id)}
+              onRemove={() => onRemove(bsn.id)}
             />
           ))}
         </div>
@@ -164,12 +220,8 @@ export const ChainSelectionModal = ({
       </DialogBody>
 
       <DialogFooter className="flex justify-end">
-        <Button
-          variant="contained"
-          onClick={onNext}
-          disabled={activeBsnId === undefined}
-        >
-          Next
+        <Button variant="contained" onClick={onClose}>
+          Done
         </Button>
       </DialogFooter>
     </ResponsiveDialog>

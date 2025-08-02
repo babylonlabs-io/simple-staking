@@ -47,7 +47,10 @@ export const FinalityProviderModal = ({
           by validating and finalising transactions. Select one to delegate your
           stake.
         </div>
-        <div className="overflow-x-auto flex flex-col gap-2 mt-10">
+        <div
+          className="overflow-x-auto flex flex-col gap-2 mt-10"
+          style={{ maxHeight: "min(60vh, 500px)" }}
+        >
           <FinalityProviders selectedFP={selectedFP} onChange={setSelectedFp} />
         </div>
       </DialogBody>
@@ -65,7 +68,7 @@ export const FinalityProviderModal = ({
           onClick={() => {
             if (selectedBsnId !== undefined) {
               onAdd(selectedBsnId, selectedFP);
-              handleClose();
+              setSelectedFp("");
             }
           }}
           disabled={!selectedFP}
