@@ -15,8 +15,13 @@ export interface BtcCheckpointParams {
   btc_confirmation_depth: number;
 }
 
+interface AllowList {
+  is_expired: boolean;
+}
+
 interface StakingStatus {
   is_staking_open: boolean;
+  allow_list?: AllowList;
 }
 
 interface NetworkInfoAPI {
@@ -147,6 +152,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
   return {
     stakingStatus: {
       isStakingOpen: staking_status.is_staking_open,
+      allowList: staking_status.allow_list
+        ? {
+            isExpired: staking_status.allow_list.is_expired,
+          }
+        : undefined,
     },
     params: {
       bbnStakingParams: {
