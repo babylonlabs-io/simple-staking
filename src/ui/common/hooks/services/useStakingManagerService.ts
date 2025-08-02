@@ -71,6 +71,18 @@ export const useStakingManagerService = () => {
     const btcProvider = {
       signPsbt,
       signMessage,
+      getTransactionHex: async (txid: string) => {
+        const response = await fetch(
+          `https://mempool.space/signet/api/tx/${txid}/hex`,
+        );
+        console.log("response", response);
+        if (!response.ok) {
+          throw new Error(
+            `Failed to fetch transaction hex: ${response.statusText}`,
+          );
+        }
+        return await response.text();
+      },
     };
 
     const bbnProvider = {

@@ -296,6 +296,8 @@ export async function getTxMerkleProof(txId: string): Promise<MerkleProof> {
  * @returns A promise that resolves into the transaction hex.
  */
 export async function getTxHex(txId: string): Promise<string> {
-  const response = await fetchApi<string>(txHexUrl(txId));
+  const response = await fetchApi<string>(txHexUrl(txId), {
+    parseAs: "text",
+  });
   return response;
 }

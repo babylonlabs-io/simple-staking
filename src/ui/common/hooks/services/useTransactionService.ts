@@ -73,16 +73,34 @@ export const useTransactionService = () => {
         logger.error(clientError);
         throw clientError;
       }
+      const previousTx = Transaction.fromHex(
+        "0200000001c91ed7d1efcdd521f0a8860e8b180ef95f8d2f8f8a42fe88debd5b369072d4400000000000ffffffff0210270000000000002251201d800815bce2af09bbc2c26d2c65185903001f3a3e9d66f09868ad98140a7bb31e8c0000000000001600140a70b8068c6c24946a9e41c23e5bb4084f5266a000000000",
+      );
 
+      console.log("@@@@@@@ before signing");
       const { stakingTx, signedBabylonTx } =
-        await btcStakingManager!.preStakeRegistrationBabylonTransaction(
+        await btcStakingManager!.stakingExpansionRegistrationBabylonTransaction(
           stakerInfo,
           stakingInput,
           tipHeight,
           availableUTXOs,
           feeRate,
           bech32Address,
+          {
+            stakingTx: previousTx,
+            paramVersion: 0,
+            stakingInput: {
+              finalityProviderPksNoCoordHex: [
+                stakingInput.finalityProviderPksNoCoordHex[0],
+              ],
+              stakingAmountSat: stakingInput.stakingAmountSat,
+              stakingTimelock: stakingInput.stakingTimelock,
+            },
+          },
         );
+      console.log("@@@@@@@ after signing in registration");
+      console.log("stakingTx", stakingTx);
+      console.log("signedBabylonTx", signedBabylonTx);
       return {
         stakingTxHash: stakingTx.getId(),
         signedBabylonTx,
@@ -192,66 +210,90 @@ export const useTransactionService = () => {
    * @param expectedTxHashHex - The expected transaction hash hex
    * @param stakingTxHex - The staking transaction hex
    */
-  const submitStakingTx = useCallback(
-    async (
-      stakingInput: BtcStakingInputs,
-      paramVersion: number,
-      expectedTxHashHex: string,
-      unsignedStakingTxHex: string,
-    ) => {
-      const btcStakingManager = createBtcStakingManager();
-      validateCommonInputs(
-        btcStakingManager,
-        stakingInput,
-        tipHeight,
+  const submitStakingTx = useCallback(async () => {
+    const btcStakingManager = createBtcStakingManager();
+    const stakingInput = {
+      finalityProviderPksNoCoordHex: [
+        "2b48b92bb0191ffff18d7b339c079cf5863526b470ed847bcf5541dcfeacac5d",
+        "87f6994f25863ebf0717d1b8a76fa26b3625f17bcbdf6b06c167ab1dfac534e7",
+      ],
+      stakingAmountSat: 10000,
+      stakingTimelock: 60000,
+    };
+
+    const unsignedStakingTxHex =
+      "0200000002774902425181ac1b061a439678bc26f1fabcdb9063ea61892ab5a6c2ef1d13af0000000000ffffffff51ee08e02031c57ff3ef7f6629d8737e1976e5ee5269d76734422977b4fd7e090100000000ffffffff02102700000000000022512088bf32b7573545b8cd7a6f58ddb46e28960e694de98896c8b62a075afe217baaa9030000000000001600140a70b8068c6c24946a9e41c23e5bb4084f5266a000000000";
+
+    const unsignedStakingTx = Transaction.fromHex(unsignedStakingTxHex);
+    console.log("unsignedStakingTx.getId()");
+    console.log(unsignedStakingTx.getId());
+
+    const previousTx = Transaction.fromHex(
+      "0200000001c91ed7d1efcdd521f0a8860e8b180ef95f8d2f8f8a42fe88debd5b369072d4400000000000ffffffff0210270000000000002251201d800815bce2af09bbc2c26d2c65185903001f3a3e9d66f09868ad98140a7bb31e8c0000000000001600140a70b8068c6c24946a9e41c23e5bb4084f5266a000000000",
+    );
+    const signedStakingTx =
+      await btcStakingManager!.createSignedBtcStakingExpansionTransaction(
         stakerInfo,
-      );
-      if (!availableUTXOs) {
-        const clientError = new ClientError(
-          ERROR_CODES.INITIALIZATION_ERROR,
-          "Available UTXOs not initialized",
-        );
-        logger.error(clientError);
-        throw clientError;
-      }
-
-      const unsignedStakingTx = Transaction.fromHex(unsignedStakingTxHex);
-
-      const signedStakingTx =
-        await btcStakingManager!.createSignedBtcStakingTransaction(
-          stakerInfo,
-          stakingInput,
-          unsignedStakingTx,
-          availableUTXOs,
-          paramVersion,
-        );
-
-      if (signedStakingTx.getId() !== expectedTxHashHex) {
-        const clientError = new ClientError(
-          ERROR_CODES.VALIDATION_ERROR,
-          `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
-        );
-        logger.error(clientError, {
-          data: {
-            expectedTxHashHex,
-            unsignedStakingTxHex,
+        stakingInput,
+        unsignedStakingTx,
+        availableUTXOs!,
+        0,
+        {
+          stakingTx: previousTx,
+          paramVersion: 0,
+          stakingInput: {
+            finalityProviderPksNoCoordHex: [
+              "2b48b92bb0191ffff18d7b339c079cf5863526b470ed847bcf5541dcfeacac5d",
+            ],
+            stakingAmountSat: 10000,
+            stakingTimelock: 60000,
           },
-        });
-        throw clientError;
-      }
-      await pushTx(signedStakingTx.toHex());
-      refetchUTXOs();
-    },
-    [
-      availableUTXOs,
-      createBtcStakingManager,
-      pushTx,
-      refetchUTXOs,
-      stakerInfo,
-      tipHeight,
-      logger,
-    ],
-  );
+        },
+        [
+          {
+            btcPkHex:
+              "a5c60c2188e833d39d0fa798ab3f69aa12ed3dd2f3bad659effa252782de3c31",
+            sigHex:
+              "8a2c233c9c01c8a90e607e861b078eb8f13a9598637f1b7ab75797acf27e22391397738f3914968732324cd161e05c77b47d5d18991347c35ed027c6c0f5c57b",
+          },
+          {
+            btcPkHex:
+              "ffeaec52a9b407b355ef6967a7ffc15fd6c3fe07de2844d61550475e7a5233e5",
+            sigHex:
+              "61d250b7a60643fc9f49e76ff1004ac10ae075d5d11d83f8acfe1a82e8a6d29d1ee2959a9df6ad7bf2ed958f991a14d7063204ad9d106337b70a302c93719be1",
+          },
+          {
+            btcPkHex:
+              "59d3532148a597a2d05c0395bf5f7176044b1cd312f37701a9b4d0aad70bc5a4",
+            sigHex:
+              "23e03657e377d5a85bacd6e15e7ee18ee3ca03b6b68c590e6d0e3223acfe52ce99d391e51f70e5d444c3d5d9996d0d1427ab1bb4922cba5d4138d1033b982de2",
+          },
+        ],
+      );
+    console.log("signedStakingTx.getId()");
+    console.log(signedStakingTx.getId());
+    // if (signedStakingTx.getId() !== expectedTxHashHex) {
+    //   const clientError = new ClientError(
+    //     ERROR_CODES.VALIDATION_ERROR,
+    //     `Staking transaction hash mismatch, expected ${expectedTxHashHex} but got ${signedStakingTx.getId()}`,
+    //   );
+    //   logger.error(clientError, {
+    //     data: {
+    //       expectedTxHashHex,
+    //       unsignedStakingTxHex,
+    //     },
+    //   });
+    //   throw clientError;
+    // }
+    await pushTx(signedStakingTx.toHex());
+    refetchUTXOs();
+  }, [
+    availableUTXOs,
+    createBtcStakingManager,
+    pushTx,
+    refetchUTXOs,
+    stakerInfo,
+  ]);
 
   /**
    * Submit the unbonding transaction

@@ -65,26 +65,37 @@ export function useStakingService() {
   );
 
   const createEOI = useCallback(
-    async ({ finalityProviders, amount, term, feeRate }: FormFields) => {
+    async ({ feeRate }: FormFields) => {
       try {
+        const newInput = {
+          fps: [
+            "2b48b92bb0191ffff18d7b339c079cf5863526b470ed847bcf5541dcfeacac5d",
+            "87f6994f25863ebf0717d1b8a76fa26b3625f17bcbdf6b06c167ab1dfac534e7",
+          ],
+          amount: 10000,
+          timelock: 60000,
+        };
+
         const eoiInput = {
-          finalityProviderPksNoCoordHex: finalityProviders || [],
-          stakingAmountSat: amount,
-          stakingTimelock: term,
-          feeRate: feeRate,
+          finalityProviderPksNoCoordHex: newInput.fps || [],
+          stakingAmountSat: newInput.amount,
+          stakingTimelock: newInput.timelock,
+          feeRate: feeRate + 1,
         };
         setProcessing(true);
+        console.log("@@@@@@@ before createDelegationEoi");
         const { stakingTxHash, signedBabylonTx } = await createDelegationEoi(
           eoiInput,
           feeRate,
         );
+        console.log("stakingTxHash", stakingTxHash);
 
         // Send the transaction
         goToStep(StakingStep.EOI_SEND_BBN);
         await sendBbnTx(signedBabylonTx);
 
         addDelegation({
-          stakingAmount: amount,
+          stakingAmount: newInput.amount,
           stakingTxHashHex: stakingTxHash,
           startHeight: 0,
           state: DelegationState.INTERMEDIATE_PENDING_VERIFICATION,
@@ -145,25 +156,9 @@ export function useStakingService() {
       try {
         setProcessing(true);
 
-        const {
-          finalityProviderBtcPksHex,
-          stakingAmount,
-          stakingTimelock,
-          paramsVersion,
-          stakingTxHashHex,
-          stakingTxHex,
-        } = delegation;
+        const { stakingTxHashHex } = delegation;
 
-        await submitStakingTx(
-          {
-            finalityProviderPksNoCoordHex: finalityProviderBtcPksHex,
-            stakingAmountSat: stakingAmount,
-            stakingTimelock,
-          },
-          paramsVersion,
-          stakingTxHashHex,
-          stakingTxHex,
-        );
+        await submitStakingTx();
         updateDelegationStatus(
           stakingTxHashHex,
           DelegationState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
