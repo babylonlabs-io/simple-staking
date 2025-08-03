@@ -4,6 +4,7 @@ export const mockSingleDelegationResponse = {
       finality_provider_btc_pks_hex: ["pk1", "pk2"],
       params_version: 1,
       staker_btc_pk_hex: "stakerPk",
+      can_expand: true,
       state: "ACTIVE",
       delegation_staking: {
         staking_tx_hex: "txHex123",
@@ -39,6 +40,7 @@ export const mockPaginatedResponse = {
         finality_provider_btc_pks_hex: ["pk1", "pk2"],
         params_version: 1,
         staker_btc_pk_hex: "stakerPk1",
+        can_expand: true,
         state: "ACTIVE",
         delegation_staking: {
           staking_tx_hex: "txHex1",
@@ -68,6 +70,7 @@ export const mockPaginatedResponse = {
         finality_provider_btc_pks_hex: ["pk3", "pk4"],
         params_version: 1,
         staker_btc_pk_hex: "stakerPk2",
+        can_expand: false,
         state: "TIMELOCK_UNBONDING",
         delegation_staking: {
           staking_tx_hex: "txHex2",

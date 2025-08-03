@@ -15,6 +15,7 @@ interface DelegationV2API {
   finality_provider_btc_pks_hex: string[];
   params_version: number;
   staker_btc_pk_hex: string;
+  can_expand?: boolean;
   delegation_staking: {
     staking_tx_hex: string;
     staking_tx_hash_hex: string;
@@ -43,7 +44,6 @@ interface DelegationV2API {
     };
   };
   state: string;
-  can_expand: boolean;
   previous_staking_tx_hash_hex?: string;
 }
 
@@ -116,9 +116,9 @@ const apiToDelegationV2 = (apiDelegation: DelegationV2API): DelegationV2 => {
     bbnInceptionHeight: apiDelegation.delegation_staking.bbn_inception_height,
     bbnInceptionTime: apiDelegation.delegation_staking.bbn_inception_time,
     state,
+    canExpand: apiDelegation.can_expand,
     unbondingTimelock: apiDelegation.delegation_unbonding.unbonding_timelock,
     unbondingTxHex: apiDelegation.delegation_unbonding.unbonding_tx,
-    canExpand: apiDelegation.can_expand,
     previousStakingTxHashHex: apiDelegation.previous_staking_tx_hash_hex,
     slashing: {
       stakingSlashingTxHex:

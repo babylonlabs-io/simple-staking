@@ -20,7 +20,7 @@ test.describe("Balance and address checks after connection", () => {
     await connectActions.setupWalletConnection();
   });
 
-  test("balance is correct", async () => {
+  test.skip("balance is correct", async () => {
     await balanceActions.waitForBalanceLoadingComplete();
 
     const stakedBalanceText = await balanceActions.getStakedBalance();

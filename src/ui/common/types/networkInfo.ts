@@ -9,6 +9,10 @@ export interface NetworkUpgradeConfig {
   pop?: PopUpgradeConfig[];
 }
 
+export interface AllowList {
+  isExpired: boolean;
+}
+
 export interface BbnStakingParamsVersion extends StakingParams {
   version: number;
   minCommissionRate: string;
@@ -37,8 +41,10 @@ export interface BtcEpochCheckParams {
   latestParam: BtcEpochCheckParamsVersion;
   versions: BtcEpochCheckParamsVersion[];
 }
+
 export interface StakingStatus {
   isStakingOpen: boolean;
+  allowList?: AllowList;
 }
 
 export interface Params {
