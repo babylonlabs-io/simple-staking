@@ -30,7 +30,7 @@ interface DelegationProps {
   intermediateState?: string;
 }
 
-const { coinSymbol, mempoolApiUrl } = getNetworkConfigBTC();
+const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
 
 interface FinalityProviderDisplayProps {
   fpName: string;
