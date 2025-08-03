@@ -116,7 +116,6 @@ const apiToDelegationV2 = (apiDelegation: DelegationV2API): DelegationV2 => {
     bbnInceptionHeight: apiDelegation.delegation_staking.bbn_inception_height,
     bbnInceptionTime: apiDelegation.delegation_staking.bbn_inception_time,
     state,
-    canExpand: apiDelegation.can_expand,
     unbondingTimelock: apiDelegation.delegation_unbonding.unbonding_timelock,
     unbondingTxHex: apiDelegation.delegation_unbonding.unbonding_tx,
     previousStakingTxHashHex: apiDelegation.previous_staking_tx_hash_hex,
