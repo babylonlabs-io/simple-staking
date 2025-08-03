@@ -30,7 +30,7 @@ interface DelegationProps {
   intermediateState?: string;
 }
 
-const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
+const { coinSymbol, mempoolApiUrl } = getNetworkConfigBTC();
 
 interface FinalityProviderDisplayProps {
   fpName: string;
@@ -60,7 +60,9 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
         }
         status="error"
       >
-        <span className="text-error-main">{fpName}</span>
+        <span className="text-error-main truncate" title={fpName}>
+          {fpName}
+        </span>
       </Hint>
     );
   }
@@ -82,12 +84,18 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
         }
         status="error"
       >
-        <span className="text-error-main">{fpName}</span>
+        <span className="text-error-main truncate" title={fpName}>
+          {fpName}
+        </span>
       </Hint>
     );
   }
 
-  return <>{fpName}</>;
+  return (
+    <span className="truncate" title={fpName}>
+      {fpName}
+    </span>
+  );
 };
 
 const DelegationState: React.FC<{
@@ -124,9 +132,9 @@ const DelegationState: React.FC<{
 
   const renderState = () => {
     if (isSlashed) {
-      return <span className="text-error-main">Slashed</span>;
+      return <span className="text-error-main text-xs">Slashed</span>;
     }
-    return getState(displayState);
+    return <span className="text-xs">{getState(displayState)}</span>;
   };
 
   return (
@@ -138,6 +146,32 @@ const DelegationState: React.FC<{
     </Hint>
   );
 };
+
+function compactDuration(full: string) {
+  const parts = full.replace(/ ago$/, "").split(" ");
+  const compactParts: string[] = [];
+  for (let i = 0; i < parts.length; i += 2) {
+    const value = parts[i];
+    const unit = parts[i + 1] ?? "";
+    const abbr = unit.startsWith("year")
+      ? "y"
+      : unit.startsWith("month")
+        ? "mo"
+        : unit.startsWith("week")
+          ? "w"
+          : unit.startsWith("day")
+            ? "d"
+            : unit.startsWith("hour")
+              ? "h"
+              : unit.startsWith("minute")
+                ? "m"
+                : unit.startsWith("second")
+                  ? "s"
+                  : unit;
+    compactParts.push(`${value}${abbr}`);
+  }
+  return compactParts.join(" ") + " ago";
+}
 
 export const Delegation: React.FC<DelegationProps> = ({
   currentTime,
@@ -179,10 +213,19 @@ export const Delegation: React.FC<DelegationProps> = ({
     <>
       <tr className="bg-surface odd:bg-secondary-highlight text-sm text-accent-primary">
         <DelegationCell>
-          {durationTillNow(startTimestamp, currentTime)}
+          <div className="flex flex-col">
+            <span>
+              {compactDuration(durationTillNow(startTimestamp, currentTime))}
+            </span>
+            <DelegationState
+              displayState={displayState}
+              isSlashed={isSlashed}
+              isFPResgistered={isFpRegistered}
+            />
+          </div>
         </DelegationCell>
 
-        <DelegationCell>
+        <DelegationCell className="max-w-[12rem] truncate">
           <FinalityProviderDisplay
             fpName={fpName}
             isSlashed={isSlashed}
@@ -190,11 +233,11 @@ export const Delegation: React.FC<DelegationProps> = ({
           />
         </DelegationCell>
 
-        <DelegationCell>
+        <DelegationCell className="min-w-[8rem]">
           <div className="flex gap-1 items-center">
             <FaBitcoin className="text-primary" />
             <p>
-              {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}
+              {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinSymbol}
             </p>
           </div>
         </DelegationCell>
@@ -208,17 +251,6 @@ export const Delegation: React.FC<DelegationProps> = ({
           >
             {trim(stakingTxHashHex)}
           </a>
-        </DelegationCell>
-        {/*
-          we need to center the text without the tooltip
-          add its size 12px and gap 4px, 16/2 = 8px
-          */}
-        <DelegationCell>
-          <DelegationState
-            displayState={displayState}
-            isSlashed={isSlashed}
-            isFPResgistered={isFpRegistered}
-          />
         </DelegationCell>
 
         <DelegationCell>
