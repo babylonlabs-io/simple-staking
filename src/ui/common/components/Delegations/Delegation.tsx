@@ -30,7 +30,7 @@ interface DelegationProps {
   intermediateState?: string;
 }
 
-const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
+const { coinSymbol, mempoolApiUrl } = getNetworkConfigBTC();
 
 interface FinalityProviderDisplayProps {
   fpName: string;
@@ -101,10 +101,10 @@ const FinalityProviderDisplay: React.FC<FinalityProviderDisplayProps> = ({
 const DelegationState: React.FC<{
   displayState: string;
   isSlashed: boolean;
-  isFPResgistered: boolean;
-}> = ({ displayState, isSlashed, isFPResgistered }) => {
+  isFPRegistered: boolean;
+}> = ({ displayState, isSlashed, isFPRegistered }) => {
   const renderStateTooltip = () => {
-    if (!isFPResgistered) {
+    if (!isFPRegistered) {
       return "Your Finality Provider is not registered on Babylon Genesis. You need to wait for their registration to become eligible to register your stake to Babylon Genesis";
     }
 
