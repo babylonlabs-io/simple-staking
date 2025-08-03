@@ -9,6 +9,7 @@ interface ExpansionButtonProps {
   counter?: string;
   onClick: () => void;
   className?: string;
+  disabled?: boolean;
 }
 
 export function ExpansionButton({
@@ -17,11 +18,17 @@ export function ExpansionButton({
   counter,
   onClick,
   className = "",
+  disabled = false,
 }: ExpansionButtonProps) {
   return (
     <button
-      className={twMerge("border-0 btn btn-ghost", className)}
+      className={twMerge(
+        "border-0 btn btn-ghost",
+        disabled && "opacity-50 cursor-not-allowed",
+        className,
+      )}
       onClick={onClick}
+      disabled={disabled}
     >
       <div className="flex items-center justify-between w-full gap-4">
         <ThemedIcon
