@@ -220,7 +220,7 @@ export const Delegation: React.FC<DelegationProps> = ({
             <DelegationState
               displayState={displayState}
               isSlashed={isSlashed}
-              isFPResgistered={isFpRegistered}
+              isFPRegistered={isFpRegistered}
             />
           </div>
         </DelegationCell>
