@@ -36,14 +36,14 @@ export function Rewards() {
   const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
     getNetworkConfigBBN();
 
-  const MOCK_REWARD_UBBN = 1000000; // 1 BABY for testing purposes
-
-  const effectiveRewardBalance = rewardBalance || MOCK_REWARD_UBBN;
+  const effectiveRewardBalance = rewardBalance;
 
   const rewards = [] as any[];
 
   // BABY / tBABY reward
-  const formattedRewardBaby = ubbnToBaby(effectiveRewardBalance).toString();
+  const formattedRewardBaby = effectiveRewardBalance
+    ? ubbnToBaby(effectiveRewardBalance).toString()
+    : "0";
   const babyIcon = /BABY$/i.test(bbnCoinSymbol)
     ? babyTokenIcon
     : generatePlaceholder(bbnCoinSymbol.charAt(0));
@@ -68,7 +68,7 @@ export function Rewards() {
 
   const handleClick = async () => {
     if (!effectiveRewardBalance || processing) return;
-    await showPreview(); // estimates fee and sets transactionFee in state
+    await showPreview();
     setPreviewOpen(true);
   };
 
