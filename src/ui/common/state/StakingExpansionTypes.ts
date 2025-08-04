@@ -1,10 +1,12 @@
 import type { EventData } from "@babylonlabs-io/btc-staking-ts";
 
 import { BaseStakingStep, EOIStep } from "@/ui/common/constants";
+import type { Bsn } from "@/ui/common/types/bsn";
 import type {
   DelegationV2,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
+import type { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
 /**
  * Enum representing the different steps in the staking expansion workflow.
@@ -92,3 +94,51 @@ export interface StakingExpansionState {
   /** Check if expansion is possible for a given delegation */
   canExpand: (delegation: { finalityProviderBtcPksHex: string[] }) => boolean;
 }
+
+/**
+ * Extended BSN interface for expansion mode that includes status information
+ */
+export interface BsnWithStatus extends Bsn {
+  /** Whether this BSN already has a finality provider in the original delegation */
+  isExisting: boolean;
+  /** Whether this BSN has been selected for the current expansion */
+  isSelected: boolean;
+  /** The finality provider public key hex associated with this BSN */
+  fpPkHex?: string;
+}
+
+/**
+ * Display data structure for BSNs in expansion modal
+ */
+export interface ExpansionBsnDisplay {
+  babylon: BsnWithStatus | null;
+  external: BsnWithStatus[];
+}
+
+/**
+ * Helper function to get finality provider information for a BSN
+ */
+export interface BsnFinalityProviderInfo {
+  fpPkHex?: string;
+  provider?: FinalityProvider;
+  title: string;
+  isDisabled: boolean;
+  isExisting: boolean;
+}
+
+/**
+ * Validation helper for StakingExpansionFormData
+ */
+export const validateExpansionFormData = (
+  data: Partial<StakingExpansionFormData>,
+): data is StakingExpansionFormData => {
+  return !!(
+    data.originalDelegation &&
+    data.selectedBsnFps &&
+    Object.keys(data.selectedBsnFps).length > 0 &&
+    data.feeRate &&
+    data.feeRate > 0 &&
+    data.stakingTimelock &&
+    data.stakingTimelock > 0
+  );
+};

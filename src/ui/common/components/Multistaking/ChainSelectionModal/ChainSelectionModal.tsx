@@ -5,7 +5,7 @@ import {
   DialogHeader,
   FinalityProviderItem,
 } from "@babylonlabs-io/core-ui";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
@@ -13,6 +13,11 @@ import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
+import type {
+  BsnFinalityProviderInfo,
+  BsnWithStatus,
+  ExpansionBsnDisplay,
+} from "@/ui/common/state/StakingExpansionTypes";
 import { Bsn } from "@/ui/common/types/bsn";
 import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
@@ -47,6 +52,7 @@ interface ChainButtonProps {
   title?: string | JSX.Element;
   onSelectFp?: () => void;
   onRemove?: (bsnId: string) => void;
+  isExisting?: boolean;
 }
 
 const ChainButton = ({
@@ -58,6 +64,7 @@ const ChainButton = ({
   logoUrl,
   onSelectFp,
   onRemove,
+  isExisting = false,
 }: ChainButtonProps) => (
   <div
     className={twMerge(
@@ -74,7 +81,7 @@ const ChainButton = ({
             bsnId={bsnId || ""}
             bsnName={bsnName || ""}
             provider={provider}
-            onRemove={() => onRemove?.(bsnId || "")}
+            onRemove={isExisting ? undefined : () => onRemove?.(bsnId || "")}
           />
         </div>
       ) : (
@@ -108,11 +115,15 @@ interface ChainSelectionModalProps {
   loading?: boolean;
   activeBsnId?: string;
   selectedBsns?: Record<string, string>;
+  existingBsns?: Record<string, string>;
   bsns?: Bsn[];
   onNext: () => void;
   onClose: () => void;
   onSelect: (bsnId: string) => void;
   onRemove: (bsnId: string) => void;
+  isExpansionMode?: boolean;
+  onExpand?: () => void;
+  expandLoading?: boolean;
 }
 
 export const ChainSelectionModal = ({
@@ -120,10 +131,14 @@ export const ChainSelectionModal = ({
   open,
   loading,
   selectedBsns = {},
+  existingBsns = {},
   onSelect,
   onNext,
   onClose,
   onRemove,
+  isExpansionMode = false,
+  onExpand,
+  expandLoading = false,
 }: ChainSelectionModalProps) => {
   const babylonBsn = useMemo(
     () => bsns.find((bsn) => bsn.id === BSN_ID),
@@ -140,11 +155,116 @@ export const ChainSelectionModal = ({
     ? Boolean(selectedBsns[babylonBsn.id])
     : false;
 
+  // Helper function to create display BSN data
+  const createDisplayBsns = useCallback((): ExpansionBsnDisplay => {
+    if (!isExpansionMode) {
+      const babylonWithStatus: BsnWithStatus | null = babylonBsn
+        ? {
+            ...babylonBsn,
+            isExisting: false,
+            isSelected: Boolean(selectedBsns[babylonBsn.id]),
+            fpPkHex: selectedBsns[babylonBsn.id],
+          }
+        : null;
+
+      const externalWithStatus: BsnWithStatus[] = externalBsns.map((bsn) => ({
+        ...bsn,
+        isExisting: false,
+        isSelected: Boolean(selectedBsns[bsn.id]),
+        fpPkHex: selectedBsns[bsn.id],
+      }));
+
+      return { babylon: babylonWithStatus, external: externalWithStatus };
+    }
+
+    const babylonWithStatus: BsnWithStatus | null = babylonBsn
+      ? {
+          ...babylonBsn,
+          isExisting: Boolean(existingBsns?.[babylonBsn.id]),
+          isSelected: Boolean(selectedBsns?.[babylonBsn.id]),
+          fpPkHex:
+            existingBsns?.[babylonBsn.id] || selectedBsns?.[babylonBsn.id],
+        }
+      : null;
+
+    const externalWithStatus: BsnWithStatus[] = bsns
+      .filter((bsn) => bsn.id !== BSN_ID)
+      .map((bsn) => ({
+        ...bsn,
+        isExisting: Boolean(existingBsns?.[bsn.id]),
+        isSelected: Boolean(selectedBsns?.[bsn.id]),
+        fpPkHex: existingBsns?.[bsn.id] || selectedBsns?.[bsn.id],
+      }))
+      .sort((a, b) => {
+        if (a.isExisting && !b.isExisting) return -1;
+        if (!a.isExisting && b.isExisting) return 1;
+        return 0;
+      });
+
+    return { babylon: babylonWithStatus, external: externalWithStatus };
+  }, [
+    isExpansionMode,
+    babylonBsn,
+    externalBsns,
+    existingBsns,
+    selectedBsns,
+    bsns,
+  ]);
+
+  // Helper function to get finality provider info for a BSN
+  const getBsnFinalityProviderInfo = useCallback(
+    (bsn: Bsn | BsnWithStatus): BsnFinalityProviderInfo => {
+      const fpPkHex = isExpansionMode
+        ? (bsn as BsnWithStatus)?.fpPkHex
+        : selectedBsns[bsn.id];
+
+      const provider = fpPkHex ? finalityProviderMap.get(fpPkHex) : undefined;
+      const title = fpPkHex
+        ? (getFinalityProviderName(fpPkHex) ?? bsn.name)
+        : bsn.name;
+
+      const isExisting = isExpansionMode
+        ? !!(bsn as BsnWithStatus)?.isExisting
+        : false;
+
+      const isDisabled = isExpansionMode
+        ? isExisting
+        : bsn.id === BSN_ID
+          ? false // Babylon BSN is never disabled in regular staking
+          : !isBabylonSelected; // External BSNs are disabled until Babylon is selected
+
+      return {
+        fpPkHex,
+        provider,
+        title,
+        isDisabled,
+        isExisting,
+      };
+    },
+    [
+      isExpansionMode,
+      selectedBsns,
+      finalityProviderMap,
+      getFinalityProviderName,
+      isBabylonSelected,
+    ],
+  );
+
+  // Create comprehensive BSN display list for expansion mode
+  const displayBsns = useMemo(() => createDisplayBsns(), [createDisplayBsns]);
+
   // Helper: when user clicks "Select FP" on a chain, choose it and advance.
-  const handleSelectFp = (bsnId: string) => {
-    onSelect(bsnId);
-    onNext();
-  };
+  const handleSelectFp = useCallback(
+    (bsnId: string) => {
+      // Prevent selecting BSNs that already have FPs in expansion mode
+      if (isExpansionMode && (existingBsns?.[bsnId] || selectedBsns?.[bsnId])) {
+        return;
+      }
+      onSelect(bsnId);
+      onNext();
+    },
+    [isExpansionMode, existingBsns, selectedBsns, onSelect, onNext],
+  );
 
   return (
     <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
@@ -164,50 +284,49 @@ export const ChainSelectionModal = ({
           style={{ maxHeight: "min(60vh, 500px)" }}
         >
           {loading && <div>Loading...</div>}
-          {babylonBsn && (
-            <ChainButton
-              provider={
-                selectedBsns[babylonBsn.id]
-                  ? finalityProviderMap.get(selectedBsns[babylonBsn.id])
-                  : undefined
-              }
-              bsnName={babylonBsn.name}
-              bsnId={babylonBsn.id}
-              logoUrl={chainLogos.babylon}
-              title={
-                selectedBsns[babylonBsn.id]
-                  ? (getFinalityProviderName(selectedBsns[babylonBsn.id]) ??
-                    babylonBsn.name)
-                  : babylonBsn.name
-              }
-              disabled={false}
-              onSelectFp={() => handleSelectFp(babylonBsn.id)}
-              onRemove={() => onRemove(babylonBsn.id)}
-            />
-          )}
-          {externalBsns.map((bsn) => (
-            <ChainButton
-              key={bsn.id}
-              provider={
-                selectedBsns[bsn.id]
-                  ? finalityProviderMap.get(selectedBsns[bsn.id])
-                  : undefined
-              }
-              bsnName={bsn.name}
-              bsnId={bsn.id}
-              logoUrl={chainLogos[bsn.id] || chainLogos.placeholder}
-              title={
-                selectedBsns[bsn.id]
-                  ? (getFinalityProviderName(selectedBsns[bsn.id]) ?? bsn.name)
-                  : bsn.name
-              }
-              disabled={!selectedBsns[bsn.id] && !isBabylonSelected}
-              onSelectFp={() => handleSelectFp(bsn.id)}
-              onRemove={() => onRemove(bsn.id)}
-            />
-          ))}
+          {!loading &&
+            displayBsns.babylon &&
+            (() => {
+              const bsnInfo = getBsnFinalityProviderInfo(displayBsns.babylon);
+              return (
+                <ChainButton
+                  provider={bsnInfo.provider}
+                  bsnName={displayBsns.babylon.name}
+                  bsnId={displayBsns.babylon.id}
+                  logoUrl={chainLogos.babylon}
+                  title={bsnInfo.title}
+                  disabled={bsnInfo.isDisabled}
+                  isExisting={bsnInfo.isExisting}
+                  onSelectFp={() =>
+                    displayBsns.babylon &&
+                    handleSelectFp(displayBsns.babylon.id)
+                  }
+                  onRemove={() =>
+                    displayBsns.babylon && onRemove(displayBsns.babylon.id)
+                  }
+                />
+              );
+            })()}
+          {!loading &&
+            displayBsns.external.map((bsn) => {
+              const bsnInfo = getBsnFinalityProviderInfo(bsn);
+              return (
+                <ChainButton
+                  key={bsn.id}
+                  provider={bsnInfo.provider}
+                  bsnName={bsn.name}
+                  bsnId={bsn.id}
+                  logoUrl={chainLogos[bsn.id] || chainLogos.placeholder}
+                  title={bsnInfo.title}
+                  disabled={bsnInfo.isDisabled}
+                  isExisting={bsnInfo.isExisting}
+                  onSelectFp={() => handleSelectFp(bsn.id)}
+                  onRemove={() => onRemove(bsn.id)}
+                />
+              );
+            })}
         </div>
-        {!isBabylonSelected && (
+        {!isBabylonSelected && !isExpansionMode && (
           <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
             <div>
               <MdOutlineInfo size={22} />
@@ -220,10 +339,31 @@ export const ChainSelectionModal = ({
         )}
       </DialogBody>
 
-      <DialogFooter className="flex justify-end">
-        <Button variant="contained" onClick={onClose}>
-          Done
+      <DialogFooter className="flex justify-between">
+        <Button variant="outlined" onClick={onClose}>
+          Cancel
         </Button>
+        <div className="flex gap-2">
+          {isExpansionMode &&
+            Object.keys(selectedBsns).length > 0 &&
+            onExpand && (
+              <Button
+                variant="contained"
+                onClick={onExpand}
+                disabled={expandLoading}
+              >
+                {expandLoading ? "Calculating..." : "Expand"}
+              </Button>
+            )}
+          {!isExpansionMode && (
+            <Button
+              variant="contained"
+              onClick={Object.keys(selectedBsns).length > 0 ? onClose : onNext}
+            >
+              Done
+            </Button>
+          )}
+        </div>
       </DialogFooter>
     </ResponsiveDialog>
   );
