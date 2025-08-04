@@ -16,7 +16,13 @@ import { array, number, object, ObjectSchema, string } from "yup";
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
 import { getDisabledWallets, IS_FIXED_TERM_FIELD } from "@/ui/common/config";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import {
+  BaseStakingStep,
+  EOIStep,
+  STAKING_DISABLED,
+} from "@/ui/common/constants";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useNetworkFees } from "@/ui/common/hooks/client/api/useNetworkFees";
 import { useEventBus } from "@/ui/common/hooks/useEventBus";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
@@ -29,9 +35,6 @@ import {
   formatStakingAmount,
 } from "@/ui/common/utils/formTransforms";
 import { getFeeRateFromMempool } from "@/ui/common/utils/getFeeRateFromMempool";
-
-import { STAKING_DISABLED } from "../constants";
-import { useCosmosWallet } from "../context/wallet/CosmosWalletProvider";
 
 import { useBalanceState } from "./BalanceState";
 
@@ -52,16 +55,19 @@ export interface FormFields {
 }
 
 export enum StakingStep {
-  PREVIEW = "preview",
-  EOI_STAKING_SLASHING = "eoi-staking-slashing",
-  EOI_UNBONDING_SLASHING = "eoi-unbonding-slashing",
-  EOI_PROOF_OF_POSSESSION = "eoi-proof-of-possession",
-  EOI_SIGN_BBN = "eoi-sign-bbn",
-  EOI_SEND_BBN = "eoi-send-bbn",
-  VERIFYING = "verifying",
-  VERIFIED = "verified",
-  FEEDBACK_SUCCESS = "feedback-success",
-  FEEDBACK_CANCEL = "feedback-cancel",
+  /** Base workflow steps - reuse shared base steps */
+  PREVIEW = BaseStakingStep.PREVIEW,
+  /** EOI signing steps - reuse shared EOI steps */
+  EOI_STAKING_SLASHING = EOIStep.EOI_STAKING_SLASHING,
+  EOI_UNBONDING_SLASHING = EOIStep.EOI_UNBONDING_SLASHING,
+  EOI_PROOF_OF_POSSESSION = EOIStep.EOI_PROOF_OF_POSSESSION,
+  EOI_SIGN_BBN = EOIStep.EOI_SIGN_BBN,
+  EOI_SEND_BBN = EOIStep.EOI_SEND_BBN,
+  /** Final steps */
+  VERIFYING = BaseStakingStep.VERIFYING,
+  VERIFIED = BaseStakingStep.VERIFIED,
+  FEEDBACK_SUCCESS = BaseStakingStep.FEEDBACK_SUCCESS,
+  FEEDBACK_CANCEL = BaseStakingStep.FEEDBACK_CANCEL,
 }
 
 export interface StakingState {
