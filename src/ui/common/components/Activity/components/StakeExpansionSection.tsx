@@ -21,15 +21,14 @@ interface StakeExpansionSectionProps {
 export function StakeExpansionSection({
   delegation,
 }: StakeExpansionSectionProps) {
-  const { goToStep, setFormData, processing, maxFinalityProviders } =
+  const { goToStep, setFormData, processing, maxFinalityProviders, canExpand } =
     useStakingExpansionState();
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
-  const availableSlots = maxFinalityProviders - currentBsnCount;
-  const canExpand = availableSlots > 0;
+  const canExpandDelegation = canExpand(delegation);
 
   const handleAddBsnFp = () => {
-    if (!canExpand) {
+    if (!canExpandDelegation) {
       console.warn("Cannot expand: maximum BSN count reached");
       return;
     }
@@ -89,7 +88,7 @@ export function StakeExpansionSection({
               text="Add BSNs and Finality Providers"
               counter={`${currentBsnCount}/${maxFinalityProviders}`}
               onClick={handleAddBsnFp}
-              disabled={!canExpand || processing}
+              disabled={!canExpandDelegation || processing}
             />
             <ExpansionButton
               Icon={iconHistory}

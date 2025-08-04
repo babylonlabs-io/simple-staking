@@ -1,6 +1,7 @@
 import { EventData } from "@babylonlabs-io/btc-staking-ts";
 import { useCallback, useState, type PropsWithChildren } from "react";
 
+import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import type { DelegationV2 } from "@/ui/common/types/delegationsV2";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
@@ -11,8 +12,6 @@ import {
   type StakingExpansionFormData,
   type StakingExpansionState,
 } from "./StakingExpansionTypes";
-
-const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
 
 const { StateProvider, useState: useStakingExpansionState } =
   createStateUtils<StakingExpansionState>({
@@ -30,9 +29,9 @@ const { StateProvider, useState: useStakingExpansionState } =
     expansionStepOptions: undefined,
     setExpansionStepOptions: () => {},
     maxFinalityProviders: DEFAULT_MAX_FINALITY_PROVIDERS,
-    getCurrentBsnCount: () => 0,
     getAvailableBsnSlots: () => 0,
     canAddMoreBsns: () => false,
+    canExpand: () => false,
   });
 
 /**
@@ -83,23 +82,14 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   }, []);
 
   /**
-   * Calculate current BSN count from the original delegation.
-   */
-  const getCurrentBsnCount = useCallback(() => {
-    if (!formData?.originalDelegation) return 0;
-    const fpCount =
-      formData.originalDelegation.finalityProviderBtcPksHex?.length || 0;
-    return fpCount;
-  }, [formData]);
-
-  /**
    * Calculate available BSN slots based on network parameter maxFinalityProviders and current count.
    */
   const getAvailableBsnSlots = useCallback(() => {
-    const currentCount = getCurrentBsnCount();
+    const currentCount =
+      formData?.originalDelegation?.finalityProviderBtcPksHex?.length || 0;
     const availableSlots = maxFinalityProviders - currentCount;
     return Math.max(0, availableSlots); // Ensure we never return negative values
-  }, [getCurrentBsnCount, maxFinalityProviders]);
+  }, [formData, maxFinalityProviders]);
 
   /**
    * Check if more BSNs can be added to the delegation.
@@ -107,6 +97,19 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   const canAddMoreBsns = useCallback(() => {
     return getAvailableBsnSlots() > 0;
   }, [getAvailableBsnSlots]);
+
+  /**
+   * Check if expansion is possible for a given delegation.
+   * @param delegation - The delegation to check expansion for
+   */
+  const canExpand = useCallback(
+    (delegation: { finalityProviderBtcPksHex: string[] }) => {
+      const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
+      const availableSlots = maxFinalityProviders - currentBsnCount;
+      return availableSlots > 0;
+    },
+    [maxFinalityProviders],
+  );
 
   const state: StakingExpansionState = {
     hasError,
@@ -123,9 +126,9 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     expansionStepOptions,
     setExpansionStepOptions,
     maxFinalityProviders,
-    getCurrentBsnCount,
     getAvailableBsnSlots,
     canAddMoreBsns,
+    canExpand,
   };
 
   return <StateProvider value={state}>{children}</StateProvider>;

@@ -615,11 +615,6 @@ export const useTransactionService = () => {
         stakingExpansionInput.previousStakingTxHex,
       );
 
-      logger.info("Transaction parsing completed", {
-        unsignedTxId: unsignedStakingExpansionTx.getId(),
-        previousTxId: previousStakingTx.getId(),
-      });
-
       // Create signed transaction using btc-staking-ts
       const signedStakingExpansionTx =
         await btcStakingManager!.createSignedBtcStakingExpansionTransaction(
@@ -664,9 +659,20 @@ export const useTransactionService = () => {
         throw clientError;
       }
 
-      logger.info("Broadcasting signed staking expansion transaction", {
-        txHashHex: actualTxHashHex,
-      });
+      const logContext: Record<string, string> = {
+        txHashHex: signedStakingExpansionTx.getId(),
+      };
+
+      if (stakingExpansionInput.previousStakingTxHex) {
+        logContext.previousStakingTxHashHex = Transaction.fromHex(
+          stakingExpansionInput.previousStakingTxHex,
+        ).getId();
+      }
+
+      logger.info(
+        "Broadcasting signed staking expansion transaction",
+        logContext,
+      );
 
       await pushTx(signedStakingExpansionTx.toHex());
       refetchUTXOs();

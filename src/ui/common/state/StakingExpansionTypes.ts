@@ -1,5 +1,6 @@
 import type { EventData } from "@babylonlabs-io/btc-staking-ts";
 
+import { BaseStakingStep, EOIStep } from "@/ui/common/constants";
 import type {
   DelegationV2,
   DelegationWithFP,
@@ -7,24 +8,24 @@ import type {
 
 /**
  * Enum representing the different steps in the staking expansion workflow.
+ * Extends shared EOI steps to avoid code duplication.
  */
 export enum StakingExpansionStep {
-  /** Initial step for selecting BSN and Finality Provider pairs */
+  /** Initial step for selecting BSN and Finality Provider pairs - unique to expansion */
   BSN_FP_SELECTION = "bsn-fp-selection",
-  /** Preview step showing expansion details before signing */
-  PREVIEW = "preview",
-  /** EOI signing steps - these follow the same pattern as regular staking */
-  EOI_STAKING_SLASHING = "eoi-staking-slashing",
-  EOI_UNBONDING_SLASHING = "eoi-unbonding-slashing",
-  EOI_PROOF_OF_POSSESSION = "eoi-proof-of-possession",
-  EOI_SIGN_BBN = "eoi-sign-bbn",
-  EOI_SEND_BBN = "eoi-send-bbn",
-  /** Verification and completion steps */
-  VERIFYING = "verifying",
-  VERIFIED = "verified",
-  /** Feedback steps for user experience */
-  FEEDBACK_SUCCESS = "feedback-success",
-  FEEDBACK_CANCEL = "feedback-cancel",
+  /** Base workflow steps - reuse shared base steps */
+  PREVIEW = BaseStakingStep.PREVIEW,
+  /** EOI signing steps - reuse shared EOI steps */
+  EOI_STAKING_SLASHING = EOIStep.EOI_STAKING_SLASHING,
+  EOI_UNBONDING_SLASHING = EOIStep.EOI_UNBONDING_SLASHING,
+  EOI_PROOF_OF_POSSESSION = EOIStep.EOI_PROOF_OF_POSSESSION,
+  EOI_SIGN_BBN = EOIStep.EOI_SIGN_BBN,
+  EOI_SEND_BBN = EOIStep.EOI_SEND_BBN,
+  /** Final steps */
+  VERIFYING = BaseStakingStep.VERIFYING,
+  VERIFIED = BaseStakingStep.VERIFIED,
+  FEEDBACK_SUCCESS = BaseStakingStep.FEEDBACK_SUCCESS,
+  FEEDBACK_CANCEL = BaseStakingStep.FEEDBACK_CANCEL,
 }
 
 /**
@@ -84,27 +85,10 @@ export interface StakingExpansionState {
   maxFinalityProviders: number;
 
   // Helper methods for BSN management
-  /** Get current count of BSNs in the original delegation */
-  getCurrentBsnCount: () => number;
   /** Get number of available BSN slots based on network parameters */
   getAvailableBsnSlots: () => number;
   /** Check if more BSNs can be added */
   canAddMoreBsns: () => boolean;
+  /** Check if expansion is possible for a given delegation */
+  canExpand: (delegation: { finalityProviderBtcPksHex: string[] }) => boolean;
 }
-
-/**
- * Validation helper for StakingExpansionFormData
- */
-export const validateExpansionFormData = (
-  data: Partial<StakingExpansionFormData>,
-): data is StakingExpansionFormData => {
-  return !!(
-    data.originalDelegation &&
-    data.selectedBsnFps &&
-    Object.keys(data.selectedBsnFps).length > 0 &&
-    data.feeRate &&
-    data.feeRate > 0 &&
-    data.stakingTimelock &&
-    data.stakingTimelock > 0
-  );
-};
