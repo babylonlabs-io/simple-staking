@@ -33,6 +33,7 @@ import {
   ActivityListItemData,
 } from "../../ActivityCard/ActivityCard";
 import { DelegationModal } from "../../Delegations/DelegationList/components/DelegationModal";
+import { StakingExpansionModalSystem } from "../../StakingExpansion/StakingExpansionModalSystem";
 
 const networkConfig = getNetworkConfig();
 const { coinName } = getNetworkConfigBTC();
@@ -338,6 +339,8 @@ export function ActivityList() {
         onClose={closeConfirmationModal}
         networkConfig={networkConfig}
       />
+
+      <StakingExpansionModalSystem />
     </>
   );
 }
