@@ -145,13 +145,23 @@ export const ChainSelectionModal = ({
       </DialogBody>
 
       <DialogFooter className="flex justify-end">
-        <Button
-          variant="contained"
-          onClick={onNext}
-          disabled={activeBsnId === undefined}
-        >
-          Next
-        </Button>
+        {activeBsnId && selectedBsns[activeBsnId] ? (
+          <Button
+            variant="contained"
+            onClick={onClose}
+            disabled={activeBsnId === undefined}
+          >
+            Done
+          </Button>
+        ) : (
+          <Button
+            variant="contained"
+            onClick={onNext}
+            disabled={activeBsnId === undefined}
+          >
+            Next
+          </Button>
+        )}
       </DialogFooter>
     </ResponsiveDialog>
   );
