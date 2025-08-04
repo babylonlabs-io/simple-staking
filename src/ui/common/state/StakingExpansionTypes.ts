@@ -1,9 +1,11 @@
 import type { EventData } from "@babylonlabs-io/btc-staking-ts";
 
+import type { Bsn } from "@/ui/common/types/bsn";
 import type {
   DelegationV2,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
+import type { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
 /**
  * Enum representing the different steps in the staking expansion workflow.
@@ -90,6 +92,37 @@ export interface StakingExpansionState {
   getAvailableBsnSlots: () => number;
   /** Check if more BSNs can be added */
   canAddMoreBsns: () => boolean;
+}
+
+/**
+ * Extended BSN interface for expansion mode that includes status information
+ */
+export interface BsnWithStatus extends Bsn {
+  /** Whether this BSN already has a finality provider in the original delegation */
+  isExisting: boolean;
+  /** Whether this BSN has been selected for the current expansion */
+  isSelected: boolean;
+  /** The finality provider public key hex associated with this BSN */
+  fpPkHex?: string;
+}
+
+/**
+ * Display data structure for BSNs in expansion modal
+ */
+export interface ExpansionBsnDisplay {
+  babylon: BsnWithStatus | null;
+  external: BsnWithStatus[];
+}
+
+/**
+ * Helper function to get finality provider information for a BSN
+ */
+export interface BsnFinalityProviderInfo {
+  fpPkHex?: string;
+  provider?: FinalityProvider;
+  title: string;
+  isDisabled: boolean;
+  isExisting: boolean;
 }
 
 /**
