@@ -372,31 +372,28 @@ export const Delegations = () => {
           </Heading>
 
           <InfiniteScroll
-            className="no-scrollbar max-h-[25rem] overflow-auto"
+            className="no-scrollbar max-h-[25rem] overflow-y-auto overflow-x-hidden"
             dataLength={combinedDelegationsData.length}
             next={fetchMoreDelegations}
             hasMore={hasMoreDelegations}
             loader={isLoading ? <LoadingTableList /> : null}
           >
-            <table className="w-full min-w-[1000px]">
+            <table className="w-full">
               <thead className="sticky top-0 bg-surface">
                 <tr className="text-accent-secondary text-xs">
-                  <th className="text-left h-[52px] md:min-w-52 px-4 whitespace-nowrap font-normal">
+                  <th className="text-left h-[52px] px-2 font-normal">
                     Inception
                   </th>
-                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  <th className="text-left h-[52px] px-2 font-normal max-w-[12rem] truncate">
                     Finality Provider
                   </th>
-                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  <th className="text-left h-[52px] px-2 font-normal min-w-[8rem]">
                     Amount
                   </th>
-                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  <th className="text-left h-[52px] px-2 font-normal">
                     Transaction ID
                   </th>
-                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
-                    Status
-                  </th>
-                  <th className="text-left h-[52px] px-4 whitespace-nowrap font-normal">
+                  <th className="text-left h-[52px] px-2 font-normal">
                     Action
                   </th>
                 </tr>
