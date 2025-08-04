@@ -61,6 +61,53 @@ const handleExpansionError = (error: unknown, context: string): Error => {
 };
 
 /**
+ * Combines existing finality providers with newly selected BSN+FP pairs.
+ */
+const combineProviders = (
+  existingProviders: string[],
+  selectedBsnFps: Record<string, string>,
+): string[] => {
+  const newProviders = Object.values(selectedBsnFps);
+  return [...existingProviders, ...newProviders];
+};
+
+/**
+ * Fetches and validates transaction hex from mempool API.
+ */
+const fetchAndValidateTxHex = async (
+  stakingTxHashHex: string,
+): Promise<string> => {
+  const txHex = await getTxHex(stakingTxHashHex);
+
+  if (!txHex || typeof txHex !== "string" || txHex.length === 0) {
+    throw new Error(`Failed to fetch transaction hex for ${stakingTxHashHex}`);
+  }
+
+  return txHex;
+};
+
+/**
+ * Builds the standardized expansion input object for transaction operations.
+ */
+const buildExpansionInput = (
+  formData: StakingExpansionFormData,
+  allProviders: string[],
+  previousStakingTxHex: string,
+): BtcStakingExpansionInputs => ({
+  finalityProviderPksNoCoordHex: allProviders,
+  stakingAmountSat: formData.originalDelegation.stakingAmount,
+  stakingTimelock: formData.stakingTimelock,
+  previousStakingTxHex,
+  previousStakingParamsVersion: formData.originalDelegation.paramsVersion,
+  previousStakingInput: {
+    finalityProviderPksNoCoordHex:
+      formData.originalDelegation.finalityProviderBtcPksHex,
+    stakingAmountSat: formData.originalDelegation.stakingAmount,
+    stakingTimelock: formData.originalDelegation.stakingTimelock,
+  },
+});
+
+/**
  * Hook providing staking expansion services and business logic.
  * Handles the complete expansion workflow from fee calculation to transaction submission.
  */
@@ -92,41 +139,22 @@ export function useStakingExpansionService() {
       }
 
       try {
-        // Fetch the previous staking transaction hex
-        const previousStakingTxHex = await getTxHex(
+        const previousStakingTxHex = await fetchAndValidateTxHex(
           formData.originalDelegation.stakingTxHashHex,
         );
 
-        if (
-          !previousStakingTxHex ||
-          typeof previousStakingTxHex !== "string" ||
-          previousStakingTxHex.length === 0
-        ) {
-          throw new Error(
-            `Failed to fetch transaction hex for ${formData.originalDelegation.stakingTxHashHex}`,
-          );
-        }
-
-        // Combine existing finality providers with new ones for expansion
         const existingProviders =
           formData.originalDelegation.finalityProviderBtcPksHex || [];
-        const newProviders = Object.values(formData.selectedBsnFps);
-        const allProviders = [...existingProviders, ...newProviders];
+        const allProviders = combineProviders(
+          existingProviders,
+          formData.selectedBsnFps,
+        );
 
-        const expansionInput: BtcStakingExpansionInputs = {
-          finalityProviderPksNoCoordHex: allProviders,
-          stakingAmountSat: formData.originalDelegation.stakingAmount,
-          stakingTimelock: formData.stakingTimelock,
+        const expansionInput = buildExpansionInput(
+          formData,
+          allProviders,
           previousStakingTxHex,
-          previousStakingParamsVersion:
-            formData.originalDelegation.paramsVersion,
-          previousStakingInput: {
-            finalityProviderPksNoCoordHex:
-              formData.originalDelegation.finalityProviderBtcPksHex,
-            stakingAmountSat: formData.originalDelegation.stakingAmount,
-            stakingTimelock: formData.originalDelegation.stakingTimelock,
-          },
-        };
+        );
 
         const feeAmount = estimateStakingExpansionFee(
           expansionInput,
@@ -165,42 +193,23 @@ export function useStakingExpansionService() {
   const createExpansionEOI = useCallback(
     async (formData: StakingExpansionFormData) => {
       try {
-        // Fetch the previous staking transaction hex
-        const previousStakingTxHex = await getTxHex(
+        const previousStakingTxHex = await fetchAndValidateTxHex(
           formData.originalDelegation.stakingTxHashHex,
         );
 
-        // Validate transaction hex data
-        if (
-          !previousStakingTxHex ||
-          typeof previousStakingTxHex !== "string" ||
-          previousStakingTxHex.length === 0
-        ) {
-          throw new Error(
-            `Failed to fetch transaction hex for ${formData.originalDelegation.stakingTxHashHex}`,
-          );
-        }
-
-        // Combine existing finality providers with new ones for expansion
         const existingProviders =
           formData.originalDelegation.finalityProviderBtcPksHex || [];
-        const newProviders = Object.values(formData.selectedBsnFps);
-        const allProviders = [...existingProviders, ...newProviders];
+        const allProviders = combineProviders(
+          existingProviders,
+          formData.selectedBsnFps,
+        );
 
-        const expansionInput: BtcStakingExpansionInputs = {
-          finalityProviderPksNoCoordHex: allProviders,
-          stakingAmountSat: formData.originalDelegation.stakingAmount,
-          stakingTimelock: formData.stakingTimelock,
+        const expansionInput = buildExpansionInput(
+          formData,
+          allProviders,
           previousStakingTxHex,
-          previousStakingParamsVersion:
-            formData.originalDelegation.paramsVersion,
-          previousStakingInput: {
-            finalityProviderPksNoCoordHex:
-              formData.originalDelegation.finalityProviderBtcPksHex,
-            stakingAmountSat: formData.originalDelegation.stakingAmount,
-            stakingTimelock: formData.originalDelegation.stakingTimelock,
-          },
-        };
+        );
+
         setProcessing(true);
         const { stakingTxHash, signedBabylonTx } =
           await createStakingExpansionEoi(expansionInput, formData.feeRate);
