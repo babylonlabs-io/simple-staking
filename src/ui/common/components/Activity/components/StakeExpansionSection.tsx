@@ -4,10 +4,14 @@ import {
   AccordionSummary,
   Text,
 } from "@babylonlabs-io/core-ui";
+import { useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
 import iconHistory from "@/ui/common/assets/expansion-history.svg";
+import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
+import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
+import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
 import { DelegationWithFP } from "@/ui/common/types/delegationsV2";
@@ -23,6 +27,10 @@ export function StakeExpansionSection({
 }: StakeExpansionSectionProps) {
   const { goToStep, setFormData, processing, maxFinalityProviders } =
     useStakingExpansionState();
+  const { delegations } = useDelegationV2State();
+  const { getHistoryCount } = useExpansionHistoryService();
+  const [expansionHistoryModalOpen, setExpansionHistoryModalOpen] =
+    useState(false);
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
   const availableSlots = maxFinalityProviders - currentBsnCount;
@@ -56,13 +64,16 @@ export function StakeExpansionSection({
    * Handle expansion history button click.
    */
   const handleExpansionHistory = () => {
-    console.log(
-      `expansion history clicked, staking tx: ${delegation.stakingTxHashHex}`,
-    );
+    if (expansionHistoryCount > 0) {
+      setExpansionHistoryModalOpen(true);
+    }
   };
 
-  // Count expansion history, 0 is regular staking, 1+ is expanded
-  const expansionHistoryCount = delegation.previousStakingTxHashHex ? "1+" : 0;
+  // Calculate actual expansion history count
+  const expansionHistoryCount = getHistoryCount(
+    delegations,
+    delegation.stakingTxHashHex,
+  );
 
   return (
     <div className="w-full">
@@ -96,11 +107,18 @@ export function StakeExpansionSection({
               text="Expansion History"
               counter={`${expansionHistoryCount}`}
               onClick={handleExpansionHistory}
-              disabled={processing}
+              disabled={expansionHistoryCount === 0 || processing}
             />
           </div>
         </AccordionDetails>
       </Accordion>
+
+      <ExpansionHistoryModal
+        open={expansionHistoryModalOpen}
+        onClose={() => setExpansionHistoryModalOpen(false)}
+        targetDelegation={delegation}
+        allDelegations={delegations}
+      />
     </div>
   );
 }
