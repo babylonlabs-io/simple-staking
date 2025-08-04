@@ -121,9 +121,9 @@ interface ChainSelectionModalProps {
   onClose: () => void;
   onSelect: (bsnId: string) => void;
   onRemove: (bsnId: string) => void;
-  isExpansionMode?: boolean;
   onExpand?: () => void;
   expandLoading?: boolean;
+  isExpansionMode?: boolean; // Clear intent
 }
 
 export const ChainSelectionModal = ({
@@ -136,9 +136,9 @@ export const ChainSelectionModal = ({
   onNext,
   onClose,
   onRemove,
-  isExpansionMode = false,
   onExpand,
   expandLoading = false,
+  isExpansionMode = false,
 }: ChainSelectionModalProps) => {
   const babylonBsn = useMemo(
     () => bsns.find((bsn) => bsn.id === BSN_ID),
@@ -151,32 +151,13 @@ export const ChainSelectionModal = ({
     () => bsns.filter((bsn) => bsn.id !== BSN_ID),
     [bsns],
   );
-  const isBabylonSelected = babylonBsn
-    ? Boolean(selectedBsns[babylonBsn.id])
-    : false;
+  const isBabylonSelected = Boolean(
+    existingBsns?.[BSN_ID] || selectedBsns?.[BSN_ID],
+  );
 
   // Helper function to create display BSN data
   const createDisplayBsns = useCallback((): ExpansionBsnDisplay => {
-    if (!isExpansionMode) {
-      const babylonWithStatus: BsnWithStatus | null = babylonBsn
-        ? {
-            ...babylonBsn,
-            isExisting: false,
-            isSelected: Boolean(selectedBsns[babylonBsn.id]),
-            fpPkHex: selectedBsns[babylonBsn.id],
-          }
-        : null;
-
-      const externalWithStatus: BsnWithStatus[] = externalBsns.map((bsn) => ({
-        ...bsn,
-        isExisting: false,
-        isSelected: Boolean(selectedBsns[bsn.id]),
-        fpPkHex: selectedBsns[bsn.id],
-      }));
-
-      return { babylon: babylonWithStatus, external: externalWithStatus };
-    }
-
+    // Unified logic - always use expansion-style data structure
     const babylonWithStatus: BsnWithStatus | null = babylonBsn
       ? {
           ...babylonBsn,
@@ -187,51 +168,47 @@ export const ChainSelectionModal = ({
         }
       : null;
 
-    const externalWithStatus: BsnWithStatus[] = bsns
-      .filter((bsn) => bsn.id !== BSN_ID)
-      .map((bsn) => ({
-        ...bsn,
-        isExisting: Boolean(existingBsns?.[bsn.id]),
-        isSelected: Boolean(selectedBsns?.[bsn.id]),
-        fpPkHex: existingBsns?.[bsn.id] || selectedBsns?.[bsn.id],
-      }))
-      .sort((a, b) => {
+    const externalWithStatus: BsnWithStatus[] = externalBsns.map((bsn) => ({
+      ...bsn,
+      isExisting: Boolean(existingBsns?.[bsn.id]),
+      isSelected: Boolean(selectedBsns?.[bsn.id]),
+      fpPkHex: existingBsns?.[bsn.id] || selectedBsns?.[bsn.id],
+    }));
+
+    // Only sort in expansion mode (when there are existing BSNs)
+    if (Object.keys(existingBsns || {}).length > 0) {
+      externalWithStatus.sort((a, b) => {
         if (a.isExisting && !b.isExisting) return -1;
         if (!a.isExisting && b.isExisting) return 1;
         return 0;
       });
+    }
 
     return { babylon: babylonWithStatus, external: externalWithStatus };
-  }, [
-    isExpansionMode,
-    babylonBsn,
-    externalBsns,
-    existingBsns,
-    selectedBsns,
-    bsns,
-  ]);
+  }, [babylonBsn, externalBsns, existingBsns, selectedBsns]);
 
   // Helper function to get finality provider info for a BSN
   const getBsnFinalityProviderInfo = useCallback(
     (bsn: Bsn | BsnWithStatus): BsnFinalityProviderInfo => {
-      const fpPkHex = isExpansionMode
-        ? (bsn as BsnWithStatus)?.fpPkHex
-        : selectedBsns[bsn.id];
+      // Unified logic: always use expansion-style data structure
+      const fpPkHex = (bsn as BsnWithStatus)?.fpPkHex || selectedBsns[bsn.id];
 
       const provider = fpPkHex ? finalityProviderMap.get(fpPkHex) : undefined;
       const title = fpPkHex
         ? (getFinalityProviderName(fpPkHex) ?? bsn.name)
         : bsn.name;
 
-      const isExisting = isExpansionMode
-        ? !!(bsn as BsnWithStatus)?.isExisting
-        : false;
+      // Unified logic: check if BSN exists in either existing or selected
+      const isExisting = Boolean(existingBsns?.[bsn.id]);
 
+      // Unified disable logic:
+      // - Existing BSNs are disabled (can't re-select them, including Babylon)
+      // - Other BSNs are disabled until Babylon is selected
       const isDisabled = isExpansionMode
-        ? isExisting
+        ? isExisting // In expansion mode, disable existing BSNs
         : bsn.id === BSN_ID
-          ? false // Babylon BSN is never disabled in regular staking
-          : !isBabylonSelected; // External BSNs are disabled until Babylon is selected
+          ? false
+          : !isBabylonSelected; // In regular mode, Babylon-first rule
 
       return {
         fpPkHex,
@@ -242,10 +219,11 @@ export const ChainSelectionModal = ({
       };
     },
     [
-      isExpansionMode,
       selectedBsns,
+      existingBsns,
       finalityProviderMap,
       getFinalityProviderName,
+      isExpansionMode,
       isBabylonSelected,
     ],
   );
@@ -256,14 +234,14 @@ export const ChainSelectionModal = ({
   // Helper: when user clicks "Select FP" on a chain, choose it and advance.
   const handleSelectFp = useCallback(
     (bsnId: string) => {
-      // Prevent selecting BSNs that already have FPs in expansion mode
-      if (isExpansionMode && (existingBsns?.[bsnId] || selectedBsns?.[bsnId])) {
-        return;
+      // Unified validation: prevent selecting BSNs that already have FPs
+      if (existingBsns?.[bsnId]) {
+        return; // Can't select existing BSNs (expansion mode only)
       }
       onSelect(bsnId);
       onNext();
     },
-    [isExpansionMode, existingBsns, selectedBsns, onSelect, onNext],
+    [existingBsns, onSelect, onNext],
   );
 
   return (
@@ -326,7 +304,7 @@ export const ChainSelectionModal = ({
               );
             })}
         </div>
-        {!isBabylonSelected && !isExpansionMode && (
+        {!isBabylonSelected && Object.keys(existingBsns || {}).length === 0 && (
           <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
             <div>
               <MdOutlineInfo size={22} />
@@ -344,7 +322,7 @@ export const ChainSelectionModal = ({
           Cancel
         </Button>
         <div className="flex gap-2">
-          {isExpansionMode &&
+          {Object.keys(existingBsns || {}).length > 0 &&
             Object.keys(selectedBsns).length > 0 &&
             onExpand && (
               <Button
@@ -355,7 +333,7 @@ export const ChainSelectionModal = ({
                 {expandLoading ? "Calculating..." : "Expand"}
               </Button>
             )}
-          {!isExpansionMode && (
+          {Object.keys(existingBsns || {}).length === 0 && (
             <Button
               variant="contained"
               onClick={Object.keys(selectedBsns).length > 0 ? onClose : onNext}
