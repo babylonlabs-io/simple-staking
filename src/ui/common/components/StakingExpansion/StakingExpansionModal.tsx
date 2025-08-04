@@ -64,7 +64,7 @@ export const StakingExpansionModal = ({
   const { calculateExpansionFeeAmount, displayExpansionPreview } =
     useStakingExpansionService();
   const { networkInfo } = useAppState();
-  const logger = useLogger("StakingExpansionModal");
+  const logger = useLogger();
 
   // Calculate the default staking timelock using the same logic as regular staking
   const defaultStakingTimeBlocks = useMemo(() => {
@@ -123,7 +123,9 @@ export const StakingExpansionModal = ({
 
       return pairs;
     } catch (error) {
-      logger.error("Failed to map existing BSN+FP pairs", { error });
+      logger.error(new Error("Failed to map existing BSN+FP pairs"), {
+        data: { error: String(error) },
+      });
       return {};
     }
   }, [
@@ -228,7 +230,9 @@ export const StakingExpansionModal = ({
       handleClose();
       displayExpansionPreview(finalFormData);
     } catch (error) {
-      logger.error("Failed to calculate expansion fee", { error });
+      logger.error(new Error("Failed to calculate expansion fee"), {
+        data: { error: String(error) },
+      });
     } finally {
       setIsCalculatingFee(false);
     }
