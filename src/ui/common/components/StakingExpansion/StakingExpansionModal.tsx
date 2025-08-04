@@ -1,8 +1,8 @@
 /*
  * Staking Expansion Modal - Integrated with existing BSN/FP modals
  *
- * This modal reuses the existing ChainSelectionModal and FinalityProviderModal
- * from the regular staking flow, with adaptations for expansion:
+ * This modal uses the dedicated ExpansionChainSelectionModal and FinalityProviderModal
+ * for expansion staking:
  * - No Babylon Genesis priority requirement (already exists in delegation)
  * - "Expand" button instead of "Done" when BSN+FP pairs are selected
  * - Allows adding multiple BSN+FP pairs before expanding
@@ -10,8 +10,8 @@
 
 import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 
-import { ChainSelectionModal } from "@/ui/common/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderModal";
+import { ExpansionChainSelectionModal } from "@/ui/common/components/StakingExpansion/ExpansionChainSelectionModal";
 import { IS_FIXED_TERM_FIELD } from "@/ui/common/config";
 import { useNetworkFees } from "@/ui/common/hooks/client/api/useNetworkFees";
 import { useStakingExpansionService } from "@/ui/common/hooks/services/useStakingExpansionService";
@@ -34,7 +34,7 @@ interface StakingExpansionModalProps {
 /**
  * Staking Expansion Modal - Integrated Implementation
  *
- * This modal integrates with existing ChainSelectionModal and FinalityProviderModal
+ * This modal integrates with ExpansionChainSelectionModal and FinalityProviderModal
  * to provide BSN+FP selection for staking expansion.
  *
  * KEY DIFFERENCES FROM REGULAR STAKING:
@@ -257,19 +257,17 @@ export const StakingExpansionModal = ({
 
   return (
     <Fragment>
-      {/* Reuse existing ChainSelectionModal for BSN selection */}
-      <ChainSelectionModal
+      {/* Use dedicated ExpansionChainSelectionModal for BSN selection */}
+      <ExpansionChainSelectionModal
         loading={bsnLoading}
         open={stakingModalPage === StakingModalPage.BSN}
         bsns={bsnList}
-        activeBsnId={selectedBsnId}
         selectedBsns={selectedBsnFps}
         existingBsns={existingBsnFps}
         onNext={handleBsnNext}
         onClose={handleClose}
         onSelect={handleBsnSelect}
         onRemove={handleRemoveBsnFp}
-        isExpansionMode={true}
         onExpand={canExpand ? handleExpand : undefined}
         expandLoading={isCalculatingFee}
       />
