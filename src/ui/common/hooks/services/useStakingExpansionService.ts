@@ -10,7 +10,6 @@ import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   StakingExpansionStep,
-  validateExpansionFormData,
   type StakingExpansionFormData,
 } from "@/ui/common/state/StakingExpansionTypes";
 import {
@@ -19,6 +18,7 @@ import {
 } from "@/ui/common/types/delegationsV2";
 import { retry } from "@/ui/common/utils";
 import { getTxHex } from "@/ui/common/utils/mempool_api";
+import { validateExpansionFormData } from "@/ui/common/utils/stakingExpansionValidation";
 
 import { useBbnTransaction } from "../client/rpc/mutation/useBbnTransaction";
 
