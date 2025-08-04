@@ -3,6 +3,7 @@ import {
   DialogBody,
   DialogFooter,
   DialogHeader,
+  SubSection,
   Text,
 } from "@babylonlabs-io/core-ui";
 import { PropsWithChildren, useMemo } from "react";
@@ -10,7 +11,6 @@ import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
-import { SubSection } from "@/ui/common/components/Multistaking/ChainSelectionModal/shared";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
 import { Bsn } from "@/ui/common/types/bsn";
@@ -132,7 +132,7 @@ export const ChainSelectionModal = ({
           ))}
         </div>
         {!isBabylonSelected && (
-          <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4">
+          <SubSection className="text-base text-[#387085] gap-3 flex-row mt-4 rounded">
             <div>
               <MdOutlineInfo size={22} />
             </div>

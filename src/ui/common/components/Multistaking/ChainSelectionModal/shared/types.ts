@@ -11,9 +11,3 @@ export interface ChainButtonProps {
   onRemove?: (bsnId: string) => void;
   isExisting?: boolean;
 }
-
-export interface SubSectionProps {
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-  className?: string;
-}
