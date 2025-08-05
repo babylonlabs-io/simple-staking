@@ -5,5 +5,5 @@ export function useWalletService() {
   const { bech32Address } = useCosmosWallet();
   const { data: balance = 0 } = useBabyBalance(bech32Address);
 
-  return { balance };
+  return { balance, bech32Address };
 }
