@@ -3,10 +3,9 @@ import { Fragment, useMemo } from "react";
 
 import { ChainSelectionModal } from "@/ui/common/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderModal";
-import { MultistakingUnavailableWarning } from "@/ui/common/components/Multistaking/MultistakingForm/MultiStakingWarning";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
-import { useAllowList } from "@/ui/common/hooks/useAllowList";
+import { useStakingExpansionAllowList } from "@/ui/common/hooks/useStakingExpansionAllowList";
 import {
   StakingModalPage,
   useFinalityProviderBsnState,
@@ -23,7 +22,7 @@ type SelectedProviderItemLocal = {
 
 export function FinalityProvidersSection() {
   const { maxFinalityProviders } = useMultistakingState();
-  const { isAllowListActive } = useAllowList();
+  const { isAllowListActive } = useStakingExpansionAllowList();
 
   // Determine if we should allow multiple BSNs
   // We allow multiple BSNs if:
@@ -115,14 +114,12 @@ export function FinalityProvidersSection() {
   return (
     <Fragment>
       <FinalityProviderSubsection
-        max={maxFinalityProviders}
+        max={allowsMultipleBsns ? maxFinalityProviders : 1}
         items={selectedItems}
         actionText={actionText}
         onAdd={handleOpen}
         onRemove={handleRemove}
       />
-
-      <MultistakingUnavailableWarning />
 
       <ChainSelectionModal
         loading={bsnLoading}

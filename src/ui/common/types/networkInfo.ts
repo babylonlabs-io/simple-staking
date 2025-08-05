@@ -44,7 +44,7 @@ export interface BtcEpochCheckParams {
 
 export interface StakingStatus {
   isStakingOpen: boolean;
-  allowList?: AllowList;
+  stakingExpansionAllowList?: AllowList;
 }
 
 export interface Params {

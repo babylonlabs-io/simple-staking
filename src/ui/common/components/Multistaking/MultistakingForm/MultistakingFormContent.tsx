@@ -9,6 +9,7 @@ import { AmountSection } from "./AmountSection";
 import { ConnectButton } from "./ConnectButton";
 import { FinalityProvidersSection } from "./FinalityProvidersSection";
 import { FormAlert } from "./FormAlert";
+import { MultistakingUnavailableWarning } from "./MultiStakingWarning";
 import { StakingFeesSection } from "./StakingFeesSection";
 import { SubmitButton } from "./SubmitButton";
 
@@ -40,6 +41,7 @@ export function MultistakingFormContent() {
         <AuthGuard fallback={<ConnectButton />}>
           <SubmitButton />
         </AuthGuard>
+        <MultistakingUnavailableWarning />
 
         <FormAlert
           address={address}

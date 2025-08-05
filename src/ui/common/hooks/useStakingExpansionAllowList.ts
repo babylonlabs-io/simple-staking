@@ -6,25 +6,26 @@ import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
  * Hook to determine if the allow list is active and expose allow list data
  * @returns {object} - Object containing isActive flag and allow list data
  */
-export function useAllowList() {
+export function useStakingExpansionAllowList() {
   const { data: networkInfo } = useNetworkInfo();
 
-  const allowList = networkInfo?.stakingStatus?.allowList;
+  const stakingExpansionAllowList =
+    networkInfo?.stakingStatus?.stakingExpansionAllowList;
 
   const isActive = useMemo(() => {
-    if (!allowList) {
+    if (!stakingExpansionAllowList) {
       return false;
     }
 
-    if (allowList.isExpired) {
+    if (stakingExpansionAllowList.isExpired) {
       return false;
     }
 
     return true;
-  }, [allowList]);
+  }, [stakingExpansionAllowList]);
 
   return {
     isAllowListActive: isActive,
-    allowList,
+    allowList: stakingExpansionAllowList,
   };
 }

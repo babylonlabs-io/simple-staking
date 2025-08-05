@@ -1,9 +1,9 @@
 import { Warning } from "@babylonlabs-io/core-ui";
 
-import { useAllowList } from "@/ui/common/hooks/useAllowList";
+import { useStakingExpansionAllowList } from "@/ui/common/hooks/useStakingExpansionAllowList";
 
 export function MultistakingUnavailableWarning() {
-  const { isAllowListActive, allowList } = useAllowList();
+  const { isAllowListActive, allowList } = useStakingExpansionAllowList();
 
   if (!allowList) {
     return null;
@@ -12,12 +12,10 @@ export function MultistakingUnavailableWarning() {
   // If allow list is active, show warning about multi-staking being unavailable
   if (isAllowListActive) {
     return (
-      <div className="mt-4">
-        <Warning>
-          New stakes can only delegate to Babylon Genesis. Multi-Staking is
-          currently unavailable due to allow list restrictions.
-        </Warning>
-      </div>
+      <Warning className="mt-2">
+        New stakes can only delegate to Babylon Genesis. Multi-Staking is
+        currently unavailable due to allow list restrictions.
+      </Warning>
     );
   }
 

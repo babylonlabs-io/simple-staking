@@ -21,7 +21,7 @@ interface AllowList {
 
 interface StakingStatus {
   is_staking_open: boolean;
-  allow_list?: AllowList;
+  staking_expansion_allow_list?: AllowList;
 }
 
 interface NetworkInfoAPI {
@@ -149,21 +149,16 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     throw clientError;
   }
 
-  const allowList = staking_status.allow_list
+  const stakingExpansionAllowList = staking_status.staking_expansion_allow_list
     ? {
-        activationBlock: staking_status.allow_list.activation_block,
-        expirationBlock: staking_status.allow_list.expiration_block,
+        isExpired: staking_status.staking_expansion_allow_list.is_expired,
       }
     : undefined;
 
   return {
     stakingStatus: {
       isStakingOpen: staking_status.is_staking_open,
-      allowList: staking_status.allow_list
-        ? {
-            isExpired: staking_status.allow_list.is_expired,
-          }
-        : undefined,
+      stakingExpansionAllowList,
     },
     params: {
       bbnStakingParams: {
