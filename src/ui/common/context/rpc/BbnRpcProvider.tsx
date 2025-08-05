@@ -1,5 +1,5 @@
 import { QueryClient } from "@cosmjs/stargate";
-import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import { CometClient, connectComet } from "@cosmjs/tendermint-rpc";
 import {
   createContext,
   useCallback,
@@ -13,7 +13,7 @@ import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 
 interface BbnRpcContextType {
   queryClient: QueryClient | undefined;
-  tmClient: Tendermint34Client | undefined;
+  tmClient: CometClient | undefined;
   isLoading: boolean;
   error: Error | null;
   reconnect: () => Promise<void>;
@@ -29,14 +29,14 @@ const BbnRpcContext = createContext<BbnRpcContextType>({
 
 export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
   const [queryClient, setQueryClient] = useState<QueryClient>();
-  const [tmClient, setTmClient] = useState<Tendermint34Client>();
+  const [tmClient, setTmClient] = useState<CometClient>();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const { rpc } = getNetworkConfigBBN();
 
   const connect = useCallback(async () => {
     try {
-      const tmClientInstance = await Tendermint34Client.connect(rpc);
+      const tmClientInstance = await connectComet(rpc);
       const client = QueryClient.withExtensions(tmClientInstance);
       setQueryClient(client);
       setTmClient(tmClientInstance);
