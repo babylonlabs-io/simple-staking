@@ -1,6 +1,10 @@
 import { useCallback, useMemo } from "react";
 
-import babylon from "@/infrastructure/babylon";
+import {
+  estimateStakeFee,
+  stake as stakeTx,
+  unstake as unstakeTx,
+} from "@/domain/services/delegationService";
 import { useDelegations } from "@/ui/baby/hooks/api/useDelegations";
 import {
   type Validator,
@@ -60,57 +64,47 @@ export function useDelegationService() {
     [delegations, validatorMap, isValidatorLoading],
   );
 
+  const signAndBroadcast = useCallback(
+    async (msgs: any | any[]) => {
+      const signed = await signBbnTx(msgs);
+      return sendBbnTx(signed);
+    },
+    [signBbnTx, sendBbnTx],
+  );
+
   const stake = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
-
-      const stakeMsg = babylon.txs.baby.createStakeMsg({
-        validatorAddress,
-        delegatorAddress: bech32Address,
-        amount:
-          typeof amount === "string"
-            ? babylon.utils.babyToUbbn(Number(amount))
-            : BigInt(amount),
-      });
-      const signedTx = await signBbnTx(stakeMsg);
-      const result = await sendBbnTx(signedTx);
-
+      const result = await stakeTx(
+        { delegatorAddress: bech32Address, validatorAddress, amount },
+        signAndBroadcast,
+      );
       await refetchDelegations();
       return result;
     },
-    [bech32Address, signBbnTx, sendBbnTx, refetchDelegations],
+    [bech32Address, signAndBroadcast, refetchDelegations],
   );
 
   const unstake = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
-
-      const unstakeMsg = babylon.txs.baby.createUnstakeMsg({
-        validatorAddress,
-        delegatorAddress: bech32Address,
-        amount: babylon.utils.babyToUbbn(Number(amount)),
-      });
-      const signedTx = await signBbnTx(unstakeMsg);
-      const result = await sendBbnTx(signedTx);
-
+      const result = await unstakeTx(
+        { delegatorAddress: bech32Address, validatorAddress, amount },
+        signAndBroadcast,
+      );
       await refetchDelegations();
       return result;
     },
-    [bech32Address, signBbnTx, sendBbnTx, refetchDelegations],
+    [bech32Address, signAndBroadcast, refetchDelegations],
   );
 
   const estimateStakingFee = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
-
-      const stakeMsg = babylon.txs.baby.createStakeMsg({
-        validatorAddress,
-        delegatorAddress: bech32Address,
-        amount: babylon.utils.babyToUbbn(Number(amount)),
-      });
-      const result = await estimateBbnGasFee(stakeMsg);
-
-      return result.amount.reduce((sum, { amount }) => sum + Number(amount), 0);
+      return estimateStakeFee(
+        { delegatorAddress: bech32Address, validatorAddress, amount },
+        estimateBbnGasFee,
+      );
     },
     [bech32Address, estimateBbnGasFee],
   );
