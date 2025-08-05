@@ -56,10 +56,28 @@ export function useRewardService() {
     return result;
   }, [bech32Address, rewards, signBbnTx, sendBbnTx, refetchRewards]);
 
+  const claimReward = useCallback(
+    async (validatorAddress: string) => {
+      if (!bech32Address) throw Error("Babylon Wallet is not connected");
+
+      const msg = babylon.txs.baby.createClaimRewardMsg({
+        validatorAddress,
+        delegatorAddress: bech32Address,
+      });
+      const signedTx = await signBbnTx(msg);
+      const result = await sendBbnTx(signedTx);
+
+      await refetchRewards();
+      return result;
+    },
+    [bech32Address, signBbnTx, sendBbnTx, refetchRewards],
+  );
+
   return {
     loading: isLoading,
     rewards: rewardList,
     totalReward,
     claimAllRewards,
+    claimReward,
   };
 }
