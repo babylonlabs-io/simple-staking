@@ -1,9 +1,5 @@
-import { Card, Heading } from "@babylonlabs-io/core-ui";
+import { Card, Heading, Table } from "@babylonlabs-io/core-ui";
 
-import {
-  GridTable,
-  type TableColumn,
-} from "@/ui/common/components/Common/GridTable";
 import { Hint } from "@/ui/common/components/Common/Hint";
 import { FinalityProviderMoniker } from "@/ui/common/components/Delegations/DelegationList/components/FinalityProviderMoniker";
 import { getNetworkConfig } from "@/ui/common/config/network";
@@ -25,44 +21,45 @@ import { Status } from "./components/Status";
 import { TxHash } from "./components/TxHash";
 import { NoDelegations } from "./NoDelegations";
 
-type TableParams = {
-  validations: Record<string, { valid: boolean; error?: string }>;
-  handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void;
-  isStakingManagerReady: boolean;
-};
-
 const networkConfig = getNetworkConfig();
 
-const columns: TableColumn<DelegationWithFP, TableParams>[] = [
+const createColumns = (
+  validations: Record<string, { valid: boolean; error?: string }>,
+  handleActionClick: (action: ActionType, delegation: DelegationWithFP) => void,
+  isStakingManagerReady: boolean,
+) => [
   {
-    field: "Inception",
-    headerName: "Inception",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <Inception value={row.bbnInceptionTime} />,
+    key: "bbnInceptionTime",
+    header: "Inception",
+    render: (_: unknown, row: DelegationWithFP) => (
+      <Inception value={row.bbnInceptionTime} />
+    ),
   },
   {
-    field: "finalityProvider",
-    headerName: "Finality Provider",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <FinalityProviderMoniker value={row.fp} />,
+    key: "finalityProvider",
+    header: "Finality Provider",
+    render: (_: unknown, row: DelegationWithFP) => (
+      <FinalityProviderMoniker value={row.fp} />
+    ),
   },
   {
-    field: "stakingAmount",
-    headerName: "Amount",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <Amount value={row.stakingAmount} />,
+    key: "stakingAmount",
+    header: "Amount",
+    render: (_: unknown, row: DelegationWithFP) => (
+      <Amount value={row.stakingAmount} />
+    ),
   },
   {
-    field: "stakingTxHashHex",
-    headerName: "Transaction ID",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row) => <TxHash value={row.stakingTxHashHex} />,
+    key: "stakingTxHashHex",
+    header: "Transaction ID",
+    render: (_: unknown, row: DelegationWithFP) => (
+      <TxHash value={row.stakingTxHashHex} />
+    ),
   },
   {
-    field: "state",
-    headerName: "Status",
-    width: "minmax(max-content, 1fr)",
-    renderCell: (row, _, { validations }) => {
+    key: "state",
+    header: "Status",
+    render: (_: unknown, row: DelegationWithFP) => {
       const { valid, error } = validations[row.stakingTxHashHex];
       if (!valid) return <Hint tooltip={error}>Unavailable</Hint>;
 
@@ -70,14 +67,10 @@ const columns: TableColumn<DelegationWithFP, TableParams>[] = [
     },
   },
   {
-    field: "actions",
-    headerName: "Action",
-    width: "minmax(max-content, 0.5fr)",
-    renderCell: (
-      row,
-      _,
-      { handleActionClick, validations, isStakingManagerReady },
-    ) => {
+    key: "actions",
+    header: "Action",
+    frozen: "right" as const,
+    render: (_: unknown, row: DelegationWithFP) => {
       const { valid, error } = validations[row.stakingTxHashHex];
 
       if (!valid) return null;
@@ -116,35 +109,56 @@ export function DelegationList() {
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
 
+  const columns = createColumns(
+    validations,
+    openConfirmationModal,
+    isStakingManagerReady,
+  );
+
+  // Convert delegations to include an id field for core-ui Table
+  const tableData = delegations.map((delegation) => ({
+    ...delegation,
+    id: `${delegation.stakingTxHashHex}-${delegation.startHeight}`,
+  }));
+
+  if (isLoading) {
+    return (
+      <Card>
+        <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+          {networkConfig.bbn.networkFullName} Stakes
+        </Heading>
+        <div className="flex justify-center items-center h-48">
+          <div>Loading...</div>
+        </div>
+      </Card>
+    );
+  }
+
+  if (!delegations.length && !isLoading) {
+    return (
+      <Card>
+        <Heading variant="h6" className="text-accent-primary py-2 mb-6">
+          {networkConfig.bbn.networkFullName} Stakes
+        </Heading>
+        <NoDelegations />
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <Heading variant="h6" className="text-accent-primary py-2 mb-6">
         {networkConfig.bbn.networkFullName} Stakes
       </Heading>
 
-      <GridTable
-        getRowId={(row) => `${row.stakingTxHashHex}-${row.startHeight}`}
+      <Table
+        wrapperClassName="max-h-[25rem]"
+        className="min-w-[1000px]"
+        data={tableData}
         columns={columns}
-        data={delegations}
-        loading={isLoading}
-        isFetchingNextPage={isFetchingNextPage}
-        infiniteScroll={hasMoreDelegations}
-        onInfiniteScroll={fetchMoreDelegations}
-        classNames={{
-          headerRowClassName: "text-accent-primary text-xs",
-          headerCellClassName: "p-4 text-align-left text-accent-secondary",
-          rowClassName: "group",
-          wrapperClassName: "max-h-[25rem] overflow-x-auto",
-          bodyClassName: "min-w-[1000px]",
-          cellClassName:
-            "p-4 first:pl-4 first:rounded-l last:pr-4 last:rounded-r bg-surface flex items-center text-sm justify-start group-even:bg-secondary-highlight text-accent-primary",
-        }}
-        params={{
-          handleActionClick: openConfirmationModal,
-          validations,
-          isStakingManagerReady,
-        }}
-        fallback={<NoDelegations />}
+        loading={isFetchingNextPage}
+        hasMore={hasMoreDelegations}
+        onLoadMore={fetchMoreDelegations}
       />
 
       <DelegationModal

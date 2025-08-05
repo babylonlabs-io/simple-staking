@@ -1,15 +1,15 @@
 import { getBabylonParamByBtcHeight } from "@babylonlabs-io/btc-staking-ts";
-import { Card, Heading } from "@babylonlabs-io/core-ui";
+import { Card, Heading, Table } from "@babylonlabs-io/core-ui";
 import { useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { FaBitcoin } from "react-icons/fa";
 import { useLocalStorage } from "usehooks-ts";
 
-import { LoadingTableList } from "@/ui/common/components/Loading/Loading";
 import { RegistrationEndModal } from "@/ui/common/components/Modals/RegistrationModal/RegistrationEndModal";
 import { RegistrationStartModal } from "@/ui/common/components/Modals/RegistrationModal/RegistrationStartModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
 import { WithdrawModal } from "@/ui/common/components/Modals/WithdrawModal";
-import { ONE_MINUTE } from "@/ui/common/constants";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { DOCUMENTATION_LINKS, ONE_MINUTE } from "@/ui/common/constants";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
@@ -20,17 +20,25 @@ import { useRegistrationService } from "@/ui/common/hooks/services/useRegistrati
 import { useV1TransactionService } from "@/ui/common/hooks/services/useV1TransactionService";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useDelegationState } from "@/ui/common/state/DelegationState";
+import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/ui/common/types/delegations";
+import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
+import { satoshiToBtc } from "@/ui/common/utils/btc";
+import { getState, getStateTooltip } from "@/ui/common/utils/getState";
 import { getIntermediateDelegationsLocalStorageKey } from "@/ui/common/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/ui/common/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { maxDecimals } from "@/ui/common/utils/maxDecimals";
+import { durationTillNow } from "@/ui/common/utils/time";
+import { trim } from "@/ui/common/utils/trim";
 
+import { Hint } from "../Common/Hint";
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";
 
-import { Delegation } from "./Delegation";
+import { DelegationActions } from "./DelegationActions";
 
 const MODE_WITHDRAW = "withdraw";
 const MODE_UNBOND = "unbond";
@@ -47,6 +55,289 @@ const VERIFICATION_STEPS: Record<string, 1 | 2> = {
   "registration-send-bbn": 1,
   "registration-verifying": 2,
 };
+
+const { coinSymbol, mempoolApiUrl } = getNetworkConfigBTC();
+
+// Helper function to compact duration display
+function compactDuration(full: string) {
+  const parts = full.replace(/ ago$/, "").split(" ");
+  const compactParts: string[] = [];
+  for (let i = 0; i < parts.length; i += 2) {
+    const value = parts[i];
+    const unit = parts[i + 1] ?? "";
+    const abbr = unit.startsWith("year")
+      ? "y"
+      : unit.startsWith("month")
+        ? "mo"
+        : unit.startsWith("week")
+          ? "w"
+          : unit.startsWith("day")
+            ? "d"
+            : unit.startsWith("hour")
+              ? "h"
+              : unit.startsWith("minute")
+                ? "m"
+                : unit.startsWith("second")
+                  ? "s"
+                  : unit;
+    compactParts.push(`${value}${abbr}`);
+  }
+  return compactParts.join(" ") + " ago";
+}
+
+// Finality Provider Display Component
+const FinalityProviderDisplay: React.FC<{
+  fpName: string;
+  isSlashed: boolean;
+  isJailed: boolean;
+}> = ({ fpName, isSlashed, isJailed }) => {
+  if (isSlashed) {
+    return (
+      <Hint
+        tooltip={
+          <span>
+            This finality provider has been slashed.{" "}
+            <a
+              className="text-error-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </a>
+          </span>
+        }
+        status="error"
+      >
+        <span className="text-error-main truncate" title={fpName}>
+          {fpName}
+        </span>
+      </Hint>
+    );
+  }
+
+  if (isJailed) {
+    return (
+      <Hint
+        tooltip={
+          <span>
+            This finality provider has been jailed.{" "}
+            <a
+              className="text-secondary-main"
+              target="_blank"
+              href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+            >
+              Learn more
+            </a>
+          </span>
+        }
+        status="error"
+      >
+        <span className="text-error-main truncate" title={fpName}>
+          {fpName}
+        </span>
+      </Hint>
+    );
+  }
+
+  return (
+    <span className="truncate" title={fpName}>
+      {fpName}
+    </span>
+  );
+};
+
+// Delegation State Component
+const DelegationStateDisplay: React.FC<{
+  displayState: string;
+  isSlashed: boolean;
+  isFPRegistered: boolean;
+}> = ({ displayState, isSlashed, isFPRegistered }) => {
+  const renderStateTooltip = () => {
+    if (!isFPRegistered) {
+      return "Your Finality Provider is not registered on Babylon Genesis. You need to wait for their registration to become eligible to register your stake to Babylon Genesis";
+    }
+
+    if (isSlashed) {
+      return (
+        <span>
+          This finality provider has been slashed.{" "}
+          <a
+            className="text-secondary-main"
+            target="_blank"
+            href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+          >
+            Learn more
+          </a>
+        </span>
+      );
+    }
+
+    if (displayState === DelegationState.OVERFLOW) {
+      return "Stake was over the Phase-1 staking cap it was created in";
+    }
+
+    return getStateTooltip(displayState);
+  };
+
+  const renderState = () => {
+    if (isSlashed) {
+      return <span className="text-error-main text-xs">Slashed</span>;
+    }
+    return <span className="text-xs">{getState(displayState)}</span>;
+  };
+
+  return (
+    <Hint
+      tooltip={renderStateTooltip()}
+      status={isSlashed ? "warning" : "default"}
+    >
+      {renderState()}
+    </Hint>
+  );
+};
+
+// Create column definitions for the Table component
+const createDelegationColumns = (
+  currentTime: number,
+  intermediateDelegationsLocalStorage: DelegationInterface[],
+  onRegistration: (delegation: DelegationInterface) => Promise<void>,
+  onWithdraw: (id: string) => void,
+  onUnbond: (id: string) => void,
+  getRegisteredFinalityProvider: any,
+  getFinalityProviderName: any,
+) => [
+  {
+    key: "inception",
+    header: "Inception",
+    render: (_: unknown, row: DelegationInterface & { id: string }) => {
+      const { stakingTx, state, isOverflow, finalityProviderPkHex } = row;
+      const { startTimestamp } = stakingTx;
+
+      const finalityProvider = getRegisteredFinalityProvider(
+        finalityProviderPkHex,
+      );
+      const fpState = finalityProvider?.state;
+      const isActive = state === DelegationState.ACTIVE;
+      const isFpRegistered = finalityProvider !== null;
+      const isSlashed = fpState === FinalityProviderState.SLASHED;
+
+      const intermediateDelegation = intermediateDelegationsLocalStorage.find(
+        (item) => item.stakingTxHashHex === row.stakingTxHashHex,
+      );
+
+      const displayState =
+        isOverflow && isActive
+          ? DelegationState.OVERFLOW
+          : intermediateDelegation?.state || state;
+
+      return (
+        <div className="flex flex-col">
+          <span>
+            {compactDuration(durationTillNow(startTimestamp, currentTime))}
+          </span>
+          <DelegationStateDisplay
+            displayState={displayState}
+            isSlashed={isSlashed}
+            isFPRegistered={isFpRegistered}
+          />
+        </div>
+      );
+    },
+  },
+  {
+    key: "finalityProvider",
+    header: "Finality Provider",
+    headerClassName: "max-w-[12rem]",
+    cellClassName: "max-w-[12rem] truncate",
+    render: (_: unknown, row: DelegationInterface & { id: string }) => {
+      const { finalityProviderPkHex } = row;
+      const finalityProvider = getRegisteredFinalityProvider(
+        finalityProviderPkHex,
+      );
+      const fpState = finalityProvider?.state;
+      const fpName = getFinalityProviderName(finalityProviderPkHex) ?? "-";
+      const isSlashed = fpState === FinalityProviderState.SLASHED;
+      const isJailed = fpState === FinalityProviderState.JAILED;
+
+      return (
+        <FinalityProviderDisplay
+          fpName={fpName}
+          isSlashed={isSlashed}
+          isJailed={isJailed}
+        />
+      );
+    },
+  },
+  {
+    key: "amount",
+    header: "Amount",
+    cellClassName: "min-w-[8rem]",
+    render: (_: unknown, row: DelegationInterface & { id: string }) => {
+      const { stakingValueSat } = row;
+      return (
+        <div className="flex gap-1 items-center">
+          <FaBitcoin className="text-primary" />
+          <p>
+            {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinSymbol}
+          </p>
+        </div>
+      );
+    },
+  },
+  {
+    key: "txHash",
+    header: "Transaction ID",
+    render: (_: unknown, row: DelegationInterface & { id: string }) => {
+      const { stakingTxHashHex } = row;
+      return (
+        <a
+          href={`${mempoolApiUrl}/tx/${stakingTxHashHex}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          {trim(stakingTxHashHex)}
+        </a>
+      );
+    },
+  },
+  {
+    key: "actions",
+    header: "Action",
+    frozen: "right" as const,
+    render: (_: unknown, row: DelegationInterface & { id: string }) => {
+      const {
+        state,
+        stakingTxHashHex,
+        finalityProviderPkHex,
+        isEligibleForTransition,
+      } = row;
+
+      const intermediateDelegation = intermediateDelegationsLocalStorage.find(
+        (item) => item.stakingTxHashHex === stakingTxHashHex,
+      );
+
+      const finalityProvider = getRegisteredFinalityProvider(
+        finalityProviderPkHex,
+      );
+      const isFpRegistered = finalityProvider !== null;
+
+      return (
+        <DelegationActions
+          state={state}
+          intermediateState={intermediateDelegation?.state}
+          isEligibleForRegistration={isEligibleForTransition}
+          isFpRegistered={isFpRegistered}
+          stakingTxHashHex={stakingTxHashHex}
+          finalityProviderPkHex={finalityProviderPkHex}
+          onRegistration={() => onRegistration(row)}
+          onUnbond={onUnbond}
+          onWithdraw={onWithdraw}
+        />
+      );
+    },
+  },
+];
 
 export const Delegations = () => {
   const { data: networkInfo } = useNetworkInfo();
@@ -76,6 +367,8 @@ export const Delegations = () => {
   } = useDelegationState();
 
   const { setDelegationStepOptions } = useDelegationState();
+  const { getRegisteredFinalityProvider, getFinalityProviderName } =
+    useFinalityProviderState();
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
@@ -363,6 +656,23 @@ export const Delegations = () => {
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
+  // Prepare table data with ID field required by core-ui Table
+  const tableData = combinedDelegationsData.map((delegation) => ({
+    ...delegation,
+    id: `${delegation.stakingTxHashHex}-${delegation.stakingTx.startHeight}`,
+  }));
+
+  // Create columns with current dependencies
+  const columns = createDelegationColumns(
+    currentTime,
+    intermediateDelegationsLocalStorage,
+    onRegistration,
+    (id: string) => handleModal(id, MODE_WITHDRAW),
+    (id: string) => handleModal(id, MODE_UNBOND),
+    getRegisteredFinalityProvider,
+    getFinalityProviderName,
+  );
+
   return (
     <>
       {combinedDelegationsData.length !== 0 && (
@@ -371,62 +681,15 @@ export const Delegations = () => {
             Pending Registration
           </Heading>
 
-          <InfiniteScroll
-            className="no-scrollbar max-h-[25rem] overflow-y-auto overflow-x-hidden"
-            dataLength={combinedDelegationsData.length}
-            next={fetchMoreDelegations}
+          <Table
+            wrapperClassName="max-h-[25rem]"
+            className="w-full"
+            data={tableData}
+            columns={columns}
+            loading={isLoading}
             hasMore={hasMoreDelegations}
-            loader={isLoading ? <LoadingTableList /> : null}
-          >
-            <table className="w-full">
-              <thead className="sticky top-0 bg-surface">
-                <tr className="text-accent-secondary text-xs">
-                  <th className="text-left h-[52px] px-2 font-normal">
-                    Inception
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal max-w-[12rem] truncate">
-                    Finality Provider
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal min-w-[8rem]">
-                    Amount
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal">
-                    Transaction ID
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {combinedDelegationsData?.map((delegation) => {
-                  if (!delegation) return null;
-                  const { stakingTx, stakingTxHashHex } = delegation;
-                  const intermediateDelegation =
-                    intermediateDelegationsLocalStorage.find(
-                      (item) => item.stakingTxHashHex === stakingTxHashHex,
-                    );
-
-                  return (
-                    <Delegation
-                      currentTime={currentTime}
-                      key={stakingTxHashHex + stakingTx.startHeight}
-                      delegation={delegation}
-                      onWithdraw={() =>
-                        handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                      }
-                      onRegistration={onRegistration}
-                      onUnbond={() =>
-                        handleModal(stakingTxHashHex, MODE_UNBOND)
-                      }
-                      intermediateState={intermediateDelegation?.state}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </InfiniteScroll>
+            onLoadMore={fetchMoreDelegations}
+          />
         </Card>
       )}
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (

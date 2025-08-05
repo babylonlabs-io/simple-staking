@@ -8,6 +8,7 @@ export interface TableColumn<R extends object, P extends object = object> {
   width?: string;
   align?: "left" | "right" | "center";
   sortable?: boolean;
+  frozen?: "left" | "right";
   renderCell?: (row: R, index: number, params: P) => ReactNode;
 }
 
