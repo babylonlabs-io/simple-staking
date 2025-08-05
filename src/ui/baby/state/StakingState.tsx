@@ -101,6 +101,14 @@ function StakingState({ children }: PropsWithChildren) {
               "invalidFormat",
               "Staking amount must have no more than 6 decimal points.",
               (_, context) => validateDecimalPoints(context.originalValue, 6),
+            )
+            .test(
+              "insufficientBalanceWithFee",
+              "Total (amount + fee) exceeds balance.",
+              (value = 0, context) => {
+                const feeAmount: number = context.parent?.feeAmount || 0;
+                return BigInt(value) + BigInt(feeAmount) <= balance;
+              },
             ),
         },
         {
