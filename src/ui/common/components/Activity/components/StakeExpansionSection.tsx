@@ -4,10 +4,16 @@ import {
   AccordionSummary,
   Text,
 } from "@babylonlabs-io/core-ui";
+import { useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
 import iconHistory from "@/ui/common/assets/expansion-history.svg";
+import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
+import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
+import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
+import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
+import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
 import { DelegationWithFP } from "@/ui/common/types/delegationsV2";
 
 import { ExpansionButton } from "./ExpansionButton";
@@ -19,22 +25,54 @@ interface StakeExpansionSectionProps {
 export function StakeExpansionSection({
   delegation,
 }: StakeExpansionSectionProps) {
-  // Count current BSNs
-  const currentBsnCount = delegation.finalityProviderBtcPksHex?.length;
-  const maxBsnCount = 3;
+  const { goToStep, setFormData, processing, maxFinalityProviders, canExpand } =
+    useStakingExpansionState();
+  const { delegations } = useDelegationV2State();
+  const { getHistoryCount } = useExpansionHistoryService();
+  const [expansionHistoryModalOpen, setExpansionHistoryModalOpen] =
+    useState(false);
 
-  // Count expansion history, 0 is regular staking, 1+ is expanded
-  const expansionHistoryCount = delegation.previousStakingTxHashHex ? "1+" : 0;
+  const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
+  const canExpandDelegation = canExpand(delegation);
 
   const handleAddBsnFp = () => {
-    console.log(`add bsn/fp, staking tx: ${delegation.stakingTxHashHex}`);
+    if (!canExpandDelegation) {
+      console.warn("Cannot expand: maximum BSN count reached");
+      return;
+    }
+
+    if (processing) {
+      console.warn("Cannot start expansion: another operation in progress");
+      return;
+    }
+
+    // Initialize expansion form data with current delegation
+    const initialFormData = {
+      originalDelegation: delegation,
+      selectedBsnFps: {},
+      feeRate: 0,
+      feeAmount: 0,
+      stakingTimelock: 0,
+    };
+
+    setFormData(initialFormData);
+    goToStep(StakingExpansionStep.BSN_FP_SELECTION);
   };
 
+  /**
+   * Handle expansion history button click.
+   */
   const handleExpansionHistory = () => {
-    console.log(
-      `expansion history clicked, staking tx: ${delegation.stakingTxHashHex}`,
-    );
+    if (expansionHistoryCount > 0) {
+      setExpansionHistoryModalOpen(true);
+    }
   };
+
+  // Calculate actual expansion history count
+  const expansionHistoryCount = getHistoryCount(
+    delegations,
+    delegation.stakingTxHashHex,
+  );
 
   return (
     <div className="w-full">
@@ -59,18 +97,27 @@ export function StakeExpansionSection({
             <ExpansionButton
               Icon={iconBSNFp}
               text="Add BSNs and Finality Providers"
-              counter={`${currentBsnCount}/${maxBsnCount}`}
+              counter={`${currentBsnCount}/${maxFinalityProviders}`}
               onClick={handleAddBsnFp}
+              disabled={!canExpandDelegation || processing}
             />
             <ExpansionButton
               Icon={iconHistory}
               text="Expansion History"
               counter={`${expansionHistoryCount}`}
               onClick={handleExpansionHistory}
+              disabled={expansionHistoryCount === 0 || processing}
             />
           </div>
         </AccordionDetails>
       </Accordion>
+
+      <ExpansionHistoryModal
+        open={expansionHistoryModalOpen}
+        onClose={() => setExpansionHistoryModalOpen(false)}
+        targetDelegation={delegation}
+        allDelegations={delegations}
+      />
     </div>
   );
 }

@@ -1,4 +1,8 @@
-import { btcstakingtx, incentivetx } from "@babylonlabs-io/babylon-proto-ts";
+import {
+  btcstakingtx,
+  epochingtx,
+  incentivetx,
+} from "@babylonlabs-io/babylon-proto-ts";
 import { MessageFns } from "@babylonlabs-io/babylon-proto-ts/dist/generated/google/protobuf/any";
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
 
@@ -12,6 +16,7 @@ export const BBN_REGISTRY_TYPE_URLS = {
   MsgCreateBTCDelegation: "/babylon.btcstaking.v1.MsgCreateBTCDelegation",
   MsgBtcStakeExpand: "/babylon.btcstaking.v1.MsgBtcStakeExpand",
   MsgWithdrawReward: "/babylon.incentive.MsgWithdrawReward",
+  MsgWrappedDelegation: "/babylon.epoching.v1.MsgWrappedDelegate",
 };
 
 // List of protos to register in the registry
@@ -30,6 +35,10 @@ const protosToRegister: ProtoToRegister<any>[] = [
   {
     typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWithdrawReward,
     messageType: incentivetx.MsgWithdrawReward,
+  },
+  {
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWrappedDelegation,
+    messageType: epochingtx.MsgWrappedDelegate,
   },
 ];
 

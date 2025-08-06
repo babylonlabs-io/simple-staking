@@ -9,6 +9,7 @@ import { useBbnQuery } from "@/ui/common/hooks/client/rpc/queries/useBbnQuery";
 import { useEventBus } from "@/ui/common/hooks/useEventBus";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useAppState } from "@/ui/common/state";
+import { getTxHex } from "@/ui/common/utils/mempool_api";
 
 export const useStakingManagerService = () => {
   const { networkInfo } = useAppState();
@@ -71,6 +72,7 @@ export const useStakingManagerService = () => {
     const btcProvider = {
       signPsbt,
       signMessage,
+      getTransactionHex: getTxHex,
     };
 
     const bbnProvider = {

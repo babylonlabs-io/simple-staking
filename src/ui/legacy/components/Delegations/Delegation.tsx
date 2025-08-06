@@ -30,7 +30,7 @@ interface DelegationProps {
   intermediateState?: string;
 }
 
-const { coinName, mempoolApiUrl } = getNetworkConfigBTC();
+const { coinSymbol, mempoolApiUrl } = getNetworkConfigBTC();
 
 interface FinalityProviderDisplayProps {
   fpName: string;
@@ -194,7 +194,7 @@ export const Delegation: React.FC<DelegationProps> = ({
           <div className="flex gap-1 items-center">
             <FaBitcoin className="text-primary" />
             <p>
-              {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinName}
+              {maxDecimals(satoshiToBtc(stakingValueSat), 8)} {coinSymbol}
             </p>
           </div>
         </DelegationCell>

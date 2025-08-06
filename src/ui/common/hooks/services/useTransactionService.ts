@@ -22,6 +22,15 @@ export interface BtcStakingInputs {
   stakingTimelock: number;
 }
 
+export interface BtcStakingExpansionInputs {
+  finalityProviderPksNoCoordHex: string[];
+  stakingAmountSat: number;
+  stakingTimelock: number;
+  previousStakingTxHex: string;
+  previousStakingParamsVersion: number;
+  previousStakingInput: BtcStakingInputs;
+}
+
 export const useTransactionService = () => {
   const { availableUTXOs, refetchUTXOs } = useAppState();
 
@@ -422,6 +431,263 @@ export const useTransactionService = () => {
     [createBtcStakingManager, defaultFeeRate, pushTx, stakerInfo, tipHeight],
   );
 
+  /**
+   * Create the staking expansion EOI
+   *
+   * @param stakingExpansionInput - The staking expansion inputs
+   * @param feeRate - The fee rate
+   * @returns The expansion staking transaction hash and signed Babylon transaction
+   */
+  const createStakingExpansionEoi = useCallback(
+    async (
+      stakingExpansionInput: BtcStakingExpansionInputs,
+      feeRate: number,
+    ) => {
+      const btcStakingManager = createBtcStakingManager();
+
+      validateCommonInputs(
+        btcStakingManager,
+        {
+          finalityProviderPksNoCoordHex:
+            stakingExpansionInput.finalityProviderPksNoCoordHex,
+          stakingAmountSat: stakingExpansionInput.stakingAmountSat,
+          stakingTimelock: stakingExpansionInput.stakingTimelock,
+        },
+        tipHeight,
+        stakerInfo,
+      );
+
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Create previous staking transaction from hex
+      const previousStakingTx = Transaction.fromHex(
+        stakingExpansionInput.previousStakingTxHex,
+      );
+
+      const { stakingTx, signedBabylonTx } =
+        await btcStakingManager!.stakingExpansionRegistrationBabylonTransaction(
+          stakerInfo,
+          stakingExpansionInput,
+          tipHeight,
+          availableUTXOs,
+          feeRate,
+          bech32Address,
+          {
+            stakingTx: previousStakingTx,
+            paramVersion: stakingExpansionInput.previousStakingParamsVersion,
+            stakingInput: stakingExpansionInput.previousStakingInput,
+          },
+        );
+
+      return {
+        stakingTxHash: stakingTx.getId(),
+        signedBabylonTx,
+      };
+    },
+    [
+      availableUTXOs,
+      bech32Address,
+      createBtcStakingManager,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
+  );
+
+  /**
+   * Estimate the staking expansion fee
+   *
+   * @param stakingExpansionInput - The staking expansion inputs
+   * @param feeRate - The fee rate
+   * @returns The expansion staking fee
+   */
+  const estimateStakingExpansionFee = useCallback(
+    (
+      stakingExpansionInput: BtcStakingExpansionInputs,
+      feeRate: number,
+    ): number => {
+      logger.info("Estimating staking expansion fee", {
+        feeRate,
+      });
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        {
+          finalityProviderPksNoCoordHex:
+            stakingExpansionInput.finalityProviderPksNoCoordHex,
+          stakingAmountSat: stakingExpansionInput.stakingAmountSat,
+          stakingTimelock: stakingExpansionInput.stakingTimelock,
+        },
+        tipHeight,
+        stakerInfo,
+      );
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Create previous staking transaction from hex
+      const previousStakingTx = Transaction.fromHex(
+        stakingExpansionInput.previousStakingTxHex,
+      );
+
+      const fee = btcStakingManager!.estimateBtcStakingExpansionFee(
+        stakerInfo,
+        tipHeight,
+        stakingExpansionInput,
+        availableUTXOs,
+        feeRate,
+        {
+          stakingTx: previousStakingTx,
+          paramVersion: stakingExpansionInput.previousStakingParamsVersion,
+          stakingInput: stakingExpansionInput.previousStakingInput,
+        },
+      );
+      return fee;
+    },
+    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs, logger],
+  );
+
+  /**
+   * Submit the staking expansion transaction
+   *
+   * @param stakingExpansionInput - The staking expansion inputs
+   * @param paramVersion - The param version
+   * @param expectedTxHashHex - The expected transaction hash hex
+   * @param unsignedStakingExpansionTxHex - The unsigned staking expansion transaction hex
+   * @param covenantExpansionSignatures - The covenant expansion signatures
+   */
+  const submitStakingExpansionTx = useCallback(
+    async (
+      stakingExpansionInput: BtcStakingExpansionInputs,
+      paramVersion: number,
+      expectedTxHashHex: string,
+      unsignedStakingExpansionTxHex: string,
+      covenantExpansionSignatures: {
+        btcPkHex: string;
+        sigHex: string;
+      }[],
+    ) => {
+      logger.info("Starting submitStakingExpansionTx", {
+        expectedTxHashHex,
+        unsignedTxHex: unsignedStakingExpansionTxHex.slice(0, 32) + "...",
+        covenantSignaturesCount: covenantExpansionSignatures.length,
+        paramVersion,
+      });
+
+      const btcStakingManager = createBtcStakingManager();
+      validateCommonInputs(
+        btcStakingManager,
+        {
+          finalityProviderPksNoCoordHex:
+            stakingExpansionInput.finalityProviderPksNoCoordHex,
+          stakingAmountSat: stakingExpansionInput.stakingAmountSat,
+          stakingTimelock: stakingExpansionInput.stakingTimelock,
+        },
+        tipHeight,
+        stakerInfo,
+      );
+      if (!availableUTXOs) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Available UTXOs not initialized",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      // Parse transactions
+      const unsignedStakingExpansionTx = Transaction.fromHex(
+        unsignedStakingExpansionTxHex,
+      );
+      const previousStakingTx = Transaction.fromHex(
+        stakingExpansionInput.previousStakingTxHex,
+      );
+
+      // Create signed transaction using btc-staking-ts
+      const signedStakingExpansionTx =
+        await btcStakingManager!.createSignedBtcStakingExpansionTransaction(
+          stakerInfo,
+          stakingExpansionInput,
+          unsignedStakingExpansionTx,
+          availableUTXOs,
+          paramVersion,
+          {
+            stakingTx: previousStakingTx,
+            paramVersion: stakingExpansionInput.previousStakingParamsVersion,
+            stakingInput: stakingExpansionInput.previousStakingInput,
+          },
+          covenantExpansionSignatures,
+        );
+
+      const actualTxHashHex = signedStakingExpansionTx.getId();
+
+      logger.info("Transaction signing completed", {
+        expectedTxHashHex,
+        actualTxHashHex,
+        matches: actualTxHashHex === expectedTxHashHex,
+      });
+
+      // Verify the signed transaction hash matches the expected hash from API
+      if (actualTxHashHex !== expectedTxHashHex) {
+        const clientError = new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          `Staking expansion transaction hash mismatch, expected ${expectedTxHashHex} but got ${actualTxHashHex}`,
+        );
+        logger.error(clientError, {
+          data: {
+            expectedTxHashHex,
+            actualTxHashHex,
+            unsignedStakingExpansionTxHex:
+              unsignedStakingExpansionTxHex.slice(0, 64) + "...",
+            signedStakingExpansionTxHex:
+              signedStakingExpansionTx.toHex().slice(0, 64) + "...",
+            covenantSignaturesCount: covenantExpansionSignatures.length,
+          },
+        });
+        throw clientError;
+      }
+
+      const logContext: Record<string, string> = {
+        txHashHex: signedStakingExpansionTx.getId(),
+      };
+
+      if (stakingExpansionInput.previousStakingTxHex) {
+        logContext.previousStakingTxHashHex = Transaction.fromHex(
+          stakingExpansionInput.previousStakingTxHex,
+        ).getId();
+      }
+
+      logger.info(
+        "Broadcasting signed staking expansion transaction",
+        logContext,
+      );
+
+      await pushTx(signedStakingExpansionTx.toHex());
+      refetchUTXOs();
+    },
+    [
+      availableUTXOs,
+      createBtcStakingManager,
+      pushTx,
+      refetchUTXOs,
+      stakerInfo,
+      tipHeight,
+      logger,
+    ],
+  );
+
   return {
     createDelegationEoi,
     estimateStakingFee,
@@ -431,6 +697,9 @@ export const useTransactionService = () => {
     submitEarlyUnbondedWithdrawalTx,
     submitTimelockUnbondedWithdrawalTx,
     submitSlashingWithdrawalTx,
+    createStakingExpansionEoi,
+    estimateStakingExpansionFee,
+    submitStakingExpansionTx,
     tipHeight,
   };
 };

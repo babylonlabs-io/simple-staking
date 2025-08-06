@@ -1,6 +1,7 @@
 import { BabylonBtcStakingManager } from "@babylonlabs-io/btc-staking-ts";
 import { useCallback } from "react";
 
+import { getTxHex } from "@/ui/common/utils/mempool_api";
 import { useBTCWallet } from "@/ui/legacy/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/ui/legacy/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/ui/legacy/hooks/client/rpc/mutation/useBbnTransaction";
@@ -52,6 +53,7 @@ export const useStakingManagerService = () => {
     const btcProvider = {
       signPsbt,
       signMessage,
+      getTransactionHex: getTxHex,
     };
 
     const bbnProvider = {

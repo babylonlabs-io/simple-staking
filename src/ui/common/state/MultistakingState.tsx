@@ -11,6 +11,7 @@ import {
 
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
@@ -39,8 +40,6 @@ interface FieldOptions {
   schema: Schema;
   errors?: Record<string, { level: "warning" | "default" | "error" }>;
 }
-
-const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
 
 export interface MultistakingState {
   stakingModalPage: StakingModalPage;

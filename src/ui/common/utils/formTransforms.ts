@@ -1,3 +1,4 @@
+import babylon from "@/infrastructure/babylon";
 import { btcToSatoshi } from "@/ui/common/utils/btc";
 
 /**
@@ -21,3 +22,6 @@ export const formatStakingAmount = (value: number) =>
  */
 export const formatNumber = (value: number) =>
   !Number.isNaN(value) ? value : undefined;
+
+export const formatBabyStakingAmount = (value: number) =>
+  !Number.isNaN(value) ? Number(babylon.utils.babyToUbbn(value)) : undefined;

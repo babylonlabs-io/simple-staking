@@ -37,7 +37,6 @@ export const DELEGATION_ACTIONS = {
   WITHDRAW_ON_TIMELOCK: "WITHDRAW_ON_TIMELOCK",
   WITHDRAW_ON_TIMELOCK_SLASHING: "WITHDRAW_ON_TIMELOCK_SLASHING",
   WITHDRAW_ON_EARLY_UNBONDING_SLASHING: "WITHDRAW_ON_EARLY_UNBONDING_SLASHING",
-  EXPAND: "EXPAND",
 } as const;
 
 export const DOCUMENTATION_LINKS = {
@@ -58,3 +57,31 @@ export const BABYLON_EXPLORER = process.env.NEXT_PUBLIC_BABYLON_EXPLORER ?? "";
 export const REPLAYS_ON_ERROR_RATE = parseFloat(
   process.env.NEXT_PUBLIC_REPLAYS_RATE ?? "0.05",
 );
+
+export const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
+
+/**
+ * Shared EOI steps used across staking workflows
+ */
+export enum EOIStep {
+  /** EOI signing steps - these follow the same pattern across workflows */
+  EOI_STAKING_SLASHING = "eoi-staking-slashing",
+  EOI_UNBONDING_SLASHING = "eoi-unbonding-slashing",
+  EOI_PROOF_OF_POSSESSION = "eoi-proof-of-possession",
+  EOI_SIGN_BBN = "eoi-sign-bbn",
+  EOI_SEND_BBN = "eoi-send-bbn",
+}
+
+/**
+ * Base staking workflow steps shared across different staking types
+ */
+export enum BaseStakingStep {
+  /** Preview step showing staking details before signing */
+  PREVIEW = "preview",
+  /** Verification and completion steps */
+  VERIFYING = "verifying",
+  VERIFIED = "verified",
+  /** Feedback steps for user experience */
+  FEEDBACK_SUCCESS = "feedback-success",
+  FEEDBACK_CANCEL = "feedback-cancel",
+}
