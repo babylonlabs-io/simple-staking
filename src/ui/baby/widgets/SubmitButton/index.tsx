@@ -17,6 +17,7 @@ export function SubmitButton({ disabled = false, onClick }: SubmitButton) {
   return (
     <AuthGuard fallback={<ConnectButton disabled={disabled} />}>
       <Button
+        //@ts-expect-error - fix type issue in core-ui
         type="submit"
         disabled={!isValid || disabled}
         className="w-full mt-2 capitalize disabled:!text-accent-primary disabled:!bg-accent-primary/10"

@@ -11,6 +11,7 @@ export function ConnectButton({ disabled }: ConnectButtonProps) {
 
   return (
     <Button
+      //@ts-expect-error - fix type issue in core-ui
       type="button"
       onClick={open}
       className="w-full mt-2"

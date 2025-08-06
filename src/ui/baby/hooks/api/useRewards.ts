@@ -9,7 +9,10 @@ export function useRewards(
 ) {
   return useClientQuery({
     queryKey: [BABY_REWARDS_KEY, address],
-    queryFn: () => babylon.client.baby.getRewards(address),
+    queryFn: async () => {
+      const client = await babylon.client();
+      return client.baby.getRewards(address);
+    },
     enabled: Boolean(address) && enabled,
   });
 }
