@@ -5,6 +5,7 @@ import {
 } from "@babylonlabs-io/babylon-proto-ts";
 import { MessageFns } from "@babylonlabs-io/babylon-proto-ts/dist/generated/google/protobuf/any";
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
 // Define the structure of each proto to register
 type ProtoToRegister<T> = {
@@ -69,6 +70,12 @@ export const createBbnRegistry = (): Registry => {
     const generatedType = createGeneratedType(proto.messageType);
     registry.register(proto.typeUrl, generatedType);
   });
+
+  // Register Cosmos SDK message types
+  registry.register(
+    BBN_REGISTRY_TYPE_URLS.MsgWithdrawDelegatorReward,
+    MsgWithdrawDelegatorReward,
+  );
 
   return registry;
 };
