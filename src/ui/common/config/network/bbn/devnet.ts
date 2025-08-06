@@ -3,7 +3,7 @@ import { getUrlFromEnv } from "./urlUtils";
 export const BBN_DEVNET_RPC_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
-  "https://rpc-dapp.devnet.babylonlabs.io/",
+  "https://rpc.devnet.babylonlabs.io/",
 );
 
 export const BBN_DEVNET_LCD_URL = getUrlFromEnv(
