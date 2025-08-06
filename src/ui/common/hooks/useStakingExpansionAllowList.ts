@@ -1,5 +1,3 @@
-import { useMemo } from "react";
-
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 
 /**
@@ -9,23 +7,10 @@ import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 export function useStakingExpansionAllowList() {
   const { data: networkInfo } = useNetworkInfo();
 
-  const stakingExpansionAllowList =
-    networkInfo?.stakingStatus?.stakingExpansionAllowList;
-
-  const isActive = useMemo(() => {
-    if (!stakingExpansionAllowList) {
-      return false;
-    }
-
-    if (stakingExpansionAllowList.isExpired) {
-      return false;
-    }
-
-    return true;
-  }, [stakingExpansionAllowList]);
+  const isMultiStakingAllowListInForce =
+    networkInfo?.stakingStatus?.isMultiStakingAllowListInForce;
 
   return {
-    isAllowListActive: isActive,
-    allowList: stakingExpansionAllowList,
+    isMultiStakingAllowListInForce,
   };
 }

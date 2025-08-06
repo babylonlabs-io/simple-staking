@@ -61,7 +61,11 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     "Error getting network info",
   );
   const { data } = response;
-  const { params, staking_status, network_upgrade } = data.data;
+  const {
+    params,
+    staking_status: { staking_expansion_allow_list },
+    network_upgrade,
+  } = data.data;
 
   const stakingVersions = (params.bbn || [])
     .sort((a, b) => a.version - b.version)
@@ -149,16 +153,13 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     throw clientError;
   }
 
-  const stakingExpansionAllowList = staking_status.staking_expansion_allow_list
-    ? {
-        isExpired: staking_status.staking_expansion_allow_list.is_expired,
-      }
-    : undefined;
+  const isMultiStakingAllowListInForce = staking_expansion_allow_list
+    ? !staking_expansion_allow_list.is_expired
+    : false;
 
   return {
     stakingStatus: {
-      isStakingOpen: staking_status.is_staking_open,
-      stakingExpansionAllowList,
+      isMultiStakingAllowListInForce,
     },
     params: {
       bbnStakingParams: {

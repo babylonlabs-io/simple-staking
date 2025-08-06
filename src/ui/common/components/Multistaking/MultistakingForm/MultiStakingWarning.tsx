@@ -3,14 +3,10 @@ import { Warning } from "@babylonlabs-io/core-ui";
 import { useStakingExpansionAllowList } from "@/ui/common/hooks/useStakingExpansionAllowList";
 
 export function MultistakingUnavailableWarning() {
-  const { isAllowListActive, allowList } = useStakingExpansionAllowList();
-
-  if (!allowList) {
-    return null;
-  }
+  const { isMultiStakingAllowListInForce } = useStakingExpansionAllowList();
 
   // If allow list is active, show warning about multi-staking being unavailable
-  if (isAllowListActive) {
+  if (isMultiStakingAllowListInForce) {
     return (
       <Warning className="mt-2">
         New stakes can only delegate to Babylon Genesis. Multi-Staking is

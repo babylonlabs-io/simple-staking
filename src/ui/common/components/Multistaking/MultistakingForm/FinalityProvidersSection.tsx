@@ -22,13 +22,14 @@ type SelectedProviderItemLocal = {
 
 export function FinalityProvidersSection() {
   const { maxFinalityProviders } = useMultistakingState();
-  const { isAllowListActive } = useStakingExpansionAllowList();
+  const { isMultiStakingAllowListInForce } = useStakingExpansionAllowList();
 
   // Determine if we should allow multiple BSNs
   // We allow multiple BSNs if:
   // 1. maxFinalityProviders > 1 (feature flag enabled)
-  // 2. AND allow list is not active (no restrictions)
-  const allowsMultipleBsns = maxFinalityProviders > 1 && !isAllowListActive;
+  // 2. AND allow list is not in force (no restrictions)
+  const allowsMultipleBsns =
+    maxFinalityProviders > 1 && !isMultiStakingAllowListInForce;
 
   const { value: selectedProviderMap = {}, onChange } = useField<
     Record<string, string>
