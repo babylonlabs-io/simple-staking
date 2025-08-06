@@ -48,7 +48,6 @@ export function BabyActivityList() {
       });
       closeUnbondingModal();
     } catch (error) {
-      console.error("Failed to unbond:", error);
       // Error is already handled in the delegation state
     }
   };
@@ -120,9 +119,9 @@ export function BabyActivityList() {
   return (
     <>
       <div className="space-y-4">
-        {activityItems.map(({ data }, index) => (
+        {activityItems.map(({ data }) => (
           <BabyActivityCard
-            key={`${delegations[index]?.validator.address}-${index}`}
+            key={data.validator.address}
             activityData={data}
           />
         ))}
