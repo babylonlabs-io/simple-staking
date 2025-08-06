@@ -93,6 +93,11 @@ function StakingState({ children }: PropsWithChildren) {
             .required("Enter BABY Amount to Stake")
             .moreThan(0, "Staking amount must be greater than 0.")
             .test(
+              "invalidMinAmount",
+              "Minimum staking amount is 1 BABY",
+              (value = 0) => babylon.utils.ubbnToBaby(BigInt(value)) >= 1,
+            )
+            .test(
               "invalidBalance",
               "Staking Amount Exceeds Balance",
               (value = 0) => BigInt(value) <= balance,
