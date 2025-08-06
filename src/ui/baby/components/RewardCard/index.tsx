@@ -13,13 +13,6 @@ export function RewardCard() {
   const hasRewards = totalReward > 0n;
   const formattedReward = maxDecimals(Number(totalReward) / 1e6, 6);
 
-  console.log("🎯 RewardCard Debug:", {
-    totalReward: totalReward.toString(),
-    hasRewards,
-    formattedReward,
-    loading,
-  });
-
   return (
     <SubSection className="flex-col gap-4">
       <div className="flex justify-between items-center w-full">

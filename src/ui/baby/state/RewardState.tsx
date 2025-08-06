@@ -49,7 +49,6 @@ function RewardState({ children }: PropsWithChildren) {
   }, []);
 
   const refreshRewards = useCallback(() => {
-    console.log("🔄 Manually refreshing rewards...");
     refetchRewards();
   }, [refetchRewards]);
 

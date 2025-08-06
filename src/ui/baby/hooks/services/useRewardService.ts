@@ -20,35 +20,20 @@ export function useRewardService() {
   } = useRewards(bech32Address);
   const { signBbnTx, sendBbnTx } = useBbnTransaction();
 
-  console.log("🐛 BABY Rewards Debug:", {
-    bech32Address,
-    rewards,
-    isLoading,
-    rewardsLength: rewards.length,
-  });
-
   const rewardList = useMemo(() => {
     const processed = rewards
       .map(({ validatorAddress, reward }) => {
-        console.log(
-          "🔍 Processing reward for validator:",
-          validatorAddress,
-          "rewards:",
-          reward,
-        );
         const coin = reward.find((coin) => coin.denom === "ubbn");
-        console.log("💰 Found uBBN coin:", coin);
         return coin
           ? {
               validatorAddress,
-              amount: BigInt(coin.amount),
+              amount: BigInt(Math.floor(Number(coin.amount))),
               coin: coin.denom,
             }
           : null;
       })
       .filter(Boolean) as Reward[];
 
-    console.log("📊 Final processed reward list:", processed);
     return processed;
   }, [rewards]);
 
@@ -57,7 +42,6 @@ export function useRewardService() {
       (total, reward) => total + reward.amount,
       0n,
     );
-    console.log("💎 Total reward calculated:", total.toString(), "uBBN");
     return total;
   }, [rewardList]);
 
