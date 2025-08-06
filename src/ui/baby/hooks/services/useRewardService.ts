@@ -20,27 +20,46 @@ export function useRewardService() {
   } = useRewards(bech32Address);
   const { signBbnTx, sendBbnTx } = useBbnTransaction();
 
-  const rewardList = useMemo(
-    () =>
-      rewards
-        .map(({ validatorAddress, reward }) => {
-          const coin = reward.find((coin) => coin.denom === "ubbn");
-          return coin
-            ? {
-                validatorAddress,
-                amount: BigInt(coin.amount),
-                coin: coin.denom,
-              }
-            : null;
-        })
-        .filter(Boolean) as Reward[],
-    [rewards],
-  );
+  console.log("🐛 BABY Rewards Debug:", {
+    bech32Address,
+    rewards,
+    isLoading,
+    rewardsLength: rewards.length,
+  });
 
-  const totalReward = useMemo(
-    () => rewardList.reduce((total, reward) => total + reward.amount, 0n),
-    [rewardList],
-  );
+  const rewardList = useMemo(() => {
+    const processed = rewards
+      .map(({ validatorAddress, reward }) => {
+        console.log(
+          "🔍 Processing reward for validator:",
+          validatorAddress,
+          "rewards:",
+          reward,
+        );
+        const coin = reward.find((coin) => coin.denom === "ubbn");
+        console.log("💰 Found uBBN coin:", coin);
+        return coin
+          ? {
+              validatorAddress,
+              amount: BigInt(coin.amount),
+              coin: coin.denom,
+            }
+          : null;
+      })
+      .filter(Boolean) as Reward[];
+
+    console.log("📊 Final processed reward list:", processed);
+    return processed;
+  }, [rewards]);
+
+  const totalReward = useMemo(() => {
+    const total = rewardList.reduce(
+      (total, reward) => total + reward.amount,
+      0n,
+    );
+    console.log("💎 Total reward calculated:", total.toString(), "uBBN");
+    return total;
+  }, [rewardList]);
 
   const claimAllRewards = useCallback(async () => {
     if (!bech32Address) throw Error("Babylon Wallet is not connected");
@@ -61,5 +80,6 @@ export function useRewardService() {
     rewards: rewardList,
     totalReward,
     claimAllRewards,
+    refetchRewards,
   };
 }

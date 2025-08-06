@@ -1,10 +1,25 @@
 import { Avatar, Button, SubSection, Text } from "@babylonlabs-io/core-ui";
 
+import { useRewardState } from "@/ui/baby/state/RewardState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 const { logo, coinSymbol } = getNetworkConfigBBN();
 
 export function RewardCard() {
+  const { totalReward, openClaimModal, loading, refreshRewards } =
+    useRewardState();
+
+  const hasRewards = totalReward > 0n;
+  const formattedReward = maxDecimals(Number(totalReward) / 1e6, 6);
+
+  console.log("🎯 RewardCard Debug:", {
+    totalReward: totalReward.toString(),
+    hasRewards,
+    formattedReward,
+    loading,
+  });
+
   return (
     <SubSection className="flex-col gap-4">
       <div className="flex justify-between items-center w-full">
@@ -15,7 +30,23 @@ export function RewardCard() {
           </span>
         </div>
 
-        <Button size="small">Claim</Button>
+        <div className="flex gap-2">
+          <Button
+            size="small"
+            onClick={refreshRewards}
+            disabled={loading}
+            variant="outlined"
+          >
+            🔄
+          </Button>
+          <Button
+            size="small"
+            onClick={openClaimModal}
+            disabled={!hasRewards || loading}
+          >
+            Claim
+          </Button>
+        </div>
       </div>
 
       <Text
@@ -24,10 +55,17 @@ export function RewardCard() {
         className="flex justify-between items-center text-accent-secondary"
       >
         <span>Babylon Genesis</span>
-        <span>$100.00 USD</span>
+        <span>
+          {formattedReward} {coinSymbol}
+          <span style={{ fontSize: "10px", opacity: 0.5, marginLeft: "8px" }}>
+            (raw: {totalReward.toString()})
+          </span>
+        </span>
       </Text>
 
-      <Button fluid>Claim</Button>
+      <Button fluid onClick={openClaimModal} disabled={!hasRewards || loading}>
+        Claim
+      </Button>
     </SubSection>
   );
 }
