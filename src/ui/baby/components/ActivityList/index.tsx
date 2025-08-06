@@ -56,17 +56,20 @@ export function BabyActivityList() {
   const activityItems = useMemo(() => {
     return delegations.map((delegation) => {
       const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
+      const isUnbonding = delegation.status === "unbonding";
 
       return {
         delegation,
         data: {
           icon: logo,
           formattedAmount: `${formattedAmount} ${coinSymbol}`,
-          primaryAction: {
-            label: "Unbond",
-            variant: "contained" as const,
-            onClick: () => openUnbondingModal(delegation),
-          },
+          primaryAction: isUnbonding
+            ? undefined
+            : {
+                label: "Unbond",
+                variant: "contained" as const,
+                onClick: () => openUnbondingModal(delegation),
+              },
           details: [],
           optionalDetails: [
             {
@@ -80,6 +83,10 @@ export function BabyActivityList() {
             {
               label: "Shares",
               value: delegation.shares.toFixed(6),
+            },
+            {
+              label: "Status",
+              value: isUnbonding ? "Unbonding" : "Active",
             },
             {
               label: "Voting Power",
