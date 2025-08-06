@@ -6,6 +6,9 @@ export const mockSuccessResponse = {
   data: {
     staking_status: {
       is_staking_open: true,
+      staking_expansion_allow_list: {
+        is_expired: false,
+      },
     },
     params: {
       bbn: [

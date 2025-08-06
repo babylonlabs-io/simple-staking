@@ -11,6 +11,7 @@ import { FinalityProvidersSection } from "./FinalityProvidersSection";
 import { FormAlert } from "./FormAlert";
 import { StakingFeesSection } from "./StakingFeesSection";
 import { SubmitButton } from "./SubmitButton";
+import { UnavailableWarning } from "./UnavailableWarning";
 
 export function MultistakingFormContent() {
   const { address } = useBTCWallet();
@@ -40,6 +41,7 @@ export function MultistakingFormContent() {
         <AuthGuard fallback={<ConnectButton />}>
           <SubmitButton />
         </AuthGuard>
+        <UnavailableWarning />
 
         <FormAlert
           address={address}

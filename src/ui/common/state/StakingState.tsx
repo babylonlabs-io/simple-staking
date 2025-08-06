@@ -73,7 +73,6 @@ export enum StakingStep {
 export interface StakingState {
   hasError: boolean;
   blocked: boolean;
-  available: boolean;
   loading: boolean;
   processing: boolean;
   errorMessage?: string;
@@ -117,7 +116,6 @@ const { StateProvider, useState: useStakingState } =
   createStateUtils<StakingState>({
     hasError: false,
     blocked: false,
-    available: false,
     disabled: undefined,
     loading: false,
     processing: false,
@@ -193,7 +191,6 @@ export function StakingState({ children }: PropsWithChildren) {
     isStateLoading || isCheckLoading || isFeeLoading || isBalanceLoading;
   const hasError = isStateError || isNetworkFeeError || !isApiNormal;
   const blocked = isGeoBlocked;
-  const available = Boolean(networkInfo?.stakingStatus.isStakingOpen);
   const errorMessage = healthCheckError?.message;
   const latestParam = networkInfo?.params.bbnStakingParams?.latestParam;
 
@@ -394,7 +391,6 @@ export function StakingState({ children }: PropsWithChildren) {
     () => ({
       hasError,
       blocked,
-      available,
       disabled: isDisabled,
       loading,
       processing,
@@ -415,7 +411,6 @@ export function StakingState({ children }: PropsWithChildren) {
     [
       hasError,
       blocked,
-      available,
       isDisabled,
       loading,
       processing,
