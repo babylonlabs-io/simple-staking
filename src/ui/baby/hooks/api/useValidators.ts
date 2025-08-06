@@ -6,7 +6,10 @@ const BABY_VALIDATORS_KEY = "BABY_VALIDATORS_KEY";
 export function useValidators({ enabled }: { enabled?: boolean } = {}) {
   return useClientQuery({
     queryKey: [BABY_VALIDATORS_KEY],
-    queryFn: () => babylon.client.baby.getValidators(),
+    queryFn: async () => {
+      const client = await babylon.client();
+      return client.baby.getValidators();
+    },
     enabled,
   });
 }

@@ -6,7 +6,10 @@ const BABY_POOL_KEY = "BABY_POOL_KEY";
 export function usePool({ enabled = true }: { enabled?: boolean } = {}) {
   return useClientQuery({
     queryKey: [BABY_POOL_KEY],
-    queryFn: () => babylon.client.baby.getPool(),
+    queryFn: async () => {
+      const client = await babylon.client();
+      return client.baby.getPool();
+    },
     enabled,
   });
 }
