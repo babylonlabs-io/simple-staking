@@ -47,7 +47,7 @@ export function BabyActivityList() {
         amount,
       });
       closeUnbondingModal();
-    } catch (error) {
+    } catch {
       // Error is already handled in the delegation state
     }
   };
@@ -119,9 +119,9 @@ export function BabyActivityList() {
   return (
     <>
       <div className="space-y-4">
-        {activityItems.map(({ data }) => (
+        {activityItems.map(({ delegation, data }) => (
           <BabyActivityCard
-            key={data.validator.address}
+            key={delegation.validator.address}
             activityData={data}
           />
         ))}
