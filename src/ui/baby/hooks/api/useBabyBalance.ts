@@ -9,7 +9,8 @@ export function useBabyBalance(
 ) {
   return useClientQuery({
     queryKey: [BABY_BALANCE_KEY, address],
-    queryFn: () => babylon.client.baby.getBalance(address),
+    queryFn: () =>
+      babylon.client.baby.getBalance(address).then(babylon.utils.ubbnToBaby),
     enabled: Boolean(address) && enabled,
   });
 }

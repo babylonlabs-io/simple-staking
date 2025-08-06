@@ -1,9 +1,6 @@
 import { type PropsWithChildren, useCallback, useMemo, useState } from "react";
 
-import {
-  type Delegation,
-  useDelegationService,
-} from "@/ui/baby/hooks/services/useDelegationService";
+import { useDelegationService } from "@/ui/baby/hooks/services/useDelegationService";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
@@ -11,6 +8,14 @@ import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 interface UnbondProps {
   validatorAddress: string;
   amount: string;
+}
+
+export interface Delegation {
+  validatorAddress: string;
+  delegatorAddress: string;
+  shares: number;
+  amount: bigint;
+  coin: "ubbn";
 }
 
 interface ValidatorState {
@@ -63,4 +68,4 @@ function DelegationState({ children }: PropsWithChildren) {
   return <StateProvider value={context}>{children}</StateProvider>;
 }
 
-export { Delegation, DelegationState, useDelegationState };
+export { DelegationState, useDelegationState };

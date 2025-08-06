@@ -2,20 +2,16 @@ import { useCallback, useMemo } from "react";
 
 import babylon from "@/infrastructure/babylon";
 import { useDelegations } from "@/ui/baby/hooks/api/useDelegations";
-import {
-  type Validator,
-  useValidatorService,
-} from "@/ui/baby/hooks/services/useValidatorService";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
 
 interface StakingParams {
   validatorAddress: string;
-  amount: string | number;
+  amount: string;
 }
 
 export interface Delegation {
-  validator: Validator;
+  validatorAddress: string;
   delegatorAddress: string;
   shares: number;
   amount: bigint;
@@ -30,34 +26,31 @@ export function useDelegationService() {
     isLoading,
   } = useDelegations(bech32Address);
   const { signBbnTx, sendBbnTx, estimateBbnGasFee } = useBbnTransaction();
-  const { validatorMap, loading: isValidatorLoading } = useValidatorService();
 
   const groupedDelegations = useMemo(
     () =>
-      !isValidatorLoading
-        ? Object.values(
-            delegations.reduce(
-              (acc, item) => {
-                const delegation = acc[item.delegation.validatorAddress];
-                if (delegation) {
-                  delegation.shares += parseFloat(item.delegation.shares);
-                  delegation.amount += BigInt(item.balance.amount);
-                } else {
-                  acc[item.delegation.validatorAddress] = {
-                    validator: validatorMap[item.delegation.validatorAddress],
-                    delegatorAddress: item.delegation.delegatorAddress,
-                    shares: parseFloat(item.delegation.shares),
-                    amount: BigInt(item.balance.amount),
-                    coin: "ubbn",
-                  };
-                }
-                return acc;
-              },
-              {} as Record<string, Delegation>,
-            ),
-          )
-        : [],
-    [delegations, validatorMap, isValidatorLoading],
+      Object.values(
+        delegations.reduce(
+          (acc, item) => {
+            const delegation = acc[item.delegation.validatorAddress];
+            if (delegation) {
+              delegation.shares += parseFloat(item.delegation.shares);
+              delegation.amount += BigInt(item.balance.amount);
+            } else {
+              acc[item.delegation.validatorAddress] = {
+                validatorAddress: item.delegation.validatorAddress,
+                delegatorAddress: item.delegation.delegatorAddress,
+                shares: parseFloat(item.delegation.shares),
+                amount: BigInt(item.balance.amount),
+                coin: "ubbn",
+              };
+            }
+            return acc;
+          },
+          {} as Record<string, Delegation>,
+        ),
+      ),
+    [delegations],
   );
 
   const stake = useCallback(
@@ -67,10 +60,7 @@ export function useDelegationService() {
       const stakeMsg = babylon.txs.baby.createStakeMsg({
         validatorAddress,
         delegatorAddress: bech32Address,
-        amount:
-          typeof amount === "string"
-            ? babylon.utils.babyToUbbn(Number(amount))
-            : BigInt(amount),
+        amount: babylon.utils.babyToUbbn(Number(amount)),
       });
       const signedTx = await signBbnTx(stakeMsg);
       const result = await sendBbnTx(signedTx);

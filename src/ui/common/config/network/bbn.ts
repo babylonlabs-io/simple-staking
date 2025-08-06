@@ -1,7 +1,5 @@
 import type { BBNConfig } from "@babylonlabs-io/wallet-connector";
 
-import babyLogo from "@/ui/common/assets/baby.png";
-
 import { bbnBsnDevnet } from "./bbn/bsn-devnet";
 import { bbnCanary } from "./bbn/canary";
 import { bbnDevnet } from "./bbn/devnet";
@@ -11,7 +9,6 @@ import { bbnTestnet } from "./bbn/testnet";
 
 interface ExtendedBBNConfig extends BBNConfig {
   displayUSD: boolean;
-  logo: string;
 }
 
 const defaultNetwork = "devnet";
@@ -26,7 +23,6 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
     displayUSD: true,
-    logo: babyLogo,
   },
   canary: {
     chainId: bbnCanary.chainId,
@@ -36,7 +32,6 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkFullName: "Babylon Genesis",
     coinSymbol: "BABY",
     displayUSD: true,
-    logo: babyLogo,
   },
   devnet: {
     chainId: bbnDevnet.chainId,
@@ -46,7 +41,6 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
     displayUSD: false,
-    logo: babyLogo,
   },
   bsnDevnet: {
     chainId: bbnBsnDevnet.chainId,
@@ -56,7 +50,6 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
     displayUSD: false,
-    logo: babyLogo,
   },
   edgeDevnet: {
     chainId: bbnEdgeDevnet.chainId,
@@ -66,7 +59,6 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
     displayUSD: false,
-    logo: babyLogo,
   },
   testnet: {
     chainId: bbnTestnet.chainId,
@@ -76,7 +68,6 @@ const config: Record<string, ExtendedBBNConfig> = {
     networkFullName: "Testnet Babylon Genesis",
     coinSymbol: "tBABY",
     displayUSD: false,
-    logo: babyLogo,
   },
 };
 

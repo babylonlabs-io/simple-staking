@@ -12,10 +12,7 @@ export const validateNoDecimalPoints = (value: string): boolean => {
  * @param value The value to validate.
  * @returns `true` if the value has no more than 8 decimal points, otherwise `false`.
  */
-export const validateDecimalPoints = (
-  value: string,
-  decimals: number = 8,
-): boolean => {
+export const validateDecimalPoints = (value: string): boolean => {
   const decimalPoints = value.split(".")[1]?.length || 0;
-  return decimalPoints <= decimals;
+  return decimalPoints <= 8;
 };
