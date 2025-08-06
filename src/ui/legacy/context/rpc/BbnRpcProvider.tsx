@@ -1,5 +1,5 @@
 import { QueryClient } from "@cosmjs/stargate";
-import { Tendermint34Client } from "@cosmjs/tendermint-rpc";
+import { connectComet } from "@cosmjs/tendermint-rpc";
 import {
   createContext,
   useCallback,
@@ -33,7 +33,7 @@ export function BbnRpcProvider({ children }: { children: React.ReactNode }) {
 
   const connect = useCallback(async () => {
     try {
-      const tmClient = await Tendermint34Client.connect(rpc);
+      const tmClient = await connectComet(rpc);
       const client = QueryClient.withExtensions(tmClient);
       setQueryClient(client);
       setIsLoading(false);
