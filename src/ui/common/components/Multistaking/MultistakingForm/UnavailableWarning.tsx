@@ -2,7 +2,7 @@ import { Warning } from "@babylonlabs-io/core-ui";
 
 import { useStakingExpansionAllowList } from "@/ui/common/hooks/useStakingExpansionAllowList";
 
-export function MultistakingUnavailableWarning() {
+export function UnavailableWarning() {
   const { isMultiStakingAllowListInForce } = useStakingExpansionAllowList();
 
   // If allow list is active, show warning about multi-staking being unavailable
