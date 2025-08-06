@@ -36,6 +36,7 @@ export function RewardCard() {
             onClick={refreshRewards}
             disabled={loading}
             variant="outlined"
+            aria-label="Refresh rewards"
           >
             🔄
           </Button>
