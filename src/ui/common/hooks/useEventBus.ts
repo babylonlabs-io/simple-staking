@@ -1,10 +1,35 @@
-import type { ManagerEvents } from "@babylonlabs-io/btc-staking-ts";
-import { createNanoEvents } from "nanoevents";
+import { useEffect, useRef } from "react";
 
-export type EventBusEvents = ManagerEvents;
+import { eventBus, type EventType } from "@/ui/common/utils/eventBus";
 
-const eventBus = createNanoEvents<EventBusEvents>();
+/**
+ * Hook to subscribe to EventBus events with automatic cleanup
+ */
+export function useEventBus<T = any>(
+  event: EventType,
+  callback: (data: T) => void,
+) {
+  const callbackRef = useRef(callback);
 
-export function useEventBus() {
-  return eventBus;
+  // Keep callback ref current
+  useEffect(() => {
+    callbackRef.current = callback;
+  });
+
+  useEffect(() => {
+    const unsubscribe = eventBus.on(event, (data: T) => {
+      callbackRef.current(data);
+    });
+
+    return unsubscribe;
+  }, [event]);
+}
+
+/**
+ * Hook to emit events
+ */
+export function useEventEmitter() {
+  return {
+    emit: eventBus.emit.bind(eventBus),
+  };
 }
