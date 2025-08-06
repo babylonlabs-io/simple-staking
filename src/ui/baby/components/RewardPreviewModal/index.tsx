@@ -9,6 +9,7 @@ import { PropsWithChildren } from "react";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 const { coinSymbol } = getNetworkConfigBBN();
 
@@ -16,6 +17,7 @@ interface PreviewModalProps {
   open: boolean;
   processing?: boolean;
   title: string;
+  totalReward: bigint;
   onClose: () => void;
   onProceed: () => void;
 }
@@ -24,9 +26,11 @@ export const RewardsPreviewModal = ({
   open,
   processing = false,
   title,
+  totalReward,
   onClose,
   onProceed,
 }: PropsWithChildren<PreviewModalProps>) => {
+  const formattedReward = maxDecimals(Number(totalReward) / 1e6, 6); // Convert from uBBN to BBN
   return (
     <ResponsiveDialog open={open} onClose={onClose}>
       <DialogHeader title={title} className="text-accent-primary" />
@@ -36,8 +40,7 @@ export const RewardsPreviewModal = ({
           <Text variant="body1" className="flex justify-between">
             <span>Babylon Genesis</span>
             <span className="flex flex-col items-end">
-              1000 {coinSymbol}
-              <Text variant="body2">~ $5,677.39 USD</Text>
+              {formattedReward} {coinSymbol}
             </span>
           </Text>
 
@@ -46,8 +49,7 @@ export const RewardsPreviewModal = ({
           <Text variant="body1" className="flex justify-between">
             <span>Transaction Fees</span>
             <span className="flex flex-col gap-2 items-end">
-              10 {coinSymbol}
-              <Text variant="body2">~ $5,677.39 USD</Text>
+              <Text variant="body2">Network fees will be calculated</Text>
             </span>
           </Text>
         </div>
