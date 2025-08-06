@@ -9,7 +9,10 @@ export function useDelegations(
 ) {
   return useClientQuery({
     queryKey: [BABY_DELEGATIONS_KEY, address],
-    queryFn: () => babylon.client.baby.getDelegations(address),
+    queryFn: async () => {
+      const client = await babylon.client();
+      return client.baby.getDelegations(address);
+    },
     enabled: Boolean(address) && enabled,
   });
 }
