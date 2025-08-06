@@ -48,7 +48,6 @@ export function BabyActivityList() {
       });
       closeUnbondingModal();
     } catch (error) {
-      console.error("Failed to unbond:", error);
       // Error is already handled in the delegation state
     }
   };
