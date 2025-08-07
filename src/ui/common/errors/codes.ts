@@ -12,6 +12,10 @@ export const ERROR_CODES = {
   VALIDATION_ERROR: "VALIDATION_ERROR", // Generic invalid data (address, block height, amounts, timelocks, proofs, delegation state)
   MISSING_DATA_ERROR: "MISSING_DATA_ERROR", // Required data not provided (e.g., PoP, signatures)
 
+  // --- UTXO & Fund Management Errors ---
+  INSUFFICIENT_FUNDS: "INSUFFICIENT_FUNDS", // Not enough funds or UTXOs to complete the operation
+  UTXO_CONFLICT: "UTXO_CONFLICT", // UTXOs already spent or conflicting with mempool transactions
+
   // --- Transaction Lifecycle Errors ---
   TRANSACTION_PREPARATION_ERROR: "TRANSACTION_PREPARATION_ERROR", // Errors building the transaction (e.g., fee estimation issues)
   TRANSACTION_SUBMISSION_ERROR: "TRANSACTION_SUBMISSION_ERROR", // Errors sending/broadcasting the transaction via wallet or directly

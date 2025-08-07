@@ -8,6 +8,7 @@ import { useCallback, useMemo, type PropsWithChildren } from "react";
 
 import { useOrdinals } from "@/ui/common/hooks/client/api/useOrdinals";
 import { useUTXOs } from "@/ui/common/hooks/client/api/useUTXOs";
+import { validateUTXOs } from "@/ui/common/services/UTXOValidationService";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import { filterDust } from "@/ui/common/utils/wallet";
 
@@ -46,6 +47,7 @@ export interface AppState {
   excludeOrdinals: () => void;
   refetchUTXOs: () => void;
   setTheme: (theme: "dark" | "light") => void;
+  getValidatedUTXOs: () => Promise<UTXO[]>;
 }
 
 const { StateProvider, useState: useApplicationState } =
@@ -58,6 +60,7 @@ const { StateProvider, useState: useApplicationState } =
     excludeOrdinals: () => {},
     refetchUTXOs: () => {},
     setTheme: () => {},
+    getValidatedUTXOs: async () => [],
   });
 
 export function AppState({ children }: PropsWithChildren) {
@@ -122,6 +125,20 @@ export function AppState({ children }: PropsWithChildren) {
     [toggleLockInscriptions],
   );
 
+  const getValidatedUTXOs = useCallback(async (): Promise<UTXO[]> => {
+    if (!availableUTXOs || availableUTXOs.length === 0) {
+      return [];
+    }
+
+    try {
+      return await validateUTXOs(availableUTXOs);
+    } catch (error) {
+      console.error("Failed to validate UTXOs:", error);
+      // Fallback to original UTXOs if validation fails
+      return availableUTXOs;
+    }
+  }, [availableUTXOs]);
+
   // Context
   const context = useMemo(
     () => ({
@@ -137,6 +154,7 @@ export function AppState({ children }: PropsWithChildren) {
       excludeOrdinals,
       refetchUTXOs,
       setTheme,
+      getValidatedUTXOs,
     }),
     [
       theme,
@@ -151,6 +169,7 @@ export function AppState({ children }: PropsWithChildren) {
       excludeOrdinals,
       refetchUTXOs,
       setTheme,
+      getValidatedUTXOs,
     ],
   );
 

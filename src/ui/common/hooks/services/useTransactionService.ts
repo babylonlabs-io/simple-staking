@@ -32,7 +32,7 @@ export interface BtcStakingExpansionInputs {
 }
 
 export const useTransactionService = () => {
-  const { availableUTXOs, refetchUTXOs } = useAppState();
+  const { availableUTXOs, refetchUTXOs, getValidatedUTXOs } = useAppState();
 
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
@@ -466,6 +466,18 @@ export const useTransactionService = () => {
         throw clientError;
       }
 
+      // Validate UTXOs before transaction creation to prevent mempool conflicts
+      const validatedUTXOs = await getValidatedUTXOs();
+
+      if (validatedUTXOs.length === 0) {
+        const clientError = new ClientError(
+          ERROR_CODES.INSUFFICIENT_FUNDS,
+          "No valid UTXOs available for staking expansion transaction. Please refresh and try again.",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
       // Create previous staking transaction from hex
       const previousStakingTx = Transaction.fromHex(
         stakingExpansionInput.previousStakingTxHex,
@@ -476,7 +488,7 @@ export const useTransactionService = () => {
           stakerInfo,
           stakingExpansionInput,
           tipHeight,
-          availableUTXOs,
+          validatedUTXOs,
           feeRate,
           bech32Address,
           {
@@ -498,6 +510,7 @@ export const useTransactionService = () => {
       stakerInfo,
       tipHeight,
       logger,
+      getValidatedUTXOs,
     ],
   );
 

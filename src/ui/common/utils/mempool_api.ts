@@ -302,3 +302,39 @@ export async function getTxHex(txId: string): Promise<string> {
   });
   return response;
 }
+
+// URL for checking if a specific UTXO is spent
+function utxoOutspendUrl(txId: string, vout: number): URL {
+  return new URL(mempoolAPI + "tx/" + txId + "/outspend/" + vout);
+}
+
+/**
+ * Check if a specific UTXO is spent.
+ * @param txId - The transaction ID in string format.
+ * @param vout - The output index.
+ * @returns A promise that resolves to true if the UTXO is spent, false if it's available.
+ */
+export async function isUTXOSpent(
+  txId: string,
+  vout: number,
+): Promise<boolean> {
+  try {
+    const response = await fetchApi<{
+      spent: boolean;
+      txid?: string;
+      vin?: number;
+      status?: {
+        confirmed: boolean;
+        block_height: number;
+        block_hash: string;
+        block_time: number;
+      };
+    }>(utxoOutspendUrl(txId, vout));
+
+    return response.spent;
+  } catch (error) {
+    // If we can't verify, assume it's spent to be safe
+    console.warn(`Failed to check UTXO ${txId}:${vout} spent status`, error);
+    return true;
+  }
+}
