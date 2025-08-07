@@ -4,8 +4,14 @@ import { useRewardState } from "@/ui/baby/state/RewardState";
 import { RouteGuard } from "@/ui/common/components/RouteGuard/RouteGuard";
 
 export default function Rewards() {
-  const { showClaimModal, closeClaimModal, claimAll, loading, totalReward } =
-    useRewardState();
+  const {
+    showClaimModal,
+    closeClaimModal,
+    claimAll,
+    loading,
+    totalReward,
+    rewards,
+  } = useRewardState();
 
   return (
     <RouteGuard redirectTo="/baby/staking">
@@ -18,6 +24,7 @@ export default function Rewards() {
         processing={loading}
         title="Claim Rewards"
         totalReward={totalReward}
+        rewards={rewards}
         onClose={closeClaimModal}
         onProceed={claimAll}
       />
