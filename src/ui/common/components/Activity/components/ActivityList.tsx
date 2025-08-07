@@ -256,12 +256,9 @@ const transformToActivityCard = (
 
   // Check if expansion section should be shown
   // 1. Feature flag enabled
-  // 2. Delegation is active
-  // 3. Delegation can expand
+  // 2. Delegation can expand (is active logic is handled in the backend)
   const showExpansionSection =
-    FeatureFlagService.IsStakingExpansionEnabled &&
-    delegation.state === DelegationV2StakingState.ACTIVE &&
-    delegation.canExpand;
+    FeatureFlagService.IsStakingExpansionEnabled && delegation.canExpand;
 
   return {
     formattedAmount: `${maxDecimals(satoshiToBtc(delegation.stakingAmount), 8)} ${coinName}`,
