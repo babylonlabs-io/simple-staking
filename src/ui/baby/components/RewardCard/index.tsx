@@ -2,6 +2,7 @@ import { Avatar, Button, SubSection, Text } from "@babylonlabs-io/core-ui";
 
 import { useRewardState } from "@/ui/baby/state/RewardState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 const { logo, coinSymbol } = getNetworkConfigBBN();
@@ -11,7 +12,7 @@ export function RewardCard() {
     useRewardState();
 
   const hasRewards = totalReward > 0n;
-  const formattedReward = maxDecimals(Number(totalReward) / 1e6, 6);
+  const formattedReward = maxDecimals(ubbnToBaby(Number(totalReward)), 6);
 
   return (
     <SubSection className="flex-col gap-4">

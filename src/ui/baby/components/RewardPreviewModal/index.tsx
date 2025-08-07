@@ -9,6 +9,7 @@ import { PropsWithChildren } from "react";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 const { coinSymbol } = getNetworkConfigBBN();
@@ -30,7 +31,7 @@ export const RewardsPreviewModal = ({
   onClose,
   onProceed,
 }: PropsWithChildren<PreviewModalProps>) => {
-  const formattedReward = maxDecimals(Number(totalReward) / 1e6, 6); // Convert from uBBN to BBN
+  const formattedReward = maxDecimals(ubbnToBaby(Number(totalReward)), 6);
   return (
     <ResponsiveDialog open={open} onClose={onClose}>
       <DialogHeader title={title} className="text-accent-primary" />

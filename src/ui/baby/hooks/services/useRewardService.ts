@@ -4,6 +4,7 @@ import babylon from "@/infrastructure/babylon";
 import { useRewards } from "@/ui/baby/hooks/api/useRewards";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
+import { coinAmountToBigInt } from "@/ui/common/utils/bbn";
 
 export interface Reward {
   validatorAddress: string;
@@ -27,7 +28,7 @@ export function useRewardService() {
         return coin
           ? {
               validatorAddress,
-              amount: BigInt(Math.floor(Number(coin.amount))),
+              amount: coinAmountToBigInt(coin.amount),
               coin: coin.denom,
             }
           : null;
