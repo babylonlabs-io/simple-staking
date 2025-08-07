@@ -17,3 +17,13 @@ export function babyToUbbn(bbn: number): number {
 export function ubbnToBaby(ubbn: number): number {
   return ubbn / 1e6;
 }
+
+/**
+ * Converts a coin amount string to BigInt, safely handling decimal values.
+ * Used for financial calculations involving BBN rewards and amounts.
+ * @param amount The coin amount as a string.
+ * @returns The amount as BigInt, floored to remove decimal precision.
+ */
+export function coinAmountToBigInt(amount: string): bigint {
+  return BigInt(Math.floor(Number(amount)));
+}
