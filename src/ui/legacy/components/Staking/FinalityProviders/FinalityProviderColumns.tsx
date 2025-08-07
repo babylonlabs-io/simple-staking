@@ -6,6 +6,7 @@ import {
   FinalityProviderStateLabels,
 } from "@/ui/legacy/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/legacy/utils/btc";
+import { formatCommissionPercentage } from "@/ui/legacy/utils/formatCommissionPercentage";
 import { maxDecimals } from "@/ui/legacy/utils/maxDecimals";
 
 import { FinalityProviderLogo } from "./FinalityProviderLogo";
@@ -80,7 +81,7 @@ export const finalityProviderColumns = [
     render: (value: unknown) => {
       const commission = Number(value);
       if (isNaN(commission)) return "-";
-      return `${maxDecimals(commission * 100, 2)}%`;
+      return formatCommissionPercentage(commission);
     },
     sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
       const commissionA = Number(a?.commission) || 0;

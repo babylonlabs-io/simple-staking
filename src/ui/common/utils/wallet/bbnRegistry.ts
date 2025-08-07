@@ -18,6 +18,7 @@ export const BBN_REGISTRY_TYPE_URLS = {
   MsgBtcStakeExpand: "/babylon.btcstaking.v1.MsgBtcStakeExpand",
   MsgWithdrawReward: "/babylon.incentive.MsgWithdrawReward",
   MsgWrappedDelegation: "/babylon.epoching.v1.MsgWrappedDelegate",
+  MsgWrappedUndelegation: "/babylon.epoching.v1.MsgWrappedUndelegate",
   MsgWithdrawDelegatorReward:
     "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
 };
@@ -42,6 +43,10 @@ const protosToRegister: ProtoToRegister<any>[] = [
   {
     typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWrappedDelegation,
     messageType: epochingtx.MsgWrappedDelegate,
+  },
+  {
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWrappedUndelegation,
+    messageType: epochingtx.MsgWrappedUndelegate,
   },
 ];
 
