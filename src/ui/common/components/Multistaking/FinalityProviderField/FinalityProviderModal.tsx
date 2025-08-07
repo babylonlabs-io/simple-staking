@@ -9,6 +9,8 @@ import { useState } from "react";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { FinalityProviders } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviders";
 
+import { UnavailableWarning } from "../MultistakingForm/UnavailableWarning";
+
 interface Props {
   open: boolean;
   defaultFinalityProvider?: string;
@@ -41,14 +43,15 @@ export const FinalityProviderModal = ({
         className="text-accent-primary"
       />
 
-      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary">
-        <div>
+      <DialogBody className="flex flex-col mb-4 mt-4 text-accent-primary gap-4">
+        <div className="text-accent-secondary">
           Finality Providers play a key role in securing Proof-of-Stake networks
           by validating and finalising transactions. Select one to delegate your
           stake.
         </div>
+        <UnavailableWarning />
         <div
-          className="overflow-x-auto flex flex-col gap-2 mt-10"
+          className="overflow-x-auto flex flex-col gap-2"
           style={{ maxHeight: "min(60vh, 500px)" }}
         >
           <FinalityProviders selectedFP={selectedFP} onChange={setSelectedFp} />
