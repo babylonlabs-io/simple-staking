@@ -50,6 +50,14 @@ const protosToRegister: ProtoToRegister<any>[] = [
   },
 ];
 
+// Cosmos SDK message types (already in GeneratedType format)
+const cosmosMessagesToRegister = [
+  {
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWithdrawDelegatorReward,
+    messageType: MsgWithdrawDelegatorReward,
+  },
+];
+
 // Utility function to create a `GeneratedType` from `MessageFns`
 // Temporary workaround until https://github.com/cosmos/cosmjs/issues/1613 is fixed
 const createGeneratedType = <T>(messageType: any): GeneratedType => {
@@ -71,11 +79,9 @@ export const createBbnRegistry = (): Registry => {
     registry.register(proto.typeUrl, generatedType);
   });
 
-  // Register Cosmos SDK message types
-  registry.register(
-    BBN_REGISTRY_TYPE_URLS.MsgWithdrawDelegatorReward,
-    MsgWithdrawDelegatorReward,
-  );
+  cosmosMessagesToRegister.forEach((proto) => {
+    registry.register(proto.typeUrl, proto.messageType);
+  });
 
   return registry;
 };

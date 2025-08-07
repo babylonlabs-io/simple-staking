@@ -6,6 +6,7 @@ import {
   useDelegationState,
 } from "@/ui/baby/state/DelegationState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
 
 import { BabyActivityCard } from "../ActivityCard";
 import { UnbondingModal } from "../UnbondingModal";
@@ -41,15 +42,11 @@ export function BabyActivityList() {
   const handleUnbond = async (amount: string) => {
     if (!unbondingModal.delegation) return;
 
-    try {
-      await unbond({
-        validatorAddress: unbondingModal.delegation.validator.address,
-        amount,
-      });
-      closeUnbondingModal();
-    } catch {
-      // Error is already handled in the delegation state
-    }
+    await unbond({
+      validatorAddress: unbondingModal.delegation.validator.address,
+      amount,
+    });
+    closeUnbondingModal();
   };
 
   const activityItems = useMemo(() => {
@@ -77,7 +74,9 @@ export function BabyActivityList() {
             },
             {
               label: "Commission",
-              value: `${(delegation.validator.commission * 100).toFixed(2)}%`,
+              value: formatCommissionPercentage(
+                delegation.validator.commission,
+              ),
             },
             {
               label: "Shares",

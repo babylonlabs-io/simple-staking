@@ -9,6 +9,7 @@ import {
 } from "@/ui/baby/hooks/services/useValidatorService";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
+import { type DelegationStatus } from "@/ui/common/types/delegations";
 
 interface StakingParams {
   validatorAddress: string;
@@ -21,7 +22,7 @@ export interface Delegation {
   shares: number;
   amount: bigint;
   coin: "ubbn";
-  status?: "active" | "unbonding" | "unbonded";
+  status?: DelegationStatus;
 }
 
 export function useDelegationService() {
@@ -71,9 +72,7 @@ export function useDelegationService() {
           const delegation = acc[validatorAddress];
 
           const isUnbonding = unbondingValidatorAddresses.has(validatorAddress);
-          const status: "active" | "unbonding" | "unbonded" = isUnbonding
-            ? "unbonding"
-            : "active";
+          const status: DelegationStatus = isUnbonding ? "unbonding" : "active";
 
           if (delegation) {
             delegation.shares += parseFloat(item.delegation.shares);
