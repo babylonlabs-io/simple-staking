@@ -11,6 +11,7 @@ import {
   useFormState,
 } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
+import type { FieldValues } from "react-hook-form";
 import { number, object } from "yup";
 
 import babylon from "@/infrastructure/babylon";
@@ -25,6 +26,10 @@ interface UnbondingModalProps {
   delegation: Delegation | null;
   onClose: () => void;
   onSubmit: (amount: string) => Promise<void>;
+}
+
+interface UnbondingFormData {
+  amount: number;
 }
 
 const MAX_WINDOW_HEIGHT = 500;
@@ -45,8 +50,9 @@ const UnbondingModalContent = ({
   const validatorName =
     delegation.validator.name || delegation.validator.address;
 
-  const handleFormSubmit = async (data: { amount: number }) => {
-    await onSubmit(data.amount.toString());
+  const handleFormSubmit = async (data: FieldValues) => {
+    const formData = data as UnbondingFormData;
+    await onSubmit(formData.amount.toString());
   };
 
   return (
@@ -84,12 +90,7 @@ const UnbondingModalContent = ({
       </DialogBody>
 
       <DialogFooter className="flex justify-end mt-[80px]">
-        {/* @ts-expect-error */}
-        <Button
-          type="submit"
-          onClick={handleSubmit(handleFormSubmit)}
-          disabled={!isValid}
-        >
+        <Button onClick={handleSubmit(handleFormSubmit)} disabled={!isValid}>
           Unbond
         </Button>
       </DialogFooter>
