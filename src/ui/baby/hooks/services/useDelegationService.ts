@@ -31,6 +31,8 @@ interface PendingStake {
   timestamp: number;
 }
 
+const PENDING_STAKE_API_UPDATE_TIMEOUT_MS = 5000;
+
 export function useDelegationService() {
   const [pendingUnbondingValidators, setPendingUnbondingValidators] = useState<
     Set<string>
