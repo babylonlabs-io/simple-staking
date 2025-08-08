@@ -1,6 +1,8 @@
 import { StakeExpansionSection } from "@/ui/common/components/Activity/components/StakeExpansionSection";
 import { DelegationWithFP } from "@/ui/common/types/delegationsV2";
 
+import { NonExpandableExpansion } from "../Activity/components/NonExpandableExpansion";
+
 import { ActivityCardActionSection } from "./components/ActivityCardActionSection";
 import { ActivityCardAmountSection } from "./components/ActivityCardAmountSection";
 import { ActivityCardDetailsSection } from "./components/ActivityCardDetailsSection";
@@ -64,8 +66,10 @@ export function ActivityCard({ data, className }: ActivityCardProps) {
         listItems={data.listItems}
       />
 
-      {data.expansionSection && (
+      {data.expansionSection ? (
         <StakeExpansionSection delegation={data.expansionSection} />
+      ) : (
+        <NonExpandableExpansion />
       )}
 
       {data.secondaryActions && data.secondaryActions.length > 0 && (
