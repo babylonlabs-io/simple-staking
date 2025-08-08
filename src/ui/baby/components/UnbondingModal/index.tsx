@@ -8,12 +8,17 @@ import {
   Text,
   Warning,
   useFormContext,
+  useFormState,
 } from "@babylonlabs-io/core-ui";
+import { useMemo } from "react";
+import { number, object } from "yup";
 
 import babylon from "@/infrastructure/babylon";
 import { AmountField } from "@/ui/baby/components/AmountField";
 import { type Delegation } from "@/ui/baby/state/DelegationState";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
+import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
+import { formatBabyStakingAmount } from "@/ui/common/utils/formTransforms";
 
 interface UnbondingModalProps {
   open: boolean;
@@ -34,6 +39,7 @@ const UnbondingModalContent = ({
   onSubmit: (amount: string) => Promise<void>;
 }) => {
   const { handleSubmit } = useFormContext();
+  const { isValid } = useFormState();
 
   const availableBalance = babylon.utils.ubbnToBaby(delegation.amount);
   const validatorName =
@@ -79,7 +85,11 @@ const UnbondingModalContent = ({
 
       <DialogFooter className="flex justify-end mt-[80px]">
         {/* @ts-expect-error */}
-        <Button type="submit" onClick={handleSubmit(handleFormSubmit)}>
+        <Button
+          type="submit"
+          onClick={handleSubmit(handleFormSubmit)}
+          disabled={!isValid}
+        >
           Unbond
         </Button>
       </DialogFooter>
@@ -93,10 +103,37 @@ export const UnbondingModal = ({
   onClose,
   onSubmit,
 }: UnbondingModalProps) => {
+  const availableBalance = delegation ? delegation.amount : 0n;
+  const availableBalanceInBaby = delegation
+    ? babylon.utils.ubbnToBaby(delegation.amount)
+    : 0;
+
+  const validationSchema = useMemo(
+    () =>
+      object().shape({
+        amount: number()
+          .transform(formatBabyStakingAmount)
+          .typeError("Unbonding amount must be a valid number.")
+          .required("Enter BABY Amount to Unbond")
+          .moreThan(0, "Unbonding amount must be greater than 0.")
+          .test(
+            "invalidBalance",
+            `Unbonding amount cannot exceed your staked balance (${availableBalanceInBaby} BABY).`,
+            (value = 0) => BigInt(value) <= availableBalance,
+          )
+          .test(
+            "invalidFormat",
+            "Unbonding amount must have no more than 6 decimal points.",
+            (_, context) => validateDecimalPoints(context.originalValue, 6),
+          ),
+      }),
+    [availableBalance, availableBalanceInBaby],
+  );
+
   if (!open || !delegation) return null;
 
   return (
-    <Form>
+    <Form schema={validationSchema} mode="onChange" reValidateMode="onChange">
       <UnbondingModalContent
         delegation={delegation}
         onClose={onClose}
