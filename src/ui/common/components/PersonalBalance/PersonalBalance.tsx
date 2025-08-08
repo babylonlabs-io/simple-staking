@@ -12,7 +12,6 @@ import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
-import { ActionComponent } from "../Stats/ActionComponent";
 import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
 const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
@@ -20,9 +19,7 @@ const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
 const { coinSymbol, networkName } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
-  // Load reward state
   const {
-    loading: rewardLoading,
     processing,
     showRewardModal,
     showProcessingModal,
@@ -35,7 +32,6 @@ export function PersonalBalance() {
     setTransactionHash,
   } = useRewardsState();
 
-  // Load balance state
   const {
     bbnBalance,
     stakableBtcBalance,
@@ -47,7 +43,7 @@ export function PersonalBalance() {
   const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
   const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
 
-  const { claimRewards, showPreview } = useRewardsService();
+  const { claimRewards } = useRewardsService();
 
   const isMobile = useIsMobileView();
   const formattedRewardBalance = ubbnToBaby(rewardBalance);
@@ -94,20 +90,6 @@ export function PersonalBalance() {
               : `${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`
           }
           loadingStyle={LoadingStyle.ShowSpinner}
-        />
-
-        <StatItem
-          loading={rewardLoading}
-          title={`${isMobile ? "BABY" : bbnNetworkName} Rewards`}
-          value={`${formattedRewardBalance} ${bbnCoinSymbol}`}
-          suffix={
-            <ActionComponent
-              className="h-6"
-              title="Claim"
-              onAction={showPreview}
-              isDisabled={!rewardBalance || processing}
-            />
-          }
         />
       </Section>
 
