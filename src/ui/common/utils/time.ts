@@ -107,3 +107,27 @@ export const durationTillNow = (
     return "Just now";
   }
 };
+
+/**
+ * Formats the time remaining until a future completion time
+ *
+ * @param {string} completionTime - The completion timestamp (ISO string).
+ * @returns {string} - The formatted time remaining (e.g., "2 hours 30 minutes" or "45 minutes").
+ */
+export const formatTimeRemaining = (completionTime: string): string => {
+  const now = new Date();
+  const completion = new Date(completionTime);
+
+  if (completion <= now) {
+    return "0 minutes";
+  }
+
+  const duration = intervalToDuration({
+    start: now,
+    end: completion,
+  });
+
+  return formatDuration(duration, {
+    format: ["hours", "minutes"],
+  });
+};

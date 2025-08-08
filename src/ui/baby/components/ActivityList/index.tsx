@@ -7,6 +7,7 @@ import {
 } from "@/ui/baby/state/DelegationState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
+import { formatTimeRemaining } from "@/ui/common/utils/time";
 
 import { BabyActivityCard } from "../ActivityCard";
 import { UnbondingModal } from "../UnbondingModal";
@@ -90,6 +91,18 @@ export function BabyActivityList() {
               label: "Voting Power",
               value: `${(delegation.validator.votingPower * 100).toFixed(2)}%`,
             },
+            ...(isUnbonding
+              ? [
+                  {
+                    label: "Unbonding",
+                    value: delegation.unbondingInfo
+                      ? delegation.unbondingInfo.isOptimistic
+                        ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} - Processing`
+                        : `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} in ${formatTimeRemaining(delegation.unbondingInfo.completionTime)}${delegation.unbondingInfo.statusSuffix || ""}`
+                      : "In progress...",
+                  },
+                ]
+              : []),
           ],
         },
       };
