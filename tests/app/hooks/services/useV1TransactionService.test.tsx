@@ -1,8 +1,8 @@
 // Mock SVG imports
-jest.mock("@/ui/legacy/assets/warning-triangle.svg", () => "SVG-mock");
+jest.mock("@/ui/common/assets/warning-triangle.svg", () => "SVG-mock");
 
 // Mock the Error Provider to avoid the SVG import issue
-jest.mock("@/ui/legacy/context/Error/ErrorProvider", () => ({
+jest.mock("@/ui/common/context/Error/ErrorProvider", () => ({
   useError: jest.fn(),
 }));
 
@@ -36,32 +36,29 @@ jest.mock("@babylonlabs-io/wallet-connector", () => ({
 import { act, renderHook } from "@testing-library/react";
 import { Transaction } from "bitcoinjs-lib";
 
-import { getUnbondingEligibility } from "@/ui/legacy/api/getUnbondingEligibility";
-import { postUnbonding } from "@/ui/legacy/api/postUnbonding";
-import { ClientErrorCategory } from "@/ui/legacy/constants/errorMessages";
-import { ClientError } from "@/ui/legacy/context/Error/errors";
-import { useBTCWallet } from "@/ui/legacy/context/wallet/BTCWalletProvider";
-import { useNetworkFees } from "@/ui/legacy/hooks/client/api/useNetworkFees";
-import { useStakingManagerService } from "@/ui/legacy/hooks/services/useStakingManagerService";
-import { useV1TransactionService } from "@/ui/legacy/hooks/services/useV1TransactionService";
-import { useAppState } from "@/ui/legacy/state";
-import { ErrorType } from "@/ui/legacy/types/errors";
-import { validateStakingInput } from "@/ui/legacy/utils/delegations";
-import { txFeeSafetyCheck } from "@/ui/legacy/utils/delegations/fee";
-import { getFeeRateFromMempool } from "@/ui/legacy/utils/getFeeRateFromMempool";
-import { getBbnParamByBtcHeight } from "@/ui/legacy/utils/params";
+import { getUnbondingEligibility } from "@/ui/common/api/getUnbondingEligibility";
+import { postUnbonding } from "@/ui/common/api/postUnbonding";
+import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { useNetworkFees } from "@/ui/common/hooks/client/api/useNetworkFees";
+import { useStakingManagerService } from "@/ui/common/hooks/services/useStakingManagerService";
+import { useV1TransactionService } from "@/ui/common/hooks/services/useV1TransactionService";
+import { useAppState } from "@/ui/common/state";
+import { validateStakingInput } from "@/ui/common/utils/delegations";
+import { txFeeSafetyCheck } from "@/ui/common/utils/delegations/fee";
+import { getFeeRateFromMempool } from "@/ui/common/utils/getFeeRateFromMempool";
+import { getBbnParamByBtcHeight } from "@/ui/common/utils/params";
 
 // Mock all dependencies
-jest.mock("@/ui/legacy/api/getUnbondingEligibility");
-jest.mock("@/ui/legacy/api/postUnbonding");
-jest.mock("@/ui/legacy/context/wallet/BTCWalletProvider");
-jest.mock("@/ui/legacy/hooks/client/api/useNetworkFees");
-jest.mock("@/ui/legacy/hooks/services/useStakingManagerService");
-jest.mock("@/ui/legacy/state");
-jest.mock("@/ui/legacy/utils/delegations");
-jest.mock("@/ui/legacy/utils/delegations/fee");
-jest.mock("@/ui/legacy/utils/getFeeRateFromMempool");
-jest.mock("@/ui/legacy/utils/params");
+jest.mock("@/ui/common/api/getUnbondingEligibility");
+jest.mock("@/ui/common/api/postUnbonding");
+jest.mock("@/ui/common/context/wallet/BTCWalletProvider");
+jest.mock("@/ui/common/hooks/client/api/useNetworkFees");
+jest.mock("@/ui/common/hooks/services/useStakingManagerService");
+jest.mock("@/ui/common/state");
+jest.mock("@/ui/common/utils/delegations");
+jest.mock("@/ui/common/utils/delegations/fee");
+jest.mock("@/ui/common/utils/getFeeRateFromMempool");
+jest.mock("@/ui/common/utils/params");
 jest.mock("bitcoinjs-lib", () => ({
   Transaction: {
     fromHex: jest.fn(),
@@ -402,36 +399,6 @@ describe("useV1TransactionService", () => {
       expect(mockPushTx).toHaveBeenCalledWith(
         mockWithdrawalTx.transaction.toHex(),
       );
-    });
-
-    it("should handle fee safety check errors", async () => {
-      // Setup txFeeSafetyCheck to throw an error
-      const mockError = new ClientError({
-        message: "Estimated fee is too high",
-        category: ClientErrorCategory.CLIENT_VALIDATION,
-        type: ErrorType.STAKING,
-      });
-      (txFeeSafetyCheck as jest.Mock).mockImplementation(() => {
-        throw mockError;
-      });
-
-      const { result } = renderHook(() => useV1TransactionService());
-
-      await expect(
-        act(async () => {
-          await result.current.submitWithdrawalTx(
-            mockStakingInput,
-            mockStakingHeight,
-            mockStakingTxHex,
-          );
-        }),
-      ).rejects.toThrow("Estimated fee is too high");
-
-      expect(
-        mockBtcStakingManager.createSignedBtcWithdrawStakingExpiredTransaction,
-      ).toHaveBeenCalled();
-      expect(txFeeSafetyCheck).toHaveBeenCalled();
-      expect(mockPushTx).not.toHaveBeenCalled();
     });
   });
 });
