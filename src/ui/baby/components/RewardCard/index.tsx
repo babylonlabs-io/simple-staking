@@ -2,17 +2,22 @@ import { Avatar, Button, SubSection, Text } from "@babylonlabs-io/core-ui";
 
 import { useRewardState } from "@/ui/baby/state/RewardState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
+import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
-const { logo, coinSymbol } = getNetworkConfigBBN();
+const { logo, coinSymbol, displayUSD } = getNetworkConfigBBN();
 
 export function RewardCard() {
-  const { totalReward, openClaimModal, loading, refreshRewards } =
-    useRewardState();
+  const { totalReward, openClaimModal, loading } = useRewardState();
+  const babyPrice = usePrice(coinSymbol);
 
   const hasRewards = totalReward > 0n;
   const formattedReward = maxDecimals(ubbnToBaby(Number(totalReward)), 6);
+  const rewardInUsd = displayUSD
+    ? calculateTokenValueInCurrency(Number(formattedReward), babyPrice)
+    : undefined;
 
   return (
     <SubSection className="flex-col gap-4">
@@ -24,15 +29,9 @@ export function RewardCard() {
           </span>
         </div>
 
-        <Button
-          size="small"
-          onClick={refreshRewards}
-          disabled={loading}
-          variant="outlined"
-          aria-label="Refresh rewards"
-        >
-          🔄
-        </Button>
+        <span className="text-base sm:text-lg font-medium text-accent-primary">
+          {formattedReward} {coinSymbol}
+        </span>
       </div>
 
       <Text
@@ -41,9 +40,7 @@ export function RewardCard() {
         className="flex justify-between items-center text-accent-secondary"
       >
         <span>Babylon Genesis</span>
-        <span>
-          {formattedReward} {coinSymbol}
-        </span>
+        <span>{rewardInUsd}</span>
       </Text>
 
       <Button fluid onClick={openClaimModal} disabled={!hasRewards || loading}>
