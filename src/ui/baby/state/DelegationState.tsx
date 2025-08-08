@@ -28,7 +28,9 @@ const { StateProvider, useState: useDelegationState } =
   createStateUtils<ValidatorState>({
     loading: false,
     delegations: [],
-    stake: async () => ({}),
+    stake: async () => {
+      throw new Error("stake function not initialized");
+    },
     unbond: async () => {},
     clearPendingUnbonding: () => {},
   });
