@@ -66,8 +66,62 @@ interface Duration {
 }
 
 /**
+ * Converts a full duration string to compact format (e.g. "2 hours 30 minutes ago" -> "2h 30m ago")
+ * @param {string} full - The full duration string to compact
+ * @returns {string} - The compacted duration string
+ */
+export const compactDuration = (full: string): string => {
+  const parts = full.replace(/ ago$/, "").split(" ");
+  const compactParts: string[] = [];
+  for (let i = 0; i < parts.length; i += 2) {
+    const value = parts[i];
+    const unit = parts[i + 1] ?? "";
+    const abbr = unit.startsWith("year")
+      ? "y"
+      : unit.startsWith("month")
+        ? "mo"
+        : unit.startsWith("week")
+          ? "w"
+          : unit.startsWith("day")
+            ? "d"
+            : unit.startsWith("hour")
+              ? "h"
+              : unit.startsWith("minute")
+                ? "m"
+                : unit.startsWith("second")
+                  ? "s"
+                  : unit;
+    compactParts.push(`${value}${abbr}`);
+  }
+  return compactParts.join(" ") + " ago";
+};
+
+/**
+ * Formats time remaining until a future date in compact format (e.g. "2h 30m" or "45m")
+ * @param {string} completionTime - The completion time as an ISO string
+ * @returns {string} - The formatted time remaining
+ */
+export const formatTimeRemaining = (completionTime: string): string => {
+  const now = new Date();
+  const completion = new Date(completionTime);
+  const diffMs = completion.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return "0h 0m";
+  }
+
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else {
+    return `${minutes}m`;
+  }
+};
+
+/**
  * Returns the duration between the start timestamp and the current time
- *
  * @param {string} startTimestamp - The start timestamp.
  * @param {number} currentTime - The current time.
  * @returns {string} - The duration between the start timestamp and the current time.

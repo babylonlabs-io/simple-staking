@@ -13,7 +13,7 @@ import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { getState, getStateTooltip } from "@/ui/common/utils/getState";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
-import { durationTillNow } from "@/ui/common/utils/time";
+import { compactDuration, durationTillNow } from "@/ui/common/utils/time";
 import { trim } from "@/ui/common/utils/trim";
 
 import { DelegationCell } from "./components/DelegationCell";
@@ -146,32 +146,6 @@ const DelegationState: React.FC<{
     </Hint>
   );
 };
-
-function compactDuration(full: string) {
-  const parts = full.replace(/ ago$/, "").split(" ");
-  const compactParts: string[] = [];
-  for (let i = 0; i < parts.length; i += 2) {
-    const value = parts[i];
-    const unit = parts[i + 1] ?? "";
-    const abbr = unit.startsWith("year")
-      ? "y"
-      : unit.startsWith("month")
-        ? "mo"
-        : unit.startsWith("week")
-          ? "w"
-          : unit.startsWith("day")
-            ? "d"
-            : unit.startsWith("hour")
-              ? "h"
-              : unit.startsWith("minute")
-                ? "m"
-                : unit.startsWith("second")
-                  ? "s"
-                  : unit;
-    compactParts.push(`${value}${abbr}`);
-  }
-  return compactParts.join(" ") + " ago";
-}
 
 export const Delegation: React.FC<DelegationProps> = ({
   currentTime,

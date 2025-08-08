@@ -7,30 +7,12 @@ import {
 } from "@/ui/baby/state/DelegationState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
+import { formatTimeRemaining } from "@/ui/common/utils/time";
 
 import { BabyActivityCard } from "../ActivityCard";
 import { UnbondingModal } from "../UnbondingModal";
 
 const { logo, coinSymbol } = getNetworkConfigBBN();
-
-const formatTimeRemaining = (completionTime: string): string => {
-  const now = new Date();
-  const completion = new Date(completionTime);
-  const diffMs = completion.getTime() - now.getTime();
-
-  if (diffMs <= 0) {
-    return "0h 0m";
-  }
-
-  const hours = Math.floor(diffMs / (1000 * 60 * 60));
-  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-
-  if (hours > 0) {
-    return `${hours}h ${minutes}m`;
-  } else {
-    return `${minutes}m`;
-  }
-};
 
 interface UnbondingModalState {
   isOpen: boolean;
@@ -72,8 +54,7 @@ export function BabyActivityList() {
   const activityItems = useMemo(() => {
     return delegations.map((delegation) => {
       const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
-      const isUnbonding = delegation.status === "unbonding";
-      const isPending = delegation.status === "pending";
+      const { isUnbonding, isPending, hasPendingUnbonding } = delegation;
 
       let statusDisplay = "Active";
       let primaryAction:
@@ -89,6 +70,9 @@ export function BabyActivityList() {
         primaryAction = undefined;
       } else if (isPending) {
         statusDisplay = "Processing";
+        primaryAction = undefined;
+      } else if (hasPendingUnbonding) {
+        statusDisplay = "Unbonding Pending";
         primaryAction = undefined;
       }
 
