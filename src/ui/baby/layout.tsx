@@ -10,9 +10,9 @@ import { Nav, NavItem } from "@/ui/common/components/Nav";
 
 export default function BabyLayout() {
   return (
-    <StakingState>
-      <ValidatorState>
-        <DelegationState>
+    <ValidatorState>
+      <DelegationState>
+        <StakingState>
           <RewardState>
             <Content>
               <AuthGuard>
@@ -28,8 +28,8 @@ export default function BabyLayout() {
               </div>
             </Content>
           </RewardState>
-        </DelegationState>
-      </ValidatorState>
-    </StakingState>
+        </StakingState>
+      </DelegationState>
+    </ValidatorState>
   );
 }

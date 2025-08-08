@@ -5,6 +5,7 @@ import babylon from "@/infrastructure/babylon";
 import { useDelegationService } from "@/ui/baby/hooks/services/useDelegationService";
 import { useValidatorService } from "@/ui/baby/hooks/services/useValidatorService";
 import { useWalletService } from "@/ui/baby/hooks/services/useWalletService";
+import { useDelegationState } from "@/ui/baby/state/DelegationState";
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
@@ -75,7 +76,8 @@ const { StateProvider, useState: useStakingState } =
 function StakingState({ children }: PropsWithChildren) {
   const [step, setStep] = useState<StakingStep>({ name: "initial" });
 
-  const { stake, estimateStakingFee } = useDelegationService();
+  const { stake } = useDelegationState();
+  const { estimateStakingFee } = useDelegationService();
   const { validatorMap, loading } = useValidatorService();
   const { balance } = useWalletService();
   const { handleError } = useError();

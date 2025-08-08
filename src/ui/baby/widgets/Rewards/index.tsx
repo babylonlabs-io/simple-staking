@@ -15,8 +15,10 @@ export default function Rewards() {
 
   return (
     <RouteGuard redirectTo="/baby/staking">
-      <div className="h-[500px]">
-        <RewardCard />
+      <div className="pb-32 md:pb-40">
+        <div className="h-[500px]">
+          <RewardCard />
+        </div>
       </div>
 
       <RewardsPreviewModal

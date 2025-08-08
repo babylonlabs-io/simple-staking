@@ -26,17 +26,19 @@ export default function StakingForm() {
   };
 
   return (
-    <Form
-      schema={formSchema}
-      className="flex flex-col gap-2 h-[500px]"
-      onSubmit={handlePreview}
-    >
-      <AmountField balance={balance} price={babyPrice} />
-      <ValidatorField />
-      <FeeField babyPrice={babyPrice} calculateFee={calculateFee} />
+    <div className="pb-32 md:pb-40">
+      <Form
+        schema={formSchema}
+        className="flex flex-col gap-2 h-[500px]"
+        onSubmit={handlePreview}
+      >
+        <AmountField balance={balance} price={babyPrice} />
+        <ValidatorField />
+        <FeeField babyPrice={babyPrice} calculateFee={calculateFee} />
 
-      <SubmitButton disabled={loading} />
-      <StakingModal />
-    </Form>
+        <SubmitButton disabled={loading} />
+        <StakingModal />
+      </Form>
+    </div>
   );
 }

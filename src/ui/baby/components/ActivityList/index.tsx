@@ -53,19 +53,31 @@ export function BabyActivityList() {
     return delegations.map((delegation) => {
       const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
       const isUnbonding = delegation.status === "unbonding";
+      const isPending = delegation.status === "pending";
+
+      let statusDisplay = "Active";
+      let primaryAction:
+        | { label: string; variant: "contained"; onClick: () => void }
+        | undefined = {
+        label: "Unbond",
+        variant: "contained" as const,
+        onClick: () => openUnbondingModal(delegation),
+      };
+
+      if (isUnbonding) {
+        statusDisplay = "Unbonding";
+        primaryAction = undefined;
+      } else if (isPending) {
+        statusDisplay = "Processing";
+        primaryAction = undefined;
+      }
 
       return {
         delegation,
         data: {
           icon: logo,
           formattedAmount: `${formattedAmount} ${coinSymbol}`,
-          primaryAction: isUnbonding
-            ? undefined
-            : {
-                label: "Unbond",
-                variant: "contained" as const,
-                onClick: () => openUnbondingModal(delegation),
-              },
+          primaryAction,
           details: [],
           optionalDetails: [
             {
@@ -80,11 +92,11 @@ export function BabyActivityList() {
             },
             {
               label: "Shares",
-              value: delegation.shares.toFixed(6),
+              value: isPending ? "Processing" : delegation.shares.toFixed(6),
             },
             {
               label: "Status",
-              value: isUnbonding ? "Unbonding" : "Active",
+              value: statusDisplay,
             },
             {
               label: "Voting Power",

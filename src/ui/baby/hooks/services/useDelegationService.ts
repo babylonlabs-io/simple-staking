@@ -25,10 +25,17 @@ export interface Delegation {
   status?: DelegationStatus;
 }
 
+interface PendingStake {
+  validatorAddress: string;
+  amount: bigint;
+  timestamp: number;
+}
+
 export function useDelegationService() {
   const [pendingUnbondingValidators, setPendingUnbondingValidators] = useState<
     Set<string>
   >(new Set());
+  const [pendingStakes, setPendingStakes] = useState<PendingStake[]>([]);
 
   const { bech32Address } = useCosmosWallet();
   const {
@@ -96,6 +103,52 @@ export function useDelegationService() {
       ),
     );
 
+    const pendingStakesToRemove: PendingStake[] = [];
+
+    pendingStakes.forEach((pendingStake) => {
+      const validator = validatorMap[pendingStake.validatorAddress];
+
+      if (validator) {
+        const existingDelegation = result.find(
+          (d) => d.validator.address === pendingStake.validatorAddress,
+        );
+
+        if (existingDelegation) {
+          const hasTimePassedForApiUpdate =
+            Date.now() - pendingStake.timestamp > 5000;
+
+          if (hasTimePassedForApiUpdate) {
+            pendingStakesToRemove.push(pendingStake);
+          } else {
+            existingDelegation.amount += pendingStake.amount;
+            existingDelegation.status = "pending";
+          }
+        } else {
+          result.push({
+            validator,
+            delegatorAddress: bech32Address || "",
+            shares: 0,
+            amount: pendingStake.amount,
+            coin: "ubbn",
+            status: "pending",
+          });
+        }
+      }
+    });
+
+    if (pendingStakesToRemove.length > 0) {
+      setPendingStakes((prev) =>
+        prev.filter(
+          (p) =>
+            !pendingStakesToRemove.some(
+              (toRemove) =>
+                toRemove.validatorAddress === p.validatorAddress &&
+                toRemove.timestamp === p.timestamp,
+            ),
+        ),
+      );
+    }
+
     return result;
   }, [
     delegations,
@@ -103,25 +156,56 @@ export function useDelegationService() {
     isValidatorLoading,
     unbondingDelegations,
     pendingUnbondingValidators,
+    pendingStakes,
+    bech32Address,
   ]);
 
   const stake = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
 
-      const stakeMsg = babylon.txs.baby.createStakeMsg({
-        validatorAddress,
-        delegatorAddress: bech32Address,
-        amount:
-          typeof amount === "string"
-            ? babylon.utils.babyToUbbn(Number(amount))
-            : BigInt(amount),
-      });
-      const signedTx = await signBbnTx(stakeMsg);
-      const result = await sendBbnTx(signedTx);
+      const stakeAmount =
+        typeof amount === "string"
+          ? babylon.utils.babyToUbbn(Number(amount))
+          : BigInt(amount);
 
-      await Promise.all([refetchDelegations(), refetchUnbondingDelegations()]);
-      return result;
+      const pendingStake: PendingStake = {
+        validatorAddress,
+        amount: stakeAmount,
+        timestamp: Date.now(),
+      };
+
+      setPendingStakes((prev) => [...prev, pendingStake]);
+
+      try {
+        const stakeMsg = babylon.txs.baby.createStakeMsg({
+          validatorAddress,
+          delegatorAddress: bech32Address,
+          amount: stakeAmount,
+        });
+
+        const signedTx = await signBbnTx(stakeMsg);
+        const result = await sendBbnTx(signedTx);
+
+        await Promise.all([
+          refetchDelegations(),
+          refetchUnbondingDelegations(),
+        ]);
+
+        return result;
+      } catch (error) {
+        // Remove from pending stakes on error
+        setPendingStakes((prev) =>
+          prev.filter(
+            (p) =>
+              !(
+                p.validatorAddress === validatorAddress &&
+                p.timestamp === pendingStake.timestamp
+              ),
+          ),
+        );
+        throw error;
+      }
     },
     [
       bech32Address,

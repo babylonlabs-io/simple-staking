@@ -16,6 +16,10 @@ interface UnbondProps {
 interface ValidatorState {
   loading: boolean;
   delegations: Delegation[];
+  stake: (params: {
+    validatorAddress: string;
+    amount: string | number;
+  }) => Promise<any>;
   unbond: (params: UnbondProps) => Promise<void>;
   clearPendingUnbonding: (validatorAddress?: string) => void;
 }
@@ -24,6 +28,7 @@ const { StateProvider, useState: useDelegationState } =
   createStateUtils<ValidatorState>({
     loading: false,
     delegations: [],
+    stake: async () => ({}),
     unbond: async () => {},
     clearPendingUnbonding: () => {},
   });
@@ -31,7 +36,7 @@ const { StateProvider, useState: useDelegationState } =
 function DelegationState({ children }: PropsWithChildren) {
   const [processing, setProcessing] = useState(false);
 
-  const { loading, delegations, unstake, clearPendingUnbonding } =
+  const { loading, delegations, stake, unstake, clearPendingUnbonding } =
     useDelegationService();
   const { handleError } = useError();
   const logger = useLogger();
@@ -62,10 +67,11 @@ function DelegationState({ children }: PropsWithChildren) {
     () => ({
       loading: processing || loading,
       delegations,
+      stake,
       unbond,
       clearPendingUnbonding,
     }),
-    [processing, loading, delegations, unbond, clearPendingUnbonding],
+    [processing, loading, delegations, stake, unbond, clearPendingUnbonding],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;

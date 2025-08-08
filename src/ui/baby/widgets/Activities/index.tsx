@@ -6,9 +6,11 @@ import { BabyActivityList } from "../../components/ActivityList";
 export default function Activities() {
   return (
     <RouteGuard redirectTo="/baby/staking">
-      <Section title="Activity" titleClassName="md:text-[1.25rem]">
-        <BabyActivityList />
-      </Section>
+      <div className="pb-32 md:pb-40">
+        <Section title="Activity" titleClassName="md:text-[1.25rem]">
+          <BabyActivityList />
+        </Section>
+      </div>
     </RouteGuard>
   );
 }
