@@ -115,7 +115,7 @@ export function useDelegationService() {
 
         if (existingDelegation) {
           const hasTimePassedForApiUpdate =
-            Date.now() - pendingStake.timestamp > 5000;
+            Date.now() - pendingStake.timestamp > PENDING_STAKE_API_UPDATE_TIMEOUT_MS;
 
           if (hasTimePassedForApiUpdate) {
             pendingStakesToRemove.push(pendingStake);
