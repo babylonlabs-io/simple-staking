@@ -1,5 +1,5 @@
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
-import FeatureFlagService from "@/ui/legacy/utils/FeatureFlagService";
+import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 /**
  * Hook to determine if the allow list is active and expose allow list data
