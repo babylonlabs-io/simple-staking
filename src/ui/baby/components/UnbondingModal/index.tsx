@@ -77,7 +77,7 @@ const UnbondingModalContent = ({
         </Warning>
       </DialogBody>
 
-      <DialogFooter className="flex justify-end mt-[80px]">
+      <DialogFooter className="flex justify-end mt-[40px]">
         {/* @ts-expect-error */}
         <Button type="submit" onClick={handleSubmit(handleFormSubmit)}>
           Unbond
