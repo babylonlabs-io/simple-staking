@@ -13,6 +13,25 @@ import { UnbondingModal } from "../UnbondingModal";
 
 const { logo, coinSymbol } = getNetworkConfigBBN();
 
+const formatTimeRemaining = (completionTime: string): string => {
+  const now = new Date();
+  const completion = new Date(completionTime);
+  const diffMs = completion.getTime() - now.getTime();
+
+  if (diffMs <= 0) {
+    return "0h 0m";
+  }
+
+  const hours = Math.floor(diffMs / (1000 * 60 * 60));
+  const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+  if (hours > 0) {
+    return `${hours}h ${minutes}m`;
+  } else {
+    return `${minutes}m`;
+  }
+};
+
 interface UnbondingModalState {
   isOpen: boolean;
   delegation: Delegation | null;
@@ -46,6 +65,7 @@ export function BabyActivityList() {
       validatorAddress: unbondingModal.delegation.validator.address,
       amount,
     });
+
     closeUnbondingModal();
   };
 
@@ -102,6 +122,16 @@ export function BabyActivityList() {
               label: "Voting Power",
               value: `${(delegation.validator.votingPower * 100).toFixed(2)}%`,
             },
+            ...(isUnbonding
+              ? [
+                  {
+                    label: "Unbonding",
+                    value: delegation.unbondingInfo
+                      ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} in ${formatTimeRemaining(delegation.unbondingInfo.completionTime)}`
+                      : "In progress...",
+                  },
+                ]
+              : []),
           ],
         },
       };

@@ -16,6 +16,11 @@ interface StakingParams {
   amount: string | number;
 }
 
+export interface UnbondingInfo {
+  amount: bigint;
+  completionTime: string;
+}
+
 export interface Delegation {
   validator: Validator;
   delegatorAddress: string;
@@ -23,6 +28,7 @@ export interface Delegation {
   amount: bigint;
   coin: "ubbn";
   status?: DelegationStatus;
+  unbondingInfo?: UnbondingInfo;
 }
 
 interface PendingStake {
@@ -31,13 +37,19 @@ interface PendingStake {
   timestamp: number;
 }
 
+interface ExpectedDelegationAmount {
+  validatorAddress: string;
+  expectedAmount: bigint;
+  lastUpdated: number;
+}
+
 const PENDING_STAKE_API_UPDATE_TIMEOUT_MS = 5000;
 
 export function useDelegationService() {
-  const [pendingUnbondingValidators, setPendingUnbondingValidators] = useState<
-    Set<string>
-  >(new Set());
   const [pendingStakes, setPendingStakes] = useState<PendingStake[]>([]);
+  const [expectedAmounts, setExpectedAmounts] = useState<
+    ExpectedDelegationAmount[]
+  >([]);
 
   const { bech32Address } = useCosmosWallet();
   const {
@@ -58,21 +70,39 @@ export function useDelegationService() {
       return [];
     }
 
-    const unbondingValidatorAddresses = new Set(
-      unbondingDelegations
-        .map((unbonding: any) => {
-          const validatorAddress =
-            unbonding.validatorAddress ||
-            unbonding.validator_address ||
-            unbonding.validatorAddr;
-          return validatorAddress;
-        })
-        .filter(Boolean),
-    );
+    const unbondingValidatorAddresses = new Set<string>();
+    const unbondingInfoByValidator: Record<string, UnbondingInfo> = {};
 
-    pendingUnbondingValidators.forEach((validatorAddress) => {
-      unbondingValidatorAddresses.add(validatorAddress);
+    unbondingDelegations.forEach((unbonding: any) => {
+      const validatorAddress =
+        unbonding.validatorAddress ||
+        unbonding.validator_address ||
+        unbonding.validatorAddr;
+
+      if (validatorAddress) {
+        unbondingValidatorAddresses.add(validatorAddress);
+
+        const entries = unbonding.entries || [];
+        if (entries.length > 0) {
+          const firstEntry = entries[0];
+          unbondingInfoByValidator[validatorAddress] = {
+            amount: BigInt(
+              firstEntry.balance || firstEntry.initial_balance || 0,
+            ),
+            completionTime:
+              firstEntry.completion_time || new Date().toISOString(),
+          };
+        }
+      }
     });
+
+    const expectedAmountsByValidator = expectedAmounts.reduce(
+      (acc, expected) => {
+        acc[expected.validatorAddress] = expected.expectedAmount;
+        return acc;
+      },
+      {} as Record<string, bigint>,
+    );
 
     const result = Object.values(
       delegations.reduce(
@@ -80,23 +110,48 @@ export function useDelegationService() {
           const validatorAddress = item.delegation.validatorAddress;
           const delegation = acc[validatorAddress];
 
-          const isUnbonding = unbondingValidatorAddresses.has(validatorAddress);
-          const status: DelegationStatus = isUnbonding ? "unbonding" : "active";
+          const apiAmount = BigInt(item.balance.amount);
+          const expectedAmount = expectedAmountsByValidator[validatorAddress];
+
+          const effectiveAmount =
+            expectedAmount !== undefined
+              ? apiAmount <= expectedAmount
+                ? apiAmount
+                : expectedAmount
+              : apiAmount;
+
+          const hasApiUnbonding =
+            unbondingValidatorAddresses.has(validatorAddress);
+          const hasExpectedReduction =
+            expectedAmount !== undefined && expectedAmount < apiAmount;
+
+          let status: DelegationStatus;
+          if (hasApiUnbonding || hasExpectedReduction) {
+            status = "unbonding";
+          } else {
+            status = "active";
+          }
 
           if (delegation) {
             delegation.shares += parseFloat(item.delegation.shares);
-            delegation.amount += BigInt(item.balance.amount);
+            delegation.amount += effectiveAmount;
             if (status === "unbonding") {
               delegation.status = "unbonding";
+              delegation.unbondingInfo =
+                unbondingInfoByValidator[validatorAddress];
             }
           } else {
             acc[validatorAddress] = {
               validator: validatorMap[validatorAddress],
               delegatorAddress: item.delegation.delegatorAddress,
               shares: parseFloat(item.delegation.shares),
-              amount: BigInt(item.balance.amount),
+              amount: effectiveAmount,
               coin: "ubbn",
               status,
+              unbondingInfo:
+                status === "unbonding"
+                  ? unbondingInfoByValidator[validatorAddress]
+                  : undefined,
             };
           }
           return acc;
@@ -152,14 +207,46 @@ export function useDelegationService() {
       );
     }
 
+    const expectedAmountsToRemove: ExpectedDelegationAmount[] = [];
+    expectedAmounts.forEach((expected) => {
+      const currentDelegation = delegations.find(
+        (d) => d.delegation.validatorAddress === expected.validatorAddress,
+      );
+      const currentApiAmount = currentDelegation
+        ? BigInt(currentDelegation.balance.amount)
+        : 0n;
+
+      const apiMatchesExpectation = currentApiAmount <= expected.expectedAmount;
+      const isStillUnbonding = unbondingValidatorAddresses.has(
+        expected.validatorAddress,
+      );
+
+      if (apiMatchesExpectation && !isStillUnbonding) {
+        expectedAmountsToRemove.push(expected);
+      }
+    });
+
+    if (expectedAmountsToRemove.length > 0) {
+      const toRemoveSet = new Set(
+        expectedAmountsToRemove.map(
+          (toRemove) => `${toRemove.validatorAddress}:${toRemove.lastUpdated}`,
+        ),
+      );
+      setExpectedAmounts((prev) =>
+        prev.filter(
+          (e) => !toRemoveSet.has(`${e.validatorAddress}:${e.lastUpdated}`),
+        ),
+      );
+    }
+
     return result;
   }, [
     delegations,
     validatorMap,
     isValidatorLoading,
     unbondingDelegations,
-    pendingUnbondingValidators,
     pendingStakes,
+    expectedAmounts,
     bech32Address,
   ]);
 
@@ -223,15 +310,32 @@ export function useDelegationService() {
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
 
-      setPendingUnbondingValidators(
-        (prev) => new Set([...prev, validatorAddress]),
+      const unbondAmount = babylon.utils.babyToUbbn(Number(amount));
+
+      const currentDelegation = delegations.find(
+        (d) => d.delegation.validatorAddress === validatorAddress,
       );
+      const currentAmount = currentDelegation
+        ? BigInt(currentDelegation.balance.amount)
+        : 0n;
+      const expectedAmountAfterUnbond = currentAmount - unbondAmount;
+
+      const expectedAmount: ExpectedDelegationAmount = {
+        validatorAddress,
+        expectedAmount: expectedAmountAfterUnbond,
+        lastUpdated: Date.now(),
+      };
+
+      setExpectedAmounts((prev) => [
+        ...prev.filter((e) => e.validatorAddress !== validatorAddress),
+        expectedAmount,
+      ]);
 
       try {
         const unstakeMsg = babylon.txs.baby.createUnstakeMsg({
           validatorAddress,
           delegatorAddress: bech32Address,
-          amount: babylon.utils.babyToUbbn(Number(amount)),
+          amount: unbondAmount,
         });
 
         const signedTx = await signBbnTx(unstakeMsg);
@@ -244,16 +348,15 @@ export function useDelegationService() {
 
         return result;
       } catch (error) {
-        setPendingUnbondingValidators((prev) => {
-          const newSet = new Set(prev);
-          newSet.delete(validatorAddress);
-          return newSet;
-        });
+        setExpectedAmounts((prev) =>
+          prev.filter((e) => e.validatorAddress !== validatorAddress),
+        );
         throw error;
       }
     },
     [
       bech32Address,
+      delegations,
       signBbnTx,
       sendBbnTx,
       refetchDelegations,
@@ -279,13 +382,11 @@ export function useDelegationService() {
 
   const clearPendingUnbonding = useCallback((validatorAddress?: string) => {
     if (validatorAddress) {
-      setPendingUnbondingValidators((prev) => {
-        const newSet = new Set(prev);
-        newSet.delete(validatorAddress);
-        return newSet;
-      });
+      setExpectedAmounts((prev) =>
+        prev.filter((e) => e.validatorAddress !== validatorAddress),
+      );
     } else {
-      setPendingUnbondingValidators(new Set());
+      setExpectedAmounts([]);
     }
   }, []);
 
