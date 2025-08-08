@@ -115,7 +115,8 @@ export function useDelegationService() {
 
         if (existingDelegation) {
           const hasTimePassedForApiUpdate =
-            Date.now() - pendingStake.timestamp > PENDING_STAKE_API_UPDATE_TIMEOUT_MS;
+            Date.now() - pendingStake.timestamp >
+            PENDING_STAKE_API_UPDATE_TIMEOUT_MS;
 
           if (hasTimePassedForApiUpdate) {
             pendingStakesToRemove.push(pendingStake);
@@ -137,14 +138,14 @@ export function useDelegationService() {
     });
 
     if (pendingStakesToRemove.length > 0) {
+      const toRemoveSet = new Set(
+        pendingStakesToRemove.map(
+          (toRemove) => `${toRemove.validatorAddress}:${toRemove.timestamp}`,
+        ),
+      );
       setPendingStakes((prev) =>
         prev.filter(
-          (p) =>
-            !pendingStakesToRemove.some(
-              (toRemove) =>
-                toRemove.validatorAddress === p.validatorAddress &&
-                toRemove.timestamp === p.timestamp,
-            ),
+          (p) => !toRemoveSet.has(`${p.validatorAddress}:${p.timestamp}`),
         ),
       );
     }
