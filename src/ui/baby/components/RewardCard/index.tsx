@@ -24,24 +24,15 @@ export function RewardCard() {
           </span>
         </div>
 
-        <div className="flex gap-2">
-          <Button
-            size="small"
-            onClick={refreshRewards}
-            disabled={loading}
-            variant="outlined"
-            aria-label="Refresh rewards"
-          >
-            🔄
-          </Button>
-          <Button
-            size="small"
-            onClick={openClaimModal}
-            disabled={!hasRewards || loading}
-          >
-            Claim
-          </Button>
-        </div>
+        <Button
+          size="small"
+          onClick={refreshRewards}
+          disabled={loading}
+          variant="outlined"
+          aria-label="Refresh rewards"
+        >
+          🔄
+        </Button>
       </div>
 
       <Text
@@ -52,9 +43,6 @@ export function RewardCard() {
         <span>Babylon Genesis</span>
         <span>
           {formattedReward} {coinSymbol}
-          <span style={{ fontSize: "10px", opacity: 0.5, marginLeft: "8px" }}>
-            (raw: {totalReward.toString()})
-          </span>
         </span>
       </Text>
 

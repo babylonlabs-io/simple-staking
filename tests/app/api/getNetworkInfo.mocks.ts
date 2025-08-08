@@ -5,7 +5,6 @@
 export const mockSuccessResponse = {
   data: {
     staking_status: {
-      is_staking_open: true,
       staking_expansion_allow_list: {
         is_expired: false,
       },
@@ -26,7 +25,7 @@ export const mockSuccessResponse = {
           unbonding_time_blocks: 144,
           unbonding_fee_sat: 2000,
           min_commission_rate: "0.05",
-          max_active_finality_providers: 10,
+          max_finality_providers: 10,
           delegation_creation_base_gas_fee: 50000,
           btc_activation_height: 100,
           allow_list_expiration_height: 200,
@@ -45,7 +44,7 @@ export const mockSuccessResponse = {
           unbonding_time_blocks: 288,
           unbonding_fee_sat: 3000,
           min_commission_rate: "0.1",
-          max_active_finality_providers: 15,
+          max_finality_providers: 15,
           delegation_creation_base_gas_fee: 60000,
           btc_activation_height: 200,
           allow_list_expiration_height: 300,

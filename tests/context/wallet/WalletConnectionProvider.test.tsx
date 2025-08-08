@@ -1,7 +1,7 @@
-import { useError } from "@/ui/legacy/context/Error/ErrorProvider";
-import { WalletConnectionProvider } from "@/ui/legacy/context/wallet/WalletConnectionProvider";
-import { useLogger } from "@/ui/legacy/hooks/useLogger";
-import FeatureFlagService from "@/ui/legacy/utils/FeatureFlagService";
+import { useError } from "@/ui/common/context/Error/ErrorProvider";
+import { WalletConnectionProvider } from "@/ui/common/context/wallet/WalletConnectionProvider";
+import { useLogger } from "@/ui/common/hooks/useLogger";
+import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 import { WalletProvider } from "@babylonlabs-io/wallet-connector";
 import { render } from "@testing-library/react";
 import { useTheme } from "next-themes";

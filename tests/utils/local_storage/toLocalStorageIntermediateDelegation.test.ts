@@ -1,5 +1,5 @@
-import { DelegationState } from "@/ui/legacy/types/delegations";
-import { toLocalStorageIntermediateDelegation } from "@/ui/legacy/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { DelegationState } from "@/ui/common/types/delegations";
+import { toLocalStorageIntermediateDelegation } from "@/ui/common/utils/local_storage/toLocalStorageIntermediateDelegation";
 
 describe("utils/local_storage/toLocalStorageIntermediateDelegation", () => {
   it("should create an intermediate unbonding delegation object with the correct values", () => {
