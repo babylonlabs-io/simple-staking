@@ -48,31 +48,39 @@ interface OptimisticUnbondingStorage {
 }
 
 const OPTIMISTIC_UNBONDING_KEY = "baby-optimistic-unbondings";
+const UNBONDING_PERIOD_MS = 21 * 24 * 60 * 60 * 1000;
+const POLLING_INTERVAL_MS = 15000;
+const OPTIMISTIC_TIMEOUT_MS = 3 * 60 * 1000;
+
+function getStatusSuffix(age: number, ageMinutes: number): string {
+  if (age > 2 * 60 * 1000) {
+    return ` (${ageMinutes}min - verifying...)`;
+  } else if (age > 30 * 1000) {
+    return " (confirming...)";
+  }
+  return "";
+}
 
 export function useDelegationService() {
   const [optimisticUnbondings, setOptimisticUnbondings] = useState<
     OptimisticUnbonding[]
   >(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const stored = localStorage.getItem(OPTIMISTIC_UNBONDING_KEY);
-        if (stored) {
-          const parsedStorage: OptimisticUnbondingStorage[] =
-            JSON.parse(stored);
-          const parsed: OptimisticUnbonding[] = parsedStorage.map((item) => ({
-            ...item,
-            expectedAmount: BigInt(item.expectedAmount),
-            unbondingAmount: BigInt(item.unbondingAmount),
-          }));
+    try {
+      const stored = localStorage.getItem(OPTIMISTIC_UNBONDING_KEY);
+      if (stored) {
+        const parsedStorage: OptimisticUnbondingStorage[] = JSON.parse(stored);
+        const parsed: OptimisticUnbonding[] = parsedStorage.map((item) => ({
+          ...item,
+          expectedAmount: BigInt(item.expectedAmount),
+          unbondingAmount: BigInt(item.unbondingAmount),
+        }));
 
-          return parsed;
-        }
-        return [];
-      } catch {
-        return [];
+        return parsed;
       }
+      return [];
+    } catch {
+      return [];
     }
-    return [];
   });
 
   const { bech32Address } = useCosmosWallet();
@@ -90,26 +98,24 @@ export function useDelegationService() {
   const { validatorMap, loading: isValidatorLoading } = useValidatorService();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storageFormat: OptimisticUnbondingStorage[] =
-        optimisticUnbondings.map((item) => ({
-          ...item,
-          expectedAmount: item.expectedAmount.toString(),
-          unbondingAmount: item.unbondingAmount.toString(),
-        }));
+    const storageFormat: OptimisticUnbondingStorage[] =
+      optimisticUnbondings.map((item) => ({
+        ...item,
+        expectedAmount: item.expectedAmount.toString(),
+        unbondingAmount: item.unbondingAmount.toString(),
+      }));
 
-      localStorage.setItem(
-        OPTIMISTIC_UNBONDING_KEY,
-        JSON.stringify(storageFormat),
-      );
-    }
+    localStorage.setItem(
+      OPTIMISTIC_UNBONDING_KEY,
+      JSON.stringify(storageFormat),
+    );
   }, [optimisticUnbondings]);
 
   useEffect(() => {
     if (optimisticUnbondings.length === 0) return;
 
-    const POLLING_INTERVAL = 15000;
-    const OPTIMISTIC_TIMEOUT = 3 * 60 * 1000;
+    const POLLING_INTERVAL = POLLING_INTERVAL_MS;
+    const OPTIMISTIC_TIMEOUT = OPTIMISTIC_TIMEOUT_MS;
 
     const poll = async () => {
       const now = Date.now();
@@ -154,6 +160,10 @@ export function useDelegationService() {
         unbondingValidatorAddresses.add(validatorAddress);
 
         if (entries.length > 0) {
+          // Use the first entry to represent the unbonding state for this validator.
+          // In Cosmos SDK, multiple unbonding entries can exist per validator if the user
+          // unbonds at different times. For UI purposes, we show one representative entry.
+          // entries[0] is typically the earliest or most recent unbonding delegation.
           const firstEntry = entries[0];
           unbondingInfoByValidator[validatorAddress] = {
             amount: BigInt(
@@ -182,15 +192,10 @@ export function useDelegationService() {
         const age = Date.now() - optimistic.timestamp;
         const ageMinutes = Math.floor(age / (60 * 1000));
         const estimatedCompletionTime = new Date(
-          optimistic.timestamp + 21 * 24 * 60 * 60 * 1000,
+          optimistic.timestamp + UNBONDING_PERIOD_MS,
         );
 
-        let statusSuffix = "";
-        if (age > 2 * 60 * 1000) {
-          statusSuffix = ` (${ageMinutes}min - verifying...)`;
-        } else if (age > 30 * 1000) {
-          statusSuffix = " (confirming...)";
-        }
+        const statusSuffix = getStatusSuffix(age, ageMinutes);
 
         unbondingInfoByValidator[validatorAddress] = {
           amount: optimistic.unbondingAmount,
@@ -342,7 +347,16 @@ export function useDelegationService() {
         const result = await sendBbnTx(signedTx);
 
         setTimeout(() => {
-          Promise.all([refetchDelegations(), refetchUnbondingDelegations()]);
+          (async () => {
+            try {
+              await Promise.all([
+                refetchDelegations(),
+                refetchUnbondingDelegations(),
+              ]);
+            } catch (err) {
+              console.error("Error during refetch after unstake:", err);
+            }
+          })();
         }, 2000);
 
         return result;

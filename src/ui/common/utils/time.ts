@@ -127,7 +127,8 @@ export const formatTimeRemaining = (completionTime: string): string => {
     end: completion,
   });
 
-  return formatDuration(duration, {
+  const formatted = formatDuration(duration, {
     format: ["hours", "minutes"],
   });
+  return formatted === "" ? "< 1 minute" : formatted;
 };
