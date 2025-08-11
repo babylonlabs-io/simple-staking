@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Button,
   DialogBody,
@@ -12,14 +11,12 @@ import {
 } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 import type { FieldValues } from "react-hook-form";
-import { number, object } from "yup";
 
 import babylon from "@/infrastructure/babylon";
 import { AmountField } from "@/ui/baby/components/AmountField";
 import { type Delegation } from "@/ui/baby/state/DelegationState";
+import { createUnbondingValidationSchema } from "@/ui/baby/validation/unbondingValidation";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
-import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
-import { formatBabyStakingAmount } from "@/ui/common/utils/formTransforms";
 
 interface UnbondingModalProps {
   open: boolean;
@@ -111,23 +108,7 @@ export const UnbondingModal = ({
 
   const validationSchema = useMemo(
     () =>
-      object().shape({
-        amount: number()
-          .transform(formatBabyStakingAmount)
-          .typeError("Unbonding amount must be a valid number.")
-          .required("Enter BABY Amount to Unbond")
-          .moreThan(0, "Unbonding amount must be greater than 0.")
-          .test(
-            "invalidBalance",
-            `Unbonding amount cannot exceed your staked balance (${availableBalanceInBaby} BABY).`,
-            (value = 0) => BigInt(value) <= availableBalance,
-          )
-          .test(
-            "invalidFormat",
-            "Unbonding amount must have no more than 6 decimal points.",
-            (_, context) => validateDecimalPoints(context.originalValue, 6),
-          ),
-      }),
+      createUnbondingValidationSchema(availableBalance, availableBalanceInBaby),
     [availableBalance, availableBalanceInBaby],
   );
 
