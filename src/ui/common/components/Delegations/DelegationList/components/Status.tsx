@@ -85,6 +85,10 @@ const STATUSES: Record<string, StatusAdapter> = {
     ),
     status: "error",
   }),
+  [State.EXPANDED]: () => ({
+    label: "Expanded",
+    tooltip: "Delegation has been expanded/renewed to a new delegation",
+  }),
   [State.TIMELOCK_WITHDRAWN]: () => ({
     label: "Withdrawn",
     tooltip: "Stake has been withdrawn",
