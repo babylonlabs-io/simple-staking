@@ -71,7 +71,6 @@ jobs:
           NEXT_PUBLIC_FF_ENABLE_LEDGER: ${{ vars.NEXT_PUBLIC_FF_ENABLE_LEDGER }}
           NEXT_PUBLIC_FF_PHASE_3: ${{ vars.NEXT_PUBLIC_FF_PHASE_3 }}
           NEXT_PUBLIC_FF_BABYSTAKING: ${{ vars.NEXT_PUBLIC_FF_BABYSTAKING }}
-          NEXT_PUBLIC_FF_STAKING_EXPANSION: ${{ vars.NEXT_PUBLIC_FF_STAKING_EXPANSION }}
 
       - name: Generate sha256sum checksum
         run: |

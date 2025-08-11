@@ -21,7 +21,6 @@ import {
 } from "@/ui/common/types/delegationsV2";
 import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 import { durationTillNow } from "@/ui/common/utils/time";
 
@@ -259,7 +258,6 @@ const transformToActivityCard = (
   // 2. Delegation is active
   // 3. Delegation can expand from the api
   const showExpansionSection =
-    FeatureFlagService.IsStakingExpansionEnabled &&
     delegation.state === DelegationV2StakingState.ACTIVE &&
     delegation.canExpand;
 
@@ -295,6 +293,11 @@ export function ActivityList() {
         const { valid } = validations[delegation.stakingTxHashHex];
         return valid;
       })
+      .filter(
+        // Filter out expanded delegations as they are now part of the
+        // expanded delegation. User can find it from delegation history.
+        (delegation) => delegation.state !== DelegationV2StakingState.EXPANDED,
+      )
       .map((delegation) =>
         transformToActivityCard(
           delegation,
