@@ -133,7 +133,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       sortBy: sortState.field,
       order: sortState.direction,
       name: debouncedSearch,
-      bsnId: selectedBsnId,
+      // TODO: Temporary solution until the backend is able to handle query FP by Babylon bsnId
+      bsnId: selectedBsnId === BBN_CHAIN_ID ? undefined : selectedBsnId,
       enabled: stakingModalPage === StakingModalPage.FINALITY_PROVIDER,
     });
 
