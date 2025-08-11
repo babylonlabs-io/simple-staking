@@ -98,6 +98,7 @@ export function useDelegationService() {
       delegations.reduce(
         (acc, delegation) => ({
           ...acc,
+          // Validate the delegation against the available UTXOs
           [delegation.stakingTxHashHex]: validateDelegation(
             delegation,
             availableUTXOs,
