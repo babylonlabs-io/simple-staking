@@ -18,8 +18,10 @@ import { RewardsPreviewModal } from "./components/RewardPreviewModal";
 import { useRewardState } from "./state/RewardState";
 import StakingForm from "./widgets/StakingForm";
 
+type TabId = "stake" | "activity" | "rewards";
+
 export default function BabyLayout() {
-  const [activeTab, setActiveTab] = useState("stake");
+  const [activeTab, setActiveTab] = useState<TabId>("stake");
   const { connected } = useWalletConnect();
   const { isGeoBlocked, isLoading } = useHealthCheck();
   const isConnected = connected && !isGeoBlocked && !isLoading;
@@ -33,12 +35,17 @@ export default function BabyLayout() {
     rewards,
   } = useRewardState();
 
-  // Reset tab to "stake" when wallet disconnects
   useEffect(() => {
     if (!connected) {
       setActiveTab("stake");
     }
   }, [connected]);
+
+  useEffect(() => {
+    if (isGeoBlocked && (activeTab === "activity" || activeTab === "rewards")) {
+      setActiveTab("stake");
+    }
+  }, [isGeoBlocked, activeTab]);
 
   const tabItems = [
     {
@@ -96,7 +103,7 @@ export default function BabyLayout() {
                     items={tabItems}
                     defaultActiveTab="stake"
                     activeTab={activeTab}
-                    onTabChange={setActiveTab}
+                    onTabChange={(tabId) => setActiveTab(tabId as TabId)}
                   />
                 </Container>
               </AuthGuard>
