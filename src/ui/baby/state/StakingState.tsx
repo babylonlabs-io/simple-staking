@@ -10,6 +10,7 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { MultistakingFormFields } from "@/ui/common/state/MultistakingState";
+import { babyToUbbnBigInt } from "@/ui/common/utils/bbn";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import {
   formatBabyStakingAmount,
@@ -97,9 +98,7 @@ function StakingState({ children }: PropsWithChildren) {
               "Minimum staking amount is 1 BABY",
               (_, context) => {
                 const originalValue = context.originalValue;
-                const valueInMicroBaby = BigInt(
-                  Math.round(originalValue * 1_000_000),
-                );
+                const valueInMicroBaby = babyToUbbnBigInt(originalValue);
                 return valueInMicroBaby >= BigInt(1_000_000);
               },
             )
@@ -108,9 +107,7 @@ function StakingState({ children }: PropsWithChildren) {
               "Staking Amount Exceeds Balance",
               (_, context) => {
                 const originalValue = context.originalValue;
-                const valueInMicroBaby = BigInt(
-                  Math.round(originalValue * 1_000_000),
-                );
+                const valueInMicroBaby = babyToUbbnBigInt(originalValue);
                 return valueInMicroBaby <= balance;
               },
             )

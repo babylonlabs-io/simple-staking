@@ -29,12 +29,13 @@ export function coinAmountToBigInt(amount: string): bigint {
 }
 
 /**
- * Safely converts BABY amount to micro-BABY (uBBN) as BigInt for validation comparisons.
- * Handles decimal values by flooring to prevent BigInt conversion errors.
+ * Converts BABY amount to micro-BABY (uBBN) as BigInt using rounding.
+ * This matches the conversion behavior used in form transformations and transactions.
+ * Use this for validation that needs to match actual transaction amounts.
  * @param babyAmount The amount in BABY (can be decimal).
  * @returns The equivalent amount in micro-BABY as BigInt.
  */
-export function safeBabyToUbbnBigInt(babyAmount: number): bigint {
-  const microBabyAmount = Math.floor(babyAmount * 1_000_000);
+export function babyToUbbnBigInt(babyAmount: number): bigint {
+  const microBabyAmount = Math.round(babyAmount * 1_000_000);
   return BigInt(microBabyAmount);
 }
