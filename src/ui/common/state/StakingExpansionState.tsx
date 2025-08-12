@@ -1,8 +1,14 @@
-import { EventData } from "@babylonlabs-io/btc-staking-ts";
-import { useCallback, useState, type PropsWithChildren } from "react";
+import { EventData, RegistrationStep } from "@babylonlabs-io/btc-staking-ts";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
 import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
+import { useEventBus } from "@/ui/common/hooks/useEventBus";
 import type { DelegationV2 } from "@/ui/common/types/delegationsV2";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
@@ -12,6 +18,13 @@ import {
   type StakingExpansionFormData,
   type StakingExpansionState,
 } from "./StakingExpansionTypes";
+
+const EXPANSION_STEP_MAP: Record<RegistrationStep, StakingExpansionStep> = {
+  "staking-slashing": StakingExpansionStep.EOI_STAKING_SLASHING,
+  "unbonding-slashing": StakingExpansionStep.EOI_UNBONDING_SLASHING,
+  "proof-of-possession": StakingExpansionStep.EOI_PROOF_OF_POSSESSION,
+  "create-btc-delegation-msg": StakingExpansionStep.EOI_SIGN_BBN,
+};
 
 const { StateProvider, useState: useStakingExpansionState } =
   createStateUtils<StakingExpansionState>({
@@ -40,6 +53,7 @@ const { StateProvider, useState: useStakingExpansionState } =
  */
 export function StakingExpansionState({ children }: PropsWithChildren) {
   const { data: networkInfo } = useNetworkInfo();
+  const eventBus = useEventBus();
 
   const maxFinalityProviders =
     FeatureFlagService.IsPhase3Enabled &&
@@ -60,6 +74,22 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   const [expansionStepOptions, setExpansionStepOptions] = useState<
     EventData | undefined
   >();
+
+  useEffect(() => {
+    const unsubscribe = eventBus.on("delegation:expand", (options) => {
+      const type = options?.type as RegistrationStep | undefined;
+
+      if (type) {
+        const stepName = EXPANSION_STEP_MAP[type];
+        if (stepName) {
+          setStep(stepName);
+          setExpansionStepOptions(options);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [setStep, setExpansionStepOptions, eventBus]);
 
   const goToStep = useCallback(
     (step: StakingExpansionStep, options?: EventData) => {
