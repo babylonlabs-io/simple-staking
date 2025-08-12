@@ -1,6 +1,7 @@
 import { number, object } from "yup";
 
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
+import { createBalanceValidator } from "@/ui/common/utils/bbn";
 import { formatBabyStakingAmount } from "@/ui/common/utils/formTransforms";
 
 /**
@@ -13,6 +14,8 @@ export const createUnbondingValidationSchema = (
   availableBalance: bigint,
   availableBalanceInBaby: number,
 ) => {
+  const balanceValidator = createBalanceValidator(availableBalance);
+
   return object().shape({
     amount: number()
       .typeError("Unbonding amount must be a valid number.")
@@ -22,14 +25,7 @@ export const createUnbondingValidationSchema = (
       .test(
         "invalidBalance",
         `Unbonding amount cannot exceed your staked balance (${availableBalanceInBaby} BABY).`,
-        (_, context) => {
-          // Get the original input value before transformation
-          const originalValue = context.originalValue;
-          const valueInMicroBaby = BigInt(
-            Math.round(originalValue * 1_000_000),
-          );
-          return valueInMicroBaby <= availableBalance;
-        },
+        (_, context) => balanceValidator(context.originalValue),
       )
       .test(
         "invalidFormat",
