@@ -19,14 +19,14 @@ export const Header = () => {
           <SmallLogo />
         </div>
 
-        <div className="absolute left-1/2 transform -translate-x-1/2">
-          <Nav>
-            <NavItem title="BTC Staking" to="/btc" />
-            {FF.IsBabyStakingEnabled && (
+        {FF.IsBabyStakingEnabled && (
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <Nav>
+              <NavItem title="BTC Staking" to="/btc" />
               <NavItem title="BABY Staking" to="/baby" />
-            )}
-          </Nav>
-        </div>
+            </Nav>
+          </div>
+        )}
 
         <div className="flex items-center gap-4">
           <Connect loading={loading} onConnect={open} />
