@@ -22,20 +22,12 @@ export const createUnbondingValidationSchema = (
       .test(
         "invalidBalance",
         `Unbonding amount cannot exceed your staked balance (${availableBalanceInBaby} BABY).`,
-        (transformedValue = 0, context) => {
+        (_, context) => {
           // Get the original input value before transformation
           const originalValue = context.originalValue;
           const valueInMicroBaby = BigInt(
             Math.round(originalValue * 1_000_000),
           );
-          console.log("🔍 BABY Unbonding Balance Validation:", {
-            transformedValue,
-            originalValue: originalValue,
-            valueInMicroBaby: valueInMicroBaby.toString(),
-            availableBalance: availableBalance.toString(),
-            availableBalanceInBaby: availableBalanceInBaby,
-            passes: valueInMicroBaby <= availableBalance,
-          });
           return valueInMicroBaby <= availableBalance;
         },
       )
