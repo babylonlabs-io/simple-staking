@@ -10,6 +10,7 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { MultistakingFormFields } from "@/ui/common/state/MultistakingState";
+import { safeBabyToUbbnBigInt } from "@/ui/common/utils/bbn";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import {
   formatBabyStakingAmount,
@@ -95,12 +96,18 @@ function StakingState({ children }: PropsWithChildren) {
             .test(
               "invalidMinAmount",
               "Minimum staking amount is 1 BABY",
-              (value = 0) => babylon.utils.ubbnToBaby(BigInt(value)) >= 1,
+              (value = 0) => {
+                const valueInMicroBaby = safeBabyToUbbnBigInt(value);
+                return valueInMicroBaby >= BigInt(1_000_000);
+              },
             )
             .test(
               "invalidBalance",
               "Staking Amount Exceeds Balance",
-              (value = 0) => BigInt(value) <= balance,
+              (value = 0) => {
+                const valueInMicroBaby = safeBabyToUbbnBigInt(value);
+                return valueInMicroBaby <= balance;
+              },
             )
             .test(
               "invalidFormat",
@@ -123,7 +130,10 @@ function StakingState({ children }: PropsWithChildren) {
             .test(
               "invalidBalance",
               "Fee Amount Exceeds Balance",
-              (value = 0) => BigInt(value) <= balance,
+              (value = 0) => {
+                const valueInMicroBaby = BigInt(Math.floor(value));
+                return valueInMicroBaby <= balance;
+              },
             ),
         },
       ] as const,

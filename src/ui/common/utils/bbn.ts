@@ -27,3 +27,14 @@ export function ubbnToBaby(ubbn: number): number {
 export function coinAmountToBigInt(amount: string): bigint {
   return BigInt(Math.floor(Number(amount)));
 }
+
+/**
+ * Safely converts BABY amount to micro-BABY (uBBN) as BigInt for validation comparisons.
+ * Handles decimal values by flooring to prevent BigInt conversion errors.
+ * @param babyAmount The amount in BABY (can be decimal).
+ * @returns The equivalent amount in micro-BABY as BigInt.
+ */
+export function safeBabyToUbbnBigInt(babyAmount: number): bigint {
+  const microBabyAmount = Math.floor(babyAmount * 1_000_000);
+  return BigInt(microBabyAmount);
+}
