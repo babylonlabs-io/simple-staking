@@ -88,13 +88,30 @@ export default function BabyLayout() {
       : []),
   ];
 
+  const fallbackTabItems = [
+    {
+      id: "stake",
+      label: "Stake",
+      content: <StakingForm />,
+    },
+  ];
+
+  const fallbackContent = (
+    <Container
+      as="main"
+      className="flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
+    >
+      <Tabs items={fallbackTabItems} defaultActiveTab="stake" />
+    </Container>
+  );
+
   return (
     <StakingState>
       <ValidatorState>
         <DelegationState>
           <RewardState>
             <Content>
-              <AuthGuard>
+              <AuthGuard fallback={fallbackContent}>
                 <Container
                   as="main"
                   className="flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
