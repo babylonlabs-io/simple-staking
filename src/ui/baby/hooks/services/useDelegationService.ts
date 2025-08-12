@@ -311,10 +311,10 @@ export function useDelegationService() {
   );
 
   const unstake = useCallback(
-    async ({ validatorAddress, amount }: StakingParams) => {
+    async ({ validatorAddress, amount: amountInUbbn }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
 
-      const unbondAmount = babylon.utils.babyToUbbn(Number(amount));
+      const unbondAmount = BigInt(amountInUbbn);
 
       const currentDelegation = delegations.find(
         (d) => d.delegation.validatorAddress === validatorAddress,

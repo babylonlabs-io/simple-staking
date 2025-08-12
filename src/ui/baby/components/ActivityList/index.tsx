@@ -80,10 +80,6 @@ export function BabyActivityList() {
               ),
             },
             {
-              label: "Shares",
-              value: delegation.shares.toFixed(6),
-            },
-            {
               label: "Status",
               value: isUnbonding ? "Unbonding" : "Active",
             },
