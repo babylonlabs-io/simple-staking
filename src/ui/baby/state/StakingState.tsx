@@ -217,11 +217,6 @@ function StakingState({ children }: PropsWithChildren) {
 
   const context = useMemo(() => {
     const displayBalance = babylon.utils.ubbnToBaby(balance);
-    console.log("📊 BABY StakingState Context:", {
-      rawBalance: balance.toString(),
-      displayBalance,
-      conversionCheck: Number(balance) / 1_000_000,
-    });
     return {
       loading,
       step,
