@@ -10,7 +10,6 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { MultistakingFormFields } from "@/ui/common/state/MultistakingState";
-import { safeBabyToUbbnBigInt } from "@/ui/common/utils/bbn";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import {
   formatBabyStakingAmount,
@@ -96,16 +95,22 @@ function StakingState({ children }: PropsWithChildren) {
             .test(
               "invalidMinAmount",
               "Minimum staking amount is 1 BABY",
-              (value = 0) => {
-                const valueInMicroBaby = safeBabyToUbbnBigInt(value);
+              (_, context) => {
+                const originalValue = context.originalValue;
+                const valueInMicroBaby = BigInt(
+                  Math.round(originalValue * 1_000_000),
+                );
                 return valueInMicroBaby >= BigInt(1_000_000);
               },
             )
             .test(
               "invalidBalance",
               "Staking Amount Exceeds Balance",
-              (value = 0) => {
-                const valueInMicroBaby = safeBabyToUbbnBigInt(value);
+              (_, context) => {
+                const originalValue = context.originalValue;
+                const valueInMicroBaby = BigInt(
+                  Math.round(originalValue * 1_000_000),
+                );
                 return valueInMicroBaby <= balance;
               },
             )
@@ -213,11 +218,17 @@ function StakingState({ children }: PropsWithChildren) {
     setStep({ name: "initial" });
   }, []);
 
-  const context = useMemo(
-    () => ({
+  const context = useMemo(() => {
+    const displayBalance = babylon.utils.ubbnToBaby(balance);
+    console.log("📊 BABY StakingState Context:", {
+      rawBalance: balance.toString(),
+      displayBalance,
+      conversionCheck: Number(balance) / 1_000_000,
+    });
+    return {
       loading,
       step,
-      balance: babylon.utils.ubbnToBaby(balance),
+      balance: displayBalance,
       formSchema,
       fields,
       babyPrice,
@@ -226,21 +237,20 @@ function StakingState({ children }: PropsWithChildren) {
       submitForm,
       resetForm,
       closePreview,
-    }),
-    [
-      loading,
-      step,
-      balance,
-      formSchema,
-      fields,
-      babyPrice,
-      calculateFee,
-      showPreview,
-      submitForm,
-      resetForm,
-      closePreview,
-    ],
-  );
+    };
+  }, [
+    loading,
+    step,
+    balance,
+    formSchema,
+    fields,
+    babyPrice,
+    calculateFee,
+    showPreview,
+    submitForm,
+    resetForm,
+    closePreview,
+  ]);
 
   return <StateProvider value={context}>{children}</StateProvider>;
 }

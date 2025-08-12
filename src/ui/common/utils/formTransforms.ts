@@ -23,5 +23,8 @@ export const formatStakingAmount = (value: number) =>
 export const formatNumber = (value: number) =>
   !Number.isNaN(value) ? value : undefined;
 
-export const formatBabyStakingAmount = (value: number) =>
-  !Number.isNaN(value) ? Number(babylon.utils.babyToUbbn(value)) : undefined;
+export const formatBabyStakingAmount = (value: number) => {
+  if (Number.isNaN(value)) return undefined;
+  const transformed = Number(babylon.utils.babyToUbbn(value));
+  return transformed;
+};
