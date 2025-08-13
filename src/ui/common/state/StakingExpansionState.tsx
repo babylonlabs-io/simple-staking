@@ -40,6 +40,9 @@ const { StateProvider, useState: useStakingExpansionState } =
     reset: () => {},
     expansionStepOptions: undefined,
     setExpansionStepOptions: () => {},
+    expansionHistoryModalOpen: false,
+    setExpansionHistoryModalOpen: () => {},
+    isExpansionModalOpen: false,
     maxFinalityProviders: DEFAULT_MAX_FINALITY_PROVIDERS,
     getAvailableBsnSlots: () => 0,
     canAddMoreBsns: () => false,
@@ -67,6 +70,8 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   const [expansionStepOptions, setExpansionStepOptions] = useState<
     EventData | undefined
   >();
+  const [expansionHistoryModalOpen, setExpansionHistoryModalOpen] =
+    useState(false);
 
   useEffect(() => {
     const unsubscribe = eventBus.on("delegation:expand", (options) => {
@@ -102,6 +107,7 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     setStep(undefined);
     setVerifiedDelegation(undefined);
     setExpansionStepOptions(undefined);
+    setExpansionHistoryModalOpen(false);
   }, []);
 
   /**
@@ -134,6 +140,9 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     [maxFinalityProviders],
   );
 
+  // Computed state: true when any expansion-related modal is open
+  const isExpansionModalOpen = Boolean(step) || expansionHistoryModalOpen;
+
   const state: StakingExpansionState = {
     hasError,
     processing,
@@ -148,6 +157,9 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     reset,
     expansionStepOptions,
     setExpansionStepOptions,
+    expansionHistoryModalOpen,
+    setExpansionHistoryModalOpen,
+    isExpansionModalOpen,
     maxFinalityProviders,
     getAvailableBsnSlots,
     canAddMoreBsns,

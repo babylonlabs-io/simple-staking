@@ -4,7 +4,6 @@ import {
   AccordionSummary,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
@@ -25,12 +24,17 @@ interface StakeExpansionSectionProps {
 export function StakeExpansionSection({
   delegation,
 }: StakeExpansionSectionProps) {
-  const { goToStep, setFormData, processing, maxFinalityProviders, canExpand } =
-    useStakingExpansionState();
+  const {
+    goToStep,
+    setFormData,
+    processing,
+    maxFinalityProviders,
+    canExpand,
+    expansionHistoryModalOpen,
+    setExpansionHistoryModalOpen,
+  } = useStakingExpansionState();
   const { delegations } = useDelegationV2State();
   const { getHistoryCount } = useExpansionHistoryService();
-  const [expansionHistoryModalOpen, setExpansionHistoryModalOpen] =
-    useState(false);
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
   const canExpandDelegation = canExpand(delegation);

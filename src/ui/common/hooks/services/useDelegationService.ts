@@ -82,12 +82,11 @@ export function useDelegationService() {
   const { isFetching: isFPLoading, finalityProviderMap } =
     useFinalityProviderState();
 
-  const { step } = useStakingExpansionState();
-  const isStakingExpansionModalOpen = Boolean(step);
+  const { isExpansionModalOpen } = useStakingExpansionState();
 
-  // Stop loading when staking expansion is working
+  // Stop loading when any expansion modal is open
   const isLoading =
-    (isDelegationLoading || isFPLoading) && !isStakingExpansionModalOpen;
+    (isDelegationLoading || isFPLoading) && !isExpansionModalOpen;
 
   const delegationsWithFP = useMemo(
     () =>
