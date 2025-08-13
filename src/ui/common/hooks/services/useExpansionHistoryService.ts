@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useRef } from "react";
 
 import { DelegationV2 } from "@/ui/common/types/delegationsV2";
 
@@ -12,7 +12,7 @@ export interface ExpansionHistoryCache {
 }
 
 export function useExpansionHistoryService() {
-  const cache = useMemo<ExpansionHistoryCache>(() => ({}), []);
+  const cache = useRef<ExpansionHistoryCache>({});
 
   const buildExpansionChain = useCallback(
     (delegations: DelegationV2[], targetTxHash: string): DelegationV2[] => {
@@ -42,8 +42,8 @@ export function useExpansionHistoryService() {
       delegations: DelegationV2[],
       targetTxHash: string,
     ): ExpansionHistoryData => {
-      if (cache[targetTxHash]) {
-        return cache[targetTxHash];
+      if (cache.current[targetTxHash]) {
+        return cache.current[targetTxHash];
       }
 
       const expansionChain = buildExpansionChain(delegations, targetTxHash);
@@ -54,10 +54,10 @@ export function useExpansionHistoryService() {
         expansionChain,
       };
 
-      cache[targetTxHash] = result;
+      cache.current[targetTxHash] = result;
       return result;
     },
-    [buildExpansionChain, cache],
+    [buildExpansionChain],
   );
 
   const getExpansionChain = useCallback(
@@ -76,8 +76,8 @@ export function useExpansionHistoryService() {
   );
 
   const clearCache = useCallback(() => {
-    Object.keys(cache).forEach((key) => delete cache[key]);
-  }, [cache]);
+    cache.current = {};
+  }, []);
 
   return {
     calculateExpansionHistory,
