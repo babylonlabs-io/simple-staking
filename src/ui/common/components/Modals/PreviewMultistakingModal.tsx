@@ -1,187 +1,56 @@
 import {
-  Avatar,
   Button,
+  Card,
   DialogBody,
   DialogFooter,
   DialogHeader,
-  Heading,
-  Loader,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { Fragment } from "react";
+import { PropsWithChildren } from "react";
 
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
-import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
-import { useIsMobileView } from "@/ui/common/hooks/useBreakpoint";
-import { satoshiToBtc } from "@/ui/common/utils/btc";
-import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
-import { maxDecimals } from "@/ui/common/utils/maxDecimals";
-import { blocksToDisplayTime } from "@/ui/common/utils/time";
+import { BsnFpDisplayItem, StakingDetails } from "@/ui/common/types/display";
 
 import { ResponsiveDialog } from "./ResponsiveDialog";
 
-interface ProviderInfo {
-  name: string;
-  avatar?: string;
-}
-
 interface PreviewMultistakingModalProps {
   open: boolean;
+  processing?: boolean;
   onClose: () => void;
-  onSign: () => void;
-  providers: ProviderInfo[];
-  stakingAmountSat: number;
-  stakingTimelock: number;
-  stakingFeeSat: number;
-  feeRate: number;
-  unbondingFeeSat: number;
-  processing: boolean;
+  onProceed: () => void;
+  bsns: BsnFpDisplayItem[];
+  finalityProviders: BsnFpDisplayItem[];
+  details: StakingDetails;
+  isExpansion?: boolean; // For expansion-specific behavior
 }
-
-const { networkFullName: bbnNetworkFullName } = getNetworkConfigBBN();
-const { coinSymbol, networkName, displayUSD } = getNetworkConfigBTC();
 
 export const PreviewMultistakingModal = ({
   open,
+  processing = false,
   onClose,
-  onSign,
-  providers,
-  stakingAmountSat,
-  stakingTimelock,
-  stakingFeeSat,
-  feeRate,
-  unbondingFeeSat,
-  processing,
-}: PreviewMultistakingModalProps) => {
-  const isMobileView = useIsMobileView();
-
-  const { data: networkInfo } = useNetworkInfo();
-  const confirmationDepth =
-    networkInfo?.params.btcEpochCheckParams?.latestParam
-      ?.btcConfirmationDepth || 30;
-  const unbondingTime =
-    blocksToDisplayTime(
-      networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,
-    ) || "7 days";
-
-  const btcInUsd = usePrice(coinSymbol);
-
-  const FinalityProvidersValue = isMobileView ? (
-    <div className="flex flex-col gap-2">
-      {providers.map((p) => (
-        <span key={p.name} className="flex gap-2 items-center">
-          {p.avatar && (
-            <Avatar
-              size="small"
-              url={p.avatar}
-              variant="circular"
-              alt={p.name}
-            />
-          )}
-          <Text variant="body1">{p.name}</Text>
-        </span>
-      ))}
-    </div>
-  ) : (
-    <Text variant="body1">
-      {providers.map((p) => p.name).join(", ") || "-"}
-    </Text>
-  );
-
-  const previewFields = [
+  onProceed,
+  bsns,
+  finalityProviders,
+  details,
+  isExpansion = false,
+}: PropsWithChildren<PreviewMultistakingModalProps>) => {
+  const fields = [
+    { label: "Stake Amount", value: details.stakeAmount },
+    { label: "Fee Rate", value: details.feeRate },
+    { label: "Transaction Fees", value: details.transactionFees },
     {
-      key: "Finality Providers",
-      value: FinalityProvidersValue,
-    },
-    {
-      key: "Stake Amount",
+      label: "Term",
       value: (
         <>
-          <Text variant="body1">
-            {maxDecimals(satoshiToBtc(stakingAmountSat), 8)} {coinSymbol}
-          </Text>
-          {displayUSD && (
-            <Text
-              as="span"
-              variant="body2"
-              className="text-accent-secondary ml-2"
-            >
-              {calculateTokenValueInCurrency(
-                satoshiToBtc(stakingAmountSat),
-                btcInUsd,
-              )}
-            </Text>
-          )}
+          {details.term.blocks}
+          <br />
+          <span className="text-md text-secondary">
+            {details.term.duration}
+          </span>
         </>
       ),
     },
-    {
-      key: "Fee rate",
-      value: <Text variant="body1">{feeRate} sat/vB</Text>,
-    },
-    {
-      key: "Transaction fee",
-      value: (
-        <>
-          <Text variant="body1">
-            {maxDecimals(satoshiToBtc(stakingFeeSat), 8)} {coinSymbol}
-          </Text>
-          {displayUSD && (
-            <Text
-              as="span"
-              variant="body2"
-              className="text-accent-secondary ml-2"
-            >
-              {calculateTokenValueInCurrency(
-                satoshiToBtc(stakingFeeSat),
-                btcInUsd,
-              )}
-            </Text>
-          )}
-        </>
-      ),
-    },
-    {
-      key: "Term",
-      value: (
-        <>
-          <Text variant="body1">{stakingTimelock} blocks</Text>
-          <Text variant="body2" className="text-accent-secondary">
-            ~ {blocksToDisplayTime(stakingTimelock)}
-          </Text>
-        </>
-      ),
-    },
-    {
-      key: "On Demand Unbonding",
-      value: (
-        <Text variant="body1">Enabled (~ {unbondingTime} unbonding time)</Text>
-      ),
-    },
-    {
-      key: "Unbonding fee",
-      value: (
-        <>
-          <Text variant="body1">
-            {maxDecimals(satoshiToBtc(unbondingFeeSat), 8)} {coinSymbol}
-          </Text>
-          {displayUSD && (
-            <Text
-              as="span"
-              variant="body2"
-              className="text-accent-secondary ml-2"
-            >
-              {calculateTokenValueInCurrency(
-                satoshiToBtc(unbondingFeeSat),
-                btcInUsd,
-              )}
-            </Text>
-          )}
-        </>
-      ),
-    },
+    { label: "Unbonding", value: details.unbonding },
+    { label: "Unbonding Fee", value: details.unbondingFee },
   ];
 
   return (
@@ -191,39 +60,101 @@ export const PreviewMultistakingModal = ({
         onClose={onClose}
         className="text-accent-primary"
       />
-
-      <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4">
-        <div className="flex flex-col">
-          {previewFields.map((field, index) => (
-            <Fragment key={field.key}>
-              <div key={field.key} className="flex justify-between">
-                <Text variant="body1">{field.key}</Text>
-                <div className="text-right">{field.value}</div>
+      <DialogBody className="flex flex-col mb-8 mt-4 text-accent-primary gap-4 overflow-y-auto no-scrollbar max-h-[calc(100vh-12rem)]">
+        <Card className="p-4 pt-2">
+          <div className="flex flex-col">
+            {bsns.length > 1 && (
+              <div className="grid grid-cols-2 gap-4 items-center mb-2">
+                <Text
+                  variant="caption"
+                  className="text-secondary text-left ml-4"
+                >
+                  BSNs
+                </Text>
+                <Text variant="caption" className="text-secondary text-left">
+                  Finality Provider
+                </Text>
               </div>
-              {index < previewFields.length - 1 && (
-                <div className="divider mx-0 my-2" />
-              )}
-            </Fragment>
+            )}
+            <div className="bg-primary-contrast rounded p-4 max-h-48 overflow-y-auto">
+              <div className="flex flex-col gap-2">
+                {bsns.map((bsnItem, index) => {
+                  const fpItem = finalityProviders[index];
+                  return (
+                    <div
+                      key={`pair-${index}`}
+                      className="grid grid-cols-2 gap-4 items-center"
+                    >
+                      <div
+                        className={`flex items-center justify-start gap-2 w-full py-1 ${
+                          bsnItem.isExisting ? "opacity-50" : ""
+                        }`}
+                      >
+                        {bsnItem.icon}
+                        <Text variant="body2" className="font-medium">
+                          {bsnItem.name}
+                        </Text>
+                      </div>
+                      <div
+                        className={`flex items-center justify-start gap-2 w-full py-1 ${
+                          fpItem?.isExisting ? "opacity-50" : ""
+                        }`}
+                      >
+                        {fpItem?.icon}
+                        <Text variant="body2" className="font-medium">
+                          {fpItem?.name}
+                        </Text>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <div className="flex flex-col gap-2">
+          {fields.map((field, index) => (
+            <div
+              key={index}
+              className="flex flex-row items-center justify-between py-1"
+            >
+              <Text variant="body2" className="text-secondary font-normal">
+                {field.label}
+              </Text>
+              <Text variant="body2" className="text-right font-normal">
+                {field.value}
+              </Text>
+            </div>
           ))}
         </div>
-        <br />
-        <div className="flex flex-col gap-2">
-          <Heading variant="h6">Attention!</Heading>
-          <Text variant="body2">
-            1. No third party possesses your staked {coinSymbol}. You are the
-            only one who can unbond and withdraw your stake.
+
+        <div className="border-t border-divider w-full" />
+
+        <div className="pt-2 gap-2 flex flex-col">
+          <Text variant="body1" className="text-secondary">
+            Attention!
           </Text>
-          <Text variant="body2">
-            2. Your stake will first be sent to {bbnNetworkFullName} for
-            verification (~20 seconds), then you will be prompted to submit it
-            to the {networkName} ledger. It will be marked as
-            &quot;Pending&quot; until it receives {confirmationDepth} Bitcoin
-            confirmations.
+          <Text variant="body2" className="text-secondary">
+            1. No third party possesses your staked BTC. You are the only one
+            who can unbond and withdraw your stake.
           </Text>
+          <Text variant="body2" className="text-secondary">
+            2. Your stake will first be sent to Babylon Genesis for verification
+            (~20 seconds), then you will be prompted to submit it to the Bitcoin
+            ledger. It will be marked as &apos;Pending&apos; until it receives
+            10 Bitcoin confirmations.
+          </Text>
+          {/* Additional expansion related text */}
+          {isExpansion && (
+            <Text variant="body2" className="text-secondary">
+              3. Please note: submitting this transaction will reset your
+              stake&apos;s timelock.
+            </Text>
+          )}
         </div>
       </DialogBody>
-
-      <DialogFooter className="flex gap-4">
+      <DialogFooter className="flex gap-4 pb-8 pt-0">
         <Button
           variant="outlined"
           color="primary"
@@ -234,17 +165,12 @@ export const PreviewMultistakingModal = ({
         </Button>
         <Button
           variant="contained"
-          onClick={onSign}
+          color="primary"
+          onClick={onProceed}
           className="flex-1"
           disabled={processing}
         >
-          {processing ? (
-            <Loader size={16} className="text-white" />
-          ) : (
-            <>
-              Proceed <span className="hidden md:inline">to Signing</span>
-            </>
-          )}
+          {processing ? "Processing..." : "Proceed to Signing"}
         </Button>
       </DialogFooter>
     </ResponsiveDialog>
