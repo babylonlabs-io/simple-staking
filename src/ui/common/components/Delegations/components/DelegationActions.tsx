@@ -22,6 +22,7 @@ interface DelegationActionsProps {
   onRegistration: () => Promise<void>;
   onUnbond: (id: string) => void;
   onWithdraw: (id: string) => void;
+  tooltipIdOverride?: string;
 }
 
 export const DelegationActions: React.FC<DelegationActionsProps> = ({
@@ -34,6 +35,7 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
   onRegistration,
   onUnbond,
   onWithdraw,
+  tooltipIdOverride,
 }) => {
   const [isPopoverOpen, setIsPopoverOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -126,7 +128,8 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
 
   // Active, eligible for registration
   if (state === DelegationState.ACTIVE || isEligibleForRegistration) {
-    const tooltipId = `tooltip-registration-${stakingTxHashHex}`;
+    const tooltipId =
+      tooltipIdOverride ?? `tooltip-registration-${stakingTxHashHex}`;
 
     return (
       <div
@@ -151,12 +154,16 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           >
             Register
           </Button>
-          <Tooltip
-            id={tooltipId}
-            className="tooltip-wrap"
-            clickable={true}
-            delayHide={500}
-          />
+          {!tooltipIdOverride && (
+            <Tooltip
+              id={tooltipId}
+              className="tooltip-wrap"
+              clickable={true}
+              delayHide={500}
+              positionStrategy="fixed"
+              globalCloseEvents={{ scroll: true }}
+            />
+          )}
         </div>
 
         <button
@@ -172,11 +179,9 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
           anchorEl={anchorEl}
           placement="bottom-end"
           onClickOutside={() => setIsPopoverOpen(false)}
-          className="bg-surface p-4 rounded border border-secondary-strokeLight w-48 shadow-md"
+          className="bg-surface rounded border border-secondary-strokeLight w-40 sm:w-48 shadow-md"
         >
-          <Text
-            variant="body2"
-            as="button"
+          <button
             onClick={() => {
               if (isStakingManagerReady) {
                 onUnbond(stakingTxHashHex);
@@ -184,17 +189,19 @@ export const DelegationActions: React.FC<DelegationActionsProps> = ({
               }
             }}
             className={twJoin(
-              "flex items-center gap-1 text-accent-primary transition-all",
+              "w-full p-4 flex items-center gap-1 text-accent-primary transition-all text-left",
               isStakingManagerReady
                 ? "hover:brightness-125"
                 : "opacity-50 cursor-not-allowed",
             )}
           >
-            Unbond
-            {!isStakingManagerReady && (
-              <Loader size={12} className="text-accent-primary ml-1" />
-            )}
-          </Text>
+            <Text variant="body2" className="flex items-center gap-1">
+              Unbond
+              {!isStakingManagerReady && (
+                <Loader size={12} className="text-accent-primary ml-1" />
+              )}
+            </Text>
+          </button>
         </Popover>
       </div>
     );

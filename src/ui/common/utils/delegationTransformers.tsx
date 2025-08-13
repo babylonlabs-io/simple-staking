@@ -1,5 +1,5 @@
 import bitcoin from "@/ui/common/assets/bitcoin.png";
-import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
+import { DelegationStatus } from "@/ui/common/components/Delegations/components/DelegationStatus";
 import { Hash } from "@/ui/common/components/Hash/Hash";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
@@ -37,7 +37,7 @@ export const transformDelegationToActivityCard = (
     {
       label: "Status",
       value: finalityProvider ? (
-        <Status delegation={delegationWithFP} showTooltip={false} />
+        <DelegationStatus delegation={delegationWithFP} showTooltip={false} />
       ) : (
         "Unknown"
       ),

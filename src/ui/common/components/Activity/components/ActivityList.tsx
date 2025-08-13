@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 import bitcoin from "@/ui/common/assets/bitcoin.png";
-import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
+import { DelegationStatus } from "@/ui/common/components/Delegations/components/DelegationStatus";
 import { Hash } from "@/ui/common/components/Hash/Hash";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfig } from "@/ui/common/config/network";
@@ -31,7 +31,7 @@ import {
   ActivityCardDetailItem,
   ActivityListItemData,
 } from "../../ActivityCard/ActivityCard";
-import { DelegationModal } from "../../Delegations/DelegationList/components/DelegationModal";
+import { DelegationModal } from "../../Delegations/components/DelegationModal";
 import { StakingExpansionModalSystem } from "../../StakingExpansion/StakingExpansionModalSystem";
 
 const networkConfig = getNetworkConfig();
@@ -174,7 +174,7 @@ const transformToActivityCard = (
   const details: ActivityCardDetailItem[] = [
     {
       label: "Status",
-      value: <Status delegation={delegation} showTooltip={false} />,
+      value: <DelegationStatus delegation={delegation} showTooltip={false} />,
     },
     {
       label: "Inception",

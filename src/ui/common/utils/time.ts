@@ -75,6 +75,7 @@ interface Duration {
 export const durationTillNow = (
   startTimestamp: string,
   currentTime: number,
+  options?: { compact?: boolean },
 ) => {
   if (!startTimestamp || startTimestamp.startsWith("000")) return "Ongoing";
 
@@ -101,11 +102,37 @@ export const durationTillNow = (
   const formattedTime = formatDuration(duration, {
     format,
   });
-  if (formattedTime) {
-    return `${formattedTime} ago`;
-  } else {
-    return "Just now";
+  if (!formattedTime) return "Just now";
+
+  const full = `${formattedTime} ago`;
+
+  if (options?.compact) {
+    const parts = full.replace(/ ago$/, "").split(" ");
+    const compactParts: string[] = [];
+    for (let i = 0; i < parts.length; i += 2) {
+      const value = parts[i];
+      const unit = parts[i + 1] ?? "";
+      const abbr = unit.startsWith("year")
+        ? "y"
+        : unit.startsWith("month")
+          ? "mo"
+          : unit.startsWith("week")
+            ? "w"
+            : unit.startsWith("day")
+              ? "d"
+              : unit.startsWith("hour")
+                ? "h"
+                : unit.startsWith("minute")
+                  ? "m"
+                  : unit.startsWith("second")
+                    ? "s"
+                    : unit;
+      compactParts.push(`${value}${abbr}`);
+    }
+    return compactParts.join(" ") + " ago";
   }
+
+  return full;
 };
 
 /**

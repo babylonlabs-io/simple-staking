@@ -13,17 +13,17 @@ import { NetworkInfo } from "@/ui/common/types/networkInfo";
 
 import { SlashingContent } from "./SlashingContent";
 
-interface StatusProps {
+interface DelegationStatusProps {
   delegation: DelegationWithFP;
   showTooltip?: boolean;
 }
 
-interface StatusParams {
+interface DelegationStatusParams {
   delegation: DelegationWithFP;
   networkInfo?: NetworkInfo;
 }
 
-type StatusAdapter = (props: StatusParams) => {
+type DelegationStatusAdapter = (props: DelegationStatusParams) => {
   label: string;
   tooltip: string | JSX.Element;
   status?: "warning" | "error";
@@ -31,7 +31,7 @@ type StatusAdapter = (props: StatusParams) => {
 
 const { coinName } = getNetworkConfigBTC();
 
-const STATUSES: Record<string, StatusAdapter> = {
+const STATUSES: Record<string, DelegationStatusAdapter> = {
   [State.PENDING]: () => ({
     label: "Pending",
     tooltip: "Stake is pending verification",
@@ -138,7 +138,7 @@ const STATUSES: Record<string, StatusAdapter> = {
   }),
 };
 
-const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
+const FP_STATUSES: Record<string, Record<string, DelegationStatusAdapter>> = {
   [FinalityProviderState.ACTIVE]: {},
   [FinalityProviderState.SLASHED]: {
     [State.VERIFIED]: () => ({
@@ -166,7 +166,10 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
   [FinalityProviderState.JAILED]: {},
 };
 
-export function Status({ delegation, showTooltip = true }: StatusProps) {
+export function DelegationStatus({
+  delegation,
+  showTooltip = true,
+}: DelegationStatusProps) {
   const { networkInfo } = useAppState();
 
   const delegationStatus = useMemo(

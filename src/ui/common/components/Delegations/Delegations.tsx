@@ -1,15 +1,22 @@
 import { getBabylonParamByBtcHeight } from "@babylonlabs-io/btc-staking-ts";
-import { Card, Heading } from "@babylonlabs-io/core-ui";
+import type {
+  ColumnProps as CoreTableColumn,
+  TableData as CoreTableData,
+} from "@babylonlabs-io/core-ui";
+import { Card, Heading, Table } from "@babylonlabs-io/core-ui";
 import { useEffect, useMemo, useState } from "react";
-import InfiniteScroll from "react-infinite-scroll-component";
+import { FaBitcoin } from "react-icons/fa";
+import { Tooltip } from "react-tooltip";
 import { useLocalStorage } from "usehooks-ts";
 
-import { LoadingTableList } from "@/ui/common/components/Loading/Loading";
+import { Hint } from "@/ui/common/components/Common/Hint";
+import { DelegationActions } from "@/ui/common/components/Delegations/components/DelegationActions";
 import { RegistrationEndModal } from "@/ui/common/components/Modals/RegistrationModal/RegistrationEndModal";
 import { RegistrationStartModal } from "@/ui/common/components/Modals/RegistrationModal/RegistrationStartModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
 import { WithdrawModal } from "@/ui/common/components/Modals/WithdrawModal";
-import { ONE_MINUTE } from "@/ui/common/constants";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { DOCUMENTATION_LINKS, ONE_MINUTE } from "@/ui/common/constants";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
@@ -20,17 +27,22 @@ import { useRegistrationService } from "@/ui/common/hooks/services/useRegistrati
 import { useV1TransactionService } from "@/ui/common/hooks/services/useV1TransactionService";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useDelegationState } from "@/ui/common/state/DelegationState";
+import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import {
   Delegation as DelegationInterface,
   DelegationState,
 } from "@/ui/common/types/delegations";
+import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
+import { satoshiToBtc } from "@/ui/common/utils/btc";
+import { getState, getStateTooltip } from "@/ui/common/utils/getState";
 import { getIntermediateDelegationsLocalStorageKey } from "@/ui/common/utils/local_storage/getIntermediateDelegationsLocalStorageKey";
 import { toLocalStorageIntermediateDelegation } from "@/ui/common/utils/local_storage/toLocalStorageIntermediateDelegation";
+import { maxDecimals } from "@/ui/common/utils/maxDecimals";
+import { durationTillNow } from "@/ui/common/utils/time";
+import { trim } from "@/ui/common/utils/trim";
 
 import { UnbondModal } from "../Modals/UnbondModal";
 import { VerificationModal } from "../Modals/VerificationModal";
-
-import { Delegation } from "./Delegation";
 
 const MODE_WITHDRAW = "withdraw";
 const MODE_UNBOND = "unbond";
@@ -79,6 +91,9 @@ export const Delegations = () => {
 
   const { submitWithdrawalTx, submitUnbondingTx } = useV1TransactionService();
   const { data: networkFees } = useNetworkFees();
+  const { coinSymbol, mempoolApiUrl } = getNetworkConfigBTC();
+  const { getRegisteredFinalityProvider, getFinalityProviderName } =
+    useFinalityProviderState();
 
   const selectedDelegation = delegationsAPI?.delegations.find(
     (delegation) => delegation.stakingTxHashHex === txID,
@@ -363,70 +378,239 @@ export const Delegations = () => {
     : // if no API data, fallback to using only local storage delegations
       delegations;
 
+  type RowData = CoreTableData & {
+    delegation: DelegationInterface;
+    intermediateState?: string;
+  };
+
+  const rows: RowData[] = combinedDelegationsData.map((delegation) => {
+    const intermediateDelegation = intermediateDelegationsLocalStorage.find(
+      (item) => item.stakingTxHashHex === delegation.stakingTxHashHex,
+    );
+    return {
+      id: `${delegation.stakingTxHashHex}-${delegation.stakingTx.startHeight}`,
+      delegation,
+      intermediateState: intermediateDelegation?.state,
+    };
+  });
+
+  const columns: CoreTableColumn<RowData>[] = [
+    {
+      key: "inception",
+      header: "Inception",
+      headerClassName:
+        "text-left h-[52px] px-2 font-normal text-accent-secondary text-xs",
+      cellClassName: "h-16 px-2",
+      render: (_, row) => {
+        const d = row.delegation;
+        const { startTimestamp } = d.stakingTx;
+        const finalityProvider = getRegisteredFinalityProvider(
+          d.finalityProviderPkHex,
+        );
+        const isFpRegistered = finalityProvider !== null;
+        const fpState = finalityProvider?.state;
+        const isSlashed = fpState === FinalityProviderState.SLASHED;
+        const displayState =
+          d.isOverflow && d.state === DelegationState.ACTIVE
+            ? DelegationState.OVERFLOW
+            : row.intermediateState || d.state;
+
+        const stateTooltip = () => {
+          if (!isFpRegistered) {
+            return "Your Finality Provider is not registered on Babylon Genesis. You need to wait for their registration to become eligible to register your stake to Babylon Genesis";
+          }
+          if (isSlashed) {
+            return (
+              <span>
+                This finality provider has been slashed.{" "}
+                <a
+                  className="text-secondary-main"
+                  target="_blank"
+                  href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+                >
+                  Learn more
+                </a>
+              </span>
+            );
+          }
+          if (displayState === DelegationState.OVERFLOW) {
+            return "Stake was over the Phase-1 staking cap it was created in";
+          }
+          return getStateTooltip(displayState);
+        };
+
+        return (
+          <div className="flex flex-col">
+            <span>
+              {durationTillNow(startTimestamp, currentTime, { compact: true })}
+            </span>
+            <Hint
+              tooltip={stateTooltip()}
+              status={isSlashed ? "warning" : "default"}
+            >
+              {isSlashed ? (
+                <span className="text-error-main text-xs">Slashed</span>
+              ) : (
+                <span className="text-xs">{getState(displayState)}</span>
+              )}
+            </Hint>
+          </div>
+        );
+      },
+    },
+    {
+      key: "finalityProvider",
+      header: "Finality Provider",
+      headerClassName:
+        "text-left h-[52px] px-2 font-normal max-w-[12rem] truncate text-accent-secondary text-xs",
+      cellClassName: "h-16 px-2 max-w-[12rem] truncate",
+      render: (_, row) => {
+        const fpName =
+          getFinalityProviderName(row.delegation.finalityProviderPkHex) || "-";
+        const finalityProvider = getRegisteredFinalityProvider(
+          row.delegation.finalityProviderPkHex,
+        );
+        const fpState = finalityProvider?.state;
+        const isSlashed = fpState === FinalityProviderState.SLASHED;
+        const isJailed = fpState === FinalityProviderState.JAILED;
+
+        if (isSlashed) {
+          return (
+            <Hint
+              tooltip={
+                <span>
+                  This finality provider has been slashed.{" "}
+                  <a
+                    className="text-error-main"
+                    target="_blank"
+                    href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+                  >
+                    Learn more
+                  </a>
+                </span>
+              }
+              status="error"
+            >
+              <span className="text-error-main truncate" title={fpName}>
+                {fpName}
+              </span>
+            </Hint>
+          );
+        }
+        if (isJailed) {
+          return (
+            <Hint
+              tooltip={
+                <span>
+                  This finality provider has been jailed.{" "}
+                  <a
+                    className="text-secondary-main"
+                    target="_blank"
+                    href={DOCUMENTATION_LINKS.TECHNICAL_PRELIMINARIES}
+                  >
+                    Learn more
+                  </a>
+                </span>
+              }
+              status="error"
+            >
+              <span className="text-error-main truncate" title={fpName}>
+                {fpName}
+              </span>
+            </Hint>
+          );
+        }
+        return (
+          <span className="truncate" title={fpName}>
+            {fpName}
+          </span>
+        );
+      },
+    },
+    {
+      key: "amount",
+      header: "Amount",
+      headerClassName:
+        "text-left h-[52px] px-2 font-normal min-w-[8rem] text-accent-secondary text-xs",
+      cellClassName: "h-16 px-2 min-w-[8rem]",
+      render: (_, row) => (
+        <div className="flex gap-1 items-center">
+          <FaBitcoin className="text-primary" />
+          <p>
+            {maxDecimals(satoshiToBtc(row.delegation.stakingValueSat), 8)}{" "}
+            {coinSymbol}
+          </p>
+        </div>
+      ),
+    },
+    {
+      key: "txid",
+      header: "Transaction ID",
+      headerClassName:
+        "text-left h-[52px] px-2 font-normal text-accent-secondary text-xs",
+      cellClassName: "h-16 px-2",
+      render: (_, row) => (
+        <a
+          href={`${mempoolApiUrl}/tx/${row.delegation.stakingTxHashHex}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hover:underline"
+        >
+          {trim(row.delegation.stakingTxHashHex)}
+        </a>
+      ),
+    },
+    {
+      key: "action",
+      header: "Action",
+      headerClassName:
+        "text-left h-[52px] px-1 font-normal text-accent-secondary text-xs w-[6.5rem] sm:w-[9rem]",
+      cellClassName: "h-16 px-1 w-[6.5rem] sm:w-[9rem]",
+      frozen: "right",
+      render: (_, row) => (
+        <DelegationActions
+          state={row.delegation.state}
+          intermediateState={row.intermediateState}
+          isEligibleForRegistration={row.delegation.isEligibleForTransition}
+          isFpRegistered={
+            getRegisteredFinalityProvider(
+              row.delegation.finalityProviderPkHex,
+            ) !== null
+          }
+          stakingTxHashHex={row.delegation.stakingTxHashHex}
+          finalityProviderPkHex={row.delegation.finalityProviderPkHex}
+          onRegistration={() => onRegistration(row.delegation)}
+          onUnbond={(id) => handleModal(id, MODE_UNBOND)}
+          onWithdraw={(id) => handleModal(id, MODE_WITHDRAW)}
+        />
+      ),
+    },
+  ];
+
   return (
     <>
-      {combinedDelegationsData.length !== 0 && (
+      <Tooltip
+        anchorSelect="[data-tooltip-id^='tooltip-registration-']"
+        className="tooltip-wrap"
+        clickable={true}
+        delayHide={500}
+        positionStrategy="fixed"
+        globalCloseEvents={{ scroll: true }}
+      />
+      {rows.length !== 0 && (
         <Card className="mb-6">
           <Heading variant="h6" className="text-accent-primary py-2 mb-6">
             Pending Registration
           </Heading>
-
-          <InfiniteScroll
-            className="no-scrollbar max-h-[25rem] overflow-y-auto overflow-x-hidden"
-            dataLength={combinedDelegationsData.length}
-            next={fetchMoreDelegations}
+          <Table
+            data={rows}
+            columns={columns}
+            wrapperClassName="no-scrollbar max-h-[25rem] overflow-y-auto overflow-x-auto"
+            className="w-full min-w-[1000px]"
             hasMore={hasMoreDelegations}
-            loader={isLoading ? <LoadingTableList /> : null}
-          >
-            <table className="w-full">
-              <thead className="sticky top-0 bg-surface">
-                <tr className="text-accent-secondary text-xs">
-                  <th className="text-left h-[52px] px-2 font-normal">
-                    Inception
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal max-w-[12rem] truncate">
-                    Finality Provider
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal min-w-[8rem]">
-                    Amount
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal">
-                    Transaction ID
-                  </th>
-                  <th className="text-left h-[52px] px-2 font-normal">
-                    Action
-                  </th>
-                </tr>
-              </thead>
-
-              <tbody>
-                {combinedDelegationsData?.map((delegation) => {
-                  if (!delegation) return null;
-                  const { stakingTx, stakingTxHashHex } = delegation;
-                  const intermediateDelegation =
-                    intermediateDelegationsLocalStorage.find(
-                      (item) => item.stakingTxHashHex === stakingTxHashHex,
-                    );
-
-                  return (
-                    <Delegation
-                      currentTime={currentTime}
-                      key={stakingTxHashHex + stakingTx.startHeight}
-                      delegation={delegation}
-                      onWithdraw={() =>
-                        handleModal(stakingTxHashHex, MODE_WITHDRAW)
-                      }
-                      onRegistration={onRegistration}
-                      onUnbond={() =>
-                        handleModal(stakingTxHashHex, MODE_UNBOND)
-                      }
-                      intermediateState={intermediateDelegation?.state}
-                    />
-                  );
-                })}
-              </tbody>
-            </table>
-          </InfiniteScroll>
+            loading={isLoading}
+            onLoadMore={fetchMoreDelegations}
+          />
         </Card>
       )}
       {modalMode === MODE_WITHDRAW && txID && selectedDelegation && (
