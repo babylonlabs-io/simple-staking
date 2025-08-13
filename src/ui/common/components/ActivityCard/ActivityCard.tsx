@@ -67,7 +67,7 @@ export function ActivityCard({ data, className }: ActivityCardProps) {
         listItems={data.listItems}
       />
 
-      {!!FeatureFlagService.IsPhase3Enabled &&
+      {FeatureFlagService.IsPhase3Enabled &&
         (data.expansionSection ? (
           <StakeExpansionSection delegation={data.expansionSection} />
         ) : (
