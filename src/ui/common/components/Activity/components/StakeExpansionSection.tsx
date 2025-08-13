@@ -101,13 +101,15 @@ export function StakeExpansionSection({
               onClick={handleAddBsnFp}
               disabled={!canExpandDelegation || processing}
             />
-            <ExpansionButton
-              Icon={iconHistory}
-              text="Expansion History"
-              counter={`${expansionHistoryCount}`}
-              onClick={handleExpansionHistory}
-              disabled={expansionHistoryCount === 0 || processing}
-            />
+            {expansionHistoryCount > 0 && (
+              <ExpansionButton
+                Icon={iconHistory}
+                text="Expansion History"
+                counter={`${expansionHistoryCount}`}
+                onClick={handleExpansionHistory}
+                disabled={processing}
+              />
+            )}
           </div>
         </AccordionDetails>
       </Accordion>
