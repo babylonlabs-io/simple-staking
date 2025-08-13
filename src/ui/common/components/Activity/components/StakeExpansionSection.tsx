@@ -8,7 +8,6 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
 import iconHistory from "@/ui/common/assets/expansion-history.svg";
-import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
 import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
@@ -30,8 +29,7 @@ export function StakeExpansionSection({
     processing,
     maxFinalityProviders,
     canExpand,
-    expansionHistoryModalOpen,
-    setExpansionHistoryModalOpen,
+    openExpansionHistoryModal,
   } = useStakingExpansionState();
   const { delegations } = useDelegationV2State();
   const { getHistoryCount } = useExpansionHistoryService();
@@ -68,7 +66,7 @@ export function StakeExpansionSection({
    */
   const handleExpansionHistory = () => {
     if (expansionHistoryCount > 0) {
-      setExpansionHistoryModalOpen(true);
+      openExpansionHistoryModal(delegation);
     }
   };
 
@@ -117,13 +115,6 @@ export function StakeExpansionSection({
           </div>
         </AccordionDetails>
       </Accordion>
-
-      <ExpansionHistoryModal
-        open={expansionHistoryModalOpen}
-        onClose={() => setExpansionHistoryModalOpen(false)}
-        targetDelegation={delegation}
-        allDelegations={delegations}
-      />
     </div>
   );
 }

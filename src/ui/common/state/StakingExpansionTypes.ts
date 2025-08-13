@@ -69,6 +69,8 @@ export interface StakingExpansionState {
   expansionStepOptions: EventData | undefined;
   /** Whether the expansion history modal is open */
   expansionHistoryModalOpen: boolean;
+  /** Target delegation for expansion history modal */
+  expansionHistoryTargetDelegation: DelegationWithFP | null;
   /** Computed state: true when any expansion-related modal is open */
   isExpansionModalOpen: boolean;
 
@@ -87,6 +89,10 @@ export interface StakingExpansionState {
   setExpansionStepOptions: (options?: EventData) => void;
   /** Set expansion history modal open state */
   setExpansionHistoryModalOpen: (open: boolean) => void;
+  /** Open expansion history modal for a specific delegation */
+  openExpansionHistoryModal: (delegation: DelegationWithFP) => void;
+  /** Close expansion history modal */
+  closeExpansionHistoryModal: () => void;
 
   // Network configuration
   /** Maximum number of finality providers allowed based on network parameters */
