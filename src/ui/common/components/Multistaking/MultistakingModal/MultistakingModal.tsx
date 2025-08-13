@@ -2,7 +2,7 @@ import { Avatar, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/ui/common/components/Modals/CancelFeedbackModal";
-import { MultistakingPreviewModal } from "@/ui/common/components/Modals/MultistakingModal/MultistakingStartModal";
+import { PreviewMultistakingModal } from "@/ui/common/components/Modals/PreviewMultistakingModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
@@ -17,6 +17,7 @@ import { useStakingService } from "@/ui/common/hooks/services/useStakingService"
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { useStakingState } from "@/ui/common/state/StakingState";
+import { BsnFpDisplayItem } from "@/ui/common/types/display";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
@@ -65,8 +66,8 @@ export function MultistakingModal() {
   const currentFinalityProviders = useWatch({ name: "finalityProviders" });
 
   const { bsnInfos, finalityProviderInfos } = useMemo(() => {
-    const bsns: Array<{ icon: React.ReactNode; name: string }> = [];
-    const fps: Array<{ icon: React.ReactNode; name: string }> = [];
+    const bsns: BsnFpDisplayItem[] = [];
+    const fps: BsnFpDisplayItem[] = [];
 
     if (currentFinalityProviders) {
       if (
@@ -90,6 +91,7 @@ export function MultistakingModal() {
                 />
               ),
               name: bsn?.name || "Babylon Genesis",
+              isExisting: false,
             });
           }
 
@@ -105,6 +107,7 @@ export function MultistakingModal() {
                 />
               ),
               name: provider.description?.moniker || trim(fpPublicKey, 8),
+              isExisting: false,
             });
           }
         });
@@ -125,6 +128,7 @@ export function MultistakingModal() {
               />
             ),
             name: "Babylon Genesis",
+            isExisting: false,
           });
 
           const provider = getRegisteredFinalityProvider(fpPublicKey);
@@ -139,6 +143,7 @@ export function MultistakingModal() {
                 />
               ),
               name: provider.description?.moniker || trim(fpPublicKey, 8),
+              isExisting: false,
             });
           }
         });
@@ -195,7 +200,7 @@ export function MultistakingModal() {
   return (
     <>
       {step === "preview" && stakingInfo && details && (
-        <MultistakingPreviewModal
+        <PreviewMultistakingModal
           open
           processing={processing}
           bsns={bsnInfos}
