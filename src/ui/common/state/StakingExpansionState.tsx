@@ -7,11 +7,10 @@ import {
 } from "react";
 
 import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
-import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { useEventBus } from "@/ui/common/hooks/useEventBus";
+import { useMaxFinalityProviders } from "@/ui/common/hooks/useMaxFinalityProviders";
 import type { DelegationV2 } from "@/ui/common/types/delegationsV2";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 import {
   StakingExpansionStep,
@@ -52,14 +51,8 @@ const { StateProvider, useState: useStakingExpansionState } =
  * Wraps the application with expansion-specific state and methods.
  */
 export function StakingExpansionState({ children }: PropsWithChildren) {
-  const { data: networkInfo } = useNetworkInfo();
   const eventBus = useEventBus();
-
-  const maxFinalityProviders =
-    FeatureFlagService.IsPhase3Enabled &&
-    networkInfo?.params.bbnStakingParams.latestParam.maxFinalityProviders
-      ? networkInfo.params.bbnStakingParams.latestParam.maxFinalityProviders
-      : DEFAULT_MAX_FINALITY_PROVIDERS;
+  const maxFinalityProviders = useMaxFinalityProviders();
 
   const [hasError, setHasError] = useState(false);
   const [processing, setProcessing] = useState(false);
