@@ -12,6 +12,7 @@ import { bbnTestnet } from "./bbn/testnet";
 interface ExtendedBBNConfig extends BBNConfig {
   displayUSD: boolean;
   logo: string;
+  lcdUrl: string;
 }
 
 const defaultNetwork = "devnet";
@@ -27,6 +28,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     coinSymbol: "BABY",
     displayUSD: true,
     logo: babyLogo,
+    lcdUrl: bbnMainnet.rest,
   },
   canary: {
     chainId: bbnCanary.chainId,
@@ -37,6 +39,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     coinSymbol: "BABY",
     displayUSD: true,
     logo: babyLogo,
+    lcdUrl: bbnCanary.rest,
   },
   devnet: {
     chainId: bbnDevnet.chainId,
@@ -47,6 +50,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     coinSymbol: "tBABY",
     displayUSD: false,
     logo: babyLogo,
+    lcdUrl: bbnDevnet.rest,
   },
   bsnDevnet: {
     chainId: bbnBsnDevnet.chainId,
@@ -57,6 +61,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     coinSymbol: "tBABY",
     displayUSD: false,
     logo: babyLogo,
+    lcdUrl: bbnBsnDevnet.rest,
   },
   edgeDevnet: {
     chainId: bbnEdgeDevnet.chainId,
@@ -67,6 +72,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     coinSymbol: "tBABY",
     displayUSD: false,
     logo: babyLogo,
+    lcdUrl: bbnEdgeDevnet.rest,
   },
   testnet: {
     chainId: bbnTestnet.chainId,
@@ -77,6 +83,7 @@ const config: Record<string, ExtendedBBNConfig> = {
     coinSymbol: "tBABY",
     displayUSD: false,
     logo: babyLogo,
+    lcdUrl: bbnTestnet.rest,
   },
 };
 
