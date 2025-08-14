@@ -9,7 +9,7 @@ export const getCurrentEpoch = async (): Promise<number> => {
 
   const res = await fetch(url);
   if (!res.ok) {
-    throw new Error(`Error fetching current epoch. HTTP ${res.status}`);
+    throw new Error(`Error fetching current epoch from ${url}. HTTP ${res.status}: ${res.statusText}`);
   }
 
   const data: CurrentEpochResponse = await res.json();
