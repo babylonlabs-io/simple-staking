@@ -303,7 +303,7 @@ export function useDelegationService() {
 
         const signedTx = await signBbnTx(unstakeMsg);
 
-        return signedTx;
+        return { signedTx, optimisticUnbonding };
       } catch (error) {
         setOptimisticUnbondings((prev) =>
           prev.filter(
@@ -325,9 +325,25 @@ export function useDelegationService() {
    * sendTx is used to send the signed transaction to the network
    */
   const sendTx = useCallback(
-    async (signedTx: Uint8Array<ArrayBufferLike>) => {
-      const result = await sendBbnTx(signedTx);
-      return result;
+    async (signedTx: Uint8Array, optimisticUnbonding?: OptimisticUnbonding) => {
+      try {
+        const result = await sendBbnTx(signedTx);
+        return result;
+      } catch (error) {
+        if (optimisticUnbonding) {
+          setOptimisticUnbondings((prev) =>
+            prev.filter(
+              (opt) =>
+                !(
+                  opt.validatorAddress ===
+                    optimisticUnbonding.validatorAddress &&
+                  opt.timestamp === optimisticUnbonding.timestamp
+                ),
+            ),
+          );
+        }
+        throw error;
+      }
     },
     [sendBbnTx],
   );
