@@ -40,7 +40,9 @@ export function RewardCard() {
         className="flex justify-between items-center text-accent-secondary"
       >
         <span>Babylon Genesis</span>
-        <span>{rewardInUsd}</span>
+        <span>
+          {rewardInUsd !== undefined && rewardInUsd !== null ? rewardInUsd : ""}
+        </span>
       </Text>
 
       <Button fluid onClick={openClaimModal} disabled={!hasRewards || loading}>

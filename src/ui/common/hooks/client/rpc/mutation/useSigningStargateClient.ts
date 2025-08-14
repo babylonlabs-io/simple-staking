@@ -49,11 +49,11 @@ export const useSigningStargateClient = () => {
       if (bech32Address) {
         logger.info("Using Cosmos address for simulation", { bech32Address });
       }
-      // estimate gas
       return signingStargateClient.simulate(
         bech32Address,
         msgArr,
-        `estimate transaction fee for ${msgArr.map((msg) => msg.typeUrl).join(",")}`,
+        // Provide an empty memo to avoid exceeding the 256-character limit enforced by the Babylon RPC nodes.
+        "",
       );
     },
     [signingStargateClient, bech32Address, logger],
