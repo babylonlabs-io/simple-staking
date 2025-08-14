@@ -14,6 +14,7 @@ import { useLocalStorage } from "usehooks-ts";
 
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useDelegations } from "@/ui/common/hooks/client/api/useDelegations";
+import { useEpochPolling } from "@/ui/common/hooks/client/api/useEpochPolling";
 import { useEventBus } from "@/ui/common/hooks/useEventBus";
 import type { Delegation } from "@/ui/common/types/delegations";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
@@ -95,6 +96,8 @@ export function DelegationState({ children }: PropsWithChildren) {
   const [selectedDelegation, setSelectedDelegation] = useState<Delegation>();
   const [delegationStepOptions, setDelegationStepOptions] =
     useState<EventData>();
+
+  useEpochPolling();
 
   // Methods
   const addDelegation = useCallback(

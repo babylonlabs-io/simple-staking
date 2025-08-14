@@ -8,7 +8,6 @@ import {
 import {
   API_DEFAULT_RETRY_COUNT,
   API_DEFAULT_RETRY_DELAY,
-  ONE_MINUTE,
   ONE_SECOND,
 } from "@/ui/common/constants";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
@@ -36,17 +35,9 @@ export function useDelegations({ enabled = true }: { enabled?: boolean } = {}) {
         ? lastPage?.pagination?.next_key
         : null,
     initialPageParam: "",
-    refetchInterval: (query) => {
-      const totalPages = query.state.data?.pages.length ?? 0;
-      if (
-        totalPages > 0 &&
-        query.state.data?.pages[totalPages - 1].delegations.length === 0
-      ) {
-        // Stop refetching is there is no data available
-        return false;
-      }
-      return ONE_MINUTE;
-    },
+    // Delegations are refreshed explicitly when the Babylon epoch number increases.
+    // Disable periodic refetching to reduce unnecessary network traffic.
+    refetchInterval: false,
     enabled:
       Boolean(publicKeyNoCoord) && enabled && !isGeoBlocked && !isLoading,
     select: (data) => {
