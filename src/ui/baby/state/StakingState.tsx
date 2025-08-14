@@ -2,9 +2,9 @@ import { type PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { array, number, object, ObjectSchema, ObjectShape, string } from "yup";
 
 import babylon from "@/infrastructure/babylon";
-import { useDelegationService } from "@/ui/baby/hooks/services/useDelegationService";
 import { useValidatorService } from "@/ui/baby/hooks/services/useValidatorService";
 import { useWalletService } from "@/ui/baby/hooks/services/useWalletService";
+import { useDelegationState } from "@/ui/baby/state/DelegationState";
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
@@ -79,7 +79,8 @@ const { StateProvider, useState: useStakingState } =
 function StakingState({ children }: PropsWithChildren) {
   const [step, setStep] = useState<StakingStep>({ name: "initial" });
 
-  const { stake, estimateStakingFee } = useDelegationService();
+  const { stake, estimateStakingFee } = useDelegationState();
+
   const { validatorMap, loading } = useValidatorService();
   const { balance } = useWalletService();
   const { handleError } = useError();
@@ -188,10 +189,11 @@ function StakingState({ children }: PropsWithChildren) {
       const amount = step.data.amount;
       const validatorAddress = step.data.validator.address;
       const result = await stake({ amount, validatorAddress });
+      const txHash = result?.txHash || "";
       logger.info("Baby Staking: Stake", {
-        txHash: result?.txHash,
+        txHash,
       });
-      setStep({ name: "success", data: { txHash: result?.txHash } });
+      setStep({ name: "success", data: { txHash } });
     } catch (error: any) {
       handleError({ error });
       logger.error(error);

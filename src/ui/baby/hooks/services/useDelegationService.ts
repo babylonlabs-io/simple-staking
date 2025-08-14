@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import babylon from "@/infrastructure/babylon";
 import { useDelegations } from "@/ui/baby/hooks/api/useDelegations";
@@ -47,7 +47,20 @@ interface OptimisticUnbondingStorage {
   timestamp: number;
 }
 
+interface OptimisticStaking {
+  validatorAddress: string;
+  amount: bigint;
+  timestamp: number;
+}
+
+interface OptimisticStakingStorage {
+  validatorAddress: string;
+  amount: string;
+  timestamp: number;
+}
+
 const OPTIMISTIC_UNBONDING_KEY = "baby-optimistic-unbondings";
+const OPTIMISTIC_STAKING_KEY = "baby-optimistic-stakings";
 const UNBONDING_PERIOD_MS = 21 * 24 * 60 * 60 * 1000;
 const POLLING_INTERVAL_MS = 15000;
 const OPTIMISTIC_TIMEOUT_MS = 3 * 60 * 1000;
@@ -83,6 +96,27 @@ export function useDelegationService() {
     }
   });
 
+  const [optimisticStakings, setOptimisticStakings] = useState<
+    OptimisticStaking[]
+  >(() => {
+    try {
+      const stored = localStorage.getItem(OPTIMISTIC_STAKING_KEY);
+      if (stored) {
+        const parsedStorage: OptimisticStakingStorage[] = JSON.parse(stored);
+        const parsed: OptimisticStaking[] = parsedStorage.map((item) => ({
+          ...item,
+          amount: BigInt(item.amount),
+        }));
+        return parsed;
+      }
+      return [];
+    } catch {
+      return [];
+    }
+  });
+
+  const isStakingRef = useRef(false);
+
   const { bech32Address } = useCosmosWallet();
   const {
     data: delegations = [],
@@ -112,36 +146,71 @@ export function useDelegationService() {
   }, [optimisticUnbondings]);
 
   useEffect(() => {
-    if (optimisticUnbondings.length === 0) return;
+    const storageFormat: OptimisticStakingStorage[] = optimisticStakings.map(
+      (item) => ({
+        ...item,
+        amount: item.amount.toString(),
+      }),
+    );
 
+    if (optimisticStakings.length > 0 || !isStakingRef.current) {
+      localStorage.setItem(
+        OPTIMISTIC_STAKING_KEY,
+        JSON.stringify(storageFormat),
+      );
+    }
+  }, [optimisticStakings]);
+
+  const optimisticUnbondingsRef = useRef(optimisticUnbondings);
+  const optimisticStakingsRef = useRef(optimisticStakings);
+
+  useEffect(() => {
+    optimisticUnbondingsRef.current = optimisticUnbondings;
+  }, [optimisticUnbondings]);
+
+  useEffect(() => {
+    optimisticStakingsRef.current = optimisticStakings;
+  }, [optimisticStakings]);
+
+  useEffect(() => {
     const POLLING_INTERVAL = POLLING_INTERVAL_MS;
     const OPTIMISTIC_TIMEOUT = OPTIMISTIC_TIMEOUT_MS;
 
     const poll = async () => {
-      const now = Date.now();
-      const expiredOptimistic: OptimisticUnbonding[] = [];
-      const validOptimistic: OptimisticUnbonding[] = [];
+      try {
+        await refetchDelegations();
+        await refetchUnbondingDelegations();
 
-      optimisticUnbondings.forEach((opt) => {
-        const ageMs = now - opt.timestamp;
-
-        if (ageMs > OPTIMISTIC_TIMEOUT) {
-          expiredOptimistic.push(opt);
-        } else {
-          validOptimistic.push(opt);
+        // Clean up expired optimistic unbondings
+        const currentUnbondings = optimisticUnbondingsRef.current;
+        if (currentUnbondings.length > 0) {
+          const validUnbondings = currentUnbondings.filter(
+            (unbonding) =>
+              Date.now() - unbonding.timestamp < OPTIMISTIC_TIMEOUT,
+          );
+          if (validUnbondings.length !== currentUnbondings.length) {
+            setOptimisticUnbondings(validUnbondings);
+          }
         }
-      });
 
-      if (expiredOptimistic.length > 0) {
-        setOptimisticUnbondings(validOptimistic);
+        // Clean up expired optimistic stakings
+        const currentStakings = optimisticStakingsRef.current;
+        if (currentStakings.length > 0) {
+          const validStakings = currentStakings.filter(
+            (staking) => Date.now() - staking.timestamp < OPTIMISTIC_TIMEOUT,
+          );
+          if (validStakings.length !== currentStakings.length) {
+            setOptimisticStakings(validStakings);
+          }
+        }
+      } catch (error) {
+        console.error("Polling error:", error);
       }
-
-      await Promise.all([refetchDelegations(), refetchUnbondingDelegations()]);
     };
 
     const interval = setInterval(poll, POLLING_INTERVAL);
     return () => clearInterval(interval);
-  }, [optimisticUnbondings, refetchDelegations, refetchUnbondingDelegations]);
+  }, [refetchDelegations, refetchUnbondingDelegations]);
 
   const groupedDelegations = useMemo(() => {
     if (isValidatorLoading) {
@@ -160,10 +229,7 @@ export function useDelegationService() {
         unbondingValidatorAddresses.add(validatorAddress);
 
         if (entries.length > 0) {
-          // Use the first entry to represent the unbonding state for this validator.
-          // In Cosmos SDK, multiple unbonding entries can exist per validator if the user
-          // unbonds at different times. For UI purposes, we show one representative entry.
-          // entries[0] is typically the earliest or most recent unbonding delegation.
+          // Use the first entry to represent the unbonding state for this validator
           const firstEntry = entries[0];
           unbondingInfoByValidator[validatorAddress] = {
             amount: BigInt(
@@ -274,6 +340,45 @@ export function useDelegationService() {
       ),
     );
 
+    const optimisticStakingsToRemove: OptimisticStaking[] = [];
+
+    optimisticStakings.forEach((optimisticStaking) => {
+      const { validatorAddress } = optimisticStaking;
+
+      const age = Date.now() - optimisticStaking.timestamp;
+      const isConfirmedInAPI = age > 30000;
+
+      if (isConfirmedInAPI) {
+        optimisticStakingsToRemove.push(optimisticStaking);
+      } else {
+        const validator = validatorMap[validatorAddress];
+        if (validator) {
+          const pendingDelegation = {
+            validator,
+            delegatorAddress: bech32Address || "",
+            shares: 0,
+            amount: optimisticStaking.amount,
+            coin: "ubbn" as const,
+            status: "pending" as DelegationStatus,
+          };
+          result.push(pendingDelegation);
+        }
+      }
+    });
+
+    if (optimisticStakingsToRemove.length > 0) {
+      setOptimisticStakings((prev) =>
+        prev.filter(
+          (opt) =>
+            !optimisticStakingsToRemove.some(
+              (toRemove) =>
+                toRemove.validatorAddress === opt.validatorAddress &&
+                toRemove.timestamp === opt.timestamp,
+            ),
+        ),
+      );
+    }
+
     return result;
   }, [
     delegations,
@@ -281,33 +386,68 @@ export function useDelegationService() {
     isValidatorLoading,
     unbondingDelegations,
     optimisticUnbondings,
+    optimisticStakings,
+    bech32Address,
   ]);
 
   const stake = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
-      if (!bech32Address) throw Error("Babylon Wallet is not connected");
+      isStakingRef.current = true;
 
-      const stakeMsg = babylon.txs.baby.createStakeMsg({
+      if (!bech32Address) {
+        throw Error("Babylon Wallet is not connected");
+      }
+
+      const stakeAmount =
+        typeof amount === "string"
+          ? babylon.utils.babyToUbbn(Number(amount))
+          : BigInt(amount);
+
+      const optimisticStaking: OptimisticStaking = {
         validatorAddress,
-        delegatorAddress: bech32Address,
-        amount:
-          typeof amount === "string"
-            ? babylon.utils.babyToUbbn(Number(amount))
-            : BigInt(amount),
-      });
-      const signedTx = await signBbnTx(stakeMsg);
-      const result = await sendBbnTx(signedTx);
+        amount: stakeAmount,
+        timestamp: Date.now(),
+      };
 
-      await Promise.all([refetchDelegations(), refetchUnbondingDelegations()]);
-      return result;
+      setOptimisticStakings((prev) => {
+        const filtered = prev.filter(
+          (opt) => opt.validatorAddress !== validatorAddress,
+        );
+        const newStakings = [...filtered, optimisticStaking];
+        return newStakings;
+      });
+
+      try {
+        const stakeMsg = babylon.txs.baby.createStakeMsg({
+          validatorAddress,
+          delegatorAddress: bech32Address,
+          amount: stakeAmount,
+        });
+
+        const signedTx = await signBbnTx(stakeMsg);
+        const result = await sendBbnTx(signedTx);
+
+        setTimeout(() => {
+          isStakingRef.current = false;
+        }, 5000);
+
+        return result;
+      } catch (error) {
+        isStakingRef.current = false;
+        setOptimisticStakings((prev) =>
+          prev.filter(
+            (opt) =>
+              !(
+                opt.validatorAddress === validatorAddress &&
+                opt.timestamp === optimisticStaking.timestamp
+              ),
+          ),
+        );
+
+        throw error;
+      }
     },
-    [
-      bech32Address,
-      signBbnTx,
-      sendBbnTx,
-      refetchDelegations,
-      refetchUnbondingDelegations,
-    ],
+    [bech32Address, signBbnTx, sendBbnTx],
   );
 
   const unstake = useCallback(
@@ -353,8 +493,8 @@ export function useDelegationService() {
                 refetchDelegations(),
                 refetchUnbondingDelegations(),
               ]);
-            } catch (err) {
-              console.error("Error during refetch after unstake:", err);
+            } catch {
+              // Ignore refetch errors
             }
           })();
         }, 2000);

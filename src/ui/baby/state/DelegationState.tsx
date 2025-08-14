@@ -13,10 +13,21 @@ interface UnbondProps {
   amount: string;
 }
 
+interface StakeProps {
+  validatorAddress: string;
+  amount: string | number;
+}
+
 interface ValidatorState {
   loading: boolean;
   delegations: Delegation[];
   unbond: (params: UnbondProps) => Promise<void>;
+  stake: (
+    params: StakeProps,
+  ) => Promise<{ txHash: string; gasUsed: string } | undefined>;
+  estimateStakingFee: (
+    params: Omit<StakeProps, "amount"> & { amount: number },
+  ) => Promise<number>;
 }
 
 const { StateProvider, useState: useDelegationState } =
@@ -24,12 +35,15 @@ const { StateProvider, useState: useDelegationState } =
     loading: false,
     delegations: [],
     unbond: async () => {},
+    stake: async () => undefined,
+    estimateStakingFee: async () => 0,
   });
 
 function DelegationState({ children }: PropsWithChildren) {
   const [processing, setProcessing] = useState(false);
 
-  const { loading, delegations, unstake } = useDelegationService();
+  const { loading, delegations, unstake, stake, estimateStakingFee } =
+    useDelegationService();
   const { handleError } = useError();
   const logger = useLogger();
 
@@ -60,8 +74,10 @@ function DelegationState({ children }: PropsWithChildren) {
       loading: processing || loading,
       delegations,
       unbond,
+      stake,
+      estimateStakingFee,
     }),
-    [processing, loading, delegations, unbond],
+    [processing, loading, delegations, unbond, stake, estimateStakingFee],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;

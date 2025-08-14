@@ -21,6 +21,7 @@ interface UnbondingModalState {
 
 export function BabyActivityList() {
   const { loading, delegations, unbond } = useDelegationState();
+
   const [unbondingModal, setUnbondingModal] = useState<UnbondingModalState>({
     isOpen: false,
     delegation: null,
@@ -54,19 +55,28 @@ export function BabyActivityList() {
     return delegations.map((delegation) => {
       const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
       const isUnbonding = delegation.status === "unbonding";
+      const isPending = delegation.status === "pending";
+
+      let statusText = "Active";
+      if (isUnbonding) {
+        statusText = "Unbonding";
+      } else if (isPending) {
+        statusText = "Pending";
+      }
 
       return {
         delegation,
         data: {
           icon: logo,
           formattedAmount: `${formattedAmount} ${coinSymbol}`,
-          primaryAction: isUnbonding
-            ? undefined
-            : {
-                label: "Unbond",
-                variant: "contained" as const,
-                onClick: () => openUnbondingModal(delegation),
-              },
+          primaryAction:
+            isUnbonding || isPending
+              ? undefined
+              : {
+                  label: "Unbond",
+                  variant: "contained" as const,
+                  onClick: () => openUnbondingModal(delegation),
+                },
           details: [],
           optionalDetails: [
             {
@@ -81,7 +91,7 @@ export function BabyActivityList() {
             },
             {
               label: "Status",
-              value: isUnbonding ? "Unbonding" : "Active",
+              value: statusText,
             },
             {
               label: "Voting Power",
@@ -96,6 +106,14 @@ export function BabyActivityList() {
                         ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} - Processing`
                         : `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} in ${formatTimeRemaining(delegation.unbondingInfo.completionTime)}${delegation.unbondingInfo.statusSuffix || ""}`
                       : "In progress...",
+                  },
+                ]
+              : []),
+            ...(isPending
+              ? [
+                  {
+                    label: "Transaction",
+                    value: "Processing on blockchain...",
                   },
                 ]
               : []),
@@ -129,7 +147,7 @@ export function BabyActivityList() {
       <div className="space-y-4">
         {activityItems.map(({ delegation, data }) => (
           <BabyActivityCard
-            key={delegation.validator.address}
+            key={`${delegation.validator.address}-${delegation.amount.toString()}-${delegation.status}`}
             activityData={data}
           />
         ))}
