@@ -31,6 +31,7 @@ export interface Delegation {
   coin: "ubbn";
   status?: DelegationStatus;
   unbondingInfo?: UnbondingInfo;
+  timestamp?: number;
 }
 
 interface OptimisticUnbonding {
@@ -362,6 +363,7 @@ export function useDelegationService() {
             amount: optimisticStaking.amount,
             coin: "ubbn" as const,
             status: "pending" as DelegationStatus,
+            timestamp: optimisticStaking.timestamp,
           };
           result.push(pendingDelegation);
         }

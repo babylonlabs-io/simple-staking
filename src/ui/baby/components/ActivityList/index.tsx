@@ -147,7 +147,7 @@ export function BabyActivityList() {
       <div className="space-y-4">
         {activityItems.map(({ delegation, data }) => (
           <BabyActivityCard
-            key={`${delegation.validator.address}-${delegation.amount.toString()}-${delegation.status}`}
+            key={`${delegation.validator.address}-${delegation.amount.toString()}-${delegation.status}${delegation.timestamp ? `-${delegation.timestamp}` : ""}`}
             activityData={data}
           />
         ))}
