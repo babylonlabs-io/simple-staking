@@ -64,6 +64,8 @@ const OPTIMISTIC_STAKING_KEY = "baby-optimistic-stakings";
 const UNBONDING_PERIOD_MS = 21 * 24 * 60 * 60 * 1000;
 const POLLING_INTERVAL_MS = 15000;
 const OPTIMISTIC_TIMEOUT_MS = 3 * 60 * 1000;
+const STAKING_CONFIRMATION_TIMEOUT_MS = 30000;
+const STAKING_RESET_TIMEOUT_MS = 5000;
 
 function getStatusSuffix(age: number, ageMinutes: number): string {
   if (age > 2 * 60 * 1000) {
@@ -153,7 +155,7 @@ export function useDelegationService() {
       }),
     );
 
-    if (optimisticStakings.length > 0 || !isStakingRef.current) {
+    if (optimisticStakings.length > 0) {
       localStorage.setItem(
         OPTIMISTIC_STAKING_KEY,
         JSON.stringify(storageFormat),
@@ -346,7 +348,7 @@ export function useDelegationService() {
       const { validatorAddress } = optimisticStaking;
 
       const age = Date.now() - optimisticStaking.timestamp;
-      const isConfirmedInAPI = age > 30000;
+      const isConfirmedInAPI = age > STAKING_CONFIRMATION_TIMEOUT_MS;
 
       if (isConfirmedInAPI) {
         optimisticStakingsToRemove.push(optimisticStaking);
@@ -429,7 +431,7 @@ export function useDelegationService() {
 
         setTimeout(() => {
           isStakingRef.current = false;
-        }, 5000);
+        }, STAKING_RESET_TIMEOUT_MS);
 
         return result;
       } catch (error) {
