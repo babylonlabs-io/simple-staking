@@ -44,6 +44,7 @@ interface Step<K extends string, D = never> {
 type StakingStep =
   | Step<"initial">
   | Step<"preview", PreviewData>
+  | Step<"signing">
   | Step<"loading">
   | Step<"success", { txHash: string }>;
 
@@ -79,7 +80,7 @@ const { StateProvider, useState: useStakingState } =
 function StakingState({ children }: PropsWithChildren) {
   const [step, setStep] = useState<StakingStep>({ name: "initial" });
 
-  const { stake, estimateStakingFee } = useDelegationService();
+  const { stake, sendTx, estimateStakingFee } = useDelegationService();
   const { validatorMap, loading } = useValidatorService();
   const { balance } = useWalletService();
   const { handleError } = useError();
@@ -184,10 +185,13 @@ function StakingState({ children }: PropsWithChildren) {
     if (step.name !== "preview" || !step.data) return;
 
     try {
-      setStep({ name: "loading" });
+      setStep({ name: "signing" });
       const amount = step.data.amount;
       const validatorAddress = step.data.validator.address;
-      const result = await stake({ amount, validatorAddress });
+      const signedTx = await stake({ amount, validatorAddress });
+
+      setStep({ name: "loading" });
+      const result = await sendTx(signedTx);
       logger.info("Baby Staking: Stake", {
         txHash: result?.txHash,
       });
@@ -197,7 +201,7 @@ function StakingState({ children }: PropsWithChildren) {
       logger.error(error);
       setStep({ name: "initial" });
     }
-  }, [step, logger, stake, handleError]);
+  }, [step, logger, stake, handleError, sendTx]);
 
   const calculateFee = useCallback(
     async ({ validatorAddress, amount }: Omit<FormData, "feeAmount">) => {

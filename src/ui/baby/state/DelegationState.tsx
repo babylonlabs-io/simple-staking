@@ -12,11 +12,18 @@ interface UnbondProps {
   validatorAddress: string;
   amount: string;
 }
+interface Step<K extends string, D = never> {
+  name: K;
+  data?: D;
+}
+
+export type UnbondingStep = Step<"initial"> | Step<"signing"> | Step<"loading">;
 
 interface ValidatorState {
   loading: boolean;
   delegations: Delegation[];
   unbond: (params: UnbondProps) => Promise<void>;
+  step: UnbondingStep;
 }
 
 const { StateProvider, useState: useDelegationState } =
@@ -24,24 +31,25 @@ const { StateProvider, useState: useDelegationState } =
     loading: false,
     delegations: [],
     unbond: async () => {},
+    step: { name: "initial" },
   });
 
 function DelegationState({ children }: PropsWithChildren) {
-  const [processing, setProcessing] = useState(false);
-
-  const { loading, delegations, unstake } = useDelegationService();
+  const { loading, delegations, unstake, sendTx } = useDelegationService();
   const { handleError } = useError();
   const logger = useLogger();
+
+  const [step, setStep] = useState<UnbondingStep>({ name: "initial" });
 
   const unbond = useCallback(
     async ({ validatorAddress, amount }: UnbondProps) => {
       try {
-        setProcessing(true);
-
-        const result = await unstake({ validatorAddress, amount });
-
+        setStep({ name: "signing" });
+        const signedTx = await unstake({ validatorAddress, amount });
+        setStep({ name: "loading" });
+        const result = await sendTx(signedTx);
         logger.info("Baby Staking: Unbond", {
-          txHash: result?.txHash,
+          txHash: result?.txHash || "",
           validatorAddress,
           amount,
         });
@@ -49,19 +57,20 @@ function DelegationState({ children }: PropsWithChildren) {
         handleError({ error });
         logger.error(error);
       } finally {
-        setProcessing(false);
+        setStep({ name: "initial" });
       }
     },
-    [handleError, logger, unstake],
+    [handleError, logger, sendTx, unstake, setStep],
   );
 
   const context = useMemo(
     () => ({
-      loading: processing || loading,
+      loading,
       delegations,
       unbond,
+      step,
     }),
-    [processing, loading, delegations, unbond],
+    [loading, delegations, unbond, step],
   );
 
   return <StateProvider value={context}>{children}</StateProvider>;

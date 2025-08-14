@@ -19,6 +19,12 @@ export function StakingModal() {
           onSubmit={submitForm}
         />
       )}
+      {step.name === "signing" && (
+        <LoadingModal
+          title="Signing in progress"
+          description="Please sign the transaction in your wallet to continue"
+        />
+      )}
       {step.name === "loading" && (
         <LoadingModal
           title="Processing"

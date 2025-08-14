@@ -14,9 +14,14 @@ import type { FieldValues } from "react-hook-form";
 
 import babylon from "@/infrastructure/babylon";
 import { AmountField } from "@/ui/baby/components/AmountField";
-import { type Delegation } from "@/ui/baby/state/DelegationState";
+import {
+  useDelegationState,
+  type Delegation,
+} from "@/ui/baby/state/DelegationState";
 import { createUnbondingValidationSchema } from "@/ui/baby/validation/unbondingValidation";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
+
+import { LoadingModal } from "../LoadingModal";
 
 interface UnbondingModalProps {
   open: boolean;
@@ -101,6 +106,8 @@ export const UnbondingModal = ({
   onClose,
   onSubmit,
 }: UnbondingModalProps) => {
+  const { step } = useDelegationState();
+
   const availableBalance = delegation ? delegation.amount : 0n;
   const availableBalanceInBaby = delegation
     ? babylon.utils.ubbnToBaby(delegation.amount)
@@ -111,6 +118,22 @@ export const UnbondingModal = ({
       createUnbondingValidationSchema(availableBalance, availableBalanceInBaby),
     [availableBalance, availableBalanceInBaby],
   );
+
+  if (step.name === "signing") {
+    return (
+      <LoadingModal
+        title="Signing in progress"
+        description="Please sign the unbonding transaction in your wallet to continue"
+      />
+    );
+  } else if (step.name === "loading") {
+    return (
+      <LoadingModal
+        title="Processing"
+        description="Babylon Genesis is processing your unbonding transaction"
+      />
+    );
+  }
 
   if (!open || !delegation) return null;
 

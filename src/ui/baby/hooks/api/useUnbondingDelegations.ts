@@ -1,3 +1,4 @@
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useClientQuery } from "@/ui/common/hooks/client/useClient";
 
@@ -7,6 +8,7 @@ export function useUnbondingDelegations({
   enabled = true,
 }: { enabled?: boolean } = {}) {
   const { bech32Address } = useCosmosWallet();
+  const { lcdUrl } = getNetworkConfigBBN();
 
   return useClientQuery({
     queryKey: [BABY_UNBONDING_DELEGATIONS_KEY, bech32Address],
@@ -17,7 +19,7 @@ export function useUnbondingDelegations({
 
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BABY_LCD_URL}/cosmos/staking/v1beta1/delegators/${bech32Address}/unbonding_delegations`,
+          `${lcdUrl}/cosmos/staking/v1beta1/delegators/${bech32Address}/unbonding_delegations`,
         );
 
         if (response.ok) {

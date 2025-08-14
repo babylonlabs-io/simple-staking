@@ -42,12 +42,11 @@ export function BabyActivityList() {
 
   const handleUnbond = async (amount: string) => {
     if (!unbondingModal.delegation) return;
-
+    closeUnbondingModal();
     await unbond({
       validatorAddress: unbondingModal.delegation.validator.address,
       amount,
     });
-    closeUnbondingModal();
   };
 
   const activityItems = useMemo(() => {
@@ -60,13 +59,14 @@ export function BabyActivityList() {
         data: {
           icon: logo,
           formattedAmount: `${formattedAmount} ${coinSymbol}`,
-          primaryAction: isUnbonding
-            ? undefined
-            : {
-                label: "Unbond",
-                variant: "contained" as const,
-                onClick: () => openUnbondingModal(delegation),
-              },
+          primaryAction:
+            formattedAmount > 0
+              ? {
+                  label: "Unbond",
+                  variant: "contained" as const,
+                  onClick: () => openUnbondingModal(delegation),
+                }
+              : undefined,
           details: [],
           optionalDetails: [
             {
@@ -78,14 +78,6 @@ export function BabyActivityList() {
               value: formatCommissionPercentage(
                 delegation.validator.commission,
               ),
-            },
-            {
-              label: "Status",
-              value: isUnbonding ? "Unbonding" : "Active",
-            },
-            {
-              label: "Voting Power",
-              value: `${(delegation.validator.votingPower * 100).toFixed(2)}%`,
             },
             ...(isUnbonding
               ? [

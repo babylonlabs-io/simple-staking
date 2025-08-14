@@ -49,8 +49,6 @@ interface OptimisticUnbondingStorage {
 
 const OPTIMISTIC_UNBONDING_KEY = "baby-optimistic-unbondings";
 const UNBONDING_PERIOD_MS = 21 * 24 * 60 * 60 * 1000;
-const POLLING_INTERVAL_MS = 15000;
-const OPTIMISTIC_TIMEOUT_MS = 3 * 60 * 1000;
 
 function getStatusSuffix(age: number, ageMinutes: number): string {
   if (age > 2 * 60 * 1000) {
@@ -84,16 +82,9 @@ export function useDelegationService() {
   });
 
   const { bech32Address } = useCosmosWallet();
-  const {
-    data: delegations = [],
-    refetch: refetchDelegations,
-    isLoading,
-  } = useDelegations(bech32Address);
-  const {
-    data: unbondingDelegations = [],
-    refetch: refetchUnbondingDelegations,
-    isLoading: isUnbondingLoading,
-  } = useUnbondingDelegations();
+  const { data: delegations = [], isLoading } = useDelegations(bech32Address);
+  const { data: unbondingDelegations = [], isLoading: isUnbondingLoading } =
+    useUnbondingDelegations();
   const { signBbnTx, sendBbnTx, estimateBbnGasFee } = useBbnTransaction();
   const { validatorMap, loading: isValidatorLoading } = useValidatorService();
 
@@ -110,38 +101,6 @@ export function useDelegationService() {
       JSON.stringify(storageFormat),
     );
   }, [optimisticUnbondings]);
-
-  useEffect(() => {
-    if (optimisticUnbondings.length === 0) return;
-
-    const POLLING_INTERVAL = POLLING_INTERVAL_MS;
-    const OPTIMISTIC_TIMEOUT = OPTIMISTIC_TIMEOUT_MS;
-
-    const poll = async () => {
-      const now = Date.now();
-      const expiredOptimistic: OptimisticUnbonding[] = [];
-      const validOptimistic: OptimisticUnbonding[] = [];
-
-      optimisticUnbondings.forEach((opt) => {
-        const ageMs = now - opt.timestamp;
-
-        if (ageMs > OPTIMISTIC_TIMEOUT) {
-          expiredOptimistic.push(opt);
-        } else {
-          validOptimistic.push(opt);
-        }
-      });
-
-      if (expiredOptimistic.length > 0) {
-        setOptimisticUnbondings(validOptimistic);
-      }
-
-      await Promise.all([refetchDelegations(), refetchUnbondingDelegations()]);
-    };
-
-    const interval = setInterval(poll, POLLING_INTERVAL);
-    return () => clearInterval(interval);
-  }, [optimisticUnbondings, refetchDelegations, refetchUnbondingDelegations]);
 
   const groupedDelegations = useMemo(() => {
     if (isValidatorLoading) {
@@ -283,6 +242,10 @@ export function useDelegationService() {
     optimisticUnbondings,
   ]);
 
+  /**
+   * stake is used to sign the stake message and return the signed transaction
+   * it does not send the transaction to the network
+   */
   const stake = useCallback(
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
@@ -296,20 +259,15 @@ export function useDelegationService() {
             : BigInt(amount),
       });
       const signedTx = await signBbnTx(stakeMsg);
-      const result = await sendBbnTx(signedTx);
-
-      await Promise.all([refetchDelegations(), refetchUnbondingDelegations()]);
-      return result;
+      return signedTx;
     },
-    [
-      bech32Address,
-      signBbnTx,
-      sendBbnTx,
-      refetchDelegations,
-      refetchUnbondingDelegations,
-    ],
+    [bech32Address, signBbnTx],
   );
 
+  /**
+   * unstake is used to sign the unstake message and return the signed transaction
+   * it does not send the transaction to the network
+   */
   const unstake = useCallback(
     async ({ validatorAddress, amount: amountInUbbn }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
@@ -344,22 +302,8 @@ export function useDelegationService() {
         });
 
         const signedTx = await signBbnTx(unstakeMsg);
-        const result = await sendBbnTx(signedTx);
 
-        setTimeout(() => {
-          (async () => {
-            try {
-              await Promise.all([
-                refetchDelegations(),
-                refetchUnbondingDelegations(),
-              ]);
-            } catch (err) {
-              console.error("Error during refetch after unstake:", err);
-            }
-          })();
-        }, 2000);
-
-        return result;
+        return signedTx;
       } catch (error) {
         setOptimisticUnbondings((prev) =>
           prev.filter(
@@ -374,14 +318,18 @@ export function useDelegationService() {
         throw error;
       }
     },
-    [
-      bech32Address,
-      delegations,
-      signBbnTx,
-      sendBbnTx,
-      refetchDelegations,
-      refetchUnbondingDelegations,
-    ],
+    [bech32Address, delegations, signBbnTx],
+  );
+
+  /**
+   * sendTx is used to send the signed transaction to the network
+   */
+  const sendTx = useCallback(
+    async (signedTx: Uint8Array<ArrayBufferLike>) => {
+      const result = await sendBbnTx(signedTx);
+      return result;
+    },
+    [sendBbnTx],
   );
 
   const estimateStakingFee = useCallback(
@@ -406,5 +354,6 @@ export function useDelegationService() {
     stake,
     unstake,
     estimateStakingFee,
+    sendTx,
   };
 }
