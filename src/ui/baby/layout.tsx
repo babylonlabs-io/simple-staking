@@ -2,7 +2,7 @@ import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import { useEffect, useState } from "react";
 
 import { DelegationState } from "@/ui/baby/state/DelegationState";
-import { RewardState } from "@/ui/baby/state/RewardState";
+import { RewardState, useRewardState } from "@/ui/baby/state/RewardState";
 import { StakingState } from "@/ui/baby/state/StakingState";
 import { ValidatorState } from "@/ui/baby/state/ValidatorState";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
@@ -15,7 +15,6 @@ import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 import { BabyActivityList } from "./components/ActivityList";
 import { RewardCard } from "./components/RewardCard";
 import { RewardsPreviewModal } from "./components/RewardPreviewModal";
-import { useRewardState } from "./state/RewardState";
 import StakingForm from "./widgets/StakingForm";
 
 type TabId = "stake" | "activity" | "rewards";
@@ -59,7 +58,7 @@ export default function BabyLayout() {
             id: "activity",
             label: "Activity",
             content: (
-              <Section title="Activity" titleClassName="md:text-[1.25rem]">
+              <Section>
                 <BabyActivityList />
               </Section>
             ),
@@ -68,7 +67,7 @@ export default function BabyLayout() {
             id: "rewards",
             label: "Rewards",
             content: (
-              <Section title="Rewards" titleClassName="md:text-[1.25rem]">
+              <Section>
                 <div className="h-[500px]">
                   <RewardCard />
                   <RewardsPreviewModal
