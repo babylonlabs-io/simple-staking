@@ -11,6 +11,17 @@ import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider
 import { useBbnTransaction } from "@/ui/common/hooks/client/rpc/mutation/useBbnTransaction";
 import { type DelegationStatus } from "@/ui/common/types/delegations";
 
+// Small helper to stringify objects containing BigInt
+const safeStringify = (obj: any) =>
+  JSON.stringify(obj, (_, v) => (typeof v === "bigint" ? v.toString() : v));
+
+// Track validators involved in optimistic operations during this browser session
+export const sessionOptimisticValidators = new Set<string>();
+const sessionValidatorTimes = new Map<string, number>();
+
+// Temporary debug cutoff exportable
+export const DEBUG_CUTOFF_MS = new Date("2025-08-14T21:20:00Z").getTime();
+
 interface StakingParams {
   validatorAddress: string;
   amount: string | number;
@@ -31,6 +42,8 @@ export interface Delegation {
   coin: "ubbn";
   status?: DelegationStatus;
   unbondingInfo?: UnbondingInfo;
+  // present for optimistic (pending/unbonding) delegations to aid debugging
+  timestamp?: number;
 }
 
 interface OptimisticUnbonding {
@@ -47,7 +60,22 @@ interface OptimisticUnbondingStorage {
   timestamp: number;
 }
 
+interface OptimisticStake {
+  validatorAddress: string;
+  expectedAmount: bigint;
+  stakingAmount: bigint;
+  timestamp: number;
+}
+
+interface OptimisticStakeStorage {
+  validatorAddress: string;
+  expectedAmount: string;
+  stakingAmount: string;
+  timestamp: number;
+}
+
 const OPTIMISTIC_UNBONDING_KEY = "baby-optimistic-unbondings";
+const OPTIMISTIC_STAKE_KEY = "baby-optimistic-stakes";
 const UNBONDING_PERIOD_MS = 21 * 24 * 60 * 60 * 1000;
 
 function getStatusSuffix(age: number, ageMinutes: number): string {
@@ -81,6 +109,25 @@ export function useDelegationService() {
     }
   });
 
+  const [optimisticStakes, setOptimisticStakes] = useState<OptimisticStake[]>(
+    () => {
+      try {
+        const stored = localStorage.getItem(OPTIMISTIC_STAKE_KEY);
+        if (stored) {
+          const parsedStorage: OptimisticStakeStorage[] = JSON.parse(stored);
+          return parsedStorage.map((item) => ({
+            ...item,
+            expectedAmount: BigInt(item.expectedAmount),
+            stakingAmount: BigInt(item.stakingAmount),
+          }));
+        }
+        return [];
+      } catch {
+        return [];
+      }
+    },
+  );
+
   const { bech32Address } = useCosmosWallet();
   const { data: delegations = [], isLoading } = useDelegations(bech32Address);
   const { data: unbondingDelegations = [], isLoading: isUnbondingLoading } =
@@ -101,6 +148,18 @@ export function useDelegationService() {
       JSON.stringify(storageFormat),
     );
   }, [optimisticUnbondings]);
+
+  useEffect(() => {
+    const storageFormat: OptimisticStakeStorage[] = optimisticStakes.map(
+      (item) => ({
+        ...item,
+        expectedAmount: item.expectedAmount.toString(),
+        stakingAmount: item.stakingAmount.toString(),
+      }),
+    );
+
+    localStorage.setItem(OPTIMISTIC_STAKE_KEY, JSON.stringify(storageFormat));
+  }, [optimisticStakes]);
 
   const groupedDelegations = useMemo(() => {
     if (isValidatorLoading) {
@@ -178,60 +237,142 @@ export function useDelegationService() {
       );
     }
 
-    const result = Object.values(
-      delegations.reduce(
-        (acc, item) => {
-          const validatorAddress = item.delegation.validatorAddress;
-          const delegation = acc[validatorAddress];
+    const optimisticStakesToRemove: OptimisticStake[] = [];
 
-          const apiAmount = BigInt(item.balance.amount);
+    optimisticStakes.forEach((optimistic) => {
+      const apiDelegation = delegations.find(
+        (d) => d.delegation.validatorAddress === optimistic.validatorAddress,
+      );
 
-          const optimisticUnbonding = optimisticUnbondings.find(
-            (opt) => opt.validatorAddress === validatorAddress,
-          );
-          let effectiveAmount = apiAmount;
+      if (apiDelegation) {
+        const apiAmount = BigInt(apiDelegation.balance.amount);
+        if (apiAmount >= optimistic.expectedAmount) {
+          optimisticStakesToRemove.push(optimistic);
+        }
+      }
+    });
 
-          if (optimisticUnbonding) {
-            effectiveAmount = optimisticUnbonding.expectedAmount;
-          } else if (unbondingInfoByValidator[validatorAddress]) {
-            const unbondingAmount =
-              unbondingInfoByValidator[validatorAddress].amount;
-            effectiveAmount =
-              apiAmount > unbondingAmount
-                ? apiAmount - unbondingAmount
-                : apiAmount;
-          }
+    if (optimisticStakesToRemove.length > 0) {
+      setOptimisticStakes((prev) =>
+        prev.filter(
+          (opt) =>
+            !optimisticStakesToRemove.some(
+              (toRemove) =>
+                toRemove.validatorAddress === opt.validatorAddress &&
+                toRemove.timestamp === opt.timestamp,
+            ),
+        ),
+      );
+    }
 
-          const isUnbonding = unbondingValidatorAddresses.has(validatorAddress);
-          const status: DelegationStatus = isUnbonding ? "unbonding" : "active";
+    const tempAcc: Record<string, Delegation> = {};
 
-          if (delegation) {
-            delegation.shares += parseFloat(item.delegation.shares);
-            delegation.amount += effectiveAmount;
-            if (status === "unbonding") {
-              delegation.status = "unbonding";
-              delegation.unbondingInfo =
-                unbondingInfoByValidator[validatorAddress];
-            }
-          } else {
-            acc[validatorAddress] = {
-              validator: validatorMap[validatorAddress],
-              delegatorAddress: item.delegation.delegatorAddress,
-              shares: parseFloat(item.delegation.shares),
-              amount: effectiveAmount,
-              coin: "ubbn",
-              status,
-              unbondingInfo:
-                status === "unbonding"
-                  ? unbondingInfoByValidator[validatorAddress]
-                  : undefined,
-            };
-          }
-          return acc;
-        },
-        {} as Record<string, Delegation>,
-      ),
-    );
+    delegations.forEach((item) => {
+      const validatorAddress = item.delegation.validatorAddress;
+      const apiAmount = BigInt(item.balance.amount);
+
+      const optimisticUnbonding = optimisticUnbondings.find(
+        (opt) => opt.validatorAddress === validatorAddress,
+      );
+
+      const optimisticStake = optimisticStakes.find(
+        (opt) => opt.validatorAddress === validatorAddress,
+      );
+
+      let effectiveAmount = apiAmount;
+
+      if (optimisticStake) {
+        effectiveAmount = optimisticStake.expectedAmount;
+      } else if (optimisticUnbonding) {
+        effectiveAmount = optimisticUnbonding.expectedAmount;
+      } else if (unbondingInfoByValidator[validatorAddress]) {
+        const unbondingAmount =
+          unbondingInfoByValidator[validatorAddress].amount;
+        effectiveAmount =
+          apiAmount > unbondingAmount ? apiAmount - unbondingAmount : apiAmount;
+      }
+
+      const isUnbonding = unbondingValidatorAddresses.has(validatorAddress);
+
+      let status: DelegationStatus;
+      if (optimisticStake) {
+        status = "pending";
+      } else if (isUnbonding) {
+        status = "unbonding";
+      } else {
+        status = "active";
+      }
+
+      const existing = tempAcc[validatorAddress];
+
+      if (existing) {
+        const updated: Delegation = {
+          ...existing,
+          shares: existing.shares + parseFloat(item.delegation.shares),
+          amount: existing.amount + effectiveAmount,
+          status,
+          unbondingInfo:
+            status === "unbonding"
+              ? unbondingInfoByValidator[validatorAddress]
+              : undefined,
+          timestamp:
+            optimisticStake?.timestamp ?? existing.timestamp ?? Date.now(),
+        };
+
+        tempAcc[validatorAddress] = updated;
+      } else {
+        tempAcc[validatorAddress] = {
+          validator: validatorMap[validatorAddress],
+          delegatorAddress: item.delegation.delegatorAddress,
+          shares: parseFloat(item.delegation.shares),
+          amount: effectiveAmount,
+          coin: "ubbn",
+          status,
+          unbondingInfo:
+            status === "unbonding"
+              ? unbondingInfoByValidator[validatorAddress]
+              : undefined,
+          timestamp:
+            optimisticStake?.timestamp ?? optimisticUnbonding?.timestamp,
+        };
+      }
+    });
+
+    // Add optimistic stakes for validators not yet present in API delegations
+    optimisticStakes.forEach((optimistic) => {
+      const validatorAddress = optimistic.validatorAddress;
+      if (!tempAcc[validatorAddress]) {
+        const validator = validatorMap[validatorAddress];
+        if (validator) {
+          tempAcc[validatorAddress] = {
+            validator,
+            delegatorAddress: bech32Address || "",
+            shares: 0,
+            amount: optimistic.expectedAmount,
+            coin: "ubbn",
+            status: "pending",
+            timestamp: optimistic.timestamp,
+          };
+        }
+      }
+    });
+
+    const result = Object.values(tempAcc);
+
+    // Only log delegations related to current test session (optimistic validators)
+    const sessionDelegations = result.filter((d) => {
+      const vAddr = d.validator.address;
+      if (!sessionOptimisticValidators.has(vAddr)) return false;
+      const ts = sessionValidatorTimes.get(vAddr) || 0;
+      return ts >= DEBUG_CUTOFF_MS;
+    });
+
+    if (sessionDelegations.length > 0) {
+      console.log(
+        "[BABY] Grouped delegations:",
+        safeStringify(sessionDelegations),
+      );
+    }
 
     return result;
   }, [
@@ -240,6 +381,8 @@ export function useDelegationService() {
     isValidatorLoading,
     unbondingDelegations,
     optimisticUnbondings,
+    optimisticStakes,
+    bech32Address,
   ]);
 
   /**
@@ -250,18 +393,65 @@ export function useDelegationService() {
     async ({ validatorAddress, amount }: StakingParams) => {
       if (!bech32Address) throw Error("Babylon Wallet is not connected");
 
-      const stakeMsg = babylon.txs.baby.createStakeMsg({
+      const stakeAmount =
+        typeof amount === "string"
+          ? babylon.utils.babyToUbbn(Number(amount))
+          : BigInt(amount);
+
+      const currentDelegation = delegations.find(
+        (d) => d.delegation.validatorAddress === validatorAddress,
+      );
+      const currentAmount = currentDelegation
+        ? BigInt(currentDelegation.balance.amount)
+        : 0n;
+
+      const expectedAmountAfterStake = currentAmount + stakeAmount;
+
+      const optimisticStake: OptimisticStake = {
         validatorAddress,
-        delegatorAddress: bech32Address,
-        amount:
-          typeof amount === "string"
-            ? babylon.utils.babyToUbbn(Number(amount))
-            : BigInt(amount),
-      });
-      const signedTx = await signBbnTx(stakeMsg);
-      return signedTx;
+        expectedAmount: expectedAmountAfterStake,
+        stakingAmount: stakeAmount,
+        timestamp: Date.now(),
+      };
+
+      setOptimisticStakes((prev) => [
+        ...prev.filter((opt) => opt.validatorAddress !== validatorAddress),
+        optimisticStake,
+      ]);
+
+      // Mark this validator as part of current session operations
+      sessionOptimisticValidators.add(validatorAddress);
+      sessionValidatorTimes.set(validatorAddress, optimisticStake.timestamp);
+
+      console.log(
+        "[BABY] Added optimistic stake:",
+        safeStringify(optimisticStake),
+      );
+
+      try {
+        const stakeMsg = babylon.txs.baby.createStakeMsg({
+          validatorAddress,
+          delegatorAddress: bech32Address,
+          amount: stakeAmount,
+        });
+
+        const signedTx = await signBbnTx(stakeMsg);
+
+        return { signedTx, optimisticStake };
+      } catch (error) {
+        setOptimisticStakes((prev) =>
+          prev.filter(
+            (opt) =>
+              !(
+                opt.validatorAddress === validatorAddress &&
+                opt.timestamp === optimisticStake.timestamp
+              ),
+          ),
+        );
+        throw error;
+      }
     },
-    [bech32Address, signBbnTx],
+    [bech32Address, delegations, signBbnTx],
   );
 
   /**
@@ -294,6 +484,12 @@ export function useDelegationService() {
         optimisticUnbonding,
       ]);
 
+      sessionOptimisticValidators.add(validatorAddress);
+      sessionValidatorTimes.set(
+        validatorAddress,
+        optimisticUnbonding.timestamp,
+      );
+
       try {
         const unstakeMsg = babylon.txs.baby.createUnstakeMsg({
           validatorAddress,
@@ -325,22 +521,40 @@ export function useDelegationService() {
    * sendTx is used to send the signed transaction to the network
    */
   const sendTx = useCallback(
-    async (signedTx: Uint8Array, optimisticUnbonding?: OptimisticUnbonding) => {
+    async (
+      signedTx: Uint8Array,
+      optimistic?: OptimisticUnbonding | OptimisticStake,
+    ) => {
       try {
         const result = await sendBbnTx(signedTx);
         return result;
       } catch (error) {
-        if (optimisticUnbonding) {
-          setOptimisticUnbondings((prev) =>
-            prev.filter(
-              (opt) =>
-                !(
-                  opt.validatorAddress ===
-                    optimisticUnbonding.validatorAddress &&
-                  opt.timestamp === optimisticUnbonding.timestamp
-                ),
-            ),
-          );
+        if (optimistic) {
+          if (
+            (optimistic as OptimisticUnbonding).unbondingAmount !== undefined
+          ) {
+            setOptimisticUnbondings((prev) =>
+              prev.filter(
+                (opt) =>
+                  !(
+                    opt.validatorAddress === optimistic.validatorAddress &&
+                    opt.timestamp === optimistic.timestamp
+                  ),
+              ),
+            );
+          } else if (
+            (optimistic as OptimisticStake).stakingAmount !== undefined
+          ) {
+            setOptimisticStakes((prev) =>
+              prev.filter(
+                (opt) =>
+                  !(
+                    opt.validatorAddress === optimistic.validatorAddress &&
+                    opt.timestamp === optimistic.timestamp
+                  ),
+              ),
+            );
+          }
         }
         throw error;
       }
