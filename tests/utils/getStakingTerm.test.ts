@@ -1,4 +1,4 @@
-import { getStakingTerm } from "@/ui/legacy/utils/getStakingTerm";
+import { getStakingTerm } from "@/ui/common/utils/getStakingTerm";
 
 describe("getStakingTerm", () => {
   it("should return the fixed term when minStakingTimeBlocks equals maxStakingTimeBlocks", () => {

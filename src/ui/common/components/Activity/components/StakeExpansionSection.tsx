@@ -4,12 +4,10 @@ import {
   AccordionSummary,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
 import iconHistory from "@/ui/common/assets/expansion-history.svg";
-import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
 import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
@@ -25,12 +23,16 @@ interface StakeExpansionSectionProps {
 export function StakeExpansionSection({
   delegation,
 }: StakeExpansionSectionProps) {
-  const { goToStep, setFormData, processing, maxFinalityProviders, canExpand } =
-    useStakingExpansionState();
+  const {
+    goToStep,
+    setFormData,
+    processing,
+    maxFinalityProviders,
+    canExpand,
+    openExpansionHistoryModal,
+  } = useStakingExpansionState();
   const { delegations } = useDelegationV2State();
   const { getHistoryCount } = useExpansionHistoryService();
-  const [expansionHistoryModalOpen, setExpansionHistoryModalOpen] =
-    useState(false);
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
   const canExpandDelegation = canExpand(delegation);
@@ -64,7 +66,7 @@ export function StakeExpansionSection({
    */
   const handleExpansionHistory = () => {
     if (expansionHistoryCount > 0) {
-      setExpansionHistoryModalOpen(true);
+      openExpansionHistoryModal(delegation);
     }
   };
 
@@ -101,23 +103,18 @@ export function StakeExpansionSection({
               onClick={handleAddBsnFp}
               disabled={!canExpandDelegation || processing}
             />
-            <ExpansionButton
-              Icon={iconHistory}
-              text="Expansion History"
-              counter={`${expansionHistoryCount}`}
-              onClick={handleExpansionHistory}
-              disabled={expansionHistoryCount === 0 || processing}
-            />
+            {expansionHistoryCount > 0 && (
+              <ExpansionButton
+                Icon={iconHistory}
+                text="Expansion History"
+                counter={`${expansionHistoryCount}`}
+                onClick={handleExpansionHistory}
+                disabled={processing}
+              />
+            )}
           </div>
         </AccordionDetails>
       </Accordion>
-
-      <ExpansionHistoryModal
-        open={expansionHistoryModalOpen}
-        onClose={() => setExpansionHistoryModalOpen(false)}
-        targetDelegation={delegation}
-        allDelegations={delegations}
-      />
     </div>
   );
 }

@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import bitcoin from "@/ui/common/assets/bitcoin.png";
 import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
+import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
 import { Hash } from "@/ui/common/components/Hash/Hash";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfig } from "@/ui/common/config/network";
@@ -15,13 +16,13 @@ import {
   useDelegationService,
 } from "@/ui/common/hooks/services/useDelegationService";
 import { useStakingManagerService } from "@/ui/common/hooks/services/useStakingManagerService";
+import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
 import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 import { durationTillNow } from "@/ui/common/utils/time";
 
@@ -259,7 +260,6 @@ const transformToActivityCard = (
   // 2. Delegation is active
   // 3. Delegation can expand from the api
   const showExpansionSection =
-    FeatureFlagService.IsStakingExpansionEnabled &&
     delegation.state === DelegationV2StakingState.ACTIVE &&
     delegation.canExpand;
 
@@ -289,12 +289,23 @@ export function ActivityList() {
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
 
+  const {
+    expansionHistoryModalOpen,
+    expansionHistoryTargetDelegation,
+    closeExpansionHistoryModal,
+  } = useStakingExpansionState();
+
   const activityList = useMemo(() => {
     return delegations
       .filter((delegation) => {
         const { valid } = validations[delegation.stakingTxHashHex];
         return valid;
       })
+      .filter(
+        // Filter out expanded delegations as they are now part of the
+        // expanded delegation. User can find it from delegation history.
+        (delegation) => delegation.state !== DelegationV2StakingState.EXPANDED,
+      )
       .map((delegation) =>
         transformToActivityCard(
           delegation,
@@ -345,6 +356,13 @@ export function ActivityList() {
       />
 
       <StakingExpansionModalSystem />
+
+      <ExpansionHistoryModal
+        open={expansionHistoryModalOpen}
+        onClose={closeExpansionHistoryModal}
+        targetDelegation={expansionHistoryTargetDelegation}
+        allDelegations={delegations}
+      />
     </>
   );
 }

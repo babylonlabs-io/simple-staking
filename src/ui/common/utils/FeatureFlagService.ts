@@ -45,31 +45,4 @@ export default {
   get IsBabyStakingEnabled() {
     return process.env.NEXT_PUBLIC_FF_BABYSTAKING === "true";
   },
-
-  /**
-   * New UI feature flag
-   *
-   * Purpose: Enables new UI which was designed as part of the phase-3 project,
-   * but this FF does not control the phase-3 functionality,
-   * which is the multi-staking, delegation-expansion etc. Instead, it only toggle
-   * between the old phase 2.5 UI to the new one.
-   * true: UI will show the new phase-3 liked UI, but still surve single FP staking
-   * false: Old phase 2.5 UI with single FP staking
-   * Why needed: To gradually roll out new UI.
-   * ETA for removal: 27th July 2025
-   */
-  get IsNewUIEnabled() {
-    return process.env.NEXT_PUBLIC_FF_NEW_UI === "true";
-  },
-
-  /**
-   * Staking Expansion feature flag
-   *
-   * Purpose: Enables staking expansion capabilities
-   * Why needed: To gradually roll out staking expansion functionality
-   * ETA for removal: 8th of August 2025 - will be removed after the MVP
-   */
-  get IsStakingExpansionEnabled() {
-    return process.env.NEXT_PUBLIC_FF_STAKING_EXPANSION === "true";
-  },
 };

@@ -10,6 +10,10 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { MultistakingFormFields } from "@/ui/common/state/MultistakingState";
+import {
+  createBalanceValidator,
+  createMinAmountValidator,
+} from "@/ui/common/utils/bbn";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import {
   formatBabyStakingAmount,
@@ -82,6 +86,12 @@ function StakingState({ children }: PropsWithChildren) {
   const logger = useLogger();
   const babyPrice = usePrice("BABY");
 
+  const minAmountValidator = useMemo(() => createMinAmountValidator(1), []);
+  const balanceValidator = useMemo(
+    () => createBalanceValidator(balance),
+    [balance],
+  );
+
   const fieldSchemas = useMemo(
     () =>
       [
@@ -95,12 +105,12 @@ function StakingState({ children }: PropsWithChildren) {
             .test(
               "invalidMinAmount",
               "Minimum staking amount is 1 BABY",
-              (value = 0) => babylon.utils.ubbnToBaby(BigInt(value)) >= 1,
+              (_, context) => minAmountValidator(context.originalValue),
             )
             .test(
               "invalidBalance",
               "Staking Amount Exceeds Balance",
-              (value = 0) => BigInt(value) <= balance,
+              (_, context) => balanceValidator(context.originalValue),
             )
             .test(
               "invalidFormat",
@@ -123,11 +133,14 @@ function StakingState({ children }: PropsWithChildren) {
             .test(
               "invalidBalance",
               "Fee Amount Exceeds Balance",
-              (value = 0) => BigInt(value) <= balance,
+              (value = 0) => {
+                const valueInMicroBaby = BigInt(Math.floor(value));
+                return valueInMicroBaby <= balance;
+              },
             ),
         },
       ] as const,
-    [balance],
+    [balance, minAmountValidator, balanceValidator],
   );
 
   const formSchema = useMemo(() => {
@@ -203,11 +216,12 @@ function StakingState({ children }: PropsWithChildren) {
     setStep({ name: "initial" });
   }, []);
 
-  const context = useMemo(
-    () => ({
+  const context = useMemo(() => {
+    const displayBalance = babylon.utils.ubbnToBaby(balance);
+    return {
       loading,
       step,
-      balance: babylon.utils.ubbnToBaby(balance),
+      balance: displayBalance,
       formSchema,
       fields,
       babyPrice,
@@ -216,21 +230,20 @@ function StakingState({ children }: PropsWithChildren) {
       submitForm,
       resetForm,
       closePreview,
-    }),
-    [
-      loading,
-      step,
-      balance,
-      formSchema,
-      fields,
-      babyPrice,
-      calculateFee,
-      showPreview,
-      submitForm,
-      resetForm,
-      closePreview,
-    ],
-  );
+    };
+  }, [
+    loading,
+    step,
+    balance,
+    formSchema,
+    fields,
+    babyPrice,
+    calculateFee,
+    showPreview,
+    submitForm,
+    resetForm,
+    closePreview,
+  ]);
 
   return <StateProvider value={context}>{children}</StateProvider>;
 }

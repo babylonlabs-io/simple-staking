@@ -1,4 +1,4 @@
-import { blocksToDisplayTime, durationTillNow } from "@/ui/legacy/utils/time";
+import { blocksToDisplayTime, durationTillNow } from "@/ui/common/utils/time";
 
 describe("blocksToDisplayTime", () => {
   it("should return '-' if block is 0", () => {

@@ -5,7 +5,7 @@ import { twMerge } from "tailwind-merge";
 interface SectionProps {
   className?: string;
   titleClassName?: string;
-  title: string;
+  title?: string;
 }
 
 export function Section({

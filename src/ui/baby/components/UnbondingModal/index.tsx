@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
 import {
   Button,
   DialogBody,
@@ -8,11 +7,15 @@ import {
   Text,
   Warning,
   useFormContext,
+  useFormState,
 } from "@babylonlabs-io/core-ui";
+import { useMemo } from "react";
+import type { FieldValues } from "react-hook-form";
 
 import babylon from "@/infrastructure/babylon";
 import { AmountField } from "@/ui/baby/components/AmountField";
 import { type Delegation } from "@/ui/baby/state/DelegationState";
+import { createUnbondingValidationSchema } from "@/ui/baby/validation/unbondingValidation";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 
 interface UnbondingModalProps {
@@ -20,6 +23,10 @@ interface UnbondingModalProps {
   delegation: Delegation | null;
   onClose: () => void;
   onSubmit: (amount: string) => Promise<void>;
+}
+
+interface UnbondingFormData {
+  amount: number;
 }
 
 const MAX_WINDOW_HEIGHT = 500;
@@ -34,13 +41,15 @@ const UnbondingModalContent = ({
   onSubmit: (amount: string) => Promise<void>;
 }) => {
   const { handleSubmit } = useFormContext();
+  const { isValid } = useFormState();
 
   const availableBalance = babylon.utils.ubbnToBaby(delegation.amount);
   const validatorName =
     delegation.validator.name || delegation.validator.address;
 
-  const handleFormSubmit = async (data: { amount: number }) => {
-    await onSubmit(data.amount.toString());
+  const handleFormSubmit = async (data: FieldValues) => {
+    const formData = data as UnbondingFormData;
+    await onSubmit(formData.amount.toString());
   };
 
   return (
@@ -78,8 +87,7 @@ const UnbondingModalContent = ({
       </DialogBody>
 
       <DialogFooter className="flex justify-end mt-[80px]">
-        {/* @ts-expect-error */}
-        <Button type="submit" onClick={handleSubmit(handleFormSubmit)}>
+        <Button onClick={handleSubmit(handleFormSubmit)} disabled={!isValid}>
           Unbond
         </Button>
       </DialogFooter>
@@ -93,10 +101,21 @@ export const UnbondingModal = ({
   onClose,
   onSubmit,
 }: UnbondingModalProps) => {
+  const availableBalance = delegation ? delegation.amount : 0n;
+  const availableBalanceInBaby = delegation
+    ? babylon.utils.ubbnToBaby(delegation.amount)
+    : 0;
+
+  const validationSchema = useMemo(
+    () =>
+      createUnbondingValidationSchema(availableBalance, availableBalanceInBaby),
+    [availableBalance, availableBalanceInBaby],
+  );
+
   if (!open || !delegation) return null;
 
   return (
-    <Form>
+    <Form schema={validationSchema} mode="onChange" reValidateMode="onChange">
       <UnbondingModalContent
         delegation={delegation}
         onClose={onClose}

@@ -61,11 +61,11 @@ import {
   StakingState,
   StakingStep,
   useStakingState,
-} from "@/ui/legacy/state/StakingState";
+} from "@/ui/common/state/StakingState";
 import {
   DelegationV2,
   DelegationV2StakingState,
-} from "@/ui/legacy/types/delegationsV2";
+} from "@/ui/common/types/delegationsV2";
 
 // Mock getFeeRateFromMempool
 jest.mock("@/ui/legacy/utils/getFeeRateFromMempool", () => ({
@@ -84,7 +84,6 @@ const TestWrapper = ({ children }: PropsWithChildren) => (
 describe("StakingState", () => {
   // Mock data
   const mockNetworkInfo = {
-    stakingStatus: { isStakingOpen: true },
     params: {
       bbnStakingParams: {
         latestParam: {
@@ -258,36 +257,6 @@ describe("StakingState", () => {
       wrapper: TestWrapper,
     });
     expect(result.current.blocked).toBe(true);
-  });
-
-  it("should set available state correctly when staking is open", () => {
-    mockUseAppState.mockReturnValue({
-      ...mockUseAppState(),
-      networkInfo: {
-        ...mockNetworkInfo,
-        stakingStatus: { isStakingOpen: true },
-      },
-    });
-
-    const { result } = renderHook(() => useStakingState(), {
-      wrapper: TestWrapper,
-    });
-    expect(result.current.available).toBe(true);
-  });
-
-  it("should set available state correctly when staking is closed", () => {
-    mockUseAppState.mockReturnValue({
-      ...mockUseAppState(),
-      networkInfo: {
-        ...mockNetworkInfo,
-        stakingStatus: { isStakingOpen: false },
-      },
-    });
-
-    const { result } = renderHook(() => useStakingState(), {
-      wrapper: TestWrapper,
-    });
-    expect(result.current.available).toBe(false);
   });
 
   it("should set errorMessage correctly from health check", () => {

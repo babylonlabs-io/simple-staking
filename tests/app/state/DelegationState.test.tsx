@@ -4,12 +4,12 @@ import * as hooks from "usehooks-ts";
 
 // Mock the dependencies, but keep their APIs close to real ones
 const mockUseBTCWallet = jest.fn();
-jest.mock("@/ui/legacy/context/wallet/BTCWalletProvider", () => ({
+jest.mock("@/ui/common/context/wallet/BTCWalletProvider", () => ({
   useBTCWallet: () => mockUseBTCWallet(),
 }));
 
 const mockUseDelegations = jest.fn();
-jest.mock("@/ui/legacy/hooks/client/api/useDelegations", () => ({
+jest.mock("@/ui/common/hooks/client/api/useDelegations", () => ({
   useDelegations: () => mockUseDelegations(),
 }));
 
@@ -23,7 +23,7 @@ jest.mock("usehooks-ts", () => ({
 
 // Mock calculateDelegationsDiff
 const mockCalculateDelegationsDiff = jest.fn();
-jest.mock("@/ui/legacy/utils/local_storage/calculateDelegationsDiff", () => ({
+jest.mock("@/ui/common/utils/local_storage/calculateDelegationsDiff", () => ({
   calculateDelegationsDiff: (...args: any[]) =>
     mockCalculateDelegationsDiff(...args),
 }));
@@ -32,8 +32,8 @@ jest.mock("@/ui/legacy/utils/local_storage/calculateDelegationsDiff", () => ({
 import {
   DelegationState,
   useDelegationState,
-} from "@/ui/legacy/state/DelegationState";
-import { DelegationState as DelegationStateEnum } from "@/ui/legacy/types/delegations";
+} from "@/ui/common/state/DelegationState";
+import { DelegationState as DelegationStateEnum } from "@/ui/common/types/delegations";
 
 // Create a test wrapper
 const TestWrapper = ({ children }: PropsWithChildren) => (

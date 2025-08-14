@@ -1,11 +1,11 @@
-import { apiWrapper } from "@/ui/legacy/api/apiWrapper";
-import { getNetworkInfo } from "@/ui/legacy/api/getNetworkInfo";
-import { ClientError, ERROR_CODES } from "@/ui/legacy/errors";
+import { apiWrapper } from "@/ui/common/api/apiWrapper";
+import { getNetworkInfo } from "@/ui/common/api/getNetworkInfo";
+import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 
 import { mockSuccessResponse } from "./getNetworkInfo.mocks";
 
 // Mock the apiWrapper module
-jest.mock("@/ui/legacy/api/apiWrapper");
+jest.mock("@/ui/common/api/apiWrapper");
 // Mock the getPublicKeyNoCoord function
 jest.mock("@babylonlabs-io/btc-staking-ts", () => ({
   getPublicKeyNoCoord: jest.fn((pk) => `no-coord-${pk}`),
@@ -34,8 +34,9 @@ describe("getNetworkInfo", () => {
 
     // Verify the result structure and transformation
     expect(result).toEqual({
+      networkUpgrade: undefined,
       stakingStatus: {
-        isStakingOpen: true,
+        isMultiStakingAllowListInForce: true,
       },
       params: {
         bbnStakingParams: {
@@ -54,7 +55,7 @@ describe("getNetworkInfo", () => {
             unbondingTime: 288,
             unbondingFeeSat: 3000,
             minCommissionRate: "0.1",
-            maxActiveFinalityProviders: 15,
+            maxFinalityProviders: 15,
             delegationCreationBaseGasFee: 60000,
             slashing: {
               slashingPkScriptHex: "slashingScript2",
@@ -85,7 +86,7 @@ describe("getNetworkInfo", () => {
             unbondingTime: 144,
             unbondingFeeSat: 2000,
             minCommissionRate: "0.05",
-            maxActiveFinalityProviders: 10,
+            maxFinalityProviders: 10,
             delegationCreationBaseGasFee: 50000,
             slashing: {
               slashingPkScriptHex: "slashingScript",

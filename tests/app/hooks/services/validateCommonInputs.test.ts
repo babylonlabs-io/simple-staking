@@ -1,12 +1,12 @@
-import { validateStakingInput } from "@/ui/legacy/utils/delegations";
+import { validateStakingInput } from "@/ui/common/utils/delegations";
 
 // Mock SVG import that's causing the error
-jest.mock("@/ui/legacy/assets/warning-triangle.svg", () => "mocked-svg", {
+jest.mock("@/ui/common/assets/warning-triangle.svg", () => "mocked-svg", {
   virtual: true,
 });
 
 // Mock dependencies
-jest.mock("@/ui/legacy/utils/delegations", () => ({
+jest.mock("@/ui/common/utils/delegations", () => ({
   validateStakingInput: jest.fn(),
 }));
 

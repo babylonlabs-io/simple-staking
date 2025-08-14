@@ -7,7 +7,7 @@ import { Delegations } from "../Delegations/Delegations";
 export function Activity() {
   return (
     <AuthGuard>
-      <Section title="Activity" titleClassName="md:text-[1.25rem] mt-10">
+      <Section>
         <Delegations />
         <ActivityList />
       </Section>

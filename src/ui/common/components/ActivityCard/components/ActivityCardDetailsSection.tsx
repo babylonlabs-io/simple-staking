@@ -19,7 +19,7 @@ interface DetailRowProps {
 function DetailRow({ label, value }: DetailRowProps) {
   return (
     <div className="flex items-center justify-between gap-2 min-w-0 overflow-x-auto">
-      <span className="text-xs sm:text-sm text-accent-secondary flex-shrink-0">
+      <span className="text-xs sm:text-sm text-accent-primary flex-shrink-0">
         {label}
       </span>
       <span className="text-xs sm:text-sm text-accent-primary font-medium text-right min-w-0 overflow-x-auto whitespace-nowrap">
@@ -53,7 +53,7 @@ export function ActivityCardDetailsSection({
               className="bg-surface p-3 sm:p-4 rounded space-y-3 sm:space-y-4 overflow-x-auto"
             >
               <div className="flex justify-between items-start gap-2">
-                <span className="text-xs sm:text-sm text-accent-secondary">
+                <span className="text-xs sm:text-sm text-accent-primary">
                   {listSection.label}
                 </span>
                 <div className="flex flex-wrap gap-2">

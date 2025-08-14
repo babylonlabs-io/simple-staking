@@ -1,4 +1,4 @@
-import { durationTillNow } from "@/ui/legacy/utils/time";
+import { durationTillNow } from "@/ui/common/utils/time";
 
 describe("durationTillNow", () => {
   const currentTime = new Date("2024-01-01T12:00:00Z").getTime();
