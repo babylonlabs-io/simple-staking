@@ -2,6 +2,7 @@ import { useMemo } from "react";
 
 import bitcoin from "@/ui/common/assets/bitcoin.png";
 import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
+import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
 import { Hash } from "@/ui/common/components/Hash/Hash";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfig } from "@/ui/common/config/network";
@@ -15,6 +16,7 @@ import {
   useDelegationService,
 } from "@/ui/common/hooks/services/useDelegationService";
 import { useStakingManagerService } from "@/ui/common/hooks/services/useStakingManagerService";
+import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
@@ -287,6 +289,12 @@ export function ActivityList() {
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
 
+  const {
+    expansionHistoryModalOpen,
+    expansionHistoryTargetDelegation,
+    closeExpansionHistoryModal,
+  } = useStakingExpansionState();
+
   const activityList = useMemo(() => {
     return delegations
       .filter((delegation) => {
@@ -348,6 +356,13 @@ export function ActivityList() {
       />
 
       <StakingExpansionModalSystem />
+
+      <ExpansionHistoryModal
+        open={expansionHistoryModalOpen}
+        onClose={closeExpansionHistoryModal}
+        targetDelegation={expansionHistoryTargetDelegation}
+        allDelegations={delegations}
+      />
     </>
   );
 }
