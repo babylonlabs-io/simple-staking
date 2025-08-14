@@ -16,7 +16,6 @@ export function useEpochPolling() {
     queryKey: [CURRENT_EPOCH_KEY],
     queryFn: () => getCurrentEpoch(),
     refetchInterval: ONE_MINUTE,
-    enabled: true,
   });
 
   useEffect(() => {
