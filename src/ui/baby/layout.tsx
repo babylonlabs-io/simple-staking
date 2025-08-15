@@ -25,14 +25,33 @@ export default function BabyLayout() {
   const { isGeoBlocked, isLoading } = useHealthCheck();
   const isConnected = connected && !isGeoBlocked && !isLoading;
 
-  const {
-    showClaimModal,
-    closeClaimModal,
-    claimAll,
-    loading: rewardLoading,
-    totalReward,
-    rewards,
-  } = useRewardState();
+  const RewardsTab: React.FC = () => {
+    const {
+      showClaimModal,
+      closeClaimModal,
+      claimAll,
+      loading: rewardLoading,
+      totalReward,
+      rewards,
+    } = useRewardState();
+
+    return (
+      <Section>
+        <div className="h-[500px]">
+          <RewardCard />
+          <RewardsPreviewModal
+            open={showClaimModal}
+            processing={rewardLoading}
+            title="Claim Rewards"
+            totalReward={totalReward}
+            rewards={rewards}
+            onClose={closeClaimModal}
+            onProceed={claimAll}
+          />
+        </div>
+      </Section>
+    );
+  };
 
   useEffect(() => {
     if (!connected) {
@@ -66,22 +85,7 @@ export default function BabyLayout() {
           {
             id: "rewards",
             label: "Rewards",
-            content: (
-              <Section>
-                <div className="h-[500px]">
-                  <RewardCard />
-                  <RewardsPreviewModal
-                    open={showClaimModal}
-                    processing={rewardLoading}
-                    title="Claim Rewards"
-                    totalReward={totalReward}
-                    rewards={rewards}
-                    onClose={closeClaimModal}
-                    onProceed={claimAll}
-                  />
-                </div>
-              </Section>
-            ),
+            content: <RewardsTab />,
           },
         ]
       : []),
