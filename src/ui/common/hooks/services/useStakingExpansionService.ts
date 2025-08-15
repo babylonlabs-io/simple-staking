@@ -45,22 +45,6 @@ const getCovenantExpansionSignatures = (delegation: any) => {
 };
 
 /**
- * Enhanced error handling utility for expansion operations.
- * Converts various error types to user-friendly messages.
- */
-const handleExpansionError = (error: unknown, context: string): Error => {
-  if (error instanceof Error) {
-    return error;
-  }
-
-  if (typeof error === "string") {
-    return new Error(`${context}: ${error}`);
-  }
-
-  return new Error(`${context}: Unknown error occurred`);
-};
-
-/**
  * Combines existing finality providers with newly selected BSN+FP pairs.
  */
 const combineProviders = (
@@ -135,7 +119,10 @@ export function useStakingExpansionService() {
   const calculateExpansionFeeAmount = useCallback(
     async (formData: StakingExpansionFormData) => {
       if (!validateExpansionFormData(formData)) {
-        throw new Error("Invalid expansion form data provided");
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Invalid expansion form data provided",
+        );
       }
 
       try {
@@ -163,15 +150,14 @@ export function useStakingExpansionService() {
 
         return feeAmount;
       } catch (error) {
-        const properError = handleExpansionError(
-          error,
+        throw new ClientError(
+          ERROR_CODES.STAKING_EXPANSION_FEE_ERROR,
           "Failed to calculate expansion fee",
+          { cause: error },
         );
-        logger.error(properError);
-        throw properError;
       }
     },
-    [estimateStakingExpansionFee, logger],
+    [estimateStakingExpansionFee],
   );
 
   /**
