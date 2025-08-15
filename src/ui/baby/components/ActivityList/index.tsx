@@ -90,11 +90,23 @@ export function BabyActivityList() {
                   {
                     label: "Pending",
                     value: delegation.unbondingInfo
-                      ? delegation.unbondingInfo.isOptimistic
-                        ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} - Processing`
-                        : `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} in ${formatTimeRemaining(delegation.unbondingInfo.completionTime)}${delegation.unbondingInfo.statusSuffix || ""}`
+                      ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol}`
                       : "In progress...",
-                    collapsible: true,
+                    collapsible: Boolean(delegation.unbondingInfo),
+                    nestedDetails: delegation.unbondingInfo
+                      ? [
+                          {
+                            label: "Amount",
+                            value: `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol}`,
+                          },
+                          {
+                            label: "Time Remaining",
+                            value: delegation.unbondingInfo.isOptimistic
+                              ? "Processing"
+                              : `${formatTimeRemaining(delegation.unbondingInfo.completionTime)}${delegation.unbondingInfo.statusSuffix || ""}`,
+                          },
+                        ]
+                      : [],
                   },
                 ]
               : []),
