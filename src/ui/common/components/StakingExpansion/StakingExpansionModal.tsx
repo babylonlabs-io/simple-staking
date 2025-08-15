@@ -14,6 +14,7 @@ import { FinalityProviderModal } from "@/ui/common/components/Multistaking/Final
 import { ExpansionChainSelectionModal } from "@/ui/common/components/StakingExpansion/ExpansionChainSelectionModal";
 import { IS_FIXED_TERM_FIELD } from "@/ui/common/config";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useNetworkFees } from "@/ui/common/hooks/client/api/useNetworkFees";
 import { useStakingExpansionService } from "@/ui/common/hooks/services/useStakingExpansionService";
 import { useLogger } from "@/ui/common/hooks/useLogger";
@@ -69,6 +70,7 @@ export const StakingExpansionModal = ({
     useStakingExpansionService();
   const { networkInfo } = useAppState();
   const logger = useLogger();
+  const { handleError } = useError();
 
   // Calculate the default staking timelock using the same logic as regular staking
   const defaultStakingTimeBlocks = useMemo(() => {
@@ -235,8 +237,9 @@ export const StakingExpansionModal = ({
       handleClose();
       displayExpansionPreview(finalFormData);
     } catch (error) {
-      logger.error(new Error("Failed to calculate expansion fee"), {
-        data: { error: String(error) },
+      handleError({
+        error: error instanceof Error ? error : new Error(String(error)),
+        displayOptions: { showModal: true },
       });
     } finally {
       setIsCalculatingFee(false);
@@ -248,7 +251,7 @@ export const StakingExpansionModal = ({
     calculateExpansionFeeAmount,
     displayExpansionPreview,
     handleClose,
-    logger,
+    handleError,
   ]);
 
   // Don't render until we have form data

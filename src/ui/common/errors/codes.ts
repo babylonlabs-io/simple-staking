@@ -16,6 +16,7 @@ export const ERROR_CODES = {
   TRANSACTION_PREPARATION_ERROR: "TRANSACTION_PREPARATION_ERROR", // Errors building the transaction (e.g., fee estimation issues)
   TRANSACTION_SUBMISSION_ERROR: "TRANSACTION_SUBMISSION_ERROR", // Errors sending/broadcasting the transaction via wallet or directly
   TRANSACTION_VERIFICATION_ERROR: "TRANSACTION_VERIFICATION_ERROR", // Errors confirming transaction status (not found, hash mismatch, not eligible)
+  STAKING_EXPANSION_FEE_ERROR: "STAKING_EXPANSION_FEE_ERROR", // Errors calculating fees for staking expansion transactions
 
   // --- Staking Logic Errors ---
   DELEGATION_LOGIC_ERROR: "DELEGATION_LOGIC_ERROR", // Errors in delegation selection, missing covenant signatures, finality provider issues
