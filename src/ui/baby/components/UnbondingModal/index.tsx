@@ -83,11 +83,9 @@ const UnbondingModalContent = ({
         <AmountField balance={availableBalance} price={1} />
 
         <Warning>
-          Once the unstaking period begins:
-          <br />• You will not receive staking rewards
-          <br />• It will take 50 hours for the amount to be liquid
-          <br />• But you will be able to cancel the unstaking process anytime,
-          as this chain currently supports the function
+          Once the unbonding period begins:
+          <br />• You will not receive staking rewards for the unbonding tokens.
+          <br />• It will take 50 hours for the unbonding to be processed.
         </Warning>
       </DialogBody>
 
