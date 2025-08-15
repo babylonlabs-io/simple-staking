@@ -11,6 +11,7 @@ import { formatTimeRemaining } from "@/ui/common/utils/time";
 
 import { BabyActivityCard } from "../ActivityCard";
 import { UnbondingModal } from "../UnbondingModal";
+import { ValidatorAvatar } from "../ValidatorAvatar";
 
 const { logo, coinSymbol } = getNetworkConfigBBN();
 
@@ -58,6 +59,16 @@ export function BabyActivityList() {
         delegation,
         data: {
           icon: logo,
+          iconAlt: `${coinSymbol} Logo`,
+          chainName: delegation.validator.name || delegation.validator.address,
+          chainIcon: (
+            <ValidatorAvatar
+              size="small"
+              name={delegation.validator.name || delegation.validator.address}
+            />
+          ),
+          chainIconAlt:
+            delegation.validator.name || delegation.validator.address,
           formattedAmount: `${formattedAmount} ${coinSymbol}`,
           primaryAction:
             formattedAmount > 0
@@ -67,12 +78,7 @@ export function BabyActivityList() {
                   onClick: () => openUnbondingModal(delegation),
                 }
               : undefined,
-          details: [],
-          optionalDetails: [
-            {
-              label: "Validator",
-              value: delegation.validator.name || delegation.validator.address,
-            },
+          details: [
             {
               label: "Commission",
               value: formatCommissionPercentage(
@@ -82,16 +88,18 @@ export function BabyActivityList() {
             ...(isUnbonding
               ? [
                   {
-                    label: "Unbonding",
+                    label: "Pending",
                     value: delegation.unbondingInfo
                       ? delegation.unbondingInfo.isOptimistic
                         ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} - Processing`
                         : `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol} in ${formatTimeRemaining(delegation.unbondingInfo.completionTime)}${delegation.unbondingInfo.statusSuffix || ""}`
                       : "In progress...",
+                    collapsible: true,
                   },
                 ]
               : []),
           ],
+          optionalDetails: [],
         },
       };
     });
