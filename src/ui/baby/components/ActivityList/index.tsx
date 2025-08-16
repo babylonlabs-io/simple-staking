@@ -54,6 +54,7 @@ export function BabyActivityList() {
     return delegations.map((delegation) => {
       const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
       const isUnbonding = delegation.status === "unbonding";
+      const isPending = delegation.status === "pending";
 
       return {
         delegation,
@@ -71,7 +72,7 @@ export function BabyActivityList() {
             delegation.validator.name || delegation.validator.address,
           formattedAmount: `${formattedAmount} ${coinSymbol}`,
           primaryAction:
-            formattedAmount > 0
+            formattedAmount > 0 && !isPending
               ? {
                   label: "Unbond",
                   variant: "contained" as const,
@@ -85,6 +86,14 @@ export function BabyActivityList() {
                 delegation.validator.commission,
               ),
             },
+            ...(isPending
+              ? [
+                  {
+                    label: "Status",
+                    value: "Pending - Processing",
+                  },
+                ]
+              : []),
             ...(isUnbonding
               ? [
                   {
