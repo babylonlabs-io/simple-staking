@@ -44,7 +44,7 @@ export function ExpansionButton({
         </ThemedIcon>
         <div className="flex flex-col w-full items-start">
           <span className="text-sm text-accent-primary">{text}</span>
-          <span className="text-xs">{counter && <span>{counter}</span>}</span>
+          {counter && <span className="text-xs">{counter}</span>}
         </div>
         <MdKeyboardArrowDown
           size={24}
