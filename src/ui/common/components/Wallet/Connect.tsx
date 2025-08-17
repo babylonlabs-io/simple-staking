@@ -1,5 +1,13 @@
-import { Avatar, AvatarGroup, Button } from "@babylonlabs-io/core-ui";
-import { useWidgetState } from "@babylonlabs-io/wallet-connector";
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  WalletMenu,
+} from "@babylonlabs-io/core-ui";
+import {
+  useWalletConnect,
+  useWidgetState,
+} from "@babylonlabs-io/wallet-connector";
 import { useMemo, useRef, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { PiWalletBold } from "react-icons/pi";
@@ -17,7 +25,6 @@ import {
   SettingMenuContainer,
   SettingMenuContent,
 } from "../Menu/SettingMenu";
-import { WalletMenuContainer } from "../Menu/WalletMenu";
 
 interface ConnectProps {
   loading?: boolean;
@@ -56,6 +63,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   // Widget states
   const { selectedWallets } = useWidgetState();
+  const { disconnect } = useWalletConnect();
 
   const {
     isApiNormal,
@@ -135,9 +143,9 @@ export const Connect: React.FC<ConnectProps> = ({
   // CONNECTED STATE: Show wallet avatars + settings menu
   return (
     <div className="relative flex flex-row items-center gap-4">
-      <WalletMenuContainer
+      <WalletMenu
         trigger={
-          <div className="flex flex-row cursor-pointer">
+          <div className="cursor-pointer">
             <AvatarGroup max={2} variant="circular">
               <Avatar
                 alt={selectedWallets["BTC"]?.name}
@@ -171,6 +179,7 @@ export const Connect: React.FC<ConnectProps> = ({
         onExcludeOrdinals={excludeOrdinals}
         onDisplayLinkedDelegations={displayLinkedDelegations}
         publicKeyNoCoord={publicKeyNoCoord}
+        onDisconnect={disconnect}
         onOpenChange={handleOpenChange}
       />
 
