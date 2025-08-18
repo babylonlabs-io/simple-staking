@@ -30,6 +30,9 @@ export const RenewTimelockModal = ({
   const { calculateExpansionFeeAmount, displayExpansionPreview } =
     useStakingExpansionService();
   const [isCalculatingFee, setIsCalculatingFee] = useState(false);
+  const [feeCalculationError, setFeeCalculationError] = useState<string | null>(
+    null,
+  );
 
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
 
@@ -42,8 +45,12 @@ export const RenewTimelockModal = ({
 
     const { maxStakingTimeBlocks = 0 } = latestParam;
 
+    // Return 0 instead of throwing error - let UI handle the disabled state
     if (!maxStakingTimeBlocks) {
-      throw new Error("Maximum staking time blocks not available for renewal");
+      console.warn(
+        "Maximum staking time blocks not available for renewal. This may be due to a network issue or a problem retrieving staking parameters from the backend.",
+      );
+      return 0;
     }
 
     return maxStakingTimeBlocks;
@@ -55,7 +62,8 @@ export const RenewTimelockModal = ({
       open &&
       formData &&
       newStakingTimeBlocks > 0 &&
-      formData.stakingTimelock === 0
+      (formData.stakingTimelock === 0 ||
+        formData.stakingTimelock !== newStakingTimeBlocks)
     ) {
       setFormData({
         ...formData,
@@ -69,6 +77,7 @@ export const RenewTimelockModal = ({
     if (!formData) return;
 
     setIsCalculatingFee(true);
+    setFeeCalculationError(null);
     try {
       // Ensure the timelock and fee rate are set before calculating fee
       const updatedFormData = {
@@ -90,6 +99,9 @@ export const RenewTimelockModal = ({
       displayExpansionPreview(finalFormData);
     } catch (error) {
       console.error("Failed to calculate renewal fee:", error);
+      setFeeCalculationError(
+        "Failed to calculate transaction fee. Please try again or contact support if the problem persists.",
+      );
     } finally {
       setIsCalculatingFee(false);
     }
@@ -148,6 +160,24 @@ export const RenewTimelockModal = ({
               </div>
             </div>
           </div>
+
+          {feeCalculationError && (
+            <div className="bg-error-light border border-error rounded-lg p-4">
+              <Text variant="body2" className="text-error">
+                {feeCalculationError}
+              </Text>
+            </div>
+          )}
+
+          {!newStakingTimeBlocks && (
+            <div className="bg-warning-light border border-warning rounded-lg p-4">
+              <Text variant="body2" className="text-warning">
+                Unable to load staking parameters. This may be due to a network
+                issue or a problem retrieving data from the backend. Please try
+                again later.
+              </Text>
+            </div>
+          )}
         </div>
       </DialogBody>
       <DialogFooter className="flex gap-4">

@@ -79,7 +79,7 @@ export function StakeExpansionSection({
       selectedBsnFps: {}, // Empty - no new BSN/FP pairs
       feeRate: 0,
       feeAmount: 0,
-      stakingTimelock: 0, // Will be set based on IS_FIXED_TERM_FIELD
+      stakingTimelock: 0, // Will be set during the renewal process
       isRenewalOnly: true, // Flag to indicate this is a renewal-only operation
     };
 
