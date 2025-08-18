@@ -45,12 +45,17 @@ function DelegationState({ children }: PropsWithChildren) {
     async ({ validatorAddress, amount }: UnbondProps) => {
       try {
         setStep({ name: "signing" });
-        const { signedTx, optimisticUnbonding } = await unstake({
+        const { signedTx } = await unstake({
           validatorAddress,
           amount,
         });
         setStep({ name: "loading" });
-        const result = await sendTx(signedTx, optimisticUnbonding);
+        const result = await sendTx(
+          signedTx,
+          "unstake",
+          validatorAddress,
+          BigInt(amount),
+        );
         logger.info("Baby Staking: Unbond", {
           txHash: result?.txHash || "",
           validatorAddress,

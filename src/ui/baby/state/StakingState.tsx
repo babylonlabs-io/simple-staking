@@ -188,10 +188,18 @@ function StakingState({ children }: PropsWithChildren) {
       setStep({ name: "signing" });
       const amount = step.data.amount;
       const validatorAddress = step.data.validator.address;
-      const signedTx = await stake({ amount, validatorAddress });
+      const { signedTx } = await stake({
+        amount,
+        validatorAddress,
+      });
 
       setStep({ name: "loading" });
-      const result = await sendTx(signedTx);
+      const result = await sendTx(
+        signedTx,
+        "stake",
+        validatorAddress,
+        BigInt(amount),
+      );
       logger.info("Baby Staking: Stake", {
         txHash: result?.txHash,
       });
