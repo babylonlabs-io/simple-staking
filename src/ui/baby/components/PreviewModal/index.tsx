@@ -41,12 +41,11 @@ export const PreviewModal = ({
   onSubmit,
   data,
 }: PreviewModalProps) => {
-  // Watch for real-time fee changes from the form
   const currentFeeAmount = useWatch({ name: "feeAmount" });
 
   if (!data) return null;
   const { amount, validator } = data;
-  const feeAmount = currentFeeAmount || data.feeAmount;
+  const feeAmount = currentFeeAmount ?? data.feeAmount;
 
   const babyAmount = babylon.utils.ubbnToBaby(BigInt(amount));
   const babyFeeAmount = babylon.utils.ubbnToBaby(BigInt(feeAmount));
