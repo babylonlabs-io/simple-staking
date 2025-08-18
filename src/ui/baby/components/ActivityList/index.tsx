@@ -71,7 +71,7 @@ export function BabyActivityList() {
     // amount to get the amount that is available for unbonding. The pending
     // staked amount also being added into the delegation amount, so we need to
     // subtract it.
-    const avaliableAmountForUnbonding =
+    const availableAmountForUnbonding =
       delegation.amount - validatorPendingUnstake - validatorPendingStake;
 
     const details = [
@@ -123,7 +123,7 @@ export function BabyActivityList() {
         chainIconAlt: delegation.validator.name || delegation.validator.address,
         formattedAmount: `${formattedAmount} ${coinSymbol}`,
         primaryAction:
-          avaliableAmountForUnbonding > 0
+          availableAmountForUnbonding > 0
             ? {
                 label: "Unbond",
                 variant: "contained" as const,

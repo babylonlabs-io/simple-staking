@@ -1,5 +1,6 @@
 import {
   createContext,
+  ReactNode,
   useCallback,
   useContext,
   useEffect,
@@ -258,7 +259,11 @@ export function usePendingOperationsService() {
 }
 
 // Provider component
-export function PendingOperationsProvider({ children }: { children: any }) {
+export function PendingOperationsProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const service = usePendingOperationsServiceInternal();
   return (
     <PendingOperationsContext.Provider value={service}>
