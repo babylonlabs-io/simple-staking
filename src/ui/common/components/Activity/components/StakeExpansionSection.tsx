@@ -8,6 +8,7 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
 import iconHistory from "@/ui/common/assets/expansion-history.svg";
+import iconRenew from "@/ui/common/assets/expansion-renew.svg";
 import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
@@ -62,6 +63,32 @@ export function StakeExpansionSection({
   };
 
   /**
+   * Handle renew staking term button click.
+   * This allows users to renew the timelock without adding new BSN/FP pairs.
+   */
+  const handleRenewStakingTerm = () => {
+    if (processing) {
+      // Cannot start renewal: another operation in progress
+      return;
+    }
+
+    // Initialize expansion form data with current delegation and empty selectedBsnFps
+    // This signals we're doing a renewal-only operation
+    const renewalFormData = {
+      originalDelegation: delegation,
+      selectedBsnFps: {}, // Empty - no new BSN/FP pairs
+      feeRate: 0,
+      feeAmount: 0,
+      stakingTimelock: 0, // Will be set during the renewal process
+      isRenewalOnly: true, // Flag to indicate this is a renewal-only operation
+    };
+
+    setFormData(renewalFormData);
+    // Go to renewal timelock modal to show the new staking term
+    goToStep(StakingExpansionStep.RENEWAL_TIMELOCK);
+  };
+
+  /**
    * Handle expansion history button click.
    */
   const handleExpansionHistory = () => {
@@ -102,6 +129,12 @@ export function StakeExpansionSection({
               counter={`${currentBsnCount}/${maxFinalityProviders}`}
               onClick={handleAddBsnFp}
               disabled={!canExpandDelegation || processing}
+            />
+            <ExpansionButton
+              Icon={iconRenew}
+              text="Renew Staking Term"
+              onClick={handleRenewStakingTerm}
+              disabled={processing}
             />
             <ExpansionButton
               Icon={iconHistory}
