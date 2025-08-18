@@ -78,7 +78,7 @@ export class DataGenerator {
     return Math.floor(Math.random() * 1000) + 1;
   };
 
-  // Convenant committee are a list of public keys that are used to sign a covenant
+  // Covenant committee are a list of public keys that are used to sign a covenant
   generateRandomCovenantCommittee = (size: number): Buffer[] => {
     const committe: Buffer[] = [];
     for (let i = 0; i < size; i++) {
