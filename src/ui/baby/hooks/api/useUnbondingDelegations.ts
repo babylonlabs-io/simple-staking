@@ -2,7 +2,7 @@ import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useClientQuery } from "@/ui/common/hooks/client/useClient";
 
-const BABY_UNBONDING_DELEGATIONS_KEY = "BABY_UNBONDING_DELEGATIONS_KEY";
+export const BABY_UNBONDING_DELEGATIONS_KEY = "BABY_UNBONDING_DELEGATIONS_KEY";
 
 export function useUnbondingDelegations({
   enabled = true,

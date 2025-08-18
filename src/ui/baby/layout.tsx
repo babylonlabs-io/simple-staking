@@ -10,11 +10,14 @@ import { Container } from "@/ui/common/components/Container/Container";
 import { Content } from "@/ui/common/components/Content/Content";
 import { Section } from "@/ui/common/components/Section/Section";
 import { Tabs } from "@/ui/common/components/Tabs";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 
 import { BabyActivityList } from "./components/ActivityList";
 import { RewardCard } from "./components/RewardCard";
 import { RewardsPreviewModal } from "./components/RewardPreviewModal";
+import { useEpochPolling } from "./hooks/api/useEpochPolling";
+import { PendingOperationsProvider } from "./hooks/services/usePendingOperationsService";
 import StakingForm from "./widgets/StakingForm";
 
 type TabId = "stake" | "activity" | "rewards";
@@ -23,7 +26,40 @@ export default function BabyLayout() {
   const [activeTab, setActiveTab] = useState<TabId>("stake");
   const { connected } = useWalletConnect();
   const { isGeoBlocked, isLoading } = useHealthCheck();
+  const { bech32Address } = useCosmosWallet();
   const isConnected = connected && !isGeoBlocked && !isLoading;
+
+  return (
+    <PendingOperationsProvider>
+      <BabyLayoutContent
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isConnected={isConnected}
+        bech32Address={bech32Address}
+        connected={connected}
+        isGeoBlocked={isGeoBlocked}
+      />
+    </PendingOperationsProvider>
+  );
+}
+
+function BabyLayoutContent({
+  activeTab,
+  setActiveTab,
+  isConnected,
+  bech32Address,
+  connected,
+  isGeoBlocked,
+}: {
+  activeTab: TabId;
+  setActiveTab: (tab: TabId) => void;
+  isConnected: boolean;
+  bech32Address: string | undefined;
+  connected: boolean;
+  isGeoBlocked: boolean;
+}) {
+  // Enable epoch polling to refetch delegations when epoch changes
+  useEpochPolling(bech32Address);
 
   const RewardsTab: React.FC = () => {
     const {
@@ -57,13 +93,13 @@ export default function BabyLayout() {
     if (!connected) {
       setActiveTab("stake");
     }
-  }, [connected]);
+  }, [connected, setActiveTab]);
 
   useEffect(() => {
     if (isGeoBlocked && (activeTab === "activity" || activeTab === "rewards")) {
       setActiveTab("stake");
     }
-  }, [isGeoBlocked, activeTab]);
+  }, [isGeoBlocked, activeTab, setActiveTab]);
 
   const tabItems = [
     {

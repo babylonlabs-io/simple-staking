@@ -1,13 +1,15 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import babylon from "@/infrastructure/babylon";
+import { usePendingOperationsService } from "@/ui/baby/hooks/services/usePendingOperationsService";
 import {
   type Delegation,
   useDelegationState,
 } from "@/ui/baby/state/DelegationState";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
-import { formatTimeRemaining } from "@/ui/common/utils/time";
+import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 import { BabyActivityCard } from "../ActivityCard";
 import { UnbondingModal } from "../UnbondingModal";
@@ -22,6 +24,11 @@ interface UnbondingModalState {
 
 export function BabyActivityList() {
   const { loading, delegations, unbond } = useDelegationState();
+  const {
+    getTotalPendingOperations,
+    getTotalPendingStake,
+    getTotalPendingUnstake,
+  } = usePendingOperationsService();
   const [unbondingModal, setUnbondingModal] = useState<UnbondingModalState>({
     isOpen: false,
     delegation: null,
@@ -50,81 +57,82 @@ export function BabyActivityList() {
     });
   };
 
-  const activityItems = useMemo(() => {
-    return delegations.map((delegation) => {
-      const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
-      const isUnbonding = delegation.status === "unbonding";
-      const isPending = delegation.status === "pending";
+  const totalPendingOperations = getTotalPendingOperations();
+  const hasPendingOperations = totalPendingOperations > 0n;
+  const totalPendingStake = getTotalPendingStake();
+  const totalPendingUnstake = getTotalPendingUnstake();
+  const netPendingAmount = totalPendingStake - totalPendingUnstake;
 
-      return {
-        delegation,
-        data: {
-          icon: logo,
-          iconAlt: `${coinSymbol} Logo`,
-          chainName: delegation.validator.name || delegation.validator.address,
-          chainIcon: (
-            <ValidatorAvatar
-              size="small"
-              name={delegation.validator.name || delegation.validator.address}
-            />
-          ),
-          chainIconAlt:
-            delegation.validator.name || delegation.validator.address,
-          formattedAmount: `${formattedAmount} ${coinSymbol}`,
-          primaryAction:
-            formattedAmount > 0 && !isPending
-              ? {
-                  label: "Unbond",
-                  variant: "contained" as const,
-                  onClick: () => openUnbondingModal(delegation),
-                }
-              : undefined,
-          details: [
+  const activityItems = delegations.map((delegation) => {
+    const formattedAmount = babylon.utils.ubbnToBaby(
+      delegation.amount - netPendingAmount,
+    );
+    // We subtract the total pending unstake from the delegation amount to get
+    // the amount that is available for unbonding. The pending staked amount
+    // is not available for unbonding.
+    const avaliableAmountForUnbonding = delegation.amount - totalPendingUnstake;
+
+    const details = [
+      {
+        label: "Commission",
+        value: formatCommissionPercentage(delegation.validator.commission),
+      },
+      ...(hasPendingOperations
+        ? [
             {
-              label: "Commission",
-              value: formatCommissionPercentage(
-                delegation.validator.commission,
-              ),
+              label: "Pending",
+              value: `${maxDecimals(ubbnToBaby(Number(netPendingAmount)), 6)} ${coinSymbol}`,
+              collapsible: true,
+              nestedDetails: [
+                ...(totalPendingStake > 0n
+                  ? [
+                      {
+                        label: "Pending Stake",
+                        value: `${maxDecimals(ubbnToBaby(Number(totalPendingStake)), 6)} ${coinSymbol}`,
+                      },
+                    ]
+                  : []),
+                ...(totalPendingUnstake > 0n
+                  ? [
+                      {
+                        label: "Pending Unbonding",
+                        value: `${maxDecimals(ubbnToBaby(Number(totalPendingUnstake)), 6)} ${coinSymbol}`,
+                      },
+                    ]
+                  : []),
+              ],
             },
-            ...(isPending
-              ? [
-                  {
-                    label: "Status",
-                    value: "Pending - Processing",
-                  },
-                ]
-              : []),
-            ...(isUnbonding
-              ? [
-                  {
-                    label: "Pending",
-                    value: delegation.unbondingInfo
-                      ? `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol}`
-                      : "In progress...",
-                    collapsible: Boolean(delegation.unbondingInfo),
-                    nestedDetails: delegation.unbondingInfo
-                      ? [
-                          {
-                            label: "Amount",
-                            value: `${babylon.utils.ubbnToBaby(delegation.unbondingInfo.amount)} ${coinSymbol}`,
-                          },
-                          {
-                            label: "Time Remaining",
-                            value: delegation.unbondingInfo.isOptimistic
-                              ? "Processing"
-                              : `${formatTimeRemaining(delegation.unbondingInfo.completionTime)}${delegation.unbondingInfo.statusSuffix || ""}`,
-                          },
-                        ]
-                      : [],
-                  },
-                ]
-              : []),
-          ],
-          optionalDetails: [],
-        },
-      };
-    });
-  }, [delegations]);
+          ]
+        : []),
+    ];
+
+    return {
+      delegation,
+      data: {
+        icon: logo,
+        iconAlt: `${coinSymbol} Logo`,
+        chainName: delegation.validator.name || delegation.validator.address,
+        chainIcon: (
+          <ValidatorAvatar
+            size="small"
+            name={delegation.validator.name || delegation.validator.address}
+          />
+        ),
+        chainIconAlt: delegation.validator.name || delegation.validator.address,
+        formattedAmount: `${formattedAmount} ${coinSymbol}`,
+        primaryAction:
+          avaliableAmountForUnbonding > 0
+            ? {
+                label: "Unbond",
+                variant: "contained" as const,
+                onClick: () => openUnbondingModal(delegation),
+              }
+            : undefined,
+        details,
+        optionalDetails: [],
+      },
+    };
+  });
 
   if (loading) {
     return (
