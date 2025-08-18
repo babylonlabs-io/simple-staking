@@ -15,6 +15,8 @@ import type { FinalityProvider } from "@/ui/common/types/finalityProviders";
 export enum StakingExpansionStep {
   /** Initial step for selecting BSN and Finality Provider pairs - unique to expansion */
   BSN_FP_SELECTION = "bsn-fp-selection",
+  /** Step for showing renewal timelock information */
+  RENEWAL_TIMELOCK = "renewal-timelock",
   /** Base workflow steps - reuse shared base steps */
   PREVIEW = BaseStakingStep.PREVIEW,
   /** EOI signing steps - reuse shared EOI steps */
@@ -45,6 +47,8 @@ export interface StakingExpansionFormData {
   feeAmount: number;
   /** Staking timelock in blocks */
   stakingTimelock: number;
+  /** Flag to indicate this is a renewal-only operation (no new BSN/FP pairs) */
+  isRenewalOnly?: boolean;
 }
 
 /**
@@ -144,10 +148,14 @@ export interface BsnFinalityProviderInfo {
 export const validateExpansionFormData = (
   data: Partial<StakingExpansionFormData>,
 ): data is StakingExpansionFormData => {
+  // For renewal-only mode, selectedBsnFps can be empty
+  const hasValidBsnFps = data.isRenewalOnly
+    ? data.selectedBsnFps !== undefined
+    : data.selectedBsnFps && Object.keys(data.selectedBsnFps).length > 0;
+
   return !!(
     data.originalDelegation &&
-    data.selectedBsnFps &&
-    Object.keys(data.selectedBsnFps).length > 0 &&
+    hasValidBsnFps &&
     data.feeRate &&
     data.feeRate > 0 &&
     data.stakingTimelock &&

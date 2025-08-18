@@ -31,6 +31,7 @@ import { trim } from "@/ui/common/utils/trim";
 
 import { SignDetailsModal } from "../Modals/SignDetailsModal";
 
+import { RenewTimelockModal } from "./RenewTimelockModal";
 import { StakingExpansionModal } from "./StakingExpansionModal";
 
 const EOI_INDEXES: Record<string, number> = {
@@ -244,6 +245,9 @@ function StakingExpansionModalSystemInner() {
     <>
       {step === StakingExpansionStep.BSN_FP_SELECTION && (
         <StakingExpansionModal open onClose={handleClose} />
+      )}
+      {step === StakingExpansionStep.RENEWAL_TIMELOCK && (
+        <RenewTimelockModal open onClose={handleClose} />
       )}
       {step === StakingExpansionStep.PREVIEW && formData && details && (
         <PreviewMultistakingModal
