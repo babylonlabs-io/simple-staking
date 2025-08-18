@@ -38,24 +38,15 @@ export function useEpochPolling(address?: string) {
       // previous epochs is finalized)
       cleanupAllPendingOperationsFromStorage();
 
-      // Invalidate delegation queries for this address
-      if (address) {
-        queryClient.invalidateQueries({
-          queryKey: [BABY_DELEGATIONS_KEY, address],
-        });
-        // Also invalidate unbonding delegations since they're epoch-dependent
-        queryClient.invalidateQueries({
-          queryKey: [BABY_UNBONDING_DELEGATIONS_KEY, address],
-        });
-      } else {
-        // Fallback: invalidate all delegation queries if no address
-        queryClient.invalidateQueries({
-          queryKey: [BABY_DELEGATIONS_KEY],
-        });
-        queryClient.invalidateQueries({
-          queryKey: [BABY_UNBONDING_DELEGATIONS_KEY],
-        });
-      }
+      // Invalidate all delegation queries since epoch change affects entire
+      // blockchain state
+      queryClient.invalidateQueries({
+        queryKey: [BABY_DELEGATIONS_KEY],
+      });
+      // Also invalidate unbonding delegations since they're epoch-dependent
+      queryClient.invalidateQueries({
+        queryKey: [BABY_UNBONDING_DELEGATIONS_KEY],
+      });
       previousEpochRef.current = currentEpoch;
     }
   }, [
