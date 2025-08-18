@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
+import { useLogger } from "@/ui/common/hooks/useLogger";
 
 export interface PendingOperation {
   validatorAddress: string;
@@ -35,6 +36,7 @@ const PendingOperationsContext = createContext<ReturnType<
 
 // Internal hook that contains the actual logic
 function usePendingOperationsServiceInternal() {
+  const logger = useLogger();
   const { bech32Address } = useCosmosWallet();
 
   const [pendingOperations, setPendingOperations] = useState<
@@ -54,6 +56,12 @@ function usePendingOperationsServiceInternal() {
       }
       return [];
     } catch {
+      logger.warn("Error getting pending operations from localStorage", {
+        tags: {
+          bech32Address,
+          app: "baby",
+        },
+      });
       return [];
     }
   });
