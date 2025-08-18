@@ -24,11 +24,7 @@ interface UnbondingModalState {
 
 export function BabyActivityList() {
   const { loading, delegations, unbond } = useDelegationState();
-  const {
-    getTotalPendingOperations,
-    getTotalPendingStake,
-    getTotalPendingUnstake,
-  } = usePendingOperationsService();
+  const { getPendingStake, getPendingUnstake } = usePendingOperationsService();
   const [unbondingModal, setUnbondingModal] = useState<UnbondingModalState>({
     isOpen: false,
     delegation: null,
@@ -57,46 +53,52 @@ export function BabyActivityList() {
     });
   };
 
-  const totalPendingOperations = getTotalPendingOperations();
-  const hasPendingOperations = totalPendingOperations > 0n;
-  const totalPendingStake = getTotalPendingStake();
-  const totalPendingUnstake = getTotalPendingUnstake();
-  const netPendingAmount = totalPendingStake - totalPendingUnstake;
-
   const activityItems = delegations.map((delegation) => {
-    const formattedAmount = babylon.utils.ubbnToBaby(
-      delegation.amount - netPendingAmount,
-    );
-    // We subtract the total pending unstake from the delegation amount to get
-    // the amount that is available for unbonding. The pending staked amount
-    // is not available for unbonding.
-    const avaliableAmountForUnbonding = delegation.amount - totalPendingUnstake;
+    // Get validator-specific pending operations
+    const pendingStake = getPendingStake(delegation.validator.address);
+    const pendingUnstake = getPendingUnstake(delegation.validator.address);
+
+    const validatorPendingStake = pendingStake?.amount || 0n;
+    const validatorPendingUnstake = pendingUnstake?.amount || 0n;
+    const validatorNetPendingAmount =
+      validatorPendingStake - validatorPendingUnstake;
+    const hasValidatorPendingOperations =
+      validatorPendingStake > 0n || validatorPendingUnstake > 0n;
+
+    const formattedAmount = babylon.utils.ubbnToBaby(delegation.amount);
+
+    // We subtract the validator-specific pending unstake from the delegation
+    // amount to get the amount that is available for unbonding. The pending
+    // staked amount also being added into the delegation amount, so we need to
+    // subtract it.
+    const avaliableAmountForUnbonding =
+      delegation.amount - validatorPendingUnstake - validatorPendingStake;
 
     const details = [
       {
         label: "Commission",
         value: formatCommissionPercentage(delegation.validator.commission),
       },
-      ...(hasPendingOperations
+      ...(hasValidatorPendingOperations
         ? [
             {
               label: "Pending",
-              value: `${maxDecimals(ubbnToBaby(Number(netPendingAmount)), 6)} ${coinSymbol}`,
+              value: `${maxDecimals(ubbnToBaby(Number(validatorNetPendingAmount)), 6)} ${coinSymbol}`,
               collapsible: true,
               nestedDetails: [
-                ...(totalPendingStake > 0n
+                ...(validatorPendingStake > 0n
                   ? [
                       {
                         label: "Pending Stake",
-                        value: `${maxDecimals(ubbnToBaby(Number(totalPendingStake)), 6)} ${coinSymbol}`,
+                        value: `${maxDecimals(ubbnToBaby(Number(validatorPendingStake)), 6)} ${coinSymbol}`,
                       },
                     ]
                   : []),
-                ...(totalPendingUnstake > 0n
+                ...(validatorPendingUnstake > 0n
                   ? [
                       {
                         label: "Pending Unbonding",
-                        value: `${maxDecimals(ubbnToBaby(Number(totalPendingUnstake)), 6)} ${coinSymbol}`,
+                        value: `${maxDecimals(ubbnToBaby(Number(validatorPendingUnstake)), 6)} ${coinSymbol}`,
                       },
                     ]
                   : []),

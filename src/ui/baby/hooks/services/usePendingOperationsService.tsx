@@ -105,16 +105,7 @@ function usePendingOperationsServiceInternal() {
     ) => {
       if (!bech32Address) return;
 
-      console.log(
-        "addPendingOperation",
-        validatorAddress,
-        amount,
-        operationType,
-      );
-
       setPendingOperations((prev) => {
-        console.log(`[BABY] Previous pending operations:`, prev);
-
         // Find existing operation for this validator and operation type
         const existingOperation = prev.find(
           (op) =>
@@ -136,11 +127,6 @@ function usePendingOperationsServiceInternal() {
               ? updatedOperation
               : op,
           );
-
-          console.log(
-            `[BABY] Updated existing operation, new state:`,
-            newState,
-          );
           return newState;
         } else {
           // Create new operation
@@ -152,9 +138,7 @@ function usePendingOperationsServiceInternal() {
             walletAddress: bech32Address,
           };
 
-          const newState = [...prev, pendingOperation];
-          console.log(`[BABY] Created new operation, new state:`, newState);
-          return newState;
+          return [...prev, pendingOperation];
         }
       });
     },
@@ -236,7 +220,6 @@ function usePendingOperationsServiceInternal() {
 
   // Calculate total pending unstake across all validators
   const getTotalPendingUnstake = useCallback(() => {
-    console.log("getTotalPendingUnstake", pendingOperations);
     return pendingOperations
       .filter((op) => op.operationType === "unstake")
       .reduce((total, op) => total + op.amount, 0n);
