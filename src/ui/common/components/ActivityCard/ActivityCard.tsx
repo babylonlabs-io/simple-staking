@@ -39,9 +39,14 @@ export interface ActivityCardData {
     label: string;
     items: ActivityListItemData[];
   }[];
+  groupedDetails?: {
+    label?: string;
+    items: ActivityCardDetailItem[];
+  }[];
   primaryAction?: ActivityCardActionButton;
   secondaryActions?: ActivityCardActionButton[];
   expansionSection?: DelegationWithFP;
+  hideExpansionCompletely?: boolean;
 }
 
 interface ActivityCardProps {
@@ -50,6 +55,9 @@ interface ActivityCardProps {
 }
 
 export function ActivityCard({ data, className }: ActivityCardProps) {
+  const shouldShowExpansion =
+    FeatureFlagService.IsPhase3Enabled && !data.hideExpansionCompletely;
+
   return (
     <div
       className={`w-full bg-secondary-highlight p-3 sm:p-4 space-y-3 sm:space-y-4 rounded ${className || ""}`}
@@ -65,9 +73,10 @@ export function ActivityCard({ data, className }: ActivityCardProps) {
         details={data.details}
         optionalDetails={data.optionalDetails}
         listItems={data.listItems}
+        groupedDetails={data.groupedDetails}
       />
 
-      {FeatureFlagService.IsPhase3Enabled &&
+      {shouldShowExpansion &&
         (data.expansionSection ? (
           <StakeExpansionSection delegation={data.expansionSection} />
         ) : (
