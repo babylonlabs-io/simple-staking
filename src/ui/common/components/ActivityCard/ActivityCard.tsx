@@ -46,6 +46,7 @@ export interface ActivityCardData {
   primaryAction?: ActivityCardActionButton;
   secondaryActions?: ActivityCardActionButton[];
   expansionSection?: DelegationWithFP;
+  hideExpansionCompletely?: boolean;
 }
 
 interface ActivityCardProps {
@@ -73,11 +74,14 @@ export function ActivityCard({ data, className }: ActivityCardProps) {
       />
 
       {FeatureFlagService.IsPhase3Enabled &&
-        (data.expansionSection ? (
+        !data.hideExpansionCompletely &&
+        data.expansionSection && (
           <StakeExpansionSection delegation={data.expansionSection} />
-        ) : (
-          <NonExpandableExpansion />
-        ))}
+        )}
+
+      {FeatureFlagService.IsPhase3Enabled &&
+        !data.hideExpansionCompletely &&
+        !data.expansionSection && <NonExpandableExpansion />}
 
       {data.secondaryActions && data.secondaryActions.length > 0 && (
         <ActivityCardActionSection actions={data.secondaryActions} />

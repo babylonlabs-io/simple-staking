@@ -1,16 +1,8 @@
 import { useMemo } from "react";
 
-import bitcoin from "@/ui/common/assets/bitcoin.png";
-import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
 import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
-import { Hash } from "@/ui/common/components/Hash/Hash";
-import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfig } from "@/ui/common/config/network";
-import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import {
-  DELEGATION_ACTIONS as ACTIONS,
-  chainLogos,
-} from "@/ui/common/constants";
+import { DELEGATION_ACTIONS as ACTIONS } from "@/ui/common/constants";
 import {
   ActionType,
   useDelegationService,
@@ -22,25 +14,20 @@ import {
   DelegationV2StakingState,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
+import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
 import {
-  FinalityProvider,
-  FinalityProviderState,
-} from "@/ui/common/types/finalityProviders";
-import { satoshiToBtc } from "@/ui/common/utils/btc";
-import { maxDecimals } from "@/ui/common/utils/maxDecimals";
-import { durationTillNow } from "@/ui/common/utils/time";
+  ActivityCardTransformOptions,
+  transformDelegationToActivityCard,
+} from "@/ui/common/utils/activityCardTransformers";
 
 import {
   ActivityCard,
   ActivityCardActionButton,
-  ActivityCardData,
-  ActivityCardDetailItem,
 } from "../../ActivityCard/ActivityCard";
 import { DelegationModal } from "../../Delegations/DelegationList/components/DelegationModal";
 import { StakingExpansionModalSystem } from "../../StakingExpansion/StakingExpansionModalSystem";
 
 const networkConfig = getNetworkConfig();
-const { coinName } = getNetworkConfigBTC();
 
 const getActionButton = (
   delegation: DelegationWithFP,
@@ -171,113 +158,6 @@ const getActionButton = (
   };
 };
 
-const transformToActivityCard = (
-  delegation: DelegationWithFP,
-  onAction: (action: ActionType, delegation: DelegationWithFP) => void,
-  isStakingManagerReady: boolean,
-  finalityProviderMap: Map<string, FinalityProvider>,
-): ActivityCardData => {
-  const details: ActivityCardDetailItem[] = [
-    {
-      label: "Status",
-      value: <Status delegation={delegation} showTooltip={false} />,
-    },
-    {
-      label: "Inception",
-      value: delegation.bbnInceptionTime
-        ? durationTillNow(delegation.bbnInceptionTime, Date.now())
-        : "N/A",
-    },
-    {
-      label: "Tx Hash",
-      value: (
-        <Hash
-          value={delegation.stakingTxHashHex}
-          address
-          small
-          noFade
-          size="caption"
-        />
-      ),
-    },
-  ];
-
-  // Create grouped details for BSN/FP pairs
-  const groupedDetails: { label?: string; items: ActivityCardDetailItem[] }[] =
-    [];
-
-  if (
-    delegation.finalityProviderBtcPksHex &&
-    delegation.finalityProviderBtcPksHex.length > 0
-  ) {
-    delegation.finalityProviderBtcPksHex.forEach((fpBtcPk) => {
-      const fp = finalityProviderMap.get(fpBtcPk);
-      if (fp && fp.bsnId) {
-        const bsnLogo = chainLogos[fp.bsnId] || chainLogos.placeholder;
-
-        // Create a group for each BSN+FP pair
-        groupedDetails.push({
-          items: [
-            {
-              label: "BSN",
-              value: (
-                <div className="flex items-center gap-2">
-                  <img
-                    src={bsnLogo}
-                    alt={fp.bsnId}
-                    className="w-4 h-4 rounded-full object-cover"
-                  />
-                  <span>{fp.bsnId}</span>
-                </div>
-              ),
-            },
-            {
-              label: "Finality Provider",
-              value: (
-                <div className="flex items-center gap-2">
-                  <FinalityProviderLogo
-                    logoUrl={fp.logo_url}
-                    rank={fp.rank}
-                    moniker={fp.description?.moniker}
-                    className="w-4 h-4"
-                  />
-                  <span>
-                    {fp.description?.moniker || `Provider ${fp.rank}`}
-                  </span>
-                </div>
-              ),
-            },
-          ],
-        });
-      }
-    });
-  }
-
-  const primaryAction = getActionButton(
-    delegation,
-    onAction,
-    isStakingManagerReady,
-  );
-
-  // Check if expansion section should be shown
-  // 1. Feature flag enabled
-  // 2. Delegation is active
-  // 3. Delegation can expand from the api
-  const showExpansionSection =
-    delegation.state === DelegationV2StakingState.ACTIVE &&
-    delegation.canExpand;
-
-  return {
-    formattedAmount: `${maxDecimals(satoshiToBtc(delegation.stakingAmount), 8)} ${coinName}`,
-    icon: bitcoin,
-    iconAlt: "bitcoin",
-    details,
-    groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,
-    primaryAction,
-    expansionSection: showExpansionSection ? delegation : undefined,
-  };
-};
-
 export function ActivityList() {
   const {
     processing,
@@ -312,14 +192,20 @@ export function ActivityList() {
         // expanded delegation. User can find it from delegation history.
         (delegation) => delegation.state !== DelegationV2StakingState.EXPANDED,
       )
-      .map((delegation) =>
-        transformToActivityCard(
-          delegation,
-          openConfirmationModal,
+      .map((delegation) => {
+        const options: ActivityCardTransformOptions = {
+          showActions: true,
+          showExpansionSection: true,
+          onAction: openConfirmationModal,
           isStakingManagerReady,
+          getActionButton,
+        };
+        return transformDelegationToActivityCard(
+          delegation,
           finalityProviderMap,
-        ),
-      );
+          options,
+        );
+      });
   }, [
     delegations,
     validations,
