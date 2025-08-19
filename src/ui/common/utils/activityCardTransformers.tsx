@@ -51,7 +51,11 @@ export function transformDelegationToActivityCard(
       ? delegation
       : ({
           ...delegation,
-          fp: finalityProviderMap.get(delegation.finalityProviderBtcPksHex[0]),
+          fp:
+            Array.isArray(delegation.finalityProviderBtcPksHex) &&
+            delegation.finalityProviderBtcPksHex.length > 0
+              ? finalityProviderMap.get(delegation.finalityProviderBtcPksHex[0])
+              : undefined,
         } as DelegationWithFP);
 
   const details: ActivityCardDetailItem[] = [
