@@ -21,6 +21,18 @@ export function createBsnFpGroupedDetails(
 
   finalityProviderBtcPksHex.forEach((fpBtcPk) => {
     const fp = finalityProviderMap.get(fpBtcPk);
+    if (!fp) {
+      console.warn(
+        `Finality provider not found for BTC public key: ${fpBtcPk}`,
+      );
+      return;
+    }
+    if (!fp.bsnId) {
+      console.warn(
+        `Finality provider missing BSN ID: ${fp.description?.moniker || fpBtcPk}`,
+      );
+      return;
+    }
     if (fp && fp.bsnId) {
       const bsnLogo = chainLogos[fp.bsnId] || chainLogos.placeholder;
 
