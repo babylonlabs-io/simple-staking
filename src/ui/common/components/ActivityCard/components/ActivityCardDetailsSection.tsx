@@ -9,6 +9,10 @@ interface ActivityCardDetailsSectionProps {
     label: string;
     items: ActivityListItemData[];
   }[];
+  groupedDetails?: {
+    label?: string;
+    items: ActivityCardDetailItem[];
+  }[];
 }
 
 interface DetailRowProps {
@@ -33,9 +37,11 @@ export function ActivityCardDetailsSection({
   details,
   optionalDetails,
   listItems,
+  groupedDetails,
 }: ActivityCardDetailsSectionProps) {
   const hasOptionalDetails = optionalDetails && optionalDetails.length > 0;
   const hasListItems = listItems && listItems.length > 0;
+  const hasGroupedDetails = groupedDetails && groupedDetails.length > 0;
 
   return (
     <div className="space-y-3 sm:space-y-4 overflow-x-auto">
@@ -44,6 +50,30 @@ export function ActivityCardDetailsSection({
           <DetailRow key={index} label={detail.label} value={detail.value} />
         ))}
       </div>
+
+      {hasGroupedDetails && (
+        <div className="space-y-3 sm:space-y-4">
+          {groupedDetails.map((group, groupIndex) => (
+            <div
+              key={groupIndex}
+              className="bg-surface p-3 sm:p-4 rounded space-y-3 sm:space-y-4 overflow-x-auto"
+            >
+              {group.label && (
+                <span className="text-xs sm:text-sm text-accent-primary">
+                  {group.label}
+                </span>
+              )}
+              {group.items.map((detail, detailIndex) => (
+                <DetailRow
+                  key={detailIndex}
+                  label={detail.label}
+                  value={detail.value}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
 
       {hasListItems && (
         <div className="space-y-3 sm:space-y-4">

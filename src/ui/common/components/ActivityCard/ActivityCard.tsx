@@ -39,6 +39,10 @@ export interface ActivityCardData {
     label: string;
     items: ActivityListItemData[];
   }[];
+  groupedDetails?: {
+    label?: string;
+    items: ActivityCardDetailItem[];
+  }[];
   primaryAction?: ActivityCardActionButton;
   secondaryActions?: ActivityCardActionButton[];
   expansionSection?: DelegationWithFP;
@@ -65,6 +69,7 @@ export function ActivityCard({ data, className }: ActivityCardProps) {
         details={data.details}
         optionalDetails={data.optionalDetails}
         listItems={data.listItems}
+        groupedDetails={data.groupedDetails}
       />
 
       {FeatureFlagService.IsPhase3Enabled &&

@@ -16,12 +16,16 @@ import {
   useDelegationService,
 } from "@/ui/common/hooks/services/useDelegationService";
 import { useStakingManagerService } from "@/ui/common/hooks/services/useStakingManagerService";
+import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   DelegationV2StakingState,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
-import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
+import {
+  FinalityProvider,
+  FinalityProviderState,
+} from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 import { durationTillNow } from "@/ui/common/utils/time";
@@ -31,7 +35,6 @@ import {
   ActivityCardActionButton,
   ActivityCardData,
   ActivityCardDetailItem,
-  ActivityListItemData,
 } from "../../ActivityCard/ActivityCard";
 import { DelegationModal } from "../../Delegations/DelegationList/components/DelegationModal";
 import { StakingExpansionModalSystem } from "../../StakingExpansion/StakingExpansionModalSystem";
@@ -172,6 +175,7 @@ const transformToActivityCard = (
   delegation: DelegationWithFP,
   onAction: (action: ActionType, delegation: DelegationWithFP) => void,
   isStakingManagerReady: boolean,
+  finalityProviderMap: Map<string, FinalityProvider>,
 ): ActivityCardData => {
   const details: ActivityCardDetailItem[] = [
     {
@@ -198,56 +202,56 @@ const transformToActivityCard = (
     },
   ];
 
-  const listItems: {
-    label: string;
-    items: ActivityListItemData[];
-  }[] = [];
+  // Create grouped details for BSN/FP pairs
+  const groupedDetails: { label?: string; items: ActivityCardDetailItem[] }[] =
+    [];
 
-  if (delegation.fp?.bsnId) {
-    const bsnLogo = chainLogos[delegation.fp.bsnId] || chainLogos.placeholder;
-    listItems.push({
-      label: "BSN",
-      items: [
-        {
-          icon: bsnLogo,
-          iconAlt: delegation.fp.bsnId,
-          name: delegation.fp.bsnId,
-          id: delegation.fp.bsnId,
-        },
-      ],
+  if (
+    delegation.finalityProviderBtcPksHex &&
+    delegation.finalityProviderBtcPksHex.length > 0
+  ) {
+    delegation.finalityProviderBtcPksHex.forEach((fpBtcPk) => {
+      const fp = finalityProviderMap.get(fpBtcPk);
+      if (fp && fp.bsnId) {
+        const bsnLogo = chainLogos[fp.bsnId] || chainLogos.placeholder;
+
+        // Create a group for each BSN+FP pair
+        groupedDetails.push({
+          items: [
+            {
+              label: "BSN",
+              value: (
+                <div className="flex items-center gap-2">
+                  <img
+                    src={bsnLogo}
+                    alt={fp.bsnId}
+                    className="w-4 h-4 rounded-full object-cover"
+                  />
+                  <span>{fp.bsnId}</span>
+                </div>
+              ),
+            },
+            {
+              label: "Finality Provider",
+              value: (
+                <div className="flex items-center gap-2">
+                  <FinalityProviderLogo
+                    logoUrl={fp.logo_url}
+                    rank={fp.rank}
+                    moniker={fp.description?.moniker}
+                    className="w-4 h-4"
+                  />
+                  <span>
+                    {fp.description?.moniker || `Provider ${fp.rank}`}
+                  </span>
+                </div>
+              ),
+            },
+          ],
+        });
+      }
     });
   }
-
-  // Finality Provider Section
-  if (delegation.fp) {
-    listItems.push({
-      label: "Finality Provider",
-      items: [
-        {
-          icon: (
-            <FinalityProviderLogo
-              logoUrl={delegation.fp.logo_url}
-              rank={delegation.fp.rank}
-              moniker={delegation.fp.description?.moniker}
-              className="w-4 h-4"
-            />
-          ),
-          iconAlt: delegation.fp.description?.moniker || "Finality Provider",
-          name:
-            delegation.fp.description?.moniker ||
-            `Provider ${delegation.fp.rank}`,
-          id: delegation.fp.btcPk,
-        },
-      ],
-    });
-  }
-
-  // Reward Section (placeholder for future implementation)
-  // listItems.push({
-  //   label: "Reward",
-  //   items: [{
-  //   }]
-  // });
 
   const primaryAction = getActionButton(
     delegation,
@@ -268,7 +272,7 @@ const transformToActivityCard = (
     icon: bitcoin,
     iconAlt: "bitcoin",
     details,
-    listItems: listItems.length > 0 ? listItems : undefined,
+    groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,
     primaryAction,
     expansionSection: showExpansionSection ? delegation : undefined,
   };
@@ -288,6 +292,8 @@ export function ActivityList() {
 
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
+
+  const { finalityProviderMap } = useFinalityProviderState();
 
   const {
     expansionHistoryModalOpen,
@@ -311,9 +317,16 @@ export function ActivityList() {
           delegation,
           openConfirmationModal,
           isStakingManagerReady,
+          finalityProviderMap,
         ),
       );
-  }, [delegations, validations, openConfirmationModal, isStakingManagerReady]);
+  }, [
+    delegations,
+    validations,
+    openConfirmationModal,
+    isStakingManagerReady,
+    finalityProviderMap,
+  ]);
 
   if (isLoading) {
     return (
