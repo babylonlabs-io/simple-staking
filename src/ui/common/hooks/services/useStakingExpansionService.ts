@@ -96,7 +96,7 @@ const buildExpansionInput = (
  * Handles the complete expansion workflow from fee calculation to transaction submission.
  */
 export function useStakingExpansionService() {
-  const { setFormData, goToStep, setProcessing, setVerifiedDelegation } =
+  const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingExpansionState();
   const { sendBbnTx } = useBbnTransaction();
   const {
@@ -252,18 +252,9 @@ export function useStakingExpansionService() {
       } catch (error) {
         setProcessing(false);
 
-        // Ensure we have a proper Error object for the logger
-        const properError =
-          error instanceof Error
-            ? error
-            : new Error(
-                typeof error === "string"
-                  ? error
-                  : "Unknown error in expansion EOI creation",
-              );
-
-        logger.error(properError);
-        handleError({ error: properError });
+        logger.error(error as Error);
+        handleError({ error: error as Error });
+        reset(); // Close the modal on error
       }
     },
     [
@@ -277,6 +268,7 @@ export function useStakingExpansionService() {
       publicKeyNoCoord,
       logger,
       handleError,
+      reset,
     ],
   );
 
@@ -365,16 +357,10 @@ export function useStakingExpansionService() {
         setProcessing(false);
       } catch (error) {
         setProcessing(false);
-        const properError =
-          error instanceof Error
-            ? error
-            : new Error(
-                typeof error === "string"
-                  ? error
-                  : "Failed to stake delegation expansion",
-              );
-        logger.error(properError);
-        handleError({ error: properError });
+
+        logger.error(error as Error);
+        handleError({ error: error as Error });
+        reset(); // Close the modal on error
       }
     },
     [
@@ -384,6 +370,7 @@ export function useStakingExpansionService() {
       handleError,
       submitStakingExpansionTx,
       updateDelegationStatus,
+      reset,
     ],
   );
 
