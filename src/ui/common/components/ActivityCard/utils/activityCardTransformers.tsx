@@ -12,27 +12,14 @@ import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 import { durationTillNow } from "@/ui/common/utils/time";
 
-import {
-  ActivityCardActionButton,
-  ActivityCardData,
-  ActivityCardDetailItem,
-} from "../components/ActivityCard/ActivityCard";
-
-import { createBsnFpGroupedDetails } from "./bsnFpGroupingUtils";
+import { createBsnFpGroupedDetails } from "../../../utils/bsnFpGroupingUtils";
+import { ActivityCardData, ActivityCardDetailItem } from "../ActivityCard";
 
 const { coinName } = getNetworkConfigBTC();
 
 export interface ActivityCardTransformOptions {
-  showActions?: boolean;
   showExpansionSection?: boolean;
   hideExpansionCompletely?: boolean;
-  onAction?: (action: any, delegation: DelegationWithFP) => void;
-  isStakingManagerReady?: boolean;
-  getActionButton?: (
-    delegation: DelegationWithFP,
-    onAction: (action: any, delegation: DelegationWithFP) => void,
-    isStakingManagerReady: boolean,
-  ) => ActivityCardActionButton | undefined;
 }
 
 /**
@@ -54,7 +41,10 @@ export function transformDelegationToActivityCard(
           fp:
             Array.isArray(delegation.finalityProviderBtcPksHex) &&
             delegation.finalityProviderBtcPksHex.length > 0
-              ? finalityProviderMap.get(delegation.finalityProviderBtcPksHex[0])
+              ? // Use the first FP [0] for backward compatibility with Status component
+                // which expects a single FP. The full BSN/FP pairs are handled separately
+                // in groupedDetails for comprehensive display
+                finalityProviderMap.get(delegation.finalityProviderBtcPksHex[0])
               : undefined,
         } as DelegationWithFP);
 
@@ -89,21 +79,6 @@ export function transformDelegationToActivityCard(
     finalityProviderMap,
   );
 
-  // Handle primary action if options specify it
-  let primaryAction: ActivityCardActionButton | undefined;
-  if (
-    options.showActions &&
-    options.onAction &&
-    options.getActionButton &&
-    options.isStakingManagerReady !== undefined
-  ) {
-    primaryAction = options.getActionButton(
-      delegationWithFP,
-      options.onAction,
-      options.isStakingManagerReady,
-    );
-  }
-
   // Handle expansion section if options specify it
   let expansionSection: DelegationWithFP | undefined;
   if (options.showExpansionSection) {
@@ -128,7 +103,6 @@ export function transformDelegationToActivityCard(
     iconAlt: "bitcoin",
     details,
     groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,
-    primaryAction,
     expansionSection,
     hideExpansionCompletely: options.hideExpansionCompletely,
   };
