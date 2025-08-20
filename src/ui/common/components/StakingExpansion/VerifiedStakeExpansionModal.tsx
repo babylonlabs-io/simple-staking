@@ -5,7 +5,7 @@ import {
   DialogHeader,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { BiSolidBadgeCheck } from "react-icons/bi";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
@@ -51,10 +51,16 @@ const getExpansionType = (
   // - Mixed operations may be possible in future versions
 };
 
+interface VerifiedStakeExpansionModalProps {
+  open: boolean;
+  onClose: () => void;
+  processing?: boolean;
+}
+
 interface VerifiedExpansionItemProps {
   delegation: DelegationV2;
   onExpand: () => void;
-  processing?: boolean;
+  processing: boolean;
 }
 
 function VerifiedExpansionItem({
@@ -233,26 +239,28 @@ function VerifiedExpansionItem({
   );
 }
 
-interface VerifiedStakeExpansionModalProps {
-  open: boolean;
-  onClose: () => void;
-  processing?: boolean;
-}
-
 function VerifiedStakeExpansionModalInner({
   open,
   onClose,
-  processing,
+  processing = false,
 }: VerifiedStakeExpansionModalProps) {
   const { verifiedExpansions, resumeVerifiedExpansion } =
     useVerifiedStakingExpansionService();
 
+  // Simple state for tracking expansion process
+  const [isExpanding, setIsExpanding] = useState(false);
+
   const handleExpand = async (delegation: DelegationV2) => {
-    await resumeVerifiedExpansion(delegation);
+    setIsExpanding(true);
+    try {
+      await resumeVerifiedExpansion(delegation);
+    } finally {
+      setIsExpanding(false);
+    }
   };
 
   return (
-    <ResponsiveDialog open={open} onClose={onClose}>
+    <ResponsiveDialog open={open} onClose={() => !isExpanding && onClose()}>
       <DialogHeader
         title="Verified Stake Expansions"
         onClose={onClose}
@@ -278,7 +286,7 @@ function VerifiedStakeExpansionModalInner({
                   key={delegation.stakingTxHashHex}
                   delegation={delegation}
                   onExpand={() => handleExpand(delegation)}
-                  processing={processing}
+                  processing={processing || isExpanding}
                 />
               ))}
             </div>
@@ -290,7 +298,7 @@ function VerifiedStakeExpansionModalInner({
           variant="contained"
           className="flex-1 text-xs sm:text-base"
           onClick={onClose}
-          disabled={processing}
+          disabled={processing || isExpanding}
         >
           Close
         </Button>

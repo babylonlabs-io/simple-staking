@@ -20,7 +20,6 @@ export function useVerifiedStakingExpansionService() {
   const {
     setVerifiedDelegation,
     goToStep,
-    verifiedExpansionModalOpen,
     setVerifiedExpansionModalOpen,
     selectedDelegationForVerifiedModal,
     setSelectedDelegationForVerifiedModal,
@@ -43,11 +42,12 @@ export function useVerifiedStakingExpansionService() {
 
     // If a specific delegation is selected for the modal, filter to only show expansions for that delegation
     if (selectedDelegationForVerifiedModal) {
-      return allVerified.filter(
+      const filtered = allVerified.filter(
         (expansion) =>
           expansion.previousStakingTxHashHex ===
           selectedDelegationForVerifiedModal.stakingTxHashHex,
       );
+      return filtered;
     }
 
     // Otherwise, return all verified expansions
@@ -83,32 +83,41 @@ export function useVerifiedStakingExpansionService() {
   );
 
   /**
-   * Close the verified expansion modal.
+   * Close the verified expansion modal and clear the filter.
    */
   const closeVerifiedExpansionModal = useCallback(() => {
-    setVerifiedExpansionModalOpen(false);
     setSelectedDelegationForVerifiedModal(null);
+    setVerifiedExpansionModalOpen(false);
   }, [setVerifiedExpansionModalOpen, setSelectedDelegationForVerifiedModal]);
 
   /**
+   * Close the verified expansion modal without clearing the filter.
+   * Used during expand transition to prevent flash.
+   */
+  const closeVerifiedExpansionModalOnly = useCallback(() => {
+    setVerifiedExpansionModalOpen(false);
+  }, [setVerifiedExpansionModalOpen]);
+
+  /**
    * Resume a verified expansion.
-   * This sets up the state and triggers the staking expansion flow.
+   * This follows the same pattern as regular staking - one delegation at a time.
+   * Closes the list modal and opens individual expansion modal.
    */
   const resumeVerifiedExpansion = useCallback(
     async (delegation: DelegationV2) => {
-      // Close the modal first
-      closeVerifiedExpansionModal();
+      // Close the verified expansions modal without clearing filter (prevents flash)
+      closeVerifiedExpansionModalOnly();
 
-      // Set the verified delegation
+      // Set the verified delegation (same as regular staking pattern)
       setVerifiedDelegation(delegation);
 
-      // Go to the verified step to show the StakeModal
+      // Go to the verified step to show individual StakeModal
       goToStep(StakingExpansionStep.VERIFIED);
 
-      // The user will then click "Stake" in the StakeModal,
-      // which will call stakeDelegationExpansion
+      // The user will then click "Stake" in the individual StakeModal,
+      // which will call stakeDelegationExpansion for this single delegation
     },
-    [closeVerifiedExpansionModal, setVerifiedDelegation, goToStep],
+    [closeVerifiedExpansionModalOnly, setVerifiedDelegation, goToStep],
   );
 
   /**
@@ -147,10 +156,10 @@ export function useVerifiedStakingExpansionService() {
     verifiedExpansions,
     verifiedExpansionCount,
     hasVerifiedExpansions,
-    verifiedExpansionModalOpen,
     openVerifiedExpansionModal,
     openVerifiedExpansionModalForDelegation,
     closeVerifiedExpansionModal,
+    closeVerifiedExpansionModalOnly,
     resumeVerifiedExpansion,
     getVerifiedExpansionsForDelegation,
     getVerifiedExpansionInfoForDelegation,
