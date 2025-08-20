@@ -14,8 +14,14 @@ interface FormFields {
 }
 
 export default function StakingForm() {
-  const { loading, formSchema, balance, babyPrice, calculateFee, showPreview } =
-    useStakingState();
+  const {
+    loading,
+    formSchema,
+    availableBalance,
+    babyPrice,
+    calculateFee,
+    showPreview,
+  } = useStakingState();
 
   const handlePreview = ({
     amount,
@@ -31,7 +37,7 @@ export default function StakingForm() {
       className="flex flex-col gap-2 h-[500px]"
       onSubmit={handlePreview}
     >
-      <AmountField balance={balance} price={babyPrice} />
+      <AmountField balance={availableBalance} price={babyPrice} />
       <ValidatorField />
       <FeeField babyPrice={babyPrice} calculateFee={calculateFee} />
 
