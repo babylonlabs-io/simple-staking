@@ -266,12 +266,11 @@ function VerifiedStakeExpansionModalInner({
         onClose={onClose}
         className="text-accent-primary"
       />
-      <DialogBody className="flex flex-col pb-4 pt-4 text-accent-primary gap-4 max-h-[70vh] overflow-y-auto">
-        <Text variant="body1" className="text-accent-secondary">
-          Your expansion requests have been verified by the Babylon network. You
-          can now complete the expansion by signing and broadcasting to Bitcoin.
-        </Text>
-
+      <Text variant="body1" className="text-accent-secondary mb-4">
+        Your expansion requests have been verified by the Babylon network. You
+        can now complete the expansion by signing and broadcasting to Bitcoin.
+      </Text>
+      <DialogBody className="flex flex-col text-accent-primary gap-4 max-h-[70vh] pb-4 overflow-y-auto no-scrollbar">
         <div className="flex flex-col gap-2">
           {verifiedExpansions.length === 0 ? (
             <div className="text-center py-8">
