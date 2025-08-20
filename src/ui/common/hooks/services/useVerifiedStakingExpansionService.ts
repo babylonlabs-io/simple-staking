@@ -1,6 +1,5 @@
 import { useCallback, useMemo } from "react";
 
-import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
 import {
@@ -16,8 +15,8 @@ import {
  * Manages verified expansions that are waiting for BTC signing and broadcast.
  */
 export function useVerifiedStakingExpansionService() {
-  const { delegations } = useDelegationV2State();
   const {
+    expansions,
     setVerifiedDelegation,
     goToStep,
     setVerifiedExpansionModalOpen,
@@ -34,15 +33,33 @@ export function useVerifiedStakingExpansionService() {
    * 3. If a specific delegation is selected, filter to show only expansions for that delegation
    */
   const verifiedExpansions = useMemo(() => {
-    const allVerified = delegations.filter(
-      (delegation) =>
-        delegation.state === DelegationV2StakingState.VERIFIED &&
-        delegation.previousStakingTxHashHex,
+    // First, get all verified expansions
+    const allVerified = expansions.filter(
+      (expansion) =>
+        expansion.state === DelegationV2StakingState.VERIFIED &&
+        expansion.previousStakingTxHashHex,
     );
+
+    // Filter out verified expansions if another expansion for the same original transaction
+    // has already been broadcasted (mutual exclusivity)
+    const availableVerified = allVerified.filter((expansion) => {
+      // Check if any other expansion for the same original transaction is already being processed
+      const hasProcessingExpansion = expansions.some(
+        (other) =>
+          other.previousStakingTxHashHex ===
+            expansion.previousStakingTxHashHex &&
+          other.stakingTxHashHex !== expansion.stakingTxHashHex && // Different expansion
+          (other.state ===
+            DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+            other.state === DelegationV2StakingState.ACTIVE), // Already processed
+      );
+
+      return !hasProcessingExpansion;
+    });
 
     // If a specific delegation is selected for the modal, filter to only show expansions for that delegation
     if (selectedDelegationForVerifiedModal) {
-      const filtered = allVerified.filter(
+      const filtered = availableVerified.filter(
         (expansion) =>
           expansion.previousStakingTxHashHex ===
           selectedDelegationForVerifiedModal.stakingTxHashHex,
@@ -50,9 +67,9 @@ export function useVerifiedStakingExpansionService() {
       return filtered;
     }
 
-    // Otherwise, return all verified expansions
-    return allVerified;
-  }, [delegations, selectedDelegationForVerifiedModal]);
+    // Otherwise, return all available verified expansions
+    return availableVerified;
+  }, [expansions, selectedDelegationForVerifiedModal]);
 
   /**
    * Get count of verified expansions.

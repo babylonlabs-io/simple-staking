@@ -119,6 +119,16 @@ export interface StakingExpansionState {
   canAddMoreBsns: () => boolean;
   /** Check if expansion is possible for a given delegation */
   canExpand: (delegation: { finalityProviderBtcPksHex: string[] }) => boolean;
+
+  // Expansion storage functions
+  /** List of expansion delegations (pending and from API) */
+  expansions: DelegationV2[];
+  /** Add a pending expansion to local storage */
+  addPendingExpansion: (expansion: any) => void;
+  /** Update expansion status in local storage */
+  updateExpansionStatus: (id: string, status: any) => void;
+  /** Refetch expansions from API to trigger cleanup */
+  refetchExpansions: () => Promise<void>;
 }
 
 /**
