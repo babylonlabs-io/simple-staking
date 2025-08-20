@@ -49,6 +49,10 @@ const { StateProvider, useState: useStakingExpansionState } =
     openExpansionHistoryModal: () => {},
     closeExpansionHistoryModal: () => {},
     isExpansionModalOpen: false,
+    verifiedExpansionModalOpen: false,
+    setVerifiedExpansionModalOpen: () => {},
+    selectedDelegationForVerifiedModal: null,
+    setSelectedDelegationForVerifiedModal: () => {},
     maxFinalityProviders: DEFAULT_MAX_FINALITY_PROVIDERS,
     getAvailableBsnSlots: () => 0,
     canAddMoreBsns: () => false,
@@ -81,6 +85,12 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   const [
     expansionHistoryTargetDelegation,
     setExpansionHistoryTargetDelegation,
+  ] = useState<DelegationWithFP | null>(null);
+  const [verifiedExpansionModalOpen, setVerifiedExpansionModalOpen] =
+    useState(false);
+  const [
+    selectedDelegationForVerifiedModal,
+    setSelectedDelegationForVerifiedModal,
   ] = useState<DelegationWithFP | null>(null);
 
   useEffect(() => {
@@ -119,6 +129,8 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     setExpansionStepOptions(undefined);
     setExpansionHistoryModalOpen(false);
     setExpansionHistoryTargetDelegation(null);
+    setVerifiedExpansionModalOpen(false);
+    setSelectedDelegationForVerifiedModal(null);
   }, []);
 
   /**
@@ -166,7 +178,8 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   }, []);
 
   // Computed state: true when any expansion-related modal is open
-  const isExpansionModalOpen = Boolean(step) || expansionHistoryModalOpen;
+  const isExpansionModalOpen =
+    Boolean(step) || expansionHistoryModalOpen || verifiedExpansionModalOpen;
 
   const state: StakingExpansionState = {
     hasError,
@@ -188,6 +201,10 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     openExpansionHistoryModal,
     closeExpansionHistoryModal,
     isExpansionModalOpen,
+    verifiedExpansionModalOpen,
+    setVerifiedExpansionModalOpen,
+    selectedDelegationForVerifiedModal,
+    setSelectedDelegationForVerifiedModal,
     maxFinalityProviders,
     getAvailableBsnSlots,
     canAddMoreBsns,
