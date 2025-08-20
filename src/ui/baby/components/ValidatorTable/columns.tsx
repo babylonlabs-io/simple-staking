@@ -30,7 +30,7 @@ export const columns: ColumnProps<Validator>[] = [
     headerClassName: "w-16",
     cellClassName: "text-right pr-4",
     sorter: (a, b) => a.votingPower - b.votingPower,
-    render: (value) => <>{maxDecimals(value as number, 2)}%</>,
+    render: (value) => <>{maxDecimals((value as number) * 100, 2)}%</>,
   },
   {
     key: "commission",
