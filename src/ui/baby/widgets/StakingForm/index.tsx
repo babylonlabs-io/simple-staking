@@ -6,6 +6,7 @@ import { useStakingState } from "@/ui/baby/state/StakingState";
 import { StakingModal } from "@/ui/baby/widgets/StakingModal";
 import { SubmitButton } from "@/ui/baby/widgets/SubmitButton";
 import { ValidatorField } from "@/ui/baby/widgets/ValidatorField";
+import { FormAlert } from "@/ui/common/components/Multistaking/MultistakingForm/FormAlert";
 
 interface FormFields {
   amount: number;
@@ -13,7 +14,13 @@ interface FormFields {
   feeAmount: number;
 }
 
-export default function StakingForm() {
+interface StakingFormProps {
+  isGeoBlocked?: boolean;
+}
+
+export default function StakingForm({
+  isGeoBlocked = false,
+}: StakingFormProps) {
   const {
     loading,
     formSchema,
@@ -41,8 +48,9 @@ export default function StakingForm() {
       <ValidatorField />
       <FeeField babyPrice={babyPrice} calculateFee={calculateFee} />
 
-      <SubmitButton disabled={loading} />
+      <SubmitButton disabled={loading} isGeoBlocked={isGeoBlocked} />
       <StakingModal />
+      <FormAlert address={undefined} isGeoBlocked={isGeoBlocked} />
     </Form>
   );
 }

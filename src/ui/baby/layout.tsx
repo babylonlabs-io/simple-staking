@@ -23,41 +23,31 @@ import StakingForm from "./widgets/StakingForm";
 type TabId = "stake" | "activity" | "rewards";
 
 export default function BabyLayout() {
+  return (
+    <PendingOperationsProvider>
+      <BabyLayoutContent />
+    </PendingOperationsProvider>
+  );
+}
+
+function BabyLayoutContent() {
   const [activeTab, setActiveTab] = useState<TabId>("stake");
   const { connected } = useWalletConnect();
   const { isGeoBlocked, isLoading } = useHealthCheck();
   const { bech32Address } = useCosmosWallet();
   const isConnected = connected && !isGeoBlocked && !isLoading;
+  useEffect(() => {
+    if (!connected) {
+      setActiveTab("stake");
+    }
+  }, [connected]);
 
-  return (
-    <PendingOperationsProvider>
-      <BabyLayoutContent
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        isConnected={isConnected}
-        bech32Address={bech32Address}
-        connected={connected}
-        isGeoBlocked={isGeoBlocked}
-      />
-    </PendingOperationsProvider>
-  );
-}
+  useEffect(() => {
+    if (isGeoBlocked && (activeTab === "activity" || activeTab === "rewards")) {
+      setActiveTab("stake");
+    }
+  }, [isGeoBlocked, activeTab]);
 
-function BabyLayoutContent({
-  activeTab,
-  setActiveTab,
-  isConnected,
-  bech32Address,
-  connected,
-  isGeoBlocked,
-}: {
-  activeTab: TabId;
-  setActiveTab: (tab: TabId) => void;
-  isConnected: boolean;
-  bech32Address: string | undefined;
-  connected: boolean;
-  isGeoBlocked: boolean;
-}) {
   // Enable epoch polling to refetch delegations when epoch changes
   useEpochPolling(bech32Address);
 
@@ -89,23 +79,11 @@ function BabyLayoutContent({
     );
   };
 
-  useEffect(() => {
-    if (!connected) {
-      setActiveTab("stake");
-    }
-  }, [connected, setActiveTab]);
-
-  useEffect(() => {
-    if (isGeoBlocked && (activeTab === "activity" || activeTab === "rewards")) {
-      setActiveTab("stake");
-    }
-  }, [isGeoBlocked, activeTab, setActiveTab]);
-
   const tabItems = [
     {
       id: "stake",
       label: "Stake",
-      content: <StakingForm />,
+      content: <StakingForm isGeoBlocked={isGeoBlocked} />,
     },
     ...(isConnected
       ? [
@@ -131,7 +109,7 @@ function BabyLayoutContent({
     {
       id: "stake",
       label: "Stake",
-      content: <StakingForm />,
+      content: <StakingForm isGeoBlocked={isGeoBlocked} />,
     },
   ];
 
@@ -150,7 +128,7 @@ function BabyLayoutContent({
         <DelegationState>
           <RewardState>
             <Content>
-              <AuthGuard fallback={fallbackContent}>
+              <AuthGuard fallback={fallbackContent} geoBlocked={isGeoBlocked}>
                 <Container
                   as="main"
                   className="flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"

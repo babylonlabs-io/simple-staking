@@ -14,11 +14,7 @@ import { SubmitButton } from "./SubmitButton";
 
 export function MultistakingFormContent() {
   const { address } = useBTCWallet();
-  const {
-    stakingInfo,
-    blocked: isGeoBlocked,
-    errorMessage: geoBlockMessage,
-  } = useStakingState();
+  const { stakingInfo, blocked: isGeoBlocked } = useStakingState();
 
   return (
     <>
@@ -37,15 +33,11 @@ export function MultistakingFormContent() {
         <AmountSection />
         <StakingFeesSection />
 
-        <AuthGuard fallback={<ConnectButton />}>
+        <AuthGuard fallback={<ConnectButton />} geoBlocked={isGeoBlocked}>
           <SubmitButton />
         </AuthGuard>
 
-        <FormAlert
-          address={address}
-          isGeoBlocked={isGeoBlocked}
-          geoBlockMessage={geoBlockMessage}
-        />
+        <FormAlert address={address} isGeoBlocked={isGeoBlocked} />
       </div>
 
       <MultistakingModal />
