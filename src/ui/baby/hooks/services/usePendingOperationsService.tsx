@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 
+import { network } from "@/ui/common/config/network/bbn";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 
@@ -27,7 +28,7 @@ interface PendingOperationStorage {
 }
 
 const getPendingOperationsKey = (walletAddress: string) =>
-  `baby-pending-operations-${walletAddress}`;
+  `baby-pending-operations-${network}-${walletAddress}`;
 
 // Create the context
 const PendingOperationsContext = createContext<ReturnType<
@@ -167,13 +168,13 @@ function usePendingOperationsServiceInternal() {
   // Cleanup function to remove all pending operations from localStorage when epoch changes
   const cleanupAllPendingOperationsFromStorage = useCallback(() => {
     try {
-      // Get all localStorage keys that match our pattern
+      // Get all localStorage keys that match our pattern for the current network
       const allKeys = Object.keys(localStorage);
       const pendingOperationKeys = allKeys.filter((key) =>
-        key.startsWith("baby-pending-operations-"),
+        key.startsWith(`baby-pending-operations-${network}-`),
       );
 
-      // Remove all pending operations for all wallet addresses
+      // Remove all pending operations for all wallet addresses on the current network
       pendingOperationKeys.forEach((storageKey) => {
         localStorage.removeItem(storageKey);
       });

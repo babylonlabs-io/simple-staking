@@ -1,3 +1,5 @@
+// TODO: Below config is not in use yet.
+// This is a placeholder for future code refactoring purposes.
 export default {
   api: {
     baseUrl:
