@@ -50,7 +50,7 @@ export default function StakingForm({
 
       <SubmitButton disabled={loading} isGeoBlocked={isGeoBlocked} />
       <StakingModal />
-      <FormAlert address={undefined} isGeoBlocked={isGeoBlocked} />
+      <FormAlert isGeoBlocked={isGeoBlocked} />
     </Form>
   );
 }

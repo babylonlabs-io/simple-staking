@@ -5,7 +5,7 @@ import { STAKING_DISABLED } from "@/ui/common/constants";
 import { GEO_BLOCK_MESSAGE } from "@/ui/common/types/services/healthCheck";
 
 interface FormAlertProps {
-  address: string | undefined;
+  address?: string;
   isGeoBlocked: boolean;
 }
 
