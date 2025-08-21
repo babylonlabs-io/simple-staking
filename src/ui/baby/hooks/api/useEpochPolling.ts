@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
-import { getCurrentBabylonEpoch } from "@/ui/common/api/getCurrentEpoch";
+import babylon from "@/infrastructure/babylon";
 import { ONE_MINUTE } from "@/ui/common/constants";
 
 import { usePendingOperationsService } from "../services/usePendingOperationsService";
@@ -19,7 +19,11 @@ export function useEpochPolling(address?: string) {
 
   const { data: currentEpoch } = useQuery<number, Error>({
     queryKey: [BABYLON_CURRENT_EPOCH_KEY],
-    queryFn: () => getCurrentBabylonEpoch(),
+    queryFn: async () => {
+      const client = await babylon.client();
+      const { currentEpoch } = await client.baby.getCurrentEpoch();
+      return currentEpoch;
+    },
     refetchInterval: ONE_MINUTE,
     // Only poll if we have an address (user is connected)
     enabled: Boolean(address),
