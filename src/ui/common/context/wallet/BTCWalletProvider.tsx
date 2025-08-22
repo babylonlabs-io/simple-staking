@@ -254,10 +254,20 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
     () => ({
       getAddress: async () => btcWalletProvider?.getAddress() ?? "",
       getPublicKeyHex: async () => btcWalletProvider?.getPublicKeyHex() ?? "",
-      signPsbt: async (psbtHex: string, options?: SignPsbtOptions) =>
-        btcWalletProvider?.signPsbt(psbtHex, options) ?? "",
-      signPsbts: async (psbtsHexes: string[], options?: SignPsbtOptions[]) =>
-        btcWalletProvider?.signPsbts(psbtsHexes, options) ?? [],
+      signPsbt: async (psbtHex: string, options?: SignPsbtOptions) => {
+        console.log("[PSBT Signing Step] PSBT Hex:", psbtHex);
+        return btcWalletProvider?.signPsbt(psbtHex, options) ?? "";
+      },
+      signPsbts: async (psbtsHexes: string[], options?: SignPsbtOptions[]) => {
+        console.log(
+          "[Multiple PSBT Signing Step] Number of PSBTs:",
+          psbtsHexes.length,
+        );
+        psbtsHexes.forEach((psbtHex, index) => {
+          console.log(`[PSBT Signing Step ${index + 1}] PSBT Hex:`, psbtHex);
+        });
+        return btcWalletProvider?.signPsbts(psbtsHexes, options) ?? [];
+      },
       getNetwork: async () =>
         btcWalletProvider?.getNetwork() ?? ({} as Network),
       signMessage: async (message: string, type: "ecdsa" | "bip322-simple") =>
