@@ -55,7 +55,7 @@ export const finalityProviderColumns = [
   },
   {
     key: "btcPk",
-    header: `${coinSymbol} PK`,
+    header: "BTC PK",
     render: (_: unknown, row?: FinalityProvider) => {
       if (!row?.btcPk) return null;
       return <Hash value={row.btcPk} address small noFade />;
