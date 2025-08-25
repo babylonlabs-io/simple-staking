@@ -77,6 +77,16 @@ export interface StakingExpansionState {
   expansionHistoryTargetDelegation: DelegationWithFP | null;
   /** Computed state: true when any expansion-related modal is open */
   isExpansionModalOpen: boolean;
+  /** Whether the verified expansion modal is open */
+  verifiedExpansionModalOpen: boolean;
+  /** Set verified expansion modal open state */
+  setVerifiedExpansionModalOpen: (open: boolean) => void;
+  /** Selected delegation for filtering verified expansions */
+  selectedDelegationForVerifiedModal: DelegationWithFP | null;
+  /** Set selected delegation for verified modal */
+  setSelectedDelegationForVerifiedModal: (
+    delegation: DelegationWithFP | null,
+  ) => void;
 
   // Core actions
   /** Navigate to a specific step in the expansion flow */
@@ -109,6 +119,16 @@ export interface StakingExpansionState {
   canAddMoreBsns: () => boolean;
   /** Check if expansion is possible for a given delegation */
   canExpand: (delegation: { finalityProviderBtcPksHex: string[] }) => boolean;
+
+  // Expansion storage functions
+  /** List of expansion delegations (pending and from API) */
+  expansions: DelegationV2[];
+  /** Add a pending expansion to local storage */
+  addPendingExpansion: (expansion: any) => void;
+  /** Update expansion status in local storage */
+  updateExpansionStatus: (id: string, status: any) => void;
+  /** Refetch expansions from API to trigger cleanup */
+  refetchExpansions: () => Promise<void>;
 }
 
 /**

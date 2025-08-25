@@ -6,7 +6,6 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 import { useLogger } from "@/ui/common/hooks/useLogger";
-import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   StakingExpansionStep,
@@ -96,14 +95,17 @@ const buildExpansionInput = (
  * Handles the complete expansion workflow from fee calculation to transaction submission.
  */
 export function useStakingExpansionService() {
-  const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
-    useStakingExpansionState();
-  const { sendBbnTx } = useBbnTransaction();
   const {
-    addDelegation,
-    updateDelegationStatus,
-    refetch: refetchDelegations,
-  } = useDelegationV2State();
+    setFormData,
+    goToStep,
+    setProcessing,
+    setVerifiedDelegation,
+    reset,
+    addPendingExpansion,
+    updateExpansionStatus,
+    refetchExpansions,
+  } = useStakingExpansionState();
+  const { sendBbnTx } = useBbnTransaction();
   const {
     estimateStakingExpansionFee,
     createStakingExpansionEoi,
@@ -235,7 +237,7 @@ export function useStakingExpansionService() {
           paramsVersion: formData.originalDelegation.paramsVersion || 0,
         };
 
-        addDelegation(pendingDelegation);
+        addPendingExpansion(pendingDelegation);
         goToStep(StakingExpansionStep.VERIFYING);
 
         // Poll for verification - same as regular staking flow
@@ -246,7 +248,7 @@ export function useStakingExpansionService() {
         );
 
         setVerifiedDelegation(delegation as DelegationV2);
-        refetchDelegations();
+        refetchExpansions();
         goToStep(StakingExpansionStep.VERIFIED);
         setProcessing(false);
       } catch (error) {
@@ -263,8 +265,8 @@ export function useStakingExpansionService() {
       setProcessing,
       setVerifiedDelegation,
       goToStep,
-      addDelegation,
-      refetchDelegations,
+      addPendingExpansion,
+      refetchExpansions,
       publicKeyNoCoord,
       logger,
       handleError,
@@ -346,8 +348,8 @@ export function useStakingExpansionService() {
           covenantExpansionSignatures,
         );
 
-        // Update delegation status to pending BTC confirmation
-        updateDelegationStatus(
+        // Update expansion status to pending BTC confirmation
+        updateExpansionStatus(
           delegation.stakingTxHashHex,
           DelegationState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
         );
@@ -369,7 +371,7 @@ export function useStakingExpansionService() {
       logger,
       handleError,
       submitStakingExpansionTx,
-      updateDelegationStatus,
+      updateExpansionStatus,
       reset,
     ],
   );

@@ -9,7 +9,9 @@ import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import iconBSNFp from "@/ui/common/assets/expansion-bsn-fp.svg";
 import iconHistory from "@/ui/common/assets/expansion-history.svg";
 import iconRenew from "@/ui/common/assets/expansion-renew.svg";
+import iconVerified from "@/ui/common/assets/expansion-verified.svg";
 import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
+import { useVerifiedStakingExpansionService } from "@/ui/common/hooks/services/useVerifiedStakingExpansionService";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
@@ -34,6 +36,10 @@ export function StakeExpansionSection({
   } = useStakingExpansionState();
   const { delegations } = useDelegationV2State();
   const { getHistoryCount } = useExpansionHistoryService();
+  const {
+    openVerifiedExpansionModalForDelegation,
+    getVerifiedExpansionInfoForDelegation,
+  } = useVerifiedStakingExpansionService();
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
   const canExpandDelegation = canExpand(delegation);
@@ -97,9 +103,21 @@ export function StakeExpansionSection({
     }
   };
 
+  /**
+   * Handle verified expansion button click.
+   */
+  const handleVerifiedExpansion = () => {
+    openVerifiedExpansionModalForDelegation(delegation);
+  };
+
   // Calculate actual expansion history count
   const expansionHistoryCount = getHistoryCount(
     delegations,
+    delegation.stakingTxHashHex,
+  );
+
+  // Get verified expansion info for this specific delegation
+  const delegationVerifiedExpansionInfo = getVerifiedExpansionInfoForDelegation(
     delegation.stakingTxHashHex,
   );
 
@@ -147,6 +165,18 @@ export function StakeExpansionSection({
               onClick={handleExpansionHistory}
               disabled={expansionHistoryCount === 0 || processing}
             />
+            {delegationVerifiedExpansionInfo.hasVerifiedExpansions && (
+              <ExpansionButton
+                Icon={iconVerified}
+                text="Verified Stake Expansion"
+                counter={`${delegationVerifiedExpansionInfo.count}`}
+                onClick={handleVerifiedExpansion}
+                disabled={
+                  !delegationVerifiedExpansionInfo.hasVerifiedExpansions ||
+                  processing
+                }
+              />
+            )}
           </div>
         </AccordionDetails>
       </Accordion>

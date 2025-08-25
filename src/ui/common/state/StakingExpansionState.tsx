@@ -2,11 +2,16 @@ import { EventData, RegistrationStep } from "@babylonlabs-io/btc-staking-ts";
 import {
   useCallback,
   useEffect,
+  useMemo,
   useState,
   type PropsWithChildren,
 } from "react";
 
 import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
+import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
+import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
+import { useDelegationsV2 } from "@/ui/common/hooks/client/api/useDelegationsV2";
+import { useDelegationStorage } from "@/ui/common/hooks/storage/useDelegationStorage";
 import { useEventBus } from "@/ui/common/hooks/useEventBus";
 import { useMaxFinalityProviders } from "@/ui/common/hooks/useMaxFinalityProviders";
 import type {
@@ -14,6 +19,7 @@ import type {
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
+import { getExpansionsLocalStorageKey } from "@/ui/common/utils/local_storage/getExpansionsLocalStorageKey";
 
 import {
   StakingExpansionStep,
@@ -49,10 +55,18 @@ const { StateProvider, useState: useStakingExpansionState } =
     openExpansionHistoryModal: () => {},
     closeExpansionHistoryModal: () => {},
     isExpansionModalOpen: false,
+    verifiedExpansionModalOpen: false,
+    setVerifiedExpansionModalOpen: () => {},
+    selectedDelegationForVerifiedModal: null,
+    setSelectedDelegationForVerifiedModal: () => {},
     maxFinalityProviders: DEFAULT_MAX_FINALITY_PROVIDERS,
     getAvailableBsnSlots: () => 0,
     canAddMoreBsns: () => false,
     canExpand: () => false,
+    expansions: [],
+    addPendingExpansion: () => {},
+    updateExpansionStatus: () => {},
+    refetchExpansions: async () => {},
   });
 
 /**
@@ -62,6 +76,21 @@ const { StateProvider, useState: useStakingExpansionState } =
 export function StakingExpansionState({ children }: PropsWithChildren) {
   const eventBus = useEventBus();
   const maxFinalityProviders = useMaxFinalityProviders();
+  const { publicKeyNoCoord } = useBTCWallet();
+  const { bech32Address } = useCosmosWallet();
+
+  // Fetch delegations from API for expansion storage sync
+  const { data, refetch } = useDelegationsV2(bech32Address);
+
+  // Expansion-specific storage using the same pattern as regular delegations
+  const {
+    delegations: expansions,
+    addPendingDelegation: addPendingExpansion,
+    updateDelegationStatus: updateExpansionStatus,
+  } = useDelegationStorage(
+    getExpansionsLocalStorageKey(publicKeyNoCoord),
+    data?.delegations,
+  );
 
   const [hasError, setHasError] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -81,6 +110,12 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   const [
     expansionHistoryTargetDelegation,
     setExpansionHistoryTargetDelegation,
+  ] = useState<DelegationWithFP | null>(null);
+  const [verifiedExpansionModalOpen, setVerifiedExpansionModalOpen] =
+    useState(false);
+  const [
+    selectedDelegationForVerifiedModal,
+    setSelectedDelegationForVerifiedModal,
   ] = useState<DelegationWithFP | null>(null);
 
   useEffect(() => {
@@ -119,6 +154,8 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     setExpansionStepOptions(undefined);
     setExpansionHistoryModalOpen(false);
     setExpansionHistoryTargetDelegation(null);
+    setVerifiedExpansionModalOpen(false);
+    setSelectedDelegationForVerifiedModal(null);
   }, []);
 
   /**
@@ -166,33 +203,81 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   }, []);
 
   // Computed state: true when any expansion-related modal is open
-  const isExpansionModalOpen = Boolean(step) || expansionHistoryModalOpen;
+  const isExpansionModalOpen =
+    Boolean(step) || expansionHistoryModalOpen || verifiedExpansionModalOpen;
 
-  const state: StakingExpansionState = {
-    hasError,
-    processing,
-    errorMessage,
-    formData,
-    step,
-    verifiedDelegation,
-    goToStep,
-    setProcessing,
-    setFormData,
-    setVerifiedDelegation,
-    reset,
-    expansionStepOptions,
-    setExpansionStepOptions,
-    expansionHistoryModalOpen,
-    expansionHistoryTargetDelegation,
-    setExpansionHistoryModalOpen,
-    openExpansionHistoryModal,
-    closeExpansionHistoryModal,
-    isExpansionModalOpen,
-    maxFinalityProviders,
-    getAvailableBsnSlots,
-    canAddMoreBsns,
-    canExpand,
-  };
+  const refetchExpansions = useCallback(async () => {
+    await refetch();
+  }, [refetch]);
+
+  const state: StakingExpansionState = useMemo(
+    () => ({
+      hasError,
+      processing,
+      errorMessage,
+      formData,
+      step,
+      verifiedDelegation,
+      goToStep,
+      setProcessing,
+      setFormData,
+      setVerifiedDelegation,
+      reset,
+      expansionStepOptions,
+      setExpansionStepOptions,
+      expansionHistoryModalOpen,
+      expansionHistoryTargetDelegation,
+      setExpansionHistoryModalOpen,
+      openExpansionHistoryModal,
+      closeExpansionHistoryModal,
+      isExpansionModalOpen,
+      verifiedExpansionModalOpen,
+      setVerifiedExpansionModalOpen,
+      selectedDelegationForVerifiedModal,
+      setSelectedDelegationForVerifiedModal,
+      maxFinalityProviders,
+      getAvailableBsnSlots,
+      canAddMoreBsns,
+      canExpand,
+      expansions,
+      addPendingExpansion,
+      updateExpansionStatus,
+      refetchExpansions,
+    }),
+    [
+      hasError,
+      processing,
+      errorMessage,
+      formData,
+      step,
+      verifiedDelegation,
+      goToStep,
+      setProcessing,
+      setFormData,
+      setVerifiedDelegation,
+      reset,
+      expansionStepOptions,
+      setExpansionStepOptions,
+      expansionHistoryModalOpen,
+      expansionHistoryTargetDelegation,
+      setExpansionHistoryModalOpen,
+      openExpansionHistoryModal,
+      closeExpansionHistoryModal,
+      isExpansionModalOpen,
+      verifiedExpansionModalOpen,
+      setVerifiedExpansionModalOpen,
+      selectedDelegationForVerifiedModal,
+      setSelectedDelegationForVerifiedModal,
+      maxFinalityProviders,
+      getAvailableBsnSlots,
+      canAddMoreBsns,
+      canExpand,
+      expansions,
+      addPendingExpansion,
+      updateExpansionStatus,
+      refetchExpansions,
+    ],
+  );
 
   return <StateProvider value={state}>{children}</StateProvider>;
 }
