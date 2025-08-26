@@ -10,6 +10,7 @@ import {
 } from "yup";
 
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
 import { useMaxFinalityProviders } from "@/ui/common/hooks/useMaxFinalityProviders";
@@ -24,6 +25,8 @@ import { useBalanceState } from "./BalanceState";
 import { StakingModalPage, useStakingState } from "./StakingState";
 
 const { coinName } = getNetworkConfigBTC();
+
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 export interface MultistakingFormFields {
   finalityProviders: Record<string, string>;
@@ -78,6 +81,20 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .max(
               maxFinalityProviders,
               `Maximum ${maxFinalityProviders} finality providers allowed.`,
+            )
+            .test(
+              "containsBbnProvider",
+              "Add Babylon Finality Provider",
+              (_, context) => {
+                const original = context.originalValue as
+                  | Record<string, string>
+                  | undefined;
+                if (!original) return false;
+                return Object.prototype.hasOwnProperty.call(
+                  original,
+                  BBN_CHAIN_ID,
+                );
+              },
             ),
         },
         {

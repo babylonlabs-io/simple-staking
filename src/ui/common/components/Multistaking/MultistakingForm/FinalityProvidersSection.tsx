@@ -64,7 +64,11 @@ export function FinalityProvidersSection() {
         } as SelectedProviderItemLocal;
       })
       .filter(Boolean) as SelectedProviderItemLocal[];
-  }, [selectedProviderMap, bsnList, finalityProviderMap]);
+  }, [selectedProviderMap, bsnList, finalityProviderMap]).sort((a, b) => {
+    if (a.bsnId === BBN_CHAIN_ID) return -1;
+    if (b.bsnId === BBN_CHAIN_ID) return 1;
+    return 0;
+  });
 
   const handleAdd = (bsnId: string, providerPk: string) => {
     const updated = { ...selectedProviderMap, [bsnId]: providerPk };
