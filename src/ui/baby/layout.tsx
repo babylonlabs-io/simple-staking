@@ -8,6 +8,7 @@ import { ValidatorState } from "@/ui/baby/state/ValidatorState";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { Container } from "@/ui/common/components/Container/Container";
 import { Content } from "@/ui/common/components/Content/Content";
+import { FAQ } from "@/ui/common/components/FAQ/FAQ";
 import { Section } from "@/ui/common/components/Section/Section";
 import { Tabs } from "@/ui/common/components/Tabs";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
@@ -20,7 +21,7 @@ import { useEpochPolling } from "./hooks/api/useEpochPolling";
 import { PendingOperationsProvider } from "./hooks/services/usePendingOperationsService";
 import StakingForm from "./widgets/StakingForm";
 
-type TabId = "stake" | "activity" | "rewards";
+type TabId = "stake" | "activity" | "rewards" | "faqs";
 
 export default function BabyLayout() {
   return (
@@ -103,6 +104,11 @@ function BabyLayoutContent() {
           },
         ]
       : []),
+    {
+      id: "faqs",
+      label: "FAQs",
+      content: <FAQ variant="baby" />,
+    },
   ];
 
   const fallbackTabItems = [
@@ -110,6 +116,11 @@ function BabyLayoutContent() {
       id: "stake",
       label: "Stake",
       content: <StakingForm isGeoBlocked={isGeoBlocked} />,
+    },
+    {
+      id: "faqs",
+      label: "FAQs",
+      content: <FAQ variant="baby" />,
     },
   ];
 

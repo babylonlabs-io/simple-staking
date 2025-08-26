@@ -53,7 +53,7 @@ const Home = () => {
     {
       id: "faqs",
       label: "FAQs",
-      content: <FAQ />,
+      content: <FAQ variant="btc" />,
     },
   ];
 
