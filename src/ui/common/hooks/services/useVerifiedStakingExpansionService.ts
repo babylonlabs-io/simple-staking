@@ -21,7 +21,6 @@ export function useVerifiedStakingExpansionService() {
     selectedDelegationForVerifiedModal,
     setSelectedDelegationForVerifiedModal,
   } = useStakingExpansionState();
-  // const { stakeDelegationExpansion } = useStakingExpansionService();
 
   /**
    * Get all verified staking expansions.
