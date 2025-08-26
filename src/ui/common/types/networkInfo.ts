@@ -9,10 +9,6 @@ export interface NetworkUpgradeConfig {
   pop?: PopUpgradeConfig[];
 }
 
-export interface AllowList {
-  isExpired: boolean;
-}
-
 export interface BbnStakingParamsVersion extends StakingParams {
   version: number;
   minCommissionRate: string;
