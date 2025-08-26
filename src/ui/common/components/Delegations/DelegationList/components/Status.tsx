@@ -34,7 +34,8 @@ const { coinName } = getNetworkConfigBTC();
 const STATUSES: Record<string, StatusAdapter> = {
   [State.PENDING]: () => ({
     label: "Pending",
-    tooltip: "Stake is pending verification",
+    tooltip:
+      "Your delegation is still pending. On average, staking transactions are fully confirmed by the Bitcoin chain in 5 hours, depending on Bitcoin block times. Longer delays might may be due to slow Bitcoin block times or using low network fees.",
   }),
   [State.VERIFIED]: () => ({
     label: "Verified",
