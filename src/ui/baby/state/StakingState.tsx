@@ -89,7 +89,7 @@ function StakingState({ children }: PropsWithChildren) {
   const logger = useLogger();
   const babyPrice = usePrice("BABY");
 
-  const minAmountValidator = useMemo(() => createMinAmountValidator(1), []);
+  const minAmountValidator = useMemo(() => createMinAmountValidator(0.01), []);
   // Subtract the pending stake amount from the balance
   const { getTotalPendingStake } = usePendingOperationsService();
   const availableBalance = balance - getTotalPendingStake();
@@ -111,7 +111,7 @@ function StakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking amount must be greater than 0.")
             .test(
               "invalidMinAmount",
-              "Minimum staking amount is 1 BABY",
+              "Minimum staking amount is 0.01 BABY",
               (_, context) => minAmountValidator(context.originalValue),
             )
             .test(
