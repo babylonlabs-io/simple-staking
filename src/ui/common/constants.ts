@@ -85,6 +85,3 @@ export enum BaseStakingStep {
   FEEDBACK_SUCCESS = "feedback-success",
   FEEDBACK_CANCEL = "feedback-cancel",
 }
-
-export const STAKE_EXPANSION_MESSAGE =
-  "New stakes can only delegate to Babylon Genesis. Multi-Staking is currently unavailable due to allow list restrictions.";

@@ -35,9 +35,6 @@ describe("getNetworkInfo", () => {
     // Verify the result structure and transformation
     expect(result).toEqual({
       networkUpgrade: undefined,
-      stakingStatus: {
-        isMultiStakingAllowListInForce: true,
-      },
       params: {
         bbnStakingParams: {
           latestParam: expect.objectContaining({

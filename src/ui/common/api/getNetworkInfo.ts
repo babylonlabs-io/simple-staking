@@ -25,7 +25,7 @@ interface StakingStatus {
 }
 
 interface NetworkInfoAPI {
-  staking_status: StakingStatus;
+  staking_status?: StakingStatus;
   params: {
     bbn: BbnParams[];
     btc: BtcCheckpointParams[];
@@ -61,11 +61,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     "Error getting network info",
   );
   const { data } = response;
-  const {
-    params,
-    staking_status: { staking_expansion_allow_list },
-    network_upgrade,
-  } = data.data;
+  const { params, network_upgrade } = data.data;
 
   const stakingVersions = (params.bbn || [])
     .sort((a, b) => a.version - b.version)
@@ -153,14 +149,7 @@ export const getNetworkInfo = async (): Promise<NetworkInfo> => {
     throw clientError;
   }
 
-  const isMultiStakingAllowListInForce = staking_expansion_allow_list
-    ? !staking_expansion_allow_list.is_expired
-    : false;
-
   return {
-    stakingStatus: {
-      isMultiStakingAllowListInForce,
-    },
     params: {
       bbnStakingParams: {
         latestParam: latestStakingParam,

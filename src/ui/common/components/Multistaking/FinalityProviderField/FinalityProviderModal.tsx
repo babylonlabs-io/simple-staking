@@ -9,8 +9,6 @@ import { useState } from "react";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { FinalityProviders } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviders";
 
-import { UnavailableWarning } from "../MultistakingForm/UnavailableWarning";
-
 interface Props {
   open: boolean;
   defaultFinalityProvider?: string;
@@ -49,7 +47,7 @@ export const FinalityProviderModal = ({
           by validating and finalising transactions. Select one to delegate your
           stake.
         </div>
-        <UnavailableWarning />
+
         <div
           className="overflow-x-auto flex flex-col gap-2"
           style={{ maxHeight: "min(60vh, 500px)" }}
