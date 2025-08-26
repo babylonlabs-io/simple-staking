@@ -41,4 +41,21 @@ describe("durationTillNow", () => {
     pastTime = new Date("2024-01-01T11:59:59.999Z").toISOString();
     expect(durationTillNow(pastTime, currentTime)).toBe("Just now");
   });
+
+  it("should return only days in coarse mode", () => {
+    const pastTime = new Date("2023-12-26T05:05:00Z").toISOString();
+    expect(durationTillNow(pastTime, currentTime, false)).toBe("6 days ago");
+  });
+
+  it("should return hours in coarse mode when under a day", () => {
+    const pastTime = new Date("2024-01-01T02:00:00Z").toISOString();
+    expect(durationTillNow(pastTime, currentTime, false)).toBe("10 hours ago");
+  });
+
+  it("should return minutes in coarse mode when under an hour", () => {
+    const pastTime = new Date("2024-01-01T11:15:00Z").toISOString();
+    expect(durationTillNow(pastTime, currentTime, false)).toBe(
+      "45 minutes ago",
+    );
+  });
 });

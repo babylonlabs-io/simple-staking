@@ -56,7 +56,7 @@ export function transformDelegationToActivityCard(
     {
       label: "Inception",
       value: delegation.bbnInceptionTime
-        ? durationTillNow(delegation.bbnInceptionTime, Date.now())
+        ? durationTillNow(delegation.bbnInceptionTime, Date.now(), false)
         : "N/A",
     },
     {
