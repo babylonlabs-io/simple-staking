@@ -116,7 +116,7 @@ function BabyLayoutContent() {
   const fallbackContent = (
     <Container
       as="main"
-      className="flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
+      className="flex flex-col gap-[3rem] pb-24 max-w-[760px] mx-auto flex-1"
     >
       <Tabs items={fallbackTabItems} defaultActiveTab="stake" />
     </Container>
@@ -131,7 +131,7 @@ function BabyLayoutContent() {
               <AuthGuard fallback={fallbackContent} geoBlocked={isGeoBlocked}>
                 <Container
                   as="main"
-                  className="flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
+                  className="flex flex-col gap-[3rem] pb-24 max-w-[760px] mx-auto flex-1"
                 >
                   <Tabs
                     items={tabItems}
