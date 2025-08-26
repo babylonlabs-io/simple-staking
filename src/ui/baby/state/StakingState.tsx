@@ -106,9 +106,9 @@ function StakingState({ children }: PropsWithChildren) {
           field: "amount",
           schema: number()
             .transform(formatBabyStakingAmount)
-            .typeError("Staking amount must be a valid number.")
+            .typeError("Staking amount must be a valid number")
             .required("Enter BABY Amount to Stake")
-            .moreThan(0, "Staking amount must be greater than 0.")
+            .moreThan(0, "Staking amount must be greater than 0")
             .test(
               "invalidMinAmount",
               "Minimum staking amount is 0.01 BABY",
@@ -121,7 +121,7 @@ function StakingState({ children }: PropsWithChildren) {
             )
             .test(
               "invalidFormat",
-              "Staking amount must have no more than 6 decimal points.",
+              "Staking amount must have no more than 6 decimal points",
               (_, context) => validateDecimalPoints(context.originalValue, 6),
             ),
         },
