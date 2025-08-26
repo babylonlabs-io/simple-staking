@@ -7,7 +7,10 @@ import { useState } from "react";
 import babyTokenIcon from "@/ui/common/assets/baby-token.svg";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { Section } from "@/ui/common/components/Section/Section";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import {
+  network as currentNetwork,
+  getNetworkConfigBBN,
+} from "@/ui/common/config/network/bbn";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useRewardsService } from "@/ui/common/hooks/services/useRewardsService";
 import { useRewardsState } from "@/ui/common/state/RewardState";
@@ -104,6 +107,12 @@ export function Rewards() {
 
   const claimDisabled = !rewardBalance || processing;
 
+  const baseWarning =
+    "Processing your claim will take approximately 2 blocks to complete.";
+  const testTokenNote = " BABY is a test token without any real world value.";
+  const isMainnet = currentNetwork === "mainnet";
+  const warningText = isMainnet ? baseWarning : baseWarning + testTokenNote;
+
   return (
     <AuthGuard>
       <Section title="Rewards" titleClassName="md:text-[1.25rem] mt-10">
@@ -120,7 +129,7 @@ export function Rewards() {
         title="Claim Rewards"
         onClose={handleClose}
         onProceed={handleProceed}
-        warning="Processing your claim will take approximately 2 blocks to complete. BABY is a test token without any real world value."
+        warning={warningText}
         bsns={rewards.map((r) => ({
           icon: <img src={r.currencyIcon} className="size-6" />,
           name: r.currencyName,
