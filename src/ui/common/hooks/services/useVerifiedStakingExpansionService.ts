@@ -72,16 +72,6 @@ export function useVerifiedStakingExpansionService() {
   }, [expansions, selectedDelegationForVerifiedModal]);
 
   /**
-   * Get count of verified expansions.
-   */
-  const verifiedExpansionCount = verifiedExpansions.length;
-
-  /**
-   * Check if there are any verified expansions.
-   */
-  const hasVerifiedExpansions = verifiedExpansionCount > 0;
-
-  /**
    * Open the verified expansion modal.
    */
   const openVerifiedExpansionModal = useCallback(() => {
@@ -171,8 +161,6 @@ export function useVerifiedStakingExpansionService() {
 
   return {
     verifiedExpansions,
-    verifiedExpansionCount,
-    hasVerifiedExpansions,
     openVerifiedExpansionModal,
     openVerifiedExpansionModalForDelegation,
     closeVerifiedExpansionModal,
