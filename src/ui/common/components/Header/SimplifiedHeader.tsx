@@ -1,25 +1,27 @@
-import { twJoin } from "tailwind-merge";
+import FF from "@/ui/common/utils/FeatureFlagService";
 
 import { Container } from "../Container/Container";
-import { Logo } from "../Logo/Logo";
+import { SmallLogo } from "../Logo/SmallLogo";
+import { Nav } from "../Nav/Nav";
+import { NavItem } from "../Nav/NavItem";
 
-export const SimplifiedHeader = ({
-  isMinimal = false,
-}: {
-  isMinimal?: boolean;
-}) => {
+export const SimplifiedHeader = () => {
   return (
-    <nav className="w-full">
-      <section
-        className={twJoin(
-          "bg-primary-main w-full",
-          isMinimal ? "h-[84px]" : "h-[300px]",
+    <header className="mb-20">
+      <Container className="h-20 flex items-center justify-between relative">
+        <div className="flex items-center">
+          <SmallLogo />
+        </div>
+
+        {FF.IsBabyStakingEnabled && (
+          <div className="absolute left-1/2 transform -translate-x-1/2">
+            <Nav>
+              <NavItem title="BTC Staking" to="/btc" />
+              <NavItem title="BABY Staking" to="/baby" />
+            </Nav>
+          </div>
         )}
-      >
-        <Container className="h-20 p-6 flex items-center justify-between">
-          <Logo />
-        </Container>
-      </section>
-    </nav>
+      </Container>
+    </header>
   );
 };

@@ -15,13 +15,13 @@ interface Props {
 export default function GenericError({
   title = "Oops! Something Went Wrong",
   message = `It looks like we’re experiencing a temporary issue on our end.
-  Our team is already on it, and we’ll have things back to normal as soon as possible. 
+  Our team is already on it, and we’ll have things back to normal as soon as possible.
   Please check back shortly, and thank you for your patience!`,
   image = BitcoinBlock,
 }: Props) {
   return (
     <div className="h-full min-h-svh w-full flex flex-col justify-between">
-      <SimplifiedHeader isMinimal />
+      <SimplifiedHeader />
 
       <Container className="py-12 px-6">
         <div className="flex flex-col items-center justify-center gap-8">
@@ -41,7 +41,7 @@ export default function GenericError({
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => history.go()}
+            onClick={() => (window.location.href = "/")}
           >
             Back to homepage
           </Button>
