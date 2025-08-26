@@ -11,15 +11,10 @@ import { FinalityProvidersSection } from "./FinalityProvidersSection";
 import { FormAlert } from "./FormAlert";
 import { StakingFeesSection } from "./StakingFeesSection";
 import { SubmitButton } from "./SubmitButton";
-import { UnavailableWarning } from "./UnavailableWarning";
 
 export function MultistakingFormContent() {
   const { address } = useBTCWallet();
-  const {
-    stakingInfo,
-    blocked: isGeoBlocked,
-    errorMessage: geoBlockMessage,
-  } = useStakingState();
+  const { stakingInfo, blocked: isGeoBlocked } = useStakingState();
 
   return (
     <>
@@ -38,16 +33,11 @@ export function MultistakingFormContent() {
         <AmountSection />
         <StakingFeesSection />
 
-        <AuthGuard fallback={<ConnectButton />}>
+        <AuthGuard fallback={<ConnectButton />} geoBlocked={isGeoBlocked}>
           <SubmitButton />
         </AuthGuard>
-        <UnavailableWarning />
 
-        <FormAlert
-          address={address}
-          isGeoBlocked={isGeoBlocked}
-          geoBlockMessage={geoBlockMessage}
-        />
+        <FormAlert address={address} isGeoBlocked={isGeoBlocked} />
       </div>
 
       <MultistakingModal />

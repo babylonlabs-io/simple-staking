@@ -1,5 +1,6 @@
 import { type ColumnProps, Avatar, Text } from "@babylonlabs-io/core-ui";
 
+import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 import { Validator } from ".";
@@ -29,7 +30,7 @@ export const columns: ColumnProps<Validator>[] = [
     headerClassName: "w-16",
     cellClassName: "text-right pr-4",
     sorter: (a, b) => a.votingPower - b.votingPower,
-    render: (value) => <>{maxDecimals(value as number, 2)}%</>,
+    render: (value) => <>{maxDecimals((value as number) * 100, 2)}%</>,
   },
   {
     key: "commission",
@@ -37,6 +38,6 @@ export const columns: ColumnProps<Validator>[] = [
     headerClassName: "w-16",
     cellClassName: "text-right pr-4",
     sorter: (a, b) => a.commission - b.commission,
-    render: (value) => <>{maxDecimals(value as number, 2)}%</>,
+    render: (value) => <>{formatCommissionPercentage(value as number)}</>,
   },
 ];

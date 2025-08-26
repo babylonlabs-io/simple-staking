@@ -19,6 +19,12 @@ export function StakingModal() {
           onSubmit={submitForm}
         />
       )}
+      {step.name === "signing" && (
+        <LoadingModal
+          title="Signing in progress"
+          description="Please sign the transaction in your wallet to continue"
+        />
+      )}
       {step.name === "loading" && (
         <LoadingModal
           title="Processing"
@@ -27,8 +33,8 @@ export function StakingModal() {
       )}
       {step.name === "success" && (
         <SuccessModal
-          title="Successful"
-          description="Your BABY rewards have been successfully staked"
+          title="Your BABY staking request has been submitted"
+          description="Stakes activate within ~1 hour. Until then, keep the staked amount in your wallet to ensure successful processing."
           onClose={() => {
             closePreview();
             reset();

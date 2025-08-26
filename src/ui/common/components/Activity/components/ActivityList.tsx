@@ -1,274 +1,27 @@
 import { useMemo } from "react";
 
-import bitcoin from "@/ui/common/assets/bitcoin.png";
-import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
-import { Hash } from "@/ui/common/components/Hash/Hash";
-import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
+import { ExpansionHistoryModal } from "@/ui/common/components/ExpansionHistory/ExpansionHistoryModal";
 import { getNetworkConfig } from "@/ui/common/config/network";
-import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import {
-  DELEGATION_ACTIONS as ACTIONS,
-  chainLogos,
-} from "@/ui/common/constants";
-import {
-  ActionType,
-  useDelegationService,
-} from "@/ui/common/hooks/services/useDelegationService";
+import { useDelegationService } from "@/ui/common/hooks/services/useDelegationService";
 import { useStakingManagerService } from "@/ui/common/hooks/services/useStakingManagerService";
+import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
+import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
+  DelegationV2,
   DelegationV2StakingState,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
-import { FinalityProviderState } from "@/ui/common/types/finalityProviders";
-import { satoshiToBtc } from "@/ui/common/utils/btc";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
-import { maxDecimals } from "@/ui/common/utils/maxDecimals";
-import { durationTillNow } from "@/ui/common/utils/time";
 
+import { ActivityCard } from "../../ActivityCard/ActivityCard";
+import { getActionButton } from "../../ActivityCard/utils/actionButtonUtils";
 import {
-  ActivityCard,
-  ActivityCardActionButton,
-  ActivityCardData,
-  ActivityCardDetailItem,
-  ActivityListItemData,
-} from "../../ActivityCard/ActivityCard";
+  ActivityCardTransformOptions,
+  transformDelegationToActivityCard,
+} from "../../ActivityCard/utils/activityCardTransformers";
 import { DelegationModal } from "../../Delegations/DelegationList/components/DelegationModal";
 import { StakingExpansionModalSystem } from "../../StakingExpansion/StakingExpansionModalSystem";
 
 const networkConfig = getNetworkConfig();
-const { coinName } = getNetworkConfigBTC();
-
-const getActionButton = (
-  delegation: DelegationWithFP,
-  onAction: (action: ActionType, delegation: DelegationWithFP) => void,
-  isStakingManagerReady: boolean,
-): ActivityCardActionButton | undefined => {
-  const { state, fp } = delegation;
-
-  // Define action mapping
-  const actionMap: Record<
-    string,
-    Record<string, { action: ActionType; title: string }>
-  > = {
-    [FinalityProviderState.ACTIVE]: {
-      [DelegationV2StakingState.VERIFIED]: {
-        action: ACTIONS.STAKE,
-        title: "Stake",
-      },
-      [DelegationV2StakingState.ACTIVE]: {
-        action: ACTIONS.UNBOND,
-        title: "Unbond",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
-        title: "Withdraw",
-      },
-    },
-    [FinalityProviderState.INACTIVE]: {
-      [DelegationV2StakingState.VERIFIED]: {
-        action: ACTIONS.STAKE,
-        title: "Stake",
-      },
-      [DelegationV2StakingState.ACTIVE]: {
-        action: ACTIONS.UNBOND,
-        title: "Unbond",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
-        title: "Withdraw",
-      },
-    },
-    [FinalityProviderState.JAILED]: {
-      [DelegationV2StakingState.VERIFIED]: {
-        action: ACTIONS.STAKE,
-        title: "Stake",
-      },
-      [DelegationV2StakingState.ACTIVE]: {
-        action: ACTIONS.UNBOND,
-        title: "Unbond",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
-        title: "Withdraw",
-      },
-    },
-    [FinalityProviderState.SLASHED]: {
-      [DelegationV2StakingState.ACTIVE]: {
-        action: ACTIONS.UNBOND,
-        title: "Unbond",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.TIMELOCK_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_TIMELOCK_SLASHING,
-        title: "Withdraw",
-      },
-      [DelegationV2StakingState.EARLY_UNBONDING_SLASHING_WITHDRAWABLE]: {
-        action: ACTIONS.WITHDRAW_ON_EARLY_UNBONDING_SLASHING,
-        title: "Withdraw",
-      },
-    },
-  };
-
-  const actionConfig = actionMap[fp?.state]?.[state];
-  if (!actionConfig) return undefined;
-
-  const isUnbondDisabled =
-    state === DelegationV2StakingState.ACTIVE && !isStakingManagerReady;
-
-  return {
-    label: actionConfig.title,
-    onClick: () => onAction(actionConfig.action, delegation),
-    variant: "contained",
-    size: "medium",
-    className: isUnbondDisabled ? "opacity-50" : "",
-  };
-};
-
-const transformToActivityCard = (
-  delegation: DelegationWithFP,
-  onAction: (action: ActionType, delegation: DelegationWithFP) => void,
-  isStakingManagerReady: boolean,
-): ActivityCardData => {
-  const details: ActivityCardDetailItem[] = [
-    {
-      label: "Status",
-      value: <Status delegation={delegation} showTooltip={false} />,
-    },
-    {
-      label: "Inception",
-      value: delegation.bbnInceptionTime
-        ? durationTillNow(delegation.bbnInceptionTime, Date.now())
-        : "N/A",
-    },
-    {
-      label: "Tx Hash",
-      value: (
-        <Hash
-          value={delegation.stakingTxHashHex}
-          address
-          small
-          noFade
-          size="caption"
-        />
-      ),
-    },
-  ];
-
-  const listItems: {
-    label: string;
-    items: ActivityListItemData[];
-  }[] = [];
-
-  if (delegation.fp?.bsnId) {
-    const bsnLogo = chainLogos[delegation.fp.bsnId] || chainLogos.placeholder;
-    listItems.push({
-      label: "BSN",
-      items: [
-        {
-          icon: bsnLogo,
-          iconAlt: delegation.fp.bsnId,
-          name: delegation.fp.bsnId,
-          id: delegation.fp.bsnId,
-        },
-      ],
-    });
-  }
-
-  // Finality Provider Section
-  if (delegation.fp) {
-    listItems.push({
-      label: "Finality Provider",
-      items: [
-        {
-          icon: (
-            <FinalityProviderLogo
-              logoUrl={delegation.fp.logo_url}
-              rank={delegation.fp.rank}
-              moniker={delegation.fp.description?.moniker}
-              className="w-4 h-4"
-            />
-          ),
-          iconAlt: delegation.fp.description?.moniker || "Finality Provider",
-          name:
-            delegation.fp.description?.moniker ||
-            `Provider ${delegation.fp.rank}`,
-          id: delegation.fp.btcPk,
-        },
-      ],
-    });
-  }
-
-  // Reward Section (placeholder for future implementation)
-  // listItems.push({
-  //   label: "Reward",
-  //   items: [{
-  //   }]
-  // });
-
-  const primaryAction = getActionButton(
-    delegation,
-    onAction,
-    isStakingManagerReady,
-  );
-
-  // Check if expansion section should be shown
-  const showExpansionSection =
-    FeatureFlagService.IsStakingExpansionEnabled &&
-    delegation.state === DelegationV2StakingState.ACTIVE;
-
-  return {
-    formattedAmount: `${maxDecimals(satoshiToBtc(delegation.stakingAmount), 8)} ${coinName}`,
-    icon: bitcoin,
-    iconAlt: "bitcoin",
-    details,
-    listItems: listItems.length > 0 ? listItems : undefined,
-    primaryAction,
-    expansionSection: showExpansionSection ? delegation : undefined,
-  };
-};
 
 export function ActivityList() {
   const {
@@ -285,20 +38,72 @@ export function ActivityList() {
   const { isLoading: isStakingManagerLoading } = useStakingManagerService();
   const isStakingManagerReady = !isStakingManagerLoading;
 
+  const { finalityProviderMap } = useFinalityProviderState();
+
+  const {
+    expansionHistoryModalOpen,
+    expansionHistoryTargetDelegation,
+    closeExpansionHistoryModal,
+  } = useStakingExpansionState();
+
   const activityList = useMemo(() => {
     return delegations
       .filter((delegation) => {
         const { valid } = validations[delegation.stakingTxHashHex];
         return valid;
       })
-      .map((delegation) =>
-        transformToActivityCard(
+      .filter(
+        // Filter out expanded delegations as they are now part of the
+        // expanded delegation. User can find it from delegation history.
+        (delegation) => delegation.state !== DelegationV2StakingState.EXPANDED,
+      )
+      .map((delegation) => {
+        const options: ActivityCardTransformOptions = {
+          showExpansionSection: true,
+        };
+        const cardData = transformDelegationToActivityCard(
           delegation,
+          finalityProviderMap,
+          options,
+        );
+
+        // Create delegation with FP for action button
+        // delegations from useDelegationService are DelegationV2 objects
+        const delegation_v2 = delegation as DelegationV2;
+        // Use the first FP [0] for backward compatibility with action button logic
+        // which expects a single FP to determine button state. The full BSN/FP pairs
+        // are properly displayed in the card's grouped details section
+        const fp =
+          Array.isArray(delegation_v2.finalityProviderBtcPksHex) &&
+          delegation_v2.finalityProviderBtcPksHex.length > 0
+            ? finalityProviderMap.get(
+                delegation_v2.finalityProviderBtcPksHex[0],
+              )
+            : undefined;
+        const delegationWithFP: DelegationWithFP = {
+          ...delegation_v2,
+          fp,
+        } as DelegationWithFP;
+
+        // Add action button if applicable
+        const primaryAction = getActionButton(
+          delegationWithFP,
           openConfirmationModal,
           isStakingManagerReady,
-        ),
-      );
-  }, [delegations, validations, openConfirmationModal, isStakingManagerReady]);
+        );
+
+        return {
+          ...cardData,
+          primaryAction,
+        };
+      });
+  }, [
+    delegations,
+    validations,
+    openConfirmationModal,
+    isStakingManagerReady,
+    finalityProviderMap,
+  ]);
 
   if (isLoading) {
     return (
@@ -341,6 +146,13 @@ export function ActivityList() {
       />
 
       <StakingExpansionModalSystem />
+
+      <ExpansionHistoryModal
+        open={expansionHistoryModalOpen}
+        onClose={closeExpansionHistoryModal}
+        targetDelegation={expansionHistoryTargetDelegation}
+        allDelegations={delegations}
+      />
     </>
   );
 }

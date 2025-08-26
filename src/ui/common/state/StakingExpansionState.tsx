@@ -1,17 +1,32 @@
-import { EventData } from "@babylonlabs-io/btc-staking-ts";
-import { useCallback, useState, type PropsWithChildren } from "react";
+import { EventData, RegistrationStep } from "@babylonlabs-io/btc-staking-ts";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  type PropsWithChildren,
+} from "react";
 
 import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
-import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
-import type { DelegationV2 } from "@/ui/common/types/delegationsV2";
+import { useEventBus } from "@/ui/common/hooks/useEventBus";
+import { useMaxFinalityProviders } from "@/ui/common/hooks/useMaxFinalityProviders";
+import type {
+  DelegationV2,
+  DelegationWithFP,
+} from "@/ui/common/types/delegationsV2";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
-import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 
 import {
   StakingExpansionStep,
   type StakingExpansionFormData,
   type StakingExpansionState,
 } from "./StakingExpansionTypes";
+
+const EXPANSION_STEP_MAP: Record<RegistrationStep, StakingExpansionStep> = {
+  "staking-slashing": StakingExpansionStep.EOI_STAKING_SLASHING,
+  "unbonding-slashing": StakingExpansionStep.EOI_UNBONDING_SLASHING,
+  "proof-of-possession": StakingExpansionStep.EOI_PROOF_OF_POSSESSION,
+  "create-btc-delegation-msg": StakingExpansionStep.EOI_SIGN_BBN,
+};
 
 const { StateProvider, useState: useStakingExpansionState } =
   createStateUtils<StakingExpansionState>({
@@ -28,6 +43,12 @@ const { StateProvider, useState: useStakingExpansionState } =
     reset: () => {},
     expansionStepOptions: undefined,
     setExpansionStepOptions: () => {},
+    expansionHistoryModalOpen: false,
+    expansionHistoryTargetDelegation: null,
+    setExpansionHistoryModalOpen: () => {},
+    openExpansionHistoryModal: () => {},
+    closeExpansionHistoryModal: () => {},
+    isExpansionModalOpen: false,
     maxFinalityProviders: DEFAULT_MAX_FINALITY_PROVIDERS,
     getAvailableBsnSlots: () => 0,
     canAddMoreBsns: () => false,
@@ -39,13 +60,8 @@ const { StateProvider, useState: useStakingExpansionState } =
  * Wraps the application with expansion-specific state and methods.
  */
 export function StakingExpansionState({ children }: PropsWithChildren) {
-  const { data: networkInfo } = useNetworkInfo();
-
-  const maxFinalityProviders =
-    FeatureFlagService.IsPhase3Enabled &&
-    networkInfo?.params.bbnStakingParams.latestParam.maxFinalityProviders
-      ? networkInfo.params.bbnStakingParams.latestParam.maxFinalityProviders
-      : DEFAULT_MAX_FINALITY_PROVIDERS;
+  const eventBus = useEventBus();
+  const maxFinalityProviders = useMaxFinalityProviders();
 
   const [hasError, setHasError] = useState(false);
   const [processing, setProcessing] = useState(false);
@@ -60,6 +76,28 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
   const [expansionStepOptions, setExpansionStepOptions] = useState<
     EventData | undefined
   >();
+  const [expansionHistoryModalOpen, setExpansionHistoryModalOpen] =
+    useState(false);
+  const [
+    expansionHistoryTargetDelegation,
+    setExpansionHistoryTargetDelegation,
+  ] = useState<DelegationWithFP | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = eventBus.on("delegation:expand", (options) => {
+      const type = options?.type as RegistrationStep | undefined;
+
+      if (type) {
+        const stepName = EXPANSION_STEP_MAP[type];
+        if (stepName) {
+          setStep(stepName);
+          setExpansionStepOptions(options);
+        }
+      }
+    });
+
+    return unsubscribe;
+  }, [setStep, setExpansionStepOptions, eventBus]);
 
   const goToStep = useCallback(
     (step: StakingExpansionStep, options?: EventData) => {
@@ -79,6 +117,8 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     setStep(undefined);
     setVerifiedDelegation(undefined);
     setExpansionStepOptions(undefined);
+    setExpansionHistoryModalOpen(false);
+    setExpansionHistoryTargetDelegation(null);
   }, []);
 
   /**
@@ -111,6 +151,23 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     [maxFinalityProviders],
   );
 
+  // Modal control functions
+  const openExpansionHistoryModal = useCallback(
+    (delegation: DelegationWithFP) => {
+      setExpansionHistoryTargetDelegation(delegation);
+      setExpansionHistoryModalOpen(true);
+    },
+    [],
+  );
+
+  const closeExpansionHistoryModal = useCallback(() => {
+    setExpansionHistoryModalOpen(false);
+    setExpansionHistoryTargetDelegation(null);
+  }, []);
+
+  // Computed state: true when any expansion-related modal is open
+  const isExpansionModalOpen = Boolean(step) || expansionHistoryModalOpen;
+
   const state: StakingExpansionState = {
     hasError,
     processing,
@@ -125,6 +182,12 @@ export function StakingExpansionState({ children }: PropsWithChildren) {
     reset,
     expansionStepOptions,
     setExpansionStepOptions,
+    expansionHistoryModalOpen,
+    expansionHistoryTargetDelegation,
+    setExpansionHistoryModalOpen,
+    openExpansionHistoryModal,
+    closeExpansionHistoryModal,
+    isExpansionModalOpen,
     maxFinalityProviders,
     getAvailableBsnSlots,
     canAddMoreBsns,

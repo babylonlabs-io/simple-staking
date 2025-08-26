@@ -7,6 +7,7 @@ on:
       - "release/v1.x"
     tags:
       - "*"
+  workflow_dispatch:
 
 jobs:
   lint_test:
@@ -30,7 +31,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24.2.0
           cache: "npm"
 
       - name: Install dependencies
@@ -54,6 +55,8 @@ jobs:
           NEXT_PUBLIC_REPLAYS_RATE: ${{ vars.NEXT_PUBLIC_REPLAYS_RATE }}
           NEXT_PUBLIC_STAKING_DISABLED: ${{ vars.NEXT_PUBLIC_STAKING_DISABLED}}
           NEXT_PUBLIC_DISABLED_WALLETS: ${{ vars.NEXT_PUBLIC_DISABLED_WALLETS }}
+          NEXT_PUBLIC_BABY_LCD_URL: ${{ vars.NEXT_PUBLIC_BABY_LCD_URL }}
+          NEXT_PUBLIC_BABY_RPC_URL: ${{ vars.NEXT_PUBLIC_BABY_RPC_URL }}
           S3_PUBLIC_BUCKET: ${{ vars.S3_PUBLIC_BUCKET }}
           SENTRY_ORG: ${{ vars.SENTRY_ORG }}
           GA4_MEASUREMENT_ID: ${{ vars.GA4_MEASUREMENT_ID }}
@@ -70,8 +73,6 @@ jobs:
           NEXT_PUBLIC_FF_ENABLE_LEDGER: ${{ vars.NEXT_PUBLIC_FF_ENABLE_LEDGER }}
           NEXT_PUBLIC_FF_PHASE_3: ${{ vars.NEXT_PUBLIC_FF_PHASE_3 }}
           NEXT_PUBLIC_FF_BABYSTAKING: ${{ vars.NEXT_PUBLIC_FF_BABYSTAKING }}
-          NEXT_PUBLIC_FF_NEW_UI: ${{ vars.NEXT_PUBLIC_FF_NEW_UI }}
-          NEXT_PUBLIC_FF_STAKING_EXPANSION: ${{ vars.NEXT_PUBLIC_FF_STAKING_EXPANSION }}
 
       - name: Generate sha256sum checksum
         run: |

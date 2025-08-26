@@ -13,6 +13,8 @@ import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { FinalityProviderModal } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderModal";
 import { ExpansionChainSelectionModal } from "@/ui/common/components/StakingExpansion/ExpansionChainSelectionModal";
 import { IS_FIXED_TERM_FIELD } from "@/ui/common/config";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useNetworkFees } from "@/ui/common/hooks/client/api/useNetworkFees";
 import { useStakingExpansionService } from "@/ui/common/hooks/services/useStakingExpansionService";
 import { useLogger } from "@/ui/common/hooks/useLogger";
@@ -25,6 +27,9 @@ import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderStat
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { type StakingExpansionFormData } from "@/ui/common/state/StakingExpansionTypes";
 import { getFeeRateFromMempool } from "@/ui/common/utils/getFeeRateFromMempool";
+
+// Get the Babylon Genesis BSN ID
+const BSN_ID = getNetworkConfigBBN().chainId;
 
 interface StakingExpansionModalProps {
   open: boolean;
@@ -65,6 +70,7 @@ export const StakingExpansionModal = ({
     useStakingExpansionService();
   const { networkInfo } = useAppState();
   const logger = useLogger();
+  const { handleError } = useError();
 
   // Calculate the default staking timelock using the same logic as regular staking
   const defaultStakingTimeBlocks = useMemo(() => {
@@ -115,10 +121,11 @@ export const StakingExpansionModal = ({
         }
 
         const fp = getRegisteredFinalityProvider(fpPkHex);
-        if (fp && fp.bsnId) {
-          pairs[fp.bsnId] = fpPkHex;
+        if (fp) {
+          // Use bsnId if available, otherwise it's a Babylon Genesis FP (bsnId is null)
+          const bsnId = fp.bsnId || BSN_ID;
+          pairs[bsnId] = fpPkHex;
         }
-        // Note: If FP is not found or has no bsnId, we skip it (no action needed)
       });
 
       return pairs;
@@ -230,8 +237,9 @@ export const StakingExpansionModal = ({
       handleClose();
       displayExpansionPreview(finalFormData);
     } catch (error) {
-      logger.error(new Error("Failed to calculate expansion fee"), {
-        data: { error: String(error) },
+      handleError({
+        error: error instanceof Error ? error : new Error(String(error)),
+        displayOptions: { showModal: true },
       });
     } finally {
       setIsCalculatingFee(false);
@@ -243,7 +251,7 @@ export const StakingExpansionModal = ({
     calculateExpansionFeeAmount,
     displayExpansionPreview,
     handleClose,
-    logger,
+    handleError,
   ]);
 
   // Don't render until we have form data

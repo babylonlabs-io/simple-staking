@@ -15,6 +15,8 @@ import type { FinalityProvider } from "@/ui/common/types/finalityProviders";
 export enum StakingExpansionStep {
   /** Initial step for selecting BSN and Finality Provider pairs - unique to expansion */
   BSN_FP_SELECTION = "bsn-fp-selection",
+  /** Step for showing renewal timelock information */
+  RENEWAL_TIMELOCK = "renewal-timelock",
   /** Base workflow steps - reuse shared base steps */
   PREVIEW = BaseStakingStep.PREVIEW,
   /** EOI signing steps - reuse shared EOI steps */
@@ -45,6 +47,8 @@ export interface StakingExpansionFormData {
   feeAmount: number;
   /** Staking timelock in blocks */
   stakingTimelock: number;
+  /** Flag to indicate this is a renewal-only operation (no new BSN/FP pairs) */
+  isRenewalOnly?: boolean;
 }
 
 /**
@@ -67,6 +71,12 @@ export interface StakingExpansionState {
   verifiedDelegation?: DelegationV2;
   /** Event data options for current step */
   expansionStepOptions: EventData | undefined;
+  /** Whether the expansion history modal is open */
+  expansionHistoryModalOpen: boolean;
+  /** Target delegation for expansion history modal */
+  expansionHistoryTargetDelegation: DelegationWithFP | null;
+  /** Computed state: true when any expansion-related modal is open */
+  isExpansionModalOpen: boolean;
 
   // Core actions
   /** Navigate to a specific step in the expansion flow */
@@ -81,6 +91,12 @@ export interface StakingExpansionState {
   reset: () => void;
   /** Set options for current expansion step */
   setExpansionStepOptions: (options?: EventData) => void;
+  /** Set expansion history modal open state */
+  setExpansionHistoryModalOpen: (open: boolean) => void;
+  /** Open expansion history modal for a specific delegation */
+  openExpansionHistoryModal: (delegation: DelegationWithFP) => void;
+  /** Close expansion history modal */
+  closeExpansionHistoryModal: () => void;
 
   // Network configuration
   /** Maximum number of finality providers allowed based on network parameters */
@@ -132,10 +148,14 @@ export interface BsnFinalityProviderInfo {
 export const validateExpansionFormData = (
   data: Partial<StakingExpansionFormData>,
 ): data is StakingExpansionFormData => {
+  // For renewal-only mode, selectedBsnFps can be empty
+  const hasValidBsnFps = data.isRenewalOnly
+    ? data.selectedBsnFps !== undefined
+    : data.selectedBsnFps && Object.keys(data.selectedBsnFps).length > 0;
+
   return !!(
     data.originalDelegation &&
-    data.selectedBsnFps &&
-    Object.keys(data.selectedBsnFps).length > 0 &&
+    hasValidBsnFps &&
     data.feeRate &&
     data.feeRate > 0 &&
     data.stakingTimelock &&

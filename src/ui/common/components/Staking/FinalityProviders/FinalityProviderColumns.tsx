@@ -6,6 +6,7 @@ import {
   FinalityProviderStateLabels,
 } from "@/ui/common/types/finalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
+import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 import { FinalityProviderLogo } from "./FinalityProviderLogo";
@@ -54,7 +55,7 @@ export const finalityProviderColumns = [
   },
   {
     key: "btcPk",
-    header: `${coinSymbol} PK`,
+    header: "BTC PK",
     render: (_: unknown, row?: FinalityProvider) => {
       if (!row?.btcPk) return null;
       return <Hash value={row.btcPk} address small noFade />;
@@ -80,7 +81,7 @@ export const finalityProviderColumns = [
     render: (value: unknown) => {
       const commission = Number(value);
       if (isNaN(commission)) return "-";
-      return `${maxDecimals(commission * 100, 2)}%`;
+      return formatCommissionPercentage(commission);
     },
     sorter: (a?: FinalityProvider, b?: FinalityProvider) => {
       const commissionA = Number(a?.commission) || 0;

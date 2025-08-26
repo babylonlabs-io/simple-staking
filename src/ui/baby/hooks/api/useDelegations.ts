@@ -1,7 +1,7 @@
 import babylon from "@/infrastructure/babylon";
 import { useClientQuery } from "@/ui/common/hooks/client/useClient";
 
-const BABY_DELEGATIONS_KEY = "BABY_DELEGATIONS_KEY";
+export const BABY_DELEGATIONS_KEY = "BABY_DELEGATIONS_KEY";
 
 export function useDelegations(
   address: string,

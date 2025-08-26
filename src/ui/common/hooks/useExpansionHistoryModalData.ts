@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 
+import { transformDelegationToActivityCard } from "@/ui/common/components/ActivityCard/utils/activityCardTransformers";
 import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import {
   DelegationV2,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
-import { transformDelegationToActivityCard } from "@/ui/common/utils/delegationTransformers";
 
 import { ActivityCardData } from "../components/ActivityCard/ActivityCard";
 
@@ -34,14 +34,21 @@ export function useExpansionHistoryModalData({
   }, [targetDelegation, allDelegations, getExpansionChain]);
 
   const activityCards = useMemo(() => {
-    return expansionChain.map((delegation, index) => {
-      const finalityProvider = finalityProviderMap.get(
-        delegation.finalityProviderBtcPksHex[0],
-      );
+    // Show only expansion history (exclude the target delegation itself)
+    const historyChain = expansionChain.slice(0, -1);
+
+    return historyChain.map((delegation, index) => {
+      const stepLabel = index === 0 ? "Original Stake" : `Expansion ${index}`;
+      // Options for expansion history: no expansion section, hide expansion completely
+      const options = {
+        showExpansionSection: false,
+        hideExpansionCompletely: true,
+      };
       return transformDelegationToActivityCard(
         delegation,
-        finalityProvider,
-        index,
+        finalityProviderMap,
+        options,
+        stepLabel,
       );
     });
   }, [expansionChain, finalityProviderMap]);

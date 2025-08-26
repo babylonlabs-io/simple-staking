@@ -24,6 +24,8 @@ export interface UnbondingTx {
   outputIndex: number;
 }
 
+export type DelegationStatus = "active" | "unbonding" | "unbonded" | "pending";
+
 export const ACTIVE = "active";
 export const UNBONDING_REQUESTED = "unbonding_requested";
 export const UNBONDING = "unbonding";

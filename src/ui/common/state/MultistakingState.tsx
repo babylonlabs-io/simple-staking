@@ -10,9 +10,10 @@ import {
 } from "yup";
 
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { DEFAULT_MAX_FINALITY_PROVIDERS } from "@/ui/common/constants";
-import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
+import { useMaxFinalityProviders } from "@/ui/common/hooks/useMaxFinalityProviders";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import {
@@ -20,12 +21,12 @@ import {
   formatStakingAmount,
 } from "@/ui/common/utils/formTransforms";
 
-import FeatureFlagService from "../utils/FeatureFlagService";
-
 import { useBalanceState } from "./BalanceState";
 import { StakingModalPage, useStakingState } from "./StakingState";
 
 const { coinName } = getNetworkConfigBTC();
+
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 export interface MultistakingFormFields {
   finalityProviders: Record<string, string>;
@@ -62,15 +63,7 @@ export function MultistakingState({ children }: PropsWithChildren) {
   const [stakingModalPage, setStakingModalPage] = useState<StakingModalPage>(
     StakingModalPage.DEFAULT,
   );
-  const { data: networkInfo } = useNetworkInfo();
-  // The maxFinalityProviders is controlled by the FF. Only when IsPhase3Enabled
-  // is true, the maxFinalityProviders is the max number of FP that can be
-  // selected. Otherwise, it is 1.
-  const maxFinalityProviders =
-    FeatureFlagService.IsPhase3Enabled &&
-    networkInfo?.params.bbnStakingParams.latestParam.maxFinalityProviders
-      ? networkInfo.params.bbnStakingParams.latestParam.maxFinalityProviders
-      : DEFAULT_MAX_FINALITY_PROVIDERS;
+  const maxFinalityProviders = useMaxFinalityProviders();
 
   const { stakableBtcBalance, bbnBalance } = useBalanceState();
   const { stakingInfo } = useStakingState();
@@ -88,6 +81,11 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .max(
               maxFinalityProviders,
               `Maximum ${maxFinalityProviders} finality providers allowed.`,
+            )
+            .test(
+              "containsBbnProvider",
+              "Add Babylon Finality Provider",
+              (values) => values?.includes(BBN_CHAIN_ID),
             ),
         },
         {

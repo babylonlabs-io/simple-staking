@@ -9,6 +9,10 @@ interface ActivityCardDetailsSectionProps {
     label: string;
     items: ActivityListItemData[];
   }[];
+  groupedDetails?: {
+    label?: string;
+    items: ActivityCardDetailItem[];
+  }[];
 }
 
 interface DetailRowProps {
@@ -19,7 +23,7 @@ interface DetailRowProps {
 function DetailRow({ label, value }: DetailRowProps) {
   return (
     <div className="flex items-center justify-between gap-2 min-w-0 overflow-x-auto">
-      <span className="text-xs sm:text-sm text-accent-secondary flex-shrink-0">
+      <span className="text-xs sm:text-sm text-accent-primary flex-shrink-0">
         {label}
       </span>
       <span className="text-xs sm:text-sm text-accent-primary font-medium text-right min-w-0 overflow-x-auto whitespace-nowrap">
@@ -33,9 +37,11 @@ export function ActivityCardDetailsSection({
   details,
   optionalDetails,
   listItems,
+  groupedDetails,
 }: ActivityCardDetailsSectionProps) {
   const hasOptionalDetails = optionalDetails && optionalDetails.length > 0;
   const hasListItems = listItems && listItems.length > 0;
+  const hasGroupedDetails = groupedDetails && groupedDetails.length > 0;
 
   return (
     <div className="space-y-3 sm:space-y-4 overflow-x-auto">
@@ -45,6 +51,30 @@ export function ActivityCardDetailsSection({
         ))}
       </div>
 
+      {hasGroupedDetails && (
+        <div className="space-y-3 sm:space-y-4">
+          {groupedDetails.map((group, groupIndex) => (
+            <div
+              key={groupIndex}
+              className="bg-surface p-3 sm:p-4 rounded space-y-3 sm:space-y-4 overflow-x-auto"
+            >
+              {group.label && (
+                <span className="text-xs sm:text-sm text-accent-primary">
+                  {group.label}
+                </span>
+              )}
+              {group.items.map((detail, detailIndex) => (
+                <DetailRow
+                  key={detailIndex}
+                  label={detail.label}
+                  value={detail.value}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
       {hasListItems && (
         <div className="space-y-3 sm:space-y-4">
           {listItems.map((listSection, sectionIndex) => (
@@ -53,7 +83,7 @@ export function ActivityCardDetailsSection({
               className="bg-surface p-3 sm:p-4 rounded space-y-3 sm:space-y-4 overflow-x-auto"
             >
               <div className="flex justify-between items-start gap-2">
-                <span className="text-xs sm:text-sm text-accent-secondary">
+                <span className="text-xs sm:text-sm text-accent-primary">
                   {listSection.label}
                 </span>
                 <div className="flex flex-wrap gap-2">

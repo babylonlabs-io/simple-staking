@@ -5,6 +5,7 @@ import {
 } from "@babylonlabs-io/babylon-proto-ts";
 import { MessageFns } from "@babylonlabs-io/babylon-proto-ts/dist/generated/google/protobuf/any";
 import { GeneratedType, Registry } from "@cosmjs/proto-signing";
+import { MsgWithdrawDelegatorReward } from "cosmjs-types/cosmos/distribution/v1beta1/tx";
 
 // Define the structure of each proto to register
 type ProtoToRegister<T> = {
@@ -17,6 +18,9 @@ export const BBN_REGISTRY_TYPE_URLS = {
   MsgBtcStakeExpand: "/babylon.btcstaking.v1.MsgBtcStakeExpand",
   MsgWithdrawReward: "/babylon.incentive.MsgWithdrawReward",
   MsgWrappedDelegation: "/babylon.epoching.v1.MsgWrappedDelegate",
+  MsgWrappedUndelegation: "/babylon.epoching.v1.MsgWrappedUndelegate",
+  MsgWithdrawDelegatorReward:
+    "/cosmos.distribution.v1beta1.MsgWithdrawDelegatorReward",
 };
 
 // List of protos to register in the registry
@@ -40,6 +44,18 @@ const protosToRegister: ProtoToRegister<any>[] = [
     typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWrappedDelegation,
     messageType: epochingtx.MsgWrappedDelegate,
   },
+  {
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWrappedUndelegation,
+    messageType: epochingtx.MsgWrappedUndelegate,
+  },
+];
+
+// Cosmos SDK message types (already in GeneratedType format)
+const cosmosMessagesToRegister = [
+  {
+    typeUrl: BBN_REGISTRY_TYPE_URLS.MsgWithdrawDelegatorReward,
+    messageType: MsgWithdrawDelegatorReward,
+  },
 ];
 
 // Utility function to create a `GeneratedType` from `MessageFns`
@@ -61,6 +77,10 @@ export const createBbnRegistry = (): Registry => {
   protosToRegister.forEach((proto) => {
     const generatedType = createGeneratedType(proto.messageType);
     registry.register(proto.typeUrl, generatedType);
+  });
+
+  cosmosMessagesToRegister.forEach((proto) => {
+    registry.register(proto.typeUrl, proto.messageType);
   });
 
   return registry;

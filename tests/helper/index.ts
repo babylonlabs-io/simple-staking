@@ -3,9 +3,9 @@ import * as ecc from "@bitcoin-js/tiny-secp256k1-asmjs";
 import * as bitcoin from "bitcoinjs-lib";
 import ECPairFactory from "ecpair";
 
-import { ClientError } from "@/ui/legacy/errors";
-import { ERROR_CODES } from "@/ui/legacy/errors/codes";
-import { getPublicKeyNoCoord } from "@/ui/legacy/utils/wallet";
+import { ClientError } from "@/ui/common/errors";
+import { ERROR_CODES } from "@/ui/common/errors/codes";
+import { getPublicKeyNoCoord } from "@/ui/common/utils/wallet";
 
 // Initialize the ECC library
 initBTCCurve();
@@ -78,7 +78,7 @@ export class DataGenerator {
     return Math.floor(Math.random() * 1000) + 1;
   };
 
-  // Convenant committee are a list of public keys that are used to sign a covenant
+  // Covenant committee are a list of public keys that are used to sign a covenant
   generateRandomCovenantCommittee = (size: number): Buffer[] => {
     const committe: Buffer[] = [];
     for (let i = 0; i < size; i++) {

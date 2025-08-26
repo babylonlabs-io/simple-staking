@@ -45,22 +45,6 @@ const getCovenantExpansionSignatures = (delegation: any) => {
 };
 
 /**
- * Enhanced error handling utility for expansion operations.
- * Converts various error types to user-friendly messages.
- */
-const handleExpansionError = (error: unknown, context: string): Error => {
-  if (error instanceof Error) {
-    return error;
-  }
-
-  if (typeof error === "string") {
-    return new Error(`${context}: ${error}`);
-  }
-
-  return new Error(`${context}: Unknown error occurred`);
-};
-
-/**
  * Combines existing finality providers with newly selected BSN+FP pairs.
  */
 const combineProviders = (
@@ -112,7 +96,7 @@ const buildExpansionInput = (
  * Handles the complete expansion workflow from fee calculation to transaction submission.
  */
 export function useStakingExpansionService() {
-  const { setFormData, goToStep, setProcessing, setVerifiedDelegation } =
+  const { setFormData, goToStep, setProcessing, setVerifiedDelegation, reset } =
     useStakingExpansionState();
   const { sendBbnTx } = useBbnTransaction();
   const {
@@ -135,7 +119,10 @@ export function useStakingExpansionService() {
   const calculateExpansionFeeAmount = useCallback(
     async (formData: StakingExpansionFormData) => {
       if (!validateExpansionFormData(formData)) {
-        throw new Error("Invalid expansion form data provided");
+        throw new ClientError(
+          ERROR_CODES.VALIDATION_ERROR,
+          "Invalid expansion form data provided",
+        );
       }
 
       try {
@@ -163,15 +150,14 @@ export function useStakingExpansionService() {
 
         return feeAmount;
       } catch (error) {
-        const properError = handleExpansionError(
-          error,
+        throw new ClientError(
+          ERROR_CODES.STAKING_EXPANSION_FEE_ERROR,
           "Failed to calculate expansion fee",
+          { cause: error },
         );
-        logger.error(properError);
-        throw properError;
       }
     },
-    [estimateStakingExpansionFee, logger],
+    [estimateStakingExpansionFee],
   );
 
   /**
@@ -266,18 +252,9 @@ export function useStakingExpansionService() {
       } catch (error) {
         setProcessing(false);
 
-        // Ensure we have a proper Error object for the logger
-        const properError =
-          error instanceof Error
-            ? error
-            : new Error(
-                typeof error === "string"
-                  ? error
-                  : "Unknown error in expansion EOI creation",
-              );
-
-        logger.error(properError);
-        handleError({ error: properError });
+        logger.error(error as Error);
+        handleError({ error: error as Error });
+        reset(); // Close the modal on error
       }
     },
     [
@@ -291,6 +268,7 @@ export function useStakingExpansionService() {
       publicKeyNoCoord,
       logger,
       handleError,
+      reset,
     ],
   );
 
@@ -379,16 +357,10 @@ export function useStakingExpansionService() {
         setProcessing(false);
       } catch (error) {
         setProcessing(false);
-        const properError =
-          error instanceof Error
-            ? error
-            : new Error(
-                typeof error === "string"
-                  ? error
-                  : "Failed to stake delegation expansion",
-              );
-        logger.error(properError);
-        handleError({ error: properError });
+
+        logger.error(error as Error);
+        handleError({ error: error as Error });
+        reset(); // Close the modal on error
       }
     },
     [
@@ -398,6 +370,7 @@ export function useStakingExpansionService() {
       handleError,
       submitStakingExpansionTx,
       updateDelegationStatus,
+      reset,
     ],
   );
 

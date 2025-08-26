@@ -10,11 +10,19 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { MultistakingFormFields } from "@/ui/common/state/MultistakingState";
+import {
+  createBalanceValidator,
+  createMinAmountValidator,
+} from "@/ui/common/utils/bbn";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 import {
   formatBabyStakingAmount,
   formatNumber,
 } from "@/ui/common/utils/formTransforms";
+
+import { usePendingOperationsService } from "../hooks/services/usePendingOperationsService";
+
+const MIN_STAKING_AMOUNT = 0.01;
 
 export interface FormData {
   validatorAddress: string;
@@ -40,6 +48,7 @@ interface Step<K extends string, D = never> {
 type StakingStep =
   | Step<"initial">
   | Step<"preview", PreviewData>
+  | Step<"signing">
   | Step<"loading">
   | Step<"success", { txHash: string }>;
 
@@ -47,7 +56,7 @@ interface StakingState {
   loading: boolean;
   formSchema: any;
   step: StakingStep;
-  balance: number;
+  availableBalance: number;
   babyPrice: number;
   fields: string[];
   showPreview(data: FormData): void;
@@ -62,7 +71,7 @@ const { StateProvider, useState: useStakingState } =
     loading: true,
     formSchema: null,
     step: { name: "initial" },
-    balance: 0,
+    availableBalance: 0,
     babyPrice: 0,
     fields: [],
     calculateFee: async () => 0,
@@ -75,12 +84,25 @@ const { StateProvider, useState: useStakingState } =
 function StakingState({ children }: PropsWithChildren) {
   const [step, setStep] = useState<StakingStep>({ name: "initial" });
 
-  const { stake, estimateStakingFee } = useDelegationService();
+  const { stake, sendTx, estimateStakingFee } = useDelegationService();
   const { validatorMap, loading } = useValidatorService();
   const { balance } = useWalletService();
   const { handleError } = useError();
   const logger = useLogger();
   const babyPrice = usePrice("BABY");
+
+  const minAmountValidator = useMemo(
+    () => createMinAmountValidator(MIN_STAKING_AMOUNT),
+    [],
+  );
+  // Subtract the pending stake amount from the balance
+  const { getTotalPendingStake } = usePendingOperationsService();
+  const availableBalance = balance - getTotalPendingStake();
+
+  const balanceValidator = useMemo(
+    () => createBalanceValidator(availableBalance),
+    [availableBalance],
+  );
 
   const fieldSchemas = useMemo(
     () =>
@@ -89,22 +111,22 @@ function StakingState({ children }: PropsWithChildren) {
           field: "amount",
           schema: number()
             .transform(formatBabyStakingAmount)
-            .typeError("Staking amount must be a valid number.")
+            .typeError("Staking amount must be a valid number")
             .required("Enter BABY Amount to Stake")
-            .moreThan(0, "Staking amount must be greater than 0.")
+            .moreThan(0, "Staking amount must be greater than 0")
             .test(
               "invalidMinAmount",
-              "Minimum staking amount is 1 BABY",
-              (value = 0) => babylon.utils.ubbnToBaby(BigInt(value)) >= 1,
+              `Minimum staking amount is ${MIN_STAKING_AMOUNT} BABY`,
+              (_, context) => minAmountValidator(context.originalValue),
             )
             .test(
               "invalidBalance",
-              "Staking Amount Exceeds Balance",
-              (value = 0) => BigInt(value) <= balance,
+              "Staking Amount Exceeds Available Balance",
+              (_, context) => balanceValidator(context.originalValue),
             )
             .test(
               "invalidFormat",
-              "Staking amount must have no more than 6 decimal points.",
+              "Staking amount must have no more than 6 decimal points",
               (_, context) => validateDecimalPoints(context.originalValue, 6),
             ),
         },
@@ -123,11 +145,14 @@ function StakingState({ children }: PropsWithChildren) {
             .test(
               "invalidBalance",
               "Fee Amount Exceeds Balance",
-              (value = 0) => BigInt(value) <= balance,
+              (value = 0) => {
+                const valueInMicroBaby = BigInt(Math.floor(value));
+                return valueInMicroBaby <= availableBalance;
+              },
             ),
         },
       ] as const,
-    [balance],
+    [availableBalance, minAmountValidator, balanceValidator],
   );
 
   const formSchema = useMemo(() => {
@@ -171,10 +196,21 @@ function StakingState({ children }: PropsWithChildren) {
     if (step.name !== "preview" || !step.data) return;
 
     try {
-      setStep({ name: "loading" });
+      setStep({ name: "signing" });
       const amount = step.data.amount;
       const validatorAddress = step.data.validator.address;
-      const result = await stake({ amount, validatorAddress });
+      const { signedTx } = await stake({
+        amount,
+        validatorAddress,
+      });
+
+      setStep({ name: "loading" });
+      const result = await sendTx(
+        signedTx,
+        "stake",
+        validatorAddress,
+        BigInt(amount),
+      );
       logger.info("Baby Staking: Stake", {
         txHash: result?.txHash,
       });
@@ -184,7 +220,7 @@ function StakingState({ children }: PropsWithChildren) {
       logger.error(error);
       setStep({ name: "initial" });
     }
-  }, [step, logger, stake, handleError]);
+  }, [step, logger, stake, handleError, sendTx]);
 
   const calculateFee = useCallback(
     async ({ validatorAddress, amount }: Omit<FormData, "feeAmount">) => {
@@ -203,11 +239,12 @@ function StakingState({ children }: PropsWithChildren) {
     setStep({ name: "initial" });
   }, []);
 
-  const context = useMemo(
-    () => ({
+  const context = useMemo(() => {
+    const displayBalance = babylon.utils.ubbnToBaby(availableBalance);
+    return {
       loading,
       step,
-      balance: babylon.utils.ubbnToBaby(balance),
+      availableBalance: displayBalance,
       formSchema,
       fields,
       babyPrice,
@@ -216,21 +253,20 @@ function StakingState({ children }: PropsWithChildren) {
       submitForm,
       resetForm,
       closePreview,
-    }),
-    [
-      loading,
-      step,
-      balance,
-      formSchema,
-      fields,
-      babyPrice,
-      calculateFee,
-      showPreview,
-      submitForm,
-      resetForm,
-      closePreview,
-    ],
-  );
+    };
+  }, [
+    availableBalance,
+    loading,
+    step,
+    formSchema,
+    fields,
+    babyPrice,
+    calculateFee,
+    showPreview,
+    submitForm,
+    resetForm,
+    closePreview,
+  ]);
 
   return <StateProvider value={context}>{children}</StateProvider>;
 }

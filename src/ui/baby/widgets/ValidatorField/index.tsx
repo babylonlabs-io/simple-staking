@@ -59,7 +59,7 @@ export function ValidatorField() {
   return (
     <>
       <ListSubsection
-        title="Selected Validator"
+        title="Select Validator"
         max={1}
         items={selectedValidators}
         renderItem={(item) => <ValidatorItem name={item.name} />}
