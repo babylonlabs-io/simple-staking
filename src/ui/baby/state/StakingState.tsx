@@ -22,6 +22,8 @@ import {
 
 import { usePendingOperationsService } from "../hooks/services/usePendingOperationsService";
 
+const MIN_STAKING_AMOUNT = 0.01;
+
 export interface FormData {
   validatorAddress: string;
   amount: number;
@@ -89,7 +91,10 @@ function StakingState({ children }: PropsWithChildren) {
   const logger = useLogger();
   const babyPrice = usePrice("BABY");
 
-  const minAmountValidator = useMemo(() => createMinAmountValidator(0.01), []);
+  const minAmountValidator = useMemo(
+    () => createMinAmountValidator(MIN_STAKING_AMOUNT),
+    [],
+  );
   // Subtract the pending stake amount from the balance
   const { getTotalPendingStake } = usePendingOperationsService();
   const availableBalance = balance - getTotalPendingStake();
@@ -111,7 +116,7 @@ function StakingState({ children }: PropsWithChildren) {
             .moreThan(0, "Staking amount must be greater than 0")
             .test(
               "invalidMinAmount",
-              "Minimum staking amount is 0.01 BABY",
+              `Minimum staking amount is ${MIN_STAKING_AMOUNT} BABY`,
               (_, context) => minAmountValidator(context.originalValue),
             )
             .test(
