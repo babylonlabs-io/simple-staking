@@ -19,7 +19,6 @@ interface StakingParams {
 
 export interface UnbondingInfo {
   amount: bigint;
-  completionTime: string;
   statusSuffix?: string;
 }
 
@@ -67,8 +66,6 @@ export function useDelegationService() {
         const firstEntry = entries[0];
         unbondingInfoByValidator[validatorAddress] = {
           amount: BigInt(firstEntry.balance || firstEntry.initial_balance || 0),
-          completionTime:
-            firstEntry.completion_time || new Date().toISOString(),
         };
       }
     });
@@ -77,13 +74,8 @@ export function useDelegationService() {
     pendingOperations.forEach((operation) => {
       if (operation.operationType === "unstake") {
         unbondingValidatorAddresses.add(operation.validatorAddress);
-        const estimatedCompletionTime = new Date(
-          operation.timestamp + 21 * 24 * 60 * 60 * 1000, // 21 days
-        );
-
         unbondingInfoByValidator[operation.validatorAddress] = {
           amount: operation.amount,
-          completionTime: estimatedCompletionTime.toISOString(),
           statusSuffix: " (pending...)",
         };
       }
@@ -117,9 +109,9 @@ export function useDelegationService() {
             const unbondingAmount =
               unbondingInfoByValidator[validatorAddress].amount;
             effectiveAmount =
-              effectiveAmount > unbondingAmount
+              effectiveAmount >= unbondingAmount
                 ? effectiveAmount - unbondingAmount
-                : effectiveAmount;
+                : 0n;
             status = "unbonding";
           }
 

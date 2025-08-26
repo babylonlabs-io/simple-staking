@@ -2,21 +2,17 @@ import { MdErrorOutline } from "react-icons/md";
 
 import { Alert } from "@/ui/common/components/Alerts/Alert";
 import { STAKING_DISABLED } from "@/ui/common/constants";
+import { GEO_BLOCK_MESSAGE } from "@/ui/common/types/services/healthCheck";
 
 interface FormAlertProps {
-  address: string | undefined;
+  address?: string;
   isGeoBlocked: boolean;
-  geoBlockMessage: string | undefined;
 }
 
-export const FormAlert = ({
-  address,
-  isGeoBlocked,
-  geoBlockMessage,
-}: FormAlertProps) => {
+export const FormAlert = ({ address, isGeoBlocked }: FormAlertProps) => {
   const stakingDisabledMessage = (
     <>
-      The Babylon network is temporarily halted. New stakes are paused until the
+      The Babylon network is under maintenance. New stakes are paused until the
       network resumes.
     </>
   );
@@ -39,7 +35,7 @@ export const FormAlert = ({
           )
         }
       >
-        {isGeoBlocked ? geoBlockMessage : stakingDisabledMessage}
+        {isGeoBlocked ? GEO_BLOCK_MESSAGE : stakingDisabledMessage}
       </Alert>
     </div>
   );

@@ -25,6 +25,8 @@ export const formatNumber = (value: number) =>
 
 export const formatBabyStakingAmount = (value: number) => {
   if (Number.isNaN(value)) return undefined;
-  const transformed = Number(babylon.utils.babyToUbbn(value));
+  // Limit to maximum 6 decimal places before conversion
+  const limitedValue = Number(value.toFixed(6));
+  const transformed = Number(babylon.utils.babyToUbbn(limitedValue));
   return transformed;
 };

@@ -20,16 +20,18 @@ export function useValidatorService() {
 
   const validators = useMemo(
     () =>
-      validatorList.map((validator) => ({
-        address: validator.operatorAddress,
-        name: validator.description.moniker,
-        tokens: parseFloat(validator.tokens),
-        votingPower: parseFloat(validator.tokens) / (pool?.bondedTokens ?? 0),
-        commission: parseFloat(validator.commission.commissionRates.rate),
-        unbondingTime: Number(validator.unbondingTime.seconds) * 1000,
-        // apr: 0,
-        // logoUrl: "",
-      })),
+      validatorList
+        .map((validator) => ({
+          address: validator.operatorAddress,
+          name: validator.description.moniker,
+          tokens: parseFloat(validator.tokens),
+          votingPower: parseFloat(validator.tokens) / (pool?.bondedTokens ?? 0),
+          commission: parseFloat(validator.commission.commissionRates.rate),
+          unbondingTime: Number(validator.unbondingTime.seconds) * 1000,
+          // apr: 0,
+          // logoUrl: "",
+        }))
+        .sort((a, b) => b.tokens - a.tokens),
     [validatorList, pool?.bondedTokens],
   );
 

@@ -20,6 +20,10 @@ import {
   formatNumber,
 } from "@/ui/common/utils/formTransforms";
 
+import { usePendingOperationsService } from "../hooks/services/usePendingOperationsService";
+
+const MIN_STAKING_AMOUNT = 0.01;
+
 export interface FormData {
   validatorAddress: string;
   amount: number;
@@ -52,7 +56,7 @@ interface StakingState {
   loading: boolean;
   formSchema: any;
   step: StakingStep;
-  balance: number;
+  availableBalance: number;
   babyPrice: number;
   fields: string[];
   showPreview(data: FormData): void;
@@ -67,7 +71,7 @@ const { StateProvider, useState: useStakingState } =
     loading: true,
     formSchema: null,
     step: { name: "initial" },
-    balance: 0,
+    availableBalance: 0,
     babyPrice: 0,
     fields: [],
     calculateFee: async () => 0,
@@ -87,10 +91,17 @@ function StakingState({ children }: PropsWithChildren) {
   const logger = useLogger();
   const babyPrice = usePrice("BABY");
 
-  const minAmountValidator = useMemo(() => createMinAmountValidator(1), []);
+  const minAmountValidator = useMemo(
+    () => createMinAmountValidator(MIN_STAKING_AMOUNT),
+    [],
+  );
+  // Subtract the pending stake amount from the balance
+  const { getTotalPendingStake } = usePendingOperationsService();
+  const availableBalance = balance - getTotalPendingStake();
+
   const balanceValidator = useMemo(
-    () => createBalanceValidator(balance),
-    [balance],
+    () => createBalanceValidator(availableBalance),
+    [availableBalance],
   );
 
   const fieldSchemas = useMemo(
@@ -100,22 +111,22 @@ function StakingState({ children }: PropsWithChildren) {
           field: "amount",
           schema: number()
             .transform(formatBabyStakingAmount)
-            .typeError("Staking amount must be a valid number.")
+            .typeError("Staking amount must be a valid number")
             .required("Enter BABY Amount to Stake")
-            .moreThan(0, "Staking amount must be greater than 0.")
+            .moreThan(0, "Staking amount must be greater than 0")
             .test(
               "invalidMinAmount",
-              "Minimum staking amount is 1 BABY",
+              `Minimum staking amount is ${MIN_STAKING_AMOUNT} BABY`,
               (_, context) => minAmountValidator(context.originalValue),
             )
             .test(
               "invalidBalance",
-              "Staking Amount Exceeds Balance",
+              "Staking Amount Exceeds Available Balance",
               (_, context) => balanceValidator(context.originalValue),
             )
             .test(
               "invalidFormat",
-              "Staking amount must have no more than 6 decimal points.",
+              "Staking amount must have no more than 6 decimal points",
               (_, context) => validateDecimalPoints(context.originalValue, 6),
             ),
         },
@@ -136,12 +147,12 @@ function StakingState({ children }: PropsWithChildren) {
               "Fee Amount Exceeds Balance",
               (value = 0) => {
                 const valueInMicroBaby = BigInt(Math.floor(value));
-                return valueInMicroBaby <= balance;
+                return valueInMicroBaby <= availableBalance;
               },
             ),
         },
       ] as const,
-    [balance, minAmountValidator, balanceValidator],
+    [availableBalance, minAmountValidator, balanceValidator],
   );
 
   const formSchema = useMemo(() => {
@@ -229,11 +240,11 @@ function StakingState({ children }: PropsWithChildren) {
   }, []);
 
   const context = useMemo(() => {
-    const displayBalance = babylon.utils.ubbnToBaby(balance);
+    const displayBalance = babylon.utils.ubbnToBaby(availableBalance);
     return {
       loading,
       step,
-      balance: displayBalance,
+      availableBalance: displayBalance,
       formSchema,
       fields,
       babyPrice,
@@ -244,9 +255,9 @@ function StakingState({ children }: PropsWithChildren) {
       closePreview,
     };
   }, [
+    availableBalance,
     loading,
     step,
-    balance,
     formSchema,
     fields,
     babyPrice,

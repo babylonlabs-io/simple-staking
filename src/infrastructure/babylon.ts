@@ -1,12 +1,13 @@
 import { createLCDClient, txs, utils } from "@babylonlabs-io/babylon-proto-ts";
 
-import config from "./config";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 
 let clientInstance: Awaited<ReturnType<typeof createLCDClient>> | null = null;
 
 export const getBabylonClient = async () => {
   if (!clientInstance) {
-    clientInstance = await createLCDClient({ url: config.babylon.lcdUrl });
+    const networkConfig = getNetworkConfigBBN();
+    clientInstance = await createLCDClient({ url: networkConfig.lcdUrl });
   }
   return clientInstance;
 };

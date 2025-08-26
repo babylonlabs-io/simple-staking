@@ -5,7 +5,6 @@ import { ChainSelectionModal } from "@/ui/common/components/Multistaking/ChainSe
 import { FinalityProviderModal } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderModal";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { chainLogos } from "@/ui/common/constants";
-import { useStakingExpansionAllowList } from "@/ui/common/hooks/useStakingExpansionAllowList";
 import {
   StakingModalPage,
   useFinalityProviderBsnState,
@@ -22,14 +21,10 @@ type SelectedProviderItemLocal = {
 
 export function FinalityProvidersSection() {
   const { maxFinalityProviders } = useMultistakingState();
-  const { isMultiStakingAllowListInForce } = useStakingExpansionAllowList();
 
   // Determine if we should allow multiple BSNs
-  // We allow multiple BSNs if:
-  // 1. maxFinalityProviders > 1 (feature flag enabled)
-  // 2. AND allow list is not in force (no restrictions)
-  const allowsMultipleBsns =
-    maxFinalityProviders > 1 && !isMultiStakingAllowListInForce;
+  // We allow multiple BSNs if maxFinalityProviders > 1 (feature flag enabled)
+  const allowsMultipleBsns = maxFinalityProviders > 1;
 
   const { value: selectedProviderMap = {}, onChange } = useField<
     Record<string, string>
@@ -50,7 +45,7 @@ export function FinalityProvidersSection() {
   const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
   const selectedItems = useMemo<SelectedProviderItemLocal[]>(() => {
-    return (Object.entries(selectedProviderMap) as [string, string][])
+    const items = (Object.entries(selectedProviderMap) as [string, string][])
       .map(([bsnId, providerId]) => {
         const bsn = bsnList.find((b) => b.id === bsnId);
         const provider = finalityProviderMap.get(providerId);
@@ -64,7 +59,13 @@ export function FinalityProvidersSection() {
         } as SelectedProviderItemLocal;
       })
       .filter(Boolean) as SelectedProviderItemLocal[];
-  }, [selectedProviderMap, bsnList, finalityProviderMap]);
+
+    return items.sort((a, b) => {
+      if (a.bsnId === BBN_CHAIN_ID) return -1;
+      if (b.bsnId === BBN_CHAIN_ID) return 1;
+      return 0;
+    });
+  }, [selectedProviderMap, bsnList, finalityProviderMap, BBN_CHAIN_ID]);
 
   const handleAdd = (bsnId: string, providerPk: string) => {
     const updated = { ...selectedProviderMap, [bsnId]: providerPk };
