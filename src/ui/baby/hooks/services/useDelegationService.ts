@@ -117,9 +117,9 @@ export function useDelegationService() {
             const unbondingAmount =
               unbondingInfoByValidator[validatorAddress].amount;
             effectiveAmount =
-              effectiveAmount > unbondingAmount
+              effectiveAmount >= unbondingAmount
                 ? effectiveAmount - unbondingAmount
-                : effectiveAmount;
+                : 0n;
             status = "unbonding";
           }
 
