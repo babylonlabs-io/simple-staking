@@ -8,8 +8,6 @@ import {
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
 
-// import { useStakingExpansionService } from "./useStakingExpansionService";
-
 /**
  * Hook providing verified staking expansion services.
  * Manages verified expansions that are waiting for BTC signing and broadcast.

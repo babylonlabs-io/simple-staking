@@ -198,9 +198,7 @@ function VerifiedExpansionItem({
           {/* Show BSN/FP pairs - different display for different operation types */}
           <div className="mt-3 space-y-1">
             <Text variant="body2" className="text-accent-secondary mb-1">
-              {operationType === "RENEW_TIMELOCK"
-                ? "BSN / Finality Provider pairs:"
-                : "BSN / Finality Provider pairs:"}
+              BSN / Finality Provider pairs:
             </Text>
             <div className="space-y-1">
               {bsnFpPairs.map((pair, index) => (
