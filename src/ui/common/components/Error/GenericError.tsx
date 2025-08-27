@@ -1,4 +1,5 @@
 import { Button, Heading, Text } from "@babylonlabs-io/core-ui";
+import { useNavigate } from "react-router";
 
 import BitcoinBlock from "@/ui/common/assets/bitcoin-block.svg";
 import { Container } from "@/ui/common/components/Container/Container";
@@ -19,6 +20,8 @@ export default function GenericError({
   Please check back shortly, and thank you for your patience!`,
   image = BitcoinBlock,
 }: Props) {
+  const navigate = useNavigate();
+
   return (
     <div className="h-full min-h-svh w-full flex flex-col justify-between">
       <SimplifiedHeader />
@@ -41,7 +44,7 @@ export default function GenericError({
           <Button
             variant="outlined"
             color="primary"
-            onClick={() => (window.location.href = "/")}
+            onClick={() => navigate("/")}
           >
             Back to homepage
           </Button>
