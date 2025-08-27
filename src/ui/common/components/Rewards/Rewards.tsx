@@ -7,14 +7,12 @@ import { useState } from "react";
 import babyTokenIcon from "@/ui/common/assets/baby-token.svg";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { Section } from "@/ui/common/components/Section/Section";
-import {
-  network as currentNetwork,
-  getNetworkConfigBBN,
-} from "@/ui/common/config/network/bbn";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useRewardsService } from "@/ui/common/hooks/services/useRewardsService";
 import { useRewardsState } from "@/ui/common/state/RewardState";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
+import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 
@@ -107,11 +105,7 @@ export function Rewards() {
 
   const claimDisabled = !rewardBalance || processing;
 
-  const baseWarning =
-    "Processing your claim will take approximately 2 blocks to complete.";
-  const testTokenNote = " BABY is a test token without any real world value.";
-  const isMainnet = currentNetwork === "mainnet";
-  const warningText = isMainnet ? baseWarning : baseWarning + testTokenNote;
+  // Note: previous warning text removed; new modal API does not accept it
 
   return (
     <AuthGuard>
@@ -129,18 +123,22 @@ export function Rewards() {
         title="Claim Rewards"
         onClose={handleClose}
         onProceed={handleProceed}
-        warning={warningText}
-        bsns={rewards.map((r) => ({
-          icon: <img src={r.currencyIcon} className="size-6" />,
-          name: r.currencyName,
+        tokens={rewards.map((r) => ({
+          name: r.chainName,
+          amount: {
+            token: `${r.amount} ${r.balanceDetails.symbol}`,
+            usd: calculateTokenValueInCurrency(
+              Number(r.amount),
+              r.balanceDetails.price,
+            ),
+          },
         }))}
-        amount={{
-          token: `${rewards[0].amount} ${bbnCoinSymbol}`,
-          usd: `$${(Number(rewards[0].amount) * babyPrice).toFixed(2)}`,
-        }}
         transactionFees={{
-          token: `${(transactionFee / 1e6).toFixed(6)} ${bbnCoinSymbol}`,
-          usd: `$${((transactionFee / 1e6) * babyPrice).toFixed(2)}`,
+          token: `${ubbnToBaby(transactionFee).toFixed(6)} ${bbnCoinSymbol}`,
+          usd: calculateTokenValueInCurrency(
+            ubbnToBaby(transactionFee),
+            babyPrice,
+          ),
         }}
       />
 
