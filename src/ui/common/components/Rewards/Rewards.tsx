@@ -8,11 +8,9 @@ import babyTokenIcon from "@/ui/common/assets/baby-token.svg";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { Section } from "@/ui/common/components/Section/Section";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useRewardsService } from "@/ui/common/hooks/services/useRewardsService";
 import { useRewardsState } from "@/ui/common/state/RewardState";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
-import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 
@@ -60,8 +58,6 @@ export function Rewards() {
   const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
     getNetworkConfigBBN();
 
-  const rewards: RewardItem[] = [];
-
   // BABY / tBABY reward
   const formattedRewardBaby = rewardBalance
     ? ubbnToBaby(rewardBalance).toString()
@@ -69,22 +65,23 @@ export function Rewards() {
   const babyIcon = /BABY$/i.test(bbnCoinSymbol)
     ? babyTokenIcon
     : generatePlaceholder(bbnCoinSymbol.charAt(0));
-  const babyPrice = usePrice(bbnCoinSymbol);
-  rewards.push({
-    amount: formattedRewardBaby,
-    currencyIcon: babyIcon,
-    chainName: bbnNetworkName,
-    currencyName: bbnCoinSymbol,
-    placeholder: "0",
-    displayBalance: true,
-    balanceDetails: {
-      balance: formattedRewardBaby,
-      symbol: bbnCoinSymbol,
-      price: babyPrice,
-      displayUSD: true,
-      decimals: 6,
+  const rewards: RewardItem[] = [
+    {
+      amount: formattedRewardBaby,
+      currencyIcon: babyIcon,
+      chainName: bbnNetworkName,
+      currencyName: bbnCoinSymbol,
+      placeholder: "0",
+      displayBalance: true,
+      balanceDetails: {
+        balance: formattedRewardBaby,
+        symbol: bbnCoinSymbol,
+        price: 0,
+        displayUSD: false,
+        decimals: 6,
+      },
     },
-  });
+  ];
 
   const [previewOpen, setPreviewOpen] = useState(false);
 
@@ -104,8 +101,6 @@ export function Rewards() {
   };
 
   const claimDisabled = !rewardBalance || processing;
-
-  // Note: previous warning text removed; new modal API does not accept it
 
   return (
     <AuthGuard>
@@ -127,18 +122,12 @@ export function Rewards() {
           name: r.chainName,
           amount: {
             token: `${r.amount} ${r.balanceDetails.symbol}`,
-            usd: calculateTokenValueInCurrency(
-              Number(r.amount),
-              r.balanceDetails.price,
-            ),
+            usd: "",
           },
         }))}
         transactionFees={{
           token: `${ubbnToBaby(transactionFee).toFixed(6)} ${bbnCoinSymbol}`,
-          usd: calculateTokenValueInCurrency(
-            ubbnToBaby(transactionFee),
-            babyPrice,
-          ),
+          usd: "",
         }}
       />
 
