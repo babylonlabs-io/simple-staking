@@ -26,7 +26,7 @@ function DetailRow({ label, value }: DetailRowProps) {
       <span className="text-xs sm:text-sm text-accent-primary flex-shrink-0">
         {label}
       </span>
-      <span className="text-xs sm:text-sm text-accent-primary font-medium text-right min-w-0">
+      <span className="text-xs sm:text-sm text-accent-primary font-medium text-right min-w-0 truncate overflow-hidden text-ellipsis">
         {value}
       </span>
     </div>
