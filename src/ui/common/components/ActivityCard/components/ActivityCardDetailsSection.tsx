@@ -22,11 +22,11 @@ interface DetailRowProps {
 
 function DetailRow({ label, value }: DetailRowProps) {
   return (
-    <div className="flex items-center justify-between gap-2 min-w-0 overflow-x-auto">
+    <div className="flex items-center justify-between gap-2 min-w-0">
       <span className="text-xs sm:text-sm text-accent-primary flex-shrink-0">
         {label}
       </span>
-      <span className="text-xs sm:text-sm text-accent-primary font-medium text-right min-w-0 overflow-x-auto whitespace-nowrap">
+      <span className="text-xs sm:text-sm text-accent-primary font-medium text-right min-w-0 truncate overflow-hidden text-ellipsis">
         {value}
       </span>
     </div>
