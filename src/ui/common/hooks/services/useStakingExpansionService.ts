@@ -6,6 +6,7 @@ import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 import { useLogger } from "@/ui/common/hooks/useLogger";
+import { useAppState } from "@/ui/common/state";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   StakingExpansionStep,
@@ -114,6 +115,7 @@ export function useStakingExpansionService() {
   const { handleError } = useError();
   const { publicKeyNoCoord } = useBTCWallet();
   const logger = useLogger();
+  const { isLoading: isUTXOsLoading, availableUTXOs } = useAppState();
 
   /**
    * Calculate the fee amount for a staking expansion transaction.
@@ -124,6 +126,14 @@ export function useStakingExpansionService() {
         throw new ClientError(
           ERROR_CODES.VALIDATION_ERROR,
           "Invalid expansion form data provided",
+        );
+      }
+
+      // Check if UTXOs are still loading
+      if (isUTXOsLoading || !availableUTXOs || availableUTXOs.length === 0) {
+        throw new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Wallet UTXOs are still loading. Please wait a moment and try again.",
         );
       }
 
@@ -159,7 +169,7 @@ export function useStakingExpansionService() {
         );
       }
     },
-    [estimateStakingExpansionFee],
+    [estimateStakingExpansionFee, isUTXOsLoading, availableUTXOs],
   );
 
   /**
@@ -180,6 +190,17 @@ export function useStakingExpansionService() {
 
   const createExpansionEOI = useCallback(
     async (formData: StakingExpansionFormData) => {
+      // Check if UTXOs are still loading
+      if (isUTXOsLoading || !availableUTXOs || availableUTXOs.length === 0) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Wallet UTXOs are still loading. Please wait a moment and try again.",
+        );
+        handleError({ error: clientError });
+        reset();
+        return;
+      }
+
       try {
         const previousStakingTxHex = await fetchAndValidateTxHex(
           formData.originalDelegation.stakingTxHashHex,
@@ -271,11 +292,24 @@ export function useStakingExpansionService() {
       logger,
       handleError,
       reset,
+      isUTXOsLoading,
+      availableUTXOs,
     ],
   );
 
   const stakeDelegationExpansion = useCallback(
     async (delegation: DelegationV2) => {
+      // Check if UTXOs are still loading before starting
+      if (isUTXOsLoading || !availableUTXOs || availableUTXOs.length === 0) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "Wallet UTXOs are still loading. Please wait a moment and try again.",
+        );
+        handleError({ error: clientError });
+        reset();
+        return;
+      }
+
       try {
         setProcessing(true);
 
@@ -373,6 +407,8 @@ export function useStakingExpansionService() {
       submitStakingExpansionTx,
       updateExpansionStatus,
       reset,
+      isUTXOsLoading,
+      availableUTXOs,
     ],
   );
 
