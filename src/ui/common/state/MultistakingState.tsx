@@ -85,7 +85,8 @@ export function MultistakingState({ children }: PropsWithChildren) {
             .test(
               "containsBbnProvider",
               "Add Babylon Finality Provider",
-              (values) => values?.includes(BBN_CHAIN_ID),
+              (_, context) =>
+                Object.keys(context.originalValue || {}).includes(BBN_CHAIN_ID),
             ),
         },
         {
