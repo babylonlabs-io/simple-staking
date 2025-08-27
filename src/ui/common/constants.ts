@@ -61,6 +61,14 @@ export const REPLAYS_ON_ERROR_RATE = parseFloat(
 export const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
 
 /**
+ * Staking expansion operation types
+ */
+export const EXPANSION_OPERATIONS = {
+  ADD_BSN_FP: "ADD_BSN_FP",
+  RENEW_TIMELOCK: "RENEW_TIMELOCK",
+};
+
+/**
  * Shared EOI steps used across staking workflows
  */
 export enum EOIStep {
