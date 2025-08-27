@@ -31,7 +31,7 @@ export const Section: React.FC<SectionProps> = ({ title, content }) => {
           </Heading>
         </AccordionSummary>
         <AccordionDetails className="p-2" unmountOnExit>
-          <Text>{content}</Text>
+          <Text as="div">{content}</Text>
         </AccordionDetails>
       </Accordion>
     </div>
