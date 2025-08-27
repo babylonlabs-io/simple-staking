@@ -8,7 +8,6 @@ import { useRewardsState } from "@/ui/common/state/RewardState";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 
-import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
 import { LoadingStyle, StatItem } from "../Stats/StatItem";
 
@@ -17,14 +16,7 @@ const { networkName: bbnNetworkName, coinSymbol: bbnCoinSymbol } =
 const { coinSymbol, networkName } = getNetworkConfigBTC();
 
 export function PersonalBalance() {
-  const {
-    processing,
-    showProcessingModal,
-    closeProcessingModal,
-
-    transactionHash,
-    setTransactionHash,
-  } = useRewardsState();
+  const { processing } = useRewardsState();
 
   const {
     bbnBalance,
@@ -83,16 +75,6 @@ export function PersonalBalance() {
           loadingStyle={LoadingStyle.ShowSpinner}
         />
       </Section>
-
-      <ClaimStatusModal
-        open={showProcessingModal}
-        onClose={() => {
-          closeProcessingModal();
-          setTransactionHash("");
-        }}
-        loading={processing}
-        transactionHash={transactionHash}
-      />
     </AuthGuard>
   );
 }
