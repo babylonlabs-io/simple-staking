@@ -207,7 +207,7 @@ export const FinalityProviderTable = ({
                     {row.commission} %
                   </div>
                 ),
-                sorter: (a, b) => a.commission - b.commission,
+                sorter: (a, b) => parseFloat(a.commission) - parseFloat(b.commission),
               },
             ]}
             isRowSelectable={(row) => row.isSelectable}
