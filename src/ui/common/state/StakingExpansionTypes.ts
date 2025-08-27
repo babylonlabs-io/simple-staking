@@ -4,6 +4,7 @@ import { BaseStakingStep, EOIStep } from "@/ui/common/constants";
 import type { Bsn } from "@/ui/common/types/bsn";
 import type {
   DelegationV2,
+  DelegationV2StakingState,
   DelegationWithFP,
 } from "@/ui/common/types/delegationsV2";
 import type { FinalityProvider } from "@/ui/common/types/finalityProviders";
@@ -124,9 +125,9 @@ export interface StakingExpansionState {
   /** List of expansion delegations (pending and from API) */
   expansions: DelegationV2[];
   /** Add a pending expansion to local storage */
-  addPendingExpansion: (expansion: any) => void;
+  addPendingExpansion: (expansion: DelegationV2) => void;
   /** Update expansion status in local storage */
-  updateExpansionStatus: (id: string, status: any) => void;
+  updateExpansionStatus: (id: string, status: DelegationV2StakingState) => void;
   /** Refetch expansions from API to trigger cleanup */
   refetchExpansions: () => Promise<void>;
 }

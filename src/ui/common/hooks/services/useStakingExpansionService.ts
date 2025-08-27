@@ -31,16 +31,16 @@ import {
  * Helper function to extract covenant expansion signatures from delegation data.
  * These signatures are available after the expansion EOI is verified by Babylon.
  */
-const getCovenantExpansionSignatures = (delegation: any) => {
+const getCovenantExpansionSignatures = (delegation: DelegationV2) => {
   if (!delegation?.covenantUnbondingSignatures) {
     return [];
   }
 
   return delegation.covenantUnbondingSignatures
-    .filter((sig: any) => sig.stakeExpansionSignatureHex)
-    .map((sig: any) => ({
+    .filter((sig) => sig.stakeExpansionSignatureHex)
+    .map((sig) => ({
       btcPkHex: sig.covenantBtcPkHex,
-      sigHex: sig.stakeExpansionSignatureHex,
+      sigHex: sig.stakeExpansionSignatureHex as string,
     }));
 };
 
