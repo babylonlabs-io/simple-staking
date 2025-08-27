@@ -197,7 +197,7 @@ export const FinalityProviderTable = ({
                     {row.totalDelegation} {coinSymbol}
                   </div>
                 ),
-                sorter: (a, b) => a.totalDelegation - b.totalDelegation,
+                sorter: (a, b) => parseFloat(a.totalDelegation) - parseFloat(b.totalDelegation),
               },
               {
                 key: "commission",
