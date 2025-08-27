@@ -2,14 +2,12 @@ import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useUTXOs } from "@/ui/common/hooks/client/api/useUTXOs";
-import { useRewardsService } from "@/ui/common/hooks/services/useRewardsService";
 import { useIsMobileView } from "@/ui/common/hooks/useBreakpoint";
 import { useBalanceState } from "@/ui/common/state/BalanceState";
 import { useRewardsState } from "@/ui/common/state/RewardState";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 
-import { ClaimRewardModal } from "../Modals/ClaimRewardModal";
 import { ClaimStatusModal } from "../Modals/ClaimStatusModal/ClaimStatusModal";
 import { Section } from "../Section/Section";
 import { LoadingStyle, StatItem } from "../Stats/StatItem";
@@ -21,13 +19,9 @@ const { coinSymbol, networkName } = getNetworkConfigBTC();
 export function PersonalBalance() {
   const {
     processing,
-    showRewardModal,
     showProcessingModal,
     closeProcessingModal,
-    closeRewardModal,
-    bbnAddress,
-    rewardBalance,
-    transactionFee,
+
     transactionHash,
     setTransactionHash,
   } = useRewardsState();
@@ -43,10 +37,7 @@ export function PersonalBalance() {
   const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
   const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
 
-  const { claimRewards } = useRewardsService();
-
   const isMobile = useIsMobileView();
-  const formattedRewardBalance = ubbnToBaby(rewardBalance);
 
   return (
     <AuthGuard>
@@ -92,16 +83,6 @@ export function PersonalBalance() {
           loadingStyle={LoadingStyle.ShowSpinner}
         />
       </Section>
-
-      <ClaimRewardModal
-        processing={processing}
-        open={showRewardModal}
-        onClose={closeRewardModal}
-        onSubmit={claimRewards}
-        receivingValue={`${formattedRewardBalance}`}
-        address={bbnAddress}
-        transactionFee={transactionFee}
-      />
 
       <ClaimStatusModal
         open={showProcessingModal}
