@@ -197,7 +197,7 @@ export const FinalityProviderTable = ({
                     {row.totalDelegation} {coinSymbol}
                   </div>
                 ),
-                sorter: (a, b) => parseFloat(a.totalDelegation) - parseFloat(b.totalDelegation),
+                sorter: (a, b) => a.totalDelegation - b.totalDelegation,
               },
               {
                 key: "commission",
@@ -207,7 +207,7 @@ export const FinalityProviderTable = ({
                     {row.commission} %
                   </div>
                 ),
-                sorter: (a, b) => parseFloat(a.commission) - parseFloat(b.commission),
+                sorter: (a, b) => a.commission - b.commission,
               },
             ]}
             isRowSelectable={(row) => row.isSelectable}
