@@ -5,7 +5,7 @@ export interface Question {
   content: ReactNode;
 }
 
-export const questions = (coinName: string): Question[] => {
+export const questionsBtc = (coinName: string): Question[] => {
   const questionList = [
     {
       title: "What is Babylon?",
@@ -83,7 +83,7 @@ export const questions = (coinName: string): Question[] => {
             href="https://github.com/babylonlabs-io/btc-staker/blob/main/README.md"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary"
+            className="text-secondary-main"
           >
             <u>btc-staker CLI program</u>
           </a>{" "}
@@ -149,7 +149,7 @@ export const questions = (coinName: string): Question[] => {
             href="https://babylonlabs.io/terms-of-use"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-primary"
+            className="text-secondary-main"
           >
             <u>Terms of Use</u>
           </a>{" "}
@@ -218,3 +218,111 @@ export const questions = (coinName: string): Question[] => {
   ];
   return questionList;
 };
+
+export const questionsBaby = [
+  {
+    title: "What is the BABY token?",
+    content: (
+      <p>
+        BABY is the native token of Babylon Genesis. It powers transactions,
+        governance, and security across the BTCFi ecosystem.
+      </p>
+    ),
+  },
+  {
+    title: "How does BABY Staking work?",
+    content: (
+      <>
+        <p>
+          BABY holders lock their BABY tokens by delegating their BABY tokens to
+          a validator on Babylon Genesis, stakers are securely delegating their{" "}
+          <b>voting power</b>, not the custody of their funds. This trustless
+          process allows stakers to exercise governance rights and earn a share
+          of the protocol rewards while maintaining full control of their
+          tokens.
+        </p>
+        <br />
+        <p>
+          Validators secure the network, participate in consensus, and execute
+          transactions on behalf of BABY stakers.
+        </p>
+        <br />
+        <p>
+          If a validator misbehaves or attacks the network, the BABY tokens
+          delegated to them may be slashed. This mechanism helps deter malicious
+          behaviour and protects the integrity of the Babylon Genesis network.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: "What's BABY fast unbonding?",
+    content: (
+      <p>
+        Babylon&apos;s Genesis chain introduces a groundbreaking fast unbonding
+        feature that significantly enhances the staking experience for users,
+        allowing them to unstake their BABY tokens in a fraction of the time
+        compared to traditional Cosmos SDK chains. This feature is made possible
+        through a cryptographically secured accelerated unbonding protocol,
+        which reduces the standard 21-day unbonding time to approximately 2 days
+        by utilizing Bitcoin checkpoint verification and timestamping
+        technology. You can find more details{" "}
+        <a
+          href="https://docs.babylonlabs.io/babylon-genesis/babylon-genesis-staking/fast-unbonding"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-secondary-main"
+        >
+          here
+        </a>
+        .
+      </p>
+    ),
+  },
+  {
+    title: "How does epochized BABY staking work?",
+    content: (
+      <>
+        <p>
+          The Babylon Genesis chain uses an epoch-based staking mechanism,
+          differing from conventional Cosmos SDK implementations. This design
+          enhances security guarantees and reliable voting power transitions.
+        </p>
+        <br />
+        <p>
+          Instead of processing staking operations immediately, all actions
+          within an epoch are placed into a message queue. At the end of the
+          epoch, these queued operations are executed in bulk.
+        </p>
+        <br />
+        <p>
+          Each Babylon Genesis epoch lasts 1 hour. In practice, this means
+          staking, unbonding, and redelegation requests will be processed within
+          at most 1 hour after submission.
+        </p>
+      </>
+    ),
+  },
+  {
+    title: "I staked but my balance did not get reduced. Why?",
+    content: (
+      <p>
+        BABY staking is processed at the end of each epoch. To ensure your
+        staking transaction is successful, please ensure that your wallet
+        contains the full amount of BABY tokens you wish to stake throughout the
+        entire epoch period. Your token balance will only be deducted once the
+        transaction is executed, which may take up to an hour.
+      </p>
+    ),
+  },
+  {
+    title: "Does my BABY leave my wallet once staked?",
+    content: (
+      <p>
+        No. Your BABY stays in your wallet but becomes locked for the duration
+        of your staking period. You can&apos;t transfer or use it until you
+        unbond it.
+      </p>
+    ),
+  },
+];

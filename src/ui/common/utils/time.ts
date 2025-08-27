@@ -75,8 +75,34 @@ interface Duration {
 export const durationTillNow = (
   startTimestamp: string,
   currentTime: number,
+  isPrecise: boolean = true,
 ) => {
   if (!startTimestamp || startTimestamp.startsWith("000")) return "Ongoing";
+
+  // Coarse formatting branch when precision is not required
+  if (!isPrecise) {
+    const startMs = new Date(startTimestamp).getTime();
+    const diffMs = Math.max(0, currentTime - startMs);
+
+    // Less than a minute
+    if (diffMs < 60 * 1000) return "Just now";
+
+    // Under an hour: show minutes
+    if (diffMs < 60 * 60 * 1000) {
+      const minutes = Math.floor(diffMs / (60 * 1000));
+      return `${minutes} ${minutes === 1 ? "minute" : "minutes"} ago`;
+    }
+
+    // Under a day: show hours
+    if (diffMs < 24 * 60 * 60 * 1000) {
+      const hours = Math.floor(diffMs / (60 * 60 * 1000));
+      return `${hours} ${hours === 1 ? "hour" : "hours"} ago`;
+    }
+
+    // 1 day or more: show days
+    const days = Math.floor(diffMs / (24 * 60 * 60 * 1000));
+    return `${days} ${days === 1 ? "day" : "days"} ago`;
+  }
 
   const duration = intervalToDuration({
     end: currentTime,

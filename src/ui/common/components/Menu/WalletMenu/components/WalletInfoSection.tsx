@@ -1,15 +1,17 @@
 import { Avatar, Text } from "@babylonlabs-io/core-ui";
 
 import bbnIcon from "@/ui/common/assets/bbn.svg";
-import bitcoin from "@/ui/common/assets/bitcoin.png";
 import { Hash } from "@/ui/common/components/Hash/Hash";
 import { CopyIcon } from "@/ui/common/components/Icons";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 
 interface WalletInfoProps {
   btcAddress: string;
   bbnAddress: string;
   selectedWallets: Record<string, { name: string; icon: string }>;
 }
+
+const { icon } = getNetworkConfigBTC();
 
 export const WalletInfoSection = ({
   btcAddress,
@@ -28,7 +30,7 @@ export const WalletInfoSection = ({
           <div className="flex justify-start mb-3">
             <Avatar
               alt={selectedWallets["BTC"]?.name || "Bitcoin"}
-              url={selectedWallets["BTC"]?.icon || bitcoin}
+              url={selectedWallets["BTC"]?.icon || icon}
               size="large"
               className="w-10 h-10"
             />

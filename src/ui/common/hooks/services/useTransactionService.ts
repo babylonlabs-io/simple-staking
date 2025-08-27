@@ -32,7 +32,11 @@ export interface BtcStakingExpansionInputs {
 }
 
 export const useTransactionService = () => {
-  const { availableUTXOs, refetchUTXOs } = useAppState();
+  const {
+    availableUTXOs,
+    refetchUTXOs,
+    isLoading: isUTXOsLoading,
+  } = useAppState();
 
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
@@ -457,10 +461,19 @@ export const useTransactionService = () => {
         stakerInfo,
       );
 
-      if (!availableUTXOs) {
+      if (isUTXOsLoading) {
         const clientError = new ClientError(
           ERROR_CODES.INITIALIZATION_ERROR,
-          "Available UTXOs not initialized",
+          "Wallet UTXOs are still loading. Please wait a moment and try again.",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      if (!availableUTXOs || availableUTXOs.length === 0) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "No available UTXOs found. Please ensure your wallet has sufficient funds.",
         );
         logger.error(clientError);
         throw clientError;
@@ -498,6 +511,7 @@ export const useTransactionService = () => {
       stakerInfo,
       tipHeight,
       logger,
+      isUTXOsLoading,
     ],
   );
 
@@ -528,10 +542,19 @@ export const useTransactionService = () => {
         tipHeight,
         stakerInfo,
       );
-      if (!availableUTXOs) {
+      if (isUTXOsLoading) {
         const clientError = new ClientError(
           ERROR_CODES.INITIALIZATION_ERROR,
-          "Available UTXOs not initialized",
+          "Wallet UTXOs are still loading. Please wait a moment and try again.",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      if (!availableUTXOs || availableUTXOs.length === 0) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "No available UTXOs found. Please ensure your wallet has sufficient funds.",
         );
         logger.error(clientError);
         throw clientError;
@@ -556,7 +579,14 @@ export const useTransactionService = () => {
       );
       return fee;
     },
-    [createBtcStakingManager, tipHeight, stakerInfo, availableUTXOs, logger],
+    [
+      createBtcStakingManager,
+      tipHeight,
+      stakerInfo,
+      availableUTXOs,
+      logger,
+      isUTXOsLoading,
+    ],
   );
 
   /**
@@ -598,10 +628,19 @@ export const useTransactionService = () => {
         tipHeight,
         stakerInfo,
       );
-      if (!availableUTXOs) {
+      if (isUTXOsLoading) {
         const clientError = new ClientError(
           ERROR_CODES.INITIALIZATION_ERROR,
-          "Available UTXOs not initialized",
+          "Wallet UTXOs are still loading. Please wait a moment and try again.",
+        );
+        logger.error(clientError);
+        throw clientError;
+      }
+
+      if (!availableUTXOs || availableUTXOs.length === 0) {
+        const clientError = new ClientError(
+          ERROR_CODES.INITIALIZATION_ERROR,
+          "No available UTXOs found. Please ensure your wallet has sufficient funds.",
         );
         logger.error(clientError);
         throw clientError;
@@ -685,6 +724,7 @@ export const useTransactionService = () => {
       stakerInfo,
       tipHeight,
       logger,
+      isUTXOsLoading,
     ],
   );
 
