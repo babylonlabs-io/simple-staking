@@ -10,7 +10,7 @@ import { VerificationModal } from "@/ui/common/components/Modals/VerificationMod
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import { chainLogos } from "@/ui/common/constants";
+import { BaseStakingStep, chainLogos, EOIStep } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingExpansionService } from "@/ui/common/hooks/services/useStakingExpansionService";
@@ -33,17 +33,18 @@ import { SignDetailsModal } from "../Modals/SignDetailsModal";
 
 import { RenewTimelockModal } from "./RenewTimelockModal";
 import { StakingExpansionModal } from "./StakingExpansionModal";
+import { VerifiedStakeExpansionModal } from "./VerifiedStakeExpansionModal";
 
-const EOI_INDEXES: Record<string, number> = {
-  "eoi-staking-slashing": 1,
-  "eoi-unbonding-slashing": 2,
-  "eoi-proof-of-possession": 3,
-  "eoi-sign-bbn": 4,
+const EOI_STEP_INDEXES: Record<string, number> = {
+  [EOIStep.EOI_STAKING_SLASHING]: 1,
+  [EOIStep.EOI_UNBONDING_SLASHING]: 2,
+  [EOIStep.EOI_PROOF_OF_POSSESSION]: 3,
+  [EOIStep.EOI_SIGN_BBN]: 4,
 };
 
-const VERIFICATION_STEPS: Record<string, 1 | 2> = {
-  "eoi-send-bbn": 1,
-  verifying: 2,
+const VERIFICATION_STEP_INDEXES: Record<string, 1 | 2> = {
+  [EOIStep.EOI_SEND_BBN]: 1,
+  [BaseStakingStep.VERIFYING]: 2,
 };
 
 const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
@@ -57,6 +58,8 @@ function StakingExpansionModalSystemInner() {
     verifiedDelegation,
     reset: resetState,
     expansionStepOptions,
+    verifiedExpansionModalOpen,
+    setVerifiedExpansionModalOpen,
   } = useStakingExpansionState();
 
   const { getRegisteredFinalityProvider } = useFinalityProviderState();
@@ -232,76 +235,88 @@ function StakingExpansionModalSystemInner() {
     btcInUsd,
   ]);
 
-  if (!step) {
-    return null;
-  }
-
   const handleClose = () => {
     resetState();
     setDelegationV2StepOptions?.(undefined);
   };
 
+  const handleCloseVerifiedModal = () => {
+    setVerifiedExpansionModalOpen(false);
+  };
+
   return (
     <>
-      {step === StakingExpansionStep.BSN_FP_SELECTION && (
-        <StakingExpansionModal open onClose={handleClose} />
+      {/* Step-based modals - only render when there's an active step */}
+      {step && (
+        <>
+          {step === StakingExpansionStep.BSN_FP_SELECTION && (
+            <StakingExpansionModal open onClose={handleClose} />
+          )}
+          {step === StakingExpansionStep.RENEWAL_TIMELOCK && (
+            <RenewTimelockModal open onClose={handleClose} />
+          )}
+          {step === StakingExpansionStep.PREVIEW && formData && details && (
+            <PreviewMultistakingModal
+              open
+              processing={processing}
+              bsns={bsnInfos}
+              finalityProviders={finalityProviderInfos}
+              details={details}
+              isExpansion={true}
+              onClose={handleClose}
+              onProceed={async () => {
+                await createExpansionEOI(formData);
+                resetForm();
+                revalidateForm();
+              }}
+            />
+          )}
+          {Boolean(EOI_STEP_INDEXES[step]) && (
+            <SignModal
+              open
+              processing={processing}
+              step={EOI_STEP_INDEXES[step]}
+              title="Staking Expansion"
+              options={expansionStepOptions}
+            />
+          )}
+          {Boolean(VERIFICATION_STEP_INDEXES[step]) && (
+            <VerificationModal
+              open
+              processing={processing}
+              step={VERIFICATION_STEP_INDEXES[step]}
+            />
+          )}
+          {verifiedDelegation && (
+            <StakeModal
+              open={step === StakingExpansionStep.VERIFIED}
+              processing={processing}
+              onSubmit={() => stakeDelegationExpansion(verifiedDelegation)}
+              onClose={handleClose}
+            />
+          )}
+          <SuccessFeedbackModal
+            open={step === StakingExpansionStep.FEEDBACK_SUCCESS}
+            onClose={handleClose}
+          />
+          <CancelFeedbackModal
+            open={step === StakingExpansionStep.FEEDBACK_CANCEL}
+            onClose={handleClose}
+          />
+          <SignDetailsModal
+            open={Boolean(delegationV2StepOptions) && processing}
+            onClose={() => setDelegationV2StepOptions?.(undefined)}
+            details={delegationV2StepOptions}
+            title={detailsModalTitle}
+          />
+        </>
       )}
-      {step === StakingExpansionStep.RENEWAL_TIMELOCK && (
-        <RenewTimelockModal open onClose={handleClose} />
-      )}
-      {step === StakingExpansionStep.PREVIEW && formData && details && (
-        <PreviewMultistakingModal
-          open
-          processing={processing}
-          bsns={bsnInfos}
-          finalityProviders={finalityProviderInfos}
-          details={details}
-          isExpansion={true}
-          onClose={handleClose}
-          onProceed={async () => {
-            await createExpansionEOI(formData);
-            resetForm();
-            revalidateForm();
-          }}
-        />
-      )}
-      {Boolean(EOI_INDEXES[step]) && (
-        <SignModal
-          open
-          processing={processing}
-          step={EOI_INDEXES[step]}
-          title="Staking Expansion"
-          options={expansionStepOptions}
-        />
-      )}
-      {Boolean(VERIFICATION_STEPS[step]) && (
-        <VerificationModal
-          open
-          processing={processing}
-          step={VERIFICATION_STEPS[step]}
-        />
-      )}
-      {verifiedDelegation && (
-        <StakeModal
-          open={step === StakingExpansionStep.VERIFIED}
-          processing={processing}
-          onSubmit={() => stakeDelegationExpansion(verifiedDelegation)}
-          onClose={handleClose}
-        />
-      )}
-      <SuccessFeedbackModal
-        open={step === StakingExpansionStep.FEEDBACK_SUCCESS}
-        onClose={handleClose}
-      />
-      <CancelFeedbackModal
-        open={step === StakingExpansionStep.FEEDBACK_CANCEL}
-        onClose={handleClose}
-      />
-      <SignDetailsModal
-        open={Boolean(delegationV2StepOptions) && processing}
-        onClose={() => setDelegationV2StepOptions?.(undefined)}
-        details={delegationV2StepOptions}
-        title={detailsModalTitle}
+
+      {/* Independent modals - render regardless of step */}
+      <VerifiedStakeExpansionModal
+        open={verifiedExpansionModalOpen}
+        onClose={handleCloseVerifiedModal}
+        processing={processing}
       />
     </>
   );
