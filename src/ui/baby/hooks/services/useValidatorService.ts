@@ -39,8 +39,19 @@ export function useValidatorService() {
         if (nextKey) url.searchParams.set("pagination.key", nextKey);
         url.searchParams.set("pagination.limit", "200");
 
-        const resp = await fetch(url.toString());
-        if (!resp.ok) break;
+        let resp: Response;
+        try {
+          resp = await fetch(url.toString());
+        } catch (error) {
+          throw new Error(
+            `Network error while fetching signing infos: ${String(error)}`,
+          );
+        }
+        if (!resp.ok) {
+          throw new Error(
+            `Failed to fetch signing infos: ${resp.status} ${resp.statusText}`,
+          );
+        }
         const json = await resp.json();
         const infos = (json?.info ?? json?.signing_infos ?? []).map(
           (i: any) => ({
@@ -71,8 +82,21 @@ export function useValidatorService() {
         );
         if (nextKey) url.searchParams.set("pagination.key", nextKey);
         url.searchParams.set("pagination.limit", "200");
-        const resp = await fetch(url.toString());
-        if (!resp.ok) break;
+        let resp: Response;
+        try {
+          resp = await fetch(url.toString());
+        } catch (error) {
+          throw new Error(
+            `Network error while fetching validator set latest: ${String(
+              error,
+            )}`,
+          );
+        }
+        if (!resp.ok) {
+          throw new Error(
+            `Failed to fetch validator set latest: ${resp.status} ${resp.statusText}`,
+          );
+        }
         const json = await resp.json();
         const validators = json?.validators ?? [];
         results.push(...validators);

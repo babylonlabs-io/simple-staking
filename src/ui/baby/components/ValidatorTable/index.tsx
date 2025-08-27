@@ -75,10 +75,7 @@ export const ValidatorTable = ({
 
   const searchSuffix = (
     <div className="flex items-center gap-2 mr-2">
-      <Toggle
-        defaultValue={showSlashed}
-        onChange={(v) => onShowSlashedChange?.(v)}
-      />
+      <Toggle value={showSlashed} onChange={(v) => onShowSlashedChange?.(v)} />
       <Text variant="body2" className="text-accent-primary whitespace-nowrap">
         Show Slashed
       </Text>
@@ -121,7 +118,7 @@ export const ValidatorTable = ({
               { value: "slashed", label: "Slashed" },
             ]}
             placeholder="Active"
-            value={searchTerm ? "active" : status || "active"}
+            value={status || "active"}
             disabled={Boolean(searchTerm)}
             onSelect={(v) => onStatusChange?.(v as any)}
             renderSelectedOption={(option) => option.label}
