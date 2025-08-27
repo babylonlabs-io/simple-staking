@@ -20,6 +20,7 @@ export function AmountSection() {
 
   return (
     <AmountSubsection
+      autoFocus={false}
       fieldName="amount"
       currencyIcon={icon}
       currencyName={name}

@@ -68,7 +68,7 @@ export const StakingExpansionModal = ({
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const { calculateExpansionFeeAmount, displayExpansionPreview } =
     useStakingExpansionService();
-  const { networkInfo } = useAppState();
+  const { networkInfo, isLoading: isUTXOsLoading } = useAppState();
   const logger = useLogger();
   const { handleError } = useError();
 
@@ -218,6 +218,17 @@ export const StakingExpansionModal = ({
   const handleExpand = useCallback(async () => {
     if (!formData) return;
 
+    // Check if UTXOs are still loading
+    if (isUTXOsLoading) {
+      handleError({
+        error: new Error(
+          "Please wait for wallet UTXOs to finish loading before expanding.",
+        ),
+        displayOptions: { showModal: true },
+      });
+      return;
+    }
+
     // Calculate fee amount
     setIsCalculatingFee(true);
     try {
@@ -252,6 +263,7 @@ export const StakingExpansionModal = ({
     displayExpansionPreview,
     handleClose,
     handleError,
+    isUTXOsLoading,
   ]);
 
   // Don't render until we have form data
@@ -261,7 +273,8 @@ export const StakingExpansionModal = ({
 
   const availableSlots = getAvailableBsnSlots();
   const selectedCount = Object.keys(selectedBsnFps).length;
-  const canExpand = selectedCount > 0 && selectedCount <= availableSlots;
+  const canExpand =
+    selectedCount > 0 && selectedCount <= availableSlots && !isUTXOsLoading;
 
   return (
     <Fragment>
@@ -277,7 +290,7 @@ export const StakingExpansionModal = ({
         onSelect={handleBsnSelect}
         onRemove={handleRemoveBsnFp}
         onExpand={canExpand ? handleExpand : undefined}
-        expandLoading={isCalculatingFee}
+        expandLoading={isCalculatingFee || isUTXOsLoading}
       />
 
       {/* Reuse existing FinalityProviderModal for FP selection */}
