@@ -12,6 +12,7 @@ import iconRenew from "@/ui/common/assets/expansion-renew.svg";
 import iconVerified from "@/ui/common/assets/expansion-verified.svg";
 import { useExpansionHistoryService } from "@/ui/common/hooks/services/useExpansionHistoryService";
 import { useVerifiedStakingExpansionService } from "@/ui/common/hooks/services/useVerifiedStakingExpansionService";
+import { useAppState } from "@/ui/common/state";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
@@ -40,6 +41,7 @@ export function StakeExpansionSection({
     openVerifiedExpansionModalForDelegation,
     getVerifiedExpansionInfoForDelegation,
   } = useVerifiedStakingExpansionService();
+  const { isLoading: isUTXOsLoading } = useAppState();
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
   const canExpandDelegation = canExpand(delegation);
@@ -52,6 +54,11 @@ export function StakeExpansionSection({
 
     if (processing) {
       console.warn("Cannot start expansion: another operation in progress");
+      return;
+    }
+
+    if (isUTXOsLoading) {
+      console.warn("Cannot start expansion: UTXOs are still loading");
       return;
     }
 
@@ -75,6 +82,11 @@ export function StakeExpansionSection({
   const handleRenewStakingTerm = () => {
     if (processing) {
       // Cannot start renewal: another operation in progress
+      return;
+    }
+
+    if (isUTXOsLoading) {
+      // Cannot start renewal: UTXOs are still loading
       return;
     }
 
@@ -146,13 +158,13 @@ export function StakeExpansionSection({
               text="Add BSNs and Finality Providers"
               counter={`${currentBsnCount}/${maxFinalityProviders}`}
               onClick={handleAddBsnFp}
-              disabled={!canExpandDelegation || processing}
+              disabled={!canExpandDelegation || processing || isUTXOsLoading}
             />
             <ExpansionButton
               Icon={iconRenew}
               text="Renew Staking Term"
               onClick={handleRenewStakingTerm}
-              disabled={processing}
+              disabled={processing || isUTXOsLoading}
             />
             <ExpansionButton
               Icon={iconHistory}
@@ -163,7 +175,9 @@ export function StakeExpansionSection({
                   : undefined
               }
               onClick={handleExpansionHistory}
-              disabled={expansionHistoryCount === 0 || processing}
+              disabled={
+                expansionHistoryCount === 0 || processing || isUTXOsLoading
+              }
             />
             {delegationVerifiedExpansionInfo.hasVerifiedExpansions && (
               <ExpansionButton
@@ -173,7 +187,8 @@ export function StakeExpansionSection({
                 onClick={handleVerifiedExpansion}
                 disabled={
                   !delegationVerifiedExpansionInfo.hasVerifiedExpansions ||
-                  processing
+                  processing ||
+                  isUTXOsLoading
                 }
               />
             )}
