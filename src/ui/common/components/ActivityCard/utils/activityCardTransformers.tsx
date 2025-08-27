@@ -1,4 +1,3 @@
-import bitcoin from "@/ui/common/assets/bitcoin.png";
 import { Status } from "@/ui/common/components/Delegations/DelegationList/components/Status";
 import { Hash } from "@/ui/common/components/Hash/Hash";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
@@ -15,7 +14,7 @@ import { durationTillNow } from "@/ui/common/utils/time";
 import { createBsnFpGroupedDetails } from "../../../utils/bsnFpGroupingUtils";
 import { ActivityCardData, ActivityCardDetailItem } from "../ActivityCard";
 
-const { coinName } = getNetworkConfigBTC();
+const { coinName, icon } = getNetworkConfigBTC();
 
 export interface ActivityCardTransformOptions {
   showExpansionSection?: boolean;
@@ -56,7 +55,7 @@ export function transformDelegationToActivityCard(
     {
       label: "Inception",
       value: delegation.bbnInceptionTime
-        ? durationTillNow(delegation.bbnInceptionTime, Date.now())
+        ? durationTillNow(delegation.bbnInceptionTime, Date.now(), false)
         : "N/A",
     },
     {
@@ -99,7 +98,7 @@ export function transformDelegationToActivityCard(
 
   return {
     formattedAmount,
-    icon: bitcoin,
+    icon: icon,
     iconAlt: "bitcoin",
     details,
     groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,

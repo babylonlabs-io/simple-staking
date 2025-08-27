@@ -11,6 +11,7 @@ interface AmountFieldProps {
 
 export const AmountField = ({ balance, price }: AmountFieldProps) => (
   <AmountSubsection
+    autoFocus={false}
     displayBalance
     fieldName="amount"
     currencyIcon={logo}
