@@ -2,8 +2,10 @@ import {
   DialogBody,
   DialogHeader,
   Input,
+  Select,
   Table,
   Text,
+  Toggle,
 } from "@babylonlabs-io/core-ui";
 import type { PropsWithChildren } from "react";
 import { MdCancel } from "react-icons/md";
@@ -22,6 +24,7 @@ export interface Validator {
   votingPower: number;
   commission: number;
   tokens: number;
+  status: "active" | "inactive" | "jailed" | "slashed";
   // apr: number;
   // logoUrl: string;
 }
@@ -29,19 +32,29 @@ export interface Validator {
 interface ValidatorTableProps {
   open: boolean;
   searchTerm: string;
+  status?: "active" | "inactive" | "jailed" | "slashed" | "";
+  showSlashed?: boolean;
   validators: Validator[];
   onClose?: () => void;
   onSelect?: (validator: Validator) => void;
   onSearch?: (value: string) => void;
+  onStatusChange?: (
+    value: "active" | "inactive" | "jailed" | "slashed" | "",
+  ) => void;
+  onShowSlashedChange?: (value: boolean) => void;
 }
 
 export const ValidatorTable = ({
   open,
   validators,
   searchTerm,
+  status = "",
+  showSlashed = false,
   onClose,
   onSelect,
   onSearch,
+  onStatusChange,
+  onShowSlashedChange,
 }: PropsWithChildren<ValidatorTableProps>) => {
   const onClearSearch = () => {
     onSearch?.("");
@@ -58,6 +71,18 @@ export const ValidatorTable = ({
     <span className="text-secondary-strokeDark">
       <RiSearchLine size={20} />
     </span>
+  );
+
+  const searchSuffix = (
+    <div className="flex items-center gap-2 mr-2">
+      <Toggle
+        defaultValue={showSlashed}
+        onChange={(v) => onShowSlashedChange?.(v)}
+      />
+      <Text variant="body2" className="text-accent-primary whitespace-nowrap">
+        Show Slashed
+      </Text>
+    </div>
   );
 
   return (
@@ -77,19 +102,38 @@ export const ValidatorTable = ({
           of Babylon Genesis.
         </Text>
 
-        <Input
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e) => onSearch?.(e.target.value)}
-          prefix={searchPrefix}
-          className="w-full"
-        />
+        <div className="flex gap-3 items-center">
+          <div className="flex-1 min-w-0">
+            <Input
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => onSearch?.(e.target.value)}
+              prefix={searchPrefix}
+              suffix={searchSuffix}
+              className="w-full"
+            />
+          </div>
+          <Select
+            options={[
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+              { value: "jailed", label: "Jailed" },
+              { value: "slashed", label: "Slashed" },
+            ]}
+            placeholder="Active"
+            value={searchTerm ? "active" : status || "active"}
+            disabled={Boolean(searchTerm)}
+            onSelect={(v) => onStatusChange?.(v as any)}
+            renderSelectedOption={(option) => option.label}
+            className="w-[120px] flex-shrink-0"
+          />
+        </div>
 
         <Table
           data={validators}
           columns={columns}
-          className="w-full"
-          wrapperClassName="w-full"
+          className="min-w-0 w-full table-fixed"
+          wrapperClassName="w-full overflow-x-hidden"
           onRowSelect={(row) => {
             if (row) {
               onSelect?.(row);
