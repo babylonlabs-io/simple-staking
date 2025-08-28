@@ -86,7 +86,7 @@ export const WalletInfoSection = ({
               Staked Balance
             </Text>
             {isBalanceLoading ? (
-              <Loader size={20} />
+              <Loader size={20} className="text-accent-primary" />
             ) : (
               <Text variant="body1" className="text-accent-primary text-sm">
                 {`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
@@ -116,7 +116,7 @@ export const WalletInfoSection = ({
                 </Hint>
               )}
               {(isBalanceLoading || hasUnconfirmedUTXOs) && (
-                <Loader size={20} />
+                <Loader size={20} className="text-accent-primary" />
               )}
             </div>
           </div>
@@ -171,7 +171,7 @@ export const WalletInfoSection = ({
               Balance
             </Text>
             {isBalanceLoading ? (
-              <Loader size={20} />
+              <Loader size={20} className="text-accent-primary" />
             ) : (
               <Text variant="body1" className="text-accent-primary text-sm">
                 {`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
