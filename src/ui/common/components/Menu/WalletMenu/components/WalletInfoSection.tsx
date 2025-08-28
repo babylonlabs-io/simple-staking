@@ -8,7 +8,6 @@ import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useUTXOs } from "@/ui/common/hooks/client/api/useUTXOs";
 import { useBalanceState } from "@/ui/common/state/BalanceState";
-import { useRewardsState } from "@/ui/common/state/RewardState";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 
@@ -26,8 +25,6 @@ export const WalletInfoSection = ({
   bbnAddress,
   selectedWallets,
 }: WalletInfoProps) => {
-  const { processing } = useRewardsState();
-
   const {
     bbnBalance,
     stakableBtcBalance,
@@ -89,7 +86,7 @@ export const WalletInfoSection = ({
               Staked Balance
             </Text>
             {isBalanceLoading ? (
-              <Loader />
+              <Loader size={20} />
             ) : (
               <Text variant="body1" className="text-accent-primary text-sm">
                 {`${satoshiToBtc(stakedBtcBalance)} ${coinSymbol}`}
@@ -104,20 +101,24 @@ export const WalletInfoSection = ({
             >
               Stakable Balance
             </Text>
-            {!(isBalanceLoading || hasUnconfirmedUTXOs) && (
-              <Hint
-                tooltip={
-                  inscriptionsBtcBalance
-                    ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
-                    : undefined
-                }
-              >
-                <Text variant="body1" className="text-accent-primary text-sm">
-                  {`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
-                </Text>
-              </Hint>
-            )}
-            {(isBalanceLoading || hasUnconfirmedUTXOs) && <Loader />}
+            <div className="flex items-center gap-2">
+              {!(isBalanceLoading || hasUnconfirmedUTXOs) && (
+                <Hint
+                  tooltip={
+                    inscriptionsBtcBalance
+                      ? `You have ${satoshiToBtc(inscriptionsBtcBalance)} ${coinSymbol} that contains inscriptions. To use this in your stakable balance unlock them within the menu.`
+                      : undefined
+                  }
+                >
+                  <Text variant="body1" className="text-accent-primary text-sm">
+                    {`${satoshiToBtc(stakableBtcBalance)} ${coinSymbol}`}
+                  </Text>
+                </Hint>
+              )}
+              {(isBalanceLoading || hasUnconfirmedUTXOs) && (
+                <Loader size={20} />
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -169,8 +170,8 @@ export const WalletInfoSection = ({
             >
               Balance
             </Text>
-            {isBalanceLoading || processing ? (
-              <Loader />
+            {isBalanceLoading ? (
+              <Loader size={20} />
             ) : (
               <Text variant="body1" className="text-accent-primary text-sm">
                 {`${ubbnToBaby(bbnBalance)} ${bbnCoinSymbol}`}
