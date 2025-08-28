@@ -3,14 +3,17 @@ import { memo } from "react";
 
 import { Section } from "@/ui/common/components/Section/Section";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { useBsn } from "@/ui/common/hooks/client/api/useBsn";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useSystemStats } from "@/ui/common/hooks/client/api/useSystemStats";
+import { Network } from "@/ui/common/types/network";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
+import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
 import { formatBTCTvl } from "@/ui/common/utils/formatBTCTvl";
 
 import { StatItem } from "./StatItem";
 
-const { coinSymbol } = getNetworkConfigBTC();
+const { coinSymbol, network } = getNetworkConfigBTC();
 
 const formatter = Intl.NumberFormat("en", {
   notation: "compact",
@@ -28,6 +31,9 @@ export const Stats = memo(() => {
     isLoading,
   } = useSystemStats();
   const usdRate = usePrice(coinSymbol);
+  const { data: bsns = [], isLoading: isBsnLoading } = useBsn({
+    enabled: FeatureFlagService.IsPhase3Enabled,
+  });
 
   return (
     <Section title="Babylon Bitcoin Staking Stats">
@@ -43,17 +49,25 @@ export const Stats = memo(() => {
         />
 
         <StatItem
-          hidden={!stakingAPR}
+          hidden={network === Network.MAINNET ? !stakingAPR : false}
           loading={isLoading}
           title={`${coinSymbol} Staking APR`}
-          value={`${formatter.format(stakingAPR ? stakingAPR * 100 : 0)}%`}
+          value={`${formatter.format(network === Network.MAINNET && stakingAPR ? stakingAPR * 100 : 0)}%`}
         />
 
-        <StatItem
-          loading={isLoading}
-          title="Finality Providers"
-          value={`${formatter.format(activeFPs)} Active (${formatter.format(totalFPs)} Total)`}
-        />
+        {FeatureFlagService.IsPhase3Enabled ? (
+          <StatItem
+            loading={isLoading || isBsnLoading}
+            title="BSNs"
+            value={`${formatter.format(bsns.length)}`}
+          />
+        ) : (
+          <StatItem
+            loading={isLoading}
+            title="Finality Providers"
+            value={`${formatter.format(activeFPs)} Active (${formatter.format(totalFPs)} Total)`}
+          />
+        )}
       </List>
     </Section>
   );

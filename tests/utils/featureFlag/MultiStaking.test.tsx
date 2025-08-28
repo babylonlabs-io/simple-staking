@@ -41,9 +41,6 @@ jest.mock("@/ui/common/components/Delegations/Activity", () => ({
 jest.mock("@/ui/common/components/Header/Header", () => ({
   Header: () => null,
 })); // Uses @uidotdev/usehooks
-jest.mock("@/ui/common/components/PersonalBalance/PersonalBalance", () => ({
-  PersonalBalance: () => null,
-})); // Has API dependencies
 jest.mock("@/ui/common/components/Stats/Stats", () => ({ Stats: () => null })); // Has API dependencies
 jest.mock("@/ui/common/components/FAQ/FAQ", () => ({ FAQ: () => null })); // Uses ResizeObserver
 

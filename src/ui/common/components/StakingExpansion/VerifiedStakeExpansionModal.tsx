@@ -11,6 +11,7 @@ import { BiSolidBadgeCheck } from "react-icons/bi";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { EXPANSION_OPERATIONS } from "@/ui/common/constants";
 import { useVerifiedStakingExpansionService } from "@/ui/common/hooks/services/useVerifiedStakingExpansionService";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
@@ -23,16 +24,14 @@ import { trim } from "@/ui/common/utils/trim";
 const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 const { coinSymbol } = getNetworkConfigBTC();
 
-type ExpansionType = "ADD_BSN_FP" | "RENEW_TIMELOCK";
-
 // Helper function to determine expansion operation type
 const getExpansionType = (
   expansion: DelegationV2,
   original: DelegationV2 | undefined,
-): ExpansionType => {
+) => {
   if (!original) {
     // If we can't find original, assume it's adding BSN/FP based on having previous tx
-    return "ADD_BSN_FP";
+    return EXPANSION_OPERATIONS.ADD_BSN_FP;
   }
 
   const newFPs = expansion.finalityProviderBtcPksHex.filter(
@@ -41,9 +40,9 @@ const getExpansionType = (
   const fpsChanged = newFPs.length > 0;
 
   if (fpsChanged) {
-    return "ADD_BSN_FP"; // Adding BSN/FP (always includes timelock renewal)
+    return EXPANSION_OPERATIONS.ADD_BSN_FP; // Adding BSN/FP (always includes timelock renewal)
   } else {
-    return "RENEW_TIMELOCK"; // Pure timelock renewal only
+    return EXPANSION_OPERATIONS.RENEW_TIMELOCK; // Pure timelock renewal only
   }
 
   // TODO: Future expansion types to consider:
@@ -127,9 +126,9 @@ function VerifiedExpansionItem({
           <div className="flex items-center gap-2">
             <BiSolidBadgeCheck className="text-xl text-primary-light" />
             <Text variant="body1" className="font-medium text-accent-primary">
-              {operationType === "RENEW_TIMELOCK"
+              {operationType === EXPANSION_OPERATIONS.RENEW_TIMELOCK
                 ? "Timelock Renewal"
-                : operationType === "ADD_BSN_FP"
+                : operationType === EXPANSION_OPERATIONS.ADD_BSN_FP
                   ? "BSN/FP Expansion"
                   : "Verified Expansion"}
             </Text>
@@ -155,19 +154,20 @@ function VerifiedExpansionItem({
             </div>
 
             {/* Show different information based on operation type */}
-            {operationType === "RENEW_TIMELOCK" && originalDelegation && (
-              <div className="flex items-center gap-2">
-                <Text variant="body2" className="text-accent-secondary">
-                  Timelock:
-                </Text>
-                <Text variant="body2" className="text-accent-primary">
-                  {originalDelegation.stakingTimelock.toLocaleString()} blocks →{" "}
-                  {delegation.stakingTimelock.toLocaleString()} blocks
-                </Text>
-              </div>
-            )}
+            {operationType === EXPANSION_OPERATIONS.RENEW_TIMELOCK &&
+              originalDelegation && (
+                <div className="flex items-center gap-2">
+                  <Text variant="body2" className="text-accent-secondary">
+                    Timelock:
+                  </Text>
+                  <Text variant="body2" className="text-accent-primary">
+                    {originalDelegation.stakingTimelock.toLocaleString()} blocks
+                    → {delegation.stakingTimelock.toLocaleString()} blocks
+                  </Text>
+                </div>
+              )}
 
-            {operationType === "ADD_BSN_FP" && (
+            {operationType === EXPANSION_OPERATIONS.ADD_BSN_FP && (
               <>
                 {newCount > 0 && (
                   <div className="flex items-center gap-2">
@@ -212,11 +212,12 @@ function VerifiedExpansionItem({
                     {pair.bsnName} / {pair.fpName}
                   </Text>
                   {/* Only show NEW labels for ADD_BSN_FP operations and actually new pairs */}
-                  {operationType === "ADD_BSN_FP" && pair.isNew && (
-                    <span className="text-xs bg-primary-light/10 text-primary-light px-2 py-0.5 rounded">
-                      NEW
-                    </span>
-                  )}
+                  {operationType === EXPANSION_OPERATIONS.ADD_BSN_FP &&
+                    pair.isNew && (
+                      <span className="text-xs bg-primary-light/10 text-primary-light px-2 py-0.5 rounded">
+                        NEW
+                      </span>
+                    )}
                 </div>
               ))}
             </div>
