@@ -2,7 +2,7 @@ import { useWalletConnect } from "@babylonlabs-io/wallet-connector";
 import { useEffect, useState } from "react";
 
 import { DelegationState } from "@/ui/baby/state/DelegationState";
-import { RewardState, useRewardState } from "@/ui/baby/state/RewardState";
+import { RewardState } from "@/ui/baby/state/RewardState";
 import { StakingState } from "@/ui/baby/state/StakingState";
 import { ValidatorState } from "@/ui/baby/state/ValidatorState";
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
@@ -53,28 +53,11 @@ function BabyLayoutContent() {
   useEpochPolling(bech32Address);
 
   const RewardsTab: React.FC = () => {
-    const {
-      showClaimModal,
-      closeClaimModal,
-      claimAll,
-      loading: rewardLoading,
-      totalReward,
-      rewards,
-    } = useRewardState();
-
     return (
       <Section>
         <div className="h-[500px]">
           <RewardCard />
-          <RewardsPreviewModal
-            open={showClaimModal}
-            processing={rewardLoading}
-            title="Claim Rewards"
-            totalReward={totalReward}
-            rewards={rewards}
-            onClose={closeClaimModal}
-            onProceed={claimAll}
-          />
+          <RewardsPreviewModal />
         </div>
       </Section>
     );

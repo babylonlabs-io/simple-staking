@@ -5,9 +5,10 @@ import {
   DialogHeader,
   Text,
 } from "@babylonlabs-io/core-ui";
-import { PropsWithChildren, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import babylon from "@/infrastructure/babylon";
+import { useRewardState } from "@/ui/baby/state/RewardState";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
@@ -19,27 +20,17 @@ import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 const { coinSymbol, displayUSD } = getNetworkConfigBBN();
 
-interface PreviewModalProps {
-  open: boolean;
-  processing?: boolean;
-  title: string;
-  onClose: () => void;
-  onProceed: () => void;
-  rewards: Array<{ validatorAddress: string }>;
-  totalReward: bigint;
-}
-
-export const RewardsPreviewModal = ({
-  open,
-  processing = false,
-  title,
-  onClose,
-  onProceed,
-  rewards,
-  totalReward,
-}: PropsWithChildren<PreviewModalProps>) => {
+export const RewardsPreviewModal = () => {
   const { bech32Address } = useCosmosWallet();
   const { estimateBbnGasFee } = useBbnTransaction();
+  const {
+    totalReward,
+    rewards,
+    showClaimModal: open,
+    loading: processing,
+    closeClaimModal: onClose,
+    claimAll: onProceed,
+  } = useRewardState();
   const babyPrice = usePrice(coinSymbol);
   const [feeAmount, setFeeAmount] = useState<number>(0);
   const [feeLoading, setFeeLoading] = useState<boolean>(false);
@@ -51,7 +42,7 @@ export const RewardsPreviewModal = ({
 
       setFeeLoading(true);
       try {
-        const msgs = rewards.map((reward) =>
+        const msgs = rewards.map((reward: { validatorAddress: string }) =>
           babylon.txs.baby.createClaimRewardMsg({
             validatorAddress: reward.validatorAddress,
             delegatorAddress: bech32Address,
@@ -85,7 +76,7 @@ export const RewardsPreviewModal = ({
     : undefined;
   return (
     <ResponsiveDialog open={open} onClose={onClose}>
-      <DialogHeader title={title} className="text-accent-primary" />
+      <DialogHeader title="Claim Rewards" className="text-accent-primary" />
 
       <DialogBody className="no-scrollbar mb-[40px] mt-8 flex max-h-[calc(100vh-12rem)] flex-col gap-[40px] overflow-y-auto text-accent-primary">
         <div className="flex flex-col gap-4">
