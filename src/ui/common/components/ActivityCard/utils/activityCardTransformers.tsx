@@ -50,7 +50,7 @@ export function transformDelegationToActivityCard(
   const details: ActivityCardDetailItem[] = [
     {
       label: "Status",
-      value: <Status delegation={delegationWithFP} showTooltip={false} />,
+      value: <Status delegation={delegationWithFP} showTooltip={true} />,
     },
     {
       label: "Inception",
