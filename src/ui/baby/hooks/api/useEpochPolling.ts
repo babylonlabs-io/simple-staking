@@ -1,60 +1,58 @@
-import { useQueryClient } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+// import { useEffect, useRef } from "react";
 
 import babylon from "@/infrastructure/babylon";
 import { ONE_MINUTE } from "@/ui/common/constants";
 
-import { usePendingOperationsService } from "../services/usePendingOperationsService";
+// import { usePendingOperationsService } from "../services/usePendingOperationsService";
 
-import { BABY_DELEGATIONS_KEY } from "./useDelegations";
-import { BABY_UNBONDING_DELEGATIONS_KEY } from "./useUnbondingDelegations";
+// import { BABY_DELEGATIONS_KEY } from "./useDelegations";
+// import { BABY_UNBONDING_DELEGATIONS_KEY } from "./useUnbondingDelegations";
+
+const BABYLON_CURRENT_EPOCH_KEY = "BABYLON_CURRENT_EPOCH";
 
 export function useEpochPolling(address?: string) {
-  const queryClient = useQueryClient();
-  const previousEpochRef = useRef<number | undefined>(undefined);
-  const { cleanupAllPendingOperationsFromStorage } =
-    usePendingOperationsService();
-  const cleanupRef = useRef(cleanupAllPendingOperationsFromStorage);
-  cleanupRef.current = cleanupAllPendingOperationsFromStorage;
+  // const queryClient = useQueryClient();
+  // const previousEpochRef = useRef<number | undefined>(undefined);
+  // const { cleanupAllPendingOperationsFromStorage } =
+  //   usePendingOperationsService();
 
-  useEffect(() => {
-    if (!address) return;
+  // Use useQuery for caching and background updates
+  const { data: currentEpoch } = useQuery<number, Error>({
+    queryKey: [BABYLON_CURRENT_EPOCH_KEY],
+    queryFn: async () => {
+      const client = await babylon.client();
+      const { currentEpoch } = await client.baby.getCurrentEpoch();
+      return currentEpoch;
+    },
+    refetchInterval: ONE_MINUTE,
+    enabled: Boolean(address),
+    staleTime: ONE_MINUTE,
+    refetchOnWindowFocus: false,
+  });
+  return currentEpoch;
 
-    let cancelled = false;
+  // Manual control for epoch change detection
+  // useEffect(() => {
+  //   if (currentEpoch === undefined) return;
 
-    const checkEpoch = async () => {
-      try {
-        const client = await babylon.client();
-        const { currentEpoch } = await client.baby.getCurrentEpoch();
+  //   if (previousEpochRef.current === undefined) {
+  //     previousEpochRef.current = currentEpoch;
+  //     return;
+  //   }
 
-        if (previousEpochRef.current === undefined) {
-          previousEpochRef.current = currentEpoch;
-          return;
-        }
+  //   if (currentEpoch !== previousEpochRef.current) {
+  //     cleanupAllPendingOperationsFromStorage();
 
-        if (!cancelled && currentEpoch !== previousEpochRef.current) {
-          cleanupRef.current?.();
-
-          queryClient.invalidateQueries({
-            queryKey: [BABY_DELEGATIONS_KEY],
-            refetchType: "active",
-          });
-          queryClient.invalidateQueries({
-            queryKey: [BABY_UNBONDING_DELEGATIONS_KEY],
-            refetchType: "active",
-          });
-          previousEpochRef.current = currentEpoch;
-        }
-      } catch {
-        // ignore transient errors
-      }
-    };
-
-    checkEpoch();
-    const id = setInterval(checkEpoch, ONE_MINUTE);
-    return () => {
-      cancelled = true;
-      clearInterval(id);
-    };
-  }, [address, queryClient]);
+  //     queryClient.invalidateQueries({
+  //       queryKey: [BABY_DELEGATIONS_KEY],
+  //       refetchType: "active",
+  //     });
+  //     queryClient.invalidateQueries({
+  //       queryKey: [BABY_UNBONDING_DELEGATIONS_KEY],
+  //       refetchType: "active",
+  //     });
+  //     previousEpochRef.current = currentEpoch;
+  //   }
+  // }, [currentEpoch, queryClient, cleanupAllPendingOperationsFromStorage]);
 }
