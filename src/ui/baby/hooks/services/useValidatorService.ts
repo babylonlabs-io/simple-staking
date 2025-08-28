@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import babylon from "@/infrastructure/babylon";
 import { useClientQuery } from "@/ui/common/hooks/client/useClient";
 
 import { usePool } from "../api/usePool";
@@ -22,8 +22,6 @@ export function useValidatorService() {
   const { data: validatorList = [], isLoading } = useValidators();
   const { data: pool, isLoading: isPoolLoading } = usePool();
 
-  const { lcdUrl } = getNetworkConfigBBN();
-
   const { data: signingInfos = [] } = useClientQuery<
     { address: string; tombstoned: boolean }[],
     Error,
@@ -32,84 +30,28 @@ export function useValidatorService() {
   >({
     queryKey: ["BABY_SLASHING_SIGNING_INFOS"],
     queryFn: async () => {
-      const results: { address: string; tombstoned: boolean }[] = [];
-      let nextKey: string | undefined = undefined;
-      do {
-        const url = new URL(`${lcdUrl}/cosmos/slashing/v1beta1/signing_infos`);
-        if (nextKey) url.searchParams.set("pagination.key", nextKey);
-        url.searchParams.set("pagination.limit", "200");
-
-        let resp: Response;
-        try {
-          resp = await fetch(url.toString());
-        } catch (error) {
-          throw new Error(
-            `Network error while fetching signing infos: ${String(error)}`,
-          );
-        }
-        if (!resp.ok) {
-          throw new Error(
-            `Failed to fetch signing infos: ${resp.status} ${resp.statusText}`,
-          );
-        }
-        const json = await resp.json();
-        const infos = (json?.info ?? json?.signing_infos ?? []).map(
-          (i: any) => ({
-            address: i.address,
-            tombstoned: Boolean(i.tombstoned),
-          }),
-        );
-        results.push(...infos);
-        nextKey = json?.pagination?.next_key ?? json?.pagination?.nextKey;
-      } while (nextKey);
-      return results;
+      const client = await babylon.client();
+      return client.baby.getSigningInfos();
     },
   });
 
   const { data: validatorSetLatest = [] } = useClientQuery<
-    { address: string; pub_key?: { key?: string } }[],
+    { address: string; pubKey?: { key?: string } }[],
     Error,
-    { address: string; pub_key?: { key?: string } }[],
+    { address: string; pubKey?: { key?: string } }[],
     [string]
   >({
     queryKey: ["BABY_VALIDATORSET_LATEST"],
     queryFn: async () => {
-      const results: { address: string; pub_key?: { key?: string } }[] = [];
-      let nextKey: string | undefined = undefined;
-      do {
-        const url = new URL(
-          `${lcdUrl}/cosmos/base/tendermint/v1beta1/validatorsets/latest`,
-        );
-        if (nextKey) url.searchParams.set("pagination.key", nextKey);
-        url.searchParams.set("pagination.limit", "200");
-        let resp: Response;
-        try {
-          resp = await fetch(url.toString());
-        } catch (error) {
-          throw new Error(
-            `Network error while fetching validator set latest: ${String(
-              error,
-            )}`,
-          );
-        }
-        if (!resp.ok) {
-          throw new Error(
-            `Failed to fetch validator set latest: ${resp.status} ${resp.statusText}`,
-          );
-        }
-        const json = await resp.json();
-        const validators = json?.validators ?? [];
-        results.push(...validators);
-        nextKey = json?.pagination?.next_key ?? json?.pagination?.nextKey;
-      } while (nextKey);
-      return results;
+      const client = await babylon.client();
+      return client.baby.getLatestValidatorSet();
     },
   });
 
   const consAddrMap = useMemo(() => {
     return new Map<string, string>(
       validatorSetLatest
-        .map((v) => [v?.pub_key?.key, v.address] as const)
+        .map((v) => [v?.pubKey?.key, v.address] as const)
         .filter(([k]) => Boolean(k)) as [string, string][],
     );
   }, [validatorSetLatest]);
