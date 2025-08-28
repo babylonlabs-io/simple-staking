@@ -19,7 +19,7 @@ export const getAllSigningInfos = async (): Promise<
   const results: { address: string; tombstoned: boolean }[] = [];
   let nextKey: Uint8Array | undefined = undefined;
   do {
-    const resp = await client.cosmos.slashing.v1beta1.signingInfos({
+    const resp = await (client as any).cosmos.slashing.v1beta1.signingInfos({
       pagination: { key: nextKey, limit: BigInt(200) },
     });
     const infos = (resp.info ?? resp.signing_infos ?? []).map((i: any) => ({
@@ -39,10 +39,11 @@ export const getAllLatestValidatorSet = async (): Promise<
   const results: { address: string; pub_key?: { key?: string } }[] = [];
   let nextKey: Uint8Array | undefined = undefined;
   do {
-    const resp =
-      await client.cosmos.base.tendermint.v1beta1.getLatestValidatorSet({
-        pagination: { key: nextKey, limit: BigInt(200) },
-      });
+    const resp = await (
+      client as any
+    ).cosmos.base.tendermint.v1beta1.getLatestValidatorSet({
+      pagination: { key: nextKey, limit: BigInt(200) },
+    });
     const validators = resp.validators ?? [];
     results.push(...validators);
     nextKey = resp.pagination?.next_key as Uint8Array | undefined;
