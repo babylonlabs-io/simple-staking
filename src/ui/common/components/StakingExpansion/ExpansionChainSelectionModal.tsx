@@ -1,4 +1,3 @@
-import { getRegistry } from "@babylonlabs-io/bsn-registry";
 import {
   Button,
   DialogBody,
@@ -7,10 +6,9 @@ import {
 } from "@babylonlabs-io/core-ui";
 import { useCallback, useMemo } from "react";
 
-import bsnPlaceholder from "@/ui/common/assets/chain-placeholder.svg";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { ChainButton } from "@/ui/common/components/Multistaking/ChainSelectionModal/shared";
-import { getNetworkConfigBBN, network } from "@/ui/common/config/network/bbn";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import type {
   BsnFinalityProviderInfo,
@@ -18,8 +16,6 @@ import type {
   ExpansionBsnDisplay,
 } from "@/ui/common/state/StakingExpansionTypes";
 import { Bsn } from "@/ui/common/types/bsn";
-
-const registry = getRegistry(network === "mainnet" ? "mainnet" : "testnet");
 
 const BSN_ID = getNetworkConfigBBN().chainId;
 
@@ -103,7 +99,7 @@ export const ExpansionChainSelectionModal = ({
         fpPkHex,
         provider,
         title,
-        logoUrl: registry[bsn.id]?.logoUrl || bsnPlaceholder,
+        logoUrl: bsn.logoUrl,
         isDisabled,
         isExisting,
       };

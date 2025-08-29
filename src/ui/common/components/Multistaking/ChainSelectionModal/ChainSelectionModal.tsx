@@ -1,4 +1,3 @@
-import { getRegistry } from "@babylonlabs-io/bsn-registry";
 import {
   Button,
   DialogBody,
@@ -11,12 +10,10 @@ import { PropsWithChildren, useMemo } from "react";
 import { MdOutlineInfo } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 
-import bsnPlaceholder from "@/ui/common/assets/chain-placeholder.svg";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
-import { getNetworkConfigBBN, network } from "@/ui/common/config/network/bbn";
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { Bsn } from "@/ui/common/types/bsn";
 
-const registry = getRegistry(network === "mainnet" ? "mainnet" : "testnet");
 const { chainId: BSN_ID } = getNetworkConfigBBN();
 
 interface ChainButtonProps extends PropsWithChildren {
@@ -115,7 +112,7 @@ export const ChainSelectionModal = ({
           {loading && <div>Loading...</div>}
           {babylonBsn && (
             <ChainButton
-              logo={registry[babylonBsn.id]?.logoUrl || bsnPlaceholder}
+              logo={babylonBsn.logoUrl}
               title={babylonBsn.name}
               selected={activeBsnId === babylonBsn.id}
               disabled={Boolean(selectedBsns[babylonBsn.id])}
@@ -125,7 +122,7 @@ export const ChainSelectionModal = ({
           {externalBsns.map((bsn) => (
             <ChainButton
               key={bsn.id}
-              logo={registry[bsn.id]?.logoUrl || bsnPlaceholder}
+              logo={bsn.logoUrl}
               title={bsn.name}
               selected={activeBsnId === bsn.id}
               disabled={Boolean(selectedBsns[bsn.id]) || !isBabylonSelected}

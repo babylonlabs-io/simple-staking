@@ -1,13 +1,9 @@
-import { getRegistry } from "@babylonlabs-io/bsn-registry";
-
-import bsnPlaceholder from "@/ui/common/assets/chain-placeholder.svg";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
-import { network } from "@/ui/common/config/network/bbn";
 import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
 import { ActivityCardDetailItem } from "../components/ActivityCard/ActivityCard";
 
-const registry = getRegistry(network === "mainnet" ? "mainnet" : "testnet");
+import { getBsnLogoUrl } from "./bsnLogo";
 
 /**
  * Creates grouped details for BSN/FP pairs from finality provider Bitcoin public keys
@@ -35,7 +31,7 @@ export function createBsnFpGroupedDetails(
             value: (
               <div className="flex items-center gap-2">
                 <img
-                  src={registry[fp.bsnId]?.logoUrl || bsnPlaceholder}
+                  src={getBsnLogoUrl(fp.bsnId)}
                   alt={fp.bsnId}
                   className="w-4 h-4 rounded-full object-cover"
                 />

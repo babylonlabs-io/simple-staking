@@ -10,6 +10,7 @@ import {
   FinalityProviderState as FinalityProviderStateEnum,
   type FinalityProvider,
 } from "@/ui/common/types/finalityProviders";
+import { getBsnLogoUrl } from "@/ui/common/utils/bsnLogo";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 
 interface SortState {
@@ -146,6 +147,11 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     enabled: stakingModalPage === StakingModalPage.BSN,
   });
 
+  const enrichedBsnList = useMemo(
+    () => bsnList.map((b) => ({ ...b, logoUrl: getBsnLogoUrl(b.id) })),
+    [bsnList],
+  );
+
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) {
       return [];
@@ -203,7 +209,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     () => ({
       filter,
       finalityProviders: filteredFinalityProviders,
-      bsnList,
+      bsnList: enrichedBsnList,
       bsnLoading,
       bsnError,
       hasNextPage,
@@ -223,7 +229,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     [
       filter,
       filteredFinalityProviders,
-      bsnList,
+      enrichedBsnList,
       bsnLoading,
       bsnError,
       hasNextPage,
