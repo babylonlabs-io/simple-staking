@@ -1,11 +1,5 @@
 import { Text } from "@babylonlabs-io/core-ui";
-import {
-  BsDiscord,
-  BsGithub,
-  BsLinkedin,
-  BsMedium,
-  BsTelegram,
-} from "react-icons/bs";
+import { BsDiscord, BsGithub, BsLinkedin, BsTelegram } from "react-icons/bs";
 import { FaXTwitter } from "react-icons/fa6";
 import { GoHome } from "react-icons/go";
 import { IoMdBook } from "react-icons/io";
@@ -42,18 +36,13 @@ const iconLinks = [
     Icon: BsLinkedin,
   },
   {
-    name: "Medium",
-    url: "https://medium.com/babylonlabs-io",
-    Icon: BsMedium,
-  },
-  {
     name: "Docs",
     url: "https://docs.babylonlabs.io/",
     Icon: IoMdBook,
   },
   {
     name: "Forum",
-    url: "https://forum.babylonlabs.io/",
+    url: "https://forum.babylon.foundation/",
     Icon: MdForum,
   },
   {
