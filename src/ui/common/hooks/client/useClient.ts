@@ -70,6 +70,13 @@ export function useClientQuery<
         return;
       }
 
+      const rootKey = Array.isArray(options.queryKey)
+        ? options.queryKey[0]
+        : options.queryKey;
+      const isNonCriticalError = ["API_STATS", "PRICES", "ORDINALS"].includes(
+        String(rootKey ?? "").toUpperCase(),
+      );
+
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
         "Error fetching data from the API",
@@ -81,10 +88,18 @@ export function useClientQuery<
         error: clientError,
         displayOptions: {
           retryAction: data.refetch,
+          showModal: !isNonCriticalError,
         },
       });
     }
-  }, [handleError, data.error, data.isError, data.refetch, logger]);
+  }, [
+    handleError,
+    data.error,
+    data.isError,
+    data.refetch,
+    logger,
+    options.queryKey,
+  ]);
 
   return data;
 }
