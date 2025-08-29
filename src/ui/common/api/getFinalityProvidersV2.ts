@@ -30,6 +30,7 @@ interface FinalityProviderAPI {
   logo_url?: string;
   bsn_id?: string;
   type: string;
+  is_allowlisted?: boolean;
 }
 
 interface DescriptionAPI {
@@ -99,6 +100,7 @@ export const getFinalityProvidersV2 = async ({
       logo_url: fp.logo_url,
       bsnId: fp.bsn_id,
       chain: fp.type,
+      isAllowlisted: fp.is_allowlisted,
     }),
   );
 
