@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
 
+import { useExpansionValidation } from "@/ui/common/hooks/services/useExpansionValidation";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
 import {
@@ -27,9 +28,10 @@ export function useVerifiedStakingExpansionService() {
    * These are delegations that:
    * 1. Have state='VERIFIED'
    * 2. Have a previousStakingTxHashHex (indicating they are expansions)
-   * 3. If a specific delegation is selected, filter to show only expansions for that delegation
+   * 3. Have valid UTXOs (funding UTXOs are still available)
+   * 4. If a specific delegation is selected, filter to show only expansions for that delegation
    */
-  const verifiedExpansions = useMemo(() => {
+  const allVerifiedExpansions = useMemo(() => {
     // First, get all verified expansions
     const allVerified = expansions.filter(
       (expansion) =>
@@ -54,9 +56,21 @@ export function useVerifiedStakingExpansionService() {
       return !hasProcessingExpansion;
     });
 
+    return availableVerified;
+  }, [expansions]);
+
+  // Validate all verified expansions against available UTXOs
+  const validationMap = useExpansionValidation(allVerifiedExpansions);
+
+  const verifiedExpansions = useMemo(() => {
+    // Filter out expansions with invalid UTXOs
+    const validExpansions = allVerifiedExpansions.filter(
+      (expansion) => validationMap[expansion.stakingTxHashHex]?.valid !== false,
+    );
+
     // If a specific delegation is selected for the modal, filter to only show expansions for that delegation
     if (selectedDelegationForVerifiedModal) {
-      const filtered = availableVerified.filter(
+      const filtered = validExpansions.filter(
         (expansion) =>
           expansion.previousStakingTxHashHex ===
           selectedDelegationForVerifiedModal.stakingTxHashHex,
@@ -64,9 +78,13 @@ export function useVerifiedStakingExpansionService() {
       return filtered;
     }
 
-    // Otherwise, return all available verified expansions
-    return availableVerified;
-  }, [expansions, selectedDelegationForVerifiedModal]);
+    // Otherwise, return all valid verified expansions
+    return validExpansions;
+  }, [
+    allVerifiedExpansions,
+    validationMap,
+    selectedDelegationForVerifiedModal,
+  ]);
 
   /**
    * Open the verified expansion modal.
@@ -127,6 +145,7 @@ export function useVerifiedStakingExpansionService() {
   /**
    * Get verified expansions for a specific original delegation.
    * This is useful when showing verified expansions related to a specific stake.
+   * This already returns only valid expansions (with available UTXOs).
    */
   const getVerifiedExpansionsForDelegation = useCallback(
     (originalStakingTxHashHex: string) => {
