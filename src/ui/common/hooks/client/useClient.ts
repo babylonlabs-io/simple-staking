@@ -18,6 +18,9 @@ import {
 } from "@/ui/common/constants";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
+import { ORDINAL_KEY } from "@/ui/common/hooks/client/api/useOrdinals";
+import { PRICES_KEY } from "@/ui/common/hooks/client/api/usePrices";
+import { SYSTEM_STATS_KEY } from "@/ui/common/hooks/client/api/useSystemStats";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 
 export function useClientQuery<
@@ -76,9 +79,11 @@ export function useClientQuery<
         return;
       }
 
-      const isNonCriticalError = ["API_STATS", "PRICES", "ORDINALS"].includes(
-        rootKeyString,
-      );
+      const isNonCriticalError = [
+        SYSTEM_STATS_KEY,
+        PRICES_KEY,
+        ORDINAL_KEY,
+      ].includes(rootKeyString);
 
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
