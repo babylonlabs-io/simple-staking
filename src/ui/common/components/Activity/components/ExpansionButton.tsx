@@ -1,7 +1,6 @@
+import { ThemedIcon } from "@babylonlabs-io/core-ui";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
-
-import { ThemedIcon } from "../../Icons/ThemedIcon";
 
 interface ExpansionButtonProps {
   Icon: string;
