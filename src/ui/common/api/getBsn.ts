@@ -1,4 +1,5 @@
 import { Bsn } from "../types/bsn";
+import { getBsnLogoUrl } from "../utils/bsnLogo";
 
 import { apiWrapper } from "./apiWrapper";
 
@@ -18,6 +19,7 @@ const createBSN = (bsn: BsnAPI): Bsn => ({
   name: bsn.name,
   description: bsn.description,
   activeTvl: bsn.active_tvl,
+  logoUrl: getBsnLogoUrl(bsn.id),
 });
 
 export const getBSNs = async (): Promise<Bsn[]> => {

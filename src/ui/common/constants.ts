@@ -1,29 +1,3 @@
-import babylon from "@/ui/common/assets/chains/babylon-genesis.png";
-import cosmos from "@/ui/common/assets/chains/cosmos.png";
-import ethereum from "@/ui/common/assets/chains/ethereum.png";
-import placeholder from "@/ui/common/assets/chains/placeholder.svg";
-import sui from "@/ui/common/assets/chains/sui.png";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-
-const { chainId: BABYLON_BSN_ID } = getNetworkConfigBBN();
-
-export const chainLogos: Record<string, string> = {
-  babylon,
-  [BABYLON_BSN_ID]: babylon,
-  cosmos,
-  ethereum,
-  sui,
-  placeholder,
-};
-
-export const chainNames = {
-  babylon: "Babylon Genesis",
-  cosmos: "Cosmos",
-  ethereum: "Ethereum",
-  sui: "Sui",
-  unknown: "Unknown Chain",
-} as const;
-
 export const ONE_SECOND = 1000;
 export const ONE_MINUTE = 60 * ONE_SECOND;
 

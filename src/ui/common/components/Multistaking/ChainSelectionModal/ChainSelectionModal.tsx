@@ -12,10 +12,9 @@ import { twMerge } from "tailwind-merge";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-import { chainLogos } from "@/ui/common/constants";
 import { Bsn } from "@/ui/common/types/bsn";
 
-const BSN_ID = getNetworkConfigBBN().chainId;
+const { chainId: BSN_ID } = getNetworkConfigBBN();
 
 interface ChainButtonProps extends PropsWithChildren {
   className?: string;
@@ -113,7 +112,7 @@ export const ChainSelectionModal = ({
           {loading && <div>Loading...</div>}
           {babylonBsn && (
             <ChainButton
-              logo={chainLogos.babylon}
+              logo={babylonBsn.logoUrl}
               title={babylonBsn.name}
               selected={activeBsnId === babylonBsn.id}
               disabled={Boolean(selectedBsns[babylonBsn.id])}
@@ -123,7 +122,7 @@ export const ChainSelectionModal = ({
           {externalBsns.map((bsn) => (
             <ChainButton
               key={bsn.id}
-              logo={chainLogos[bsn.id] || chainLogos.placeholder}
+              logo={bsn.logoUrl}
               title={bsn.name}
               selected={activeBsnId === bsn.id}
               disabled={Boolean(selectedBsns[bsn.id]) || !isBabylonSelected}

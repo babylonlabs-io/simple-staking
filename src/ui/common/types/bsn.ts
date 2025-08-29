@@ -3,4 +3,5 @@ export interface Bsn {
   name: string;
   description: string;
   activeTvl: number;
+  logoUrl: string;
 }

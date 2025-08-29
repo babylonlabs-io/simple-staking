@@ -4,7 +4,6 @@ import { Fragment, useMemo } from "react";
 import { ChainSelectionModal } from "@/ui/common/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderModal";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-import { chainLogos } from "@/ui/common/constants";
 import {
   StakingModalPage,
   useFinalityProviderBsnState,
@@ -54,7 +53,7 @@ export function FinalityProvidersSection() {
         return {
           bsnId,
           bsnName: bsn?.name || "",
-          bsnLogoUrl: chainLogos[provider.chain || "babylon"],
+          bsnLogoUrl: bsn?.logoUrl,
           provider,
         } as SelectedProviderItemLocal;
       })

@@ -1,5 +1,4 @@
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
-import { chainLogos } from "@/ui/common/constants";
 import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
 import { ActivityCardDetailItem } from "../components/ActivityCard/ActivityCard";
@@ -22,8 +21,6 @@ export function createBsnFpGroupedDetails(
   finalityProviderBtcPksHex.forEach((fpBtcPk) => {
     const fp = finalityProviderMap.get(fpBtcPk);
     if (fp && fp.bsnId) {
-      const bsnLogo = chainLogos[fp.bsnId] || chainLogos.placeholder;
-
       // Create a group for each BSN+FP pair
       groupedDetails.push({
         items: [
@@ -32,7 +29,7 @@ export function createBsnFpGroupedDetails(
             value: (
               <div className="flex items-center gap-2">
                 <img
-                  src={bsnLogo}
+                  src={fp.bsnLogoUrl}
                   alt={fp.bsnId}
                   className="w-4 h-4 rounded-full object-cover"
                 />
