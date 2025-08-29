@@ -3,8 +3,6 @@ import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 
 import { ActivityCardDetailItem } from "../components/ActivityCard/ActivityCard";
 
-import { getBsnLogoUrl } from "./bsnLogo";
-
 /**
  * Creates grouped details for BSN/FP pairs from finality provider Bitcoin public keys
  * This utility is shared between main activity cards and expansion history
@@ -31,7 +29,7 @@ export function createBsnFpGroupedDetails(
             value: (
               <div className="flex items-center gap-2">
                 <img
-                  src={getBsnLogoUrl(fp.bsnId)}
+                  src={fp.bsnLogoUrl}
                   alt={fp.bsnId}
                   className="w-4 h-4 rounded-full object-cover"
                 />

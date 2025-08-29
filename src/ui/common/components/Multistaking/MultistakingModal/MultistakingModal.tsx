@@ -63,7 +63,12 @@ export function MultistakingModal() {
   const { data: networkInfo } = useNetworkInfo();
   const btcInUsd = usePrice(coinSymbol);
 
-  const currentFinalityProviders = useWatch({ name: "finalityProviders" });
+  const currentFinalityProviders = useWatch<
+    { finalityProviders: Record<string, string> | string[] | undefined },
+    "finalityProviders"
+  >({
+    name: "finalityProviders",
+  });
 
   const { bsnInfos, finalityProviderInfos } = useMemo(() => {
     const bsns: BsnFpDisplayItem[] = [];
@@ -74,41 +79,41 @@ export function MultistakingModal() {
         typeof currentFinalityProviders === "object" &&
         !Array.isArray(currentFinalityProviders)
       ) {
-        const providerMap = currentFinalityProviders as Record<string, string>;
+        Object.entries(currentFinalityProviders).forEach(
+          ([bsnId, fpPublicKey]) => {
+            const bsn = bsnList.find((bsn) => bsn.id === bsnId);
+            if (bsn || bsnId === BBN_CHAIN_ID) {
+              bsns.push({
+                icon: (
+                  <Avatar
+                    url={bsn?.logoUrl}
+                    alt={bsn?.name || "Babylon Genesis"}
+                    variant="rounded"
+                    size="tiny"
+                  />
+                ),
+                name: bsn?.name || "Babylon Genesis",
+                isExisting: false,
+              });
+            }
 
-        Object.entries(providerMap).forEach(([bsnId, fpPublicKey]) => {
-          const bsn = bsnList.find((bsn) => bsn.id === bsnId);
-          if (bsn || bsnId === BBN_CHAIN_ID) {
-            bsns.push({
-              icon: (
-                <Avatar
-                  url={bsn?.logoUrl}
-                  alt={bsn?.name || "Babylon Genesis"}
-                  variant="rounded"
-                  size="tiny"
-                />
-              ),
-              name: bsn?.name || "Babylon Genesis",
-              isExisting: false,
-            });
-          }
-
-          const provider = getRegisteredFinalityProvider(fpPublicKey);
-          if (provider) {
-            fps.push({
-              icon: (
-                <FinalityProviderLogo
-                  logoUrl={provider.logo_url}
-                  rank={provider.rank}
-                  moniker={provider.description?.moniker}
-                  size="sm"
-                />
-              ),
-              name: provider.description?.moniker || trim(fpPublicKey, 8),
-              isExisting: false,
-            });
-          }
-        });
+            const provider = getRegisteredFinalityProvider(fpPublicKey);
+            if (provider) {
+              fps.push({
+                icon: (
+                  <FinalityProviderLogo
+                    logoUrl={provider.logo_url}
+                    rank={provider.rank}
+                    moniker={provider.description?.moniker}
+                    size="sm"
+                  />
+                ),
+                name: provider.description?.moniker || trim(fpPublicKey, 8),
+                isExisting: false,
+              });
+            }
+          },
+        );
       } else {
         const fpArray = Array.isArray(currentFinalityProviders)
           ? currentFinalityProviders
