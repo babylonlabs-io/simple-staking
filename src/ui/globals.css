@@ -99,6 +99,7 @@ input[type="number"] {
   word-wrap: break-word;
   height: fit-content !important;
   z-index: 9999;
+  text-align: left;
 }
 
 .tooltip-wrap[data-popper-placement*="top"] .tooltip-arrow {
