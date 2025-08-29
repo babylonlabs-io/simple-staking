@@ -123,7 +123,7 @@ describe("useTransactionService", () => {
     3,
     "mock-script-pubkey",
   );
-  const mockTipHeader = { height: 800000 };
+  const mockTipHeight = 800000;
   const mockBech32Address = "mock-bech32-address";
   const mockSignedBabylonTx = "mock-signed-babylon-tx";
   const mockPushTx = jest.fn();
@@ -149,7 +149,7 @@ describe("useTransactionService", () => {
 
     // Mock useBbnQuery
     (useBbnQuery as jest.Mock).mockReturnValue({
-      btcTipQuery: { data: mockTipHeader },
+      btcTipHeightQuery: { data: mockTipHeight },
     });
 
     // Mock useBTCWallet
@@ -224,7 +224,7 @@ describe("useTransactionService", () => {
       ).toHaveBeenCalledWith(
         mockStakerInfo,
         mockStakingInputs,
-        mockTipHeader.height,
+        mockTipHeight,
         mockAvailableUTXOs,
         mockFeeRate,
         mockBech32Address,
@@ -267,7 +267,7 @@ describe("useTransactionService", () => {
       // Check the results
       expect(mockBtcStakingManager.estimateBtcStakingFee).toHaveBeenCalledWith(
         mockStakerInfo,
-        mockTipHeader.height,
+        mockTipHeight,
         mockStakingInputs,
         mockAvailableUTXOs,
         mockFeeRate,
@@ -577,7 +577,7 @@ describe("useTransactionService", () => {
     it("should throw error when tip height is 0", () => {
       // Mock useBbnQuery to return 0 height
       (useBbnQuery as jest.Mock).mockReturnValue({
-        btcTipQuery: { data: { height: 0 } },
+        btcTipHeightQuery: { data: 0 },
       });
 
       const { result } = renderHook(() => useTransactionService());

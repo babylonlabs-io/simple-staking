@@ -41,7 +41,7 @@ export const useTransactionService = () => {
   const { data: networkFees } = useNetworkFees();
   const { defaultFeeRate } = getFeeRateFromMempool(networkFees);
   const {
-    btcTipQuery: { data: tipHeader },
+    btcTipHeightQuery: { data: btcTipHeight },
   } = useBbnQuery();
 
   const { bech32Address } = useCosmosWallet();
@@ -56,7 +56,7 @@ export const useTransactionService = () => {
     [btcAddress, publicKeyNoCoord],
   );
 
-  const tipHeight = useMemo(() => tipHeader?.height ?? 0, [tipHeader]);
+  const tipHeight = useMemo(() => btcTipHeight ?? 0, [btcTipHeight]);
 
   const { createBtcStakingManager } = useStakingManagerService();
 
