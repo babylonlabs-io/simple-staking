@@ -61,7 +61,7 @@ export const ValidatorTable = ({
   );
 
   return (
-    <ResponsiveDialog open={open} onClose={onClose}>
+    <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
       <DialogHeader
         title="Select Validator"
         onClose={onClose}
