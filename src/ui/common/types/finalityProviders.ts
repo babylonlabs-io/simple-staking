@@ -12,6 +12,7 @@ export interface FinalityProvider {
   logo_url?: string;
   bsnId?: string;
   chain: string;
+  isAllowlisted?: boolean;
 }
 
 export interface FinalityProviderV1 {

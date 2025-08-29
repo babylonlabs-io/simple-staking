@@ -13,10 +13,10 @@ export const FinalityProviderFilter = () => {
   return (
     <Select
       options={options}
-      onSelect={(value) => handleFilter("status", value.toString())}
+      onSelect={(value) => handleFilter("providerStatus", value.toString())}
       placeholder="Select Status"
-      value={filter.search ? "" : filter.status}
-      disabled={Boolean(filter.search)}
+      value={filter.searchTerm ? "" : filter.providerStatus}
+      disabled={Boolean(filter.searchTerm)}
       renderSelectedOption={(option) => `Showing ${option.label}`}
       className="h-10"
     />
