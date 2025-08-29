@@ -3,10 +3,16 @@
  */
 import "core-js/features/array/to-sorted";
 
-import { Loader, TableElement } from "@babylonlabs-io/core-ui";
+import {
+  FinalityProviderItem,
+  Loader,
+  Table,
+  TableElement,
+} from "@babylonlabs-io/core-ui";
 
 import warningOctagon from "@/ui/common/assets/warning-octagon.svg";
 import warningTriangle from "@/ui/common/assets/warning-triangle.svg";
+import { Hash } from "@/ui/common/components/Hash/Hash";
 import { StatusView } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderTableStatusView";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
@@ -16,10 +22,15 @@ import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 interface Props {
   selectedFP?: string;
+  layout: "grid" | "list";
   onSelectRow?: (btcPk: string) => void;
 }
 
-export const FinalityProviderTable = ({ selectedFP, onSelectRow }: Props) => {
+export const FinalityProviderTable = ({
+  selectedFP,
+  onSelectRow,
+  layout = "grid",
+}: Props) => {
   const { isFetching, finalityProviders, hasError, isRowSelectable } =
     useFinalityProviderBsnState();
 
@@ -71,46 +82,138 @@ export const FinalityProviderTable = ({ selectedFP, onSelectRow }: Props) => {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-4 w-full h-[500px] overflow-scroll">
-      {finalityProviders.map((fp) => {
-        const isSelected = selectedFP === fp.btcPk;
-        const isSelectable = isRowSelectable(fp);
+    <>
+      {layout === "grid" ? (
+        <div className="grid grid-cols-2 gap-4 w-full overflow-scroll max-h-[440px]">
+          {finalityProviders.map((fp) => {
+            const isSelected = selectedFP === fp.btcPk;
+            const isSelectable = isRowSelectable(fp);
 
-        const totalDelegation = maxDecimals(
-          satoshiToBtc(fp.activeTVLSat || 0),
-          8,
-        );
-        const commission = maxDecimals((Number(fp.commission) || 0) * 100, 2);
-        const status = FinalityProviderStateLabels[fp.state] || "Unknown";
+            const totalDelegation = maxDecimals(
+              satoshiToBtc(fp.activeTVLSat || 0),
+              8,
+            );
+            const commission = maxDecimals(
+              (Number(fp.commission) || 0) * 100,
+              2,
+            );
+            const status = FinalityProviderStateLabels[fp.state] || "Unknown";
 
-        return (
-          <TableElement
-            key={fp.btcPk}
-            providerItemProps={{
+            return (
+              <TableElement
+                key={fp.btcPk}
+                providerItemProps={{
+                  bsnId: fp.bsnId || "",
+                  bsnName: fp.chain || "",
+                  address: fp.btcPk,
+                  provider: {
+                    logo_url: fp.logo_url,
+                    rank: fp.rank,
+                    description: fp.description,
+                  },
+                }}
+                attributes={{
+                  Status: status,
+                  "Total Delegation": (
+                    <>
+                      {totalDelegation} {coinSymbol}
+                    </>
+                  ),
+                  Commission: `${commission}%`,
+                }}
+                isSelected={isSelected}
+                isSelectable={isSelectable}
+                onSelect={() => handleSelect(fp.btcPk)}
+              />
+            );
+          })}
+        </div>
+      ) : (
+        <div className="flex flex-col gap-4 w-full overflow-scroll max-h-[440px]">
+          <Table
+            onRowSelect={(row) => handleSelect(row?.address || "")}
+            fluid
+            selectedRow={selectedFP}
+            data={finalityProviders.map((fp) => ({
+              id: fp.btcPk || "",
               bsnId: fp.bsnId || "",
               bsnName: fp.chain || "",
               address: fp.btcPk,
+              status: FinalityProviderStateLabels[fp.state] || "Unknown",
               provider: {
                 logo_url: fp.logo_url,
                 rank: fp.rank,
                 description: fp.description,
               },
-            }}
-            attributes={{
-              Status: status,
-              "Total Delegation": (
-                <>
-                  {totalDelegation} {coinSymbol}
-                </>
+              totalDelegation: maxDecimals(
+                satoshiToBtc(fp.activeTVLSat || 0),
+                8,
               ),
-              Commission: `${commission}%`,
-            }}
-            isSelected={isSelected}
-            isSelectable={isSelectable}
-            onSelect={() => handleSelect(fp.btcPk)}
+              commission: maxDecimals((Number(fp.commission) || 0) * 100, 2),
+              isSelectable: isRowSelectable(fp),
+            }))}
+            columns={[
+              {
+                key: "provider",
+                header: "Finality Provider",
+                render: (_value, row) => {
+                  return (
+                    <FinalityProviderItem
+                      provider={{
+                        logo_url: row.provider.logo_url,
+                        rank: row.provider.rank,
+                        description: row.provider.description,
+                      }}
+                      bsnId={row.bsnId}
+                      bsnName={row.bsnName}
+                      showChain={false}
+                    />
+                  );
+                },
+                sorter: (a, b) =>
+                  a.provider.description.moniker.localeCompare(
+                    b.provider.description.moniker,
+                  ),
+              },
+              {
+                key: "address",
+                header: "BTC PK",
+                render: (_value, row) => (
+                  <div className="flex items-center gap-2">
+                    <Hash
+                      address={true}
+                      value={row.address}
+                      symbols={8}
+                      noFade
+                    />
+                  </div>
+                ),
+              },
+              {
+                key: "totalDelegation",
+                header: "Total Delegation",
+                render: (_value, row) => (
+                  <div className="flex items-center gap-2">
+                    {row.totalDelegation} {coinSymbol}
+                  </div>
+                ),
+                sorter: (a, b) => a.totalDelegation - b.totalDelegation,
+              },
+              {
+                key: "commission",
+                header: "Commission",
+                render: (_value, row) => (
+                  <div className="flex items-center gap-2">
+                    {row.commission} %
+                  </div>
+                ),
+                sorter: (a, b) => a.commission - b.commission,
+              },
+            ]}
+            isRowSelectable={(row) => row.isSelectable}
           />
-        );
-      })}
-    </div>
+        </div>
+      )}
+    </>
   );
 };

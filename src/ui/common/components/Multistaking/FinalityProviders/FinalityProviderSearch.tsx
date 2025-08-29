@@ -38,6 +38,7 @@ export const FinalityProviderSearch = () => {
       suffix={searchSuffix}
       value={filter.search}
       onChange={onSearchChange}
+      className="h-[22px]"
     />
   );
 };

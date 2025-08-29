@@ -60,7 +60,7 @@ const Home = () => {
   return (
     <Container
       as="main"
-      className="flex flex-col gap-[3rem] pb-16 max-w-[760px] mx-auto flex-1"
+      className="flex flex-col gap-[3rem] pb-24 max-w-[760px] mx-auto flex-1"
     >
       <Stats />
       <Tabs

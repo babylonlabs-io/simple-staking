@@ -18,6 +18,7 @@ export const FinalityProviderFilter = () => {
       value={filter.search ? "" : filter.status}
       disabled={Boolean(filter.search)}
       renderSelectedOption={(option) => `Showing ${option.label}`}
+      className="h-10"
     />
   );
 };
