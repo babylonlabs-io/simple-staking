@@ -60,6 +60,12 @@ export function useClientQuery<
     ...options,
   });
 
+  const rootKeyString = String(
+    (Array.isArray(options.queryKey)
+      ? options.queryKey[0]
+      : options.queryKey) ?? "",
+  ).toUpperCase();
+
   useEffect(() => {
     if (data.isError) {
       const error = data.error as Error;
@@ -70,11 +76,8 @@ export function useClientQuery<
         return;
       }
 
-      const rootKey = Array.isArray(options.queryKey)
-        ? options.queryKey[0]
-        : options.queryKey;
       const isNonCriticalError = ["API_STATS", "PRICES", "ORDINALS"].includes(
-        String(rootKey ?? "").toUpperCase(),
+        rootKeyString,
       );
 
       const clientError = new ClientError(
@@ -98,7 +101,7 @@ export function useClientQuery<
     data.isError,
     data.refetch,
     logger,
-    options.queryKey,
+    rootKeyString,
   ]);
 
   return data;
