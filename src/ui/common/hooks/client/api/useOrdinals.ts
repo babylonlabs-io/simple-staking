@@ -3,7 +3,6 @@ import { InscriptionIdentifier } from "@babylonlabs-io/wallet-connector";
 
 import { postVerifyUtxoOrdinals } from "@/ui/common/api/postFilterOrdinals";
 import { ONE_MINUTE } from "@/ui/common/constants";
-import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
 import { useClientQuery } from "@/ui/common/hooks/client/useClient";
@@ -19,7 +18,6 @@ export function useOrdinals(
   { enabled = true }: { enabled?: boolean } = {},
 ) {
   const { getInscriptions, address, publicKeyNoCoord } = useBTCWallet();
-  const { handleError } = useError();
   const logger = useLogger();
 
   const fetchOrdinals = async (): Promise<InscriptionIdentifier[]> => {
@@ -50,14 +48,11 @@ export function useOrdinals(
           cause: error as Error,
         },
       );
-      handleError({
-        error: clientError,
-        displayOptions: {
-          retryAction: () => fetchOrdinals(),
-        },
-        metadata: {
-          userPublicKey: publicKeyNoCoord,
-          btcAddress: address,
+      logger.error(clientError, {
+        data: {
+          userPublicKey: publicKeyNoCoord || "",
+          btcAddress: address || "",
+          source: "ORDINALS",
         },
       });
       // App should work without ordinals
