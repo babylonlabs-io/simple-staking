@@ -102,7 +102,7 @@ const VALIDATORS: Partial<Record<DelegationState, Validator>> = {
     const isExpansion = Boolean(delegation.previousStakingTxHashHex);
 
     // For expansions, we need to check:
-    // 1. The first input (index 0) is the previous staking tx output (already checked elsewhere)
+    // 1. The first input (index 0) is the previous staking tx output
     // 2. The remaining inputs (funding UTXOs) are still available
     const inputsToCheck = isExpansion ? tx.ins.slice(1) : tx.ins;
 
