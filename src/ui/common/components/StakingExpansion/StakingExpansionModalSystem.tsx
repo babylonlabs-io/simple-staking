@@ -1,8 +1,7 @@
-import { Avatar, useFormContext } from "@babylonlabs-io/core-ui";
+import { Avatar, PreviewModal, useFormContext } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/ui/common/components/Modals/CancelFeedbackModal";
-import { PreviewMultistakingModal } from "@/ui/common/components/Modals/PreviewMultistakingModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
@@ -256,19 +255,23 @@ function StakingExpansionModalSystemInner() {
             <RenewTimelockModal open onClose={handleClose} />
           )}
           {step === StakingExpansionStep.PREVIEW && formData && details && (
-            <PreviewMultistakingModal
+            <PreviewModal
               open
               processing={processing}
               bsns={bsnInfos}
               finalityProviders={finalityProviderInfos}
               details={details}
-              isExpansion={true}
               onClose={handleClose}
               onProceed={async () => {
                 await createExpansionEOI(formData);
                 resetForm();
                 revalidateForm();
               }}
+              warnings={[
+                "1. No third party possesses your staked BTC. You are the only one who can unbond and withdraw your stake.",
+                "2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives 10 Bitcoin confirmations.",
+                "3. Please note: submitting this transaction will reset your stake's timelock.",
+              ]}
             />
           )}
           {Boolean(EOI_STEP_INDEXES[step]) && (

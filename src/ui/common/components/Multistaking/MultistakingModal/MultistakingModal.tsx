@@ -1,8 +1,12 @@
-import { Avatar, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import {
+  Avatar,
+  PreviewModal,
+  useFormContext,
+  useWatch,
+} from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/ui/common/components/Modals/CancelFeedbackModal";
-import { PreviewMultistakingModal } from "@/ui/common/components/Modals/PreviewMultistakingModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
@@ -200,12 +204,16 @@ export function MultistakingModal() {
   return (
     <>
       {step === "preview" && stakingInfo && details && (
-        <PreviewMultistakingModal
+        <PreviewModal
           open
           processing={processing}
           bsns={bsnInfos}
           finalityProviders={finalityProviderInfos}
           details={details}
+          warnings={[
+            "1. No third party possesses your staked BTC. You are the only one who can unbond and withdraw your stake.",
+            "2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives 10 Bitcoin confirmations.",
+          ]}
           onClose={resetState}
           onProceed={async () => {
             if (!formData) return;
