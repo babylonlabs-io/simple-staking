@@ -1,3 +1,4 @@
+import { getRegistry } from "@babylonlabs-io/bsn-registry";
 import {
   Button,
   DialogBody,
@@ -6,10 +7,10 @@ import {
 } from "@babylonlabs-io/core-ui";
 import { useCallback, useMemo } from "react";
 
+import bsnPlaceholder from "@/ui/common/assets/chain-placeholder.svg";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { ChainButton } from "@/ui/common/components/Multistaking/ChainSelectionModal/shared";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-import { chainLogos } from "@/ui/common/constants";
+import { getNetworkConfigBBN, network } from "@/ui/common/config/network/bbn";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import type {
   BsnFinalityProviderInfo,
@@ -17,6 +18,8 @@ import type {
   ExpansionBsnDisplay,
 } from "@/ui/common/state/StakingExpansionTypes";
 import { Bsn } from "@/ui/common/types/bsn";
+
+const registry = getRegistry(network === "mainnet" ? "mainnet" : "testnet");
 
 const BSN_ID = getNetworkConfigBBN().chainId;
 
@@ -100,6 +103,7 @@ export const ExpansionChainSelectionModal = ({
         fpPkHex,
         provider,
         title,
+        logoUrl: registry[bsn.id]?.logoUrl || bsnPlaceholder,
         isDisabled,
         isExisting,
       };
@@ -150,7 +154,7 @@ export const ExpansionChainSelectionModal = ({
                   provider={bsnInfo.provider}
                   bsnName={displayBsns.babylon.name}
                   bsnId={displayBsns.babylon.id}
-                  logoUrl={chainLogos.babylon}
+                  logoUrl={bsnInfo.logoUrl}
                   title={bsnInfo.title}
                   disabled={bsnInfo.isDisabled}
                   isExisting={bsnInfo.isExisting}
@@ -173,7 +177,7 @@ export const ExpansionChainSelectionModal = ({
                   provider={bsnInfo.provider}
                   bsnName={bsn.name}
                   bsnId={bsn.id}
-                  logoUrl={chainLogos[bsn.id] || chainLogos.placeholder}
+                  logoUrl={bsnInfo.logoUrl}
                   title={bsnInfo.title}
                   disabled={bsnInfo.isDisabled}
                   isExisting={bsnInfo.isExisting}

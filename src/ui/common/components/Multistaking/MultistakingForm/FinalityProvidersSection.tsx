@@ -1,16 +1,19 @@
+import { getRegistry } from "@babylonlabs-io/bsn-registry";
 import { FinalityProviderSubsection, useField } from "@babylonlabs-io/core-ui";
 import { Fragment, useMemo } from "react";
 
+import bsnPlaceholder from "@/ui/common/assets/chain-placeholder.svg";
 import { ChainSelectionModal } from "@/ui/common/components/Multistaking/ChainSelectionModal/ChainSelectionModal";
 import { FinalityProviderModal } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviderModal";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
-import { chainLogos } from "@/ui/common/constants";
+import { getNetworkConfigBBN, network } from "@/ui/common/config/network/bbn";
 import {
   StakingModalPage,
   useFinalityProviderBsnState,
 } from "@/ui/common/state/FinalityProviderBsnState";
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { useMultistakingState } from "@/ui/common/state/MultistakingState";
+
+const registry = getRegistry(network === "mainnet" ? "mainnet" : "testnet");
 
 type SelectedProviderItemLocal = {
   bsnId: string;
@@ -54,7 +57,10 @@ export function FinalityProvidersSection() {
         return {
           bsnId,
           bsnName: bsn?.name || "",
-          bsnLogoUrl: chainLogos[provider.chain || "babylon"],
+          bsnLogoUrl:
+            registry[provider.bsnId || BBN_CHAIN_ID]?.logoUrl ||
+            registry[BBN_CHAIN_ID]?.logoUrl ||
+            bsnPlaceholder,
           provider,
         } as SelectedProviderItemLocal;
       })

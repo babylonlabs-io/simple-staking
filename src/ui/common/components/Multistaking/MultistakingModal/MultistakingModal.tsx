@@ -1,6 +1,8 @@
+import { getRegistry } from "@babylonlabs-io/bsn-registry";
 import { Avatar, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
+import bsnPlaceholder from "@/ui/common/assets/chain-placeholder.svg";
 import { CancelFeedbackModal } from "@/ui/common/components/Modals/CancelFeedbackModal";
 import { PreviewMultistakingModal } from "@/ui/common/components/Modals/PreviewMultistakingModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
@@ -8,9 +10,8 @@ import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
 import { VerificationModal } from "@/ui/common/components/Modals/VerificationModal";
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
-import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { getNetworkConfigBBN, network } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import { chainLogos } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingService } from "@/ui/common/hooks/services/useStakingService";
@@ -23,6 +24,8 @@ import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency"
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 import { blocksToDisplayTime } from "@/ui/common/utils/time";
 import { trim } from "@/ui/common/utils/trim";
+
+const registry = getRegistry(network === "mainnet" ? "mainnet" : "testnet");
 
 const EOI_INDEXES: Record<string, number> = {
   "eoi-staking-slashing": 1,
@@ -80,7 +83,7 @@ export function MultistakingModal() {
           const bsn = bsnList.find((bsn) => bsn.id === bsnId);
           if (bsn || bsnId === BBN_CHAIN_ID) {
             const logoUrl =
-              chainLogos[bsn?.id || "babylon"] || chainLogos.placeholder;
+              registry[bsn?.id || "babylon"]?.logoUrl || bsnPlaceholder;
             bsns.push({
               icon: (
                 <Avatar
@@ -117,7 +120,7 @@ export function MultistakingModal() {
           : [];
 
         fpArray.forEach((fpPublicKey) => {
-          const logoUrl = chainLogos["babylon"];
+          const logoUrl = registry[BBN_CHAIN_ID]?.logoUrl || bsnPlaceholder;
           bsns.push({
             icon: (
               <Avatar
