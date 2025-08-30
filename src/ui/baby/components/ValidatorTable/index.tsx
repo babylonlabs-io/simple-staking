@@ -2,6 +2,7 @@ import {
   DialogBody,
   DialogHeader,
   Input,
+  Select,
   Table,
   Text,
 } from "@babylonlabs-io/core-ui";
@@ -10,6 +11,11 @@ import { MdCancel } from "react-icons/md";
 import { RiSearchLine } from "react-icons/ri";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
+
+import type {
+  ValidatorStatus,
+  ValidatorStatusWithEmpty,
+} from "../../types/validator";
 
 import { columns } from "./columns";
 
@@ -22,6 +28,7 @@ export interface Validator {
   votingPower: number;
   commission: number;
   tokens: number;
+  status: ValidatorStatus;
   // apr: number;
   // logoUrl: string;
 }
@@ -29,19 +36,27 @@ export interface Validator {
 interface ValidatorTableProps {
   open: boolean;
   searchTerm: string;
+  status?: ValidatorStatusWithEmpty;
+  showSlashed?: boolean;
   validators: Validator[];
   onClose?: () => void;
   onSelect?: (validator: Validator) => void;
   onSearch?: (value: string) => void;
+  onStatusChange?: (value: ValidatorStatusWithEmpty) => void;
+  onShowSlashedChange?: (value: boolean) => void;
 }
 
 export const ValidatorTable = ({
   open,
   validators,
   searchTerm,
+  status = "",
   onClose,
   onSelect,
   onSearch,
+  onStatusChange,
+  // showSlashed = false,
+  // onShowSlashedChange,
 }: PropsWithChildren<ValidatorTableProps>) => {
   const onClearSearch = () => {
     onSearch?.("");
@@ -77,19 +92,43 @@ export const ValidatorTable = ({
           of Babylon Genesis.
         </Text>
 
-        <Input
-          placeholder="Search"
-          value={searchTerm}
-          onChange={(e) => onSearch?.(e.target.value)}
-          prefix={searchPrefix}
-          className="w-full"
-        />
+        <div className="flex gap-3 items-center">
+          <div className="flex-1 min-w-0">
+            <Input
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => onSearch?.(e.target.value)}
+              prefix={searchPrefix}
+              // suffix={<div className="flex items-center gap-2 mr-2">
+              //   <Toggle value={showSlashed} onChange={(v) => onShowSlashedChange?.(v)} />
+              //   <Text variant="body2" className="text-accent-primary whitespace-nowrap">
+              //     Show Slashed
+              //   </Text>
+              // </div>}
+              className="w-full"
+            />
+          </div>
+          <Select
+            options={[
+              { value: "active", label: "Active" },
+              { value: "inactive", label: "Inactive" },
+              { value: "jailed", label: "Jailed" },
+              { value: "slashed", label: "Slashed" },
+            ]}
+            placeholder="Active"
+            value={status || "active"}
+            disabled={Boolean(searchTerm)}
+            onSelect={(v) => onStatusChange?.(v as ValidatorStatusWithEmpty)}
+            renderSelectedOption={(option) => option.label}
+            className="w-[120px] flex-shrink-0"
+          />
+        </div>
 
         <Table
           data={validators}
           columns={columns}
-          className="w-full"
-          wrapperClassName="w-full"
+          className="min-w-0 w-full table-fixed"
+          wrapperClassName="w-full overflow-x-hidden"
           onRowSelect={(row) => {
             if (row) {
               onSelect?.(row);

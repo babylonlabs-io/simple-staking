@@ -13,6 +13,7 @@ export const columns: ColumnProps<Validator>[] = [
   {
     key: "name",
     header: "Validator",
+    headerClassName: "w-[50%]",
     sorter: (a, b) => a.name.localeCompare(b.name),
     render: (_, row) => (
       <div className="flex items-center gap-2">
@@ -31,7 +32,7 @@ export const columns: ColumnProps<Validator>[] = [
   {
     key: "votingPower",
     header: "Voting Power",
-    headerClassName: "w-16",
+    headerClassName: "w-[25%]",
     cellClassName: "text-right pr-4",
     sorter: (a, b) => a.votingPower - b.votingPower,
     render: (value) => <>{maxDecimals((value as number) * 100, 2)}%</>,
@@ -39,7 +40,7 @@ export const columns: ColumnProps<Validator>[] = [
   {
     key: "commission",
     header: "Commission",
-    headerClassName: "w-16",
+    headerClassName: "w-[25%]",
     cellClassName: "text-right pr-4",
     sorter: (a, b) => a.commission - b.commission,
     render: (value) => <>{formatCommissionPercentage(value as number)}</>,
