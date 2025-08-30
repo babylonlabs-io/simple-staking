@@ -25,22 +25,27 @@ export function useEpochPolling(address?: string) {
       try {
         const client = await babylon.client();
         const { currentEpoch } = await client.baby.getCurrentEpoch();
+        const epochNumber = Number(currentEpoch);
+
+        if (!Number.isFinite(epochNumber)) {
+          return;
+        }
 
         try {
           localStorage.setItem(
             `baby-current-epoch-${network}`,
-            String(currentEpoch),
+            String(epochNumber),
           );
         } catch {
           // ignore storage errors
         }
 
         if (previousEpochRef.current === undefined) {
-          previousEpochRef.current = currentEpoch;
+          previousEpochRef.current = epochNumber;
           return;
         }
 
-        if (!cancelled && currentEpoch !== previousEpochRef.current) {
+        if (!cancelled && epochNumber !== previousEpochRef.current) {
           // Epoch advanced, prune stale pending operations first
           cleanupAllPendingOperationsFromStorage();
           queryClient.invalidateQueries({
@@ -51,7 +56,7 @@ export function useEpochPolling(address?: string) {
             queryKey: [BABY_UNBONDING_DELEGATIONS_KEY],
             refetchType: "active",
           });
-          previousEpochRef.current = currentEpoch;
+          previousEpochRef.current = epochNumber;
         }
       } catch {
         // ignore transient errors

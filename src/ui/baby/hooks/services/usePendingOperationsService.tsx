@@ -204,7 +204,7 @@ function usePendingOperationsServiceInternal() {
           if (!stored) return;
           const parsedStorage: PendingOperationStorage[] = JSON.parse(stored);
           const filtered = parsedStorage.filter(
-            (op) => op.epoch !== undefined && op.epoch >= currentEpoch,
+            (op) => op.epoch !== undefined && op.epoch === currentEpoch,
           );
           if (filtered.length > 0) {
             localStorage.setItem(storageKey, JSON.stringify(filtered));
@@ -218,7 +218,9 @@ function usePendingOperationsServiceInternal() {
 
       // Also prune the in-memory state for current wallet
       setPendingOperations((prev) =>
-        prev.filter((op) => op.epoch !== undefined && op.epoch >= currentEpoch),
+        prev.filter(
+          (op) => op.epoch !== undefined && op.epoch === currentEpoch,
+        ),
       );
     } catch (error) {
       console.error("[BABY] Error during localStorage cleanup:", error);
