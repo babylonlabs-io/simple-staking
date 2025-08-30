@@ -66,6 +66,9 @@ export function MultistakingModal() {
   const { coinSymbol } = getNetworkConfigBTC();
   const { data: networkInfo } = useNetworkInfo();
   const btcInUsd = usePrice(coinSymbol);
+  const confirmationDepth =
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 30;
 
   const currentFinalityProviders = useWatch({ name: "finalityProviders" });
 
@@ -212,7 +215,7 @@ export function MultistakingModal() {
           details={details}
           warnings={[
             "1. No third party possesses your staked BTC. You are the only one who can unbond and withdraw your stake.",
-            "2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives 10 Bitcoin confirmations.",
+            `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${confirmationDepth} Bitcoin confirmations.`,
           ]}
           onClose={resetState}
           onProceed={async () => {

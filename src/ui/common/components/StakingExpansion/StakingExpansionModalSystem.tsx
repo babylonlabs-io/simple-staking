@@ -268,8 +268,8 @@ function StakingExpansionModalSystemInner() {
                 revalidateForm();
               }}
               warnings={[
-                "1. No third party possesses your staked BTC. You are the only one who can unbond and withdraw your stake.",
-                "2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives 10 Bitcoin confirmations.",
+                `1. No third party possesses your staked ${coinSymbol}. You are the only one who can unbond and withdraw your stake.`,
+                `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${networkInfoData?.params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth ?? 30} Bitcoin confirmations.`,
                 "3. Please note: submitting this transaction will reset your stake's timelock.",
               ]}
             />
