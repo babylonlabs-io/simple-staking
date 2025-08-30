@@ -3,11 +3,13 @@ import { type PropsWithChildren, useCallback, useMemo, useState } from "react";
 import { useValidatorService } from "@/ui/baby/hooks/services/useValidatorService";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 
+import type { ValidatorStatus } from "../types/validator";
+
 type ListView = "table" | "cards";
 
 interface Filter {
   search: string;
-  status: "active" | "inactive" | "jailed" | "slashed" | "";
+  status: ValidatorStatus | "";
   showSlashed: boolean;
 }
 
@@ -19,7 +21,7 @@ interface Validator {
   commission: number;
   tokens: number;
   unbondingTime: number;
-  status: "active" | "inactive" | "jailed" | "slashed";
+  status: ValidatorStatus;
   // apr: number;
   // logoUrl: string;
 }

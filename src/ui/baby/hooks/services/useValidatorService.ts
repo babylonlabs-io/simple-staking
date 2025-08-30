@@ -3,6 +3,7 @@ import { useMemo } from "react";
 import babylon from "@/infrastructure/babylon";
 import { useClientQuery } from "@/ui/common/hooks/client/useClient";
 
+import type { ValidatorStatus } from "../../types/validator";
 import { usePool } from "../api/usePool";
 import { useValidators } from "../api/useValidators";
 
@@ -13,9 +14,19 @@ export interface Validator {
   commission: number;
   tokens: number;
   unbondingTime: number;
-  status: "active" | "inactive" | "jailed" | "slashed";
+  status: ValidatorStatus;
   // apr: number;
   // logoUrl: string;
+}
+
+function getValidatorStatus(
+  isSlashed: boolean,
+  isJailed: boolean,
+  isInActiveSet: boolean,
+): ValidatorStatus {
+  if (isSlashed) return "slashed";
+  if (isJailed) return "jailed";
+  return isInActiveSet ? "active" : "inactive";
 }
 
 export function useValidatorService() {
@@ -82,13 +93,11 @@ export function useValidatorService() {
           );
           const isSlashed = consAddr ? tombstonedSet.has(consAddr) : false;
           const isJailed = Boolean((validator as any).jailed);
-          const status: Validator["status"] = isSlashed
-            ? "slashed"
-            : isJailed
-              ? "jailed"
-              : isInActiveSet
-                ? "active"
-                : "inactive";
+          const status: Validator["status"] = getValidatorStatus(
+            isSlashed,
+            isJailed,
+            isInActiveSet,
+          );
 
           return {
             address: validator.operatorAddress,
