@@ -18,6 +18,9 @@ import {
 } from "@/ui/common/constants";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
+import { ORDINAL_KEY } from "@/ui/common/hooks/client/api/useOrdinals";
+import { PRICES_KEY } from "@/ui/common/hooks/client/api/usePrices";
+import { SYSTEM_STATS_KEY } from "@/ui/common/hooks/client/api/useSystemStats";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 
 export function useClientQuery<
@@ -60,6 +63,12 @@ export function useClientQuery<
     ...options,
   });
 
+  const rootKeyString = String(
+    (Array.isArray(options.queryKey)
+      ? options.queryKey[0]
+      : options.queryKey) ?? "",
+  ).toUpperCase();
+
   useEffect(() => {
     if (data.isError) {
       const error = data.error as Error;
@@ -69,6 +78,12 @@ export function useClientQuery<
       if (isGeoBlocked) {
         return;
       }
+
+      const isNonCriticalError = [
+        SYSTEM_STATS_KEY,
+        PRICES_KEY,
+        ORDINAL_KEY,
+      ].includes(rootKeyString);
 
       const clientError = new ClientError(
         ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
@@ -81,10 +96,18 @@ export function useClientQuery<
         error: clientError,
         displayOptions: {
           retryAction: data.refetch,
+          showModal: !isNonCriticalError,
         },
       });
     }
-  }, [handleError, data.error, data.isError, data.refetch, logger]);
+  }, [
+    handleError,
+    data.error,
+    data.isError,
+    data.refetch,
+    logger,
+    rootKeyString,
+  ]);
 
   return data;
 }

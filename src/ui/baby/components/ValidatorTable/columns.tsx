@@ -1,9 +1,13 @@
 import { type ColumnProps, Avatar, Text } from "@babylonlabs-io/core-ui";
 
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 import { Validator } from ".";
+
+const { coinSymbol } = getNetworkConfigBBN();
 
 export const columns: ColumnProps<Validator>[] = [
   {
@@ -40,5 +44,17 @@ export const columns: ColumnProps<Validator>[] = [
     cellClassName: "text-right pr-4",
     sorter: (a, b) => a.commission - b.commission,
     render: (value) => <>{formatCommissionPercentage(value as number)}</>,
+  },
+  {
+    key: "tokens",
+    header: "Total Staked",
+    headerClassName: "w-24",
+    cellClassName: "text-right pr-4",
+    sorter: (a, b) => a.tokens - b.tokens,
+    render: (value) => (
+      <>
+        {maxDecimals(ubbnToBaby(value as number), 2)} {coinSymbol}
+      </>
+    ),
   },
 ];
