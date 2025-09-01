@@ -8,7 +8,7 @@ import {
   useWalletConnect,
   useWidgetState,
 } from "@babylonlabs-io/wallet-connector";
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
@@ -26,11 +26,7 @@ import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 
-import {
-  SettingMenuButton,
-  SettingMenuContainer,
-  SettingMenuContent,
-} from "../Menu/SettingMenu";
+import { SettingMenuWrapper } from "../Menu/SettingMenu";
 
 interface ConnectProps {
   loading?: boolean;
@@ -41,9 +37,6 @@ export const Connect: React.FC<ConnectProps> = ({
   loading = false,
   onConnect,
 }) => {
-  const settingsButtonRef = useRef<HTMLButtonElement>(null);
-  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
-
   const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
   const handleOpenChange = (open: boolean) => {
     setIsWalletMenuOpen(open);
@@ -167,17 +160,7 @@ export const Connect: React.FC<ConnectProps> = ({
           <span className="hidden md:flex">Connect Wallets</span>
         </Button>
 
-        <SettingMenuButton
-          ref={settingsButtonRef}
-          toggleMenu={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
-        />
-        <SettingMenuContainer
-          anchorEl={settingsButtonRef.current}
-          isOpen={isSettingsMenuOpen}
-          onClose={() => setIsSettingsMenuOpen(false)}
-        >
-          <SettingMenuContent />
-        </SettingMenuContainer>
+        <SettingMenuWrapper />
 
         {!isApiNormal && renderApiNotAvailableTooltip}
       </div>
@@ -235,17 +218,7 @@ export const Connect: React.FC<ConnectProps> = ({
         bbnCoinSymbol={bbnCoinSymbol}
       />
 
-      <SettingMenuButton
-        ref={settingsButtonRef}
-        toggleMenu={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
-      />
-      <SettingMenuContainer
-        anchorEl={settingsButtonRef.current}
-        isOpen={isSettingsMenuOpen}
-        onClose={() => setIsSettingsMenuOpen(false)}
-      >
-        <SettingMenuContent />
-      </SettingMenuContainer>
+      <SettingMenuWrapper />
     </div>
   );
 };
