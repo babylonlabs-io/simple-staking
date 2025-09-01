@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 
-import { useExpansionValidation } from "@/ui/common/hooks/services/useExpansionValidation";
+import { useUtxoValidation } from "@/ui/common/hooks/services/useUtxoValidation";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
 import {
@@ -24,67 +24,70 @@ export function useVerifiedStakingExpansionService() {
   } = useStakingExpansionState();
 
   /**
-   * Get all verified staking expansions.
+   * Get all verified staking expansions with valid UTXOs.
    * These are delegations that:
    * 1. Have state='VERIFIED'
    * 2. Have a previousStakingTxHashHex (indicating they are expansions)
-   * 3. Have valid UTXOs (funding UTXOs are still available)
-   * 4. If a specific delegation is selected, filter to show only expansions for that delegation
+   * 3. Are not mutually exclusive with already processed expansions
+   * 4. Have valid funding UTXOs that are still available
+   * 5. If a specific delegation is selected, filter to show only expansions for that delegation
    */
-  const allVerifiedExpansions = useMemo(() => {
-    // First, get all verified expansions
-    const allVerified = expansions.filter(
-      (expansion) =>
-        expansion.state === DelegationV2StakingState.VERIFIED &&
-        expansion.previousStakingTxHashHex,
-    );
-
-    // Filter out verified expansions if another expansion for the same original transaction
-    // has already been broadcasted (mutual exclusivity)
-    const availableVerified = allVerified.filter((expansion) => {
-      // Check if any other expansion for the same original transaction is already being processed
-      const hasProcessingExpansion = expansions.some(
-        (other) =>
-          other.previousStakingTxHashHex ===
-            expansion.previousStakingTxHashHex &&
-          other.stakingTxHashHex !== expansion.stakingTxHashHex && // Different expansion
-          (other.state ===
-            DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
-            other.state === DelegationV2StakingState.ACTIVE), // Already processed
+  const verifiedExpansions = useMemo(() => {
+    // Helper function to get verified expansions without UTXO validation
+    const getVerifiedExpansions = () => {
+      // First, get all verified expansions
+      const allVerified = expansions.filter(
+        (expansion) =>
+          expansion.state === DelegationV2StakingState.VERIFIED &&
+          expansion.previousStakingTxHashHex,
       );
 
-      return !hasProcessingExpansion;
-    });
+      // Filter out verified expansions if another expansion for the same original transaction
+      // has already been broadcasted (mutual exclusivity)
+      return allVerified.filter((expansion) => {
+        // Check if any other expansion for the same original transaction is already being processed
+        const hasProcessingExpansion = expansions.some(
+          (other) =>
+            other.previousStakingTxHashHex ===
+              expansion.previousStakingTxHashHex &&
+            other.stakingTxHashHex !== expansion.stakingTxHashHex && // Different expansion
+            (other.state ===
+              DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+              other.state === DelegationV2StakingState.ACTIVE), // Already processed
+        );
+
+        return !hasProcessingExpansion;
+      });
+    };
+
+    // Get all verified expansions that aren't mutually exclusive
+    const availableVerified = getVerifiedExpansions();
 
     return availableVerified;
   }, [expansions]);
 
   // Validate all verified expansions against available UTXOs
-  const validationMap = useExpansionValidation(allVerifiedExpansions);
+  const validationMap = useUtxoValidation(verifiedExpansions);
 
-  const verifiedExpansions = useMemo(() => {
+  // Filter verified expansions to only include those with valid UTXOs
+  const validVerifiedExpansions = useMemo(() => {
     // Filter out expansions with invalid UTXOs
-    const validExpansions = allVerifiedExpansions.filter(
+    const validExpansions = verifiedExpansions.filter(
       (expansion) => validationMap[expansion.stakingTxHashHex]?.valid !== false,
     );
 
     // If a specific delegation is selected for the modal, filter to only show expansions for that delegation
     if (selectedDelegationForVerifiedModal) {
-      const filtered = validExpansions.filter(
+      return validExpansions.filter(
         (expansion) =>
           expansion.previousStakingTxHashHex ===
           selectedDelegationForVerifiedModal.stakingTxHashHex,
       );
-      return filtered;
     }
 
     // Otherwise, return all valid verified expansions
     return validExpansions;
-  }, [
-    allVerifiedExpansions,
-    validationMap,
-    selectedDelegationForVerifiedModal,
-  ]);
+  }, [verifiedExpansions, validationMap, selectedDelegationForVerifiedModal]);
 
   /**
    * Open the verified expansion modal.
@@ -149,12 +152,12 @@ export function useVerifiedStakingExpansionService() {
    */
   const getVerifiedExpansionsForDelegation = useCallback(
     (originalStakingTxHashHex: string) => {
-      return verifiedExpansions.filter(
+      return validVerifiedExpansions.filter(
         (expansion) =>
           expansion.previousStakingTxHashHex === originalStakingTxHashHex,
       );
     },
-    [verifiedExpansions],
+    [validVerifiedExpansions],
   );
 
   /**
@@ -176,7 +179,7 @@ export function useVerifiedStakingExpansionService() {
   );
 
   return {
-    verifiedExpansions,
+    verifiedExpansions: validVerifiedExpansions,
     openVerifiedExpansionModal,
     openVerifiedExpansionModalForDelegation,
     closeVerifiedExpansionModal,

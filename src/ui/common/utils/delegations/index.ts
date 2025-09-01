@@ -88,7 +88,6 @@ export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
  * @param allUTXOs - The UTXOs set.
  * @returns True if the transaction inputs are still available, false otherwise.
  */
-
 type Validator = (
   delegation: DelegationV2,
   utxos: UTXO[],
