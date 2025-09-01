@@ -6,7 +6,6 @@ import { Suspense, useState } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
-import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
@@ -21,15 +20,13 @@ function Providers({ children }: React.PropsWithChildren) {
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <QueryClientProvider client={client}>
             <ErrorProvider>
-              <BbnRpcProvider>
-                <WalletConnectionProvider>
-                  <BTCWalletProvider>
-                    <CosmosWalletProvider>
-                      <AppState>{children}</AppState>
-                    </CosmosWalletProvider>
-                  </BTCWalletProvider>
-                </WalletConnectionProvider>
-              </BbnRpcProvider>
+              <WalletConnectionProvider>
+                <BTCWalletProvider>
+                  <CosmosWalletProvider>
+                    <AppState>{children}</AppState>
+                  </CosmosWalletProvider>
+                </BTCWalletProvider>
+              </WalletConnectionProvider>
             </ErrorProvider>
             <ReactQueryDevtools
               buttonPosition="bottom-left"

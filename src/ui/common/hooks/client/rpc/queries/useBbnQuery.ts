@@ -2,14 +2,10 @@ import { createRPCClient } from "@babylonlabs-io/babylon-proto-ts";
 
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { ONE_MINUTE, ONE_SECOND } from "@/ui/common/constants";
-import { useBbnRpc } from "@/ui/common/context/rpc/BbnRpcProvider";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
-import { ClientError } from "@/ui/common/errors";
-import { ERROR_CODES } from "@/ui/common/errors/codes";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 
 import { useClientQuery } from "../../useClient";
-import { useRpcErrorHandler } from "../useRpcErrorHandler";
 
 const BBN_BTCLIGHTCLIENT_TIP_KEY = "BBN_BTCLIGHTCLIENT_TIP";
 const BBN_BALANCE_KEY = "BBN_BALANCE";
@@ -24,8 +20,6 @@ const { rpc: BBN_RPC_URL } = getNetworkConfigBBN();
 export const useBbnQuery = () => {
   const { isGeoBlocked, isLoading: isHealthcheckLoading } = useHealthCheck();
   const { bech32Address, connected } = useCosmosWallet();
-  const { queryClient, tmClient } = useBbnRpc();
-  const { hasRpcError, reconnect } = useRpcErrorHandler();
 
   /**
    * Gets the rewards from the user's account.
@@ -92,21 +86,11 @@ export const useBbnQuery = () => {
   const babyTipHeightQuery = useClientQuery({
     queryKey: [BBN_HEIGHT_KEY],
     queryFn: async () => {
-      if (!tmClient) {
-        return 0;
-      }
-      try {
-        const status = await tmClient.status();
-        return status.syncInfo.latestBlockHeight;
-      } catch (error) {
-        throw new ClientError(
-          ERROR_CODES.EXTERNAL_SERVICE_UNAVAILABLE,
-          "Error getting Babylon chain height",
-          { cause: error as Error },
-        );
-      }
+      const { baby } = await createRPCClient({ url: BBN_RPC_URL });
+      const height = await baby.getBlockHeight();
+      return height;
     },
-    enabled: Boolean(tmClient && connected),
+    enabled: connected,
     staleTime: ONE_SECOND * 10,
     refetchInterval: false, // Disable automatic periodic refetching
   });
@@ -116,8 +100,5 @@ export const useBbnQuery = () => {
     balanceQuery,
     btcTipHeightQuery,
     babyTipHeightQuery,
-    hasRpcError,
-    reconnectRpc: reconnect,
-    queryClient,
   };
 };
