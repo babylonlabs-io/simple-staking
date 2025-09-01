@@ -2,6 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/ui/common/constants";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
+import { useUtxoValidation } from "@/ui/common/hooks/services/useUtxoValidation";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useAppState } from "@/ui/common/state";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
@@ -13,7 +14,6 @@ import {
 } from "@/ui/common/types/delegationsV2";
 import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/ui/common/types/networkInfo";
-import { validateDelegation } from "@/ui/common/utils/delegations";
 import { getBbnParamByVersion } from "@/ui/common/utils/params";
 
 import { useStakingExpansionState } from "../../state/StakingExpansionState";
@@ -60,7 +60,7 @@ export function useDelegationService() {
   >({});
   const logger = useLogger();
 
-  const { availableUTXOs = [], networkInfo } = useAppState();
+  const { networkInfo } = useAppState();
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -99,21 +99,7 @@ export function useDelegationService() {
     [delegations, finalityProviderMap],
   );
 
-  const validations = useMemo(
-    () =>
-      delegations.reduce(
-        (acc, delegation) => ({
-          ...acc,
-          // Validate the delegation against the available UTXOs
-          [delegation.stakingTxHashHex]: validateDelegation(
-            delegation,
-            availableUTXOs,
-          ),
-        }),
-        {} as Record<string, { valid: boolean; error?: string }>,
-      ),
-    [delegations, availableUTXOs],
-  );
+  const validations = useUtxoValidation(delegations);
 
   const processing = useMemo(
     () =>
