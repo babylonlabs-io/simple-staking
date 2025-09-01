@@ -9,7 +9,7 @@ import { VerificationModal } from "@/ui/common/components/Modals/VerificationMod
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import { BaseStakingStep, chainLogos, EOIStep } from "@/ui/common/constants";
+import { BaseStakingStep, EOIStep } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingExpansionService } from "@/ui/common/hooks/services/useStakingExpansionService";
@@ -104,14 +104,10 @@ function StakingExpansionModalSystemInner() {
           const bsnId = provider.bsnId || BBN_CHAIN_ID;
           const bsn = bsnList.find((b) => b.id === bsnId);
 
-          const logoUrl =
-            chainLogos[bsnId] ||
-            chainLogos["babylon"] ||
-            chainLogos.placeholder;
           existingBsns.push({
             icon: (
               <Avatar
-                url={logoUrl}
+                url={bsn?.logoUrl}
                 alt={bsn?.name || "Babylon Genesis"}
                 variant="rounded"
                 size="tiny"
@@ -143,12 +139,10 @@ function StakingExpansionModalSystemInner() {
       const provider = getRegisteredFinalityProvider(fpPkHex);
 
       if (bsn || bsnId === BBN_CHAIN_ID) {
-        const logoUrl =
-          chainLogos[bsnId] || chainLogos["babylon"] || chainLogos.placeholder;
         newBsns.push({
           icon: (
             <Avatar
-              url={logoUrl}
+              url={bsn?.logoUrl}
               alt={bsn?.name || "Babylon Genesis"}
               variant="rounded"
               size="tiny"
