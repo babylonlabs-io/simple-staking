@@ -207,6 +207,11 @@ export function MultistakingModal() {
 
   if (!step) return null;
 
+  const warnings = [
+    `1. No third party possesses your staked ${coinSymbol}. You are the only one who can unbond and withdraw your stake.`,
+    `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${confirmationDepth} Bitcoin confirmations.`,
+  ];
+
   return (
     <>
       {step === "preview" && stakingInfo && details && (
@@ -216,10 +221,7 @@ export function MultistakingModal() {
           bsns={bsnInfos}
           finalityProviders={finalityProviderInfos}
           details={details}
-          warnings={[
-            `1. No third party possesses your staked ${coinSymbol}. You are the only one who can unbond and withdraw your stake.`,
-            `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${confirmationDepth} Bitcoin confirmations.`,
-          ]}
+          warnings={warnings}
           onClose={resetState}
           onProceed={async () => {
             if (!formData) return;

@@ -3,6 +3,7 @@ import { PreviewModal, useFormContext } from "@babylonlabs-io/core-ui";
 import babylon from "@/infrastructure/babylon";
 import { ValidatorAvatar } from "@/ui/baby/components/ValidatorAvatar";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
 import { LoadingModal } from "../../components/LoadingModal";
@@ -13,6 +14,15 @@ export function StakingModal() {
   const { step, closePreview, submitForm } = useStakingState();
   const { reset } = useFormContext();
   const { coinSymbol } = getNetworkConfigBBN();
+  const { data: networkInfo } = useNetworkInfo();
+  const confirmationDepth =
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 30;
+  const processingHours = Math.ceil(confirmationDepth / 6);
+  const processingHourLabel = processingHours === 1 ? "hour" : "hours";
+  const warnings = [
+    `The staking transaction may take up to ~${processingHours} ${processingHourLabel} to process. Funds will not be deducted instantly; a sufficient available balance must be maintained until the transaction is confirmed and the deduction is finalized.`,
+  ];
 
   return (
     <>
@@ -49,9 +59,7 @@ export function StakingModal() {
             unbondingFee: "",
           }}
           visibleFields={["Stake Amount", "Transaction Fees"]}
-          warnings={[
-            "The staking transaction may take up to one (1) hour to process. Funds will not be deducted instantly; a sufficient available balance must be maintained until the transaction is confirmed and the deduction is finalized.",
-          ]}
+          warnings={warnings}
           onClose={closePreview}
           onProceed={submitForm}
           proceedLabel="Stake"
