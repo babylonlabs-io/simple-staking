@@ -29,8 +29,6 @@ export interface Validator {
   commission: number;
   tokens: number;
   status: ValidatorStatus;
-  // apr: number;
-  // logoUrl: string;
 }
 
 interface ValidatorTableProps {
@@ -55,8 +53,6 @@ export const ValidatorTable = ({
   onSelect,
   onSearch,
   onStatusChange,
-  // showSlashed = false,
-  // onShowSlashedChange,
 }: PropsWithChildren<ValidatorTableProps>) => {
   const onClearSearch = () => {
     onSearch?.("");
@@ -99,12 +95,6 @@ export const ValidatorTable = ({
               value={searchTerm}
               onChange={(e) => onSearch?.(e.target.value)}
               prefix={searchPrefix}
-              // suffix={<div className="flex items-center gap-2 mr-2">
-              //   <Toggle value={showSlashed} onChange={(v) => onShowSlashedChange?.(v)} />
-              //   <Text variant="body2" className="text-accent-primary whitespace-nowrap">
-              //     Show Slashed
-              //   </Text>
-              // </div>}
               className="w-full"
             />
           </div>
