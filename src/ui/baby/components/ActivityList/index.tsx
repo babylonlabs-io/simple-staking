@@ -6,6 +6,7 @@ import {
   type Delegation,
   useDelegationState,
 } from "@/ui/baby/state/DelegationState";
+import { Hint } from "@/ui/common/components/Common/Hint";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { ubbnToBaby } from "@/ui/common/utils/bbn";
 import { formatCommissionPercentage } from "@/ui/common/utils/formatCommissionPercentage";
@@ -56,7 +57,9 @@ export function BabyActivityList() {
   const activityItems = delegations.map((delegation) => {
     // Get validator-specific pending operations
     const pendingStake = getPendingStake(delegation.validator.address);
+    console.log("pendingStake", pendingStake);
     const pendingUnstake = getPendingUnstake(delegation.validator.address);
+    console.log("pendingUnstake", pendingUnstake);
 
     const validatorPendingStake = pendingStake?.amount || 0n;
     const validatorPendingUnstake = pendingUnstake?.amount || 0n;
@@ -89,7 +92,11 @@ export function BabyActivityList() {
                 ...(validatorPendingStake > 0n
                   ? [
                       {
-                        label: "Pending Stake",
+                        label: (
+                          <Hint tooltip="Your stake will be activated in the next epoch, which takes around 1 hour">
+                            Pending Stake
+                          </Hint>
+                        ),
                         value: `${maxDecimals(ubbnToBaby(Number(validatorPendingStake)), 6)} ${coinSymbol}`,
                       },
                     ]
@@ -97,7 +104,11 @@ export function BabyActivityList() {
                 ...(validatorPendingUnstake > 0n
                   ? [
                       {
-                        label: "Pending Unbonding",
+                        label: (
+                          <Hint tooltip="It will take 50 hours for the amount to be liquid">
+                            Pending Unbonding
+                          </Hint>
+                        ),
                         value: `${maxDecimals(ubbnToBaby(Number(validatorPendingUnstake)), 6)} ${coinSymbol}`,
                       },
                     ]
