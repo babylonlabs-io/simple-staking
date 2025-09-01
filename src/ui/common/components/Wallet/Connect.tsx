@@ -1,23 +1,32 @@
-import { Avatar, AvatarGroup, Button } from "@babylonlabs-io/core-ui";
-import { useWidgetState } from "@babylonlabs-io/wallet-connector";
-import { useMemo, useRef, useState } from "react";
+import {
+  Avatar,
+  AvatarGroup,
+  Button,
+  WalletMenu,
+} from "@babylonlabs-io/core-ui";
+import {
+  useWalletConnect,
+  useWidgetState,
+} from "@babylonlabs-io/wallet-connector";
+import { useMemo, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { PiWalletBold } from "react-icons/pi";
 import { Tooltip } from "react-tooltip";
 import { twMerge } from "tailwind-merge";
 
+import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
+import { useUTXOs } from "@/ui/common/hooks/client/api/useUTXOs";
 import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 import { useAppState } from "@/ui/common/state";
+import { useBalanceState } from "@/ui/common/state/BalanceState";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
+import { ubbnToBaby } from "@/ui/common/utils/bbn";
+import { satoshiToBtc } from "@/ui/common/utils/btc";
 
-import {
-  SettingMenuButton,
-  SettingMenuContainer,
-  SettingMenuContent,
-} from "../Menu/SettingMenu";
-import { WalletMenuContainer } from "../Menu/WalletMenu";
+import { SettingMenuWrapper } from "../Menu/SettingMenu";
 
 interface ConnectProps {
   loading?: boolean;
@@ -28,9 +37,6 @@ export const Connect: React.FC<ConnectProps> = ({
   loading = false,
   onConnect,
 }) => {
-  const settingsButtonRef = useRef<HTMLButtonElement>(null);
-  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState(false);
-
   const [isWalletMenuOpen, setIsWalletMenuOpen] = useState(false);
   const handleOpenChange = (open: boolean) => {
     setIsWalletMenuOpen(open);
@@ -40,6 +46,44 @@ export const Connect: React.FC<ConnectProps> = ({
   const { includeOrdinals, excludeOrdinals, ordinalsExcluded } = useAppState();
   const { linkedDelegationsVisibility, displayLinkedDelegations } =
     useDelegationV2State();
+
+  // Balance state
+  const {
+    bbnBalance,
+    stakableBtcBalance,
+    stakedBtcBalance,
+    inscriptionsBtcBalance,
+    loading: isBalanceLoading,
+  } = useBalanceState();
+
+  // UTXO data for unconfirmed transactions check
+  const { allUTXOs = [], confirmedUTXOs = [] } = useUTXOs();
+  const hasUnconfirmedUTXOs = allUTXOs.length > confirmedUTXOs.length;
+
+  // Network configs for coin symbols
+  const { coinSymbol: btcCoinSymbol } = getNetworkConfigBTC();
+  const { coinSymbol: bbnCoinSymbol } = getNetworkConfigBBN();
+
+  // Balance data for WalletMenu
+  const btcBalances = {
+    staked: stakedBtcBalance,
+    stakable: stakableBtcBalance,
+    inscriptions: inscriptionsBtcBalance,
+  };
+
+  const bbnBalances = {
+    available: bbnBalance,
+  };
+
+  // Unified balance formatter
+  const formatBalance = (amount: number, coinSymbol: string) => {
+    if (coinSymbol === btcCoinSymbol) {
+      return `${satoshiToBtc(amount)} ${coinSymbol}`;
+    } else if (coinSymbol === bbnCoinSymbol) {
+      return `${ubbnToBaby(amount)} ${coinSymbol}`;
+    }
+    return `${amount} ${coinSymbol}`;
+  };
 
   // Wallet states
   const {
@@ -56,6 +100,7 @@ export const Connect: React.FC<ConnectProps> = ({
 
   // Widget states
   const { selectedWallets } = useWidgetState();
+  const { disconnect } = useWalletConnect();
 
   const {
     isApiNormal,
@@ -115,17 +160,7 @@ export const Connect: React.FC<ConnectProps> = ({
           <span className="hidden md:flex">Connect Wallets</span>
         </Button>
 
-        <SettingMenuButton
-          ref={settingsButtonRef}
-          toggleMenu={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
-        />
-        <SettingMenuContainer
-          anchorEl={settingsButtonRef.current}
-          isOpen={isSettingsMenuOpen}
-          onClose={() => setIsSettingsMenuOpen(false)}
-        >
-          <SettingMenuContent />
-        </SettingMenuContainer>
+        <SettingMenuWrapper />
 
         {!isApiNormal && renderApiNotAvailableTooltip}
       </div>
@@ -135,9 +170,9 @@ export const Connect: React.FC<ConnectProps> = ({
   // CONNECTED STATE: Show wallet avatars + settings menu
   return (
     <div className="relative flex flex-row items-center gap-4">
-      <WalletMenuContainer
+      <WalletMenu
         trigger={
-          <div className="flex flex-row cursor-pointer">
+          <div className="cursor-pointer">
             <AvatarGroup max={2} variant="circular">
               <Avatar
                 alt={selectedWallets["BTC"]?.name}
@@ -171,20 +206,19 @@ export const Connect: React.FC<ConnectProps> = ({
         onExcludeOrdinals={excludeOrdinals}
         onDisplayLinkedDelegations={displayLinkedDelegations}
         publicKeyNoCoord={publicKeyNoCoord}
+        onDisconnect={disconnect}
         onOpenChange={handleOpenChange}
+        // Balance-related props
+        btcBalances={btcBalances}
+        bbnBalances={bbnBalances}
+        balancesLoading={isBalanceLoading}
+        hasUnconfirmedTransactions={hasUnconfirmedUTXOs}
+        formatBalance={formatBalance}
+        btcCoinSymbol={btcCoinSymbol}
+        bbnCoinSymbol={bbnCoinSymbol}
       />
 
-      <SettingMenuButton
-        ref={settingsButtonRef}
-        toggleMenu={() => setIsSettingsMenuOpen(!isSettingsMenuOpen)}
-      />
-      <SettingMenuContainer
-        anchorEl={settingsButtonRef.current}
-        isOpen={isSettingsMenuOpen}
-        onClose={() => setIsSettingsMenuOpen(false)}
-      >
-        <SettingMenuContent />
-      </SettingMenuContainer>
+      <SettingMenuWrapper />
     </div>
   );
 };

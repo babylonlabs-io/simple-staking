@@ -1,8 +1,8 @@
-import { ScrollLocker } from "@babylonlabs-io/core-ui";
+import { CoreUIProvider, ScrollLocker } from "@babylonlabs-io/core-ui";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ThemeProvider } from "next-themes";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
@@ -13,27 +13,41 @@ import { AppState } from "./state";
 
 function Providers({ children }: React.PropsWithChildren) {
   const [client] = useState(new QueryClient());
+  const appRootRef = useRef<HTMLDivElement>(null);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (appRootRef.current) {
+      setPortalContainer(appRootRef.current);
+    }
+  }, []);
 
   return (
     <Suspense>
       <ScrollLocker>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <QueryClientProvider client={client}>
-            <ErrorProvider>
-              <WalletConnectionProvider>
-                <BTCWalletProvider>
-                  <CosmosWalletProvider>
-                    <AppState>{children}</AppState>
-                  </CosmosWalletProvider>
-                </BTCWalletProvider>
-              </WalletConnectionProvider>
-            </ErrorProvider>
-            <ReactQueryDevtools
-              buttonPosition="bottom-left"
-              initialIsOpen={false}
-            />
-          </QueryClientProvider>
-          <NotificationContainer />
+          <CoreUIProvider portalContainer={portalContainer}>
+            <div ref={appRootRef} className="min-h-screen">
+              <QueryClientProvider client={client}>
+                <ErrorProvider>
+                  <WalletConnectionProvider>
+                    <BTCWalletProvider>
+                      <CosmosWalletProvider>
+                        <AppState>{children}</AppState>
+                      </CosmosWalletProvider>
+                    </BTCWalletProvider>
+                  </WalletConnectionProvider>
+                </ErrorProvider>
+                <ReactQueryDevtools
+                  buttonPosition="bottom-left"
+                  initialIsOpen={false}
+                />
+              </QueryClientProvider>
+              <NotificationContainer />
+            </div>
+          </CoreUIProvider>
         </ThemeProvider>
       </ScrollLocker>
     </Suspense>

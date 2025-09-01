@@ -159,6 +159,7 @@ export interface BsnFinalityProviderInfo {
   fpPkHex?: string;
   provider?: FinalityProvider;
   title: string;
+  logoUrl: string;
   isDisabled: boolean;
   isExisting: boolean;
 }

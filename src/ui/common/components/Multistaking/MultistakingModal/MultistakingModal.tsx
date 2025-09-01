@@ -1,8 +1,12 @@
-import { Avatar, useFormContext, useWatch } from "@babylonlabs-io/core-ui";
+import {
+  Avatar,
+  PreviewModal,
+  useFormContext,
+  useWatch,
+} from "@babylonlabs-io/core-ui";
 import { useMemo } from "react";
 
 import { CancelFeedbackModal } from "@/ui/common/components/Modals/CancelFeedbackModal";
-import { PreviewMultistakingModal } from "@/ui/common/components/Modals/PreviewMultistakingModal";
 import { SignModal } from "@/ui/common/components/Modals/SignModal/SignModal";
 import { StakeModal } from "@/ui/common/components/Modals/StakeModal";
 import { SuccessFeedbackModal } from "@/ui/common/components/Modals/SuccessFeedbackModal";
@@ -10,7 +14,6 @@ import { VerificationModal } from "@/ui/common/components/Modals/VerificationMod
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import { chainLogos } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingService } from "@/ui/common/hooks/services/useStakingService";
@@ -18,6 +21,7 @@ import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderB
 import { useFinalityProviderState } from "@/ui/common/state/FinalityProviderState";
 import { useStakingState } from "@/ui/common/state/StakingState";
 import { BsnFpDisplayItem } from "@/ui/common/types/display";
+import { getBsnLogoUrl } from "@/ui/common/utils/bsnLogo";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
@@ -62,8 +66,16 @@ export function MultistakingModal() {
   const { coinSymbol } = getNetworkConfigBTC();
   const { data: networkInfo } = useNetworkInfo();
   const btcInUsd = usePrice(coinSymbol);
+  const confirmationDepth =
+    networkInfo?.params.btcEpochCheckParams?.latestParam
+      ?.btcConfirmationDepth || 30;
 
-  const currentFinalityProviders = useWatch({ name: "finalityProviders" });
+  const currentFinalityProviders = useWatch<
+    { finalityProviders: Record<string, string> | string[] | undefined },
+    "finalityProviders"
+  >({
+    name: "finalityProviders",
+  });
 
   const { bsnInfos, finalityProviderInfos } = useMemo(() => {
     const bsns: BsnFpDisplayItem[] = [];
@@ -74,50 +86,48 @@ export function MultistakingModal() {
         typeof currentFinalityProviders === "object" &&
         !Array.isArray(currentFinalityProviders)
       ) {
-        const providerMap = currentFinalityProviders as Record<string, string>;
+        Object.entries(currentFinalityProviders).forEach(
+          ([bsnId, fpPublicKey]) => {
+            const bsn = bsnList.find((bsn) => bsn.id === bsnId);
+            if (bsn || bsnId === BBN_CHAIN_ID) {
+              bsns.push({
+                icon: (
+                  <Avatar
+                    url={bsn?.logoUrl}
+                    alt={bsn?.name || "Babylon Genesis"}
+                    variant="rounded"
+                    size="tiny"
+                  />
+                ),
+                name: bsn?.name || "Babylon Genesis",
+                isExisting: false,
+              });
+            }
 
-        Object.entries(providerMap).forEach(([bsnId, fpPublicKey]) => {
-          const bsn = bsnList.find((bsn) => bsn.id === bsnId);
-          if (bsn || bsnId === BBN_CHAIN_ID) {
-            const logoUrl =
-              chainLogos[bsn?.id || "babylon"] || chainLogos.placeholder;
-            bsns.push({
-              icon: (
-                <Avatar
-                  url={logoUrl}
-                  alt={bsn?.name || "Babylon Genesis"}
-                  variant="rounded"
-                  size="tiny"
-                />
-              ),
-              name: bsn?.name || "Babylon Genesis",
-              isExisting: false,
-            });
-          }
-
-          const provider = getRegisteredFinalityProvider(fpPublicKey);
-          if (provider) {
-            fps.push({
-              icon: (
-                <FinalityProviderLogo
-                  logoUrl={provider.logo_url}
-                  rank={provider.rank}
-                  moniker={provider.description?.moniker}
-                  size="sm"
-                />
-              ),
-              name: provider.description?.moniker || trim(fpPublicKey, 8),
-              isExisting: false,
-            });
-          }
-        });
+            const provider = getRegisteredFinalityProvider(fpPublicKey);
+            if (provider) {
+              fps.push({
+                icon: (
+                  <FinalityProviderLogo
+                    logoUrl={provider.logo_url}
+                    rank={provider.rank}
+                    moniker={provider.description?.moniker}
+                    size="sm"
+                  />
+                ),
+                name: provider.description?.moniker || trim(fpPublicKey, 8),
+                isExisting: false,
+              });
+            }
+          },
+        );
       } else {
         const fpArray = Array.isArray(currentFinalityProviders)
           ? currentFinalityProviders
           : [];
 
         fpArray.forEach((fpPublicKey) => {
-          const logoUrl = chainLogos["babylon"];
+          const logoUrl = getBsnLogoUrl(BBN_CHAIN_ID);
           bsns.push({
             icon: (
               <Avatar
@@ -197,15 +207,21 @@ export function MultistakingModal() {
 
   if (!step) return null;
 
+  const warnings = [
+    `1. No third party possesses your staked ${coinSymbol}. You are the only one who can unbond and withdraw your stake.`,
+    `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${confirmationDepth} Bitcoin confirmations.`,
+  ];
+
   return (
     <>
       {step === "preview" && stakingInfo && details && (
-        <PreviewMultistakingModal
+        <PreviewModal
           open
           processing={processing}
           bsns={bsnInfos}
           finalityProviders={finalityProviderInfos}
           details={details}
+          warnings={warnings}
           onClose={resetState}
           onProceed={async () => {
             if (!formData) return;
