@@ -15,8 +15,6 @@ export interface Validator {
   tokens: number;
   unbondingTime: number;
   status: ValidatorStatus;
-  // apr: number;
-  // logoUrl: string;
 }
 
 function getValidatorStatus(
@@ -107,8 +105,6 @@ export function useValidatorService() {
             commission,
             unbondingTime,
             status,
-            // apr: 0,
-            // logoUrl: "",
           };
         })
         .sort((a, b) => b.tokens - a.tokens),
