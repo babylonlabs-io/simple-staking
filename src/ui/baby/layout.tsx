@@ -112,7 +112,7 @@ function BabyLayoutContent() {
       as="main"
       className="flex flex-col gap-[3rem] pb-24 max-w-[760px] mx-auto flex-1"
     >
-      <Tabs items={fallbackTabItems} defaultActiveTab="stake" />
+      <Tabs items={fallbackTabItems} defaultActiveTab="stake" keepMounted />
     </Container>
   );
 
@@ -132,6 +132,7 @@ function BabyLayoutContent() {
                     defaultActiveTab="stake"
                     activeTab={activeTab}
                     onTabChange={(tabId) => setActiveTab(tabId as TabId)}
+                    keepMounted
                   />
                 </Container>
               </AuthGuard>
