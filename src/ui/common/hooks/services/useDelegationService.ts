@@ -90,8 +90,22 @@ export function useDelegationService() {
     (isDelegationLoading || isFPLoading) && !isExpansionModalOpen;
 
   const delegationsWithFP = useMemo(() => {
-    // Merge regular delegations with expansion delegations
-    const allDelegations = [...delegations, ...expansionDelegations];
+    // Merge regular delegations with expansion delegations, avoiding duplicates
+    // Use Map to deduplicate by stakingTxHashHex, prioritizing expansion delegations
+    const delegationMap = new Map();
+
+    // First, add regular delegations
+    delegations.forEach((delegation) => {
+      delegationMap.set(delegation.stakingTxHashHex, delegation);
+    });
+
+    // Then, add expansion delegations (they will override regular ones if same stakingTxHashHex)
+    expansionDelegations.forEach((delegation) => {
+      delegationMap.set(delegation.stakingTxHashHex, delegation);
+    });
+
+    // Convert map values back to array and add FP data
+    const allDelegations = Array.from(delegationMap.values());
 
     return allDelegations.map((d) => ({
       ...d,
@@ -101,10 +115,24 @@ export function useDelegationService() {
     }));
   }, [delegations, expansionDelegations, finalityProviderMap]);
 
-  const validations = useUtxoValidation([
-    ...delegations,
-    ...expansionDelegations,
-  ]);
+  // Create deduplicated array for validation using same logic as delegationsWithFP
+  const delegationsForValidation = useMemo(() => {
+    const delegationMap = new Map();
+
+    // First, add regular delegations
+    delegations.forEach((delegation) => {
+      delegationMap.set(delegation.stakingTxHashHex, delegation);
+    });
+
+    // Then, add expansion delegations (they will override regular ones if same stakingTxHashHex)
+    expansionDelegations.forEach((delegation) => {
+      delegationMap.set(delegation.stakingTxHashHex, delegation);
+    });
+
+    return Array.from(delegationMap.values());
+  }, [delegations, expansionDelegations]);
+
+  const validations = useUtxoValidation(delegationsForValidation);
 
   const processing = useMemo(
     () =>

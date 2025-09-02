@@ -47,7 +47,7 @@ export function ActivityList() {
   } = useStakingExpansionState();
 
   const activityList = useMemo(() => {
-    return delegations
+    const result = delegations
       .filter((delegation) => {
         const { valid } = validations[delegation.stakingTxHashHex];
         return valid;
@@ -121,8 +121,11 @@ export function ActivityList() {
         return {
           ...cardData,
           primaryAction,
+          stakingTxHashHex: delegation.stakingTxHashHex,
         };
       });
+
+    return result;
   }, [
     delegations,
     validations,
@@ -155,7 +158,7 @@ export function ActivityList() {
       <div className="space-y-4">
         {activityList.map((data, index) => (
           <ActivityCard
-            key={delegations[index]?.stakingTxHashHex || index}
+            key={data.stakingTxHashHex || `activity-${index}`}
             data={data}
           />
         ))}
