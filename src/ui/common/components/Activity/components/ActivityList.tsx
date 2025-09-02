@@ -55,8 +55,32 @@ export function ActivityList() {
       .filter(
         // Filter out expanded delegations as they are now part of the
         // expanded delegation. User can find it from delegation history.
-        (delegation) => delegation.state !== DelegationV2StakingState.EXPANDED,
+        (delegation) => {
+          const isExpanded =
+            delegation.state === DelegationV2StakingState.EXPANDED;
+          return !isExpanded;
+        },
       )
+      .filter((delegation) => {
+        // Only filter out VERIFIED expansion transactions (not broadcasted yet)
+        // ACTIVE expansions should show in Activity tab
+        if (
+          delegation.previousStakingTxHashHex &&
+          delegation.state === DelegationV2StakingState.VERIFIED
+        ) {
+          return false;
+        }
+
+        // Only filter out original transactions if they have BROADCASTED expansions
+        const hasBroadcastedExpansion = delegations.some(
+          (other) =>
+            other.previousStakingTxHashHex === delegation.stakingTxHashHex &&
+            (other.state ===
+              DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+              other.state === DelegationV2StakingState.ACTIVE),
+        );
+        return !hasBroadcastedExpansion;
+      })
       .map((delegation) => {
         const options: ActivityCardTransformOptions = {
           showExpansionSection: true,
@@ -86,10 +110,12 @@ export function ActivityList() {
         } as DelegationWithFP;
 
         // Add action button if applicable
+        const validation = validations[delegation.stakingTxHashHex];
         const primaryAction = getActionButton(
           delegationWithFP,
           openConfirmationModal,
           isStakingManagerReady,
+          validation,
         );
 
         return {

@@ -82,24 +82,29 @@ export function useDelegationService() {
   const { isFetching: isFPLoading, finalityProviderMap } =
     useFinalityProviderState();
 
-  const { isExpansionModalOpen } = useStakingExpansionState();
+  const { isExpansionModalOpen, expansions: expansionDelegations } =
+    useStakingExpansionState();
 
   // Stop loading when any expansion modal is open
   const isLoading =
     (isDelegationLoading || isFPLoading) && !isExpansionModalOpen;
 
-  const delegationsWithFP = useMemo(
-    () =>
-      delegations.map((d) => ({
-        ...d,
-        fp: finalityProviderMap.get(
-          d.finalityProviderBtcPksHex[0],
-        ) as FinalityProvider,
-      })),
-    [delegations, finalityProviderMap],
-  );
+  const delegationsWithFP = useMemo(() => {
+    // Merge regular delegations with expansion delegations
+    const allDelegations = [...delegations, ...expansionDelegations];
 
-  const validations = useUtxoValidation(delegations);
+    return allDelegations.map((d) => ({
+      ...d,
+      fp: finalityProviderMap.get(
+        d.finalityProviderBtcPksHex[0],
+      ) as FinalityProvider,
+    }));
+  }, [delegations, expansionDelegations, finalityProviderMap]);
+
+  const validations = useUtxoValidation([
+    ...delegations,
+    ...expansionDelegations,
+  ]);
 
   const processing = useMemo(
     () =>
