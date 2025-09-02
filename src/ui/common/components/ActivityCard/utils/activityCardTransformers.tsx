@@ -19,6 +19,7 @@ const { coinName, icon } = getNetworkConfigBTC();
 export interface ActivityCardTransformOptions {
   showExpansionSection?: boolean;
   hideExpansionCompletely?: boolean;
+  isBroadcastedVerifiedExpansion?: boolean;
 }
 
 /**
@@ -50,7 +51,15 @@ export function transformDelegationToActivityCard(
   const details: ActivityCardDetailItem[] = [
     {
       label: "Status",
-      value: <Status delegation={delegationWithFP} showTooltip={true} />,
+      value: (
+        <Status
+          delegation={delegationWithFP}
+          showTooltip={true}
+          isBroadcastedVerifiedExpansion={
+            options.isBroadcastedVerifiedExpansion
+          }
+        />
+      ),
     },
     {
       label: "Inception",
@@ -90,8 +99,9 @@ export function transformDelegationToActivityCard(
 
     const isPendingExpansion =
       delegation.previousStakingTxHashHex &&
-      delegation.state ===
-        DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION;
+      (delegation.state ===
+        DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+        delegation.state === DelegationV2StakingState.VERIFIED);
 
     const showExpansionSection = isActiveAndCanExpand || isPendingExpansion;
 
@@ -111,5 +121,6 @@ export function transformDelegationToActivityCard(
     groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,
     expansionSection,
     hideExpansionCompletely: options.hideExpansionCompletely,
+    isBroadcastedVerifiedExpansion: options.isBroadcastedVerifiedExpansion,
   };
 }

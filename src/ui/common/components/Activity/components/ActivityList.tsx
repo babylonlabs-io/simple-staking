@@ -28,6 +28,7 @@ export function ActivityList() {
     processing,
     confirmationModal,
     delegations,
+    rawApiDelegations,
     isLoading,
     validations,
     executeDelegationAction,
@@ -47,87 +48,108 @@ export function ActivityList() {
   } = useStakingExpansionState();
 
   const activityList = useMemo(() => {
-    const result = delegations
-      .filter((delegation) => {
-        const { valid } = validations[delegation.stakingTxHashHex];
-        return valid;
-      })
-      .filter(
-        // Filter out expanded delegations as they are now part of the
-        // expanded delegation. User can find it from delegation history.
-        (delegation) => {
-          const isExpanded =
-            delegation.state === DelegationV2StakingState.EXPANDED;
-          return !isExpanded;
-        },
-      )
-      .filter((delegation) => {
-        // Only filter out VERIFIED expansion transactions (not broadcasted yet)
-        // ACTIVE expansions should show in Activity tab
-        if (
-          delegation.previousStakingTxHashHex &&
-          delegation.state === DelegationV2StakingState.VERIFIED
-        ) {
-          return false;
-        }
+    const afterValidation = delegations.filter((delegation) => {
+      const { valid } = validations[delegation.stakingTxHashHex];
+      return valid;
+    });
 
-        // Only filter out original transactions if they have BROADCASTED expansions
-        const hasBroadcastedExpansion = delegations.some(
-          (other) =>
-            other.previousStakingTxHashHex === delegation.stakingTxHashHex &&
-            (other.state ===
-              DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
-              other.state === DelegationV2StakingState.ACTIVE),
+    const afterExpanded = afterValidation.filter(
+      // Filter out expanded delegations as they are now part of the
+      // expanded delegation. User can find it from delegation history.
+      (delegation) => {
+        const isExpanded =
+          delegation.state === DelegationV2StakingState.EXPANDED;
+        return !isExpanded;
+      },
+    );
+
+    const result = afterExpanded.filter((delegation) => {
+      // Filter out VERIFIED expansion transactions that are NOT broadcasted (local storage only)
+      // Broadcasted expansions (from API) should show in Activity tab regardless of VERIFIED state
+      if (
+        delegation.previousStakingTxHashHex &&
+        delegation.state === DelegationV2StakingState.VERIFIED
+      ) {
+        // Check if this expansion transaction exists in the raw API data
+        // If not, it's local storage only and should be hidden from Activity
+        const isFromAPI = rawApiDelegations.some(
+          (apiDelegation) =>
+            apiDelegation.stakingTxHashHex === delegation.stakingTxHashHex,
         );
-        return !hasBroadcastedExpansion;
-      })
-      .map((delegation) => {
-        const options: ActivityCardTransformOptions = {
-          showExpansionSection: true,
-        };
-        const cardData = transformDelegationToActivityCard(
-          delegation,
-          finalityProviderMap,
-          options,
-        );
+        return isFromAPI; // Only show if it's from API (broadcasted)
+      }
 
-        // Create delegation with FP for action button
-        // delegations from useDelegationService are DelegationV2 objects
-        const delegation_v2 = delegation as DelegationV2;
-        // Use the first FP [0] for backward compatibility with action button logic
-        // which expects a single FP to determine button state. The full BSN/FP pairs
-        // are properly displayed in the card's grouped details section
-        const fp =
-          Array.isArray(delegation_v2.finalityProviderBtcPksHex) &&
-          delegation_v2.finalityProviderBtcPksHex.length > 0
-            ? finalityProviderMap.get(
-                delegation_v2.finalityProviderBtcPksHex[0],
-              )
-            : undefined;
-        const delegationWithFP: DelegationWithFP = {
-          ...delegation_v2,
-          fp,
-        } as DelegationWithFP;
+      // Only filter out original transactions if they have BROADCASTED expansions
+      const hasBroadcastedExpansion = delegations.some(
+        (other) =>
+          other.previousStakingTxHashHex === delegation.stakingTxHashHex &&
+          (other.state ===
+            DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+            other.state === DelegationV2StakingState.ACTIVE ||
+            other.state === DelegationV2StakingState.VERIFIED), // Include VERIFIED but broadcasted
+      );
+      return !hasBroadcastedExpansion;
+    });
 
-        // Add action button if applicable
-        const validation = validations[delegation.stakingTxHashHex];
-        const primaryAction = getActionButton(
-          delegationWithFP,
-          openConfirmationModal,
-          isStakingManagerReady,
-          validation,
+    const finalResult = result.map((delegation) => {
+      // Determine if this VERIFIED expansion is actually broadcasted
+      const isBroadcastedVerifiedExpansion =
+        delegation.previousStakingTxHashHex &&
+        delegation.state === DelegationV2StakingState.VERIFIED &&
+        rawApiDelegations.some(
+          (apiDelegation) =>
+            apiDelegation.stakingTxHashHex === delegation.stakingTxHashHex,
         );
 
-        return {
-          ...cardData,
-          primaryAction,
-          stakingTxHashHex: delegation.stakingTxHashHex,
-        };
-      });
+      const options: ActivityCardTransformOptions = {
+        showExpansionSection: true,
+        isBroadcastedVerifiedExpansion:
+          isBroadcastedVerifiedExpansion || undefined,
+      };
+      const cardData = transformDelegationToActivityCard(
+        delegation,
+        finalityProviderMap,
+        options,
+      );
 
-    return result;
+      // Create delegation with FP for action button
+      // delegations from useDelegationService are DelegationV2 objects
+      const delegation_v2 = delegation as DelegationV2;
+      // Use the first FP [0] for backward compatibility with action button logic
+      // which expects a single FP to determine button state. The full BSN/FP pairs
+      // are properly displayed in the card's grouped details section
+      const fp =
+        Array.isArray(delegation_v2.finalityProviderBtcPksHex) &&
+        delegation_v2.finalityProviderBtcPksHex.length > 0
+          ? finalityProviderMap.get(delegation_v2.finalityProviderBtcPksHex[0])
+          : undefined;
+      const delegationWithFP: DelegationWithFP = {
+        ...delegation_v2,
+        fp,
+      } as DelegationWithFP;
+
+      // Add action button if applicable (but not for broadcasted VERIFIED expansions)
+      const validation = validations[delegation.stakingTxHashHex];
+      const primaryAction = isBroadcastedVerifiedExpansion
+        ? undefined // No action button for already broadcasted expansions
+        : getActionButton(
+            delegationWithFP,
+            openConfirmationModal,
+            isStakingManagerReady,
+            validation,
+          );
+
+      return {
+        ...cardData,
+        primaryAction,
+        stakingTxHashHex: delegation.stakingTxHashHex,
+      };
+    });
+
+    return finalResult;
   }, [
     delegations,
+    rawApiDelegations,
     validations,
     openConfirmationModal,
     isStakingManagerReady,

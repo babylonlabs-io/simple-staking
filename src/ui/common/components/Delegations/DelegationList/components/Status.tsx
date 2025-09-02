@@ -16,6 +16,7 @@ import { SlashingContent } from "./SlashingContent";
 interface StatusProps {
   delegation: DelegationWithFP;
   showTooltip?: boolean;
+  isBroadcastedVerifiedExpansion?: boolean;
 }
 
 interface StatusParams {
@@ -191,11 +192,24 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
   [FinalityProviderState.JAILED]: {},
 };
 
-export function Status({ delegation, showTooltip = true }: StatusProps) {
+export function Status({
+  delegation,
+  showTooltip = true,
+  isBroadcastedVerifiedExpansion = false,
+}: StatusProps) {
   const { networkInfo } = useAppState();
 
-  const delegationStatus = useMemo(
-    () =>
+  const delegationStatus = useMemo(() => {
+    // Handle special case: broadcasted VERIFIED expansions should show pending status
+    if (isBroadcastedVerifiedExpansion) {
+      const pendingStatus = getPendingBTCConfirmationStatus(
+        delegation,
+        networkInfo,
+      );
+      return { ...pendingStatus, status: undefined }; // Add missing status property
+    }
+
+    return (
       FP_STATUSES[delegation.fp?.state]?.[delegation.state]?.({
         delegation,
         networkInfo,
@@ -203,15 +217,15 @@ export function Status({ delegation, showTooltip = true }: StatusProps) {
       STATUSES[delegation.state]?.({
         delegation,
         networkInfo,
-      }),
-    [delegation, networkInfo],
-  );
+      })
+    );
+  }, [delegation, networkInfo, isBroadcastedVerifiedExpansion]);
 
   const {
     label = "unknown",
     tooltip = "unknown",
     status,
-  } = delegationStatus ?? {};
+  } = delegationStatus ?? { label: "unknown", tooltip: "unknown" };
 
   return (
     <Hint tooltip={showTooltip ? tooltip : undefined} status={status}>

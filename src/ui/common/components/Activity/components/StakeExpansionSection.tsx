@@ -148,8 +148,9 @@ export function StakeExpansionSection({
   // Check if this is a pending expansion transaction
   const isPendingExpansion =
     delegation.previousStakingTxHashHex &&
-    delegation.state ===
-      DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION;
+    (delegation.state ===
+      DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+      delegation.state === DelegationV2StakingState.VERIFIED);
 
   // Get confirmation requirements from network info
   const confirmationDepth =
@@ -167,7 +168,7 @@ export function StakeExpansionSection({
             Stake Expansion Pending
           </Text>
           <Text variant="body2" className="text-accent-secondary">
-            Your stake expansion transaction has been forward to Bitcoin. It
+            Your stake expansion transaction has been forwarded to Bitcoin. It
             will be activated once it receives {confirmationDepth} Bitcoin block
             confirmations. Your original stake is still Active and you can find
             it in the "Expansion History" tab.

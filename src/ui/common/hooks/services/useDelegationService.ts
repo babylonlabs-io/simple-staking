@@ -90,22 +90,22 @@ export function useDelegationService() {
     (isDelegationLoading || isFPLoading) && !isExpansionModalOpen;
 
   const delegationsWithFP = useMemo(() => {
-    // Merge regular delegations with expansion delegations, avoiding duplicates
-    // Use Map to deduplicate by stakingTxHashHex, prioritizing expansion delegations
-    const delegationMap = new Map();
+    // Only add expansion transactions that are actual expansions (have previousStakingTxHashHex)
+    const actualExpansions = expansionDelegations.filter(
+      (delegation) => delegation.previousStakingTxHashHex,
+    );
 
-    // First, add regular delegations
-    delegations.forEach((delegation) => {
-      delegationMap.set(delegation.stakingTxHashHex, delegation);
-    });
+    // Track which expansions exist in API data (these are broadcasted)
+    const apiTxHashes = new Set(delegations.map((d) => d.stakingTxHashHex));
 
-    // Then, add expansion delegations (they will override regular ones if same stakingTxHashHex)
-    expansionDelegations.forEach((delegation) => {
-      delegationMap.set(delegation.stakingTxHashHex, delegation);
-    });
+    // Only add expansions that don't already exist in regular delegations (avoid duplicates)
+    // Note: If an expansion exists in both API and local storage, we prefer the API version (broadcasted)
+    const newExpansions = actualExpansions.filter(
+      (expansion) => !apiTxHashes.has(expansion.stakingTxHashHex),
+    );
 
-    // Convert map values back to array and add FP data
-    const allDelegations = Array.from(delegationMap.values());
+    // Combine regular delegations with new expansions (no duplicates)
+    const allDelegations = [...delegations, ...newExpansions];
 
     return allDelegations.map((d) => ({
       ...d,
@@ -115,21 +115,35 @@ export function useDelegationService() {
     }));
   }, [delegations, expansionDelegations, finalityProviderMap]);
 
-  // Create deduplicated array for validation using same logic as delegationsWithFP
+  // Create array for validation using same logic as delegationsWithFP
+  // Add source metadata to distinguish API (broadcasted) vs local storage transactions
   const delegationsForValidation = useMemo(() => {
-    const delegationMap = new Map();
+    // Only add expansion transactions that are actual expansions (have previousStakingTxHashHex)
+    const actualExpansions = expansionDelegations.filter(
+      (delegation) => delegation.previousStakingTxHashHex,
+    );
 
-    // First, add regular delegations
-    delegations.forEach((delegation) => {
-      delegationMap.set(delegation.stakingTxHashHex, delegation);
-    });
+    // Track which expansions exist in API data (these are broadcasted)
+    const apiTxHashes = new Set(delegations.map((d) => d.stakingTxHashHex));
 
-    // Then, add expansion delegations (they will override regular ones if same stakingTxHashHex)
-    expansionDelegations.forEach((delegation) => {
-      delegationMap.set(delegation.stakingTxHashHex, delegation);
-    });
+    // Only add expansions that don't already exist in regular delegations (avoid duplicates)
+    const newExpansions = actualExpansions.filter(
+      (expansion) => !apiTxHashes.has(expansion.stakingTxHashHex),
+    );
 
-    return Array.from(delegationMap.values());
+    // Add source metadata for validation logic
+    const apiDelegationsWithMetadata = delegations.map((d) => ({
+      ...d,
+      _isFromAPI: true, // Broadcasted transactions
+    }));
+
+    const localExpansionsWithMetadata = newExpansions.map((d) => ({
+      ...d,
+      _isFromAPI: false, // Local storage only
+    }));
+
+    // Combine regular delegations with new expansions (no duplicates)
+    return [...apiDelegationsWithMetadata, ...localExpansionsWithMetadata];
   }, [delegations, expansionDelegations]);
 
   const validations = useUtxoValidation(delegationsForValidation);
@@ -378,6 +392,7 @@ export function useDelegationService() {
     processing,
     isLoading,
     delegations: delegationsWithFP,
+    rawApiDelegations: delegations, // Raw API data for filtering logic
     validations,
     hasMoreDelegations,
     confirmationModal,
