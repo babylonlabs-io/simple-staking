@@ -53,8 +53,6 @@ export const ChainSelectionModal = ({
     ? Boolean(selectedBsns[babylonBsn.id])
     : false;
 
-  console.log({ selectedBsns });
-
   return (
     <ResponsiveDialog open={open} onClose={onClose} className="w-[52rem]">
       <DialogHeader
