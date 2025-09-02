@@ -2,8 +2,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useRef } from "react";
 
 import babylon from "@/infrastructure/babylon";
-import { network } from "@/ui/common/config/network/bbn";
 import { ONE_MINUTE } from "@/ui/common/constants";
+import { setCurrentEpoch } from "@/ui/common/utils/local_storage/epochStorage";
 
 import { usePendingOperationsService } from "../services/usePendingOperationsService";
 
@@ -31,14 +31,7 @@ export function useEpochPolling(address?: string) {
           return;
         }
 
-        try {
-          localStorage.setItem(
-            `baby-current-epoch-${network}`,
-            String(epochNumber),
-          );
-        } catch {
-          // ignore storage errors
-        }
+        setCurrentEpoch(epochNumber);
 
         if (previousEpochRef.current === undefined) {
           previousEpochRef.current = epochNumber;

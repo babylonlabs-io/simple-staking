@@ -10,6 +10,7 @@ import {
 import { network } from "@/ui/common/config/network/bbn";
 import { useCosmosWallet } from "@/ui/common/context/wallet/CosmosWalletProvider";
 import { useLogger } from "@/ui/common/hooks/useLogger";
+import { getCurrentEpoch } from "@/ui/common/utils/local_storage/epochStorage";
 
 export interface PendingOperation {
   validatorAddress: string;
@@ -31,8 +32,6 @@ interface PendingOperationStorage {
 
 const getPendingOperationsKey = (walletAddress: string) =>
   `baby-pending-operations-${network}-${walletAddress}`;
-
-const getCurrentEpochKey = () => `baby-current-epoch-${network}`;
 
 // Create the context
 const PendingOperationsContext = createContext<ReturnType<
@@ -144,18 +143,7 @@ function usePendingOperationsServiceInternal() {
           return newState;
         } else {
           // Create new operation
-          let operationEpoch: number | undefined = undefined;
-          try {
-            const epochStr = localStorage.getItem(getCurrentEpochKey());
-            if (epochStr) {
-              const parsed = parseInt(epochStr, 10);
-              if (!Number.isNaN(parsed)) {
-                operationEpoch = parsed;
-              }
-            }
-          } catch {
-            /* noop */
-          }
+          const operationEpoch = getCurrentEpoch();
 
           const pendingOperation: PendingOperation = {
             validatorAddress,
@@ -186,10 +174,8 @@ function usePendingOperationsServiceInternal() {
   // Cleanup function to prune pending operations created before the current epoch
   const cleanupAllPendingOperationsFromStorage = useCallback(() => {
     try {
-      const epochStr = localStorage.getItem(getCurrentEpochKey());
-      if (!epochStr) return;
-      const currentEpoch = parseInt(epochStr, 10);
-      if (Number.isNaN(currentEpoch)) return;
+      const currentEpoch = getCurrentEpoch();
+      if (currentEpoch === undefined) return;
 
       // Get all localStorage keys that match our pattern for the current network
       const allKeys = Object.keys(localStorage);
