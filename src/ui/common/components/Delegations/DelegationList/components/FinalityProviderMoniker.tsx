@@ -1,4 +1,5 @@
-import { Hint } from "@/ui/common/components/Common/Hint";
+import { Hint } from "@babylonlabs-io/core-ui";
+
 import { DOCUMENTATION_LINKS } from "@/ui/common/constants";
 import {
   FinalityProvider,

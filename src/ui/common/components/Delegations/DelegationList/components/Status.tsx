@@ -1,6 +1,6 @@
+import { Hint } from "@babylonlabs-io/core-ui";
 import { useMemo, type JSX } from "react";
 
-import { Hint } from "@/ui/common/components/Common/Hint";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/ui/common/constants";
 import { useAppState } from "@/ui/common/state";
