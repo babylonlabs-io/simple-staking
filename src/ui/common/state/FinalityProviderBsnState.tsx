@@ -12,6 +12,8 @@ import {
 } from "@/ui/common/types/finalityProviders";
 import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 
+import { getBsnLogoUrl } from "../utils/bsnLogo";
+
 interface SortState {
   field?: string;
   direction?: "asc" | "desc";
@@ -21,6 +23,15 @@ interface FilterState {
   search: string;
   status: "active" | "inactive" | "";
 }
+
+const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
+
+const defaultBabylonBsn: Bsn = {
+  id: BBN_CHAIN_ID,
+  name: "Babylon Genesis",
+  description: "Babylon Genesis",
+  logoUrl: getBsnLogoUrl(BBN_CHAIN_ID),
+};
 
 interface FinalityProviderBsnState {
   filter: FilterState;
@@ -81,8 +92,6 @@ const FILTERS = {
     filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
 };
 
-const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
-
 const defaultState: FinalityProviderBsnState = {
   filter: {
     search: "",
@@ -139,7 +148,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     });
 
   const {
-    data: bsnList = [],
+    data: bsnList = [defaultBabylonBsn],
     isLoading: bsnLoading,
     isError: bsnError,
   } = useBsn({
