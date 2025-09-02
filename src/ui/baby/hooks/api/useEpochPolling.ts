@@ -3,6 +3,9 @@ import { useEffect, useRef } from "react";
 
 import babylon from "@/infrastructure/babylon";
 import { ONE_MINUTE } from "@/ui/common/constants";
+import { setCurrentEpoch } from "@/ui/common/utils/local_storage/epochStorage";
+
+import { usePendingOperationsService } from "../services/usePendingOperationsService";
 
 import { BABY_DELEGATIONS_KEY } from "./useDelegations";
 import { BABY_UNBONDING_DELEGATIONS_KEY } from "./useUnbondingDelegations";
@@ -10,6 +13,8 @@ import { BABY_UNBONDING_DELEGATIONS_KEY } from "./useUnbondingDelegations";
 export function useEpochPolling(address?: string) {
   const queryClient = useQueryClient();
   const previousEpochRef = useRef<number | undefined>(undefined);
+  const { cleanupAllPendingOperationsFromStorage } =
+    usePendingOperationsService();
 
   useEffect(() => {
     if (!address) return;
@@ -20,13 +25,22 @@ export function useEpochPolling(address?: string) {
       try {
         const client = await babylon.client();
         const { currentEpoch } = await client.baby.getCurrentEpoch();
+        const epochNumber = Number(currentEpoch);
 
-        if (previousEpochRef.current === undefined) {
-          previousEpochRef.current = currentEpoch;
+        if (!Number.isFinite(epochNumber)) {
           return;
         }
 
-        if (!cancelled && currentEpoch !== previousEpochRef.current) {
+        setCurrentEpoch(epochNumber);
+
+        if (previousEpochRef.current === undefined) {
+          previousEpochRef.current = epochNumber;
+          return;
+        }
+
+        if (!cancelled && epochNumber !== previousEpochRef.current) {
+          // Epoch advanced, prune stale pending operations first
+          cleanupAllPendingOperationsFromStorage();
           queryClient.invalidateQueries({
             queryKey: [BABY_DELEGATIONS_KEY],
             refetchType: "active",
@@ -35,7 +49,7 @@ export function useEpochPolling(address?: string) {
             queryKey: [BABY_UNBONDING_DELEGATIONS_KEY],
             refetchType: "active",
           });
-          previousEpochRef.current = currentEpoch;
+          previousEpochRef.current = epochNumber;
         }
       } catch {
         // ignore transient errors
@@ -48,5 +62,5 @@ export function useEpochPolling(address?: string) {
       cancelled = true;
       clearInterval(id);
     };
-  }, [address, queryClient]);
+  }, [address, queryClient, cleanupAllPendingOperationsFromStorage]);
 }
