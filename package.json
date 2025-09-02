@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@babylonlabs-io/babylon-proto-ts": "1.13.0",
-    "@babylonlabs-io/bsn-registry": "0.2.0",
+    "@babylonlabs-io/bsn-registry": "0.2.2",
     "@babylonlabs-io/btc-staking-ts": "2.5.6",
     "@babylonlabs-io/core-ui": "1.35.2",
     "@babylonlabs-io/wallet-connector": "1.11.6",

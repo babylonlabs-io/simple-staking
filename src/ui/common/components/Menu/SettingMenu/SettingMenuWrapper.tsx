@@ -1,9 +1,4 @@
-import {
-  BugReportIcon,
-  SettingMenu,
-  ThemeIcon,
-  ThemedIcon,
-} from "@babylonlabs-io/core-ui";
+import { SettingMenu, ThemeIcon } from "@babylonlabs-io/core-ui";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { FaMoon, FaSun } from "react-icons/fa";
@@ -28,13 +23,6 @@ export const SettingMenuWrapper = () => {
     const newTheme = isLight ? "light" : "dark";
     setSelectedTheme(newTheme);
     setTheme(newTheme);
-  };
-
-  const handleReportBug = () => {
-    const reportBugUrl = process.env.NEXT_PUBLIC_REPORT_BUG_URL;
-    if (reportBugUrl) {
-      window.open(reportBugUrl, "_blank", "noopener,noreferrer");
-    }
   };
 
   const handleTermsOfUse = () => {
@@ -75,17 +63,6 @@ export const SettingMenuWrapper = () => {
           <SettingMenu.Description>
             {getThemeDescription()}
           </SettingMenu.Description>
-        </SettingMenu.Item>
-
-        <SettingMenu.Item
-          icon={
-            <ThemedIcon background rounded>
-              <BugReportIcon />
-            </ThemedIcon>
-          }
-          onClick={handleReportBug}
-        >
-          Report a Bug
         </SettingMenu.Item>
       </SettingMenu.Group>
 
