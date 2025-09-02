@@ -16,7 +16,10 @@ import { useAppState } from "@/ui/common/state";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import { StakingExpansionStep } from "@/ui/common/state/StakingExpansionTypes";
-import { DelegationWithFP } from "@/ui/common/types/delegationsV2";
+import {
+  DelegationV2StakingState,
+  DelegationWithFP,
+} from "@/ui/common/types/delegationsV2";
 
 import { ExpansionButton } from "./ExpansionButton";
 
@@ -41,14 +44,19 @@ export function StakeExpansionSection({
     openVerifiedExpansionModalForDelegation,
     getVerifiedExpansionInfoForDelegation,
   } = useVerifiedStakingExpansionService();
-  const { isLoading: isUTXOsLoading } = useAppState();
+  const { isLoading: isUTXOsLoading, networkInfo } = useAppState();
 
   const currentBsnCount = delegation.finalityProviderBtcPksHex.length;
   const canExpandDelegation = canExpand(delegation);
 
+  // Check both local canExpand (slot availability) and API canExpand field
+  const canPerformExpansionActions =
+    canExpandDelegation && // Local check: available FP slots
+    delegation.canExpand !== false; // API check: delegation is expandable
+
   const handleAddBsnFp = () => {
-    if (!canExpandDelegation) {
-      console.warn("Cannot expand: maximum BSN count reached");
+    if (!canPerformExpansionActions) {
+      console.warn("Cannot expand: expansion not allowed");
       return;
     }
 
@@ -80,6 +88,10 @@ export function StakeExpansionSection({
    * This allows users to renew the timelock without adding new BSN/FP pairs.
    */
   const handleRenewStakingTerm = () => {
+    if (!canPerformExpansionActions) {
+      return;
+    }
+
     if (processing) {
       // Cannot start renewal: another operation in progress
       return;
@@ -133,8 +145,35 @@ export function StakeExpansionSection({
     delegation.stakingTxHashHex,
   );
 
+  // Check if this is a pending expansion transaction
+  const isPendingExpansion =
+    delegation.previousStakingTxHashHex &&
+    delegation.state ===
+      DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION;
+
+  // Get confirmation requirements from network info
+  const confirmationDepth =
+    networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ??
+    6;
+
   return (
     <div className="w-full">
+      {isPendingExpansion && (
+        <div className="mb-4 p-4 bg-warning-surface border border-warning-strokeLight rounded">
+          <Text
+            variant="body1"
+            className="text-accent-primary font-medium mb-2"
+          >
+            Stake Expansion Pending
+          </Text>
+          <Text variant="body2" className="text-accent-secondary">
+            Your stake expansion transaction has been forward to Bitcoin. It
+            will be activated once it receives {confirmationDepth} Bitcoin block
+            confirmations. Your original stake is still Active and you can find
+            it in the "Expansion History" tab.
+          </Text>
+        </div>
+      )}
       <Accordion className="border border-secondary-strokeLight rounded bg-surface">
         <AccordionSummary
           className="p-4"
@@ -158,13 +197,17 @@ export function StakeExpansionSection({
               text="Add BSNs and Finality Providers"
               counter={`${currentBsnCount}/${maxFinalityProviders}`}
               onClick={handleAddBsnFp}
-              disabled={!canExpandDelegation || processing || isUTXOsLoading}
+              disabled={
+                !canPerformExpansionActions || processing || isUTXOsLoading
+              }
             />
             <ExpansionButton
               Icon={iconRenew}
               text="Renew Staking Term"
               onClick={handleRenewStakingTerm}
-              disabled={processing || isUTXOsLoading}
+              disabled={
+                !canPerformExpansionActions || processing || isUTXOsLoading
+              }
             />
             <ExpansionButton
               Icon={iconHistory}

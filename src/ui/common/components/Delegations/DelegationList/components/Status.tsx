@@ -31,6 +31,30 @@ type StatusAdapter = (props: StatusParams) => {
 
 const { coinName } = getNetworkConfigBTC();
 
+/**
+ * Helper function to generate status for pending BTC confirmation states
+ * Handles both regular pending and expansion pending states
+ */
+const getPendingBTCConfirmationStatus = (
+  delegation: DelegationWithFP,
+  networkInfo?: NetworkInfo,
+) => {
+  const isExpansion = !!delegation.previousStakingTxHashHex;
+  const confirmationDepth =
+    networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ??
+    0;
+
+  const label = isExpansion
+    ? `Expansion Pending ${coinName} Confirmation`
+    : `Pending ${coinName} Confirmation`;
+
+  const tooltip = isExpansion
+    ? `Stake expansion is pending ${confirmationDepth} ${coinName} confirmations`
+    : `Stake is pending ${confirmationDepth} ${coinName} confirmations`;
+
+  return { label, tooltip };
+};
+
 const STATUSES: Record<string, StatusAdapter> = {
   [State.PENDING]: () => ({
     label: "Pending",
@@ -113,10 +137,10 @@ const STATUSES: Record<string, StatusAdapter> = {
     label: "Pending",
     tooltip: "Stake is pending verification",
   }),
-  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({ networkInfo }) => ({
-    label: `Pending ${coinName} Confirmation`,
-    tooltip: `Stake is pending ${networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0} ${coinName} confirmations`,
-  }),
+  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({
+    delegation,
+    networkInfo,
+  }) => getPendingBTCConfirmationStatus(delegation, networkInfo),
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
     label: "Unbonding",
     tooltip: "Stake unbonding is in progress.",
