@@ -88,7 +88,6 @@ export const validateStakingInput = (stakingInput: BtcStakingInputs) => {
  * @param allUTXOs - The UTXOs set.
  * @returns True if the transaction inputs are still available, false otherwise.
  */
-
 type Validator = (
   delegation: DelegationV2,
   utxos: UTXO[],
@@ -97,7 +96,16 @@ type Validator = (
 const VALIDATORS: Partial<Record<DelegationState, Validator>> = {
   [DelegationState.VERIFIED]: (delegation, utxos) => {
     const tx = Transaction.fromHex(delegation.stakingTxHex);
-    const valid = tx.ins.every((input) =>
+
+    // Check if this is a verified expansion (has previousStakingTxHashHex)
+    const isExpansion = Boolean(delegation.previousStakingTxHashHex);
+
+    // For expansions, we need to check:
+    // 1. The first input (index 0) is the previous staking tx output
+    // 2. The remaining inputs (funding UTXOs) are still available
+    const inputsToCheck = isExpansion ? tx.ins.slice(1) : tx.ins;
+
+    const valid = inputsToCheck.every((input) =>
       utxos.find(
         (utxo) =>
           utxo.txid === Buffer.from(input.hash).reverse().toString("hex") &&
@@ -106,9 +114,13 @@ const VALIDATORS: Partial<Record<DelegationState, Validator>> = {
     );
 
     if (!valid) {
+      const errorMessage = isExpansion
+        ? "This expansion is now invalid as the funding UTXO has already been used"
+        : "This stake is now invalid as the UTXO has already been used";
+
       return {
         valid: false,
-        error: "This stake is now invalid as the UTXO has already been used",
+        error: errorMessage,
       };
     }
 

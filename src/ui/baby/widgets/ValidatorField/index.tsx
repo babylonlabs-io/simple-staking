@@ -28,6 +28,8 @@ export function ValidatorField() {
     openModal,
     closeModal,
     search,
+    handleFilter,
+    toggleShowSlashed,
     selectValidator,
   } = useValidatorState();
 
@@ -72,9 +74,13 @@ export function ValidatorField() {
       <ValidatorTable
         open={open}
         searchTerm={filter.search}
+        status={filter.status}
+        showSlashed={filter.showSlashed}
         validators={validators}
         onClose={handleClose}
         onSearch={search}
+        onStatusChange={(v) => handleFilter("status", v)}
+        onShowSlashedChange={toggleShowSlashed}
         onSelect={handleSelectValidator}
       />
     </>
