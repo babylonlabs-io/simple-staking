@@ -10,4 +10,5 @@ export interface ChainButtonProps {
   onSelectFp?: () => void;
   onRemove?: (bsnId: string) => void;
   isExisting?: boolean;
+  onChangeExisting?: () => void;
 }

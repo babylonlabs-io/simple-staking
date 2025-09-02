@@ -131,6 +131,7 @@ export function FinalityProvidersSection() {
         onNext={handleNext}
         onClose={handleClose}
         onSelect={handleSelectBsn}
+        onRemove={handleRemove}
       />
 
       <FinalityProviderModal
