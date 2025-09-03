@@ -3,13 +3,13 @@ import { getUrlFromEnv } from "./urlUtils";
 export const BSN_DEVNET_RPC_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
-  "https://rpc.bsn-devnet.babylonlabs.io/",
+  "https://rpc.bsn-devnet.babylonlabs.io",
 );
 
 export const BSN_DEVNET_LCD_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_LCD_URL,
   "http://localhost:1317",
-  "https://lcd.bsn-devnet.babylonlabs.io/",
+  "https://lcd.bsn-devnet.babylonlabs.io",
 );
 
 export const bbnBsnDevnet = {
