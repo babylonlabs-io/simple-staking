@@ -45,6 +45,7 @@ export function ActivityList() {
     expansionHistoryModalOpen,
     expansionHistoryTargetDelegation,
     closeExpansionHistoryModal,
+    expansions: localExpansions,
   } = useStakingExpansionState();
 
   const activityList = useMemo(() => {
@@ -64,31 +65,66 @@ export function ActivityList() {
     );
 
     const result = afterExpanded.filter((delegation) => {
-      // Filter out VERIFIED expansion transactions that are NOT broadcasted (local storage only)
-      // Broadcasted expansions (from API) should show in Activity tab regardless of VERIFIED state
+      // Handle VERIFIED expansion transactions
+      // VERIFIED expansions should only show in Activity tab if they were broadcast-tracked by the user
       if (
         delegation.previousStakingTxHashHex &&
         delegation.state === DelegationV2StakingState.VERIFIED
       ) {
-        // Check if this expansion transaction exists in the raw API data
-        // If not, it's local storage only and should be hidden from Activity
-        const isFromAPI = rawApiDelegations.some(
+        // Check if this expansion exists in raw API
+        const isInRawAPI = rawApiDelegations.some(
           (apiDelegation) =>
             apiDelegation.stakingTxHashHex === delegation.stakingTxHashHex,
         );
-        return isFromAPI; // Only show if it's from API (broadcasted)
+
+        // Check if this expansion was broadcast-tracked by the user
+        // Look for the expansion in the original expansion data to see its local storage state
+        const localExpansion = localExpansions.find(
+          (localExp) =>
+            localExp.stakingTxHashHex === delegation.stakingTxHashHex,
+        );
+        const hasLocalBroadcastState =
+          localExpansion &&
+          localExpansion.state !== DelegationV2StakingState.VERIFIED;
+        const isBroadcastTracked = isInRawAPI && hasLocalBroadcastState;
+
+        return isBroadcastTracked; // Only show if broadcast-tracked
       }
 
-      // Only filter out original transactions if they have BROADCASTED expansions
-      const hasBroadcastedExpansion = delegations.some(
-        (other) =>
-          other.previousStakingTxHashHex === delegation.stakingTxHashHex &&
-          (other.state ===
+      // Check if original staking should be hidden due to broadcast-tracked expansions
+      const hasBroadcastTrackedExpansion = delegations.some((other) => {
+        if (other.previousStakingTxHashHex !== delegation.stakingTxHashHex) {
+          return false; // Not an expansion of this delegation
+        }
+
+        // Expansion is broadcast-tracked if:
+        // 1. INTERMEDIATE_PENDING_BTC_CONFIRMATION or ACTIVE (clearly broadcast-tracked)
+        // 2. VERIFIED and exists in both API and local expansions (user-broadcast and confirmed)
+        if (
+          other.state ===
             DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
-            other.state === DelegationV2StakingState.ACTIVE ||
-            other.state === DelegationV2StakingState.VERIFIED), // Include VERIFIED but broadcasted
-      );
-      return !hasBroadcastedExpansion;
+          other.state === DelegationV2StakingState.ACTIVE
+        ) {
+          return true; // Clearly broadcast-tracked
+        }
+
+        if (other.state === DelegationV2StakingState.VERIFIED) {
+          const isInRawAPI = rawApiDelegations.some(
+            (api) => api.stakingTxHashHex === other.stakingTxHashHex,
+          );
+          const localExpansion = localExpansions.find(
+            (localExp) => localExp.stakingTxHashHex === other.stakingTxHashHex,
+          );
+          const hasLocalBroadcastState =
+            localExpansion &&
+            localExpansion.state !== DelegationV2StakingState.VERIFIED;
+          return isInRawAPI && hasLocalBroadcastState; // Broadcast-tracked if in API and has local broadcast state
+        }
+
+        return false;
+      });
+
+      return !hasBroadcastTrackedExpansion;
     });
 
     const finalResult = result.map((delegation) => {
@@ -150,6 +186,7 @@ export function ActivityList() {
   }, [
     delegations,
     rawApiDelegations,
+    localExpansions,
     validations,
     openConfirmationModal,
     isStakingManagerReady,

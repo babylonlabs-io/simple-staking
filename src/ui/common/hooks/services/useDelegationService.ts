@@ -16,7 +16,9 @@ import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/ui/common/types/networkInfo";
 import { getBbnParamByVersion } from "@/ui/common/utils/params";
 
+import { useCosmosWallet } from "../../context/wallet/CosmosWalletProvider";
 import { useStakingExpansionState } from "../../state/StakingExpansionState";
+import { useDelegationsV2 } from "../client/api/useDelegationsV2";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -61,6 +63,11 @@ export function useDelegationService() {
   const logger = useLogger();
 
   const { networkInfo } = useAppState();
+  const { bech32Address } = useCosmosWallet();
+
+  // Get pure API data for filtering logic
+  const { data: rawApiData } = useDelegationsV2(bech32Address);
+
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -392,7 +399,7 @@ export function useDelegationService() {
     processing,
     isLoading,
     delegations: delegationsWithFP,
-    rawApiDelegations: delegations, // Raw API data for filtering logic
+    rawApiDelegations: rawApiData?.delegations || [], // Pure API data for filtering logic
     validations,
     hasMoreDelegations,
     confirmationModal,
