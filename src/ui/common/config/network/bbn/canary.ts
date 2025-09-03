@@ -3,13 +3,13 @@ import { getUrlFromEnv } from "./urlUtils";
 export const BBN_CANARY_RPC_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
-  "https://rpc.staging.babylonlabs.io/",
+  "https://rpc.staging.babylonlabs.io",
 );
 
 export const BBN_CANARY_LCD_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_LCD_URL,
   "http://localhost:1317",
-  "https://lcd.staging.babylonlabs.io/",
+  "https://lcd.staging.babylonlabs.io",
 );
 
 export const bbnCanary = {
