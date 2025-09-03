@@ -43,7 +43,7 @@ const getPendingBTCConfirmationStatus = (
   const isExpansion = !!delegation.previousStakingTxHashHex;
   const confirmationDepth =
     networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ??
-    0;
+    30;
 
   const label = isExpansion
     ? `Expansion Pending ${coinName} Confirmation`
