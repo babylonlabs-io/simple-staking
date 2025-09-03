@@ -49,6 +49,33 @@ export function ActivityList() {
   } = useStakingExpansionState();
 
   const activityList = useMemo(() => {
+    // Pre-compute data structures for O(1) lookups to avoid O(n²) complexity
+    const rawApiDelegationTxHashes = new Set(
+      rawApiDelegations.map((apiDelegation) => apiDelegation.stakingTxHashHex),
+    );
+
+    const localExpansionsMap = new Map(
+      localExpansions.map((expansion) => [
+        expansion.stakingTxHashHex,
+        expansion,
+      ]),
+    );
+
+    // Group expansions by their original staking transaction hash for efficient lookup
+    const expansionsByOriginalTxHash = new Map<string, typeof delegations>();
+    delegations.forEach((delegation) => {
+      if (delegation.previousStakingTxHashHex) {
+        const existing =
+          expansionsByOriginalTxHash.get(delegation.previousStakingTxHashHex) ||
+          [];
+        existing.push(delegation);
+        expansionsByOriginalTxHash.set(
+          delegation.previousStakingTxHashHex,
+          existing,
+        );
+      }
+    });
+
     const afterValidation = delegations.filter((delegation) => {
       const { valid } = validations[delegation.stakingTxHashHex];
       return valid;
@@ -71,17 +98,14 @@ export function ActivityList() {
         delegation.previousStakingTxHashHex &&
         delegation.state === DelegationV2StakingState.VERIFIED
       ) {
-        // Check if this expansion exists in raw API
-        const isInRawAPI = rawApiDelegations.some(
-          (apiDelegation) =>
-            apiDelegation.stakingTxHashHex === delegation.stakingTxHashHex,
+        // Check if this expansion exists in raw API (O(1) lookup)
+        const isInRawAPI = rawApiDelegationTxHashes.has(
+          delegation.stakingTxHashHex,
         );
 
-        // Check if this expansion was broadcast-tracked by the user
-        // Look for the expansion in the original expansion data to see its local storage state
-        const localExpansion = localExpansions.find(
-          (localExp) =>
-            localExp.stakingTxHashHex === delegation.stakingTxHashHex,
+        // Check if this expansion was broadcast-tracked by the user (O(1) lookup)
+        const localExpansion = localExpansionsMap.get(
+          delegation.stakingTxHashHex,
         );
         const hasLocalBroadcastState =
           localExpansion &&
@@ -91,12 +115,10 @@ export function ActivityList() {
         return isBroadcastTracked; // Only show if broadcast-tracked
       }
 
-      // Check if original staking should be hidden due to broadcast-tracked expansions
-      const hasBroadcastTrackedExpansion = delegations.some((other) => {
-        if (other.previousStakingTxHashHex !== delegation.stakingTxHashHex) {
-          return false; // Not an expansion of this delegation
-        }
-
+      // Check if original staking should be hidden due to broadcast-tracked expansions (O(1) lookup)
+      const relatedExpansions =
+        expansionsByOriginalTxHash.get(delegation.stakingTxHashHex) || [];
+      const hasBroadcastTrackedExpansion = relatedExpansions.some((other) => {
         // Expansion is broadcast-tracked if:
         // 1. INTERMEDIATE_PENDING_BTC_CONFIRMATION or ACTIVE (clearly broadcast-tracked)
         // 2. VERIFIED and exists in both API and local expansions (user-broadcast and confirmed)
@@ -109,12 +131,11 @@ export function ActivityList() {
         }
 
         if (other.state === DelegationV2StakingState.VERIFIED) {
-          const isInRawAPI = rawApiDelegations.some(
-            (api) => api.stakingTxHashHex === other.stakingTxHashHex,
+          // Use pre-computed sets for O(1) lookups
+          const isInRawAPI = rawApiDelegationTxHashes.has(
+            other.stakingTxHashHex,
           );
-          const localExpansion = localExpansions.find(
-            (localExp) => localExp.stakingTxHashHex === other.stakingTxHashHex,
-          );
+          const localExpansion = localExpansionsMap.get(other.stakingTxHashHex);
           const hasLocalBroadcastState =
             localExpansion &&
             localExpansion.state !== DelegationV2StakingState.VERIFIED;
@@ -128,14 +149,11 @@ export function ActivityList() {
     });
 
     const finalResult = result.map((delegation) => {
-      // Determine if this VERIFIED expansion is actually broadcasted
+      // Determine if this VERIFIED expansion is actually broadcasted (O(1) lookup)
       const isBroadcastedVerifiedExpansion =
         delegation.previousStakingTxHashHex &&
         delegation.state === DelegationV2StakingState.VERIFIED &&
-        rawApiDelegations.some(
-          (apiDelegation) =>
-            apiDelegation.stakingTxHashHex === delegation.stakingTxHashHex,
-        );
+        rawApiDelegationTxHashes.has(delegation.stakingTxHashHex);
 
       const options: ActivityCardTransformOptions = {
         showExpansionSection: true,
