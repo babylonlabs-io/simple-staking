@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 
 import { useDelegationStorage } from "@/ui/common/hooks/storage/useDelegationStorage";
 import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
@@ -122,23 +122,10 @@ export function useExpansionVisibilityService(
     [isBroadcastedExpansion],
   );
 
-  /**
-   * Memoized results for performance optimization.
-   */
-  const memoizedResults = useMemo(
-    () => ({
-      getActivityTabDelegations,
-      getVerifiedExpansionModalDelegations,
-      isOriginalTransactionHidden,
-      isBroadcastedExpansion,
-    }),
-    [
-      getActivityTabDelegations,
-      getVerifiedExpansionModalDelegations,
-      isOriginalTransactionHidden,
-      isBroadcastedExpansion,
-    ],
-  );
-
-  return memoizedResults;
+  return {
+    getActivityTabDelegations,
+    getVerifiedExpansionModalDelegations,
+    isOriginalTransactionHidden,
+    isBroadcastedExpansion,
+  };
 }
