@@ -5,6 +5,7 @@ import {
 } from "@babylonlabs-io/wallet-connector";
 import { useTheme } from "next-themes";
 import { useCallback, type PropsWithChildren } from "react";
+import { useLocation } from "react-router";
 
 import { logTermsAcceptance } from "@/ui/common/api/logTermAcceptance";
 import { verifyBTCAddress } from "@/ui/common/api/verifyBTCAddress";
@@ -29,7 +30,7 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-btc-connector",
-        widget: ({ onError }) => (
+        widget: ({ onError }: { onError?: (e: Error) => void }) => (
           <ExternalWallets chainName="bitcoin" onError={onError} />
         ),
       },
@@ -41,7 +42,7 @@ const config: ChainConfigArr = [
     connectors: [
       {
         id: "tomo-bbn-connector",
-        widget: ({ onError }) => (
+        widget: ({ onError }: { onError?: (e: Error) => void }) => (
           <ExternalWallets chainName="cosmos" onError={onError} />
         ),
       },
@@ -54,6 +55,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
   const { handleError } = useError();
   const { theme } = useTheme();
   const logger = useLogger();
+  const location = useLocation();
 
   const onError = useCallback(
     (error: Error) => {
@@ -74,6 +76,10 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
     [handleError, logger],
   );
 
+  const requiredChains = (
+    location.pathname.startsWith("/baby") ? ["BBN"] : ["BTC", "BBN"]
+  ) as ("BTC" | "BBN")[];
+
   return (
     <WalletProvider
       persistent
@@ -83,6 +89,7 @@ export const WalletConnectionProvider = ({ children }: PropsWithChildren) => {
       context={context}
       onError={onError}
       disabledWallets={FeatureFlagService.IsLedgerEnabled ? [] : ["ledget_btc"]}
+      requiredChains={requiredChains}
     >
       {children}
     </WalletProvider>

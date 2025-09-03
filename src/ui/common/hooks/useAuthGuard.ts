@@ -5,8 +5,7 @@ import {
 
 export function useAuthGuard() {
   const { connected } = useWalletConnect();
-  const btc = useChainConnector("BTC");
   const baby = useChainConnector("BBN");
 
-  return { connected, loading: !btc || !baby };
+  return { connected, loading: !baby };
 }
