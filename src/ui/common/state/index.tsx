@@ -14,9 +14,11 @@ import { filterDust } from "@/ui/common/utils/wallet";
 import { useNetworkInfo } from "../hooks/client/api/useNetworkInfo";
 import { NetworkInfo } from "../types/networkInfo";
 
+import { ActivityListState } from "./ActivityListState";
 import { BalanceState } from "./BalanceState";
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
+import { ExpansionCardState } from "./ExpansionCardState";
 import { FinalityProviderState } from "./FinalityProviderState";
 import { RewardsState } from "./RewardState";
 import { StakingExpansionState } from "./StakingExpansionState";
@@ -30,6 +32,8 @@ const STATE_LIST = [
   BalanceState,
   StakingState,
   StakingExpansionState,
+  ActivityListState,
+  ExpansionCardState,
   RewardsState,
 ];
 

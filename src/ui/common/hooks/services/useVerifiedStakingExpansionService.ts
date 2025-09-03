@@ -72,22 +72,10 @@ export function useVerifiedStakingExpansionService() {
   // Filter verified expansions to only include those with valid UTXOs
   const validVerifiedExpansions = useMemo(() => {
     // Filter out expansions with invalid UTXOs
-    const validExpansions = verifiedExpansions.filter(
+    return verifiedExpansions.filter(
       (expansion) => validationMap[expansion.stakingTxHashHex]?.valid !== false,
     );
-
-    // If a specific delegation is selected for the modal, filter to only show expansions for that delegation
-    if (selectedDelegationForVerifiedModal) {
-      return validExpansions.filter(
-        (expansion) =>
-          expansion.previousStakingTxHashHex ===
-          selectedDelegationForVerifiedModal.stakingTxHashHex,
-      );
-    }
-
-    // Otherwise, return all valid verified expansions
-    return validExpansions;
-  }, [verifiedExpansions, validationMap, selectedDelegationForVerifiedModal]);
+  }, [verifiedExpansions, validationMap]);
 
   /**
    * Open the verified expansion modal.
@@ -180,6 +168,7 @@ export function useVerifiedStakingExpansionService() {
 
   return {
     verifiedExpansions: validVerifiedExpansions,
+    selectedDelegationForVerifiedModal,
     openVerifiedExpansionModal,
     openVerifiedExpansionModalForDelegation,
     closeVerifiedExpansionModal,
