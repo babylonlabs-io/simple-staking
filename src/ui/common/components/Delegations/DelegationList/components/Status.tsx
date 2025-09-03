@@ -39,7 +39,7 @@ const { coinName } = getNetworkConfigBTC();
 const getPendingBTCConfirmationStatus = (
   delegation: DelegationWithFP,
   networkInfo?: NetworkInfo,
-) => {
+): { label: string; tooltip: string; status?: "warning" | "error" } => {
   const isExpansion = !!delegation.previousStakingTxHashHex;
   const confirmationDepth =
     networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ??
@@ -202,11 +202,7 @@ export function Status({
   const delegationStatus = useMemo(() => {
     // Handle special case: broadcasted VERIFIED expansions should show pending status
     if (isBroadcastedVerifiedExpansion) {
-      const pendingStatus = getPendingBTCConfirmationStatus(
-        delegation,
-        networkInfo,
-      );
-      return { ...pendingStatus, status: undefined }; // Add missing status property
+      return getPendingBTCConfirmationStatus(delegation, networkInfo);
     }
 
     return (
