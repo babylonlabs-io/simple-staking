@@ -163,12 +163,6 @@ export function ExpansionCardState({ children }: PropsWithChildren) {
 
   const handleRenewStakingTerm = useCallback(
     (delegation: DelegationWithFP) => {
-      const expansionInfo = getExpansionInfo(delegation);
-
-      if (!expansionInfo.canPerformExpansionActions) {
-        return;
-      }
-
       if (processing) {
         return;
       }
@@ -192,7 +186,7 @@ export function ExpansionCardState({ children }: PropsWithChildren) {
       // Go to renewal timelock modal to show the new staking term
       goToStep(StakingExpansionStep.RENEWAL_TIMELOCK);
     },
-    [getExpansionInfo, processing, isUTXOsLoading, setFormData, goToStep],
+    [processing, isUTXOsLoading, setFormData, goToStep],
   );
 
   const handleExpansionHistory = useCallback(
