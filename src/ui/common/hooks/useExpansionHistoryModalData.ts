@@ -37,8 +37,15 @@ export function useExpansionHistoryModalData({
     // Show only expansion history (exclude the target delegation itself)
     const historyChain = expansionChain.slice(0, -1);
 
-    return historyChain.map((delegation, index) => {
-      const stepLabel = index === 0 ? "Original Stake" : `Expansion ${index}`;
+    // Reverse the array to show newest first (most recent expansion → original stake)
+    const reversedHistoryChain = [...historyChain].reverse();
+
+    return reversedHistoryChain.map((delegation, index) => {
+      const totalExpansions = historyChain.length;
+      const stepLabel =
+        index === totalExpansions - 1
+          ? "Original Stake"
+          : `Expansion ${totalExpansions - index - 1}`;
       // Options for expansion history: no expansion section, hide expansion completely
       const options = {
         showExpansionSection: false,
