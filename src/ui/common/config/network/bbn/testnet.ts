@@ -3,13 +3,13 @@ import { getUrlFromEnv } from "./urlUtils";
 export const BBN_TESTNET_RPC_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_RPC_URL,
   "http://localhost:3000",
-  "https://rpc-dapp.testnet.babylonlabs.io/",
+  "https://rpc-dapp.testnet.babylonlabs.io",
 );
 
 export const BBN_TESTNET_LCD_URL = getUrlFromEnv(
   process.env.NEXT_PUBLIC_BABY_LCD_URL,
   "http://localhost:1317",
-  "https://lcd-dapp.testnet.babylonlabs.io/",
+  "https://lcd-dapp.testnet.babylonlabs.io",
 );
 
 export const bbnTestnet = {
