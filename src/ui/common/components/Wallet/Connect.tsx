@@ -11,6 +11,7 @@ import {
 import { useMemo, useState } from "react";
 import { AiOutlineInfoCircle } from "react-icons/ai";
 import { PiWalletBold } from "react-icons/pi";
+import { useLocation } from "react-router";
 import { Tooltip } from "react-tooltip";
 import { twMerge } from "tailwind-merge";
 
@@ -41,6 +42,10 @@ export const Connect: React.FC<ConnectProps> = ({
   const handleOpenChange = (open: boolean) => {
     setIsWalletMenuOpen(open);
   };
+
+  const location = useLocation();
+  const isBabyRoute = location.pathname.startsWith("/baby");
+  const requireBothWallets = !isBabyRoute;
 
   // App state and wallet context
   const { includeOrdinals, excludeOrdinals, ordinalsExcluded } = useAppState();
@@ -108,14 +113,26 @@ export const Connect: React.FC<ConnectProps> = ({
     apiMessage,
     isLoading: isHealthcheckLoading,
   } = useHealthCheck();
+
   const isConnected = useMemo(
     () =>
-      btcConnected && bbnConnected && !isGeoBlocked && !isHealthcheckLoading,
-    [btcConnected, bbnConnected, isGeoBlocked, isHealthcheckLoading],
+      (requireBothWallets ? btcConnected && bbnConnected : bbnConnected) &&
+      !isGeoBlocked &&
+      !isHealthcheckLoading,
+    [
+      requireBothWallets,
+      btcConnected,
+      bbnConnected,
+      isGeoBlocked,
+      isHealthcheckLoading,
+    ],
   );
 
   const isLoading =
-    isConnected || !isApiNormal || loading || btcLoading || bbnLoading;
+    isConnected ||
+    !isApiNormal ||
+    loading ||
+    (requireBothWallets ? btcLoading || bbnLoading : bbnLoading);
 
   const transformedWallets = useMemo(() => {
     const result: Record<string, { name: string; icon: string }> = {};
@@ -174,16 +191,18 @@ export const Connect: React.FC<ConnectProps> = ({
         trigger={
           <div className="cursor-pointer">
             <AvatarGroup max={2} variant="circular">
-              <Avatar
-                alt={selectedWallets["BTC"]?.name}
-                url={selectedWallets["BTC"]?.icon}
-                size="large"
-                className={twMerge(
-                  "object-contain bg-accent-contrast box-content",
-                  isWalletMenuOpen &&
-                    "outline outline-[2px] outline-accent-primary",
-                )}
-              />
+              {selectedWallets["BTC"] ? (
+                <Avatar
+                  alt={selectedWallets["BTC"]?.name}
+                  url={selectedWallets["BTC"]?.icon}
+                  size="large"
+                  className={twMerge(
+                    "object-contain bg-accent-contrast box-content",
+                    isWalletMenuOpen &&
+                      "outline outline-[2px] outline-accent-primary",
+                  )}
+                />
+              ) : null}
               <Avatar
                 alt={selectedWallets["BBN"]?.name}
                 url={selectedWallets["BBN"]?.icon}

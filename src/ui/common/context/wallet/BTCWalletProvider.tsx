@@ -196,8 +196,9 @@ export const BTCWalletProvider = ({ children }: PropsWithChildren) => {
   );
 
   useEffect(() => {
-    if (!btcConnector) return;
+    // Ensure loading is cleared even when BTC connector is not configured
     setLoading(false);
+    if (!btcConnector) return;
     if (btcConnector.connectedWallet) {
       connectBTC(btcConnector?.connectedWallet.provider);
     }
