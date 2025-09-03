@@ -1,3 +1,4 @@
+import { Hint } from "@babylonlabs-io/core-ui";
 import { useState } from "react";
 
 import babylon from "@/infrastructure/babylon";
@@ -89,7 +90,11 @@ export function BabyActivityList() {
                 ...(validatorPendingStake > 0n
                   ? [
                       {
-                        label: "Pending Stake",
+                        label: (
+                          <Hint tooltip="Your stake will be activated in the next epoch, which takes around 1 hour">
+                            Pending Stake
+                          </Hint>
+                        ),
                         value: `${maxDecimals(ubbnToBaby(Number(validatorPendingStake)), 6)} ${coinSymbol}`,
                       },
                     ]
@@ -97,7 +102,11 @@ export function BabyActivityList() {
                 ...(validatorPendingUnstake > 0n
                   ? [
                       {
-                        label: "Pending Unbonding",
+                        label: (
+                          <Hint tooltip="It will take 50 hours for the amount to be liquid">
+                            Pending Unbonding
+                          </Hint>
+                        ),
                         value: `${maxDecimals(ubbnToBaby(Number(validatorPendingUnstake)), 6)} ${coinSymbol}`,
                       },
                     ]
