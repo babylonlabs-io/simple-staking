@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/ui/common/constants";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
-import { useUtxoValidation } from "@/ui/common/hooks/services/useUtxoValidation";
+import { useDelegationValidation } from "@/ui/common/hooks/services/useDelegationValidation";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useAppState } from "@/ui/common/state";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
@@ -153,7 +153,7 @@ export function useDelegationService() {
     return [...apiDelegationsWithMetadata, ...localExpansionsWithMetadata];
   }, [delegations, expansionDelegations]);
 
-  const validations = useUtxoValidation(delegationsForValidation);
+  const validations = useDelegationValidation(delegationsForValidation);
 
   const processing = useMemo(
     () =>

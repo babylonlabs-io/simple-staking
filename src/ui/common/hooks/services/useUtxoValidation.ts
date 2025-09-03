@@ -8,7 +8,8 @@ import {
 import { validateDelegation } from "@/ui/common/utils/delegations";
 
 /**
- * Hook for validating delegation transactions against available UTXOs.
+ * Hook for pure UTXO validation of delegation transactions.
+ * Only checks if the required UTXOs are available for the transaction.
  * Returns a validation map for all provided delegations.
  */
 export function useUtxoValidation(
@@ -31,37 +32,9 @@ export function useUtxoValidation(
         return;
       }
 
-      // First check basic UTXO validation
-      const basicValidation = validateDelegation(delegation, availableUTXOs);
-
-      // For verified expansions, also check if the previous staking transaction
-      // is still available for expansion (no other expansion has been broadcasted)
-      if (
-        basicValidation.valid &&
-        delegation.state === DelegationV2StakingState.VERIFIED &&
-        delegation.previousStakingTxHashHex
-      ) {
-        const hasConflictingExpansion = delegations.some(
-          (other) =>
-            other.previousStakingTxHashHex ===
-              delegation.previousStakingTxHashHex &&
-            other.stakingTxHashHex !== delegation.stakingTxHashHex && // Different expansion
-            (other.state ===
-              DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
-              other.state === DelegationV2StakingState.ACTIVE), // Already broadcasted
-        );
-
-        if (hasConflictingExpansion) {
-          map[delegation.stakingTxHashHex] = {
-            valid: false,
-            error:
-              "This expansion is no longer valid as another expansion for the same stake has been broadcasted",
-          };
-          return;
-        }
-      }
-
-      map[delegation.stakingTxHashHex] = basicValidation;
+      // Check UTXO validation
+      const validation = validateDelegation(delegation, availableUTXOs);
+      map[delegation.stakingTxHashHex] = validation;
     });
 
     return map;
