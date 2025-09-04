@@ -1,7 +1,9 @@
 import { Popover, Text } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
-import threeDots from "@/ui/common/assets/three-dots.svg";
+import threeDotsDark from "@/ui/common/assets/three-dots-black.svg";
+import threeDotsLight from "@/ui/common/assets/three-dots.svg";
 
 interface ThreeDotsMenuProps {
   onChange: () => void;
@@ -16,6 +18,12 @@ export const ThreeDotsMenu = ({
 }: ThreeDotsMenuProps) => {
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <>
@@ -25,7 +33,14 @@ export const ThreeDotsMenu = ({
         className={className}
         aria-label="Open options"
       >
-        <img src={threeDots} alt="options" width={20} height={20} />
+        {mounted && (
+          <img
+            src={resolvedTheme === "light" ? threeDotsDark : threeDotsLight}
+            alt="options"
+            width={20}
+            height={20}
+          />
+        )}
       </button>
 
       <Popover
