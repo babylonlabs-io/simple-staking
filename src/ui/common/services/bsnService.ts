@@ -1,3 +1,4 @@
+import logger from "@/infrastructure/logger";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 
 import { getBsnAPI } from "../api/getBsn";
@@ -62,7 +63,19 @@ export const getBsnConfig = (bsn?: Bsn): BsnConfig => {
   }
 
   // Use type-based config
-  return BSN_CONFIGS[bsn.type] || BSN_CONFIGS[BBN_CHAIN_ID];
+  const config = BSN_CONFIGS[bsn.type];
+  if (!config) {
+    logger.error(new Error(`BSN config not found for type: ${bsn.type}`), {
+      tags: { service: "bsnService", function: "getBsnConfig" },
+      data: {
+        bsnType: bsn.type,
+        bsnId: bsn.id,
+        fallback: "Babylon Genesis config",
+      },
+    });
+    return BSN_CONFIGS[BBN_CHAIN_ID];
+  }
+  return config;
 };
 
 /**
