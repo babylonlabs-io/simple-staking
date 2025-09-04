@@ -10,6 +10,11 @@ import {
   getBsnConfig,
   type BsnFilterOption,
 } from "@/ui/common/services/bsnService";
+import {
+  filterFinalityProvidersByBsn,
+  isFinalityProviderRowSelectable,
+  type FinalityProviderFilterState,
+} from "@/ui/common/services/finalityProviderService";
 import { Bsn } from "@/ui/common/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
@@ -19,19 +24,12 @@ import { createStateUtils } from "@/ui/common/utils/createStateUtils";
 
 import { getBsnLogoUrl } from "../utils/bsnLogo";
 
-const normalizeHex = (hex?: string): string =>
-  (hex ?? "").trim().toLowerCase().replace(/^0x/, "");
-
 interface SortState {
   field?: string;
   direction?: "asc" | "desc";
 }
 
-interface FilterState {
-  searchTerm: string;
-  providerStatus: "active" | "inactive" | "";
-  allowlistStatus: "allowlisted" | "not-allowlisted" | "";
-}
+type FilterState = FinalityProviderFilterState;
 
 const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
@@ -90,107 +88,7 @@ const SORT_DIRECTIONS = {
   asc: undefined,
 } as const;
 
-// BSN-specific status filters to handle different BSN behaviors
-const BABYLON_STATUS_FILTERS = {
-  active: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.ACTIVE,
-  inactive: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.INACTIVE,
-  jailed: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.JAILED,
-  slashed: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.SLASHED,
-};
-
-const COSMOS_STATUS_FILTERS = {
-  active: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.ACTIVE,
-  inactive: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.INACTIVE,
-};
-
-const ROLLUP_STATUS_FILTERS = {
-  active: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.ACTIVE,
-  inactive: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.INACTIVE,
-  slashed: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.SLASHED,
-};
-
-const BSN_STATUS_FILTERS = {
-  [BBN_CHAIN_ID]: BABYLON_STATUS_FILTERS,
-  COSMOS: COSMOS_STATUS_FILTERS,
-  ROLLUP: ROLLUP_STATUS_FILTERS,
-};
-
-const createAllowlistFilters = (selectedBsn: Bsn | undefined) => {
-  const allowSet = new Set((selectedBsn?.allowlist || []).map(normalizeHex));
-
-  return {
-    allowlisted: (fp: FinalityProvider) => allowSet.has(normalizeHex(fp.btcPk)),
-    "not-allowlisted": (fp: FinalityProvider) =>
-      !allowSet.has(normalizeHex(fp.btcPk)),
-  };
-};
-
-const filterFinalityProvidersByBsn = (
-  providers: FinalityProvider[],
-  filter: FilterState,
-  selectedBsn: Bsn | undefined,
-  fpFilterBehavior: "status-based" | "allowlist-based",
-): FinalityProvider[] => {
-  let filtered = providers;
-
-  // Apply BSN-aware filtering based on provider status
-  if (filter.providerStatus) {
-    if (fpFilterBehavior === "allowlist-based") {
-      // For rollup BSNs: filter all FPs by allowlist (regardless of active/inactive state)
-      const allowSet = new Set(
-        (selectedBsn?.allowlist || []).map(normalizeHex),
-      );
-
-      filtered = filtered.filter((fp) => {
-        const isAllowlisted = allowSet.has(normalizeHex(fp.btcPk));
-
-        if (filter.providerStatus === "active") {
-          return isAllowlisted;
-        } else if (filter.providerStatus === "inactive") {
-          return !isAllowlisted;
-        } else {
-          // Handle slashed state for rollups
-          return fp.state === FinalityProviderStateEnum.SLASHED;
-        }
-      });
-    } else if (fpFilterBehavior === "status-based") {
-      // For status-based BSNs: filter by finality provider state using BSN-specific filters
-      const bsnKey =
-        selectedBsn?.id === BBN_CHAIN_ID
-          ? BBN_CHAIN_ID
-          : selectedBsn?.type || BBN_CHAIN_ID;
-      const bsnStatusFilters =
-        BSN_STATUS_FILTERS[bsnKey] || BSN_STATUS_FILTERS[BBN_CHAIN_ID];
-      const statusFilter =
-        bsnStatusFilters[
-          filter.providerStatus as keyof typeof bsnStatusFilters
-        ];
-      if (statusFilter) {
-        filtered = filtered.filter(statusFilter);
-      }
-    }
-  }
-
-  if (filter.allowlistStatus) {
-    const allowlistFilters = createAllowlistFilters(selectedBsn);
-    const allowlistFilter =
-      allowlistFilters[filter.allowlistStatus as keyof typeof allowlistFilters];
-    if (allowlistFilter) {
-      filtered = filtered.filter(allowlistFilter);
-    }
-  }
-
-  return filtered;
-};
+// Component-specific constants remain in the state file
 
 const FILTERS = {
   searchTerm: (fp: FinalityProvider, filter: FilterState) => {
@@ -339,21 +237,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   }, []);
 
   const isRowSelectable = useCallback(
-    (row: FinalityProvider) => {
-      const statusAllowed =
-        row.state === FinalityProviderStateEnum.ACTIVE ||
-        row.state === FinalityProviderStateEnum.INACTIVE;
-
-      // For selection (not filtering), only restrict based on allowlist for non-Babylon BSNs
-      const allowlistAllowed =
-        !selectedBsnId ||
-        selectedBsnId === BBN_CHAIN_ID ||
-        (selectedBsn?.allowlist || []).some(
-          (allowedPk) => normalizeHex(allowedPk) === normalizeHex(row.btcPk),
-        );
-
-      return statusAllowed && allowlistAllowed;
-    },
+    (row: FinalityProvider) =>
+      isFinalityProviderRowSelectable(row, selectedBsnId, selectedBsn),
     [selectedBsnId, selectedBsn],
   );
 

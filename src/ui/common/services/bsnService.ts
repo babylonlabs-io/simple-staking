@@ -32,8 +32,8 @@ export const BSN_CONFIGS: Record<string, BsnConfig> = {
   COSMOS: {
     modalTitle: "Select Cosmos Finality Provider",
     filterOptions: [
-      { value: "active", label: "Active" },
-      { value: "inactive", label: "Inactive" },
+      { value: "registered", label: "Registered" },
+      { value: "slashed", label: "Slashed" },
     ],
     fpFilterBehavior: "status-based",
   },
@@ -41,8 +41,10 @@ export const BSN_CONFIGS: Record<string, BsnConfig> = {
   ROLLUP: {
     modalTitle: "Select Roll Up Finality Provider",
     filterOptions: [
-      { value: "active", label: "Allowlisted" },
-      { value: "inactive", label: "Not Allowlisted" },
+      { value: "allowlisted", label: "Allow Listed" },
+      { value: "non-allowlisted", label: "Non-Allow Listed" },
+      { value: "slashed", label: "Slashed" },
+      { value: "jailed", label: "Jailed" },
     ],
     fpFilterBehavior: "allowlist-based",
   },
