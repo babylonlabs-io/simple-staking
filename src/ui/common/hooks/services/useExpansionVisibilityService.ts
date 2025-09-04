@@ -31,7 +31,7 @@ export function useExpansionVisibilityService(
    * Checks if a delegation is a broadcasted expansion.
    * A broadcasted expansion must meet both criteria:
    * 1. Has VERIFIED status in the API data (delegation.state)
-   * 2. Has INTERMEDIATE_PENDING_VERIFICATION status in localStorage (user broadcasted it)
+   * 2. Has INTERMEDIATE_PENDING_BTC_CONFIRMATION status in localStorage (user broadcasted it)
    */
   const isBroadcastedExpansion = useCallback(
     (delegation: DelegationV2): boolean => {
@@ -40,7 +40,7 @@ export function useExpansionVisibilityService(
         return false;
       }
 
-      // Then check if this delegation exists in localStorage with INTERMEDIATE_PENDING_VERIFICATION status
+      // Then check if this delegation exists in localStorage with INTERMEDIATE_PENDING_BTC_CONFIRMATION status
       const storedDelegation = (expansionStorageDelegations ?? []).find(
         (stored) =>
           stored.stakingTxHashHex.toLowerCase() ===
@@ -49,7 +49,7 @@ export function useExpansionVisibilityService(
 
       return (
         storedDelegation?.state ===
-        DelegationV2StakingState.INTERMEDIATE_PENDING_VERIFICATION
+        DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION
       );
     },
     [expansionStorageDelegations],
@@ -77,7 +77,7 @@ export function useExpansionVisibilityService(
    * Returns delegations that should be visible in the Activity tab.
    * Applies the following rules:
    * 1. Exclude VERIFIED expansions that are not broadcasted (show in modal only)
-   * 2. Include VERIFIED expansions that are broadcasted (INTERMEDIATE_PENDING_VERIFICATION)
+   * 2. Include VERIFIED expansions that are broadcasted (INTERMEDIATE_PENDING_BTC_CONFIRMATION)
    * 3. Exclude original transactions that have broadcasted expansions
    * 4. Include all other regular transactions
    */
