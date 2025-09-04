@@ -6,6 +6,34 @@ import {
 import { getExpansionsLocalStorageKey } from "./getExpansionsLocalStorageKey";
 
 /**
+ * Helper function to remove an item from a localStorage record.
+ * This centralizes the localStorage record manipulation pattern used throughout the file.
+ *
+ * @param storageKey - The localStorage key
+ * @param itemId - The ID of the item to remove from the record
+ */
+function removeFromLocalStorageRecord(
+  storageKey: string,
+  itemId: string,
+): void {
+  try {
+    const data = localStorage.getItem(storageKey);
+    if (data) {
+      const record = JSON.parse(data);
+      if (record[itemId]) {
+        delete record[itemId];
+        localStorage.setItem(storageKey, JSON.stringify(record));
+      }
+    }
+  } catch (error) {
+    console.error(
+      `Failed to remove item from localStorage key ${storageKey}:`,
+      error,
+    );
+  }
+}
+
+/**
  * Mark an expansion as broadcasted by updating its status to INTERMEDIATE_PENDING_BTC_CONFIRMATION.
  * This is called after a verified expansion is successfully signed and broadcasted to Bitcoin.
  *
@@ -101,29 +129,11 @@ export function cleanupActiveExpansion(
   const pendingKey = `${storageKey}_pending`;
   const statusesKey = `${storageKey}_statuses`;
 
-  try {
-    // Remove from pending delegations
-    const pendingData = localStorage.getItem(pendingKey);
-    if (pendingData) {
-      const pending = JSON.parse(pendingData);
-      if (pending[expansionTxHashHex]) {
-        delete pending[expansionTxHashHex];
-        localStorage.setItem(pendingKey, JSON.stringify(pending));
-      }
-    }
+  // Remove from pending delegations
+  removeFromLocalStorageRecord(pendingKey, expansionTxHashHex);
 
-    // Remove from statuses
-    const statusesData = localStorage.getItem(statusesKey);
-    if (statusesData) {
-      const statuses = JSON.parse(statusesData);
-      if (statuses[expansionTxHashHex]) {
-        delete statuses[expansionTxHashHex];
-        localStorage.setItem(statusesKey, JSON.stringify(statuses));
-      }
-    }
-  } catch (error) {
-    console.error("Failed to cleanup active expansion:", error);
-  }
+  // Remove from statuses
+  removeFromLocalStorageRecord(statusesKey, expansionTxHashHex);
 }
 
 /**
