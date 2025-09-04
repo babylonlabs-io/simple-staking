@@ -19,26 +19,32 @@ export function useExpansionVisibilityService(
   const { expansions } = useStakingExpansionState();
 
   // Access expansion localStorage for broadcast status detection
-  const expansionStorageKey = publicKeyNoCoord
-    ? getExpansionsLocalStorageKey(publicKeyNoCoord)
-    : "";
+  const expansionStorageKey = getExpansionsLocalStorageKey(publicKeyNoCoord);
 
   // Get pending delegations from localStorage to check broadcast status
   const { delegations: expansionStorageDelegations } = useDelegationStorage(
     expansionStorageKey,
-    expansions,
+    expansions ?? [],
   );
 
   /**
    * Checks if a delegation is a broadcasted expansion.
-   * A broadcasted expansion has INTERMEDIATE_PENDING_VERIFICATION status in localStorage
-   * and is VERIFIED in the API data.
+   * A broadcasted expansion must meet both criteria:
+   * 1. Has VERIFIED status in the API data (delegation.state)
+   * 2. Has INTERMEDIATE_PENDING_VERIFICATION status in localStorage (user broadcasted it)
    */
   const isBroadcastedExpansion = useCallback(
     (delegation: DelegationV2): boolean => {
-      // Check if this delegation exists in localStorage with INTERMEDIATE_PENDING_VERIFICATION status
-      const storedDelegation = expansionStorageDelegations.find(
-        (stored) => stored.stakingTxHashHex === delegation.stakingTxHashHex,
+      // First, verify this is actually VERIFIED in the API data
+      if (delegation.state !== DelegationV2StakingState.VERIFIED) {
+        return false;
+      }
+
+      // Then check if this delegation exists in localStorage with INTERMEDIATE_PENDING_VERIFICATION status
+      const storedDelegation = (expansionStorageDelegations ?? []).find(
+        (stored) =>
+          stored.stakingTxHashHex.toLowerCase() ===
+          delegation.stakingTxHashHex.toLowerCase(),
       );
 
       return (
@@ -77,6 +83,22 @@ export function useExpansionVisibilityService(
    */
   const getActivityTabDelegations = useCallback(
     (delegations: DelegationV2[]): DelegationV2[] => {
+      // Performance optimization: Pre-compute hidden transaction IDs to avoid O^2 complexity
+      const hiddenOriginalTxIds = new Set<string>();
+
+      // First pass: identify all original transactions that should be hidden
+      delegations.forEach((delegation) => {
+        if (
+          delegation.previousStakingTxHashHex &&
+          isBroadcastedExpansion(delegation)
+        ) {
+          hiddenOriginalTxIds.add(
+            delegation.previousStakingTxHashHex.toLowerCase(),
+          );
+        }
+      });
+
+      // Second pass: filter delegations using O(1) Set lookups
       return delegations.filter((delegation) => {
         // Always exclude EXPANDED state delegations (existing logic)
         if (delegation.state === DelegationV2StakingState.EXPANDED) {
@@ -92,9 +114,9 @@ export function useExpansionVisibilityService(
           return isBroadcastedExpansion(delegation);
         }
 
-        // Check if this is an original transaction that should be hidden
+        // Check if this is an original transaction that should be hidden (O(1) lookup)
         if (
-          isOriginalTransactionHidden(delegation.stakingTxHashHex, delegations)
+          hiddenOriginalTxIds.has(delegation.stakingTxHashHex.toLowerCase())
         ) {
           return false;
         }
@@ -103,7 +125,7 @@ export function useExpansionVisibilityService(
         return true;
       });
     },
-    [isBroadcastedExpansion, isOriginalTransactionHidden],
+    [isBroadcastedExpansion],
   );
 
   /**
