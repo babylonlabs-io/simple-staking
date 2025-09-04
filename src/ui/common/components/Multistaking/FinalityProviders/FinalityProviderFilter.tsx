@@ -10,11 +10,8 @@ export const FinalityProviderFilter = () => {
   const bsnConfig = useMemo(() => getBsnConfig(selectedBsn), [selectedBsn]);
 
   const options = useMemo(
-    () => [
-      { value: "active", label: bsnConfig.filterLabels.primary },
-      { value: "inactive", label: bsnConfig.filterLabels.secondary },
-    ],
-    [bsnConfig.filterLabels],
+    () => bsnConfig.filterOptions,
+    [bsnConfig.filterOptions],
   );
 
   return (

@@ -84,7 +84,11 @@ const STATUS_FILTERS = {
   active: (fp: FinalityProvider) =>
     fp.state === FinalityProviderStateEnum.ACTIVE,
   inactive: (fp: FinalityProvider) =>
-    fp.state !== FinalityProviderStateEnum.ACTIVE,
+    fp.state === FinalityProviderStateEnum.INACTIVE,
+  jailed: (fp: FinalityProvider) =>
+    fp.state === FinalityProviderStateEnum.JAILED,
+  slashed: (fp: FinalityProvider) =>
+    fp.state === FinalityProviderStateEnum.SLASHED,
 };
 
 const createAllowlistFilters = (selectedBsn: Bsn | undefined) => {
@@ -122,8 +126,8 @@ const filterFinalityProvidersByBsn = (
           return !isAllowlisted;
         }
       });
-    } else {
-      // For cosmos/babylon BSNs: filter by active/inactive status
+    } else if (bsnConfig.fpFilterBehavior === "status-based") {
+      // For status-based BSNs: filter by finality provider state (active/inactive/jailed/slashed)
       const statusFilter =
         STATUS_FILTERS[filter.providerStatus as keyof typeof STATUS_FILTERS];
       if (statusFilter) {

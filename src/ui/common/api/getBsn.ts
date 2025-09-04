@@ -11,41 +11,44 @@ export const BSN_TYPE_ROLLUP: BsnType = "ROLLUP";
 const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
 // BSN Configuration for different types and behaviors
+export interface BsnFilterOption {
+  value: string;
+  label: string;
+}
+
 export interface BsnConfig {
   modalTitle: string;
-  filterLabels: {
-    primary: string;
-    secondary: string;
-  };
-  fpFilterBehavior: "active-inactive" | "allowlist-based";
+  filterOptions: BsnFilterOption[];
+  fpFilterBehavior: "status-based" | "allowlist-based";
 }
 
 export const BSN_CONFIGS: Record<string, BsnConfig> = {
   // Babylon Genesis
   [BBN_CHAIN_ID]: {
     modalTitle: "Select Babylon Genesis Finality Provider",
-    filterLabels: {
-      primary: "Active",
-      secondary: "Inactive",
-    },
-    fpFilterBehavior: "active-inactive",
+    filterOptions: [
+      { value: "active", label: "Active" },
+      { value: "inactive", label: "Inactive" },
+      { value: "jailed", label: "Jailed" },
+      { value: "slashed", label: "Slashed" },
+    ],
+    fpFilterBehavior: "status-based",
   },
-  // Cosmos BSN config
   COSMOS: {
     modalTitle: "Select Cosmos Finality Provider",
-    filterLabels: {
-      primary: "Active",
-      secondary: "Inactive",
-    },
-    fpFilterBehavior: "active-inactive",
+    filterOptions: [
+      { value: "active", label: "Active" },
+      { value: "inactive", label: "Inactive" },
+    ],
+    fpFilterBehavior: "status-based",
   },
   // Roll-up BSN config
   ROLLUP: {
     modalTitle: "Select Roll Up Finality Provider",
-    filterLabels: {
-      primary: "Allow listed",
-      secondary: "Non-Allow listed",
-    },
+    filterOptions: [
+      { value: "active", label: "Allowlisted" },
+      { value: "inactive", label: "Not Allowlisted" },
+    ],
     fpFilterBehavior: "allowlist-based",
   },
 };
@@ -54,7 +57,7 @@ export const BSN_CONFIGS: Record<string, BsnConfig> = {
  * Get BSN configuration based on BSN object
  */
 export const getBsnConfig = (bsn?: Bsn): BsnConfig => {
-  if (!bsn) return BSN_CONFIGS.COSMOS;
+  if (!bsn) return BSN_CONFIGS[BBN_CHAIN_ID];
 
   // Check if it's Babylon Genesis first
   if (bsn.id === BBN_CHAIN_ID) {
@@ -62,7 +65,7 @@ export const getBsnConfig = (bsn?: Bsn): BsnConfig => {
   }
 
   // Use type-based config
-  return BSN_CONFIGS[bsn.type] || BSN_CONFIGS.COSMOS;
+  return BSN_CONFIGS[bsn.type] || BSN_CONFIGS[BBN_CHAIN_ID];
 };
 
 interface BsnAPI {
