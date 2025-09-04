@@ -1,4 +1,9 @@
 import type { StakingExpansionFormData } from "@/ui/common/state/StakingExpansionTypes";
+import {
+  DelegationV2,
+  DelegationV2StakingState,
+} from "@/ui/common/types/delegationsV2";
+import { isExpansionBroadcasted } from "@/ui/common/utils/local_storage/expansionStorage";
 
 /**
  * Validation helper for StakingExpansionFormData
@@ -19,4 +24,28 @@ export const validateExpansionFormData = (
     data.stakingTimelock &&
     data.stakingTimelock > 0
   );
+};
+
+/**
+ * Validates whether a VERIFIED delegation should be included in Activity
+ * even when it doesn't have valid UTXOs yet (expansion case).
+ *
+ * @param delegation - The delegation to validate
+ * @param publicKeyNoCoord - The user's public key for localStorage access
+ * @returns true if this is a valid broadcasted expansion that should be shown
+ */
+export const isValidBroadcastedExpansion = (
+  delegation: DelegationV2,
+  publicKeyNoCoord: string | undefined,
+): boolean => {
+  // Only applies to VERIFIED delegations with previous staking tx
+  if (
+    delegation.state !== DelegationV2StakingState.VERIFIED ||
+    !delegation.previousStakingTxHashHex
+  ) {
+    return false;
+  }
+
+  // Check if it's a broadcasted expansion in localStorage
+  return isExpansionBroadcasted(delegation.stakingTxHashHex, publicKeyNoCoord);
 };
