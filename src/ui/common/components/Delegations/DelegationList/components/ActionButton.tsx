@@ -1,6 +1,5 @@
-import { Button, Loader } from "@babylonlabs-io/core-ui";
+import { Button, Hint, Loader } from "@babylonlabs-io/core-ui";
 
-import { Hint } from "@/ui/common/components/Common/Hint";
 import { DELEGATION_ACTIONS as ACTIONS } from "@/ui/common/constants";
 import { ActionType } from "@/ui/common/hooks/services/useDelegationService";
 import {
