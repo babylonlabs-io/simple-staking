@@ -1,22 +1,29 @@
 import { Select } from "@babylonlabs-io/core-ui";
+import { useMemo } from "react";
 
+import { getBsnConfig } from "@/ui/common/api/getBsn";
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 
-const options = [
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 export const FinalityProviderFilter = () => {
-  const { filter, handleFilter } = useFinalityProviderBsnState();
+  const { filter, handleFilter, selectedBsn } = useFinalityProviderBsnState();
+
+  const bsnConfig = useMemo(() => getBsnConfig(selectedBsn), [selectedBsn]);
+
+  const options = useMemo(
+    () => [
+      { value: "active", label: bsnConfig.filterLabels.primary },
+      { value: "inactive", label: bsnConfig.filterLabels.secondary },
+    ],
+    [bsnConfig.filterLabels],
+  );
 
   return (
     <Select
       options={options}
-      onSelect={(value) => handleFilter("status", value.toString())}
+      onSelect={(value) => handleFilter("providerStatus", value.toString())}
       placeholder="Select Status"
-      value={filter.search ? "" : filter.status}
-      disabled={Boolean(filter.search)}
+      value={filter.searchTerm ? "" : filter.providerStatus}
+      disabled={Boolean(filter.searchTerm)}
       renderSelectedOption={(option) => `Showing ${option.label}`}
       className="h-10"
     />

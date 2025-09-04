@@ -4,10 +4,12 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@babylonlabs-io/core-ui";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
+import { getBsnConfig } from "@/ui/common/api/getBsn";
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { FinalityProviders } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviders";
+import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 
 interface Props {
   open: boolean;
@@ -27,6 +29,9 @@ export const FinalityProviderModal = ({
   onBack,
 }: Props) => {
   const [selectedFP, setSelectedFp] = useState(defaultFinalityProvider);
+  const { selectedBsn } = useFinalityProviderBsnState();
+
+  const bsnConfig = useMemo(() => getBsnConfig(selectedBsn), [selectedBsn]);
 
   const handleClose = () => {
     onClose();
@@ -36,7 +41,7 @@ export const FinalityProviderModal = ({
   return (
     <ResponsiveDialog open={open} onClose={handleClose} className="w-[52rem]">
       <DialogHeader
-        title="Select Finality Provider"
+        title={bsnConfig.modalTitle}
         onClose={handleClose}
         className="text-accent-primary"
       />
