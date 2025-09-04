@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react";
 
 import { DELEGATION_ACTIONS as ACTIONS } from "@/ui/common/constants";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
-import { useUtxoValidation } from "@/ui/common/hooks/services/useUtxoValidation";
+import { useDelegationValidation } from "@/ui/common/hooks/services/useDelegationValidation";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { useAppState } from "@/ui/common/state";
 import { useDelegationV2State } from "@/ui/common/state/DelegationV2State";
@@ -16,7 +16,9 @@ import { FinalityProvider } from "@/ui/common/types/finalityProviders";
 import { BbnStakingParamsVersion } from "@/ui/common/types/networkInfo";
 import { getBbnParamByVersion } from "@/ui/common/utils/params";
 
+import { useCosmosWallet } from "../../context/wallet/CosmosWalletProvider";
 import { useStakingExpansionState } from "../../state/StakingExpansionState";
+import { useDelegationsV2 } from "../client/api/useDelegationsV2";
 
 import { useTransactionService } from "./useTransactionService";
 
@@ -61,6 +63,11 @@ export function useDelegationService() {
   const logger = useLogger();
 
   const { networkInfo } = useAppState();
+  const { bech32Address } = useCosmosWallet();
+
+  // Get pure API data for filtering logic
+  const { data: rawApiData } = useDelegationsV2(bech32Address);
+
   const {
     delegations = [],
     fetchMoreDelegations,
@@ -82,24 +89,71 @@ export function useDelegationService() {
   const { isFetching: isFPLoading, finalityProviderMap } =
     useFinalityProviderState();
 
-  const { isExpansionModalOpen } = useStakingExpansionState();
+  const { isExpansionModalOpen, expansions: expansionDelegations } =
+    useStakingExpansionState();
 
   // Stop loading when any expansion modal is open
   const isLoading =
     (isDelegationLoading || isFPLoading) && !isExpansionModalOpen;
 
-  const delegationsWithFP = useMemo(
-    () =>
-      delegations.map((d) => ({
-        ...d,
-        fp: finalityProviderMap.get(
-          d.finalityProviderBtcPksHex[0],
-        ) as FinalityProvider,
-      })),
-    [delegations, finalityProviderMap],
-  );
+  const delegationsWithFP = useMemo(() => {
+    // Only add expansion transactions that are actual expansions (have previousStakingTxHashHex)
+    const actualExpansions = expansionDelegations.filter(
+      (delegation) => delegation.previousStakingTxHashHex,
+    );
 
-  const validations = useUtxoValidation(delegations);
+    // Track which expansions exist in API data (these are broadcasted)
+    const apiTxHashes = new Set(delegations.map((d) => d.stakingTxHashHex));
+
+    // Only add expansions that don't already exist in regular delegations (avoid duplicates)
+    // Note: If an expansion exists in both API and local storage, we prefer the API version (broadcasted)
+    const newExpansions = actualExpansions.filter(
+      (expansion) => !apiTxHashes.has(expansion.stakingTxHashHex),
+    );
+
+    // Combine regular delegations with new expansions (no duplicates)
+    const allDelegations = [...delegations, ...newExpansions];
+
+    return allDelegations.map((d) => ({
+      ...d,
+      fp: finalityProviderMap.get(
+        d.finalityProviderBtcPksHex[0],
+      ) as FinalityProvider,
+    }));
+  }, [delegations, expansionDelegations, finalityProviderMap]);
+
+  // Create array for validation using same logic as delegationsWithFP
+  // Add source metadata to distinguish API (broadcasted) vs local storage transactions
+  const delegationsForValidation = useMemo(() => {
+    // Only add expansion transactions that are actual expansions (have previousStakingTxHashHex)
+    const actualExpansions = expansionDelegations.filter(
+      (delegation) => delegation.previousStakingTxHashHex,
+    );
+
+    // Track which expansions exist in API data (these are broadcasted)
+    const apiTxHashes = new Set(delegations.map((d) => d.stakingTxHashHex));
+
+    // Only add expansions that don't already exist in regular delegations (avoid duplicates)
+    const newExpansions = actualExpansions.filter(
+      (expansion) => !apiTxHashes.has(expansion.stakingTxHashHex),
+    );
+
+    // Add source metadata for validation logic
+    const apiDelegationsWithMetadata = delegations.map((d) => ({
+      ...d,
+      _isFromAPI: true, // Broadcasted transactions
+    }));
+
+    const localExpansionsWithMetadata = newExpansions.map((d) => ({
+      ...d,
+      _isFromAPI: false, // Local storage only
+    }));
+
+    // Combine regular delegations with new expansions (no duplicates)
+    return [...apiDelegationsWithMetadata, ...localExpansionsWithMetadata];
+  }, [delegations, expansionDelegations]);
+
+  const validations = useDelegationValidation(delegationsForValidation);
 
   const processing = useMemo(
     () =>
@@ -345,6 +399,7 @@ export function useDelegationService() {
     processing,
     isLoading,
     delegations: delegationsWithFP,
+    rawApiDelegations: rawApiData?.delegations || [], // Pure API data for filtering logic
     validations,
     hasMoreDelegations,
     confirmationModal,

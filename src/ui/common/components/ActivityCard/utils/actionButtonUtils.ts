@@ -12,8 +12,17 @@ export const getActionButton = (
   delegation: DelegationWithFP,
   onAction: (action: ActionType, delegation: DelegationWithFP) => void,
   isStakingManagerReady: boolean,
+  validation?: { valid: boolean; error?: string },
 ): ActivityCardActionButton | undefined => {
   const { state, fp } = delegation;
+
+  // For VERIFIED state delegations, check if they have valid UTXOs
+  if (
+    state === DelegationV2StakingState.VERIFIED &&
+    validation?.valid === false
+  ) {
+    return undefined;
+  }
 
   // Define action mapping
   const actionMap: Record<

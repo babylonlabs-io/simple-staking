@@ -19,6 +19,7 @@ const { coinName, icon } = getNetworkConfigBTC();
 export interface ActivityCardTransformOptions {
   showExpansionSection?: boolean;
   hideExpansionCompletely?: boolean;
+  isBroadcastedVerifiedExpansion?: boolean;
 }
 
 /**
@@ -50,7 +51,15 @@ export function transformDelegationToActivityCard(
   const details: ActivityCardDetailItem[] = [
     {
       label: "Status",
-      value: <Status delegation={delegationWithFP} showTooltip={true} />,
+      value: (
+        <Status
+          delegation={delegationWithFP}
+          showTooltip={true}
+          isBroadcastedVerifiedExpansion={
+            options.isBroadcastedVerifiedExpansion
+          }
+        />
+      ),
     },
     {
       label: "Inception",
@@ -82,11 +91,19 @@ export function transformDelegationToActivityCard(
   let expansionSection: DelegationWithFP | undefined;
   if (options.showExpansionSection) {
     // Check if expansion section should be shown
-    // 1. Delegation is active
-    // 2. Delegation can expand from the api
-    const showExpansionSection =
+    // 1. Delegation is active and can expand (existing logic)
+    // 2. Delegation is a pending expansion transaction (new logic)
+    const isActiveAndCanExpand =
       delegation.state === DelegationV2StakingState.ACTIVE &&
       delegation.canExpand;
+
+    const isPendingExpansion =
+      delegation.previousStakingTxHashHex &&
+      (delegation.state ===
+        DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION ||
+        delegation.state === DelegationV2StakingState.VERIFIED);
+
+    const showExpansionSection = isActiveAndCanExpand || isPendingExpansion;
 
     expansionSection = showExpansionSection ? delegationWithFP : undefined;
   }
@@ -104,5 +121,6 @@ export function transformDelegationToActivityCard(
     groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,
     expansionSection,
     hideExpansionCompletely: options.hideExpansionCompletely,
+    isBroadcastedVerifiedExpansion: options.isBroadcastedVerifiedExpansion,
   };
 }

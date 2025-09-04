@@ -243,11 +243,27 @@ function VerifiedStakeExpansionModalInner({
   onClose,
   processing = false,
 }: VerifiedStakeExpansionModalProps) {
-  const { verifiedExpansions, resumeVerifiedExpansion } =
-    useVerifiedStakingExpansionService();
+  const {
+    verifiedExpansions,
+    selectedDelegationForVerifiedModal,
+    resumeVerifiedExpansion,
+  } = useVerifiedStakingExpansionService();
 
-  // Simple state for tracking expansion process
   const [isExpanding, setIsExpanding] = useState(false);
+
+  // Filter expansions locally to only show those for the selected delegation
+  // This prevents the blinking issue by immediately showing the correct filtered list
+  const filteredExpansions = useMemo(() => {
+    if (!selectedDelegationForVerifiedModal) {
+      return [];
+    }
+
+    return verifiedExpansions.filter(
+      (expansion) =>
+        expansion.previousStakingTxHashHex ===
+        selectedDelegationForVerifiedModal.stakingTxHashHex,
+    );
+  }, [verifiedExpansions, selectedDelegationForVerifiedModal]);
 
   const handleExpand = async (delegation: DelegationV2) => {
     setIsExpanding(true);
@@ -271,7 +287,7 @@ function VerifiedStakeExpansionModalInner({
       </Text>
       <DialogBody className="flex flex-col text-accent-primary gap-4 max-h-[70vh] pb-4 overflow-y-auto no-scrollbar">
         <div className="flex flex-col gap-2">
-          {verifiedExpansions.length === 0 ? (
+          {filteredExpansions.length === 0 ? (
             <div className="text-center py-8">
               <Text variant="body1" className="text-accent-secondary">
                 No verified expansions found.
@@ -279,7 +295,7 @@ function VerifiedStakeExpansionModalInner({
             </div>
           ) : (
             <div className="space-y-3">
-              {verifiedExpansions.map((delegation) => (
+              {filteredExpansions.map((delegation) => (
                 <VerifiedExpansionItem
                   key={delegation.stakingTxHashHex}
                   delegation={delegation}

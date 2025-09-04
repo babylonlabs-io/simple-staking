@@ -45,6 +45,7 @@ export interface ActivityCardData {
   secondaryActions?: ActivityCardActionButton[];
   expansionSection?: DelegationWithFP;
   hideExpansionCompletely?: boolean;
+  isBroadcastedVerifiedExpansion?: boolean;
 }
 
 interface ActivityCardProps {

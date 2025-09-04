@@ -34,6 +34,8 @@ export const REPLAYS_ON_ERROR_RATE = parseFloat(
 
 export const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
 
+export const DEFAULT_BTC_CONFIRMATION_DEPTH = 30;
+
 /**
  * Staking expansion operation types
  */

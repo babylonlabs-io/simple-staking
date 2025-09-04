@@ -16,6 +16,7 @@ import { SlashingContent } from "./SlashingContent";
 interface StatusProps {
   delegation: DelegationWithFP;
   showTooltip?: boolean;
+  isBroadcastedVerifiedExpansion?: boolean;
 }
 
 interface StatusParams {
@@ -30,6 +31,30 @@ type StatusAdapter = (props: StatusParams) => {
 };
 
 const { coinName } = getNetworkConfigBTC();
+
+/**
+ * Helper function to generate status for pending BTC confirmation states
+ * Handles both regular pending and expansion pending states
+ */
+const getPendingBTCConfirmationStatus = (
+  delegation: DelegationWithFP,
+  networkInfo?: NetworkInfo,
+): { label: string; tooltip: string; status?: "warning" | "error" } => {
+  const isExpansion = !!delegation.previousStakingTxHashHex;
+  const confirmationDepth =
+    networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ??
+    30;
+
+  const label = isExpansion
+    ? `Expansion Pending ${coinName} Confirmation`
+    : `Pending ${coinName} Confirmation`;
+
+  const tooltip = isExpansion
+    ? `Stake expansion is pending ${confirmationDepth} ${coinName} confirmations`
+    : `Stake is pending ${confirmationDepth} ${coinName} confirmations`;
+
+  return { label, tooltip };
+};
 
 const STATUSES: Record<string, StatusAdapter> = {
   [State.PENDING]: () => ({
@@ -113,10 +138,10 @@ const STATUSES: Record<string, StatusAdapter> = {
     label: "Pending",
     tooltip: "Stake is pending verification",
   }),
-  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({ networkInfo }) => ({
-    label: `Pending ${coinName} Confirmation`,
-    tooltip: `Stake is pending ${networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0} ${coinName} confirmations`,
-  }),
+  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({
+    delegation,
+    networkInfo,
+  }) => getPendingBTCConfirmationStatus(delegation, networkInfo),
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
     label: "Unbonding",
     tooltip: "Stake unbonding is in progress.",
@@ -167,11 +192,20 @@ const FP_STATUSES: Record<string, Record<string, StatusAdapter>> = {
   [FinalityProviderState.JAILED]: {},
 };
 
-export function Status({ delegation, showTooltip = true }: StatusProps) {
+export function Status({
+  delegation,
+  showTooltip = true,
+  isBroadcastedVerifiedExpansion = false,
+}: StatusProps) {
   const { networkInfo } = useAppState();
 
-  const delegationStatus = useMemo(
-    () =>
+  const delegationStatus = useMemo(() => {
+    // Handle special case: broadcasted VERIFIED expansions should show pending status
+    if (isBroadcastedVerifiedExpansion) {
+      return getPendingBTCConfirmationStatus(delegation, networkInfo);
+    }
+
+    return (
       FP_STATUSES[delegation.fp?.state]?.[delegation.state]?.({
         delegation,
         networkInfo,
@@ -179,15 +213,15 @@ export function Status({ delegation, showTooltip = true }: StatusProps) {
       STATUSES[delegation.state]?.({
         delegation,
         networkInfo,
-      }),
-    [delegation, networkInfo],
-  );
+      })
+    );
+  }, [delegation, networkInfo, isBroadcastedVerifiedExpansion]);
 
   const {
     label = "unknown",
     tooltip = "unknown",
     status,
-  } = delegationStatus ?? {};
+  } = delegationStatus ?? { label: "unknown", tooltip: "unknown" };
 
   return (
     <Hint tooltip={showTooltip ? tooltip : undefined} status={status}>

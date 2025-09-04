@@ -257,6 +257,8 @@ export function useStakingExpansionService() {
           },
           state: DelegationState.INTERMEDIATE_PENDING_VERIFICATION,
           paramsVersion: formData.originalDelegation.paramsVersion || 0,
+          previousStakingTxHashHex:
+            formData.originalDelegation.stakingTxHashHex, // Mark as expansion
         };
 
         addPendingExpansion(pendingDelegation);
