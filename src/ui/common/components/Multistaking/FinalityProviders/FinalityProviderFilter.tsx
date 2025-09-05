@@ -2,21 +2,16 @@ import { Select } from "@babylonlabs-io/core-ui";
 
 import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 
-const options = [
-  { value: "active", label: "Active" },
-  { value: "inactive", label: "Inactive" },
-];
-
 export const FinalityProviderFilter = () => {
-  const { filter, handleFilter } = useFinalityProviderBsnState();
+  const { filter, handleFilter, filterOptions } = useFinalityProviderBsnState();
 
   return (
     <Select
-      options={options}
-      onSelect={(value) => handleFilter("status", value.toString())}
+      options={filterOptions}
+      onSelect={(value) => handleFilter("providerStatus", value.toString())}
       placeholder="Select Status"
-      value={filter.search ? "" : filter.status}
-      disabled={Boolean(filter.search)}
+      value={filter.searchTerm ? "" : filter.providerStatus}
+      disabled={Boolean(filter.searchTerm)}
       renderSelectedOption={(option) => `Showing ${option.label}`}
       className="h-10"
     />

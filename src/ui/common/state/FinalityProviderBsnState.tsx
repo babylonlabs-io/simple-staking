@@ -2,9 +2,19 @@ import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
 import { useSearchParams } from "react-router";
 
+import { BSN_TYPE_COSMOS } from "@/ui/common/api/getBsn";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { useBsn } from "@/ui/common/hooks/client/api/useBsn";
 import { useFinalityProvidersV2 } from "@/ui/common/hooks/client/api/useFinalityProvidersV2";
+import {
+  getBsnConfig,
+  type BsnFilterOption,
+} from "@/ui/common/services/bsnService";
+import {
+  filterFinalityProvidersByBsn,
+  isFinalityProviderRowSelectable,
+  type FinalityProviderFilterState,
+} from "@/ui/common/services/finalityProviderFilterService";
 import { Bsn } from "@/ui/common/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
@@ -19,10 +29,7 @@ interface SortState {
   direction?: "asc" | "desc";
 }
 
-interface FilterState {
-  search: string;
-  status: "active" | "inactive" | "";
-}
+type FilterState = FinalityProviderFilterState;
 
 const { chainId: BBN_CHAIN_ID } = getNetworkConfigBBN();
 
@@ -31,6 +38,7 @@ const defaultBabylonBsn: Bsn = {
   name: "Babylon Genesis",
   description: "Babylon Genesis",
   logoUrl: getBsnLogoUrl(BBN_CHAIN_ID),
+  type: BSN_TYPE_COSMOS,
 };
 
 interface FinalityProviderBsnState {
@@ -45,7 +53,13 @@ interface FinalityProviderBsnState {
   bsnLoading: boolean;
   bsnError: boolean;
   selectedBsnId: string | undefined;
+  // selectedBsn contains allowlist and type data needed for filtering logic
+  // Cannot be derived from selectedBsnId alone as it requires the full BSN object
+  selectedBsn: Bsn | undefined;
   setSelectedBsnId: (id: string | undefined) => void;
+  // BSN Configuration (moved from components to state)
+  modalTitle: string;
+  filterOptions: BsnFilterOption[];
   // Modal
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
@@ -73,29 +87,23 @@ const SORT_DIRECTIONS = {
   asc: undefined,
 } as const;
 
-const STATUS_FILTERS = {
-  active: (fp: FinalityProvider) =>
-    fp.state === FinalityProviderStateEnum.ACTIVE,
-  inactive: (fp: FinalityProvider) =>
-    fp.state !== FinalityProviderStateEnum.ACTIVE,
-};
+// Component-specific constants remain in the state file
 
 const FILTERS = {
-  search: (fp: FinalityProvider, filter: FilterState) => {
-    const searchTerm = filter.search.toLowerCase();
+  searchTerm: (fp: FinalityProvider, filter: FilterState) => {
+    const searchTerm = filter.searchTerm.toLowerCase();
     return (
       (fp.description?.moniker?.toLowerCase().includes(searchTerm) ?? false) ||
       fp.btcPk.toLowerCase().includes(searchTerm)
     );
   },
-  status: (fp: FinalityProvider, filter: FilterState) =>
-    filter.status && !filter.search ? STATUS_FILTERS[filter.status](fp) : true,
 };
 
 const defaultState: FinalityProviderBsnState = {
   filter: {
-    search: "",
-    status: "active",
+    searchTerm: "",
+    providerStatus: "active",
+    allowlistStatus: "",
   },
   finalityProviders: [],
   isFetching: false,
@@ -106,7 +114,16 @@ const defaultState: FinalityProviderBsnState = {
   bsnLoading: false,
   bsnError: false,
   selectedBsnId: undefined,
+  selectedBsn: undefined,
   setSelectedBsnId: () => {},
+  // Default BSN configuration (Babylon Genesis)
+  modalTitle: "Select Babylon Genesis Finality Provider",
+  filterOptions: [
+    { value: "active", label: "Active" },
+    { value: "inactive", label: "Inactive" },
+    { value: "jailed", label: "Jailed" },
+    { value: "slashed", label: "Slashed" },
+  ],
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
@@ -126,11 +143,12 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   );
 
   const [filter, setFilter] = useState<FilterState>({
-    search: fpParam || "",
-    status: "active",
+    searchTerm: fpParam || "",
+    providerStatus: "active",
+    allowlistStatus: "",
   });
   const [sortState, setSortState] = useState<SortState>({});
-  const debouncedSearch = useDebounce(filter.search, 300);
+  const debouncedSearch = useDebounce(filter.searchTerm, 300);
 
   const [selectedBsnId, setSelectedBsnId] = useState<string | undefined>(
     BBN_CHAIN_ID,
@@ -154,6 +172,23 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
   } = useBsn({
     enabled: stakingModalPage === StakingModalPage.BSN,
   });
+
+  const selectedBsn = useMemo(
+    () => bsnList.find((bsn) => bsn.id === selectedBsnId),
+    [bsnList, selectedBsnId],
+  );
+
+  // BSN configuration derived from selected BSN (moved from components)
+  const bsnConfig = useMemo(() => getBsnConfig(selectedBsn), [selectedBsn]);
+
+  const modalTitle = useMemo(
+    () => bsnConfig.modalTitle,
+    [bsnConfig.modalTitle],
+  );
+  const filterOptions = useMemo(
+    () => bsnConfig.filterOptions,
+    [bsnConfig.filterOptions],
+  );
 
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) {
@@ -195,18 +230,25 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     );
   }, []);
 
-  const isRowSelectable = useCallback((row: FinalityProvider) => {
-    return (
-      row.state === FinalityProviderStateEnum.ACTIVE ||
-      row.state === FinalityProviderStateEnum.INACTIVE
-    );
-  }, []);
+  const isRowSelectable = useCallback(
+    (row: FinalityProvider) =>
+      isFinalityProviderRowSelectable(row, selectedBsnId, selectedBsn),
+    [selectedBsnId, selectedBsn],
+  );
 
   const filteredFinalityProviders = useMemo(() => {
-    return finalityProviders.filter((fp: FinalityProvider) =>
-      Object.values(FILTERS).every((filterFn) => filterFn(fp, filter)),
+    // First apply search filter
+    const filtered = finalityProviders.filter((fp: FinalityProvider) =>
+      FILTERS.searchTerm(fp, filter),
     );
-  }, [finalityProviders, filter]);
+
+    // If search is active, return all matching results without status filtering
+    if (filter.searchTerm) {
+      return filtered;
+    }
+
+    return filterFinalityProvidersByBsn(filtered, filter, selectedBsn);
+  }, [finalityProviders, filter, selectedBsn]);
 
   const state = useMemo(
     () => ({
@@ -218,11 +260,15 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       hasNextPage,
       fetchNextPage,
       selectedBsnId,
+      selectedBsn,
       setSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
       isFetching,
       hasError: isError,
+      // BSN Configuration (moved from components to state)
+      modalTitle,
+      filterOptions,
       handleSort,
       handleFilter,
       isRowSelectable,
@@ -238,11 +284,14 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       hasNextPage,
       fetchNextPage,
       selectedBsnId,
+      selectedBsn,
       setSelectedBsnId,
       selectedProviderIds,
       setSelectedProviderIds,
       isFetching,
       isError,
+      modalTitle,
+      filterOptions,
       handleSort,
       handleFilter,
       isRowSelectable,
