@@ -6,7 +6,6 @@ import { Suspense, useEffect, useRef, useState } from "react";
 
 import { NotificationContainer } from "./components/Notification/NotificationContainer";
 import { ErrorProvider } from "./context/Error/ErrorProvider";
-import { BbnRpcProvider } from "./context/rpc/BbnRpcProvider";
 import { BTCWalletProvider } from "./context/wallet/BTCWalletProvider";
 import { CosmosWalletProvider } from "./context/wallet/CosmosWalletProvider";
 import { WalletConnectionProvider } from "./context/wallet/WalletConnectionProvider";
@@ -33,15 +32,13 @@ function Providers({ children }: React.PropsWithChildren) {
             <div ref={appRootRef} className="min-h-screen">
               <QueryClientProvider client={client}>
                 <ErrorProvider>
-                  <BbnRpcProvider>
-                    <WalletConnectionProvider>
-                      <BTCWalletProvider>
-                        <CosmosWalletProvider>
-                          <AppState>{children}</AppState>
-                        </CosmosWalletProvider>
-                      </BTCWalletProvider>
-                    </WalletConnectionProvider>
-                  </BbnRpcProvider>
+                  <WalletConnectionProvider>
+                    <BTCWalletProvider>
+                      <CosmosWalletProvider>
+                        <AppState>{children}</AppState>
+                      </CosmosWalletProvider>
+                    </BTCWalletProvider>
+                  </WalletConnectionProvider>
                 </ErrorProvider>
                 <ReactQueryDevtools
                   buttonPosition="bottom-left"

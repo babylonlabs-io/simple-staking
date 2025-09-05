@@ -27,8 +27,6 @@ const TestWrapper = ({ children }: PropsWithChildren) => (
 );
 
 describe("BalanceState", () => {
-  const mockReconnectRpc = jest.fn();
-
   // Setup common test data
   const mockAvailableUTXOs = [
     { txid: "tx1", vout: 0, value: 100000 },
@@ -58,8 +56,6 @@ describe("BalanceState", () => {
         data: 1000000,
         isLoading: false,
       },
-      hasRpcError: false,
-      reconnectRpc: mockReconnectRpc,
     });
 
     mockUseDelegationV2State.mockReturnValue({
@@ -147,27 +143,6 @@ describe("BalanceState", () => {
       wrapper: TestWrapper,
     });
     expect(result.current.loading).toBe(true);
-  });
-
-  it("should handle RPC error state correctly", () => {
-    mockUseBbnQuery.mockReturnValue({
-      ...mockUseBbnQuery(),
-      hasRpcError: true,
-    });
-
-    const { result } = renderHook(() => useBalanceState(), {
-      wrapper: TestWrapper,
-    });
-    expect(result.current.hasRpcError).toBe(true);
-  });
-
-  it("should provide reconnectRpc method correctly", () => {
-    const { result } = renderHook(() => useBalanceState(), {
-      wrapper: TestWrapper,
-    });
-
-    result.current.reconnectRpc();
-    expect(mockReconnectRpc).toHaveBeenCalled();
   });
 
   it("should handle case when availableUTXOs is undefined", () => {
