@@ -12,7 +12,7 @@ export const FinalityProviderFilter = () => {
       placeholder="Select Status"
       value={filter.searchTerm ? "" : filter.providerStatus}
       disabled={Boolean(filter.searchTerm)}
-      renderSelectedOption={(option) => `Showing ${option.label}`}
+      renderSelectedOption={(option) => `${option.label}`}
       className="h-10"
     />
   );
