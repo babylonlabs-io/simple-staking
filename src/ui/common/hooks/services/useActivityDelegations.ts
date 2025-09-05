@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+
 import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useDelegationService } from "@/ui/common/hooks/services/useDelegationService";
 import { useExpansionVisibilityService } from "@/ui/common/hooks/services/useExpansionVisibilityService";
@@ -55,21 +57,33 @@ export function useActivityDelegations() {
     isStakingManagerReady,
   );
 
-  return {
-    // Transformed data ready for rendering
-    activityData,
+  return useMemo(
+    () => ({
+      // Transformed data ready for rendering
+      activityData,
 
-    // Loading states
-    isLoading: isDelegationLoading,
-    isStakingManagerReady,
+      // Loading states
+      isLoading: isDelegationLoading,
+      isStakingManagerReady,
 
-    // Modal states and actions
-    processing,
-    confirmationModal,
-    executeDelegationAction,
-    closeConfirmationModal,
+      // Modal states and actions
+      processing,
+      confirmationModal,
+      executeDelegationAction,
+      closeConfirmationModal,
 
-    // Raw delegations for modals that need them
-    delegations,
-  };
+      // Raw delegations for modals that need them
+      delegations,
+    }),
+    [
+      activityData,
+      isDelegationLoading,
+      isStakingManagerReady,
+      processing,
+      confirmationModal,
+      executeDelegationAction,
+      closeConfirmationModal,
+      delegations,
+    ],
+  );
 }

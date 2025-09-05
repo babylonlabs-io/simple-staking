@@ -38,7 +38,8 @@ export const isValidBroadcastedExpansion = (
   delegation: DelegationV2,
   publicKeyNoCoord: string | undefined,
 ): boolean => {
-  // Only applies to VERIFIED delegations with previous staking tx
+  // Early return false if delegation is NOT in VERIFIED state
+  // or does NOT have a previous staking tx (not an expansion)
   if (
     delegation.state !== DelegationV2StakingState.VERIFIED ||
     !delegation.previousStakingTxHashHex
