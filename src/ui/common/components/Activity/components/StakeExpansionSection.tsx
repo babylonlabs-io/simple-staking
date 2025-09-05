@@ -36,6 +36,7 @@ export function StakeExpansionSection({
     maxFinalityProviders,
     canExpand,
     openExpansionHistoryModal,
+    disabled,
   } = useStakingExpansionState();
   const { delegations } = useDelegationV2State();
   const { getHistoryCount } = useExpansionHistoryService();
@@ -137,7 +138,10 @@ export function StakeExpansionSection({
 
   return (
     <div className="w-full">
-      <Accordion className="border border-secondary-strokeLight rounded bg-surface">
+      <Accordion
+        disabled={disabled}
+        className="border border-secondary-strokeLight rounded bg-surface"
+      >
         <AccordionSummary
           className="p-4"
           renderIcon={(expanded) =>
