@@ -2,7 +2,6 @@ import { HiddenField } from "@babylonlabs-io/core-ui";
 
 import { AuthGuard } from "@/ui/common/components/Common/AuthGuard";
 import { MultistakingModal } from "@/ui/common/components/Multistaking/MultistakingModal/MultistakingModal";
-import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useStakingState } from "@/ui/common/state/StakingState";
 
 import { AmountSection } from "./AmountSection";
@@ -13,8 +12,7 @@ import { StakingFeesSection } from "./StakingFeesSection";
 import { SubmitButton } from "./SubmitButton";
 
 export function MultistakingFormContent() {
-  const { address } = useBTCWallet();
-  const { stakingInfo, blocked: isGeoBlocked } = useStakingState();
+  const { stakingInfo, blocked: isGeoBlocked, disabled } = useStakingState();
 
   return (
     <>
@@ -37,7 +35,7 @@ export function MultistakingFormContent() {
           <SubmitButton />
         </AuthGuard>
 
-        <FormAlert address={address} isGeoBlocked={isGeoBlocked} />
+        <FormAlert {...disabled} />
       </div>
 
       <MultistakingModal />

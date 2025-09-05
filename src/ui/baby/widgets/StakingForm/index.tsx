@@ -28,6 +28,7 @@ export default function StakingForm({
     babyPrice,
     calculateFee,
     showPreview,
+    disabled,
   } = useStakingState();
 
   const handlePreview = ({
@@ -50,7 +51,7 @@ export default function StakingForm({
 
       <SubmitButton disabled={loading} isGeoBlocked={isGeoBlocked} />
       <StakingModal />
-      <FormAlert isGeoBlocked={isGeoBlocked} />
+      <FormAlert {...disabled} />
     </Form>
   );
 }

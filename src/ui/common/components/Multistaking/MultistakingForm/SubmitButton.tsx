@@ -12,7 +12,7 @@ const BUTTON_STYLES: Record<string, string> = {
 
 export function SubmitButton() {
   const { isValid, isValidating, isLoading } = useFormState();
-  const { blocked: isGeoBlocked } = useStakingState();
+  const { blocked: isGeoBlocked, disabled: isDisabled } = useStakingState();
   const error = useFormError();
 
   const renderText = () => {
@@ -44,7 +44,8 @@ export function SubmitButton() {
         isValidating ||
         isLoading ||
         STAKING_DISABLED ||
-        isGeoBlocked
+        isGeoBlocked ||
+        isDisabled !== undefined
       }
     >
       {renderText()}

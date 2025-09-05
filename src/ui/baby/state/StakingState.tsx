@@ -8,8 +8,10 @@ import { useWalletService } from "@/ui/baby/hooks/services/useWalletService";
 import { validateDecimalPoints } from "@/ui/common/components/Staking/Form/validation/validation";
 import { useError } from "@/ui/common/context/Error/ErrorProvider";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
+import { useHealthCheck } from "@/ui/common/hooks/useHealthCheck";
 import { useLogger } from "@/ui/common/hooks/useLogger";
 import { MultistakingFormFields } from "@/ui/common/state/MultistakingState";
+import { GEO_BLOCK_MESSAGE } from "@/ui/common/types/services/healthCheck";
 import {
   createBalanceValidator,
   createMinAmountValidator,
@@ -64,6 +66,10 @@ interface StakingState {
   submitForm(): Promise<void>;
   resetForm(): void;
   calculateFee: (params: Omit<FormData, "feeAmount">) => Promise<number>;
+  disabled?: {
+    title: string;
+    message: string;
+  };
 }
 
 const { StateProvider, useState: useStakingState } =
@@ -79,12 +85,14 @@ const { StateProvider, useState: useStakingState } =
     closePreview: () => {},
     submitForm: async () => {},
     resetForm: () => {},
+    disabled: undefined,
   });
 
 function StakingState({ children }: PropsWithChildren) {
   const [step, setStep] = useState<StakingStep>({ name: "initial" });
 
   const { stake, sendTx, estimateStakingFee } = useDelegationService();
+  const { isGeoBlocked } = useHealthCheck();
   const { validatorMap, loading } = useValidatorService();
   const { balance } = useWalletService();
   const { handleError } = useError();
@@ -103,6 +111,15 @@ function StakingState({ children }: PropsWithChildren) {
     () => createBalanceValidator(availableBalance),
     [availableBalance],
   );
+
+  const isDisabled = useMemo(() => {
+    if (isGeoBlocked) {
+      return {
+        title: "Unavailable In Your Region",
+        message: GEO_BLOCK_MESSAGE,
+      };
+    }
+  }, [isGeoBlocked]);
 
   const fieldSchemas = useMemo(
     () =>
@@ -253,6 +270,7 @@ function StakingState({ children }: PropsWithChildren) {
       submitForm,
       resetForm,
       closePreview,
+      disabled: isDisabled,
     };
   }, [
     availableBalance,
@@ -266,6 +284,7 @@ function StakingState({ children }: PropsWithChildren) {
     submitForm,
     resetForm,
     closePreview,
+    isDisabled,
   ]);
 
   return <StateProvider value={context}>{children}</StateProvider>;
