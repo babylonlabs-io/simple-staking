@@ -14,7 +14,7 @@ import {
   filterFinalityProvidersByBsn,
   isFinalityProviderRowSelectable,
   type FinalityProviderFilterState,
-} from "@/ui/common/services/finalityProviderService";
+} from "@/ui/common/services/finalityProviderFilterService";
 import { Bsn } from "@/ui/common/types/bsn";
 import {
   FinalityProviderState as FinalityProviderStateEnum,
@@ -60,7 +60,6 @@ interface FinalityProviderBsnState {
   // BSN Configuration (moved from components to state)
   modalTitle: string;
   filterOptions: BsnFilterOption[];
-  fpFilterBehavior: "status-based" | "allowlist-based";
   // Modal
   stakingModalPage: StakingModalPage;
   setStakingModalPage: (page: StakingModalPage) => void;
@@ -125,7 +124,6 @@ const defaultState: FinalityProviderBsnState = {
     { value: "jailed", label: "Jailed" },
     { value: "slashed", label: "Slashed" },
   ],
-  fpFilterBehavior: "status-based",
   isRowSelectable: () => false,
   handleSort: () => {},
   handleFilter: () => {},
@@ -191,10 +189,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     () => bsnConfig.filterOptions,
     [bsnConfig.filterOptions],
   );
-  const fpFilterBehavior = useMemo(
-    () => bsnConfig.fpFilterBehavior,
-    [bsnConfig.fpFilterBehavior],
-  );
 
   const finalityProviders = useMemo(() => {
     if (!data?.finalityProviders) {
@@ -253,13 +247,8 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       return filtered;
     }
 
-    return filterFinalityProvidersByBsn(
-      filtered,
-      filter,
-      selectedBsn,
-      fpFilterBehavior,
-    );
-  }, [finalityProviders, filter, selectedBsn, fpFilterBehavior]);
+    return filterFinalityProvidersByBsn(filtered, filter, selectedBsn);
+  }, [finalityProviders, filter, selectedBsn]);
 
   const state = useMemo(
     () => ({
@@ -280,7 +269,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       // BSN Configuration (moved from components to state)
       modalTitle,
       filterOptions,
-      fpFilterBehavior,
       handleSort,
       handleFilter,
       isRowSelectable,
@@ -304,7 +292,6 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
       isError,
       modalTitle,
       filterOptions,
-      fpFilterBehavior,
       handleSort,
       handleFilter,
       isRowSelectable,

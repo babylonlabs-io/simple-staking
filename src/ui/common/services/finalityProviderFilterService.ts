@@ -38,7 +38,7 @@ const BSN_STATUS_FILTERS = {
 };
 
 /**
- * Creates allowlist filters for BSN-based filtering
+ * Creates allowlist filters for Rollup BSN-based filtering
  */
 export const createAllowlistFilters = (selectedBsn: Bsn | undefined) => {
   const allowSet = new Set((selectedBsn?.allowlist || []).map(normalizeHex));
@@ -81,31 +81,36 @@ export interface FinalityProviderFilterState {
 
 /**
  * Main filtering function that applies BSN-aware filtering logic
- * Handles both allowlist-based and status-based filtering behaviors
+ * Determines filtering behavior based on BSN type: ROLLUP BSNs use allowlist-based filtering,
+ * while BABYLON and COSMOS BSNs use status-based filtering
  */
 export const filterFinalityProvidersByBsn = (
   providers: FinalityProvider[],
   filter: FinalityProviderFilterState,
   selectedBsn: Bsn | undefined,
-  fpFilterBehavior: "status-based" | "allowlist-based",
 ): FinalityProvider[] => {
   let filtered = providers;
 
   // Apply BSN-aware filtering based on provider status
   if (filter.providerStatus) {
-    if (fpFilterBehavior === "allowlist-based") {
+    // Determine filtering behavior based on BSN type
+    const isRollupBsn = selectedBsn?.type === "ROLLUP";
+
+    if (isRollupBsn) {
       // For rollup BSNs: filter FPs by allowlist status or specific states
-      const allowSet = new Set(
-        (selectedBsn?.allowlist || []).map(normalizeHex),
-      );
+      const allowlist = selectedBsn?.allowlist || [];
+      const allowSet = new Set(allowlist.map(normalizeHex));
+      const hasAllowlist = allowlist.length > 0;
 
       filtered = filtered.filter((fp) => {
         const isAllowlisted = allowSet.has(normalizeHex(fp.btcPk));
 
         if (filter.providerStatus === "allowlisted") {
-          return isAllowlisted;
+          // If no allowlist is defined, show non-allowlisted FPs (all FPs)
+          return hasAllowlist ? isAllowlisted : true;
         } else if (filter.providerStatus === "non-allowlisted") {
-          return !isAllowlisted;
+          // If no allowlist is defined, show all FPs as non-allowlisted
+          return hasAllowlist ? !isAllowlisted : true;
         } else if (filter.providerStatus === "slashed") {
           return fp.state === FinalityProviderStateEnum.SLASHED;
         } else if (filter.providerStatus === "jailed") {
@@ -113,8 +118,8 @@ export const filterFinalityProvidersByBsn = (
         }
         return true;
       });
-    } else if (fpFilterBehavior === "status-based") {
-      // For status-based BSNs: filter by finality provider state using BSN-specific filters
+    } else {
+      // For Babylon and Cosmos BSNs: filter by finality provider state using BSN-specific filters
       const bsnKey =
         selectedBsn?.id === BBN_CHAIN_ID
           ? BBN_CHAIN_ID

@@ -1,7 +1,6 @@
 import logger from "@/infrastructure/logger";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 
-import { getBsnAPI } from "../api/getBsn";
 import { Bsn, BsnType } from "../types/bsn";
 import { getBsnLogoUrl } from "../utils/bsnLogo";
 
@@ -15,7 +14,6 @@ export interface BsnFilterOption {
 export interface BsnConfig {
   modalTitle: string;
   filterOptions: BsnFilterOption[];
-  fpFilterBehavior: "status-based" | "allowlist-based";
 }
 
 export const BSN_CONFIGS: Record<string, BsnConfig> = {
@@ -28,7 +26,6 @@ export const BSN_CONFIGS: Record<string, BsnConfig> = {
       { value: "jailed", label: "Jailed" },
       { value: "slashed", label: "Slashed" },
     ],
-    fpFilterBehavior: "status-based",
   },
   COSMOS: {
     modalTitle: "Select Cosmos Finality Provider",
@@ -36,7 +33,6 @@ export const BSN_CONFIGS: Record<string, BsnConfig> = {
       { value: "registered", label: "Registered" },
       { value: "slashed", label: "Slashed" },
     ],
-    fpFilterBehavior: "status-based",
   },
   // Roll-up BSN config
   ROLLUP: {
@@ -47,7 +43,6 @@ export const BSN_CONFIGS: Record<string, BsnConfig> = {
       { value: "slashed", label: "Slashed" },
       { value: "jailed", label: "Jailed" },
     ],
-    fpFilterBehavior: "allowlist-based",
   },
 };
 
@@ -78,12 +73,6 @@ export const getBsnConfig = (bsn?: Bsn): BsnConfig => {
   return config;
 };
 
-/**
- * Determines if a BSN is Babylon Genesis
- */
-export const isBabylonGenesisBsn = (bsn: Bsn): boolean =>
-  bsn.id === BBN_CHAIN_ID;
-
 export const createBSN = (bsn: {
   id: string;
   name: string;
@@ -100,10 +89,3 @@ export const createBSN = (bsn: {
   type: bsn.type,
   allowlist: bsn.allowlist,
 });
-
-/**
- */
-export const getBSNs = async (): Promise<Bsn[]> => {
-  const data = await getBsnAPI();
-  return data.map(createBSN);
-};
