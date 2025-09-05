@@ -22,10 +22,12 @@ import { ExpansionButton } from "./ExpansionButton";
 
 interface StakeExpansionSectionProps {
   delegation: DelegationWithFP;
+  isPendingExpansion?: boolean;
 }
 
 export function StakeExpansionSection({
   delegation,
+  isPendingExpansion = false,
 }: StakeExpansionSectionProps) {
   const {
     goToStep,
@@ -158,13 +160,18 @@ export function StakeExpansionSection({
               text="Add BSNs and Finality Providers"
               counter={`${currentBsnCount}/${maxFinalityProviders}`}
               onClick={handleAddBsnFp}
-              disabled={!canExpandDelegation || processing || isUTXOsLoading}
+              disabled={
+                !canExpandDelegation ||
+                processing ||
+                isUTXOsLoading ||
+                isPendingExpansion
+              }
             />
             <ExpansionButton
               Icon={iconRenew}
               text="Renew Staking Term"
               onClick={handleRenewStakingTerm}
-              disabled={processing || isUTXOsLoading}
+              disabled={processing || isUTXOsLoading || isPendingExpansion}
             />
             <ExpansionButton
               Icon={iconHistory}

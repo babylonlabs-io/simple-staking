@@ -35,6 +35,12 @@ export const REPLAYS_ON_ERROR_RATE = parseFloat(
 export const DEFAULT_MAX_FINALITY_PROVIDERS = 1;
 
 /**
+ * Default Bitcoin confirmation depth required for transactions
+ * Used when network info is not available
+ */
+export const DEFAULT_CONFIRMATION_DEPTH = 30;
+
+/**
  * Staking expansion operation types
  */
 export const EXPANSION_OPERATIONS = {

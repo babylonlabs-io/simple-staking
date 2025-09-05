@@ -14,6 +14,7 @@ import { VerificationModal } from "@/ui/common/components/Modals/VerificationMod
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { DEFAULT_CONFIRMATION_DEPTH } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingService } from "@/ui/common/hooks/services/useStakingService";
@@ -68,7 +69,7 @@ export function MultistakingModal() {
   const btcInUsd = usePrice(coinSymbol);
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam
-      ?.btcConfirmationDepth || 30;
+      ?.btcConfirmationDepth || DEFAULT_CONFIRMATION_DEPTH;
 
   const currentFinalityProviders = useWatch<
     { finalityProviders: Record<string, string> | string[] | undefined },

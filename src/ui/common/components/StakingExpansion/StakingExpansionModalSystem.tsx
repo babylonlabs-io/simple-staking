@@ -9,7 +9,11 @@ import { VerificationModal } from "@/ui/common/components/Modals/VerificationMod
 import { FinalityProviderLogo } from "@/ui/common/components/Staking/FinalityProviders/FinalityProviderLogo";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
-import { BaseStakingStep, EOIStep } from "@/ui/common/constants";
+import {
+  BaseStakingStep,
+  DEFAULT_CONFIRMATION_DEPTH,
+  EOIStep,
+} from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingExpansionService } from "@/ui/common/hooks/services/useStakingExpansionService";
@@ -263,7 +267,7 @@ function StakingExpansionModalSystemInner() {
               }}
               warnings={[
                 `1. No third party possesses your staked ${coinSymbol}. You are the only one who can unbond and withdraw your stake.`,
-                `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${networkInfoData?.params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth ?? 30} Bitcoin confirmations.`,
+                `2. Your stake will first be sent to Babylon Genesis for verification (~20 seconds), then you will be prompted to submit it to the Bitcoin ledger. It will be marked as 'Pending' until it receives ${networkInfoData?.params?.btcEpochCheckParams?.latestParam?.btcConfirmationDepth ?? DEFAULT_CONFIRMATION_DEPTH} Bitcoin confirmations.`,
                 "3. Please note: submitting this transaction will reset your stake's timelock.",
               ]}
             />
