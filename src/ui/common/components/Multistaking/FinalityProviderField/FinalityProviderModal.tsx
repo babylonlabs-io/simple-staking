@@ -8,6 +8,7 @@ import { useState } from "react";
 
 import { ResponsiveDialog } from "@/ui/common/components/Modals/ResponsiveDialog";
 import { FinalityProviders } from "@/ui/common/components/Multistaking/FinalityProviderField/FinalityProviders";
+import { useFinalityProviderBsnState } from "@/ui/common/state/FinalityProviderBsnState";
 
 interface Props {
   open: boolean;
@@ -27,6 +28,7 @@ export const FinalityProviderModal = ({
   onBack,
 }: Props) => {
   const [selectedFP, setSelectedFp] = useState(defaultFinalityProvider);
+  const { modalTitle } = useFinalityProviderBsnState();
 
   const handleClose = () => {
     onClose();
@@ -36,7 +38,7 @@ export const FinalityProviderModal = ({
   return (
     <ResponsiveDialog open={open} onClose={handleClose} className="w-[52rem]">
       <DialogHeader
-        title="Select Finality Provider"
+        title={modalTitle}
         onClose={handleClose}
         className="text-accent-primary"
       />

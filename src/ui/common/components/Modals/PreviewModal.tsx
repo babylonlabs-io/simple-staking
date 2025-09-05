@@ -12,6 +12,7 @@ import { Fragment } from "react";
 
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
+import { DEFAULT_CONFIRMATION_DEPTH } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useIsMobileView } from "@/ui/common/hooks/useBreakpoint";
@@ -57,7 +58,7 @@ export const PreviewModal = ({
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam
-      ?.btcConfirmationDepth || 30;
+      ?.btcConfirmationDepth || DEFAULT_CONFIRMATION_DEPTH;
   const unbondingTime =
     blocksToDisplayTime(
       networkInfo?.params.bbnStakingParams?.latestParam?.unbondingTime,

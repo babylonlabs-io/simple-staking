@@ -1,6 +1,6 @@
+import { Hint } from "@babylonlabs-io/core-ui";
 import { FaBitcoin } from "react-icons/fa";
 
-import { Hint } from "@/ui/common/components/Common/Hint";
 import { DelegationActions } from "@/ui/common/components/Delegations/DelegationActions";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/ui/common/constants";

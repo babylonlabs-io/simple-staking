@@ -3,6 +3,7 @@ import { PreviewModal, useFormContext } from "@babylonlabs-io/core-ui";
 import babylon from "@/infrastructure/babylon";
 import { ValidatorAvatar } from "@/ui/baby/components/ValidatorAvatar";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
+import { DEFAULT_CONFIRMATION_DEPTH } from "@/ui/common/constants";
 import { useNetworkInfo } from "@/ui/common/hooks/client/api/useNetworkInfo";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
 
@@ -17,7 +18,7 @@ export function StakingModal() {
   const { data: networkInfo } = useNetworkInfo();
   const confirmationDepth =
     networkInfo?.params.btcEpochCheckParams?.latestParam
-      ?.btcConfirmationDepth || 30;
+      ?.btcConfirmationDepth || DEFAULT_CONFIRMATION_DEPTH;
   const processingHours = Math.ceil(confirmationDepth / 6);
   const processingHourLabel = processingHours === 1 ? "hour" : "hours";
   const warnings = [

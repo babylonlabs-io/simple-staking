@@ -1,6 +1,6 @@
+import { Hint } from "@babylonlabs-io/core-ui";
 import { useMemo, type JSX } from "react";
 
-import { Hint } from "@/ui/common/components/Common/Hint";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { DOCUMENTATION_LINKS } from "@/ui/common/constants";
 import { useAppState } from "@/ui/common/state";
@@ -30,6 +30,29 @@ type StatusAdapter = (props: StatusParams) => {
 };
 
 const { coinName } = getNetworkConfigBTC();
+
+/**
+ * Helper function to get the status info for INTERMEDIATE_PENDING_BTC_CONFIRMATION state
+ * Handles both regular staking and expansion scenarios
+ */
+const getIntermediatePendingBtcStatus = ({
+  delegation,
+  networkInfo,
+}: StatusParams) => {
+  const confirmationDepth =
+    networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ??
+    0;
+  const isExpansion = !!delegation.previousStakingTxHashHex;
+
+  return {
+    label: isExpansion
+      ? `Expansion Pending ${coinName} Confirmation`
+      : `Pending ${coinName} Confirmation`,
+    tooltip: isExpansion
+      ? `Stake expansion is pending ${confirmationDepth} ${coinName} confirmations`
+      : `Stake is pending ${confirmationDepth} ${coinName} confirmations`,
+  };
+};
 
 const STATUSES: Record<string, StatusAdapter> = {
   [State.PENDING]: () => ({
@@ -113,10 +136,8 @@ const STATUSES: Record<string, StatusAdapter> = {
     label: "Pending",
     tooltip: "Stake is pending verification",
   }),
-  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]: ({ networkInfo }) => ({
-    label: `Pending ${coinName} Confirmation`,
-    tooltip: `Stake is pending ${networkInfo?.params?.btcEpochCheckParams.latestParam.btcConfirmationDepth ?? 0} ${coinName} confirmations`,
-  }),
+  [State.INTERMEDIATE_PENDING_BTC_CONFIRMATION]:
+    getIntermediatePendingBtcStatus,
   [State.INTERMEDIATE_UNBONDING_SUBMITTED]: () => ({
     label: "Unbonding",
     tooltip: "Stake unbonding is in progress.",

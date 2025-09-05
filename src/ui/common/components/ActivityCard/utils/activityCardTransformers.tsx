@@ -19,6 +19,7 @@ const { coinName, icon } = getNetworkConfigBTC();
 export interface ActivityCardTransformOptions {
   showExpansionSection?: boolean;
   hideExpansionCompletely?: boolean;
+  isBroadcastedExpansion?: boolean;
 }
 
 /**
@@ -32,7 +33,7 @@ export function transformDelegationToActivityCard(
   indexLabel?: string,
 ): ActivityCardData {
   // Create a delegation with FP for the Status component if not already present
-  const delegationWithFP =
+  let delegationWithFP =
     "fp" in delegation
       ? delegation
       : ({
@@ -46,6 +47,14 @@ export function transformDelegationToActivityCard(
                 finalityProviderMap.get(delegation.finalityProviderBtcPksHex[0])
               : undefined,
         } as DelegationWithFP);
+
+  // Transform the state for broadcasted expansions to show correct status
+  if (options.isBroadcastedExpansion) {
+    delegationWithFP = {
+      ...delegationWithFP,
+      state: DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
+    };
+  }
 
   const details: ActivityCardDetailItem[] = [
     {
@@ -80,21 +89,32 @@ export function transformDelegationToActivityCard(
 
   // Handle expansion section if options specify it
   let expansionSection: DelegationWithFP | undefined;
+  let isPendingExpansion = false;
+
   if (options.showExpansionSection) {
     // Check if expansion section should be shown
-    // 1. Delegation is active
-    // 2. Delegation can expand from the api
-    const showExpansionSection =
+    // 1. Delegation is active and can expand from the api
+    // 2. OR delegation is a broadcasted VERIFIED expansion (waiting for confirmations)
+    const isActiveExpandable =
       delegation.state === DelegationV2StakingState.ACTIVE &&
       delegation.canExpand;
 
-    expansionSection = showExpansionSection ? delegationWithFP : undefined;
+    const showExpansionSection =
+      isActiveExpandable || options.isBroadcastedExpansion;
+
+    if (showExpansionSection) {
+      expansionSection = delegationWithFP;
+      isPendingExpansion = !!options.isBroadcastedExpansion;
+    }
   }
 
   const baseAmount = `${maxDecimals(satoshiToBtc(delegation.stakingAmount), 8)} ${coinName}`;
   const formattedAmount = indexLabel
     ? `${indexLabel} - ${baseAmount}`
     : baseAmount;
+
+  // Determine if we should show the expansion pending banner
+  const showExpansionPendingBanner = !!options.isBroadcastedExpansion;
 
   return {
     formattedAmount,
@@ -103,6 +123,8 @@ export function transformDelegationToActivityCard(
     details,
     groupedDetails: groupedDetails.length > 0 ? groupedDetails : undefined,
     expansionSection,
+    isPendingExpansion,
+    showExpansionPendingBanner,
     hideExpansionCompletely: options.hideExpansionCompletely,
   };
 }

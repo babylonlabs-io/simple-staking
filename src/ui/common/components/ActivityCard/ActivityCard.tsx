@@ -1,3 +1,4 @@
+import { ExpansionPendingBanner } from "@/ui/common/components/Activity/components/ExpansionPendingBanner";
 import { StakeExpansionSection } from "@/ui/common/components/Activity/components/StakeExpansionSection";
 import { DelegationWithFP } from "@/ui/common/types/delegationsV2";
 import FeatureFlagService from "@/ui/common/utils/FeatureFlagService";
@@ -44,6 +45,8 @@ export interface ActivityCardData {
   primaryAction?: ActivityCardActionButton;
   secondaryActions?: ActivityCardActionButton[];
   expansionSection?: DelegationWithFP;
+  isPendingExpansion?: boolean;
+  showExpansionPendingBanner?: boolean;
   hideExpansionCompletely?: boolean;
 }
 
@@ -66,18 +69,19 @@ export function ActivityCard({ data, className }: ActivityCardProps) {
         iconAlt={data.iconAlt}
         primaryAction={data.primaryAction}
       />
-
       <ActivityCardDetailsSection
         details={data.details}
         optionalDetails={data.optionalDetails}
         listItems={data.listItems}
         groupedDetails={data.groupedDetails}
       />
-
+      {data.showExpansionPendingBanner && <ExpansionPendingBanner />}
       {shouldShowExpansion && data.expansionSection && (
-        <StakeExpansionSection delegation={data.expansionSection} />
+        <StakeExpansionSection
+          delegation={data.expansionSection}
+          isPendingExpansion={data.isPendingExpansion}
+        />
       )}
-
       {data.secondaryActions && data.secondaryActions.length > 0 && (
         <ActivityCardActionSection actions={data.secondaryActions} />
       )}

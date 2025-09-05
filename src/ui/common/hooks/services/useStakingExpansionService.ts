@@ -17,6 +17,7 @@ import {
   DelegationV2,
 } from "@/ui/common/types/delegationsV2";
 import { retry } from "@/ui/common/utils";
+import { markExpansionAsBroadcasted } from "@/ui/common/utils/local_storage/expansionStorage";
 import { getTxHex } from "@/ui/common/utils/mempool_api";
 import { validateExpansionFormData } from "@/ui/common/utils/stakingExpansionValidation";
 
@@ -388,6 +389,12 @@ export function useStakingExpansionService() {
           DelegationState.INTERMEDIATE_PENDING_BTC_CONFIRMATION,
         );
 
+        // Mark expansion as broadcasted in localStorage for visibility tracking
+        markExpansionAsBroadcasted(
+          delegation.stakingTxHashHex,
+          publicKeyNoCoord,
+        );
+
         // Navigate to success
         goToStep(StakingExpansionStep.FEEDBACK_SUCCESS);
         setProcessing(false);
@@ -409,6 +416,7 @@ export function useStakingExpansionService() {
       reset,
       isUTXOsLoading,
       availableUTXOs,
+      publicKeyNoCoord,
     ],
   );
 
