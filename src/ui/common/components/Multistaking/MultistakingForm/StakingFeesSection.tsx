@@ -11,7 +11,6 @@ import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { BBN_FEE_AMOUNT } from "@/ui/common/constants";
 import { usePrice } from "@/ui/common/hooks/client/api/usePrices";
 import { useStakingService } from "@/ui/common/hooks/services/useStakingService";
-import { useStakingState } from "@/ui/common/state/StakingState";
 import { satoshiToBtc } from "@/ui/common/utils/btc";
 import { calculateTokenValueInCurrency } from "@/ui/common/utils/formatCurrency";
 import { maxDecimals } from "@/ui/common/utils/maxDecimals";
@@ -30,17 +29,6 @@ export function StakingFeesSection() {
   );
 
   const { calculateFeeAmount } = useStakingService();
-  const { stakingInfo } = useStakingState();
-
-  useEffect(() => {
-    if (stakingInfo?.defaultFeeRate !== undefined) {
-      setValue("feeRate", stakingInfo.defaultFeeRate.toString(), {
-        shouldValidate: true,
-        shouldDirty: true,
-        shouldTouch: true,
-      });
-    }
-  }, [stakingInfo?.defaultFeeRate, setValue]);
 
   useEffect(() => {
     let cancelled = false;
@@ -162,6 +150,7 @@ export function StakingFeesSection() {
         open={feeModalVisible}
         onClose={() => setFeeModalVisible(false)}
         onSubmit={handleFeeRateSubmit}
+        currentFeeRate={Number(feeRate || 0)}
       />
     </>
   );

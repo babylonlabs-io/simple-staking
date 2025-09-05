@@ -13,6 +13,7 @@ interface TabsProps {
   activeTab?: string;
   onTabChange?: (tabId: string) => void;
   className?: string;
+  keepMounted?: boolean;
 }
 
 export const Tabs = ({
@@ -21,6 +22,7 @@ export const Tabs = ({
   activeTab: controlledActiveTab,
   onTabChange,
   className,
+  keepMounted,
 }: TabsProps) => {
   const [internalActiveTab, setInternalActiveTab] = useState(
     defaultActiveTab || items[0]?.id || "",
@@ -69,14 +71,30 @@ export const Tabs = ({
         ))}
       </div>
 
-      <div
-        className="mt-6 min-h-[450px]"
-        role="tabpanel"
-        id={`panel-${activeTab}`}
-        aria-labelledby={`tab-${activeTab}`}
-      >
-        {activeContent}
-      </div>
+      {keepMounted ? (
+        <div className="mt-6 min-h-[450px]">
+          {items.map((item) => (
+            <div
+              key={item.id}
+              role="tabpanel"
+              id={`panel-${item.id}`}
+              aria-labelledby={`tab-${item.id}`}
+              className={twMerge(activeTab === item.id ? "" : "hidden")}
+            >
+              {item.content}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div
+          className="mt-6 min-h-[450px]"
+          role="tabpanel"
+          id={`panel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+        >
+          {activeContent}
+        </div>
+      )}
     </div>
   );
 };

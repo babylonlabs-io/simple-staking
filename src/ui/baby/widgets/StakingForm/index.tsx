@@ -8,6 +8,8 @@ import { SubmitButton } from "@/ui/baby/widgets/SubmitButton";
 import { ValidatorField } from "@/ui/baby/widgets/ValidatorField";
 import { FormAlert } from "@/ui/common/components/Multistaking/MultistakingForm/FormAlert";
 
+import { BabyFormPersistence } from "./BabyFormPersistence";
+
 interface FormFields {
   amount: number;
   validatorAddresses: string[];
@@ -44,6 +46,7 @@ export default function StakingForm({
       className="flex flex-col gap-2 h-[500px]"
       onSubmit={handlePreview}
     >
+      <BabyFormPersistence />
       <AmountField balance={availableBalance} price={babyPrice} />
       <ValidatorField />
       <FeeField babyPrice={babyPrice} calculateFee={calculateFee} />

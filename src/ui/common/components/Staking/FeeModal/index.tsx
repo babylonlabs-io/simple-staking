@@ -22,9 +22,15 @@ interface FeeModalProps {
   open?: boolean;
   onSubmit?: (value: number) => void;
   onClose?: () => void;
+  currentFeeRate?: number;
 }
 
-export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
+export function FeeModal({
+  open,
+  onSubmit,
+  onClose,
+  currentFeeRate,
+}: FeeModalProps) {
   const [selectedValue, setSelectedValue] = useState("");
   const [customFee, setCustomFee] = useState("");
   const customFeeRef = useRef<HTMLInputElement>(null);
@@ -44,6 +50,32 @@ export function FeeModal({ open, onSubmit, onClose }: FeeModalProps) {
       customFeeRef.current?.focus();
     }
   }, [selectedValue]);
+
+  // Initialize selection based on current fee rate when opening
+  useEffect(() => {
+    if (!open || isLoading) return;
+
+    const fee = Number(currentFeeRate);
+    if (!fee || !Number.isFinite(fee)) {
+      setSelectedValue("");
+      setCustomFee("");
+      return;
+    }
+
+    if (fee === fastestFee) {
+      setSelectedValue("fast");
+      setCustomFee("");
+    } else if (fee === mediumFee) {
+      setSelectedValue("medium");
+      setCustomFee("");
+    } else if (fee === lowestFee) {
+      setSelectedValue("slow");
+      setCustomFee("");
+    } else {
+      setSelectedValue("custom");
+      setCustomFee(fee.toString());
+    }
+  }, [open, isLoading, currentFeeRate, fastestFee, mediumFee, lowestFee]);
 
   const feeOptions = [
     {
