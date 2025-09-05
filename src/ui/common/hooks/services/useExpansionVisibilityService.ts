@@ -1,32 +1,19 @@
 import { useCallback } from "react";
 
-import { useDelegationStorage } from "@/ui/common/hooks/storage/useDelegationStorage";
-import { useStakingExpansionState } from "@/ui/common/state/StakingExpansionState";
 import {
   DelegationV2,
   DelegationV2StakingState,
 } from "@/ui/common/types/delegationsV2";
-import { getExpansionsLocalStorageKey } from "@/ui/common/utils/local_storage/getExpansionsLocalStorageKey";
+import { isExpansionBroadcasted } from "@/ui/common/utils/local_storage/expansionStorage";
 
 /**
  * Hook providing expansion visibility services.
- * Centralizes complex logic for determining which delegations should be visible
+ * Centralizes logic for determining which delegations should be visible
  * in different UI parts (Activity tab vs Verified Expansion Modal).
  */
 export function useExpansionVisibilityService(
   publicKeyNoCoord: string | undefined,
 ) {
-  const { expansions } = useStakingExpansionState();
-
-  // Access expansion localStorage for broadcast status detection
-  const expansionStorageKey = getExpansionsLocalStorageKey(publicKeyNoCoord);
-
-  // Get pending delegations from localStorage to check broadcast status
-  const { delegations: expansionStorageDelegations } = useDelegationStorage(
-    expansionStorageKey,
-    expansions ?? [],
-  );
-
   /**
    * Checks if a delegation is a broadcasted expansion.
    * A broadcasted expansion must meet both criteria:
@@ -40,19 +27,18 @@ export function useExpansionVisibilityService(
         return false;
       }
 
-      // Then check if this delegation exists in localStorage with INTERMEDIATE_PENDING_BTC_CONFIRMATION status
-      const storedDelegation = (expansionStorageDelegations ?? []).find(
-        (stored) =>
-          stored.stakingTxHashHex.toLowerCase() ===
-          delegation.stakingTxHashHex.toLowerCase(),
-      );
+      // Check if this is an expansion (has previousStakingTxHashHex)
+      if (!delegation.previousStakingTxHashHex) {
+        return false;
+      }
 
-      return (
-        storedDelegation?.state ===
-        DelegationV2StakingState.INTERMEDIATE_PENDING_BTC_CONFIRMATION
+      // Then check directly in localStorage if it's been broadcasted
+      return isExpansionBroadcasted(
+        delegation.stakingTxHashHex,
+        publicKeyNoCoord,
       );
     },
-    [expansionStorageDelegations],
+    [publicKeyNoCoord],
   );
 
   /**
