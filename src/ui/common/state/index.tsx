@@ -18,12 +18,14 @@ import { BalanceState } from "./BalanceState";
 import { DelegationState } from "./DelegationState";
 import { DelegationV2State } from "./DelegationV2State";
 import { FinalityProviderState } from "./FinalityProviderState";
+import { FormPersistenceState } from "./FormPersistenceState";
 import { RewardsState } from "./RewardState";
 import { StakingExpansionState } from "./StakingExpansionState";
 import { StakingState } from "./StakingState";
 
 // The order of the states is important for the state provider
 const STATE_LIST = [
+  FormPersistenceState,
   DelegationState,
   DelegationV2State,
   FinalityProviderState,

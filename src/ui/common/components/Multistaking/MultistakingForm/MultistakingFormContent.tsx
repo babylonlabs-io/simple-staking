@@ -6,6 +6,7 @@ import { useBTCWallet } from "@/ui/common/context/wallet/BTCWalletProvider";
 import { useStakingState } from "@/ui/common/state/StakingState";
 
 import { AmountSection } from "./AmountSection";
+import { BtcFormPersistence } from "./BtcFormPersistence";
 import { ConnectButton } from "./ConnectButton";
 import { FinalityProvidersSection } from "./FinalityProvidersSection";
 import { FormAlert } from "./FormAlert";
@@ -27,6 +28,8 @@ export function MultistakingFormContent() {
 
       <HiddenField name="feeRate" defaultValue="0" />
       <HiddenField name="feeAmount" defaultValue="0" />
+
+      <BtcFormPersistence />
 
       <div className="flex flex-col gap-2">
         <FinalityProvidersSection />

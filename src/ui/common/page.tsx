@@ -68,6 +68,7 @@ const Home = () => {
         defaultActiveTab="stake"
         activeTab={activeTab}
         onTabChange={setActiveTab}
+        keepMounted
       />
     </Container>
   );
