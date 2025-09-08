@@ -1,5 +1,11 @@
 import { useDebounce } from "@uidotdev/usehooks";
-import { useCallback, useMemo, useState, type PropsWithChildren } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type PropsWithChildren,
+} from "react";
 import { useSearchParams } from "react-router";
 
 import { BSN_TYPE_COSMOS } from "@/ui/common/api/getBsn";
@@ -89,6 +95,20 @@ const SORT_DIRECTIONS = {
 
 // Component-specific constants remain in the state file
 
+/**
+ * Get default provider status based on BSN type
+ */
+export const getDefaultProviderStatus = (
+  bsn?: Bsn,
+): FinalityProviderFilterState["providerStatus"] => {
+  if (!bsn || bsn.id === BBN_CHAIN_ID) return "active";
+  return bsn.type === "COSMOS"
+    ? "registered"
+    : bsn.type === "ROLLUP"
+      ? "allowlisted"
+      : "active";
+};
+
 const FILTERS = {
   searchTerm: (fp: FinalityProvider, filter: FilterState) => {
     const searchTerm = filter.searchTerm.toLowerCase();
@@ -102,7 +122,7 @@ const FILTERS = {
 const defaultState: FinalityProviderBsnState = {
   filter: {
     searchTerm: "",
-    providerStatus: "active",
+    providerStatus: getDefaultProviderStatus(),
     allowlistStatus: "",
   },
   finalityProviders: [],
@@ -144,7 +164,7 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
 
   const [filter, setFilter] = useState<FilterState>({
     searchTerm: fpParam || "",
-    providerStatus: "active",
+    providerStatus: getDefaultProviderStatus(),
     allowlistStatus: "",
   });
   const [sortState, setSortState] = useState<SortState>({});
@@ -177,6 +197,16 @@ export function FinalityProviderBsnState({ children }: PropsWithChildren) {
     () => bsnList.find((bsn) => bsn.id === selectedBsnId),
     [bsnList, selectedBsnId],
   );
+
+  useEffect(() => {
+    const newProviderStatus = getDefaultProviderStatus(selectedBsn);
+    if (newProviderStatus !== filter.providerStatus) {
+      setFilter((prevFilter) => ({
+        ...prevFilter,
+        providerStatus: newProviderStatus,
+      }));
+    }
+  }, [selectedBsn, filter.providerStatus]);
 
   // BSN configuration derived from selected BSN (moved from components)
   const bsnConfig = useMemo(() => getBsnConfig(selectedBsn), [selectedBsn]);
