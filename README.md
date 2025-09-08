@@ -1,3 +1,11 @@
+# ⚠️ Repository Archived
+
+**This repository has been archived and moved to the [Babylon TypeScript Monorepo](https://github.com/babylonlabs-io/babylon-toolkit).**
+
+Please refer to the new location for the latest version of the Bitcoin Staking and BABY staking dApp and all future development.
+
+---
+
 # Bitcoin Staking dApp
 
 The Bitcoin Staking dApp is a web application integrating with extension
