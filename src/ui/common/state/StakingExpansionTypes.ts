@@ -60,6 +60,8 @@ export interface StakingExpansionState {
   // Core state properties
   /** Indicates if there's an error in the expansion process */
   hasError: boolean;
+  /** Indicates if the expansion is disabled */
+  disabled: boolean;
   /** Indicates if an operation is currently in progress */
   processing: boolean;
   /** Human-readable error message for user display */

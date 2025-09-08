@@ -8,7 +8,6 @@ import { useCallback, type PropsWithChildren } from "react";
 import { useLocation } from "react-router";
 
 import { logTermsAcceptance } from "@/ui/common/api/logTermAcceptance";
-import { verifyBTCAddress } from "@/ui/common/api/verifyBTCAddress";
 import { getNetworkConfigBBN } from "@/ui/common/config/network/bbn";
 import { getNetworkConfigBTC } from "@/ui/common/config/network/btc";
 import { ClientError, ERROR_CODES } from "@/ui/common/errors";
@@ -21,7 +20,6 @@ const context = typeof window !== "undefined" ? window : {};
 
 const lifecycleHooks = {
   acceptTermsOfService: logTermsAcceptance,
-  verifyBTCAddress: verifyBTCAddress,
 };
 
 const config: ChainConfigArr = [
